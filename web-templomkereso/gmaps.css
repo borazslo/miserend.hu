@@ -1,0 +1,376 @@
+.map { 
+      /* The following are required to allow absolute positioning of the
+       * info window at the bottom right of the map, and for it to be hidden
+       * when it is "off map" 
+       */
+      position: relative; 
+      overflow: hidden; 
+      height: 100%;
+	 }
+#map_canvas {
+	min-height: 100%;
+	width: 100%;
+	margin-top: 35px;
+	overflow: hidden;
+	z-index:0;
+	}	
+	
+	
+    #placeDetails { 
+      position: absolute;
+      width: 330px;
+      top: 0;
+	  height: 100%;
+      right: -350px;
+      padding-left: 10px;
+      padding-right: 10px;
+	  padding-top: 30px;
+
+      /* Semi-transparent background */
+      background-color: rgba(0,0,0,0.8);
+      color: white;
+      font-size: 80%;
+
+      /* Rounded top left corner */
+      border-top-left-radius: 15px;
+      -moz-border-radius-topleft: 15px;
+      -webkit-border-top-left-radius: 15px;
+    }
+	
+
+#placeDetails a {
+ color: white;   
+    
+}
+    /* Fit the text nicely inside the box */
+    h1 {
+      font-family: sans-serif;
+      margin-bottom: 0;
+    }
+    #placeDetails p {
+      margin-top: 0;
+    }
+	#suggestion {
+		visibility: hidden;
+	}
+	
+	
+	 #topbar { 
+	 
+	  position: absolute;
+	  overflow: hidden;
+     
+	  padding-left: 10px;
+      padding-right: 10px;
+	  padding-top: 8px;
+	  padding-bottom: 3px;
+	  
+      /* Semi-transparent background */
+      /*background-color: rgba(0,0,0,0.8);*/
+	  
+    backgorund-color: white;
+
+      color: white;
+      font-size: 80%;
+	  z-index:3;
+
+      /* Rounded top left corner 
+      border-bottom-left-radius: 15px;
+      -moz-border-radius-topleft: 15px;
+      -webkit-border-top-left-radius: 15px; */
+   
+    }
+	
+	body {
+	background-color: #000000;
+	color: #ffffff;
+	padding: 0;
+	margin: 0;
+	}
+
+	#percent {
+    height: 30px;
+    width: 30%;
+    right: 0;
+    position: absolute;
+    padding-right: 10px;
+    padding-top: 8px;
+    z-index: 3;
+;
+}
+
+#percent_c {
+    background-color: #5ffa69;
+    height: 17px;
+    float: right;
+}
+
+#percent_uc {
+    background-color: yellow;
+    height: 17px;
+    float: right;
+}
+
+#percent_u {
+    background-color: red;
+    height: 17px;
+    float: right;
+}
+
+#percent_u {
+    border-bottom-right-radius: 3px;
+    -moz-border-radius-topright: 3px;
+    -webkit-border-top-right-radius: 3px;
+}
+
+#percent_c {
+    border-bottom-left-radius: 3px;
+    -moz-border-radius-topleft: 3px;
+    -webkit-border-top-left-radius: 3px;
+}
+
+
+#percent_u, .span {
+    color: black;
+    padding-top: 1px;
+    padding-bottom: 0px;
+    padding-left: 3px;
+    font-size: 15px;
+}
+
+#percent_uc, .span {
+    color: black;
+    padding-top: 1px;
+    padding-bottom: 0px;
+    padding-left: 3px;
+    font-size: 15px;
+}
+
+#percent_c, .span {
+    color: black;
+    padding-top: 1px;
+    padding-bottom: 0px;
+    padding-right: 3px;
+    font-size: 15px;
+}
+
+#insert_response {
+    padding-top: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 13px;
+    margin-bottom: 5px;
+    background-color: yellow;
+    color: black;
+}
+
+#geocode-input {
+    padding-top: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
+    margin-bottom: 5px;
+    border-color: yellow;
+    border: 1px;
+    border-style: solid;
+    border-top-width: 21px;
+    border-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+}
+
+#welcome {
+    position: absolute;
+    top: 10%;
+    left: 37%;
+    /*height: 330px;*/
+    width: 26%;
+    overflow: hidden;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 0px;
+    padding-bottom: 3px;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    font-size: 80%;
+    z-index: 3;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+}
+
+img.welcome {
+    vertical-align: middle;
+	margin-right: 5px;
+}
+
+#topbar {   
+ font-size: 90%;
+ font-variant:small-caps; 
+}
+
+#topbar a {
+    color: yellow;
+    background-color: black;
+    text-decoration: none;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+#topbar a:hover {
+    color: black;
+    background-color: yellow;
+    text-decoration: none   
+}
+
+.myrank {
+    color: yellow;
+    background-color: black;
+    text-decoration: none;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+#wordimg {
+    margin-left: -9px;
+    vertical-align: top;
+    margin-top: -5px;
+}
+
+#ucimg {
+    margin-left: -6px;
+    height: 20px;
+    vertical-align: top;
+    margin-top: -8px;
+}
+
+#rankimg {
+    margin-left: -7px;
+    vertical-align: top;
+    margin-top: -5px;
+}
+
+#rank-img {
+    height: 60px;
+    margin-top: -10px;
+    vertical-align: top;
+    margin-left: 40
+;
+}
+
+#deny {
+    width: 300px;
+    color: yellow;
+    font-size: 120%;
+    padding: 10px;
+	margin: 0 5 0 5;
+    border-color: yellow;
+    border-width: 2px;
+    border-style: solid;
+    text-decoration: none ;
+}
+
+#suggestion-ac a:hover {
+    color: black;
+    background-color: yellow;
+    text-decoration: none   
+}
+
+#suggestion-ac {
+    padding: 20 10 20 10;
+    position: absolute;
+    top: 25%;
+    left: 45%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 1;
+    border-radius: 15px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+	
+	visibility: hidden;
+}
+
+#filter0 {
+    width: 20px;
+    height: 20px;
+    margin-top: 7px;
+    background-color: red;
+    margin-right: 7px;
+    float: right;
+    text-align: center;
+}
+
+#filter2 {
+    width: 20px;
+    height: 20px;
+    margin-top: 7px;
+    margin-right: 7px;
+    background-color: green;
+    float: right;
+    text-align: center;
+}
+
+#filter1 {
+    width: 20px;
+    height: 20px;
+    margin-top: 7px;
+    margin-right: 7px;
+    background-color: yellow;
+    float: right;
+    text-align: center;
+}
+
+#filter2 a, #filter0 a, #filter1 a {
+    text-decoration: none;
+    color: black;
+}
+
+#filter {
+    height: 35px;
+    float: right;
+    position: absolute;
+    right: 31%;
+    z-index: 2;
+}
+
+#RightBar {
+    position: absolute;
+    top: 35px;
+    height: 100%;
+    right: -350px;
+    padding-left: 10px;
+    padding-right: 0px;
+    padding-top: 0px;
+    float: right;
+}
+
+#RightBarContent1, #RightBarContent2 {
+    width: 330px;
+	padding: 10px;
+    float: right;
+    top: 0;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    font-size: 80%;
+	display: none;
+}
+
+#RightBarContent2 {
+display: block;
+
+}
+#RightBarIcons {
+    padding-top: 30px;
+    float: left;
+}
+
+#RightBarIcon1, #RightBarIcon2 {
+    background-color: rgba(0,0,0,0.8);
+    padding: 5px 5px 5px 5px;
+    border-top-left-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+}
+
