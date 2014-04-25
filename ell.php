@@ -114,13 +114,15 @@ function url_ell() {
             if(!empty($aldomain)) {
                 $query="select nyitomodul,ugras from fooldal_aldomain where f_id='$fooldal_id' and aldomain='$aldomain'";
                 $lekerdez=mysql_query($query);
-                list($nyitom,$ugras)=mysql_fetch_row($lekerdez);
-                if(!empty($ugras)) {
-                    header("Location: $ugras");
-                    exit;
-                }
-                if(!empty($nyitom)) $nyitomodul=$nyitom;
-                if(!empty($_POST['m_id']) or !empty($_GET['m_id'])) $nyitomodul='';
+				if($lekerdez) {
+					list($nyitom,$ugras)=mysql_fetch_row($lekerdez);
+					if(!empty($ugras)) {
+						header("Location: $ugras");
+						exit;
+					}
+					if(!empty($nyitom)) $nyitomodul=$nyitom;
+					if(!empty($_POST['m_id']) or !empty($_GET['m_id'])) $nyitomodul='';
+				}
             }
             
             $urlT = array ($fooldal_id, $fooldal_cim, $fooldal_design, $aldomain, $nyitomodul, $adminoldal);
