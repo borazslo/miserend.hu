@@ -1,0 +1,39 @@
+
+body {
+	background-color: #ffffff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	color: #000000;
+	margin: 0.5in;
+}
+/*
+#keret {
+	position: static;
+	width: 775px;
+	background-color: #FFFFFF;
+}
+
+#kulso_keret {
+	position: static;
+	width: 100%;
+}
+
+#belso_keret {
+	position: static;
+	width: 100%;
+}
+*/
+#fejlec {
+	display: none;
+}
+
+
+
+#tartalom {
+	clear: both;
+	position: static;
+}
+
+#lablec {
+	display: none;	
+}

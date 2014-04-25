@@ -1,0 +1,5 @@
+Lila: #8D317C
+Sötétkék: #053D78
+középkék: #A5B6D0
+Világoskék: #D1DDE9
+szürke: #F4F2F5

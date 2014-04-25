@@ -1,0 +1,79 @@
+
+.alap {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000}
+.alapkizart {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000; text-align: justify}
+.kozepes {  font-family: Arial, Helvetica, sans-serif; font-size: 75%; color: #000000}
+.kicsi {  font-family: Arial, Helvetica, sans-serif; font-size: 70%; color: #000000}
+.kicsi_kek {  font-family: Arial, Helvetica, sans-serif; font-size: 70%; color: #244C8F}
+.kiscim {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000; font-weight: bold}
+.kiscim_lila {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #8D317C; font-weight: bold}
+.kiscim_kek {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #244C8F; font-weight: bold}
+.kiscimkizart {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000; font-weight: bold; text-align: justify}
+.kozepescim {  font-family: Arial, Helvetica, sans-serif; font-size: 85%; color: #000000; font-weight: bold}
+.alcim {  font-family: Arial, Helvetica, sans-serif; font-size: 90%; color: #000000; font-weight: bold}
+.alcim_lila {  font-family: Arial, Helvetica, sans-serif; font-size: 90%; color: #8D317C; font-weight: bold}
+.nevnap {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #053D78; font-weight: bold}
+
+.dobozcim_fekete {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000000; font-weight: bold}
+.dobozcim_feher {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #FFFFFF; font-weight: bold}
+.dobozcim_kek {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #244C8F; font-weight: bold}
+
+.dobozfocim_fekete {  font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #000000; font-weight: bold}
+.dobozfocim_feher {  font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #FFFFFF; font-weight: bold}
+.dobozfocim_kek {  font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #244C8F; font-weight: bold}
+
+.felsomenulink {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #053D78; font-weight: bold; text-decoration: none}
+.felsomenulink:visited { color: #053D78}
+.felsomenulink:hover { color: #8D317C}
+
+.alsomenulink {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #053D78; font-weight: bold;  text-decoration: none}
+.alsomenulink:visited { color: #053D78}
+.alsomenulink:hover { color: #8D317C}
+
+.link {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000000; text-decoration: none}
+.link:visited { color: #000000}
+.link:hover { color: #8D317C}
+
+.link_kek {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #053D78; text-decoration: none}
+.link_kek:visited { color: #053D78}
+.link_kek:hover { color: #8D317C}
+
+.linkkicsi {  font-family: Arial, Helvetica, sans-serif; font-size: 10px; color: #000000; text-decoration: none}
+.linkkicsi:visited { color: #000000}
+.linkkicsi:hover { color: #8D317C}
+
+.loginlink {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; color: #000000; text-decoration: none; font-weight: normal}
+.loginlink:visited { color: #000000}
+.loginlink:hover { color: #8D317C; font-weight: bold}
+
+.implink {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #BBBAB6; text-decoration: none}
+.implink:visited { color: #BBBAB6}
+.implink:hover { color: #8D317C}
+
+.emllink {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #BBBAB6; text-decoration: none}
+.emllink:visited { color: #BBBAB6}
+.emllink:hover { color: #8D317C}
+
+.menulink {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 75%; color: #FFFFFF; font-weight: bold; text-decoration: none}
+.menulink:visited { color: #FFFFFF}
+.menulink:hover { color: #F5CC4C}
+
+.kismenulink {  font-family: Arial, Helvetica, sans-serif; font-size: 75%; color: #394873; text-decoration: none}
+.kismenulink:visited { color: #394873}
+.kismenulink:hover { color: #000000}
+
+.hasabcimlink {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; color: #FFFFFF; font-weight: bold; text-decoration: none}
+.hasabcimlink:visited { color: #FFFFFF}
+.hasabcimlink:hover { color: #E6D6E0}
+
+.unnep {  font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #ff0000; text-decoration: none}
+.unnep:visited { color: #ff0000}
+.unnep:hover { color: #F6D2C4}
+
+.unnep1 {  font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: bold; color: #ff0000; text-decoration: none}
+.unnep1:visited { color: #ff0000}
+.unnep1:hover { color: #F6D2C4}
+
+.urlap {  font-family: Arial, Helvetica, sans-serif; font-size: 70%; color: #000000; background-color: #FFFFFF;}
+.jobburlap {  font-family: Arial, Helvetica, sans-serif; font-size: 70%; color: #000000; background-color: #E8ECEF;}
+.loginurlap {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000000; background-color: #FFFFFF; border: #8D317C; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px}
+.keresourlap {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000000; background-color: #FFFFFF; border: #7F9DB9; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px}

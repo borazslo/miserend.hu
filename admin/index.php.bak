@@ -1,0 +1,24 @@
+<?php
+
+function dbconnect() {
+    global $hiba,$hibauzenet,$hibauzenet_prog,$db_name,$modul_url,$fuggveny_url,$design_url,$nyitomodul;
+    
+    $modul_url='moduls';
+    $fuggveny_url='functions';
+    $design_url='design';
+    $nyitomodul=1;
+
+    $db_host = "localhost";
+    $db_uname = "kurir";
+    $db_upass = "mk05";
+    $db_name = "kurir";
+
+    if(!@mysql_connect($db_host, $db_uname, $db_upass)) {
+        $hiba=true;
+        $hibauzenet.='Elnézést kérünk, a szolgáltatás jelenleg nem érhetõ el.';
+        $idopont=date('Y.m.d. H:i.s');
+        $hibauzenet_prog.="Adatbázisszerverhez nem lehet csatlakozni!\n".mysql_error()."\n$idopont";
+    }
+}
+
+?>

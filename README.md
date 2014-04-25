@@ -1,19 +1,9 @@
-miserend
+miserend.hu
 ========
+egyelőre hirporta.hu-val egyben
 
-Miserend honlap, android app és webszerver
+A miserend.hu teljes forrása honlap a /kepek és /fajlok kivételével.
 
-#Struktúra
+Az adatbázis struktúrát a mysql_sample.sql tartalmazza, némi adattal együtt.
 
-##android
-Az android alkalmazás dolgai.
-
-##web-miserend
-A mobilra optimalizált online miserendkereső.
-http://terkep.miserend.hu/alpha
-
-##web-templomkereso
-A templomok geolokalizációját pontosító játékos honlap.
-
-#Továbbá
-A database.sql csak néhány minta adatot tartalmaz.
+Klónozás utána a config.inc-ben be kell állítani a mysql nevet/jelszót.
