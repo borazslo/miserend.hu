@@ -1,8 +1,11 @@
 <?php
 
-$header="<html><head><title>VPP - Észrevételek</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1250\">\n<style TYPE=\"text/css\">\n.alap { font-family: Arial, Verdana; font-size: 10pt; text-align: justify; }\n.urlap { font-family: Arial, Verdana;  font-size: 70%; color: #000000; background-color: #FFFFFF; }\n</style>\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">";
+$header="<html><head><title>VPP - Észrevételek</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1250\">\n<style TYPE=\"text/css\">\n.alap { font-family: Arial, Verdana; font-size: 10pt; text-align: justify; }\n.urlap { font-family: Arial, Verdana;  font-size: 70%; color: #000000; background-color: #FFFFFF; }\n</style>\n
+<script src='http://code.jquery.com/jquery-1.10.2.js'></script>\n
+</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n
+\n";
 
-$footer="</body></html>";
+$footer ="</body></html>";
 
 $kidob="<Script languate=javascript> close(); </script>";
 
@@ -33,7 +36,7 @@ function teendok($id,$kod) {
 		$bgcolor[0]='#F3E9CD';
 		$bgcolor[1]='#EFEFEF';
 	
-		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b>$nev</b> $ismertnev - <u>$varos</u></big><br><i>Javítások, változások bejelentésének kezelése</i></big></td></tr></table>";
+		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b><a href=/?templom=$id target=_blank>$nev</a></b> $ismertnev - <u>$varos</u></big><br><i>Javítások, változások bejelentésének kezelése</i></big></td></tr></table>";
 		$kiir.="\n<table width=100% bgcolor=#ECD9A4 cellpadding=0 cellspacing=1>";
 		$query="select id,nev,login,email,megbizhato,datum,allapot,admin,admindatum,leiras,adminmegj from eszrevetelek where hol='$kod' and hol_id='$id' order by datum desc";
 		$lekerdez=mysql_query($query);
@@ -54,7 +57,17 @@ function teendok($id,$kod) {
 			if(!empty($eemail)) $szoveg.="<br><a href=mailto:$eemail class=alap><b>$eemail</b></a>";
 			if($eallapot!='j') $szoveg.="<br><br><span class=alap>$eleiras</span>";	
 			else {
-				$szoveg.="<br><span class=alap><font color=red>Utoljára javítva / lezárva -> $eadmin ($eadatum)</font></span>";				
+				$szoveg.="<br><span class='alap javitva hidden' ><font color=red>Utoljára javítva / lezárva -> $eadmin ($eadatum)</font></span>";
+				$szoveg.="<br><span class='alap' style='display:none;'><br>$eleiras</span>";					
+				
+				$szoveg .= '
+				<script>
+				$( ".javitva.hidden" ).click(function( event ) {
+					event.preventDefault();
+   				$( this ).nextAll(" .alap:first ").show()
+   				$( this ).removeClass("hidden").addClass("showen");
+				});
+				</script>';
 			}
 			if(!empty($eadminmegj)) $szoveg.='<br><br><span class=alap><u>Admin megjegyzés:</u><br>'.nl2br($eadminmegj).'</span>';
 
