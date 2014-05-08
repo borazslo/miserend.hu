@@ -732,7 +732,7 @@ function miserend_modtemplom() {
 	$egyhazmegye=$_POST['egyhazmegye'];
 	if($egyhazmegye=='0') $egyhazmegye='mind';
 	$kulcsszo=$_POST['kkulcsszo'];	
-	$allapot=$_POST['allapot'];
+	$allapot=$_REQUEST['allapot'];
 
 	$sort=$_POST['sort'];
 	if(empty($sort)) $sort='moddatum desc';
@@ -894,6 +894,17 @@ function miserend_modtemplom() {
 	$kiir.='<br>';
 	$kiir.=$lapozo;
 
+	/* észrevételezett templomok esetén RSS lehetõség */
+	if($allapot == 'e') {
+		$query = array();
+		foreach(array('egyhazmegye','allapot','kkulcsszo','sort','sid') as $var) {
+			if(isset($$var) AND $$var != '') $query[] = $var."=".urlencode($$var);
+		}
+		$link = 'naplo_rss.php';
+		if(count($query)>0) $link .= "?".implode('&',$query);
+		$kiir .= "<br/><a href=\"".$link."\">RSS</a>";
+	}
+	
 	$adatT[2]='<span class=alcim>Templomok, miserendek módosítása</span><br><br>'.$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
