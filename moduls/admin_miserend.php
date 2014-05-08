@@ -875,7 +875,7 @@ function miserend_modtemplom() {
 	while(list($tid,$tnev,$tismert,$tvaros,$tok,$teszrevetel)=mysql_fetch_row($lekerdez)) {
 		$jelzes='';
 		if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
-		elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";		
+		elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a>";		
 		elseif($vaneszrevetelT[$tid]) $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";		
 		if(!$vanmiseT[$tid]) {
 			$jelzes.="<img src=img/lampa.gif title='Nincs hozzá mise!' align=absmiddle> ";
@@ -888,7 +888,7 @@ function miserend_modtemplom() {
 		if($tok=='n') $jelzes.="<img src=img/tilos.gif title='Nem engedélyezett!' align=absmiddle> ";
 		elseif($tok=='f') $jelzes.="<img src=img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
 		
-		$kiir.="\n$jelzes <a href=?m_id=$m_id&m_op=addtemplom&tid=$tid$linkveg class=felsomenulink title='$tismert'><b>- $tnev</b><font color=#8D317C> ($tvaros)</font></a> - <a href=?m_id=$m_id&m_op=addmise&tid=$tid$linkveg class=felsomenulink><img src=img/mise_edit.png title='misék' align=absmiddle border=0>szentmise</a> - <a href=?m_id=$m_id&m_op=deltemplom&tid=$tid$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
+		$kiir.="\n$jelzes <a href=?m_id=$m_id&m_op=addtemplom&tid=$tid$linkveg class=felsomenulink title='$tismert'><b>- $tnev</b><font color=#8D317C> ($tvaros)</font></a> - <a href=?m_id=$m_id&m_op=addmise&tid=$tid$linkveg class=felsomenulink><img src=img/mise_edit.png title='misék' align=absmiddle border=0>szentmise</a> - <a href=?m_id=$m_id&m_op=deltemplom&tid=$tid$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a> - <a class=felsomenulink href=\"?templom=$tid\" target=\"_blank\">megnéz</a><br>";
 	}
 
 	$kiir.='<br>';
@@ -902,7 +902,7 @@ function miserend_modtemplom() {
 		}
 		$link = 'naplo_rss.php';
 		if(count($query)>0) $link .= "?".implode('&',$query);
-		$kiir .= "<br/><a href=\"".$link."\">RSS</a>";
+		//$kiir .= "<br/><a href=\"".$link."\" class=felsomenulink>RSS</a>";
 	}
 	
 	$adatT[2]='<span class=alcim>Templomok, miserendek módosítása</span><br><br>'.$kiir;

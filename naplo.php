@@ -45,7 +45,8 @@ function teendok($id,$kod) {
 			if($a>1) $a=0;
 			$edatum=substr($edatum,0,16);
 			$eadatum=substr($eadatum,0,16);
-			$eleiras=nl2br($eleiras);
+			//$eleiras=nl2br($eleiras);
+			$eleiras=preg_replace('/\n/i','<br/>',$eleiras);
 		
 			if($eallapot=='u') $ikon="<img src=img/Folderdownloads.gif border=0 title='új észrevétel'>";
 			elseif($eallapot=='f') $ikon="<img src=img/Filesedit.gif border=0 title='folyamatban van -> $eadmin ($eadatum)'>";

@@ -801,7 +801,7 @@ function miserend_view() {
 	$tid=$_GET['tid'];
 	if(!empty($TID)) $tid=$TID;
 
-	$query="SELECT nev,ismertnev,turistautak,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,leiras,megjegyzes,misemegj,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,letrehozta,lat,lng,checked FROM templomok 
+	$query="SELECT nev,ismertnev,turistautak,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,leiras,megjegyzes,misemegj,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,letrehozta,lat,lng,checked,eszrevetel FROM templomok 
 	LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id 
 	WHERE id='$tid' and ok='i' LIMIT 1";
 	
@@ -925,6 +925,16 @@ function miserend_view() {
 
 	if(strstr($u_jogok,'miserend')) {
 		$nev.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+	
+		$query="select allapot from eszrevetelek where hol = 'templomok' AND hol_id = '".$tid."' GROUP BY allapot ORDER BY allapot limit 5;";
+		$result=mysql_query($query);
+		$allapotok = array();
+		while ($row = mysql_fetch_assoc($result)) { if($row['allapot']) $allapotok[] = $row['allapot'];}
+		if(in_array('u',$allapotok)) $nev.=" <a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
+		elseif(in_array('f',$allapotok)) $nev.=" <a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";	
+		elseif(count($allapotok)>0) $nev.=" <a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";		
+	
+	
 	}
 	elseif($u_login==$letrehozta) {
 		$nev.=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
