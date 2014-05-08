@@ -78,7 +78,7 @@ function adatadd() {
 		list($megbizhato)=mysql_fetch_row($lekerdez);
 	}
 	if(!empty($megbizhato)) $mbiz="megbizhato='$megbizhato', ";
-	$query="insert eszrevetelek set nev='$nev', login='$login', email='$email', $mbiz datum='$most', hol='$kod', hol_id='$id', allapot='u', leiras='$leiras'";
+	$query="insert eszrevetelek set nev='$nev', login='$login', email='$email', $mbiz datum='$most', hol='$kod', hol_id='$id', allapot='u', leiras='".sanitize($leiras)."'";
 	mysql_query($query);
 
 	$query="update $kod set eszrevetel='i' where id='$id'";
@@ -89,12 +89,28 @@ function adatadd() {
 		$lekerdez=mysql_query($query);
 		list($felelosmail)=mysql_fetch_row($lekerdez);
 		if(!empty($felelosmail)) {
+			$query="select nev,ismertnev,varos from templomok where id = ".$id." limit 0,1";
+			$lekerdez=mysql_query($query);
+			$templom=mysql_fetch_assoc($lekerdez);
+		
 			//Mail küldés az egyházmegyei felelõsnek
 			$targy="Miserend - észrevétel érkezett";
-			$szoveg="Kedves egyházmegyei felelõs!\n\nAz egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.";
-			$szoveg.="\nKésõbb ide beteszem, hogy pontosan melyikhez és mi,\negyelõre csak egy értesítés. (Gergõ)";
-			$szoveg.="\n\nKöszönjük munkádat!\nVPP";
-			mail($felelosmail,$targy,$szoveg,"From: info@miserend.hu");
+			$szoveg="Kedves egyházmegyei felelõs!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
+			$szoveg.="------------------<br/>\n";
+			$szoveg.= "<a href=\"http://miserend.hu/?templom=".$id."\">".$templom['nev']." (";
+			if($templom['ismertnev'] != "" ) $szoveg .= $templom['ismertnev'].", ";
+			$szoveg .= $templom['varos'].")</a><br/>\n";
+			$szoveg.= "<i><a href=\"mailto:".$email."\" target=\"_blank\">".$nev."</a>"; if($login != '') $szoveg .= ' ('.$login.') '; $szoveg .= ":</i><br/>\n";
+			$szoveg.= sanitize($leiras)."<br/>\n";
+			$szoveg.="------------------<br/>\n";
+			$szoveg.="Köszönjük munkádat!<br/>\nVPP";
+			
+			$headers  = 'MIME-Version: 1.0' . "\r\n";
+			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+			$headers .= 'To: ' . $felelosmail . "\r\n";
+			$headers .= 'Bcc: eleklaszlosj@gmail.com' . "\r\n";
+			$headers .= 'From: miserend.hu <info@miserend.hu>' . "\r\n";
+			mail($felelosmail,$targy,$szoveg,$headers);
 		}
 	}
 
@@ -122,5 +138,10 @@ switch($op) {
         	break;
 }
 
+function sanitize($text) {
+	$text = preg_replace('/\n/i','<br/>',$text);
+	$text = strip_tags($text,'<a><i><b><strong><br>');
 
+	return $text;
+}
 ?>
