@@ -87,8 +87,8 @@ function miserend_addtemplom($tid) {
 		$most=date("Y-m-d H:i:s");
 		$urlap.=include('editscript2.php'); //Csak, ha módosításról van szó
 
-		$query="select nev,ismertnev,turistautak,orszag,megye,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,espereskerulet,leiras,megjegyzes,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,kontakt,kontaktmail,adminmegj,log,ok,letrehozta,megbizhato,eszrevetel from templomok where id='$tid'";
-		if(!$lekerdez=mysql_db_query($db_name,$query)) echo 'HIBA!<br>'.mysql_error();	list($nev,$ismertnev,$turistautak,$orszag,$megye,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$espereskerulet,$szoveg,$megjegyzes,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$kontakt,$kontaktmail,$adminmegj,$log,$ok,$feltolto,$megbizhato,$teszrevetel)=mysql_fetch_row($lekerdez);
+		$query="select nev,ismertnev,turistautak,orszag,megye,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,espereskerulet,leiras,megjegyzes,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,kontakt,kontaktmail,adminmegj,log,ok,letrehozta,megbizhato,eszrevetel,lat,lng from templomok LEFT JOIN terkep_geocode ON id=tid where id='$tid'";
+		if(!$lekerdez=mysql_db_query($db_name,$query)) echo 'HIBA!<br>'.mysql_error();	list($nev,$ismertnev,$turistautak,$orszag,$megye,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$espereskerulet,$szoveg,$megjegyzes,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$kontakt,$kontaktmail,$adminmegj,$log,$ok,$feltolto,$megbizhato,$teszrevetel,$lat,$lng)=mysql_fetch_row($lekerdez);
 	}
 	else {
 		$datum=date('Y-m-d H:i');
@@ -270,6 +270,10 @@ function miserend_addtemplom($tid) {
 	$urlap.=$megyeurlap.$varosurlap;
 	$urlap.="<input type=text name=cim value=\"$cim\" class=urlap size=60 maxlength=250><span class=alap> (utca, házszám)</span>";
 	$urlap.="<br><img src=img/space.gif widt=5 height=5><br><textarea name=megkozelites class=urlap cols=50 rows=2>$megkozelites</textarea><span class=alap> (megközelítés rövid leírása)</span>";
+	
+	//Koordináta
+	$urlap.="<input type=text name=lat value=\"$lat\" class=urlap size=10 maxlength=7><span class=alap> (szélesség)</span> ";
+	$urlap.="<input type=text name=lng value=\"$lng\" class=urlap size=10 maxlength=7><span class=alap> (hosszúság)</span>";
 	$urlap.="</td></tr>";
 
 //plébánia
@@ -502,6 +506,9 @@ function miserend_addingtemplom() {
 	$feltolto=$_POST['feltolto'];
 	$megbizhato=$_POST['megbizhato'];
 	if($megbizhato!='i') $megbizhato='n';
+	
+	$lat = $_POST['lat'];
+	$lng = $_POST['lng'];
 
 	$szoveg=$_POST['szoveg'];
 	$szoveg=str_replace('&eacute;','é',$szoveg);
@@ -555,6 +562,23 @@ function miserend_addingtemplom() {
 			$katnev="$nev ($varos)";
 			if(!mysql_db_query($db_name,"update kepek set katnev='$katnev' where kat='templomok' and kid='$tid'")); 
 		}
+		
+		//geolokáció
+		$query = "SELECT * FROM terkep_geocode WHERE tid = ".$tid." LIMIT 1 ";
+		$result = mysql_query($query);
+		$geocode = mysql_fetch_assoc($result);
+		echo $geocode['lng']."->".$lng.";".$geocode['lat']."->".$lat;
+		if($lng != $geocode['lng'] OR $lat != $geocode['lat']) {
+			if($geocode != array() ) {
+				mysql_query("DELETE FROM terkep_geocode WHERE tid = ".$tid." LIMIT 1 ");
+				$geocode['checked'] = 0;
+			}
+			$query = "INSERT INTO terkep_geocode (tid,lng,lat,checked) VALUES (".$tid.",".$lng.",".$lat.",1)";
+			mysql_query($query);
+			$query = "INSERT INTO terkep_geocode_suggestion (tid,tchecked,slng,slat,uid) VALUES (".$tid.",".$geocode['checked'].",".$lng.",".$lat.",'".$u_login."')";
+			mysql_query($query);
+			
+		} 
 
 	//Szomszédos 1 (legközelebbi templomok)
 		if(is_array($oldsz1T)) {
