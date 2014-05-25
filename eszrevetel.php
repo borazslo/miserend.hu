@@ -85,35 +85,54 @@ function adatadd() {
 	mysql_query($query);
 
 	if($kod=='templomok') {
+		
+		$query="select nev,ismertnev,varos,kontaktmail from templomok where id = ".$id." limit 0,1";
+		$lekerdez=mysql_query($query);
+		$templom=mysql_fetch_assoc($lekerdez);
+					
+		$eszrevetel ="------------------<br/>\n";
+		$eszrevetel.= "<a href=\"http://miserend.hu/?templom=".$id."\">".$templom['nev']." (";
+		if($templom['ismertnev'] != "" ) $eszrevetel .= $templom['ismertnev'].", ";
+		$eszrevetel .= $templom['varos'].")</a><br/>\n";
+		$eszrevetel.= "<i><a href=\"mailto:".$email."\" target=\"_blank\">".$nev."</a>"; if($login != '') $eszrevetel .= ' ('.$login.') '; $eszrevetel .= ":</i><br/>\n";
+		$eszrevetel.= sanitize($leiras)."<br/>\n";
+		$eszrevetel.="------------------<br/>\n";
+		$eszrevetel.="Köszönjük munkádat!<br/>\nVPP";
+
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+		//$headers .= 'Bcc: eleklaszlosj@gmail.com' . "\r\n";
+		$headers .= 'From: miserend.hu <info@miserend.hu>' . "\r\n";
+
 		$query="select email from egyhazmegye where id='$ehm'";
 		$lekerdez=mysql_query($query);
 		list($felelosmail)=mysql_fetch_row($lekerdez);
 		if(!empty($felelosmail)) {
-			$query="select nev,ismertnev,varos from templomok where id = ".$id." limit 0,1";
-			$lekerdez=mysql_query($query);
-			$templom=mysql_fetch_assoc($lekerdez);
-		
 			//Mail küldés az egyházmegyei felelõsnek
-			$targy="Miserend - észrevétel érkezett";
-			$szoveg="Kedves egyházmegyei felelõs!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
-			$szoveg.="------------------<br/>\n";
-			$szoveg.= "<a href=\"http://miserend.hu/?templom=".$id."\">".$templom['nev']." (";
-			if($templom['ismertnev'] != "" ) $szoveg .= $templom['ismertnev'].", ";
-			$szoveg .= $templom['varos'].")</a><br/>\n";
-			$szoveg.= "<i><a href=\"mailto:".$email."\" target=\"_blank\">".$nev."</a>"; if($login != '') $szoveg .= ' ('.$login.') '; $szoveg .= ":</i><br/>\n";
-			$szoveg.= sanitize($leiras)."<br/>\n";
-			$szoveg.="------------------<br/>\n";
-			$szoveg.="Köszönjük munkádat!<br/>\nVPP";
-			
-			$headers  = 'MIME-Version: 1.0' . "\r\n";
-			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$headers .= 'To: ' . $felelosmail . "\r\n";
-			$headers .= 'Bcc: eleklaszlosj@gmail.com' . "\r\n";
-			$headers .= 'From: miserend.hu <info@miserend.hu>' . "\r\n";
-			mail($felelosmail,$targy,$szoveg,$headers);
+			$targy = "Miserend - észrevétel érkezett";
+			$szoveg = "Kedves egyházmegyei felelõs!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
+			$szoveg .= $eszrevetel;
+			$fejlec = $headers; //.'To: ' . $felelosmail . "\r\n";
+			mail($felelosmail,$targy,$szoveg,$fejlec);
 		}
+		
+		if(!empty($templom['kontaktmail'])) {
+			//Mail küldés az karbantartónak felelõsnek
+			$targy = "Miserend - észrevétel érkezett";
+			$szoveg = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomod adataihoz észrevétel érkezett.<br/>\n";
+			$szoveg .= $eszrevetel;
+			$fejlec = $headers; //.'To: ' . $templom['kontaktmail'] . "\r\n";
+			mail($templom['kontaktmail'],$targy,$szoveg,$fejlec);
+		}
+		
+		//Mail küldése Elek Lacinak, hogy boldog legyen
+		$targy = "Miserend - észrevétel érkezett";
+		$szoveg = "Kedves admin!\n\n<br/><br/>Az egyik templom adataihoz észrevétel érkezett.<br/>\n";
+		$szoveg .= $eszrevetel;
+		$fejlec = $headers; //.'To: ' . $templom['kontaktmail'] . "\r\n";
+		mail('eleklaszlosj@gmail.com',$targy,$szoveg,$fejlec);
+	
 	}
-
 	echo $header."<script language=Javascript>close();</script>".$footer;
 }
 
