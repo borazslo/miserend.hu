@@ -161,6 +161,8 @@ function user_mod() {
 	global $db_name,$linkveg,$m_id,$sid,$_POST;
 
 	$kulcsszo=$_POST['kulcsszo'];
+	$sort=$_POST['sort'];
+	if(empty($sort)) $sort='nev';
 	$adminok=$_POST['adminok'];
 	$limit=$_POST['limit'];
 	if(empty($limit)) $limit=50;
@@ -175,7 +177,20 @@ function user_mod() {
 	while(list($jogkod)=mysql_fetch_row($lekerdez)) {
 		$kiir.="\n<option value='$jogkod'";
 		if($adminok==$jogkod) $kiir.=' selected';
-		$kiir.=">$jogkod</option>";
+		$kiir.=">$jogkod</option>s";
+	}
+	$kiir.="\n</select>";
+	
+	$kiir.="\n<br><span class=alap>rendezés: </span><select name=sort class=urlap> ";
+	$sortT['felhasználó név']='login';
+	$sortT['becenév']='becenev';
+	$sortT['név']='nev';
+	$sortT['utolsó belépés']='lastlogin desc';	
+	
+	foreach($sortT as $kulcs=>$ertek) {
+		$kiir.="<option value='$ertek'";
+		if($ertek==$sort) $kiir.=' selected';
+		$kiir.=">$kulcs</option>";
 	}
 	$kiir.="\n</select><input type=submit value=Lista class=urlap></form>";
 
@@ -191,10 +206,14 @@ function user_mod() {
 	}
 	if(is_array($feltetelT)) $feltetel="where (".implode(' or ',$feltetelT).')';
 
-	$query="select uid,login,nev from user $feltetel order by login";
+	$query="select * from user $feltetel order by $sort";
 	$lekerdez=mysql_db_query($db_name,$query);
-	while(list($uid,$ulogin,$unev)=mysql_fetch_row($lekerdez)) {
-		$kiir.="\n<a href=?m_id=$m_id&m_op=add&uid=$uid$linkveg class=link><b>- $ulogin</b> ($unev)</a> - <a href=?m_id=$m_id&m_op=del&uid=$uid$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
+	while($user=mysql_fetch_assoc($lekerdez)) {
+		$kiir.="\n<a href=?m_id=$m_id&m_op=add&uid=".$user['uid']."$linkveg class=link>";
+		$kiir .= "<b>- ".$user['login']."</b> (".$user['nev'].")</a> - ";
+		$kiir .= "<span class=\"alap\"><a href=\"mailto:".$user['email']."\">".$user['email']."</a></span> - ";
+		$kiir .= "<span class=\"alap\">".$user['lastlogin']."</span> - ";
+		$kiir .= "<a href=?m_id=$m_id&m_op=del&uid=".$user['uid']."$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
 	}
 
 	$adatT[2]="<span class=alcim>Felhasználók szerkesztése - módosítás</span><br><br>".$kiir;
