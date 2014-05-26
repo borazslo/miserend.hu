@@ -1,65 +1,38 @@
+<style>
+.block:after{
+    clear: both;
+    content: "";
+    display: block;
+}
+</style>
+ 
+ <div class="focim_fekete block" style="background-color: #D0D6E4;width:100%;margin-bottom:5px">
+	<img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
+	<span class="dobozfocim_fekete">Szentmise keresõ</span>
+	
+	<div class="focim_fekete" style="float:right;margin-right:10px;height:7px;">&nbsp;
+		<img src="$design_url/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
+	</div>
+</div>	
 
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr> 
-    <td colspan="3"> 
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#D0D6E4">
-        <tr> 
-          <td width="10"><img src="img/space.gif" width="10" height="10"></td>
-          <td> 
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td><img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"> 
-                  <img src="img/space.gif" width="5" height="5"><span class="dobozfocim_fekete">Szentmise 
-                  keres&otilde;</span></td>
-                <td> 
-                  <div align="right"><span class="dobozfocim_fekete"><img src="$design_url/img/lilacsik.jpg" width="170" height="7" align="absmiddle"></span></div>
-                </td>
-              </tr>
-            </table>
-          </td>
-          <td width="10"><img src="img/space.gif" width="10" height="10"></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  <tr> 
-    <td colspan="3" height="5"><img src="img/space.gif" width="10" height="5"></td>
-  </tr>
-  <tr> 
-    <td width="49%" valign="top"> 
-      <p>$miseurlap</p>
-    </td>
-    <td width=15><img src=img/space.gif width=15 height=5></td>
-    <td width="49%" valign="top"> 
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr bgcolor="#EAEDF1"> 
-          <td bgcolor="#244C8F" width="5"><img src="img/space.gif" width="5" height="5"></td>
-          <td bgcolor="#244C8F"><img src="$design_url/img/negyzet_feher.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_feher">Keresés 
-            a templomok között</span></td>
-          <td width="5" bgcolor="#244C8F"><img src="img/space.gif" width="5" height="5"></td>
-        </tr>
-        <tr bgcolor="#F8F4F6"> 
-          <td width="5" bgcolor="#EAEDF1"></td>
-          <td bgcolor="#EAEDF1" class="alap">$templomurlap</td>
-          <td width="5" bgcolor="#EAEDF1"></td>
-        </tr>
-      </table>
-	  $androidreklam
-      <img src="img/space.gif" width="5" height="10"><br>
-	  <!-- következõ mise -->
-	  $kovetkezomise
-	  <!-- követekezõ mise vége -->
-    </td>
-  </tr>
-  <tr> 
-    <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
-  </tr>
-  <tr> 
-    <td bgcolor="#CCCCCC" colspan="3" height="3"><img src="img/space.gif" width="10" height="3"></td>
-  </tr>
-  <tr> 
-    <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
-  </tr>
+<div class="block">
+	<div class="miseurlap" style="width:49%;float:left">$miseurlap</div>
+	<div class="keresourlap" style="float:right;width:49%;background-color:#EAEDF1;">
+		<div style="background-color:#244C8F;height:15px">
+			<img src="$design_url/img/negyzet_feher.gif" width="6" height="8" align="absmiddle" style="margin-left:5px;margin-right:5px;">
+			<span class="dobozcim_feher">Keresés a templomok között</span>
+		</div>
+		<div style="padding-left:5px;padding-right:5px;">$templomurlap</div>
+	</div>
+	<div align="center" style="margin-top:5px;width:49%;float:right">
+		$androidreklam
+	</div>
+ </div>
+  
+<div style="background-color:#CCCCCC;height:3px;margin-top:10px;margin-bottom:10px;width:100%"></div>
+$kepek
+<!--
+<table width="100%" border="0" cellspacing="0" cellpadding="0">   
   <tr> 
     <td colspan="3"><img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class=dobozfocim_kek>Mai ünnep - üzenet</span></td>
   </tr>
@@ -104,40 +77,7 @@
   <tr> 
     <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
   </tr>
-  <!--
-  <tr> 
-    <td valign="top"> 
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr> 
-          <td bgcolor="#B51A7E" width="5"><img src="img/space.gif" width="5" height="5"></td>
-          <td bgcolor="#B51A7E"><img src="$design_url/img/negyzet_feher.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_feher">Liturgikus 
-            napt&aacute;r </span></td>
-          <td width="5" bgcolor="#B51A7E"><img src="img/space.gif" width="5" height="5"></td>
-        </tr>
-        <tr bgcolor="#F8F4F6"> 
-          <td width="5" bgcolor="#EAEDF1"></td>
-          <td bgcolor="#EAEDF1" class="alap">$naptar</td>
-          <td width="5" bgcolor="#EAEDF1"></td>
-        </tr>
-      </table>
-    </td>
-    <td><img src=img/space.gif width=15 height=5></td>
-    <td valign="top"> 
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr bgcolor="#EAEDF1"> 
-          <td bgcolor="#EAEDF1" width="5"><img src="img/space.gif" width="5" height="5"></td>
-          <td bgcolor="#EAEDF1"><img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Programajánló</span></td>
-          <td width="5" bgcolor="#EAEDF1"><img src="img/space.gif" width="5" height="5"></td>
-        </tr>
-        <tr bgcolor="#F8F4F6"> 
-          <td width="5" bgcolor="#F8F4F6"></td>
-          <td bgcolor="#F8F4F6">$programajanlo</td>
-          <td width="5" bgcolor="#F8F4F6"></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  -->
+ 
   <tr>
     <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
   </tr>
@@ -174,3 +114,4 @@
     </td>
   </tr>
 </table>
+-->
