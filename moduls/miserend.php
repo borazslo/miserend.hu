@@ -15,6 +15,27 @@ function idoszak($i) {
 function miserend_index() {
 	global $linkveg,$db_name,$m_id,$u_login,$sid,$design_url,$_GET,$u_varos,$onload,$script;
 
+    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>';
+    $script .= '
+        <script>
+        $(function() { //shorthand document.ready function
+            $(\'#tkereses\').on(\'submit\', function(e) { //use on if jQuery 1.7+
+                e.preventDefault();  //prevent form from submitting               
+                var data = $(\'#tvaros\').val() + \'&\' + $(\'#tkulcsszo\').val() + \'&\' + $(\'#tehm\').val();
+                ga(\'send\',\'event\',\'Search\',\'templom\',data);
+                $(this).unbind(\'submit\').submit();
+            });
+        
+            $(\'#mkereses\').on(\'submit\', function(e) { //use on if jQuery 1.7+
+                e.preventDefault();  //prevent form from submitting                                             
+                var data = $("#mmikor option:selected").text() + \'&\' + $(\'#mmikor2\').val() + \'&\' + $(\'#mvaros\').val() + \'&\' + $(\'#mehm\').val() + \'&\' + $(\'#mnyelv\').val() + \'&\' + $(\'#mzene\').val() + \'&\' + $(\'#mdiak\').val();
+                ga(\'send\',\'event\',\'Search\',\'mise\',data);
+                $(this).unbind(\'submit\').submit();
+            });
+        });
+			
+        </script>';
+    
 	$ma=date('Y-m-d');
 	$holnap=date('Y-m-d',(time()+86400));
 	$mikor='8:00-19:00';
@@ -32,7 +53,7 @@ function miserend_index() {
 	}
 
 	//Miserend ûrlap
-	$miseurlap="\n<div style='display: none'><form method=post><input type=hidden name=sid value=$sid><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=misekeres></div>";
+	$miseurlap="\n<div style='display: none'><form method=post id=\"mkereses\"><input type=hidden name=sid id=msid value=$sid><input type=hidden name=m_id id=m_id value=$m_id><input type=hidden id=m_op name=m_op value=misekeres></div>";
 
 //Mikor
 	$mainap=date('w');
@@ -41,20 +62,20 @@ function miserend_index() {
 		$kulonbseg=7-$mainap;
 		$vasarnap=date('Y-m-d',(time()+(86400*$kulonbseg)));
 	}
-	$miseurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Mikor: </span><br><img src=img/space.gif width=10 height=5><select name=mikor class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md').style.display='inline';} else {document.getElementById('md').style.display='none';}\">";
+	$miseurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Mikor: </span><br><img src=img/space.gif width=10 height=5><select name=mikor id=mmikor class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md').style.display='inline';} else {document.getElementById('md').style.display='none';}\">";
 	$miseurlap.="<option value='$vasarnap'>vasárnap</option><option value='$ma'>ma</option><option value='$holnap'>holnap</option><option value=x>adott napon:</option>";
 	$miseurlap.="</select> <input type=text name=mikordatum id=md style='display: none' class=keresourlap maxlength=10 size=10 value='$ma'>";
 
-	$miseurlap.="<br><img src=img/space.gif width=10 height=5><br><img src=img/space.gif width=10 height=5><select name=mikor2 class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md2').style.display='inline'; alert('FIGYELEM! Fontos a formátum!');} else {document.getElementById('md2').style.display='none';}\">";
+	$miseurlap.="<br><img src=img/space.gif width=10 height=5><br><img src=img/space.gif width=10 height=5><select name=mikor2 id=mmikor2 class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md2').style.display='inline'; alert('FIGYELEM! Fontos a formátum!');} else {document.getElementById('md2').style.display='none';}\">";
 	$miseurlap.="<option value=0>egész nap</option><option value='de'>délelõtt</option><option value='du'>délután</option><option value=x>adott idõben:</option>";
 	$miseurlap.="</select> <input type=text name=mikorido id=md2 style='display: none' class=keresourlap maxlength=11 size=10 value='$mikor'>";
 	$miseurlap.="<br><img src=img/space.gif width=5 height=8>";
 
 //Hol
-	$miseurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Hol:</span><br><span class=alap>- település: </span><br><img src=img/space.gif width=10 height=5><input type=text name=varos size=20 class=keresourlap>";	
+	$miseurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Hol:</span><br><span class=alap>- település: </span><br><input type=text name=varos id=mvaros size=20 class=keresourlap style=\"margin-left:10px\">";	
 	$miseurlap.="<br><img src=img/space.gif width=5 height=8>";
 
-	$miseurlap.="<br><span class=alap>- egyházmegye: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5><select name=ehm class=keresourlap onChange=\"if(this.value!=0) {";
+	$miseurlap.="<br><span class=alap>- egyházmegye: </span><br><img src=img/space.gif width=5 height=5><br><select name=ehm id=mehm class=keresourlap style=\"margin-left:10px\" onChange=\"if(this.value!=0) {";
 	foreach($ehmT as $id=>$nev) {
 		$miseurlap.="document.getElementById('esp$id').style.display='none'; ";
 	} 
@@ -82,11 +103,26 @@ function miserend_index() {
 
 //Milyen
 	$miseurlap.="\n<br><img src=img/space.gif width=5 height=10><br><span class=kiscim>Milyen:</span><br>";
-	$miseurlap.="<table width=100% cellpadding=0 cellspacing=0><tr><td><span class=alap>- nyelv: </span><br><select name=nyelv class=keresourlap><option value=0>mindegy</option><option value=h>magyar</option><option value=va>latin</option><option value=de>német</option><option value=sk>szlovák</option><option value=hr>horvát</option><option value=pl>lengyel</option><option value=si>szlovén</option><option value=ro>román</option><option value=en>angol</option><option value=gr>görög</option><option value=it>olasz</option><option value=fr>francia</option><option value=es>spanyol</option></select></td>";
+	$miseurlap.="<table width=100% cellpadding=0 cellspacing=0><tr><td><span class=alap>- nyelv: </span><br><select name=nyelv id=mnyelv class=keresourlap>
+    <option value=0>mindegy</option>
+    <option value=h>magyar</option>
+    <option value=en>angol</option>
+    <option value=fr>francia</option>
+    <option value=gr>görög</option>    
+    <option value=hr>horvát</option>    
+    <option value=va>latin</option>
+    <option value=pl>lengyel</option>
+    <option value=de>német</option>
+    <option value=it>olasz</option>    
+    <option value=ro>román</option>
+    <option value=es>spanyol</option>    
+    <option value=sk>szlovák</option>
+    <option value=si>szlovén</option>
+    </select></td>";
 
-	$miseurlap.="<td><span class=alap>- zene: </span><br><select name=zene class=keresourlap><option value=0>mindegy</option><option value=g>gitáros</option><option value=o>orgonás</option><option value=cs>csendes</option>";	
+	$miseurlap.="<td><span class=alap>- zene: </span><br><select name=zene id=mzene class=keresourlap><option value=0>mindegy</option><option value=cs>csendes</option><option value=g>gitáros</option><option value=o>orgonás</option>";	
 	$miseurlap.="</select></td>";
-	$miseurlap.="<td><span class=alap>- diák: </span><br><select name=diak class=keresourlap><option value=0>mindegy</option><option value=d>diák</option><option value=nd>nem diák</option>";	
+	$miseurlap.="<td><span class=alap>- diák: </span><br><select name=diak id=mdiak class=keresourlap><option value=0>mindegy</option><option value=d>diák</option><option value=nd>nem diák</option>";	
 	$miseurlap.="</select></td></tr></table>";
 
 
@@ -139,12 +175,12 @@ function miserend_index() {
 	}
 
 //Templom ûrlap
-	$templomurlap="\n<div style='display: none'><form method=post><input type=hidden name=sid value=$sid><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=templomkeres></div>";
-	$templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos size=20 class=keresourlap><br><img src=img/space.gif width=5 height=8>";
-	$templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text name=kulcsszo size=20 class=keresourlap><br><img src=img/space.gif width=5 height=8>";
+	$templomurlap="\n<div style='display: none'><form method=post id=\"tkereses\"><input type=hidden id=tsid name=sid value=$sid><input type=hidden id=tm_id name=m_id value=$m_id><input type=hidden name=m_op id=tm_op value=templomkeres></div>";
+	$templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos id=tvaros size=20 class=keresourlap><br><img src=img/space.gif width=5 height=8>";
+	$templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text id=tkulcsszo name=kulcsszo size=20 class=keresourlap><br><img src=img/space.gif width=5 height=8>";
 	
 	//Egyházmegye
-	$templomurlap.="<br><span class=kiscim>Egyházmegye: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5><select name=ehm class=keresourlap onChange=\"if(this.value!=0) {";
+	$templomurlap.="<br><span class=kiscim>Egyházmegye: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5><select id=tehm name=ehm class=keresourlap onChange=\"if(this.value!=0) {";
 	foreach($ehmT as $id=>$nev) {
 		$templomurlap.="document.getElementById($id).style.display='none'; ";
 	} 
@@ -1145,6 +1181,9 @@ function miserend_view() {
 				$(".ajax").colorbox();
 				$(".inline").colorbox({inline:true, width:"50%"});
 			});
+            
+            $(document).bind("cbox_complete", function(){
+                ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\')        });            
 		</script>';
         
      
