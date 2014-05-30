@@ -367,6 +367,9 @@ function miserend_index() {
 
 	}
 
+    //statisztika
+    $statisztika = miserend_printRegi();
+    
 	$tmpl_file = $design_url.'/miserend_fooldal.htm';
 
     $thefile = implode("", file($tmpl_file));
@@ -813,6 +816,7 @@ function miserend_view() {
 	list($nev,$ismertnev,$turistautak,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$leiras,$megjegyzes,$misemegj,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$letrehozta,$lat,$lng,$checked)=mysql_fetch_row($lekerdez);
 
 	if($frissites>0) {
+        $frissitve = $frissites;
 		$frissites=str_replace('-','.',$frissites).'.';
 		$frissites="<span class=kicsi_kek><b><u>Frissítve:</u></b><br>$frissites</span>";
 	}
@@ -1119,6 +1123,60 @@ function miserend_view() {
 		
 	}
 
+    
+    //Segíts a frissítésben!
+    if(strtotime($frissitve) < strtotime("-3 year")) { 
+        session_start();
+        if(!isset($_SESSION['help_'.$tid])) {
+            $new = true;
+            $_SESSION['help_'.$tid] = time();            
+        } else $new = false;
+        $help = '
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>
+        <link rel="stylesheet" href="'.$design_url.'/colorbox.css" />
+        <script>
+			$(document).ready(function(){
+                $.colorbox.settings.close = \'Bezár\';
+                ';
+        if($new == true) $help .= '$.colorbox({inline:true, href:"#inline_content"});';
+        $help .= '
+				//Examples of how to assign the Colorbox event to elements
+				$(".ajax").colorbox();
+				$(".inline").colorbox({inline:true, width:"50%"});
+			});
+		</script>';
+        
+     
+     
+     $help .= '<!-- This contains the hidden content for inline calls -->
+		<div style=\'display:none\'>
+			<div id=\'inline_content\' style=\'padding:10px; background:#fff;\'>
+                <div class="focim_fekete block" style="background-color: #D0D6E4;width:100%;margin-bottom:5px">
+                    <img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
+                    <span class="dobozfocim_fekete">Elavult adat!</span>
+                    <div class="focim_fekete" style="float:right;margin-right:10px;height:7px;">&nbsp;
+                        <img src="'.$design_url.'/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
+                    </div>
+                </div>	
+			<p class="alap">Sajnos a <strong>'.$nev.' ('.$varos.')</strong> adatai már régen voltak frissítve ('.date('Y.m.d.',strtotime($frissitve)).'). Ezért könnyen lehet, hogy hibás már a miserend.</p>';
+      
+      $results2 = mysql_query("SELECT * FROM eszrevetelek WHERE hol = 'templomok' AND hol_id = ".$tid." AND ( allapot = 'u' OR allapot = 'f' ) ORDER BY datum DESC, allapot DESC LIMIT 1 ;");       
+      if(mysql_num_rows($results2)>0) {
+           $eszre = mysql_fetch_assoc($results2);
+           $help .= '<p class="alap"><strong>Nagy örömünkre már volt olyan látogatónk, aki utána nézett az adatoknak. Éppen most dolgozzuk fel a beküldött észrevételt.</strong></p>';
+       } else {
+            $help .= '<p class="alap" align="center"><strong>Kérünk, segíts a többieknek azzal, hogy megküldöd nekünk a friss miserendet, ha sikerült utánajárni!</strong></p>			
+            <div style="background-color:#F8F4F6;margin-bottom:5px;width:100%">'.$kapcsolat.'</div>';
+           }
+      $help .= ' '.$eszrevetel.'			
+			</div>
+		</div>';
+        
+        $eszrevetel .= '<p><a class=\'inline\' href="#inline_content">Segíts frissíteni!</a></p>';
+       }
+       else $help = '';
+    
 	if($vane>0) {
 		$tmpl_file = $design_url.'/templom.htm';
 
@@ -1127,7 +1185,7 @@ function miserend_view() {
 	    $thefile = "\$r_file=\"".$thefile."\";";
 		eval($thefile);
     
-	    return $kod = $r_file;
+	    return $kod = $help.$r_file;
 	}
 	else {
 
@@ -1142,6 +1200,9 @@ function androidreklam() {
 	$dobozcim='Már androidra is';
 	//$dobozszoveg=nl2br($misemegj);
 	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz-kep')\"><img src=\"http://terkep.miserend.hu/images/device-2014-03-24-230146_framed.png\" height=\"180\" style=\"float:right\"></a>Megjelent a <a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz')\">miserend androidos mobiltelefonokra</a> készült változata is. Ám még meg kell találni néhány templomnak a pontos helyét a térképen. Kérem segítsen nekünk!<br/><center><a href=\"http://terkep.miserend.hu\" onclick=\"ga('send','event','Advertisment','terkep.miserend.hu','liladoboz')\">terkep.miserend.hu</a></center>";
+	
+	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\">
+  <img alt=\"Töltd le a Google Play-rõl\" src=\"img/hu_generic_rgb_wo_60.png\" /></a>";
 	$align='';
 	$width='';
 
@@ -1153,7 +1214,44 @@ function androidreklam() {
 	$thefile = "\$r_file=\"".$thefile."\";";
 	eval($thefile);
     
-	return $r_file;	
+	return $dobozszoveg; //$r_file;	
+}
+
+function miserend_getRegi() {
+    $return = array();
+    $results = mysql_query('SELECT templomok.id, templomok.varos, templomok.nev, templomok.ismertnev, frissites, egyhazmegye, egyhazmegye.nev as egyhazmegyenev FROM templomok LEFT JOIN egyhazmegye ON egyhazmegye.id = egyhazmegye WHERE templomok.ok = "i" AND templomok.nev LIKE \'%templom%\' ORDER BY frissites ASC LIMIT 100');
+    while ($templom = mysql_fetch_assoc($results)) {
+        $results2 = mysql_query("SELECT * FROM eszrevetelek WHERE hol = 'templomok' AND hol_id = ".$templom['id']." AND ( allapot = 'u' OR allapot = 'f' ) ORDER BY datum DESC, allapot DESC LIMIT 1 ;");       
+        //while ($eszrevetel = mysql_fetch_assoc($results2)) { print_R($eszrevetel); }
+        if(mysql_num_rows($results2)>0) {
+            $eszrevetel = mysql_fetch_assoc($results2);
+            $templom['eszrevetel'] = $eszrevetel;
+        }
+        $return[] = $templom;
+    }
+    return $return;
+}
+function miserend_printRegi() {
+    $templomok = miserend_getRegi();
+
+    $return = '<img src="design/miserend/img/negyzet_kek.gif" align="absmiddle" style="margin-right:5px"><span class="dobozcim_fekete">Legrégebben frissített templomaink</span><br/>';
+    $return .= "<span class=\"alap\">Segíts nekünk az adatok frissen tartásában! Hívj fel egy régen frissült templomot!</span><br/><br/>";
+    $c = 0;
+    foreach($templomok as $templom) {
+        if(isset($templom['eszrevetel'])) {
+            $return .= "<span class=\"alap\"><i>folyamatban: ".$templom['nev']." (".$templom['varos'].")</i></span><br/>\n";
+        } else {
+            $return .= "<span class=\"alap\">".date('Y.m.d.',strtotime($templom['frissites']))."</span> <a class=\"felsomenulink\" href=\"?templom=".$templom['id']."\">".$templom['nev']." (".$templom['varos'].")</a><br/>\n";
+        }
+        //echo print_R($templom,1)."<br>";
+	
+        if($c>10) break;    
+        $c++;
+    }
+
+
+    return $return;
+    
 }
 	
 switch($m_op) {
