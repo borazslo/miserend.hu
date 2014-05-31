@@ -514,6 +514,12 @@ function miserend_templomkeres() {
 	if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
 	$mennyi=mysql_num_rows($lekerdez);
 
+    if($mennyi == 1) {
+        $talalat = mysql_fetch_assoc($lekerdez);
+        header ("Location: ?templom=".$talalat['id']);
+        die();
+    }
+    
 	$kezd=$min+1;
 	$veg=$mennyi;
 	if($min>0) {
@@ -1119,7 +1125,7 @@ function miserend_view() {
       $scrollable .= '});                      
                 $(".als-color").colorbox({rel:\'als-color\', transition:"fade",maxHeight:"98%"},
                     function() {
-                        ga(\'send\',\'event\',\'Colorbox\',\'kepek\',\''.$tid.'\')        });            
+                        ga(\'send\',\'event\',\'Photos\',\'templom\',\''.$tid.'\')        });            
                 
              });
         </script>';
@@ -1187,20 +1193,19 @@ function miserend_view() {
                 $.colorbox.settings.close = \'Bezár\';
                 ';
         if($new == true) $help .= '$.colorbox({inline:true, href:"#inline_content"}, function () {
-                        ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\');
+                        ga(\'send\',\'event\',\'Update\',\'help2update\',\''.$tid.'\');
                 });                
 			});';
         $help .= '
 				//Examples of how to assign the Colorbox event to elements
 				$(".ajax").colorbox();
 				$(".inline").colorbox({inline:true, width:"50%"}, function () {
-                        ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\');
+                        ga(\'send\',\'event\',\'Update\',\'help2updateRe\',\''.$tid.'\');
                 });                
 			});
             
             $(document).bind("cbox_complete", function(){
-                //ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\') 
-                });            
+                                });            
 		</script>';
         
      
