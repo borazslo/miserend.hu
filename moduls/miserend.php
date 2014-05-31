@@ -14,8 +14,14 @@ function idoszak($i) {
 
 function miserend_index() {
 	global $linkveg,$db_name,$m_id,$u_login,$sid,$design_url,$_GET,$u_varos,$onload,$script;
-
-    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>';
+    
+    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>';
+	$script .= '<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>';
+    $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
+   	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
+    
+    $script .= '<link rel="stylesheet" href="'.$design_url.'/colorbox.css" />';
+    $script .= '<link rel="stylesheet" href="'.$design_url.'/als.css" />';
     $script .= '
         <script>
         $(function() { //shorthand document.ready function
@@ -341,25 +347,29 @@ function miserend_index() {
 	$programajanlo="<span class=alap>kapcsolódó programok a naptárból<br>Fejlesztés alatt...</span>";
 
 	//Képek
-	$query="select kid,katnev,fajlnev,felirat from kepek,templomok where kepek.kid=templomok.id and kepek.kat='templomok' and templomok.ok='i' and kepek.kiemelt='i'";
-	if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>".mysql_error();
+	$query = "SELECT t.id, t.nev, t.ismertnev, t.varos, k.fajlnev
+    FROM kepek  k
+    JOIN templomok t ON t.id=k.kid AND k.kat = 'templomok'
+	 WHERE k.kiemelt = 'i'
+    GROUP BY t.id 
+    ORDER by RAND()
+    LIMIT 15";
+
+    if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>".mysql_error();
 	$mennyi=mysql_num_rows($lekerdez);
 	if($mennyi>0) {
-		$kepek.="\n<img src=$design_url/img/negyzet_kek.gif align=absmiddle><img src=img/space.gif width=5 height=5><span class=dobozcim_fekete>Képek templomainkról</span><br><table width=100% cellpadding=0 cellspacing=0 bgcolor=#EAEDF1><tr>";
+		$kepek.="\n<img src=$design_url/img/negyzet_kek.gif align=absmiddle><img src=img/space.gif width=5 height=5><span class=dobozcim_fekete>Képek templomainkról</span><br>";
 		$konyvtaralap="kepek/templomok";
-		while(list($tid,$kepcim,$fajlnev)=mysql_fetch_row($lekerdez)) {
-			$altT[$fajlnev]=$kepcim;
-			$tidT[$fajlnev]=$tid;
-			$fajlnevT[]=$fajlnev;
-		}
-		$kulcsokT=array_rand($fajlnevT,15);
-		foreach($kulcsokT as $kulcs) {
-			$fajlnev=$fajlnevT[$kulcs];
-			$tid=$tidT[$fajlnev];
-			$kepcim=$altT[$fajlnev];
-			$konyvtar="$konyvtaralap/$tid";
-			
-			@$info=getimagesize("$konyvtar/kicsi/$fajlnev");
+        
+        $kepek .= '<div style="height:180px"><div class="als-container" id="my-als-list">
+            <span class="als-prev"><img src="img/als/thin_left_arrow_333.png" alt="prev" title="previous" /></span>
+                <div class="als-viewport">
+                    <ul class="als-wrapper">';
+    
+		while($random=mysql_fetch_assoc($lekerdez)) {
+			$random['konyvtar'] = "$konyvtaralap/".$random['id'];
+            //if(is_file("$konyvtar/kicsi/$fajlnev")) {
+            @$info=getimagesize($random['$konyvtar']."/kicsi/".$random['fajlnev']);
 			$w1=$info[0];
 			$h1=$info[1];
 			if($h1>$w1 and $h1>90) {
@@ -371,38 +381,32 @@ function miserend_index() {
 				$ujh=$h1;
 				$ujw=$w1;
 			}
-			$title=rawurlencode($kepcim);	
-			if(is_file("$konyvtar/kicsi/$fajlnev")) {
-				$osszw=$osszw+$ujw;
-				if($osszw<=480) {
-					$kepT[]="<a href=\"?templom=$tid$linkveg\"><img src=$konyvtar/kicsi/$fajlnev title='$kepcim' border=0 width=$ujw height=$ujh></a>";
-					$kepscriptT.="\nArticle[i] = new Array (\"$konyvtar/kicsi/$fajlnev\", \"?templom=$tid$linkveg\", \"$kepcim\");i++  ";
-				}		
-			}
-		}
+            
+           $kepek .= "<li class='als-item'><a href=\"".$random['konyvtar']."/".$random['fajlnev']."\" title=\"".$random['title']."\" class='als-color'>
+            <img src=\"".$random['konyvtar']."/kicsi/".$random['fajlnev']."\" title='$kepcim' ></a></li>\n";
+
+        }
+        if($mennyi < 4) for($i=0;$i<4-$mennyi;$i++) $kepek .= "<li class='als-item'></li>";
+        $kepek.='</ul>
+            </div>
+            <span class="als-next"><img src="img/als/thin_right_arrow_333.png" alt="next" title="next" /></span>
+            </div></div>';
 	
-		if($osszw>480) {
-			$onload="loadScroller();";
-			$script.="<script type=\"text/javascript\" language=\"JavaScript\">
-				<!--                                      
-				Article = new Array;
-				i=0;";
-			$script.=$kepscriptT;
-			$script.="\n--></script>";
-
-			$script.="\n<script type=\"text/javascript\" src=\"$design_url/scroll.js\"></script>";
-			$kepek.="\n<td width=460><div>";
-			$kepek.="\n<script type=\"text/javascript\" language=\"JavaScript\">buildScroller();</script>";
-			$kepek.="\n</div>";
-			$kepek.="</td><td width=20 bgcolor=#244C8F><a href=\"#\" onmouseover=\"javascript:moveLayer();\" class=dobozcim_feher><img src=$design_url/img/fehernyil_jobb.jpg border=0 align=right></a></td>";
-		}
-		elseif(is_array($kepT)) {
-			$kepek.='<td>'.implode("<img src=img/space.gif width=5 height=7>",$kepT).'</td>';
-		}
-		$kepek.="</tr></table>";
-
-	}
-
+     $scrollable .= '<script>
+			$(document).ready(function(){                
+                $("#my-als-list").als(	{visible_items: ';
+      if($mennyi < 4 ) $scrollable .= 4; else $scrollable .= 4;
+      $scrollable .= ',	circular: "no"});                      
+                $(".als-color").colorbox({rel:\'als-color\', transition:"fade",maxHeight:"98%"},
+                    function() {
+                        ga(\'send\',\'event\',\'Photos\',\'fooldal\',\''.$tid.'\')        });            
+                
+             });
+        </script>';
+        $kepek .= $scrollable;
+    
+    }
+    
     //statisztika
     $statisztika = miserend_printRegi();
     
@@ -1141,15 +1145,6 @@ function miserend_view() {
 		while(list($fajlnev,$kepcim)=mysql_fetch_row($lekerdez)) {
 			$altT[$fajlnev]=$kepcim;
 			if(!isset($ogimage)) $ogimage = '<meta property="og:image" content="'.$konyvtar."/".$fajlnev.'">';
-			@$info=getimagesize("$konyvtar/$fajlnev");
-			$w=$info[0];
-			$h=$info[1];
-			if($w>800 or $h>600) {
-				$w=800; 
-				$h=600;
-				$window='Scroll';
-			}
-			else $window='New';
 			@$info=getimagesize("$konyvtar/kicsi/$fajlnev");
 			$w1=$info[0];
 			$h1=$info[1];
@@ -1194,8 +1189,8 @@ function miserend_view() {
                 ';
         if($new == true) $help .= '$.colorbox({inline:true, href:"#inline_content"}, function () {
                         ga(\'send\',\'event\',\'Update\',\'help2update\',\''.$tid.'\');
-                });                
-			});';
+                });';
+			
         $help .= '
 				//Examples of how to assign the Colorbox event to elements
 				$(".ajax").colorbox();
@@ -1203,9 +1198,7 @@ function miserend_view() {
                         ga(\'send\',\'event\',\'Update\',\'help2updateRe\',\''.$tid.'\');
                 });                
 			});
-            
-            $(document).bind("cbox_complete", function(){
-                                });            
+                     
 		</script>';
         
      
