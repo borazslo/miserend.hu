@@ -1208,19 +1208,19 @@ function miserend_view() {
 			<div id=\'inline_content\' style=\'padding:10px; background:#fff;\'>
                 <div class="focim_fekete block" style="background-color: #D0D6E4;width:100%;margin-bottom:5px">
                     <img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
-                    <span class="dobozfocim_fekete">Elavult adat!</span>
+                    <span class="dobozfocim_fekete">Segítséget kérünk!</span>
                     <div class="focim_fekete" style="float:right;margin-right:10px;height:7px;">&nbsp;
                         <img src="'.$design_url.'/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
                     </div>
                 </div>	
-			<p class="alap">Sajnos a <strong>'.$nev.' ('.$varos.')</strong> adatai már régen voltak frissítve ('.date('Y.m.d.',strtotime($frissitve)).'). Ezért könnyen lehet, hogy hibás már a miserend.</p>';
+			<p class="alap">A honlapunk önkéntesek munkájával jött létre és a látogatóink segítségével tartjuk naprakészen az információkat. Sajnos viszont a <strong>'.$nev.' ('.$varos.')</strong> adatai már régen voltak frissítve ('.date('Y.m.d.',strtotime($frissitve)).'). Ezért könnyen lehet, hogy hibás már a miserend.</p>';
       
       $results2 = mysql_query("SELECT * FROM eszrevetelek WHERE hol = 'templomok' AND hol_id = ".$tid." AND ( allapot = 'u' OR allapot = 'f' ) ORDER BY datum DESC, allapot DESC LIMIT 1 ;");       
       if(mysql_num_rows($results2)>0) {
            $eszre = mysql_fetch_assoc($results2);
            $help .= '<p class="alap"><strong>Nagy örömünkre már volt olyan látogatónk, aki utána nézett az adatoknak. Éppen most dolgozzuk fel a beküldött észrevételt.</strong></p>';
        } else {
-            $help .= '<p class="alap" align="center"><strong>Kérünk, segíts a többieknek azzal, hogy megküldöd nekünk a friss miserendet, ha sikerült utánajárni!</strong></p>			
+            $help .= '<p class="alap" align="center"><strong>Kérünk, csatlakozz a munkánkhoz és segíts a többieknek azzal, hogy megküldöd nekünk, hogy jó-e az itteni miserendet, ha sikerült utánajárni!</strong></p>			
             <div style="background-color:#F8F4F6;margin-bottom:5px;width:100%">'.$kapcsolat.'</div>';
            }
       $help .= ' '.$eszrevetel.'			
