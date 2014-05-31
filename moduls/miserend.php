@@ -847,6 +847,14 @@ function miserend_view() {
 	
 	$lekerdez=mysql_query($query);
 	$vane=mysql_num_rows($lekerdez);
+    
+    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>';
+	$script .= '<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>';
+    $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
+   	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
+    
+    $script .= '<link rel="stylesheet" href="'.$design_url.'/colorbox.css" />';
+    $script .= '<link rel="stylesheet" href="'.$design_url.'/als.css" />';
 
 	$ma=date('Y-m-d');
 	list($nev,$ismertnev,$turistautak,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$leiras,$megjegyzes,$misemegj,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$letrehozta,$lat,$lng,$checked)=mysql_fetch_row($lekerdez);
@@ -1103,7 +1111,26 @@ function miserend_view() {
 	$lekerdez=mysql_query($query);
 	$mennyi=mysql_num_rows($lekerdez);
 	if($mennyi>0) {		
-		$kepek.="\n<img src=$design_url/img/negyzet_kek.gif align=absmiddle><img src=img/space.gif width=5 height=5><span class=dobozcim_fekete>Képek a templomról</span><br><table width=100% cellpadding=0 cellspacing=0 bgcolor=#EAEDF1><tr>";
+              
+     $scrollable .= '<script>
+			$(document).ready(function(){                
+                $("#my-als-list").als(	{visible_items: ';
+      if($mennyi < 4 ) $scrollable .= 4; else $scrollable .= 4;
+      $scrollable .= '});                      
+                $(".als-color").colorbox({rel:\'als-color\', transition:"fade",maxHeight:"98%"},
+                    function() {
+                        ga(\'send\',\'event\',\'Colorbox\',\'kepek\',\''.$tid.'\')        });            
+                
+             });
+        </script>';
+    
+		$kepek.="\n<img src=$design_url/img/negyzet_kek.gif align=absmiddle><img src=img/space.gif width=5 height=5><span class=dobozcim_fekete>Képek a templomról</span><br>";
+
+        $kepek .= '<div class="als-container" id="my-als-list">
+  <span class="als-prev"><img src="img/als/thin_left_arrow_333.png" alt="prev" title="previous" /></span>
+  <div class="als-viewport">
+    <ul class="als-wrapper">';
+
 		$konyvtar="kepek/templomok/$tid";
 		while(list($fajlnev,$kepcim)=mysql_fetch_row($lekerdez)) {
 			$altT[$fajlnev]=$kepcim;
@@ -1131,30 +1158,17 @@ function miserend_view() {
 			}
 			$osszw=$osszw+$ujw;
 			$title=rawurlencode($kepcim);			
-			$kepT[]="<a href=\"javascript:Open".$window."Window('view.php?kep=$konyvtar/$fajlnev&title=$title',$w,$h);\"><img src=$konyvtar/kicsi/$fajlnev title='$kepcim' border=0 width=$ujw height=$ujh></a>";
-			$kepscriptT.="\nArticle[i] = new Array (\"$konyvtar/kicsi/$fajlnev\", \"javascript:Open".$window."Window('view.php?kep=$konyvtar/$fajlnev&title=$title',$w,$h);\", \"$kepcim\");i++  ";
-		}
-	
-		if($osszw>480) {
-			$onload="loadScroller();";
-			$script.="<script type=\"text/javascript\" language=\"JavaScript\">
-				<!--                                      
-				Article = new Array;
-				i=0;";
-			$script.=$kepscriptT;
-			$script.="\n--></script>";
+			
+            $kepek .= "<li class='als-item'><a href=\"$konyvtar/$fajlnev\" title=\"$title\" class='als-color'><img src=$konyvtar/kicsi/$fajlnev title='$kepcim' ></a></li>\n";
+        }
+        if($mennyi < 4) for($i=0;$i<4-$mennyi;$i++) $kepek .= "<li class='als-item'></li>";
 
-			$script.="\n<script type=\"text/javascript\" src=\"$design_url/scroll.js\"></script>";
-			$kepek.="\n<td width=460><div>";
-			$kepek.="\n<script type=\"text/javascript\" language=\"JavaScript\">buildScroller();</script>";
-			$kepek.="\n</div>";
-			$kepek.="</td><td width=20 bgcolor=#244C8F><a href=\"#\" onmouseover=\"javascript:moveLayer();\" class=dobozcim_feher><img src=$design_url/img/fehernyil_jobb.jpg border=0 align=right></a></td>";
-		}
-		else {
-			$kepek.='<td>'.implode("<img src=img/space.gif width=5 height=7>",$kepT).'</td>';
-		}
-		$kepek.="</tr></table>";
-
+		$kepek.='</ul>
+            </div>
+            <span class="als-next"><img src="img/als/thin_right_arrow_333.png" alt="next" title="next" /></span>
+            </div>';
+            
+        $kepek .= $scrollable;
 		if(isset($ogimage)) $meta .= $ogimage."\n";
 		
 	}
@@ -1168,22 +1182,25 @@ function miserend_view() {
             $_SESSION['help_'.$tid] = time();            
         } else $new = false;
         $help = '
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>
-        <link rel="stylesheet" href="'.$design_url.'/colorbox.css" />
         <script>
 			$(document).ready(function(){
                 $.colorbox.settings.close = \'Bezár\';
                 ';
-        if($new == true) $help .= '$.colorbox({inline:true, href:"#inline_content"});';
+        if($new == true) $help .= '$.colorbox({inline:true, href:"#inline_content"}, function () {
+                        ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\');
+                });                
+			});';
         $help .= '
 				//Examples of how to assign the Colorbox event to elements
 				$(".ajax").colorbox();
-				$(".inline").colorbox({inline:true, width:"50%"});
+				$(".inline").colorbox({inline:true, width:"50%"}, function () {
+                        ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\');
+                });                
 			});
             
             $(document).bind("cbox_complete", function(){
-                ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\')        });            
+                //ga(\'send\',\'event\',\'Colorbox\',\'help2update\',\''.$tid.'\') 
+                });            
 		</script>';
         
      
