@@ -520,7 +520,22 @@ function miserend_templomkeres() {
 
     if($mennyi == 1) {
         $talalat = mysql_fetch_assoc($lekerdez);
-        header ("Location: ?templom=".$talalat['id']);
+        //ga('send','event','Outgoing Links','click','".$pleb_url."');
+        //header ("Location: ?templom=".$talalat['id']);
+        echo "
+        <script type='text/javascript'>
+            (function(i,s,o,g,r,a,m){i[\"GoogleAnalyticsObject\"]=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,\"script\",\"//www.google-analytics.com/analytics.js\",\"ga\");
+
+    ga(\"create\", \"UA-3987621-4\", \"miserend.hu\");
+    ga('send','event','Search','fast','".$varos.$kulcsszo.$ehm."');
+    
+    window.location = '?templom=".$talalat['id']."';
+           
+         </script>";
+        
         die();
     }
     
