@@ -76,6 +76,15 @@ function url_ell() {
         $hibauzenet.='Az oldal beazonosításánál hiba történt.';
         $hibauzenet_prog.="\n\nHIBA az adatbázis lekérdezésnél (ell.inc #114 [url_ell]):\n" . mysql_error();
     }
+    else if(mysql_num_rows($lekerdez) < 1 ) {
+        //Ha nincs beállítva ez a domain, akkor a miserend.hu-t hozza be. Pont.
+        if($_POST['admin']!=0 or $_GET['admin']!=0) $adminoldal = true;
+        $urlT = array (10, 'Miserend', 'miserend', $aldomain, 26, $adminoldal);
+        return $urlT;
+        //$hiba=true;
+        //$hibauzenet.='Az oldal beazonosításánál hiba történt.';
+        //$hibauzenet_prog.="\n\nNINCS az adatbázisban regisztrálva az '$domainell' (ell.inc #114 [url_ell]):\n" . mysql_error();
+    }
     else {
         $van=false;
         if(mysql_num_rows($lekerdez)==0) {
@@ -126,7 +135,7 @@ function url_ell() {
             }
             
             $urlT = array ($fooldal_id, $fooldal_cim, $fooldal_design, $aldomain, $nyitomodul, $adminoldal);
-
+print_r($urlT); exit;
             return $urlT;
         }
     }
