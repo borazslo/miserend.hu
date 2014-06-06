@@ -366,7 +366,11 @@ function miserend_index() {
                 <div class="als-viewport">
                     <ul class="als-wrapper">';
     
+        $randoms  = array();
 		while($random=mysql_fetch_assoc($lekerdez)) {
+            $randoms[] = $random;
+        }
+        foreach($randoms as $random) {
 			$random['konyvtar'] = "$konyvtaralap/".$random['id'];
             //if(is_file("$konyvtar/kicsi/$fajlnev")) {
             @$info=getimagesize($random['$konyvtar']."/kicsi/".$random['fajlnev']);
@@ -382,8 +386,17 @@ function miserend_index() {
 				$ujw=$w1;
 			}
             
-           $kepek .= "<li class='als-item'><a href=\"".$random['konyvtar']."/".$random['fajlnev']."\" title=\"".$random['title']."\" class='als-color'>
-            <img src=\"".$random['konyvtar']."/kicsi/".$random['fajlnev']."\" title='$kepcim' ></a></li>\n";
+           $kepek .= "<li class='als-item colorbox'><a href=\"".$random['konyvtar']."/".$random['fajlnev']."\" title=\"".$random['title']."\" class='als-color'>
+            <img src=\"".$random['konyvtar']."/kicsi/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' ></a>
+            
+                <div style='display:none;text-align:center'>
+                    <a href=\"?templom=".$random['id']."\" title=\"".$random['title']."\">
+                    <img src=\"".$random['konyvtar']."/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' align=\"center\" style=\"max-height:80%;display:block;margin-left:auto;margin-right:auto\">
+                    <div style=\"background-color:rgba(255,255,255,0.3);padding:10px;\" class=\"felsomenulink\">".$random['nev']." (".$random['varos'].")</div>
+                    </a>
+                </div>
+            
+            </li>\n";
 
         }
         if($mennyi < 4) for($i=0;$i<4-$mennyi;$i++) $kepek .= "<li class='als-item'></li>";
@@ -397,11 +410,24 @@ function miserend_index() {
                 $("#my-als-list").als(	{visible_items: ';
       if($mennyi < 4 ) $scrollable .= 4; else $scrollable .= 4;
       $scrollable .= ',	circular: "no"});                      
-                $(".als-color").colorbox({rel:\'als-color\', transition:"fade",maxHeight:"98%"},
+                
+                $("li.colorbox").each(function() {
+                    $(this).colorbox({
+                        html: $(this).find("div").html(),
+                        rel: "group_random",
+                        transition:"fade",
+                        maxHeight:"98%"
+                    },
+                    function() {
+                        ga(\'send\',\'event\',\'Photos\',\'fooldal\',\''.$tid.'\');
+                    }                        
+                   );
+                });
+                /*$(".als-color").colorbox({rel:\'als-color\', transition:"fade",maxHeight:"98%"},
                     function() {
                         ga(\'send\',\'event\',\'Photos\',\'fooldal\',\''.$tid.'\')        });            
                 
-             });
+            */ });
         </script>';
         $kepek .= $scrollable;
     
@@ -1202,14 +1228,14 @@ function miserend_view() {
 			$(document).ready(function(){
                 $.colorbox.settings.close = \'Bezár\';
                 ';
-        if($new == true) $help .= '$.colorbox({inline:true, href:"#inline_content"}, function () {
+        if($new == true) $help .= '$.colorbox({inline:true, href:"#inline_content",maxWidth:"70%"}, function () {
                         ga(\'send\',\'event\',\'Update\',\'help2update\',\''.$tid.'\');
                 });';
 			
         $help .= '
 				//Examples of how to assign the Colorbox event to elements
 				$(".ajax").colorbox();
-				$(".inline").colorbox({inline:true, width:"50%"}, function () {
+				$(".inline").colorbox({inline:true, width:"50%",maxWidth:"70%"}, function () {
                         ga(\'send\',\'event\',\'Update\',\'help2updateRe\',\''.$tid.'\');
                 });                
 			});
