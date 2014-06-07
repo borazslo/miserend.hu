@@ -233,13 +233,45 @@ function miserend_index() {
 
 	$datum=$_GET['datum'];
 	if(empty($datum)) $datum=$ma;
-
+    
+    $file = 'fajlok/igenaptar/'.$datum.'.xml';
+    if(file_exists($file)) { 
+        $xmlstr = file_get_contents($file);
+        }
+    else {
+        $source = "http://breviar.sk/cgi-bin/l.cgi?qt=pxml&d=".substr($datum,8,2)."&m=".substr($datum,5,2)."&r=".substr($datum,0,4)."&j=hu";
+        $xmlstr = file_get_contents($source);
+        file_put_contents($file,$xmlstr);
+    }
+    
+    $xmlcont = new SimpleXMLElement($xmlstr);
+    $LiturgicalSeasons = array('évközi idõ'=>'e','húsvéti idõ'=>'h');
+    
+        $url = $xmlcont->CalendarDay;
+        $readingsId = array();
+        foreach($url->Celebration as $celebration) {
+            $unnep .= iconv('UTF-8','ISO-8859-2',$celebration->StringTitle->span[0]." (".$celebration->LiturgicalCelebrationType.") <br/>\n");
+            $readingsId[] = " id = '".$celebration->LiturgicalReadingsId."' ";
+       }
+       
+       $ev = $celebration->LiturgicalYearLetter;
+       $idoszak =  $LiturgicalSeasons[iconv('UTF-8','ISO-8859-2',$celebration->LiturgicalSeason)];
+       $nap =  $celebration->LiturgicalWeek.". hét, ".iconv('UTF-8','ISO-8859-2',$url->DayOfWeek);
+               
+       $where = " WHERE ( ev = '{$ev}' AND idoszak = '{$idoszak}' AND nap = '{$nap}' ) OR (".implode(' OR ',$readingsId)." ) LIMIT 1";       
+       //echo $where."<br>";
+    
+    
+    
+    /*
 	//A liturgikus naptárból kiszedjük, hogy mi kapcsolódik a dátumhoz
 	$query="select ige,szent,szin from lnaptar where datum='$datum'";
 	list($ige,$szent,$szin)=mysql_fetch_row(mysql_query($query));
-
+*/
 	//Az igenaptárból kikeressük a mai napot
-	$query="select ev,idoszak,nap,oszov_hely,ujszov_hely,evang_hely,unnep,intro,gondolat from igenaptar where id='$ige'";
+	//$query="select ev,idoszak,nap,oszov_hely,ujszov_hely,evang_hely,unnep,intro,gondolat from igenaptar where id='$ige'";
+    $query="select ev,idoszak,nap,oszov_hely,ujszov_hely,evang_hely,unnep,intro,gondolat from igenaptar ".$where; 
+    //echo $query;
 	list($ev,$idoszak,$nap,$oszov_hely,$ujszov_hely,$evang_hely,$unnep,$intro,$gondolat)=mysql_fetch_row(mysql_query($query));
 	$napiuzenet=nl2br($intro);
 	$elmelkedes=$gondolat;
@@ -288,7 +320,7 @@ function miserend_index() {
 			$a++;
 		}
 	}
-
+    
 	if(!empty($unnep)) {
 		$unnepkiir="<span class=kiscim>$unnep</span>";
 	}
@@ -304,39 +336,20 @@ function miserend_index() {
 	$van_o=false;
 	$van_u=false;
 	$van_e=false;
-	if(!empty($oszov_hely)) {
+    foreach(array('oszov','ujszov','evang') as $hely ) {
+	if(!empty(${$hely."_hely"})) {
 		$van_o=true;
-		$tomb1=explode(',',$oszov_hely);
+		$tomb1=explode(',',${$hely."_hely"});
 		$tomb2=explode('-',$tomb1[1]);
 		$tomb3=explode(' ',$tomb1[0]);
 		$konyv=$tomb3[0];
 		$fej=$tomb3[1];
 		$vers=$tomb2[0];
-		$link="http://www.kereszteny.hu/biblia/showchapter.php?reftrans=1&abbook=$konyv&numch=$fej#$vers";
-		$oszov_biblia="<a href=$link target=_blank title='ez a rész és a környezete a Bibliában' class=link><img src=img/biblia.gif border=0 align=absmiddle> $oszov_hely</a><br>";
+		$link="http://szentiras.hu/SZIT/".preg_replace('/ /i','',$konyv)."/$fej#$vers";
+		${$hely."_biblia"}="<a href=$link target=_blank title='ez a rész és a környezete a Bibliában' class=link><img src=img/biblia.gif border=0 align=absmiddle> ".${$hely."_hely"}."</a><br>";
 	}
-	if(!empty($ujszov_hely)) {
-		$van_u=true;
-		$tomb1=explode(',',$ujszov_hely);
-		$tomb2=explode('-',$tomb1[1]);
-		$tomb3=explode(' ',$tomb1[0]);
-		$konyv=$tomb3[0];
-		$fej=$tomb3[1];
-		$vers=$tomb2[0];
-		$link="http://www.kereszteny.hu/biblia/showchapter.php?reftrans=1&abbook=$konyv&numch=$fej#$vers";
-		$ujszov_biblia.="<a href=$link target=_blank title='ez a rész és a környezete a Bibliában' class=link><img src=img/biblia.gif border=0 align=absmiddle> $ujszov_hely</a><br>";
-	}
-	if(!empty($evang_hely)) {
-		$van_e=true;
-		$tomb1=explode(',',$evang_hely);
-		$tomb2=explode('-',$tomb1[1]);
-		$tomb3=explode(' ',$tomb1[0]);
-		$konyv=$tomb3[0];
-		$fej=$tomb3[1];
-		$vers=$tomb2[0];
-		$link="http://www.kereszteny.hu/biblia/showchapter.php?reftrans=1&abbook=$konyv&numch=$fej#$vers";
-		$evang_biblia.="<a href=$link target=_blank title='ez a rész és a környezete a Bibliában' class=link><img src=img/biblia.gif border=0 align=absmiddle> $evang_hely</a><br>";
-	}
+    }
+	
 	///////////////////////////////////////////////////////////////////
 	$igehelyek=$oszov_biblia.$ujszov_biblia.$evang_biblia;
 
