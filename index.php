@@ -43,7 +43,7 @@
 
 		if(!empty($_GET['design'])) $design=$_GET['design'];
 
-        $vars['design_url'] = $design_url="design/$design";
+        $vars['design_url'] = $design_url = $config['path']['domain'];
         
 	}
 
@@ -81,7 +81,7 @@ $twig = new Twig_Environment($loader); // cache?
 //designelemek behívása
 /////////////////////////////////
     if(!$hiba) {
-        if(!include("$design_url/design.php")) {
+        if(!include("design.php")) {
             $hiba=true;
             $hibauzenet.='Elnézését kérjük, az oldal nem jeleníthető meg.';
             $hibauzenet_prog.='HIBA! A desing program nem hívható be!<br>'.$design_url.'/design.php';

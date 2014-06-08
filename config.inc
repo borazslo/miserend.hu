@@ -12,6 +12,7 @@ $config['connection'] = array(
         'prefix' => '', /* Még nem működik */
     );
 
+$config['path']['domain'] = '';
 
 function dbconnect() {
     global $hiba,$hibauzenet,$hibauzenet_prog,$db_name,$modul_url,$fuggveny_url,$design_url,$nyitomodul;

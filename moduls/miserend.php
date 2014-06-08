@@ -20,8 +20,8 @@ function miserend_index() {
     $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
    	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
     
-    $script .= '<link rel="stylesheet" href="'.$design_url.'/colorbox.css" />';
-    $script .= '<link rel="stylesheet" href="'.$design_url.'/als.css" />';
+    $script .= '<link rel="stylesheet" href="templates/colorbox.css" />';
+    $script .= '<link rel="stylesheet" href="templates/als.css" />';
     $script .= '
         <script>
         $(function() { //shorthand document.ready function
@@ -919,8 +919,8 @@ function miserend_view() {
     $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
    	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
     
-    $script .= '<link rel="stylesheet" href="'.$design_url.'/colorbox.css" />';
-    $script .= '<link rel="stylesheet" href="'.$design_url.'/als.css" />';
+    $script .= '<link rel="stylesheet" href="templates/colorbox.css" />';
+    $script .= '<link rel="stylesheet" href="templates/als.css" />';
 
 	$ma=date('Y-m-d');
 	list($nev,$ismertnev,$turistautak,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$leiras,$megjegyzes,$misemegj,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$letrehozta,$lat,$lng,$checked)=mysql_fetch_row($lekerdez);

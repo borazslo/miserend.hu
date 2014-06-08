@@ -161,6 +161,7 @@ function design(&$vars) {
 	elseif(!empty($vars['body']['onload'])) {
 		$vars['body']['onload']="onload=\"".$vars['body']['onload'].";\"";
 	}
+
 //Scriptek////////////////////////////////////
 	$script.="\n".'<script language="JavaScript" type="text/javascript">
 	<!--
