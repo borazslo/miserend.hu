@@ -2,16 +2,28 @@
 
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
+$config = array();
+
+$config['connection'] = array(
+        'host' => 'localhost',
+        'user' => '***',
+        'password' => '***',
+        'database' => 'vpa_portal',
+        'prefix' => '', /* Még nem mûködik */
+    );
+
+
 function dbconnect() {
     global $hiba,$hibauzenet,$hibauzenet_prog,$db_name,$modul_url,$fuggveny_url,$design_url,$nyitomodul;
     
     $modul_url='moduls';
     $nyitomodul=1;
 
-    $db_host = "localhost";
-    $db_uname = "***";
-    $db_upass = "***";
-    $db_name = "vpa_portal";
+    global $config;
+    $db_host = $config['connection']['host'];
+    $db_uname = $config['connection']['user'];
+    $db_upass = $config['connection']['password'];
+    $db_name = $config['connection']['database'];
 
     if(!@mysql_connect($db_host, $db_uname, $db_upass)) {
     
@@ -23,7 +35,12 @@ function dbconnect() {
     
     mysql_query("SET NAMES latin2");
     
-    mysql_select_db($db_name);
+    if(!mysql_select_db($db_name)) {
+        $hiba=true;
+        $hibauzenet.='Elnézést kérünk, a szolgáltatás jelenleg nem érhetõ el.';
+        $idopont=date('Y.m.d. H:i.s');
+        $hibauzenet_prog.="Az '".$db_name."' adatbázis nem létezik, vagy nincs megfelelõ jogosultság elérni azt!\n".mysql_error()."\n$idopont";
+    }
 }
 
 function kicsinyites($forras,$kimenet,$max) {
