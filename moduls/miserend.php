@@ -1,4 +1,4 @@
-﻿<?
+<?
 
 function idoszak($i) {
     switch($i) {
@@ -245,7 +245,6 @@ function miserend_index() {
     }
     
     $xmlcont = new SimpleXMLElement($xmlstr);
-    $LiturgicalSeasons = array('évközi idő'=>'e','húsvéti idő'=>'h');
     
         $url = $xmlcont->CalendarDay;
         $readingsId = array();
@@ -255,7 +254,10 @@ function miserend_index() {
        }
        
        $ev = $celebration->LiturgicalYearLetter;
-       $idoszak =  $LiturgicalSeasons[$variables->LiturgicalSeason];
+       if(preg_match("/évközi/i",$celebration->LiturgicalSeason)) $idoszak = 'e';
+       elseif(preg_match("/nagyböjti/i",$celebration->LiturgicalSeason)) $idoszak = 'n';
+       elseif(preg_match("/húsvéti/i",$celebration->LiturgicalSeason)) $idoszak = 'h';
+       else $idoszak = "%";
        $nap =  $celebration->LiturgicalWeek.". hét, ".$url->DayOfWeek;
                
        $where = " WHERE ( ev = '{$ev}' AND idoszak = '{$idoszak}' AND nap = '{$nap}' ) OR (".implode(' OR ',$readingsId)." ) LIMIT 1";       
@@ -449,14 +451,17 @@ function miserend_index() {
     //statisztika
     $statisztika = miserend_printRegi();
     
-	$tmpl_file = $design_url.'/miserend_fooldal.htm';
-
-    $thefile = implode("", file($tmpl_file));
-	$thefile = addslashes($thefile);
-    $thefile = "\$r_file=\"".$thefile."\";";
-	eval($thefile);
-    
-    return $kod = $r_file;
+	global $twig;
+	$variables = array(
+        'miseurlap'=>$miseurlap,
+        'androidreklam' => $androidreklam,
+        'templomurlap' => $templomurlap,
+        'kepek' => $kepek,
+        'uzenet' => $uzenet,
+        'igehelyek' => $igehelyek,
+        'elmelkedes' => $elmelkedes,
+        'design_url' => $design_url);		
+    return $twig->render('content_fooldal.html',$variables);
 }
 
 function miserend_templomkeres() {
@@ -618,15 +623,13 @@ function miserend_templomkeres() {
 	}
 
 	$focim="Keresés a templomok között";
-
-	$tmpl_file = $design_url.'/miserend_talalatok.htm';
-
-    $thefile = implode("", file($tmpl_file));
-	$thefile = addslashes($thefile);
-    $thefile = "\$r_file=\"".$thefile."\";";
-	eval($thefile);
-    
-    return $kod = $r_file;
+    global $twig;
+	$variables = array(
+        'focim'=>$focim,
+        'content' => $tartalom,
+        'templomurlap' => $templomurlap,
+        'design_url' => $design_url);		
+    return $twig->render('content_talalatok.html',$variables);
 }
 
 function miserend_misekeres() {
@@ -888,15 +891,13 @@ function miserend_misekeres() {
 
 
 	$focim="Szentmise kereső";
-
-	$tmpl_file = $design_url.'/miserend_talalatok.htm';
-
-    $thefile = implode("", file($tmpl_file));
-	$thefile = addslashes($thefile);
-    $thefile = "\$r_file=\"".$thefile."\";";
-	eval($thefile);
-    
-    return $kod = $r_file;
+    global $twig;
+	$variables = array(
+        'focim'=>$focim,
+        'content' => $tartalom,
+        'templomurlap' => $templomurlap,
+        'design_url' => $design_url);		
+    return $twig->render('content_talalatok.html',$variables);
 }
 
 function miserend_view() {

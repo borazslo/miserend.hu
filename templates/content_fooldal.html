@@ -7,34 +7,34 @@
 </style>
  
  <div class="focim_fekete block" style="background-color: #D0D6E4;width:100%;margin-bottom:5px">
-	<img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
-	<span class="dobozfocim_fekete">Szentmise keresõ</span>
+	<img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
+	<span class="dobozfocim_fekete">Szentmise keresÅ‘</span>
 	
 	<div class="focim_fekete" style="float:right;margin-right:10px;height:7px;">&nbsp;
-		<img src="$design_url/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
+		<img src="{{ design_url|raw }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
 	</div>
 </div>	
 
 <div class="block">
-	<div class="miseurlap" style="width:49%;float:left">$miseurlap</div>
+	<div class="miseurlap" style="width:49%;float:left">{{ miseurlap|raw }}</div>
 	<div class="keresourlap" style="float:right;width:49%;background-color:#EAEDF1;">
 		<div style="background-color:#244C8F;height:15px">
-			<img src="$design_url/img/negyzet_feher.gif" width="6" height="8" align="absmiddle" style="margin-left:5px;margin-right:5px;">
-			<span class="dobozcim_feher">Keresés a templomok között</span>
+			<img src="{{ design_url|raw }}/img/negyzet_feher.gif" width="6" height="8" align="absmiddle" style="margin-left:5px;margin-right:5px;">
+			<span class="dobozcim_feher">KeresÃ©s a templomok kÃ¶zÃ¶tt</span>
 		</div>
-		<div style="padding-left:5px;padding-right:5px;">$templomurlap</div>
+		<div style="padding-left:5px;padding-right:5px;">{{ templomurlap|raw }}</div>
 	</div>
 	<div align="center" style="margin-top:5px;width:49%;float:right">
-		$androidreklam
+		{{ androidreklam|raw }}
 	</div>
  </div>
   
 <div style="background-color:#CCCCCC;height:3px;margin-top:10px;margin-bottom:10px;width:100%"></div>
-$kepek
-<!--
+{{ kepek|raw }}
+ <!--
 <table width="100%" border="0" cellspacing="0" cellpadding="0">   
   <tr> 
-    <td colspan="3"><img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class=dobozfocim_kek>Mai ünnep - üzenet</span></td>
+    <td colspan="3"><img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class=dobozfocim_kek>Mai Ã¼nnep - Ã¼zenet</span></td>
   </tr>
   <tr valign="top"> 
     <td colspan="3" height="10"> 
@@ -48,10 +48,10 @@ $kepek
           <td bgcolor="#FFFFFF">
             <table bgcolor="#F8F4F6" width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr> 
-                <td><img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Napi 
+                <td><img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Napi 
                   igehelyek </span></td>
                 <td> 
-                  <div align="right"><img src="$design_url/img/lilapontok_lila.jpg" width="43" height="6"></div>
+                  <div align="right"><img src="{{ design_url|raw }}/img/lilapontok_lila.jpg" width="43" height="6"></div>
                 </td>
               </tr>
             </table>
@@ -63,7 +63,7 @@ $kepek
           <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
           <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
           <td bgcolor="#FFFFFF">
-            $igehelyek
+            {{ igehelyek|raw }}
             </td>
           <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
           <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
@@ -72,17 +72,7 @@ $kepek
           <td colspan="5" bgcolor="#EAEDF1" height="1"><img src=img/space.gif width="5" height="1"></td>
         </tr>
       </table>
-      $uzenet</td>
-  </tr>
-  <tr> 
-    <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
-  </tr>
- 
-  <tr>
-    <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
-  </tr>
-  <tr> 
-    <td colspan="3" height="10">$kepek</td>
+      {{ uzenet|raw }}</td>
   </tr>
   <tr> 
     <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
@@ -95,10 +85,10 @@ $kepek
           <td bgcolor="#D0D6E4"> 
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr> 
-                <td><img src="$design_url/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_fekete">Napi 
+                <td><img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_fekete">Napi 
                   elm&eacute;lked&eacute;s </span></td>
                 <td> 
-                  <div align="right"><span class="dobozfocim_fekete"><img src="$design_url/img/lilacsik.jpg" width="170" height="7" align="absmiddle"></span></div>
+                  <div align="right"><span class="dobozfocim_fekete"><img src="{{ design_url|raw }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle"></span></div>
                 </td>
               </tr>
             </table>
@@ -107,11 +97,11 @@ $kepek
         </tr>
         <tr bgcolor="#F8F4F6"> 
           <td width="5" bgcolor="#F3F3F5"></td>
-          <td bgcolor="#F3F3F5">$elmelkedes</td>
+          <td bgcolor="#F3F3F5">{{ elmelkedes|raw }}</td>
           <td width="5" bgcolor="#F3F3F5"></td>
         </tr>
       </table>
     </td>
   </tr>
-</table>
--->
+</table>-->
+

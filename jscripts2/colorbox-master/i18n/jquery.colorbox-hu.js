@@ -4,12 +4,12 @@
 	translated by: kovadani
 */
 jQuery.extend(jQuery.colorbox.settings, {
-	current: "{current}/{total} kép",
-	previous: "Elõzõ",
-	next: "Következõ‘",
-	close: "Bezár",
-	xhrError: "A tartalmat nem sikerült betolteni.",
-	imgError: "A képet nem sikerült betölteni.",
-	slideshowStart: "Diavetítés indítása",
-	slideshowStop: "Diavetítés leállítása"
+	current: "{current}/{total} kÃ©p",
+	previous: "ElÅ‘zÅ‘",
+	next: "KÃ¶vetkezÅ‘",
+	close: "BezÃ¡r",
+	xhrError: "A tartalmat nem sikerÃ¼lt betolteni.",
+	imgError: "A kÃ©pet nem sikerÃ¼lt betÃ¶lteni.",
+	slideshowStart: "DiavetÃ­tÃ©s indÃ­tÃ¡sa",
+	slideshowStop: "DiavetÃ­tÃ©s leÃ¡llÃ­tÃ¡sa"
 });
