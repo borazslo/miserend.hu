@@ -17,7 +17,7 @@ function url_ell() {
 
     global $_SERVER, $db_name, $hiba, $hibauzenet, $hibauzenet_prog, $_GET, $_POST;
     
-	$fooldal_id=$_POST['fooldal_id'];
+	$fooldal_id=$_REQUEST['fooldal_id'];
     if(!empty($fooldal_id)) {
         //Átugrasztjuk arra a fõoldalra
         $query="select domain,ugras from fooldal where id='$fooldal_id'";
@@ -27,31 +27,19 @@ function url_ell() {
         if(!empty($ugras)) $ujlink=$ugras;
         else $ujlink=$domain;
         
-        foreach($_POST as $kulcs=>$ertek) {
-            if($kulcs!='fooldal_id') $parameterT[]="$kulcs=$ertek";
-        }
+        if(isset($_POST['fooldal_id']))
+            foreach($_POST as $kulcs=>$ertek) {
+                if($kulcs!='fooldal_id') $parameterT[]="$kulcs=$ertek";
+            }
+        if(isset($_GET['fooldal_id']))
+            foreach($_GET as $kulcs=>$ertek) {
+                if($kulcs!='fooldal_id') $parameterT[]="$kulcs=$ertek";
+            }
         if(is_array($parameterT)) $parameterek=implode('&',$parameterT);
         
         header("Location: http://$ujlink?$parameterek");
     }
 
-    $fooldal_id=$_GET['fooldal_id'];
-    if(!empty($fooldal_id)) {
-        //Átugrasztjuk arra a fõoldalra
-        $query="select domain,ugras from fooldal where id='$fooldal_id'";
-        $lekerdez=mysql_query($query);
-        list($domain,$ugras)=mysql_fetch_row($lekerdez);
-
-        if(!empty($ugras)) $ujlink=$ugras;
-        else $ujlink=$domain;
-        
-        foreach($_GET as $kulcs=>$ertek) {
-            if($kulcs!='fooldal_id') $parameterT[]="$kulcs=$ertek";
-        }
-        if(is_array($parameterT)) $parameterek=implode('&',$parameterT);
-        
-        header("Location: http://$ujlink?$parameterek");
-    }
 
     $teljes_domain=$_SERVER['SERVER_NAME'];  // pl. www.plebania.net
     if(substr_count($teljes_domain, '.')>1) {      // lebalább 2 pontnál van aldomain
@@ -135,44 +123,12 @@ function url_ell() {
             }
             
             $urlT = array ($fooldal_id, $fooldal_cim, $fooldal_design, $aldomain, $nyitomodul, $adminoldal);
-print_r($urlT); exit;
             return $urlT;
         }
     }
 }
 
-function extra_ell($fooldal_id) {
-//Extra alkalom ellenõrzése
-/////////////////////////////////
-// id int(3) auto_increment primary
-// tol datetime [amikortól érvényes]
-// ig datetime [ameddig érvényes]
-// uzenet text [üzenet szövege, ami kiírásra kerül]
-// tipus enum(s,bn) [esemény típusa: semmi nem jön be, csak az üzenet, vagy belépés nincs, csak üzenet + egyéb oldalak]
-// fooldalak varchar(50) [mely fõoldalakat érinti az esemény]
-//
-// FIGYELEM! Egy idõszakban egy oldalhoz CSAK EGY esemény lehetséges
-/////////////////////////////////
 
-    global $hiba, $hibauzenet, $hibauzenet_prog, $db_name;
-
-    $most=date('Y-m-d H:i:s');
-    $fooldal="and fooldalak like '%-".$fooldal_id."-%'";
-
-    $query="select uzenet,tipus from extra_alkalom where tol<'$most' and ig>'$most' $fooldal";
-    if(!$lekerdez=mysql_query($query)) {
-        //Ha a lekérdezés nem sikerült...
-        $hiba=true;
-        $hibauzenet.='HIBA az adatbázis lekérdezésnél. A szolgáltatás jelenleg nem érhetõ el.';
-        $hibauzenet_prog.="\n\nHIBA az adatbázis lekérdezésnél (ell.inc #109 [extra_ell]):\n" . mysql_error();
-    }
-    else {
-        list($extra_uzenet,$extra_tipus)=mysql_fetch_row($lekerdez);
-        //Egy idõszakban egy oldalhoz CSAK EGY esemény lehetséges
-        $extraT = array ($extra_uzenet, $extra_tipus);
-        return $extraT;
-    }
-}
 
 function modul_ell($fooldal_id,$aldomain) {
 //Behívandó modulok ellenõrzése
