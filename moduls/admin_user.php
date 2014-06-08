@@ -3,10 +3,10 @@
 function user_index() {
 	global $linkveg,$m_id;
 
-	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Új felhasználó - hozzáadás</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>Meglévõ módosítása, törlése</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Ãšj felhasznÃ¡lÃ³ - hozzÃ¡adÃ¡s</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>MeglÃ©vÅ‘ mÃ³dosÃ­tÃ¡sa, tÃ¶rlÃ©se</a><br>";
 
-	$adatT[2]="<span class=alcim>Felhasználók szerkesztése</span><br><br>".$menu;
+	$adatT[2]="<span class=alcim>FelhasznÃ¡lÃ³k szerkesztÃ©se</span><br><br>".$menu;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -27,27 +27,27 @@ function user_add($uid) {
 	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=sessid value=$sessid>";
 	$urlap.="\n<input type=hidden name=m_op value=adding><input type=hidden name=uid value=$uid>";
 
-//Bejelentkezési név	
-	$urlap.="\n<span class=kiscim>Bejelentkezési név: </span><br><input type=text name=ulogin value='$ulogin' class=urlap size=20 maxlength=20";
+//BejelentkezÃ©si nÃ©v	
+	$urlap.="\n<span class=kiscim>BejelentkezÃ©si nÃ©v: </span><br><input type=text name=ulogin value='$ulogin' class=urlap size=20 maxlength=20";
 	if(!empty($ulogin)) $urlap.=' readonly';
 	$urlap.=">";
 
-//regdátum, lastlogin
-	$urlap.="<br><br><span class=kiscim>Belépések:</span><br><textarea readonly cols=40 rows=2 class=urlap>Regisztráció: $regdatum\nUtolsó belépés: $lastlogin</textarea>";
+//regdÃ¡tum, lastlogin
+	$urlap.="<br><br><span class=kiscim>BelÃ©pÃ©sek:</span><br><textarea readonly cols=40 rows=2 class=urlap>RegisztrÃ¡ciÃ³: $regdatum\nUtolsÃ³ belÃ©pÃ©s: $lastlogin</textarea>";
 
-//Becenév
-	$urlap.="\n<br><br><span class=kiscim>Becenév, megszólítás: </span><br><input type=text name=becenev value='$becenev' class=urlap size=20 maxlength=50>";
+//BecenÃ©v
+	$urlap.="\n<br><br><span class=kiscim>BecenÃ©v, megszÃ³lÃ­tÃ¡s: </span><br><input type=text name=becenev value='$becenev' class=urlap size=20 maxlength=50>";
 
-//Jelszó
-	$urlap.="\n<br><br><span class=kiscim>(új) jelszó:</span><br><input type=password name=ujelszo class=urlap maxlength=40 size=20> <span class=alap>mégegyszer:</span> <input type=password name=ujelszo1 class=urlap maxlength=40 size=20>";
+//JelszÃ³
+	$urlap.="\n<br><br><span class=kiscim>(Ãºj) jelszÃ³:</span><br><input type=password name=ujelszo class=urlap maxlength=40 size=20> <span class=alap>mÃ©gegyszer:</span> <input type=password name=ujelszo1 class=urlap maxlength=40 size=20>";
 
-//Engedélyezés
-	$urlap.="\n<br><br><span class=kiscim>Engedélyezés/kizárás: </span><br><input type=checkbox name=ok value='i' class=urlap";
+//EngedÃ©lyezÃ©s
+	$urlap.="\n<br><br><span class=kiscim>EngedÃ©lyezÃ©s/kizÃ¡rÃ¡s: </span><br><input type=checkbox name=ok value='i' class=urlap";
 	if($ok!='n') $urlap.=' checked';
-	$urlap.='><span class=alap> aktív</span>';
+	$urlap.='><span class=alap> aktÃ­v</span>';
 
-//Jogosultság	
-	$urlap.="\n<br><br><span class=kiscim>Jogosultságok: </span>";
+//JogosultsÃ¡g	
+	$urlap.="\n<br><br><span class=kiscim>JogosultsÃ¡gok: </span>";
 	$query="select jogkod from modulok where jogkod!=''";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($jogkod)=mysql_fetch_row($lekerdez)) {
@@ -59,35 +59,35 @@ function user_add($uid) {
 //Email
 	$urlap.="\n<br><br><span class=kiscim>Email: </span><br><input type=text name=email class=urlap maxlength=100 size=40 value='$email'>";
 
-//Név
-	$urlap.="\n<br><br><span class=kiscim>Név: </span><br><input type=text name=nev class=urlap maxlength=100 size=40 value='$nev'>";	
+//NÃ©v
+	$urlap.="\n<br><br><span class=kiscim>NÃ©v: </span><br><input type=text name=nev class=urlap maxlength=100 size=40 value='$nev'>";	
 
-//Elérhetõség	
-	$urlap.="\n<br><br><span class=kiscim>Elérhetõségek:</span>";
-	$urlap.="\n<br><span class=alap>Ország: </span><input type=text name=orszag class=urlap size=40 maxlength=50 value='$orszag'>";
-	$urlap.="\n<br><span class=alap>Település: </span><input type=text name=varos class=urlap size=40 maxlength=50 value='$varos'>";
+//ElÃ©rhetÅ‘sÃ©g	
+	$urlap.="\n<br><br><span class=kiscim>ElÃ©rhetÅ‘sÃ©gek:</span>";
+	$urlap.="\n<br><span class=alap>OrszÃ¡g: </span><input type=text name=orszag class=urlap size=40 maxlength=50 value='$orszag'>";
+	$urlap.="\n<br><span class=alap>TelepÃ¼lÃ©s: </span><input type=text name=varos class=urlap size=40 maxlength=50 value='$varos'>";
 	$urlap.="\n<br><span class=alap>Kontakt: </span><br><textarea name=kontakt class=urlap cols=60 rows=4>$kontakt</textarea>";
 	$urlap.="\n<br><span class=alap>Skype: </span><input type=text name=skype class=urlap size=40 maxlength=50 value='$skype'>";
 	$urlap.="\n<br><span class=alap>MSN messenger: </span><input type=text name=msn class=urlap size=40 maxlength=50 value='$msn'>";
 
-//Egyéb adatok
-	$urlap.="\n<br><br><span class=kiscim>Bemutatkozás: </span><br><textarea name=magamrol class=urlap cols=60 rows=8>$magamrol</textarea>";
-	$urlap.="\n<br><span class=alap>Foglalkozás: </span><input type=text name=foglalkozas class=urlap size=40 maxlength=50 value='$foglalkozas'>";
-	$urlap.="\n<br><br><span class=kiscim>Vallás: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$vallas'>";	
-	$urlap.="\n<br><br><span class=kiscim>Családi állapot: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$csaladiallapot'>";	
-	$urlap.="\n<br><br><span class=kiscim>Születésnap: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$szuldatum'>";	
+//EgyÃ©b adatok
+	$urlap.="\n<br><br><span class=kiscim>BemutatkozÃ¡s: </span><br><textarea name=magamrol class=urlap cols=60 rows=8>$magamrol</textarea>";
+	$urlap.="\n<br><span class=alap>FoglalkozÃ¡s: </span><input type=text name=foglalkozas class=urlap size=40 maxlength=50 value='$foglalkozas'>";
+	$urlap.="\n<br><br><span class=kiscim>VallÃ¡s: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$vallas'>";	
+	$urlap.="\n<br><br><span class=kiscim>CsalÃ¡di Ã¡llapot: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$csaladiallapot'>";	
+	$urlap.="\n<br><br><span class=kiscim>SzÃ¼letÃ©snap: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$szuldatum'>";	
 	if($szuldatum>0) {
 		$ev=date('Y');
 		$szulev=substr($szuldatum,0,4);
 		$kor=$ev-$szulev;
-		$urlap.="<span class=alap> (idén $kor éves)</span>";
+		$urlap.="<span class=alap> (idÃ©n $kor Ã©ves)</span>";
 	}
-	$urlap.="\n<br><br><span class=kiscim>Névnap: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$nevnap'>";	
+	$urlap.="\n<br><br><span class=kiscim>NÃ©vnap: </span><br><input type=text readonly class=urlap maxlength=100 size=40 value='$nevnap'>";	
 	
 
 	$urlap.='<br><br><input type=submit value=Mehet class=urlap></form>';
 
-	$adatT[2]="<span class=alcim>Felhasználók szerkesztése</span><br><br>".$urlap;
+	$adatT[2]="<span class=alcim>FelhasznÃ¡lÃ³k szerkesztÃ©se</span><br><br>".$urlap;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -126,7 +126,7 @@ function user_adding() {
 		}
 		else {
 			$hiba=true;
-			$hibauzenet='HIBA! A beírt két jelszó nem egyezik!';
+			$hibauzenet='HIBA! A beÃ­rt kÃ©t jelszÃ³ nem egyezik!';
 		}
 	}
 
@@ -149,7 +149,7 @@ function user_adding() {
 		$kod=user_add($uid);
 	}
 	else {
-		$adatT[2]="<span class=alcim>Felhasználók szerkesztése</span><br><br><span class=hiba>$hibauzenet</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
+		$adatT[2]="<span class=alcim>FelhasznÃ¡lÃ³k szerkesztÃ©se</span><br><br><span class=hiba>$hibauzenet</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
 		$tipus='doboz';
 		$kod.=formazo($adatT,$tipus);	
 	}
@@ -167,7 +167,7 @@ function user_mod() {
 	$limit=$_POST['limit'];
 	if(empty($limit)) $limit=50;
 
-	$kiir.="\n<span class=kiscim>Keresés:</span><br><br>";
+	$kiir.="\n<span class=kiscim>KeresÃ©s:</span><br><br>";
 	$kiir.="\n<form method=post><input type=hidden name=sid value=$sid>";
 	$kiir.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=mod>";
 	$kiir.="\n<input type=text name=kulcsszo value='$kulcsszo' class=urlap size=20>";
@@ -181,11 +181,11 @@ function user_mod() {
 	}
 	$kiir.="\n</select>";
 	
-	$kiir.="\n<br><span class=alap>rendezés: </span><select name=sort class=urlap> ";
-	$sortT['felhasználó név']='login';
-	$sortT['becenév']='becenev';
-	$sortT['név']='nev';
-	$sortT['utolsó belépés']='lastlogin desc';	
+	$kiir.="\n<br><span class=alap>rendezÃ©s: </span><select name=sort class=urlap> ";
+	$sortT['felhasznÃ¡lÃ³ nÃ©v']='login';
+	$sortT['becenÃ©v']='becenev';
+	$sortT['nÃ©v']='nev';
+	$sortT['utolsÃ³ belÃ©pÃ©s']='lastlogin desc';	
 	
 	foreach($sortT as $kulcs=>$ertek) {
 		$kiir.="<option value='$ertek'";
@@ -194,7 +194,7 @@ function user_mod() {
 	}
 	$kiir.="\n</select><input type=submit value=Lista class=urlap></form>";
 
-	$kiir.="<span class=kiscim>Válassz az alábbi felhasználók közül:</span><br><br>";
+	$kiir.="<span class=kiscim>VÃ¡lassz az alÃ¡bbi felhasznÃ¡lÃ³k kÃ¶zÃ¼l:</span><br><br>";
 
 	if(!empty($kulcsszo)) {
 		$feltetelT[]="login like '%$kulcsszo%'";
@@ -213,10 +213,10 @@ function user_mod() {
 		$kiir .= "<b>- ".$user['login']."</b> (".$user['nev'].")</a> - ";
 		$kiir .= "<span class=\"alap\"><a href=\"mailto:".$user['email']."\">".$user['email']."</a></span> - ";
 		$kiir .= "<span class=\"alap\">".$user['lastlogin']."</span> - ";
-		$kiir .= "<a href=?m_id=$m_id&m_op=del&uid=".$user['uid']."$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
+		$kiir .= "<a href=?m_id=$m_id&m_op=del&uid=".$user['uid']."$linkveg class=link><img src=img/del.jpg border=0 alt=TÃ¶rÃ¶l align=absmiddle> tÃ¶rÃ¶l</a><br>";
 	}
 
-	$adatT[2]="<span class=alcim>Felhasználók szerkesztése - módosítás</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>FelhasznÃ¡lÃ³k szerkesztÃ©se - mÃ³dosÃ­tÃ¡s</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -230,7 +230,7 @@ function user_del() {
 
 	$uid=$_GET['uid'];
 
-	$kiir="\n<span class=kiscim>Biztosan törölni akarod a következõ felhasználót?</span>";
+	$kiir="\n<span class=kiscim>Biztosan tÃ¶rÃ¶lni akarod a kÃ¶vetkezÅ‘ felhasznÃ¡lÃ³t?</span>";
 	
 	$query="select login,nev from user where uid='$uid'";
 	list($ulogin,$unev)=mysql_fetch_row(mysql_db_query($db_name,$query));
@@ -239,7 +239,7 @@ function user_del() {
 
 	$kiir.="<br><br><a href=?m_id=$m_id&m_op=delete&uid=$uid$linkveg class=link>Igen</a> - <a href=?m_id=$m_id&m_op=mod$linkveg class=link>NEM</a>";
 
-	$adatT[2]="<span class=alcim>Felhasználók szerkesztése - törlés</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>FelhasznÃ¡lÃ³k szerkesztÃ©se - tÃ¶rlÃ©s</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -264,7 +264,7 @@ function user_delete() {
 
 
 if(strstr($u_jogok,'user')) {
-	//Csak, ha van user jogosultsága!
+	//Csak, ha van user jogosultsÃ¡ga!
 
 switch($m_op) {
     case 'index':
@@ -294,6 +294,6 @@ switch($m_op) {
 }
 }
 else {
-	$tartalom="\n<span class=hiba>HIBA! Nincs hozzá jogosultságod!</span>";
+	$tartalom="\n<span class=hiba>HIBA! Nincs hozzÃ¡ jogosultsÃ¡god!</span>";
 }
 ?>

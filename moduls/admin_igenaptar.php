@@ -2,19 +2,19 @@
 
 function idoszak($i) {
     switch($i) {
-        case 'a': $tmp = 'Ádventi idõ'; break;
-        case 'k': $tmp = 'Karácsonyi idõ'; break;
-        case 'n': $tmp = 'Nagyböjti idõ'; break;
-        case 'h': $tmp = 'Húsvéti idõ'; break;
-        case 'e': $tmp = 'Évközi idõ'; break;
-		case 's': $tmp = 'Szent ünnepe'; break;
+        case 'a': $tmp = 'Ãdventi idÅ‘'; break;
+        case 'k': $tmp = 'KarÃ¡csonyi idÅ‘'; break;
+        case 'n': $tmp = 'NagybÃ¶jti idÅ‘'; break;
+        case 'h': $tmp = 'HÃºsvÃ©ti idÅ‘'; break;
+        case 'e': $tmp = 'Ã‰vkÃ¶zi idÅ‘'; break;
+		case 's': $tmp = 'Szent Ã¼nnepe'; break;
     }
     return $tmp;
 }
 
 function igenaptar_index() {
 
-	$kod="<span class=alap>Válassz!</span>";
+	$kod="<span class=alap>VÃ¡lassz!</span>";
 
 	return $kod;
 }
@@ -24,7 +24,7 @@ function addszent($id) {
 
 	$kod.=include('editscript2.php');
 
-	$kod.="<p class=alcim>Szent / ünnep hozzáadása, módosítása</p>";
+	$kod.="<p class=alcim>Szent / Ã¼nnep hozzÃ¡adÃ¡sa, mÃ³dosÃ­tÃ¡sa</p>";
 
     $query="select nev,nevnap,intro,ho,nap,leiras,szin from szentek where id='$id'";
     if(!$lekerdez=mysql_query($query))
@@ -35,10 +35,10 @@ function addszent($id) {
     $kod.="\n<input type=hidden name=sid value=$sid><input type=hidden name=id value=$id>";
     $kod.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=addingszent>";
 
-    $kod.="\n<span class=kiscim>Szent / ünnep neve:</span>";
+    $kod.="\n<span class=kiscim>Szent / Ã¼nnep neve:</span>";
 	$kod.="\n<br><input tpye=text name=nev value='$nev' size=40 class=urlap>";
 
-	$kod.="\n<br><br><span class=kiscim>Ünnepe:</span>";
+	$kod.="\n<br><br><span class=kiscim>Ãœnnepe:</span>";
     $kod.="<br><select name=ho class=urlap>";
     for($i=1;$i<=12;$i++) {
         $kod.= "<option value=$i";
@@ -47,7 +47,7 @@ function addszent($id) {
     }
     $kod.= "</select> <input type=text name=nap value='$nap' size=2 maxlength=2 class=urlap>";
 
-    $kod.="\n<br><br><span class=kiscim>Ünnep színe:</span><span class=alap><br>(vértanúnál piros, egyébként általában fehér)</span>";
+    $kod.="\n<br><br><span class=kiscim>Ãœnnep szÃ­ne:</span><span class=alap><br>(vÃ©rtanÃºnÃ¡l piros, egyÃ©bkÃ©nt Ã¡ltalÃ¡ban fehÃ©r)</span>";
 	$kod.="\n<br><select name=szinsz class=urlap>";
 	$kod.="<option";
 	if($szin=='feher') $kod.=' selected';
@@ -59,13 +59,13 @@ function addszent($id) {
 	if($szin=='lila') $kod.=' select';
 	$kod.=">lila</option></select>";
 	
-	$kod.="\n<br><br><span class=kiscim>Névnap:</span><span class=alap><br>Az adott napon a szent alapján tartandó névnap (csak név)</span>";
+	$kod.="\n<br><br><span class=kiscim>NÃ©vnap:</span><span class=alap><br>Az adott napon a szent alapjÃ¡n tartandÃ³ nÃ©vnap (csak nÃ©v)</span>";
 	$kod.="\n<br><input tpye=text name=nevnap value='$nevnap' size=40 class=urlap>";
 
-    $kod.="\n<br><br><span class=kiscim>Rövid leírás:</span>";
+    $kod.="\n<br><br><span class=kiscim>RÃ¶vid leÃ­rÃ¡s:</span>";
 	$kod.="<br><textarea name=intro cols=60 rows=5 class=urlap>$intro</textarea>";
 
-    $kod.="\n<br><br><span class=kiscim>Teljes leírás (elmélkedés):</span>";
+    $kod.="\n<br><br><span class=kiscim>Teljes leÃ­rÃ¡s (elmÃ©lkedÃ©s):</span>";
 	$kod.="<br><textarea name=szoveg cols=80 rows=50 class=urlap>$leiras</textarea>";
 
 	$kod.="\n<br><br><input type=submit value=Mehet class=urlap></form>";
@@ -87,7 +87,7 @@ function addingszent() {
 	$leiras=$_POST['szoveg'];
 
 	if($id>0) {
-		//Módosítás
+		//MÃ³dosÃ­tÃ¡s
 		$parameter1='update';
 		$parameter2="where id='$id'";
 		$uj=false;
@@ -111,7 +111,7 @@ function addige($id) {
     global $m_id,$ssid,$m_id;
 
 	$kod.=include('editscript2.php');
-	$kod.="<p class=alcim>Napi ünnep, gondolat (üzenet) hozzáadása, módosítása</p>";
+	$kod.="<p class=alcim>Napi Ã¼nnep, gondolat (Ã¼zenet) hozzÃ¡adÃ¡sa, mÃ³dosÃ­tÃ¡sa</p>";
 
 	if($id>0) {
 		$query="select szin,ev,idoszak,nap,oszov_hely,ujszov_hely,evang_hely,unnep,intro,gondolat from igenaptar where id='$id'";
@@ -125,25 +125,25 @@ function addige($id) {
     $kod.= "<input type=hidden name=m_id value=$m_id>";
     $kod.= "<input type=hidden name=m_op value=addingige>";
 
-//Idõszak    
-    $kod.="\n<span class=kiscim>Idõszak:</span>";
+//IdÅ‘szak    
+    $kod.="\n<span class=kiscim>IdÅ‘szak:</span>";
 	$kod.="\n<br><SELECT NAME=idoszak class=urlap>";
 	$kod.='<option value=a';
 	if($idoszak=='a') $kod.=' selected';
-	$kod.='>Ádventi idõ</option><option value=k';
+	$kod.='>Ãdventi idÅ‘</option><option value=k';
 	if($idoszak=='k') $kod.=' selected';
-	$kod.='>Karácsonyi idõ</option><option value=n';
+	$kod.='>KarÃ¡csonyi idÅ‘</option><option value=n';
 	if($idoszak=='n') $kod.=' selected';
-	$kod.='>Nagyböjti idõ</option><option value=h';
+	$kod.='>NagybÃ¶jti idÅ‘</option><option value=h';
 	if($idoszak=='h') $kod.=' selected';
-	$kod.='>Húsvéti idõ</option><option value=e';
+	$kod.='>HÃºsvÃ©ti idÅ‘</option><option value=e';
 	if($idoszak=='e') $kod.=' selected';
-	$kod.='>Évközi idõ</option><option value=s';
+	$kod.='>Ã‰vkÃ¶zi idÅ‘</option><option value=s';
 	if($idoszak=='s') $kod.=' selected';
-	$kod.='>Szent ünnepe</option></select>';
+	$kod.='>Szent Ã¼nnepe</option></select>';
 
-//Év
-	$kod.="\n<br><br><span class=kiscim>Év:</span>";
+//Ã‰v
+	$kod.="\n<br><br><span class=kiscim>Ã‰v:</span>";
 	$kod.='<br><select name=ev class=urlap>';
 	$kod.='<option value=0';
 	if($ev=='0') $kod.=' selected';
@@ -159,12 +159,12 @@ function addige($id) {
 	$kod.="\n<br><br><span class=kiscim>Nap:</span>";
 	$kod.="\n<br><input type=text name=nap value='$nap' size=60 class=urlap maxlength=250>";	
 
-//Ünnep  
-  	$kod.="\n<br><br><span class=kiscim>Ünnep:</span><span class=alap><br>Az adott nap ünnepe, ha van</span>";
+//Ãœnnep  
+  	$kod.="\n<br><br><span class=kiscim>Ãœnnep:</span><span class=alap><br>Az adott nap Ã¼nnepe, ha van</span>";
 	$kod.="\n<br><input tpye=text name=unnep value='$unnep' size=60 maxlength=250 class=urlap>";
 
-//Szín
-    $kod.="\n<br><br><span class=kiscim>Ünnep színe:</span>";
+//SzÃ­n
+    $kod.="\n<br><br><span class=kiscim>Ãœnnep szÃ­ne:</span>";
 	$kod.="\n<br><select name=szing class=urlap>";
 	$kod.="<option";
 	if($szing=='feher') $kod.=' selected';
@@ -176,13 +176,13 @@ function addige($id) {
 	if($szing=='lila') $kod.=' selected';
 	$kod.=">lila</option></select>";
 
-    $kod.="\n<br><br><span class=kiscim>Napi gondolat (röviden -> fõoldalon jelenik meg):</span>";
+    $kod.="\n<br><br><span class=kiscim>Napi gondolat (rÃ¶viden -> fÅ‘oldalon jelenik meg):</span>";
 	$kod.="<br><textarea name=intro cols=80 rows=6 class=urlap>$intro</textarea>";
 
-    $kod.="\n<br><br><span class=kiscim>Elmélkedés részletesebben:</span>";
+    $kod.="\n<br><br><span class=kiscim>ElmÃ©lkedÃ©s rÃ©szletesebben:</span>";
 	$kod.="<br><textarea name=szoveg cols=80 rows=40 class=urlap>$gondolat</textarea>";
 
-  	$kod.="\n<br><br><span class=kiscim>Olvasmány hely:</span>";
+  	$kod.="\n<br><br><span class=kiscim>OlvasmÃ¡ny hely:</span>";
 	$kod.="\n<br><input tpye=text name=oszov_hely value='$oszov_hely' size=20 class=urlap>";
 	if(!empty($oszov_hely)) {
 		$tomb1=explode(',',$oszov_hely);
@@ -208,7 +208,7 @@ function addige($id) {
 		$kod.="<a href=$link target=_blank class=link><img src=img/biblia.gif border=0 alt=Biblia align=absmiddle></a>";
 	}
 
-    $kod.="\n<br><br><span class=kiscim>Evangélium hely:</span>";
+    $kod.="\n<br><br><span class=kiscim>EvangÃ©lium hely:</span>";
 	$kod.="\n<br><input tpye=text name=evang_hely value='$evang_hely' size=20 class=urlap>";
 	if(!empty($evang_hely)) {
 		$tomb1=explode(',',$evang_hely);
@@ -242,13 +242,13 @@ function addingige() {
 	$evang_hely=$_POST['evang_hely'];
 
 	if($id>0) {
-		//módosítás
+		//mÃ³dosÃ­tÃ¡s
 		$uj=false;
 		$parameter1='update';
 		$parameter2=" where id='$id'";
 	}
 	else {
-		//beszúrás
+		//beszÃºrÃ¡s
 		$uj=true;
 		$parameter1='insert';
 		$parameter2='';
@@ -267,22 +267,22 @@ function gondolatok() {
     global $design_url,$db_name,$linkveg,$szin,$m_id,$sessid;
 
 
-//Új bejegyzés
-    $urlap.= "\n<div><a href=?m_id=$m_id&m_op=addige$linkveg class=link><b> - Új bejegyzés hozzáadása</b></a></div>";
+//Ãšj bejegyzÃ©s
+    $urlap.= "\n<div><a href=?m_id=$m_id&m_op=addige$linkveg class=link><b> - Ãšj bejegyzÃ©s hozzÃ¡adÃ¡sa</b></a></div>";
 
-//Módosításnál (vagy kiválasztja, vagy kulcsszó alapján keresi
+//MÃ³dosÃ­tÃ¡snÃ¡l (vagy kivÃ¡lasztja, vagy kulcsszÃ³ alapjÃ¡n keresi
     $urlap.= "\n<form method=post><input type=hidden name=m_op value=gondolatokmod>";
 	$urlap.= "<input type=hidden name=sessid value=$sessid><input type=hidden name=m_id value=$m_id>";
-    $urlap.= "<br><span class=link><b>- Meglévõ bejegyzés módostása</b> (keresés):</span>";
+    $urlap.= "<br><span class=link><b>- MeglÃ©vÅ‘ bejegyzÃ©s mÃ³dostÃ¡sa</b> (keresÃ©s):</span>";
 
 //Teljes lista
-	$urlap.="\n<br><br><span class=alap>Konkrét igenap:</span><br><select name=ige class=urlap><option value=0>Keresés a lenti mezõk segítségével</option>";
+	$urlap.="\n<br><br><span class=alap>KonkrÃ©t igenap:</span><br><select name=ige class=urlap><option value=0>KeresÃ©s a lenti mezÅ‘k segÃ­tsÃ©gÃ©vel</option>";
 	$query="select id,idoszak,ev,nap from igenaptar order by idoszak asc, ev asc, nap asc";
-    if(!$lekerdez=mysql_query($query)) $kod.= '<p class=hiba>HIBA a lekérdezésnél!<br>'.mysql_error();
+    if(!$lekerdez=mysql_query($query)) $kod.= '<p class=hiba>HIBA a lekÃ©rdezÃ©snÃ©l!<br>'.mysql_error();
     while(list($gid,$gidoszak,$gev,$gnap)=mysql_fetch_row($lekerdez)) {
         $kiiras=idoszak($gidoszak);
         $kiiras.=',';
-        if($gev!='' and $gev!='0') $kiiras.=" $gev év,";
+        if($gev!='' and $gev!='0') $kiiras.=" $gev Ã©v,";
         $kiiras.=" $gnap";
         $urlap.= "<option value=$gid";
         //if($ige==$gid) $urlap.= ' selected';
@@ -290,23 +290,23 @@ function gondolatok() {
     }
     $urlap.= '</select>';
 
-	//Idõszak (pl. Ádventi idõ)
-    $urlap.= '<br><br><span class=alap>Idõszak: </span><br><select name=idoszak class=urlap>';
+	//IdÅ‘szak (pl. Ãdventi idÅ‘)
+    $urlap.= '<br><br><span class=alap>IdÅ‘szak: </span><br><select name=idoszak class=urlap>';
     $urlap.= '<option value=0>Nem tudom</option>';
-    $urlap.= '<option value=a>Ádventi idõ</option><option value=k>Karácsonyi idõ</option>
-         <option value=n>Nagyböjti idõ</option><option value=h>Húsvéti idõ</option>
-         <option value=e>Évközi idõ</option><option value=s>Szent ünnepe</option></select>';
-    //Év (pl. A év)
-    $urlap.= '<br><br><span class=alap>Év:</span><br><select name=ev class=urlap><option value=0>Nem tudom / nincs</option>
-         <option value=A>A év</option><option value=B>B év</option><option value=C>C év</option>
+    $urlap.= '<option value=a>Ãdventi idÅ‘</option><option value=k>KarÃ¡csonyi idÅ‘</option>
+         <option value=n>NagybÃ¶jti idÅ‘</option><option value=h>HÃºsvÃ©ti idÅ‘</option>
+         <option value=e>Ã‰vkÃ¶zi idÅ‘</option><option value=s>Szent Ã¼nnepe</option></select>';
+    //Ã‰v (pl. A Ã©v)
+    $urlap.= '<br><br><span class=alap>Ã‰v:</span><br><select name=ev class=urlap><option value=0>Nem tudom / nincs</option>
+         <option value=A>A Ã©v</option><option value=B>B Ã©v</option><option value=C>C Ã©v</option>
          </select>';
 
-    $urlap.= '<br><br><span class=alap>Kulcsszó (a leírásban keres)</span><br><input type=text name=kulcsszo size=25 class=urlap>';
+    $urlap.= '<br><br><span class=alap>KulcsszÃ³ (a leÃ­rÃ¡sban keres)</span><br><input type=text name=kulcsszo size=25 class=urlap>';
     $urlap.= '<br><br><input type=submit value=Keres class=urlap>';
     $urlap.= '</form>';
 
 	
-	$kod="<p class=alcim>Gondolatok szerkesztése</p>";
+	$kod="<p class=alcim>Gondolatok szerkesztÃ©se</p>";
 	$kod.=$urlap;
 
 	return $kod;
@@ -324,8 +324,8 @@ function gondolatokmod() {
 	$idoszak=$_POST['idoszak'];
 	if(empty($idoszak)) $idoszak=$_GET['idoszak'];
 
-	//Fõcím
-	$kod.="<p class=alcim>Gondolatok módosítása</p>";
+	//FÅ‘cÃ­m
+	$kod.="<p class=alcim>Gondolatok mÃ³dosÃ­tÃ¡sa</p>";
 
 	$min=$_POST['min'];
 	if(!isset($min)) $min=$_GET['min'];
@@ -355,39 +355,39 @@ function gondolatokmod() {
     if($mennyi>$next) $vege=$next;
     else $vege=$mennyi;
     
-    $kod.= '<div class=alcim>Gondolatok módosítása</div>';
-    $kod.= "<div class=alap><b>Keresés eredménye $mennyi találat</b><br>";
-    $kod.= "Listázás: $kezd - $vege</div>";
+    $kod.= '<div class=alcim>Gondolatok mÃ³dosÃ­tÃ¡sa</div>';
+    $kod.= "<div class=alap><b>KeresÃ©s eredmÃ©nye $mennyi talÃ¡lat</b><br>";
+    $kod.= "ListÃ¡zÃ¡s: $kezd - $vege</div>";
     
     while(list($id,$szin,$ev1,$idoszak1,$nap1,$unnep)=mysql_fetch_row($lekerdez)) {
 		$kiiras1='';
 		$kiiras2='';
-        if($idoszak1=='a') $kiiras1=' Ádventi';
-        elseif($idoszak1=='k') $kiiras1.=' Karácsonyi';
-        elseif($idoszak1=='n') $kiiras1.=' Nagyböjti';
-        elseif($idoszak1=='h') $kiiras1.=' Húsvéti';
-        elseif($idoszak1=='e') $kiiras1.=' Évközi';
-        $kiiras1.=' idõ';
-        if($ev1!='0' and $ev1!='') $kiiras2=" $ev1 év, ";
+        if($idoszak1=='a') $kiiras1=' Ãdventi';
+        elseif($idoszak1=='k') $kiiras1.=' KarÃ¡csonyi';
+        elseif($idoszak1=='n') $kiiras1.=' NagybÃ¶jti';
+        elseif($idoszak1=='h') $kiiras1.=' HÃºsvÃ©ti';
+        elseif($idoszak1=='e') $kiiras1.=' Ã‰vkÃ¶zi';
+        $kiiras1.=' idÅ‘';
+        if($ev1!='0' and $ev1!='') $kiiras2=" $ev1 Ã©v, ";
         else $kiiras2=' ';
         if($nap1!='0') $kiiras2.="$nap1";
         $kod.= "<br><a href=?m_id=$m_id&m_op=addige&id=$id$linkveg class=link>- <b>$kiiras1</b>$kiiras2 ($unnep, $szin)</a>
         <a href=?m_id=$m_id&m_op=delgondolat&id=$id$linkveg><img src=img/del.jpg width=12 height=11
-        alt='Gondolat törlése' border=0></a>";
+        alt='Gondolat tÃ¶rlÃ©se' border=0></a>";
 
     }
 
-    //Léptetés ($tipus,$ido,$ev,$nap,$kulcsszo,$min)
+    //LÃ©ptetÃ©s ($tipus,$ido,$ev,$nap,$kulcsszo,$min)
     $kod.= '<p>';
     if($min>0) {
         $x=$leptet;
-        $kod.= "<a href='?m_id=$m_id&m_op=gondolatokmod&idoszak=$idoszak&ev=$ev&nap=$nap&kulcsszo=$kulcsszo&min=$prev$linkveg' class=link1>Elõzõ $x találat</a>";
+        $kod.= "<a href='?m_id=$m_id&m_op=gondolatokmod&idoszak=$idoszak&ev=$ev&nap=$nap&kulcsszo=$kulcsszo&min=$prev$linkveg' class=link1>ElÅ‘zÅ‘ $x talÃ¡lat</a>";
     }
     if($mennyi>$next) {
         if($min>0) $kod.= ' - ';
         if($mennyi>$next+$leptet) $x=$leptet;
         else $x=$mennyi-$next;
-        $kod.= "<a href='?m_id=$m_id&m_op=gondolatokmod&idoszak=$idoszak&ev=$ev&nap=$nap&kulcsszo=$kulcsszo&min=$next$linkveg' class=link1>Következõ $x találat</a>";
+        $kod.= "<a href='?m_id=$m_id&m_op=gondolatokmod&idoszak=$idoszak&ev=$ev&nap=$nap&kulcsszo=$kulcsszo&min=$next$linkveg' class=link1>KÃ¶vetkezÅ‘ $x talÃ¡lat</a>";
     }
 
 	return $kod;
@@ -398,26 +398,26 @@ function delgondolat() {
 
 	$id=$_GET['id'];
 
-	$kod.="<p class=alcim>Gondolatok törlése</p>";
+	$kod.="<p class=alcim>Gondolatok tÃ¶rlÃ©se</p>";
     
-    $kod.= '<p class=hiba>FIGYELEM! Valóban törölni akarod a következõ gondolatot?</p>';
+    $kod.= '<p class=hiba>FIGYELEM! ValÃ³ban tÃ¶rÃ¶lni akarod a kÃ¶vetkezÅ‘ gondolatot?</p>';
     list($idoszak,$ev,$nap)=mysql_fetch_row(mysql_query("select idoszak,ev,nap from igenaptar where id='$id'"));
-    if($idoszak=='a') $kiiras1.=' - Ádventi';
-    elseif($idoszak=='k') $kiiras1.=' Karácsonyi';
-    elseif($idoszak=='n') $kiiras1.=' Nagyböjti';
-    elseif($idoszak=='h') $kiiras1.=' Húsvéti';
-    elseif($idoszak=='e') $kiiras1.=' Évközi';
-    $kiiras1.=' idõ';
-    if($ev!='0' and !empty($ev)) $kiiras2=" $ev év, ";
+    if($idoszak=='a') $kiiras1.=' - Ãdventi';
+    elseif($idoszak=='k') $kiiras1.=' KarÃ¡csonyi';
+    elseif($idoszak=='n') $kiiras1.=' NagybÃ¶jti';
+    elseif($idoszak=='h') $kiiras1.=' HÃºsvÃ©ti';
+    elseif($idoszak=='e') $kiiras1.=' Ã‰vkÃ¶zi';
+    $kiiras1.=' idÅ‘';
+    if($ev!='0' and !empty($ev)) $kiiras2=" $ev Ã©v, ";
     else $kiiras2=' ';
     if($nap!='0') $kiiras2.="$nap";
 
     $kod.= "<p class=kiscim><i>$kiiras1 - $kiiras2</p>";
-    $kod.= '<p class=hiba>Törlés után visszaállításra nincs lehetõség!
-         <br><small>Törlés helyett adott esetben választhatod a módosítást is!</small></p>';
+    $kod.= '<p class=hiba>TÃ¶rlÃ©s utÃ¡n visszaÃ¡llÃ­tÃ¡sra nincs lehetÅ‘sÃ©g!
+         <br><small>TÃ¶rlÃ©s helyett adott esetben vÃ¡laszthatod a mÃ³dosÃ­tÃ¡st is!</small></p>';
 
-    $kod.= "<a href=?m_id=$m_id&m_op=deletegondolat&id=$id$linkveg class=link>Töröl</a> -
-         <a href=?m_id=$m_id&m_op=addgondolat&id=$id$linkveg class=link>Módosítás</a> - <a href=?m_id=$m_id&m_op=gondolatok$linkveg class=link>Mégsem</a>";
+    $kod.= "<a href=?m_id=$m_id&m_op=deletegondolat&id=$id$linkveg class=link>TÃ¶rÃ¶l</a> -
+         <a href=?m_id=$m_id&m_op=addgondolat&id=$id$linkveg class=link>MÃ³dosÃ­tÃ¡s</a> - <a href=?m_id=$m_id&m_op=gondolatok$linkveg class=link>MÃ©gsem</a>";
 
 	return $kod;
 }
@@ -429,7 +429,7 @@ function deletegondolat() {
 
     $query="delete from igenaptar where id='$id'";
     if(!mysql_query($query)) {
-        $kod.= '<p class=hiba>HIBA a törlésnél!<br>'.mysql_error();
+        $kod.= '<p class=hiba>HIBA a tÃ¶rlÃ©snÃ©l!<br>'.mysql_error();
     }
 
 	else $kod.=gondolatok();
@@ -440,25 +440,25 @@ function deletegondolat() {
 function szentek() {
     global $m_id,$linkveg,$sessid;
 
-	$kod.="<p class=alcim>Szentek / ünnepek hozzáadása, módosítása</p>";
+	$kod.="<p class=alcim>Szentek / Ã¼nnepek hozzÃ¡adÃ¡sa, mÃ³dosÃ­tÃ¡sa</p>";
 
-//Ûj bejegyzés
-    $kod.= "\n<a href=?m_id=$m_id&m_op=addszent$linkveg class=link><b>- Új bejegyzés hozzáadása</b></a>";
-    $kod.= "\n<br><br><div class=link><b>Meglévõ bejegyzés módostása:</b></div>";
+//Å°j bejegyzÃ©s
+    $kod.= "\n<a href=?m_id=$m_id&m_op=addszent$linkveg class=link><b>- Ãšj bejegyzÃ©s hozzÃ¡adÃ¡sa</b></a>";
+    $kod.= "\n<br><br><div class=link><b>MeglÃ©vÅ‘ bejegyzÃ©s mÃ³dostÃ¡sa:</b></div>";
 
-//Módosításnál (vagy kiválasztja, vagy kulcsszó alapján keresi
+//MÃ³dosÃ­tÃ¡snÃ¡l (vagy kivÃ¡lasztja, vagy kulcsszÃ³ alapjÃ¡n keresi
     $kod.= "\n<form method=post><input type=hidden name=m_op value=szentekmod>";
 	$kod.= "<input type=hidden name=sessid value=$sessid>";
 
     $query="select id,nev,ho,nap from szentek order by ho,nap";
     if(!$lekerdez=mysql_query($query)) $kod.= '<p class=hiba>HIBA!<br>'.mysql_error();
     $kod.= '<br><br><span class=alap>Szentek neve:</span> <br><select name=szid class=urlap>';
-    $kod.= '<option value=0>--- inkább kulcsszó alapján keresem ---</option>';
+    $kod.= '<option value=0>--- inkÃ¡bb kulcsszÃ³ alapjÃ¡n keresem ---</option>';
     while(list($szid,$sznev,$ho,$nap)=mysql_fetch_row($lekerdez)) {
         $kod.= "<option value=$szid>$sznev ($ho-$nap)</option>";
     }
     $kod.= '</select>';
-    $kod.= '<br><br><span class=alap>Kulcsszó (a névben és a teljes leírásban keres)</span><br><input type=text name=kulcsszo size=25 class=urlap>';
+    $kod.= '<br><br><span class=alap>KulcsszÃ³ (a nÃ©vben Ã©s a teljes leÃ­rÃ¡sban keres)</span><br><input type=text name=kulcsszo size=25 class=urlap>';
     $kod.= '<br><br><input type=submit value=Keres class=urlap>';
     $kod.= '</form>';
 
@@ -472,13 +472,13 @@ function szentekmod() {
 	$kulcsszo=$_POST['kulcsszo'];
 	if(!isset($kulcsszo)) $kulcsszo=$_GET['kulcsszo'];
 
-	$kod.="<p class=alcim>Szentek / ünnepek módosítása</p>";
+	$kod.="<p class=alcim>Szentek / Ã¼nnepek mÃ³dosÃ­tÃ¡sa</p>";
 
 
     if($szid!=0) {
         $query="select nev from szentek where id='$szid'";
         list($nev)=mysql_fetch_row(mysql_query($query));
-       $kod.= "<div><a href=?m_id=$m_id&m_op=addszent&id=$szid$linkveg class=link><b>$nev</b> - Módosítás</a> - <a href=?m_id=$m_id&m_op=delszent&id=$szid$linkveg class=link><img src=img/del.jpg border=0> Töröl</a></div>";
+       $kod.= "<div><a href=?m_id=$m_id&m_op=addszent&id=$szid$linkveg class=link><b>$nev</b> - MÃ³dosÃ­tÃ¡s</a> - <a href=?m_id=$m_id&m_op=delszent&id=$szid$linkveg class=link><img src=img/del.jpg border=0> TÃ¶rÃ¶l</a></div>";
     }
     else {
 		$min=$_GET['min'];
@@ -497,16 +497,16 @@ function szentekmod() {
         $vege=$min+$leptet;
         if($vege>$mennyi) $vege=$mennyi;
 
-        $kod.= "<div class=alap><b>Összesen $mennyi találat</b>
-             <br>Listázás: $kezd - $vege</div>";
+        $kod.= "<div class=alap><b>Ã–sszesen $mennyi talÃ¡lat</b>
+             <br>ListÃ¡zÃ¡s: $kezd - $vege</div>";
 
         $lekerdez=mysql_query($query1);
         while(list($id,$nev,$ho,$nap)=mysql_fetch_row($lekerdez)) {
-            $kod.= "<br><a href=?m_id=$m_id&m_op=addszent&id=$id$linkveg class=link><b>$nev</b> ($ho-$nap) - Módosítás</a> - <a href=?m_id=$m_id&m_op=delszent&id=$id$linkveg class=link>Töröl</a>";
+            $kod.= "<br><a href=?m_id=$m_id&m_op=addszent&id=$id$linkveg class=link><b>$nev</b> ($ho-$nap) - MÃ³dosÃ­tÃ¡s</a> - <a href=?m_id=$m_id&m_op=delszent&id=$id$linkveg class=link>TÃ¶rÃ¶l</a>";
         }
         $kod.= '<p class=alap>';
-        if($min>0) $kod.= " <a href=?m_id=$m_id&m_op=szentekmod&kulcsszo=$kulcsszo&min=$prev$linkveg class=link1>Elõzõ</a>";
-        if($mennyi>$next) $kod.= " <a href=?m_id=$m_id&m_op=szentekmod&kulcsszo=$kulcsszo&min=$next$linkveg class=link1>Következõ</a>";
+        if($min>0) $kod.= " <a href=?m_id=$m_id&m_op=szentekmod&kulcsszo=$kulcsszo&min=$prev$linkveg class=link1>ElÅ‘zÅ‘</a>";
+        if($mennyi>$next) $kod.= " <a href=?m_id=$m_id&m_op=szentekmod&kulcsszo=$kulcsszo&min=$next$linkveg class=link1>KÃ¶vetkezÅ‘</a>";
     }
 
 	return $kod;
@@ -517,18 +517,18 @@ function delszent() {
 
 	$id=$_GET['id'];
 
-	$kod.="<p class=alcim>Szentek / ünnepek törlése</p>";
+	$kod.="<p class=alcim>Szentek / Ã¼nnepek tÃ¶rlÃ©se</p>";
 
-    $kod.= '<p class=hiba>FIGYELEM! Biztosan törölni akarod a következõ szentet?</p>';
+    $kod.= '<p class=hiba>FIGYELEM! Biztosan tÃ¶rÃ¶lni akarod a kÃ¶vetkezÅ‘ szentet?</p>';
 
     list($szent)=mysql_fetch_row(mysql_query("select nev from szentek where id='$id'"));
     $kod.= "<p class=kiscim><i>$szent</p>";
     
-    $kod.= '<p class=hiba>Törlés után visszaállításra nincs lehetõség!
-         <br><small>Törlés helyett adott esetben választhatod a módosítást is!</small></p>';
+    $kod.= '<p class=hiba>TÃ¶rlÃ©s utÃ¡n visszaÃ¡llÃ­tÃ¡sra nincs lehetÅ‘sÃ©g!
+         <br><small>TÃ¶rlÃ©s helyett adott esetben vÃ¡laszthatod a mÃ³dosÃ­tÃ¡st is!</small></p>';
 
-    $kod.= "<a href=?m_id=$m_id&m_op=deleteszent&id=$id$linkveg class=link>Töröl</a> -
-         <a href=?m_id=$m_id&m_op=addszent&id=$id$linkveg class=link>Módosítás</a> - <a href=?m_id=$m_id&m_op=szentek$linkveg class=link>Mégsem</a>";
+    $kod.= "<a href=?m_id=$m_id&m_op=deleteszent&id=$id$linkveg class=link>TÃ¶rÃ¶l</a> -
+         <a href=?m_id=$m_id&m_op=addszent&id=$id$linkveg class=link>MÃ³dosÃ­tÃ¡s</a> - <a href=?m_id=$m_id&m_op=szentek$linkveg class=link>MÃ©gsem</a>";
 
 	return $kod;
 }
@@ -548,8 +548,8 @@ function deleteszent() {
 function naptar($honap,$ev) {
     global $_POST,$_GET,$linkveg,$m_id;
 
-    $kod.= '<span class=alcim>Liturgikus naptár</span><br><span class=alap><i>Itt kell beállítani az
-    aktuális liturgikus naptárnak megfelelõen, hogy az adott naphoz mely szent, illetve gondolat
+    $kod.= '<span class=alcim>Liturgikus naptÃ¡r</span><br><span class=alap><i>Itt kell beÃ¡llÃ­tani az
+    aktuÃ¡lis liturgikus naptÃ¡rnak megfelelÅ‘en, hogy az adott naphoz mely szent, illetve gondolat
     tartozik.</i></span><br><br>';
     
     define("EGYNAP", (60*60*24));
@@ -576,8 +576,8 @@ function naptar($honap,$ev) {
 
     $kod.= '</select><select name=honap>';
 
-    $honapok=Array ("Január","Február","Március","Április","Május","Június","Július",
-               "Augusztus","Szeptember","Október","November","December");
+    $honapok=Array ("JanuÃ¡r","FebruÃ¡r","MÃ¡rcius","Ãprilis","MÃ¡jus","JÃºnius","JÃºlius",
+               "Augusztus","Szeptember","OktÃ³ber","November","December");
 
     for($x=1;$x<=count($honapok); $x++) {
         $kod.= "\t<option value=$x";
@@ -588,14 +588,14 @@ function naptar($honap,$ev) {
 
     $kod.= '</select><input type=submit value=Mutat></form>';
 
-    $napok = Array ("Hétfõ","Kedd","Szerda","Csütörtök","Péntek","Szombat","Vasárnap");
+    $napok = Array ("HÃ©tfÅ‘","Kedd","Szerda","CsÃ¼tÃ¶rtÃ¶k","PÃ©ntek","Szombat","VasÃ¡rnap");
 
 
     $kod.= '<div align=center class=alcim>'.$ev.'. '.$honapok[$honap-1].'</div><br>';
     $kod.= '<table border=1 cellpadding=2 cellspacing=0>';
 
     foreach ($napok as $nap) {
-      if($nap=='Vasárnap') $tulajdonsag='bgcolor=#FFF9F9 class=unnep';
+      if($nap=='VasÃ¡rnap') $tulajdonsag='bgcolor=#FFF9F9 class=unnep';
       else $tulajdonsag='class=link';
       $kod.= "\t<td width=14% $tulajdonsag align=center><b>$nap</b></td>\n";
     }
@@ -604,7 +604,7 @@ function naptar($honap,$ev) {
     for($szamlalo=0;$szamlalo<(6*7);$szamlalo++) {
         $napTomb = getdate($kiirando);
         $moddatum=date('Y-m-d',$kiirando);
-        //$katunnep = katolikus ünnep, amikor pirossal írjuk ki az ünnepet (vasárnap és fontosabb ünnepeken)
+        //$katunnep = katolikus Ã¼nnep, amikor pirossal Ã­rjuk ki az Ã¼nnepet (vasÃ¡rnap Ã©s fontosabb Ã¼nnepeken)
         if(($szamlalo%7)==6) {
             $unnep=1;
             $katunnep=1;
@@ -619,14 +619,14 @@ function naptar($honap,$ev) {
               break;
             $kod.= '</tr><tr>';
         }
-        //ünnepek:
-        if($napTomb[mon]==1 and $napTomb["mday"]==1) {$unnep=1;$katunnep=1;$msg='Újév';}
-        elseif($napTomb[mon]==3 and $napTomb["mday"]==15) {$unnep=1;$msg='Nemzeti ünnep';}
-        elseif($napTomb[mon]==8 and $napTomb["mday"]==20) {$unnep=1;$msg='Nemzeti ünnep';}
-        elseif($napTomb[mon]==10 and $napTomb["mday"]==23) {$unnep=1;$msg='Nemzeti ünnep';}
-        elseif($napTomb[mon]==11 and $napTomb["mday"]==1) {$unnep=1;$katunnep=1;$msg='Mindenszentek ünnepe';}
-        elseif($napTomb[mon]==12 and $napTomb["mday"]==25) {$unnep=1;$katunnep=1;$msg='Karácsony';}
-        elseif($napTomb[mon]==12 and $napTomb["mday"]==26) {$unnep=1;$katunnep=1;$msg='Karácsony';}
+        //Ã¼nnepek:
+        if($napTomb[mon]==1 and $napTomb["mday"]==1) {$unnep=1;$katunnep=1;$msg='ÃšjÃ©v';}
+        elseif($napTomb[mon]==3 and $napTomb["mday"]==15) {$unnep=1;$msg='Nemzeti Ã¼nnep';}
+        elseif($napTomb[mon]==8 and $napTomb["mday"]==20) {$unnep=1;$msg='Nemzeti Ã¼nnep';}
+        elseif($napTomb[mon]==10 and $napTomb["mday"]==23) {$unnep=1;$msg='Nemzeti Ã¼nnep';}
+        elseif($napTomb[mon]==11 and $napTomb["mday"]==1) {$unnep=1;$katunnep=1;$msg='Mindenszentek Ã¼nnepe';}
+        elseif($napTomb[mon]==12 and $napTomb["mday"]==25) {$unnep=1;$katunnep=1;$msg='KarÃ¡csony';}
+        elseif($napTomb[mon]==12 and $napTomb["mday"]==26) {$unnep=1;$katunnep=1;$msg='KarÃ¡csony';}
         else $msg='';
         if($katunnep==1) $class='unnep1';
         else $class='linkkicsi';
@@ -636,18 +636,18 @@ function naptar($honap,$ev) {
         }
         else {
             $kod.= "\t<td align=center valign=top";
-            //Ha ünnep, akkor piros
+            //Ha Ã¼nnep, akkor piros
             $kod.= $unnep==1 ? " bgcolor=#FFF9F9><a class=unnep title='$msg'":" class=link";
             $kod.= '>'.$napTomb["mday"]."</a><a href=?m_id=$m_id&m_op=modnaptar&datum=$moddatum$linkveg class=$class><br>";
 
-            //Megnézzük, hogy van-e hozzá esemény
+            //MegnÃ©zzÃ¼k, hogy van-e hozzÃ¡ esemÃ©ny
 			$szent=0;
 			$ige=0;
             $nap=$napTomb[mday];
             $datum="$ev-$honap-$nap";
             $query="select ige,szent from lnaptar where datum='$datum'";
             if(!$eredmeny=mysql_query($query))
-              $kod.= '<p class=hiba>HIBA a lekérdezésnél!<br>'.mysql_error();
+              $kod.= '<p class=hiba>HIBA a lekÃ©rdezÃ©snÃ©l!<br>'.mysql_error();
             if(mysql_num_rows($eredmeny)>0) {
                 list($ige,$szent)=mysql_fetch_row($eredmeny);
                 if($szent>0) {
@@ -660,13 +660,13 @@ function naptar($honap,$ev) {
                     list($gidoszak,$gev,$gnap,$gunnep)=mysql_fetch_row(mysql_query($queryg));
                     $kiiras=idoszak($gidoszak);
                     $kiiras.=',';
-                    if($gev!='' and $gev!='0') $kiiras.=" $gev év,";
+                    if($gev!='' and $gev!='0') $kiiras.=" $gev Ã©v,";
                     $kiiras.=" $gnap";
 					if(!empty($gunnep)) $kiiras.="$gunnep unnepe";
                     $kod.= $kiiras;
                 }
             }
-            if(($szent==0) and ($ige==0)) $kod.= "HOZZÁAD";
+            if(($szent==0) and ($ige==0)) $kod.= "HOZZÃAD";
             $kod.= "</a>";
             $kiirando += EGYNAP;
             $ujnaptomb=getdate($kiirando);
@@ -687,24 +687,24 @@ function modnaptar() {
 	$query="select ige,szent from lnaptar where datum='$datum'";
 	list($ige,$szent)=mysql_fetch_row(mysql_query($query));
 
-    $kod.= '<p class=alcim>Liturgikus naptár - hozzáadás, módosítás</p>';
+    $kod.= '<p class=alcim>Liturgikus naptÃ¡r - hozzÃ¡adÃ¡s, mÃ³dosÃ­tÃ¡s</p>';
     $kod.= '<form method=post><input type=hidden name=m_op value=modingnaptar>';
 	$kod.= "\n<input type=hidden name=sid value=$sid><input type=hidden name=m_id value=$m_id>";
     $kod.= "<input type=hidden name=id value=$id>";
-    $kod.= "<div class=alap><b>Dátum:</b> <input type=text name=datum value='$datum' size=10 class=urlap> <small><font color=red>(Formátum fontos!)</font></small>";
-    $kod.= '<br><br><b>Igenapot mindig kötelezõ választani</b>, <small>ha szent ünnepe van, akkor válassz szentet is
-   - ekkor a nap ünnepét ("fõcím") és a gondolatot a szent leírásából vesszük. Ha nem választasz szentet, az igenap megnevezése lesz a "fõcím",
-    az aznapi szent ilyenkor - ha van, de nem ünnep, csak emléknap - ez alatt jelenik meg zárójelben. Szent ünnepén az igenapot aszerint kell
-    kiválasztani, hogy van-e saját olvasmánya vagy a liturgikus év idõpontjához tartozó olvasmányokat olvassák a misén (ld. direktórium ! )</small><br> </div>';
+    $kod.= "<div class=alap><b>DÃ¡tum:</b> <input type=text name=datum value='$datum' size=10 class=urlap> <small><font color=red>(FormÃ¡tum fontos!)</font></small>";
+    $kod.= '<br><br><b>Igenapot mindig kÃ¶telezÅ‘ vÃ¡lasztani</b>, <small>ha szent Ã¼nnepe van, akkor vÃ¡lassz szentet is
+   - ekkor a nap Ã¼nnepÃ©t ("fÅ‘cÃ­m") Ã©s a gondolatot a szent leÃ­rÃ¡sÃ¡bÃ³l vesszÃ¼k. Ha nem vÃ¡lasztasz szentet, az igenap megnevezÃ©se lesz a "fÅ‘cÃ­m",
+    az aznapi szent ilyenkor - ha van, de nem Ã¼nnep, csak emlÃ©knap - ez alatt jelenik meg zÃ¡rÃ³jelben. Szent Ã¼nnepÃ©n az igenapot aszerint kell
+    kivÃ¡lasztani, hogy van-e sajÃ¡t olvasmÃ¡nya vagy a liturgikus Ã©v idÅ‘pontjÃ¡hoz tartozÃ³ olvasmÃ¡nyokat olvassÃ¡k a misÃ©n (ld. direktÃ³rium ! )</small><br> </div>';
 
-//Gondolat kiválasztása
-	$kod.="\n<br><span class=alap>igenapok:</span><br><select name=ige class=urlap><option value=0>Még nincs</option>";
+//Gondolat kivÃ¡lasztÃ¡sa
+	$kod.="\n<br><span class=alap>igenapok:</span><br><select name=ige class=urlap><option value=0>MÃ©g nincs</option>";
 	$query="select id,idoszak,ev,nap from igenaptar order by idoszak asc, ev asc, nap asc";
-    if(!$lekerdez=mysql_query($query)) $kod.= '<p class=hiba>HIBA a lekérdezésnél!<br>'.mysql_error();
+    if(!$lekerdez=mysql_query($query)) $kod.= '<p class=hiba>HIBA a lekÃ©rdezÃ©snÃ©l!<br>'.mysql_error();
     while(list($gid,$gidoszak,$gev,$gnap)=mysql_fetch_row($lekerdez)) {
         $kiiras=idoszak($gidoszak);
         $kiiras.=',';
-        if($gev!='' and $gev!='0') $kiiras.=" $gev év,";
+        if($gev!='' and $gev!='0') $kiiras.=" $gev Ã©v,";
         $kiiras.=" $gnap";
         $kod.= "<option value=$gid";
         if($ige==$gid) $kod.= ' selected';
@@ -712,11 +712,11 @@ function modnaptar() {
     }
     $kod.= '</select>';
 
-//Szentek kiválasztása
+//Szentek kivÃ¡lasztÃ¡sa
 	$ev=date('Y');
 	$kod.= "\n<br><br><span class=alap>szentek: </span><br><select name=szent class=urlap><option value=0>Nincs</option>";
     $query="select id,nev,ho,nap from szentek order by ho asc, nap asc";
-    if(!$lekerdez=mysql_query($query)) $kod.= '<p class=hiba>HIBA a lekérdezésnél!<br>'.mysql_error();
+    if(!$lekerdez=mysql_query($query)) $kod.= '<p class=hiba>HIBA a lekÃ©rdezÃ©snÃ©l!<br>'.mysql_error();
     while(list($szid,$sznev,$szho,$sznap)=mysql_fetch_row($lekerdez)) {
         $kod.= "<option value=$szid";
 	    if($szent==$szid) $kod.= ' selected';
@@ -737,17 +737,17 @@ function modingnaptar() {
 	$szent=$_POST['szent'];
 
 
-//Dátum ellenõrzés
+//DÃ¡tum ellenÅ‘rzÃ©s
     $ev = substr ("$datum", 0, 4);
     $honap = substr ("$datum", 5, 2);
     $nap = substr("$datum", 8, 2);
     if(!checkdate($honap,$nap,$ev)) {
-        echo '<p class=hiba>HIBA! Nem létezõ dátum.</p>';
+        echo '<p class=hiba>HIBA! Nem lÃ©tezÅ‘ dÃ¡tum.</p>';
         echo '<a href=javascript:history.go(-1); class=link>Vissza</a>';
         exit;
     }
 
-	//Ha van szent, akkor a szent színe a mérvadó, egyébként pedig a gondolat színe
+	//Ha van szent, akkor a szent szÃ­ne a mÃ©rvadÃ³, egyÃ©bkÃ©nt pedig a gondolat szÃ­ne
 	if($szent>0) {
 		$query="select szin from szentek where id='$szent'";
 		list($szin)=mysql_fetch_row(mysql_query($query));
@@ -757,26 +757,26 @@ function modingnaptar() {
 		list($szin)=mysql_fetch_row(mysql_query($query));
 	}
 
-	//Van-e már ilyen dátum:
+	//Van-e mÃ¡r ilyen dÃ¡tum:
 	$lekerdez=mysql_query("select datum from lnaptar where datum='$datum'");
 	if(mysql_num_rows($lekerdez)>0) $uj=false;
 	else $uj=true;
 
-    //Ha módosításról van szó
+    //Ha mÃ³dosÃ­tÃ¡srÃ³l van szÃ³
 	if(!$uj) {
 		if($szent==0 and $ige==0) {
-			//Töröljük
+			//TÃ¶rÃ¶ljÃ¼k
 			if(!mysql_query("delete from lnaptar where datum='$datum'"))
-				$kod.= '<p class=hiba>HIBA a törlésnél!<br>'.mysql_error();
+				$kod.= '<p class=hiba>HIBA a tÃ¶rlÃ©snÃ©l!<br>'.mysql_error();
 		}
 		else {
 			if(!mysql_query("update lnaptar set ige='$ige', szent='$szent', szin='$szin' where datum='$datum'"))
-				$kod.= '<p class=hiba>HIBA a módosításnál!<br>'.mysql_error();
+				$kod.= '<p class=hiba>HIBA a mÃ³dosÃ­tÃ¡snÃ¡l!<br>'.mysql_error();
 		}
     }	
     else {
         if(!mysql_query("insert lnaptar set ige='$ige', szent='$szent', szin='$szin', datum='$datum'"))
-          $kod.= '<p class=hiba>HIBA a rögzítésnél!<br>'.mysql_error();
+          $kod.= '<p class=hiba>HIBA a rÃ¶gzÃ­tÃ©snÃ©l!<br>'.mysql_error();
 
     }
     $kod.=naptar($honap,$ev);
@@ -859,7 +859,7 @@ if(strstr($u_jogok,'igenaptar')) {
 	}
 }
 else {
-	$tartalom.="<p class=hiba>HIBA! A választott modul nem érhetõ el!</p>";
+	$tartalom.="<p class=hiba>HIBA! A vÃ¡lasztott modul nem Ã©rhetÅ‘ el!</p>";
 }
 
 ?>

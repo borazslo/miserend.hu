@@ -5,7 +5,7 @@ function foreklam_jobbmenu() {
 
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	$ma=date('Y-m-d');
 	$query="select id,url,title from reklam where hol='1' and (tol<='$ma' and (ig>='$ma' or ig='0000-00-00')) and ok='i'";
 	if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
@@ -24,7 +24,7 @@ function foreklam_jobbmenu() {
 		}
 		$id=$idT[$szam];
 		
-		if(strstr($urlT[$szam],'http://')) $target='target=_blank'; //Ha http, akkor új ablak
+		if(strstr($urlT[$szam],'http://')) $target='target=_blank'; //Ha http, akkor Ãºj ablak
 		$kep1="kepek/reklam/$id.jpg";
 		$kep2="kepek/reklam/$id.gif";
 		if(is_file($kep1)) {

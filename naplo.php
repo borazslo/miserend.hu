@@ -1,6 +1,6 @@
 <?php
 
-$header="<html><head><title>VPP - Észrevételek</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1250\">\n<style TYPE=\"text/css\">\n.alap { font-family: Arial, Verdana; font-size: 10pt; text-align: justify; }\n.urlap { font-family: Arial, Verdana;  font-size: 70%; color: #000000; background-color: #FFFFFF; }\n</style>\n
+$header="<html><head><title>VPP - Ă‰szrevĂ©telek</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n<style TYPE=\"text/css\">\n.alap { font-family: Arial, Verdana; font-size: 10pt; text-align: justify; }\n.urlap { font-family: Arial, Verdana;  font-size: 70%; color: #000000; background-color: #FFFFFF; }\n</style>\n
 <script src='http://code.jquery.com/jquery-1.10.2.js'></script>\n
 </head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n
 \n";
@@ -36,7 +36,7 @@ function teendok($id,$kod) {
 		$bgcolor[0]='#F3E9CD';
 		$bgcolor[1]='#EFEFEF';
 	
-		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b><a href=/?templom=$id target=_blank>$nev</a></b> $ismertnev - <u>$varos</u></big><br><i>Javítások, változások bejelentésének kezelése</i></big></td></tr></table>";
+		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b><a href=/?templom=$id target=_blank>$nev</a></b> $ismertnev - <u>$varos</u></big><br><i>JavĂ­tĂˇsok, vĂˇltozĂˇsok bejelentĂ©sĂ©nek kezelĂ©se</i></big></td></tr></table>";
 		$kiir.="\n<table width=100% bgcolor=#ECD9A4 cellpadding=0 cellspacing=1>";
 		$query="select id,nev,login,email,megbizhato,datum,allapot,admin,admindatum,leiras,adminmegj from eszrevetelek where hol='$kod' and hol_id='$id' order by datum desc";
 		$lekerdez=mysql_query($query);
@@ -48,17 +48,17 @@ function teendok($id,$kod) {
 			//$eleiras=nl2br($eleiras);
 			$eleiras=preg_replace('/\n/i','<br/>',$eleiras);
 		
-			if($eallapot=='u') $ikon="<img src=img/Folderdownloads.gif border=0 title='új észrevétel'>";
+			if($eallapot=='u') $ikon="<img src=img/Folderdownloads.gif border=0 title='Ăşj Ă©szrevĂ©tel'>";
 			elseif($eallapot=='f') $ikon="<img src=img/Filesedit.gif border=0 title='folyamatban van -> $eadmin ($eadatum)'>";
-			else $ikon="<img src=img/Hand.gif border=0 title='Javítva / lezárva -> $eadmin ($eadatum)'>";
+			else $ikon="<img src=img/Hand.gif border=0 title='JavĂ­tva / lezĂˇrva -> $eadmin ($eadatum)'>";
 
 			$szoveg="<span class=alap><b>$enev ($elogin)</b></span>";
-			if($emegbizhato=='n') $szoveg.="<span class=alap><font color=red><img src=img/tilos.gif align=absmidle hspace=2><b> NEM MEGBÍZHATÓ!!!</b></font></span>";
-			elseif($emegbizhato=='i') $szoveg.="<img src=img/pipa.png align=absmidle hspace=2 title='megbízható'>";
+			if($emegbizhato=='n') $szoveg.="<span class=alap><font color=red><img src=img/tilos.gif align=absmidle hspace=2><b> NEM MEGBĂŤZHATĂ“!!!</b></font></span>";
+			elseif($emegbizhato=='i') $szoveg.="<img src=img/pipa.png align=absmidle hspace=2 title='megbĂ­zhatĂł'>";
 			if(!empty($eemail)) $szoveg.="<br><a href=mailto:$eemail class=alap><b>$eemail</b></a>";
 			if($eallapot!='j') $szoveg.="<br><br><span class=alap>$eleiras</span>";	
 			else {
-				$szoveg.="<br><span class='alap javitva hidden' ><font color=red>Utoljára javítva / lezárva -> $eadmin ($eadatum)</font></span>";
+				$szoveg.="<br><span class='alap javitva hidden' ><font color=red>UtoljĂˇra javĂ­tva / lezĂˇrva -> $eadmin ($eadatum)</font></span>";
 				$szoveg.="<br><span class='alap' style='display:none;'><br>$eleiras</span>";					
 				
 				$szoveg .= '
@@ -70,13 +70,13 @@ function teendok($id,$kod) {
 				});
 				</script>';
 			}
-			if(!empty($eadminmegj)) $szoveg.='<br><br><span class=alap><u>Admin megjegyzés:</u><br>'.nl2br($eadminmegj).'</span>';
+			if(!empty($eadminmegj)) $szoveg.='<br><br><span class=alap><u>Admin megjegyzĂ©s:</u><br>'.nl2br($eadminmegj).'</span>';
 
 			$urlap="<form method=post><input type=hidden name=eid value=$eid><input type=hidden name=id value=$id><input type=hidden name=kod value=$kod><input type=hidden name=sid value=$sid><input type=hidden name=op value=mod>";
-			$urlapT['u']="új";
+			$urlapT['u']="Ăşj";
 			$urlapT['f']="folyamatban";
-			$urlapT['j']="javítva";
-			$urlap.="<span class=urlap>állapot: </span><select name=allapot class=urlap><option value=0>-----</option>";
+			$urlapT['j']="javĂ­tva";
+			$urlap.="<span class=urlap>Ăˇllapot: </span><select name=allapot class=urlap><option value=0>-----</option>";
 			foreach($urlapT as $i=>$ertek) {
 				if($i!=$eallapot) {
 					$urlap.="<option value=$i>$ertek</option>";
@@ -84,9 +84,9 @@ function teendok($id,$kod) {
 			}
 			$urlap.="</select>";
 			$urlap1T['?']='nem tudom';
-			$urlap1T['i']='beküldő megbízható';
-			$urlap1T['n']='nem megbízható';
-			$urlap1T['e']='egyéb észrevétel';
+			$urlap1T['i']='bekĂĽldĹ‘ megbĂ­zhatĂł';
+			$urlap1T['n']='nem megbĂ­zhatĂł';
+			$urlap1T['e']='egyĂ©b Ă©szrevĂ©tel';
 			$urlap.="<br><select name=megbizhato class=urlap>";
 			foreach($urlap1T as $i=>$ertek) {
 				$urlap.="<option value=$i";
@@ -94,7 +94,7 @@ function teendok($id,$kod) {
 				$urlap.=">$ertek</option>";
 			}
 			$urlap.="</select>";
-			if($eallapot!='j') $urlap.="<br><span class=urlap>Megjegyzés a javításhoz:</span><br><textarea name=adminmegj class=urlap cols=17 rows=5></textarea>";
+			if($eallapot!='j') $urlap.="<br><span class=urlap>MegjegyzĂ©s a javĂ­tĂˇshoz:</span><br><textarea name=adminmegj class=urlap cols=17 rows=5></textarea>";
 			$urlap.="<input type=submit value=ok class=urlap></form>";
 
 			$kiir.="<tr><td valign=top width=35 bgcolor=$bgcolor[$a]>$ikon</td><td valign=top width=125 bgcolor=$bgcolor[$a]><span class=alap>$edatum</span><br>$urlap</td><td valign=top bgcolor=$bgcolor[$a]>$szoveg</td></tr>";			
@@ -114,7 +114,7 @@ function teendok($id,$kod) {
 		$bgcolor[1]='#EFEFEF';
 	
 		$datum=substr($datum,0,10);
-		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b>$cim</b></big> - $datum<br><i>Javítások, változások bejelentésének kezelése</i></big></td></tr></table>";
+		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b>$cim</b></big> - $datum<br><i>JavĂ­tĂˇsok, vĂˇltozĂˇsok bejelentĂ©sĂ©nek kezelĂ©se</i></big></td></tr></table>";
 		$kiir.="\n<table width=100% bgcolor=#ECD9A4 cellpadding=0 cellspacing=1>";
 		$query="select id,nev,login,email,megbizhato,datum,allapot,admin,admindatum,leiras,adminmegj from eszrevetelek where hol='$kod' and hol_id='$id' order by datum desc";
 		$lekerdez=mysql_query($query);
@@ -125,25 +125,25 @@ function teendok($id,$kod) {
 			$eadatum=substr($eadatum,0,16);
 			$eleiras=nl2br($eleiras);
 		
-			if($eallapot=='u') $ikon="<img src=img/Folderdownloads.gif border=0 title='új észrevétel'>";
+			if($eallapot=='u') $ikon="<img src=img/Folderdownloads.gif border=0 title='Ăşj Ă©szrevĂ©tel'>";
 			elseif($eallapot=='f') $ikon="<img src=img/Filesedit.gif border=0 title='folyamatban van -> $eadmin ($eadatum)'>";
-			else $ikon="<img src=img/Hand.gif border=0 title='Javítva / lezárva -> $eadmin ($eadatum)'>";
+			else $ikon="<img src=img/Hand.gif border=0 title='JavĂ­tva / lezĂˇrva -> $eadmin ($eadatum)'>";
 
 			$szoveg="<span class=alap><b>$enev ($elogin)</b></span>";
-			if($emegbizhato=='n') $szoveg.="<span class=alap><font color=red><img src=img/tilos.gif align=absmidle hspace=2><b> NEM MEGBÍZHATÓ!!!</b></font></span>";
-			elseif($emegbizhato=='i') $szoveg.="<img src=img/pipa.png align=absmidle hspace=2 title='megbízható'>";
+			if($emegbizhato=='n') $szoveg.="<span class=alap><font color=red><img src=img/tilos.gif align=absmidle hspace=2><b> NEM MEGBĂŤZHATĂ“!!!</b></font></span>";
+			elseif($emegbizhato=='i') $szoveg.="<img src=img/pipa.png align=absmidle hspace=2 title='megbĂ­zhatĂł'>";
 			if(!empty($eemail)) $szoveg.="<br><a href=mailto:$eemail class=alap><b>$eemail</b></a>";
 			if($eallapot!='j') $szoveg.="<br><br><span class=alap>$eleiras</span>";	
 			else {
-				$szoveg.="<br><span class=alap><font color=red>Utoljára javítva / lezárva -> $eadmin ($eadatum)</font></span>";				
+				$szoveg.="<br><span class=alap><font color=red>UtoljĂˇra javĂ­tva / lezĂˇrva -> $eadmin ($eadatum)</font></span>";				
 			}
-			if(!empty($eadminmegj)) $szoveg.='<br><br><span class=alap><u>Admin megjegyzés:</u><br>'.nl2br($eadminmegj).'</span>';
+			if(!empty($eadminmegj)) $szoveg.='<br><br><span class=alap><u>Admin megjegyzĂ©s:</u><br>'.nl2br($eadminmegj).'</span>';
 
 			$urlap="<form method=post><input type=hidden name=eid value=$eid><input type=hidden name=id value=$id><input type=hidden name=kod value=$kod><input type=hidden name=sid value=$sid><input type=hidden name=op value=mod>";
-			$urlapT['u']="új";
+			$urlapT['u']="Ăşj";
 			$urlapT['f']="folyamatban";
-			$urlapT['j']="javítva";
-			$urlap.="<span class=urlap>állapot: </span><select name=allapot class=urlap><option value=0>-----</option>";
+			$urlapT['j']="javĂ­tva";
+			$urlap.="<span class=urlap>Ăˇllapot: </span><select name=allapot class=urlap><option value=0>-----</option>";
 			foreach($urlapT as $i=>$ertek) {
 				if($i!=$eallapot) {
 					$urlap.="<option value=$i>$ertek</option>";
@@ -151,9 +151,9 @@ function teendok($id,$kod) {
 			}
 			$urlap.="</select>";
 			$urlap1T['?']='nem tudom';
-			$urlap1T['i']='beküldő megbízható';
-			$urlap1T['n']='nem megbízható';
-			$urlap1T['e']='egyéb észrevétel';
+			$urlap1T['i']='bekĂĽldĹ‘ megbĂ­zhatĂł';
+			$urlap1T['n']='nem megbĂ­zhatĂł';
+			$urlap1T['e']='egyĂ©b Ă©szrevĂ©tel';
 			$urlap.="<br><select name=megbizhato class=urlap>";
 			foreach($urlap1T as $i=>$ertek) {
 				$urlap.="<option value=$i";
@@ -161,7 +161,7 @@ function teendok($id,$kod) {
 				$urlap.=">$ertek</option>";
 			}
 			$urlap.="</select>";
-			if($eallapot!='j') $urlap.="<br><span class=urlap>Megjegyzés a javításhoz:</span><br><textarea name=adminmegj class=urlap cols=17 rows=5></textarea>";
+			if($eallapot!='j') $urlap.="<br><span class=urlap>MegjegyzĂ©s a javĂ­tĂˇshoz:</span><br><textarea name=adminmegj class=urlap cols=17 rows=5></textarea>";
 			$urlap.="<input type=submit value=ok class=urlap></form>";
 
 			$kiir.="<tr><td valign=top width=35 bgcolor=$bgcolor[$a]>$ikon</td><td valign=top width=125 bgcolor=$bgcolor[$a]><span class=alap>$edatum</span><br>$urlap</td><td valign=top bgcolor=$bgcolor[$a]>$szoveg</td></tr>";			
@@ -201,7 +201,7 @@ function mod() {
 	}
 
 	if($emegbizhato!=$megbizhato) {
-		//A megbízhatóságot az összes beküldésénél átállítjuk
+		//A megbĂ­zhatĂłsĂˇgot az Ă¶sszes bekĂĽldĂ©sĂ©nĂ©l ĂˇtĂˇllĂ­tjuk
 		if(!empty($eemail) and strlen($eemail)>7) {			
 			$query="select distinct(login) from eszrevetelek where email='$eemail' and login!='*vendeg*'";
 			$lekerdez=mysql_query($query);

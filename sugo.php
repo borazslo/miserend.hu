@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>VPP - Súgó</title>
+<title>VPP - SĂşgĂł</title>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1250">
 <style TYPE="text/css">
 
@@ -26,7 +26,7 @@ foreach($idT as $idk) {
 	$kod.="<p class=alap>$leiras</p>";
 }
 
-$kod.="<div align=center><a href=javascript:close(); class=link><img src=img/bezar.gif border=0 aling=absmiddle> Bezár</a></div>";
+$kod.="<div align=center><a href=javascript:close(); class=link><img src=img/bezar.gif border=0 aling=absmiddle> BezĂˇr</a></div>";
 
 echo $kod;
 

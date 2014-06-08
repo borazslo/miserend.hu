@@ -5,9 +5,9 @@ function hirlevel_jobbmenu() {
 
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom lÈtrehoz·sa
+	//Tartalom l√©trehoz√°sa
 	
-	$adatT[0]='HÌrlevÈl';
+	$adatT[0]='H√≠rlev√©l';
 	$adatT[1]="?m_id=8$linkveg";
 	$tipus='jobbmenucim';
 	$kod_cim=formazo($adatT,$tipus);
@@ -16,7 +16,7 @@ function hirlevel_jobbmenu() {
 	$adatT[1]='';
 	$adatT[2]='<form method=post><td width=15><img src=img/space.gif width=15 height=5></td><td>';
 	$adatT[2].="<input type=hidden name=m_id value=8>";
-	$adatT[2].="<input type=text name=email value='emailcÌm' size=25 class='urlap'><br><input type=submit value=Feliratkoz·s class=urlap>";
+	$adatT[2].="<input type=text name=email value='emailc√≠m' size=25 class='urlap'><br><input type=submit value=Feliratkoz√°s class=urlap>";
 	$adatT[2].='</td></form>';
 	$tipus='jobbmenu';
 	$kod=formazo($adatT,$tipus);

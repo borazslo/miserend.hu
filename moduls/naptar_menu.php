@@ -4,7 +4,7 @@ function naptar_jobbmenu() {
     global $linkveg,$db_name,$elso,$m_id,$m_op,$sid,$_POST,$_GET,$bgcolor,$fooldal_id;
 
 	$tartalom=naptari();
-	$kodT[0]="<a href=?m_id=15$linkveg class=hasabcimlink>Eseménynaptár</a>";
+	$kodT[0]="<a href=?m_id=15$linkveg class=hasabcimlink>EsemÃ©nynaptÃ¡r</a>";
 	$kodT[1]=$tartalom;
 
 	return $kodT;
@@ -14,8 +14,8 @@ function naptar_jobbmenu() {
 function naptari() {
 	global $dateh, $linkveg,$_GET,$db_name,$szabadnap;
 
-	//ünnepek:
-	$unnepT=array('01-01'=>'Újév', '03-15'=>'Nemzeti ünnep', '05-01'=>'Munka ünnepe', '08-20'=>'Nemzeti Ünnep', '10-23'=>'Nemzeti ünnep', '11-01'=>'Mindenszentek ünnepe', '12-25'=>'Karácsony', '12-26'=>'Karácsony');	
+	//Ã¼nnepek:
+	$unnepT=array('01-01'=>'ÃšjÃ©v', '03-15'=>'Nemzeti Ã¼nnep', '05-01'=>'Munka Ã¼nnepe', '08-20'=>'Nemzeti Ãœnnep', '10-23'=>'Nemzeti Ã¼nnep', '11-01'=>'Mindenszentek Ã¼nnepe', '12-25'=>'KarÃ¡csony', '12-26'=>'KarÃ¡csony');	
 	$szabadnapT=array('01-01'=>1, '03-15'=>1, '05-01'=>1, '08-20'=>1, '10-23'=>1, '11-01'=>1, '12-25'=>1, '12-26'=>1);
 
 	if(is_array($_GET)) {
@@ -33,14 +33,14 @@ function naptari() {
 	$text .= '<table width=100%>';
 	$text .= '<tr>';
 	$text .= '<td align="right">';
-	$text .= '<a href="?dateh=' . $vars['prevYear'] . '-' . $vars['prevMonth'] . $parameterek.$linkveg.'" title="elõzõ hónap" class="linkkicsi">&lt;&lt;</a>';
+	$text .= '<a href="?dateh=' . $vars['prevYear'] . '-' . $vars['prevMonth'] . $parameterek.$linkveg.'" title="elÅ‘zÅ‘ hÃ³nap" class="linkkicsi">&lt;&lt;</a>';
 	$text .= '</td>';
 	$text .= '<td align="center" colspan="5">';
 	$text .= "<a href='?m_id=15&ev=$vars[currYear]&honap=$vars[currMonth]$linkveg' class=link><b>" . $vars['currYear'] . '. ' . $vars['months'][$vars['currMonth']] . '</b></a>';
 	$text .= '</td>';
 
 	$text .= '<td align="left">';
-	$text .= '<a href="?dateh=' . $vars['nextYear']. '-' . $vars['nextMonth'] .$parameterek.$linkveg.'" title="következõ hónap" class="linkkicsi">&gt;&gt;</a>';
+	$text .= '<a href="?dateh=' . $vars['nextYear']. '-' . $vars['nextMonth'] .$parameterek.$linkveg.'" title="kÃ¶vetkezÅ‘ hÃ³nap" class="linkkicsi">&gt;&gt;</a>';
 	$text .= '</td>';
 	$text .= '</tr>';
 	
@@ -70,7 +70,7 @@ function naptari() {
 	$dayCount=1;
 
 /*
-//Színek
+//SzÃ­nek
 	$szin_query = "SELECT datum,szin FROM lnaptar WHERE datum LIKE '".$vars['currYear']."-".str_pad($vars['currMonth'], 2, '0', STR_PAD_LEFT)."-%' ORDER BY datum;";
 
 	$_szin = mysql_query($szin_query) or die(mysql_error());
@@ -84,7 +84,7 @@ function naptari() {
 */	
 
 
-	//mozgó ünnepek (adatbázisból)
+	//mozgÃ³ Ã¼nnepek (adatbÃ¡zisbÃ³l)
 	$ev=$vars['currYear'];
 	$honap=str_pad($vars['currMonth'], 2, '0', STR_PAD_LEFT);
 
@@ -110,7 +110,7 @@ function naptari() {
 			{
 			$text .= '</tr><tr>';
 			}
-		if ($dayCount == date("j") && $vars['currYear'] == date("Y") && $vars['currMonth'] == date("n") and ($szabadnapT[$nap] or $rowCount%7 == 6))  // today + ünnep
+		if ($dayCount == date("j") && $vars['currYear'] == date("Y") && $vars['currMonth'] == date("n") and ($szabadnapT[$nap] or $rowCount%7 == 6))  // today + Ã¼nnep
 			{
 			$text .= '<td align="center" class="maiunnepnaptar" style="border-width: 2px;"><a href="?m_id=15&m_op=view&date=' . $vars['currYear'] . '-' . str_pad($vars['currMonth'], 2, '0', STR_PAD_LEFT)  . '-' . str_pad($dayCount, 2, '0', STR_PAD_LEFT) . "". $linkveg .'" class="linkkicsi" title="'.$unnepT[$nap].'">' .  $dayCount .  '</a></td>';
 			}
@@ -118,7 +118,7 @@ function naptari() {
 			{
 			$text .= '<td align="center" class="mainaptar" style="border-width: 2px;"><a href="?m_id=15&m_op=view&date=' . $vars['currYear'] . '-' . str_pad($vars['currMonth'], 2, '0', STR_PAD_LEFT)  . '-' . str_pad($dayCount, 2, '0', STR_PAD_LEFT) . "". $linkveg .'" class="linkkicsi" title="'.$unnepT[$nap].'">' .  $dayCount .  '</a></td>';
 			}
-		elseif ($dayCount == $datumT[2] && $vars['currYear'] == $datumT[0] && $vars['currMonth'] == $datumT[1] and ($szabadnapT[$nap] or $rowCount%7 == 6))  // select + ünnep
+		elseif ($dayCount == $datumT[2] && $vars['currYear'] == $datumT[0] && $vars['currMonth'] == $datumT[1] and ($szabadnapT[$nap] or $rowCount%7 == 6))  // select + Ã¼nnep
 			{
 			$text .= '<td align="center" class="selunnepnaptar"><a href="?m_id=15&m_op=view&date=' . $vars['currYear'] . '-' . str_pad($vars['currMonth'], 2, '0', STR_PAD_LEFT)  . '-' . str_pad($dayCount, 2, '0', STR_PAD_LEFT) . "" . $linkveg .'" class="linkkicsi" title="'.$unnepT[$nap].'">' .  $dayCount .  '</a></td>';
 			}
@@ -151,7 +151,7 @@ function naptari() {
 }
 
 function monthi() {
-	$months = array('', 'január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december');
+	$months = array('', 'januÃ¡r', 'februÃ¡r', 'mÃ¡rcius', 'Ã¡prilis', 'mÃ¡jus', 'jÃºnius', 'jÃºlius', 'augusztus', 'szeptember', 'oktÃ³ber', 'november', 'december');
 
 	if(isset($_GET['dateh']) or isset($_GET['date']))
 		{
@@ -229,7 +229,7 @@ function monthi() {
 	// find out which day the first of the month falls on
 	// set -1 on the end, while 'w' means English method 
 	
-// itt eredetileg a sor végén volt egy -1, de nemtom minek. rudanj
+// itt eredetileg a sor vÃ©gÃ©n volt egy -1, de nemtom minek. rudanj
 	
 	$firstDayOfMonth = date("w", mktime(0,0,0,$currMonth,1,$currYear)) - 1;
 

@@ -5,8 +5,8 @@ function chat_balmenu() {
 
 	$loginkiir=urlencode($u_login);
    
-	//Tartalom létrehozása
-	$kod_cim="<span class=admincimlink>Admin üzenõfal</span>";
+	//Tartalom lÃ©trehozÃ¡sa
+	$kod_cim="<span class=admincimlink>Admin Ã¼zenÅ‘fal</span>";
 
 	$kod_tartalom="<iframe name=chatadd width=135 height=135 frameborder=0 src=chatadd.php?u_login=$loginkiir$linkveg></iframe>";
 	$kod_tartalom.="<hr>";

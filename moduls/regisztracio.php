@@ -13,7 +13,7 @@ function regisztracio_index() {
 		else $tartalom.='<br><br>';
 	}
 
-	$tartalom.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Elolvastam, elfogadom, regisztrálok - tovább</a><br>";
+	$tartalom.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Elolvastam, elfogadom, regisztrÃ¡lok - tovÃ¡bb</a><br>";
 	$adatT[2]=$tartalom;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);
@@ -24,10 +24,10 @@ function regisztracio_index() {
 function regisztracio_atvett() {
 	global $u_login,$linkveg,$m_id,$m_op;
 
-	$tartalom.="\n<span class=alcim>Elsõ belépés</span><br><br><span class=alap><b>Kedves $u_login!<br>Szeretettel köszöntünk megújult portálunkon!</b><br><br>";
-	$tartalom.="\nA Virtuális Plébánia korábbi adatbázisából megtartottuk a felhasználóneved, emailcímed és ha beírtad, akkor a neved. Kérünk, hogy most az elsõ belépés alkalmával nézd át új portálunk regisztrációs részét, ellenõrizd a megtartott adatokat, s ha jónak látod, megadhatsz további adatokat is, melyek megjelenését is többféleképpen beállíthatod.<br><br><b>Köszönjük, hogy idõt szánsz rá!</b></span><br><br>";
+	$tartalom.="\n<span class=alcim>ElsÅ‘ belÃ©pÃ©s</span><br><br><span class=alap><b>Kedves $u_login!<br>Szeretettel kÃ¶szÃ¶ntÃ¼nk megÃºjult portÃ¡lunkon!</b><br><br>";
+	$tartalom.="\nA VirtuÃ¡lis PlÃ©bÃ¡nia korÃ¡bbi adatbÃ¡zisÃ¡bÃ³l megtartottuk a felhasznÃ¡lÃ³neved, emailcÃ­med Ã©s ha beÃ­rtad, akkor a neved. KÃ©rÃ¼nk, hogy most az elsÅ‘ belÃ©pÃ©s alkalmÃ¡val nÃ©zd Ã¡t Ãºj portÃ¡lunk regisztrÃ¡ciÃ³s rÃ©szÃ©t, ellenÅ‘rizd a megtartott adatokat, s ha jÃ³nak lÃ¡tod, megadhatsz tovÃ¡bbi adatokat is, melyek megjelenÃ©sÃ©t is tÃ¶bbfÃ©lekÃ©ppen beÃ¡llÃ­thatod.<br><br><b>KÃ¶szÃ¶njÃ¼k, hogy idÅ‘t szÃ¡nsz rÃ¡!</b></span><br><br>";
 
-	$tartalom.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Tovább</a><br>";
+	$tartalom.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>TovÃ¡bb</a><br>";
 	$adatT[2]=$tartalom;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);
@@ -38,46 +38,46 @@ function regisztracio_atvett() {
 function regisztracio_add() {
 	global $sessid,$m_id,$db_name,$u_oldal,$u_beosztas,$u_id,$u_jogT,$u_id,$u_login;
 
-	$optionT=array('0'=>'bárki','i'=>'ismerõs','b'=>'barát','n'=>'senki');
+	$optionT=array('0'=>'bÃ¡rki','i'=>'ismerÅ‘s','b'=>'barÃ¡t','n'=>'senki');
 
 	$urlap="\n<form method=post>";
 	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=sessid value=$sessid>";
 	$urlap.="\n<input type=hidden name=m_op value=adding>";
 	$urlap.="\n<table cellpadding=8 cellspacnig=1 bgcolor=#efefef>";
 
-//Bejelentkezési név	
+//BejelentkezÃ©si nÃ©v	
 	$urlap.="<tr><td valign=top bgcolor=#FFFFFF>";
 	if($u_id>0) {
-		$urlap.="\n<span class=kiscim>Bejelentkezési név: </span><br><span class=alap>(Nem módosítható!)</span><br><input type=text name=ulogin readonly value='$u_login' class=urlap size=20 maxlength=20>";
+		$urlap.="\n<span class=kiscim>BejelentkezÃ©si nÃ©v: </span><br><span class=alap>(Nem mÃ³dosÃ­thatÃ³!)</span><br><input type=text name=ulogin readonly value='$u_login' class=urlap size=20 maxlength=20>";
 
 		$query="select email,becenev,nev,kontakt,szuldatum,nevnap,msn,skype,nem,csaladiallapot,foglalkozas,magamrol,vallas,orszag,varos,nyilvanos from user where uid='$u_id' and ok='i'";
 		$lekerdez=mysql_db_query($db_name,$query);
 		list($email,$becenev,$nev,$kontakt,$szuldatum,$nevnap,$msn,$skype,$nem,$csaladiallapot,$foglalkozas,$magamrol,$vallas,$orszag,$varos,$nyilvanos)=mysql_fetch_row($lekerdez);
 
-		$urlap.="\n<br><br><span class=kiscim>Jelszó (jelenlegi): </span><br><span class=alap>(FONTOS! Minden módosításhoz meg kell adni!)</span><br><input type=password name=oldjelszo class=urlap size=20 maxlength=20>";
+		$urlap.="\n<br><br><span class=kiscim>JelszÃ³ (jelenlegi): </span><br><span class=alap>(FONTOS! Minden mÃ³dosÃ­tÃ¡shoz meg kell adni!)</span><br><input type=password name=oldjelszo class=urlap size=20 maxlength=20>";
 		
-		$urlap.="\n<br><br><span class=kiscim>Új jelszó: </span><br><span class=alap>(Csak a jelenlegi módosítása esetén.)</span><br><input type=password name=ujjelszo1 class=urlap size=20 maxlength=20>";
-		$urlap.="\n<br><br><span class=kiscim>Új jelszó mégegyszer: </span><br><input type=password name=ujjelszo2 class=urlap size=20 maxlength=20>";
+		$urlap.="\n<br><br><span class=kiscim>Ãšj jelszÃ³: </span><br><span class=alap>(Csak a jelenlegi mÃ³dosÃ­tÃ¡sa esetÃ©n.)</span><br><input type=password name=ujjelszo1 class=urlap size=20 maxlength=20>";
+		$urlap.="\n<br><br><span class=kiscim>Ãšj jelszÃ³ mÃ©gegyszer: </span><br><input type=password name=ujjelszo2 class=urlap size=20 maxlength=20>";
 	}
 	else {
-		$urlap.="\n<span class=kiscim>Bejelentkezési név: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=18',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><input type=text name=ulogin value='$ulogin' class=urlap size=20 maxlength=20";
-		$urlap.="><br><span class=alap>(Lehetõség szerint ékezet és speciális karakterek nélkül, maximum 20 betû. Szóköz, idézõjel és aposztróf NEM lehet benne! Ez a név azonosít, ezzel tudsz majd belépni, de alább lehetõség van külön becenév megadására is.)</span>";
+		$urlap.="\n<span class=kiscim>BejelentkezÃ©si nÃ©v: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=18',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><input type=text name=ulogin value='$ulogin' class=urlap size=20 maxlength=20";
+		$urlap.="><br><span class=alap>(LehetÅ‘sÃ©g szerint Ã©kezet Ã©s speciÃ¡lis karakterek nÃ©lkÃ¼l, maximum 20 betÅ±. SzÃ³kÃ¶z, idÃ©zÅ‘jel Ã©s aposztrÃ³f NEM lehet benne! Ez a nÃ©v azonosÃ­t, ezzel tudsz majd belÃ©pni, de alÃ¡bb lehetÅ‘sÃ©g van kÃ¼lÃ¶n becenÃ©v megadÃ¡sÃ¡ra is.)</span>";
 	}
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Bárki láthatja!</td></tr>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>BÃ¡rki lÃ¡thatja!</td></tr>";
 
-//Becenév
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Becenév, megszólítás: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=17',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><input type=text name=becenev class=urlap maxlength=100 size=40 value='$becenev'><br><span class=alap>(Ide keresztnevet, vagy becenevet célszerû írni. Alapvetõen ezen a néven jelensz meg oldalunkon, az azonosításhoz mellette kicsiben jelezzük a bejelentkezési neved is.)</span>";
+//BecenÃ©v
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>BecenÃ©v, megszÃ³lÃ­tÃ¡s: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=17',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><input type=text name=becenev class=urlap maxlength=100 size=40 value='$becenev'><br><span class=alap>(Ide keresztnevet, vagy becenevet cÃ©lszerÅ± Ã­rni. AlapvetÅ‘en ezen a nÃ©ven jelensz meg oldalunkon, az azonosÃ­tÃ¡shoz mellette kicsiben jelezzÃ¼k a bejelentkezÃ©si neved is.)</span>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Bárki láthatja!</td></tr>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>BÃ¡rki lÃ¡thatja!</td></tr>";
 
 
 //Email
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Email cím: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=19',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><input type=text name=email class=urlap maxlength=100 size=40 value='$email'><br><span class=alap>(Erre a címre küldjük ki a jelszót. A regisztrációhoz szükséges egy valós emailcím! Elküldés elõtt kérjük ellenõrizd!)</span>";
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Email cÃ­m: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=19',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><input type=text name=email class=urlap maxlength=100 size=40 value='$email'><br><span class=alap>(Erre a cÃ­mre kÃ¼ldjÃ¼k ki a jelszÃ³t. A regisztrÃ¡ciÃ³hoz szÃ¼ksÃ©ges egy valÃ³s emailcÃ­m! ElkÃ¼ldÃ©s elÅ‘tt kÃ©rjÃ¼k ellenÅ‘rizd!)</span>";
 
 //Email2
-	$urlap.="\n<br><br><span class=kiscim>Email cím mégegyszer: </span><br><input type=text name=email2 class=urlap maxlength=100 size=40 value='$email'>";
+	$urlap.="\n<br><br><span class=kiscim>Email cÃ­m mÃ©gegyszer: </span><br><input type=text name=email2 class=urlap maxlength=100 size=40 value='$email'>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[email]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[email]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"email-$x")) $urlap.=' selected';
@@ -85,10 +85,10 @@ function regisztracio_add() {
 	}
 	$urlap.="</select></td></tr>";
 
-//Név
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Név: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=20',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><input type=text name=nev class=urlap maxlength=100 size=40 value='$nev'>";
+//NÃ©v
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>NÃ©v: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=20',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><input type=text name=nev class=urlap maxlength=100 size=40 value='$nev'>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[nev]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[nev]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"nev-$x")) $urlap.=' selected';
@@ -99,11 +99,11 @@ function regisztracio_add() {
 //Nem
 	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Nem: </span><br><input type=radio name=nem class=urlap value=f";
 	if($nem=='f') $urlap.=" checked";
-	$urlap.="><span class=alap>férfi</span> <input type=radio name=nem value=n class=urlap";
+	$urlap.="><span class=alap>fÃ©rfi</span> <input type=radio name=nem value=n class=urlap";
 	if($nem=='n') $urlap.=" checked";
-	$urlap.="><span class=alap>nõ</span>";
+	$urlap.="><span class=alap>nÅ‘</span>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[nem]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[nem]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"nev-$x")) $urlap.=' selected';
@@ -111,10 +111,10 @@ function regisztracio_add() {
 	}
 	$urlap.="</select></td></tr>";
 
-//Bemutatkozás	
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Rövid bemutatkozás: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=21',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><span class=alap>(amennyiben szívesen megosztanál valamit másokkal is)</span><br><textarea name=magamrol class=urlap cols=60 rows=8>$magamrol</textarea>";	
+//BemutatkozÃ¡s	
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>RÃ¶vid bemutatkozÃ¡s: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=21',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><span class=alap>(amennyiben szÃ­vesen megosztanÃ¡l valamit mÃ¡sokkal is)</span><br><textarea name=magamrol class=urlap cols=60 rows=8>$magamrol</textarea>";	
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[magamrol]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[magamrol]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"magamrol-$x")) $urlap.=' selected';
@@ -123,8 +123,8 @@ function regisztracio_add() {
 	$urlap.="</select></td></tr>";
 
 //Lakhely
-	if(empty($orszag)) $orszag='Magyarország';
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Lakhely: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=26',200,430);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><span class=alap>- ország: </span><select name=orszag class=urlap>";	
+	if(empty($orszag)) $orszag='MagyarorszÃ¡g';
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Lakhely: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=26',200,430);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><span class=alap>- orszÃ¡g: </span><select name=orszag class=urlap>";	
 	$query="select nev from orszagok where ok='i' order by nev";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($onev)=mysql_fetch_row($lekerdez)) {
@@ -132,9 +132,9 @@ function regisztracio_add() {
 		if($onev==$orszag) $urlap.=' selected';
 		$urlap.=">$onev</option>";
 	}
-	$urlap.="</select><br><img src=img/space.gif width=5 height=8><br><span class=alap>- település: </span><input type=text name=varos value='$varos' class=urlap size=40 maxlength=50><br><span class=alap>(Kérlek pontosan és nagy kezdõbetûvel írd be a települést!)</span>";
+	$urlap.="</select><br><img src=img/space.gif width=5 height=8><br><span class=alap>- telepÃ¼lÃ©s: </span><input type=text name=varos value='$varos' class=urlap size=40 maxlength=50><br><span class=alap>(KÃ©rlek pontosan Ã©s nagy kezdÅ‘betÅ±vel Ã­rd be a telepÃ¼lÃ©st!)</span>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[orszag]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[orszag]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"kontakt-$x")) $urlap.=' selected';
@@ -149,9 +149,9 @@ function regisztracio_add() {
 	$urlap.="</select></td></tr>";
 
 //Kontakt
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Elérhetõség: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=22',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><span class=alap>(ha valamely elérhetõséged szeretnéd megadni)</span><br><textarea name=kontakt class=urlap cols=60 rows=4>$kontakt</textarea>";	
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>ElÃ©rhetÅ‘sÃ©g: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=22',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><span class=alap>(ha valamely elÃ©rhetÅ‘sÃ©ged szeretnÃ©d megadni)</span><br><textarea name=kontakt class=urlap cols=60 rows=4>$kontakt</textarea>";	
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[kontakt]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[kontakt]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"kontakt-$x")) $urlap.=' selected';
@@ -160,10 +160,10 @@ function regisztracio_add() {
 	$urlap.="</select></td></tr>";
 
 //MSN, Skype
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Internetes elérhetõség: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=28',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><span class=alap>- Skype (<a href=http://www.skype.hu/index2.php target=_blank class=link><small>www.skype.hu</small></a>) </span><input type=text name=skype class=urlap maxlength=50 size=20 value='$skype'>";
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Internetes elÃ©rhetÅ‘sÃ©g: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=28',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><span class=alap>- Skype (<a href=http://www.skype.hu/index2.php target=_blank class=link><small>www.skype.hu</small></a>) </span><input type=text name=skype class=urlap maxlength=50 size=20 value='$skype'>";
 	$urlap.="<br><img src=img/space.gif width=5 height=7><br><span class=alap>- MSN Messenger (<a href=http://messenger.msn.com target=_blank class=link><small>messenger.msn.com</small></a>) </span><input type=text name=msn class=urlap maxlength=50 size=20 value='$msn'>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[skype]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[skype]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"skype-$x")) $urlap.=' selected';
@@ -177,10 +177,10 @@ function regisztracio_add() {
 	}
 	$urlap.="</select></td></tr>";
 
-//Foglalkozás
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Foglalkozás: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=23',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><input type=text name=foglalkozas class=urlap maxlength=100 size=40 value='$foglalkozas'>";
+//FoglalkozÃ¡s
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>FoglalkozÃ¡s: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=23',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><input type=text name=foglalkozas class=urlap maxlength=100 size=40 value='$foglalkozas'>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[foglalkozas]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[foglalkozas]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"foglalkozas-$x")) $urlap.=' selected';
@@ -188,11 +188,11 @@ function regisztracio_add() {
 	}
 	$urlap.="</select></td></tr>";
 
-//Születésnap
+//SzÃ¼letÃ©snap
 	if(empty($szuldatum)) $szuldatum='0000-00-00';
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Születésnap: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=24',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><input type=text name=szuldatum class=urlap maxlength=10 size=10 value='$szuldatum'><br><span class=alap>(Fontos a formátum: év-hónap-nap => 0000-00-00)</span>";
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>SzÃ¼letÃ©snap: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=24',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><input type=text name=szuldatum class=urlap maxlength=10 size=10 value='$szuldatum'><br><span class=alap>(Fontos a formÃ¡tum: Ã©v-hÃ³nap-nap => 0000-00-00)</span>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[szuldatum]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[szuldatum]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"szuldatum-$x")) $urlap.=' selected';
@@ -200,11 +200,11 @@ function regisztracio_add() {
 	}
 	$urlap.="</select></td></tr>";
 
-//Névnap
+//NÃ©vnap
 	if(empty($nevnap)) $nevnap='00-00';
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Névnap: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=24',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><input type=text name=nevnap class=urlap maxlength=5 size=5 value='$nevnap'><br><span class=alap>(Fontos a formátum: hónap-nap => 00-00)</span>";
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>NÃ©vnap: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=24',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><input type=text name=nevnap class=urlap maxlength=5 size=5 value='$nevnap'><br><span class=alap>(Fontos a formÃ¡tum: hÃ³nap-nap => 00-00)</span>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[nevnap]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[nevnap]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"nevnap-$x")) $urlap.=' selected';
@@ -212,9 +212,9 @@ function regisztracio_add() {
 	}
 	$urlap.="</select></td></tr>";
 
-//Családi állapot
-	$csaladiallapotT=array('titok','egyedülálló', 'kapcsolatban', 'házas', 'elvált', 'özvegy', 'pap/szerzetes');
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Családi állapot: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=25',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><select name=csaladiallapot class=urlap>";
+//CsalÃ¡di Ã¡llapot
+	$csaladiallapotT=array('titok','egyedÃ¼lÃ¡llÃ³', 'kapcsolatban', 'hÃ¡zas', 'elvÃ¡lt', 'Ã¶zvegy', 'pap/szerzetes');
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>CsalÃ¡di Ã¡llapot: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=25',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><select name=csaladiallapot class=urlap>";
 	foreach($csaladiallapotT as $ertek) {
 		$urlap.="<option value=$ertek";
 		if($csaladiallapot==$ertek) $urlap.=' selected';
@@ -222,7 +222,7 @@ function regisztracio_add() {
 	}
 	$urlap.="</select>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[csaladiallapot]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[csaladiallapot]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"csaladiallapot-$x")) $urlap.=' selected';
@@ -230,9 +230,9 @@ function regisztracio_add() {
 	}
 	$urlap.="</select></td></tr>";
 
-//Vallás
-	$csaladiallapotT=array('titok','római katolikus', 'görög katolikus', 'evangélikus', 'református', 'baptista', 'izraelita', 'görög ortodox','pünkösdi','szabadkeresztény','Jehova tanúja','Hit gyülekezete','egyéb');
-	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Vallás: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=27',200,350);\"><img src=img/help.png border=0 title='Súgó' align=top></a><br><select name=vallas class=urlap>";
+//VallÃ¡s
+	$csaladiallapotT=array('titok','rÃ³mai katolikus', 'gÃ¶rÃ¶g katolikus', 'evangÃ©likus', 'reformÃ¡tus', 'baptista', 'izraelita', 'gÃ¶rÃ¶g ortodox','pÃ¼nkÃ¶sdi','szabadkeresztÃ©ny','Jehova tanÃºja','Hit gyÃ¼lekezete','egyÃ©b');
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>VallÃ¡s: </span><a href=\"javascript:OpenNewWindow('sugo.php?id=27',200,350);\"><img src=img/help.png border=0 title='SÃºgÃ³' align=top></a><br><select name=vallas class=urlap>";
 	foreach($csaladiallapotT as $ertek) {
 		$urlap.="<option value='$ertek'";
 		if($vallas==$ertek) $urlap.=' selected';
@@ -240,7 +240,7 @@ function regisztracio_add() {
 	}
 	$urlap.="</select>";
 
-	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Láthatja: </span><select name='nyilvanosT[vallas]' class=urlap>";
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>LÃ¡thatja: </span><select name='nyilvanosT[vallas]' class=urlap>";
 	foreach($optionT as $x=>$y) {
 		$urlap.="<option value=$x";
 		if(strstr($nyilvanos,"vallas-$x")) $urlap.=' selected';
@@ -252,8 +252,8 @@ function regisztracio_add() {
 
 	$urlap.='<br><br><input type=submit value=Mehet class=urlap></form>';
 
-	if($u_id>0) $tartalom="<span class=alcim>Adatok módosítása</span><br><br>".$urlap;
-	else $tartalom="<span class=alcim>Regisztráció</span><br><br>".$urlap;
+	if($u_id>0) $tartalom="<span class=alcim>Adatok mÃ³dosÃ­tÃ¡sa</span><br><br>".$urlap;
+	else $tartalom="<span class=alcim>RegisztrÃ¡ciÃ³</span><br><br>".$urlap;
 
 	$adatT[2]=$tartalom;
 	$tipus='doboz';
@@ -301,65 +301,65 @@ function regisztracio_adding() {
 	$hiba=false;
 
 	if($u_id>0) {
-		//módosítás
+		//mÃ³dosÃ­tÃ¡s
 		$query="select jelszo from user where uid='$u_id'";
 		$lekerdez=mysql_db_query($db_name,$query);
 		list($jelszo)=mysql_fetch_row($lekerdez);
 
 		if($ujjelszo1!=$ujjelszo2) {
 			$hiba=true;
-			$hibauzenet.="<span class=hiba>HIBA! A megadott két jelszó nem egyezik!</span><br>";
+			$hibauzenet.="<span class=hiba>HIBA! A megadott kÃ©t jelszÃ³ nem egyezik!</span><br>";
 		}
 		$oldjelszo=base64_encode($oldjelszo);
 		if($oldjelszo!=$jelszo) {
 			$hiba=true;
-			$hibauzenet.="<span class=hiba>HIBA! A megadott jelszó hibás!</span><br>";
+			$hibauzenet.="<span class=hiba>HIBA! A megadott jelszÃ³ hibÃ¡s!</span><br>";
 		}
 		if(!$hiba) {
 			if(!empty($ujjelszo1)) $ujjelszo=", jelszo='".base64_encode($ujjelszo1)."'";
 			$query="update user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', szuldatum='$szuldatum', nevnap='$nevnap', skype='$skype', msn='$msn', nem='$nem', csaladiallapot='$csaladiallapot', foglalkozas='$foglalkozas', magamrol='$magamrol', vallas='$vallas', orszag='$orszag', varos='$varos', nyilvanos='$nyilvanos', regip='$ip ($host)', atvett='n' $ujjelszo where uid='$u_id'";
 			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 
-			//Sessionben is módosítani kell a nemet és a szülinapot
+			//Sessionben is mÃ³dosÃ­tani kell a nemet Ã©s a szÃ¼linapot
 			$query="update session set nem='$nem' where sessid='$sid'";
 			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 
-			$tartalom="<span class=alcim>Adatok módosítása</span><br><br><span class=alap>Az adatok módosítása sikerrel járt.<br>FIGYELEM! Elõfordulhat, hogy bizonyos változások csak a következõ belépésnél lépnek érvénybe!</span>";
+			$tartalom="<span class=alcim>Adatok mÃ³dosÃ­tÃ¡sa</span><br><br><span class=alap>Az adatok mÃ³dosÃ­tÃ¡sa sikerrel jÃ¡rt.<br>FIGYELEM! ElÅ‘fordulhat, hogy bizonyos vÃ¡ltozÃ¡sok csak a kÃ¶vetkezÅ‘ belÃ©pÃ©snÃ©l lÃ©pnek Ã©rvÃ©nybe!</span>";
 		}
 		else {
-			$tartalom="<span class=alcim>Adatok módosítása</span><br><br>$hibauzenet<br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
+			$tartalom="<span class=alcim>Adatok mÃ³dosÃ­tÃ¡sa</span><br><br>$hibauzenet<br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
 		}
 	}
 	else {
-		//Új regisztráció
+		//Ãšj regisztrÃ¡ciÃ³
 
 		if(empty($login)) {
 			$hiba=true;
-			$hibauzenet.="<span class=hiba>HIBA! Nem lett megadva felhasználónév!</span><br>";
+			$hibauzenet.="<span class=hiba>HIBA! Nem lett megadva felhasznÃ¡lÃ³nÃ©v!</span><br>";
 		}
 		if(empty($email)) {
 			$hiba=true;
-			$hibauzenet.="<span class=hiba>HIBA! Nem lett megadva emailcím!</span><br>";
+			$hibauzenet.="<span class=hiba>HIBA! Nem lett megadva emailcÃ­m!</span><br>";
 		}
 		if($email!=$email2) {
 			$hiba=true;
-			$hibauzenet.="<span class=hiba>HIBA! A beírt emailcímek nem egyeznek!</span><br>";
+			$hibauzenet.="<span class=hiba>HIBA! A beÃ­rt emailcÃ­mek nem egyeznek!</span><br>";
 		}
-		//Login ellenõrzése
-		$login=str_replace(' ','',$login); //szóköz törlése, ha lenne benne
-		$login=str_replace("&nbsp;",'',$login); //szóköz törlése, ha lenne benne
-		$login=str_replace('"','',$login); //idézõjel törlése, ha lenne benne
-		$login=str_replace("'",'',$login); //aposztróf törlése, ha lenne benne
-		$login=strip_tags($login); //mindenféle html formázást is törlünk
+		//Login ellenÅ‘rzÃ©se
+		$login=str_replace(' ','',$login); //szÃ³kÃ¶z tÃ¶rlÃ©se, ha lenne benne
+		$login=str_replace("&nbsp;",'',$login); //szÃ³kÃ¶z tÃ¶rlÃ©se, ha lenne benne
+		$login=str_replace('"','',$login); //idÃ©zÅ‘jel tÃ¶rlÃ©se, ha lenne benne
+		$login=str_replace("'",'',$login); //aposztrÃ³f tÃ¶rlÃ©se, ha lenne benne
+		$login=strip_tags($login); //mindenfÃ©le html formÃ¡zÃ¡st is tÃ¶rlÃ¼nk
 		$query="select uid from user where login='$login'";
 		$lekerdez=mysql_db_query($db_name,$query);
 		if(mysql_num_rows($lekerdez)>0) {
 			$hiba=true;
-			$hibauzenet.="<span class=hiba>HIBA! Ez a bejelentkezési név már foglalt, kérjük válassz másikat!</span><br>";
+			$hibauzenet.="<span class=hiba>HIBA! Ez a bejelentkezÃ©si nÃ©v mÃ¡r foglalt, kÃ©rjÃ¼k vÃ¡lassz mÃ¡sikat!</span><br>";
 		}
 
 		if(!$hiba) {
-			//Jelszó generálás
+			//JelszÃ³ generÃ¡lÃ¡s
 			$szam1=mt_rand(0,99);
 			$jelszo1 = str_shuffle($login).$szam1;
 			$jelszo=base64_encode($jelszo1);
@@ -367,18 +367,18 @@ function regisztracio_adding() {
 			$query="insert user set nev='$nev', email='$email', kontakt='$kontakt', jelszo='$jelszo', ok='i', jogok='$jogok', login='$login', letrehozta='$u_login', regdatum='$most'";
 			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 
-			//email küldése
-			$targy='Regisztráció - Virtuális Plébánia Portál';
-			$szoveg="Köszöntünk a Virtuális Plébánia Portál felhasználói között!";
-			$szoveg.="\n\nA belépéshez szükséges jelszó: $jelszo1";
-			$szoveg.="\nA belépést követõen a BEÁLLÍTÁSOK menüben lehet a jelszót megváltoztatni.";
+			//email kÃ¼ldÃ©se
+			$targy='RegisztrÃ¡ciÃ³ - VirtuÃ¡lis PlÃ©bÃ¡nia PortÃ¡l';
+			$szoveg="KÃ¶szÃ¶ntÃ¼nk a VirtuÃ¡lis PlÃ©bÃ¡nia PortÃ¡l felhasznÃ¡lÃ³i kÃ¶zÃ¶tt!";
+			$szoveg.="\n\nA belÃ©pÃ©shez szÃ¼ksÃ©ges jelszÃ³: $jelszo1";
+			$szoveg.="\nA belÃ©pÃ©st kÃ¶vetÅ‘en a BEÃLLÃTÃSOK menÃ¼ben lehet a jelszÃ³t megvÃ¡ltoztatni.";
 			$szoveg.="\n\nVPP \nwww.plebania.net";
 			mail($email,$targy,$szoveg,"From: info@plebania.net");
 		
-			$tartalom="<span class=alcim>Regisztráció</span><br><br><span class=alap><b>Isten hozott!</b><br><br>A belépéshez szükséges kódot elküldtük a megadott emailcímre ($email), ami a belépést követõen megváltoztatható. <br><b>Ha pár órán belül nem érkezne meg, valószínûleg hibás emailcímet adtál meg.</b>";
+			$tartalom="<span class=alcim>RegisztrÃ¡ciÃ³</span><br><br><span class=alap><b>Isten hozott!</b><br><br>A belÃ©pÃ©shez szÃ¼ksÃ©ges kÃ³dot elkÃ¼ldtÃ¼k a megadott emailcÃ­mre ($email), ami a belÃ©pÃ©st kÃ¶vetÅ‘en megvÃ¡ltoztathatÃ³. <br><b>Ha pÃ¡r Ã³rÃ¡n belÃ¼l nem Ã©rkezne meg, valÃ³szÃ­nÅ±leg hibÃ¡s emailcÃ­met adtÃ¡l meg.</b>";
 		}
 		else {
-			$tartalom="<span class=alcim>Regisztráció</span><br><br>$hibauzenet<br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
+			$tartalom="<span class=alcim>RegisztrÃ¡ciÃ³</span><br><br>$hibauzenet<br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
 		}
 	}
 
@@ -393,9 +393,9 @@ function regisztracio_adding() {
 function regisztracio_jelszo() {
 	global $db_name,$m_id;
 	
-	$cim='<span class=alcim>Jelszó emlékeztetõ</span><br><br>';
-	$szoveg='<span class=alap>Az alábbi két adat közül legalább az egyik kitöltése alapján a rendszer megpróbál azonosítani és elküldi a megadott (regisztrált!) email címre a jelszót.</span><br><br>';
-	$szoveg.="\n<form method=post><input type=hidden name=m_op value=jelszokuld><input type=hidden name=m_id value=$m_id><span class=alap>Felhasználónév: </span> <input type=text name=lnev size=18 class=urlap><br><span class=alap>Emailcím: </span> <input type=text name=mail size=25 class=urlap><br><br><input type=submit value='Kérem a jelszót'></form>";
+	$cim='<span class=alcim>JelszÃ³ emlÃ©keztetÅ‘</span><br><br>';
+	$szoveg='<span class=alap>Az alÃ¡bbi kÃ©t adat kÃ¶zÃ¼l legalÃ¡bb az egyik kitÃ¶ltÃ©se alapjÃ¡n a rendszer megprÃ³bÃ¡l azonosÃ­tani Ã©s elkÃ¼ldi a megadott (regisztrÃ¡lt!) email cÃ­mre a jelszÃ³t.</span><br><br>';
+	$szoveg.="\n<form method=post><input type=hidden name=m_op value=jelszokuld><input type=hidden name=m_id value=$m_id><span class=alap>FelhasznÃ¡lÃ³nÃ©v: </span> <input type=text name=lnev size=18 class=urlap><br><span class=alap>EmailcÃ­m: </span> <input type=text name=mail size=25 class=urlap><br><br><input type=submit value='KÃ©rem a jelszÃ³t'></form>";
 
 	$adatT[2]=$cim.$szoveg;
 	$tipus='doboz';
@@ -411,7 +411,7 @@ function regisztracio_jelszokuld() {
 	$lnev=$_POST['lnev'];
 	$mail=$_POST['mail'];
 
-	$cim='<span class=alcim>Jelszó emlékeztetõ</span><br><br>';
+	$cim='<span class=alcim>JelszÃ³ emlÃ©keztetÅ‘</span><br><br>';
 	
 	if(!empty($lnev)) $feltetelT[]="login='$lnev'";
 	if(!empty($mail)) $feltetelT[]="email='$mail'";
@@ -423,22 +423,22 @@ function regisztracio_jelszokuld() {
 		if(mysql_num_rows($lekerdez)>0) {
 			list($loginnev,$jelszo,$email)=mysql_fetch_row($lekerdez);
 			$jelszokiir=base64_decode($jelszo);
-			$targy="Jelszó emlékeztetõ - Virtuális Plébánia Portál";
+			$targy="JelszÃ³ emlÃ©keztetÅ‘ - VirtuÃ¡lis PlÃ©bÃ¡nia PortÃ¡l";
 			$txt="Kedves $loginnev";
-			$txt.="\n\nKérésedre küldjük a bejelentkezéshez szükséges jelszót:";
+			$txt.="\n\nKÃ©rÃ©sedre kÃ¼ldjÃ¼k a bejelentkezÃ©shez szÃ¼ksÃ©ges jelszÃ³t:";
 			$txt.="\n$jelszokiir";
 			$txt.="\n\nVPP \nhttp://www.plebania.net";
 			
 			mail($email,$targy,$txt,"From: info@plebania.net");
 			
-			$szoveg="<span class=alap>A jelszót elküldtük a regisztrált emailcímre</span>";
+			$szoveg="<span class=alap>A jelszÃ³t elkÃ¼ldtÃ¼k a regisztrÃ¡lt emailcÃ­mre</span>";
 		}
 		else {
-			$szoveg='<span class=alap>A megadott adatok alapján nem találtunk felhasználót.</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>';
+			$szoveg='<span class=alap>A megadott adatok alapjÃ¡n nem talÃ¡ltunk felhasznÃ¡lÃ³t.</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>';
 		}
 	}
 	else {
-		$szoveg='<span class=alap>Nem lett kitöltve adat!</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>';
+		$szoveg='<span class=alap>Nem lett kitÃ¶ltve adat!</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>';
 	}
 
 	$adatT[2]=$cim.$szoveg;

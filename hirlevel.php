@@ -1,6 +1,6 @@
 <?php
 
-$kod='<html><head><title>Magyar Kurír</title><meta http-equiv="Content-Type" content="text/html; charset=windows-1250"><style type="text/css"><!--';
+$kod='<html><head><title>Magyar KurĂ­r</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css"><!--';
 $kod.="\n .cim {  font-family: Verdana; font-size: 11pt; font-weight: bold; color: #394873}";
 $kod.="\n .alap {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000}";
 $kod.="\n .kiscim {  font-family: Verdana; font-size: 11pt; font-weight: bold; color: #C26238}";
@@ -47,7 +47,7 @@ while(list($id,$cim,$intro,$szoveg,$datum,$hirlevel)=mysql_fetch_row($lekerdez))
 	$szoveg=str_replace('src="kepek','src="http://www.magyarkurir.hu/kepek',$szoveg);
 
 	if($hirlevel=='c') {
-		$hcT[]="\n<tr><td valign=top>• </td><td valign=top><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=linkb>$cim</a> <span class=kicsi>($datumkiir)</span><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=kislinkb> >>> tovább</a></td></tr>";
+		$hcT[]="\n<tr><td valign=top>â€˘ </td><td valign=top><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=linkb>$cim</a> <span class=kicsi>($datumkiir)</span><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=kislinkb> >>> tovĂˇbb</a></td></tr>";
 	}
 	elseif($hirlevel=='i') {
 		$img="kepek/hirek/$id/fokep/n.jpg";
@@ -55,7 +55,7 @@ while(list($id,$cim,$intro,$szoveg,$datum,$hirlevel)=mysql_fetch_row($lekerdez))
 			$wh=getimagesize($img);
 			$kepkiir="<img src=http://www.magyarkurir.hu/$img $wh[3] align=left vspace=3 hspace=10>";
 		}
-		$hiT[]="\n<tr><td colspan=2><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=linkb>$cim </a><span class=kicsi> ($datumkiir)</span><br>$kepkiir<span class=alap>$intro</a><br><div align=right><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=kislinkb>>>> tovább</a></div></td></tr><tr><td colspan=2><hr></td></tr>";
+		$hiT[]="\n<tr><td colspan=2><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=linkb>$cim </a><span class=kicsi> ($datumkiir)</span><br>$kepkiir<span class=alap>$intro</a><br><div align=right><a href=http://www.magyarkurir.hu/?m_id=1&m_op=view&id=$id class=kislinkb>>>> tovĂˇbb</a></div></td></tr><tr><td colspan=2><hr></td></tr>";
 	}
 	elseif($hirlevel=='t') {
 		if(is_file("kepek/hirek/$id/fokep/n.jpg")) {
@@ -74,17 +74,17 @@ $honap=alapnyelv("ho$ho");
 $nap=date('j');
 $maidatum="$ev. $honap $nap.";
 
-$kod.="\n<table width=650 cellspacing=0><tr><td colspan=2><span class=cim>Magyar Kurír - Hírlevél, $maidatum - </span><a href=http://www.magyarkurir.hu class=linkb>www.magyarkurir.hu</a><hr>";
+$kod.="\n<table width=650 cellspacing=0><tr><td colspan=2><span class=cim>Magyar KurĂ­r - HĂ­rlevĂ©l, $maidatum - </span><a href=http://www.magyarkurir.hu class=linkb>www.magyarkurir.hu</a><hr>";
 
 if(is_array($hiT)) {
-	$kod.="\n<br><span class=kiscim>Kiemelt híreink:</span><br><br></td></tr>";
+	$kod.="\n<br><span class=kiscim>Kiemelt hĂ­reink:</span><br><br></td></tr>";
 	foreach($hiT as $ertek) {
 		$kod.=$ertek;
 	}
 }
 
 if(is_array($hcT)) {
-	$kod.="\n<tr><td colspan=2><br><span class=kiscim>Magyar Kurír percről percre:</span><br><br></td></tr>";
+	$kod.="\n<tr><td colspan=2><br><span class=kiscim>Magyar KurĂ­r percrĹ‘l percre:</span><br><br></td></tr>";
 	foreach($hcT as $ertek) {
 		$kod.=$ertek;
 	}
@@ -96,18 +96,18 @@ if(is_array($htT)) {
 	}
 }
 
-//lábléc
-$kod.="\n<tr><td colspan=2><br><hr><span class=alap><b>Magyar Kurír Szerkesztőség</b>";
-$kod.="\n<br>Levélcím: 1364 Budapest, Pf. 41., <br>Telefon: 479-20-20 Fax: 479-20-21";
-$kod.="\n<br><br><b>Amennyiben le kívánja mondani napi hírlevelünket</b>, ";
-$kod.="\n<br>küldjön egy levelet a következő e-mail címre: <a href='mailto:kurir-lemondas@hcbc.hu?subject=Hírlevél lemondás' class=link>kurir-lemondas@hcbc.hu</a>";
-$kod.="\n<br>A levél tárgyához csak ennyit írjon: Hírlevél lemondás</span>";
+//lĂˇblĂ©c
+$kod.="\n<tr><td colspan=2><br><hr><span class=alap><b>Magyar KurĂ­r SzerkesztĹ‘sĂ©g</b>";
+$kod.="\n<br>LevĂ©lcĂ­m: 1364 Budapest, Pf. 41., <br>Telefon: 479-20-20 Fax: 479-20-21";
+$kod.="\n<br><br><b>Amennyiben le kĂ­vĂˇnja mondani napi hĂ­rlevelĂĽnket</b>, ";
+$kod.="\n<br>kĂĽldjĂ¶n egy levelet a kĂ¶vetkezĹ‘ e-mail cĂ­mre: <a href='mailto:kurir-lemondas@hcbc.hu?subject=HĂ­rlevĂ©l lemondĂˇs' class=link>kurir-lemondas@hcbc.hu</a>";
+$kod.="\n<br>A levĂ©l tĂˇrgyĂˇhoz csak ennyit Ă­rjon: HĂ­rlevĂ©l lemondĂˇs</span>";
 
 $kod.='</td></tr></table></body></html>';
 
-////////////Emailküldés
+////////////EmailkĂĽldĂ©s
 $From='web@magyarkurir.hu';
-$Subject="Hírlevél $maidatum";
+$Subject="HĂ­rlevĂ©l $maidatum";
 $To='kurir@katolikus.hu';
 $To1='fjk@vipmail.hu';
 $To2='feher@hcbc.hu';

@@ -18,14 +18,14 @@ function belepell() {
     if(!@$lekerdez=mysql_db_query($db_name,$query)) {
         $hiba=true;
         $hibauzenet.='';
-        $hibauzenet_prog.='HIBA a belÈptetÈsnÈl (adatb·zis ellenırzÈs) - login.php [#20]<br>'.mysql_error();
+        $hibauzenet_prog.='HIBA a bel√©ptet√©sn√©l (adatb√°zis ellen≈ërz√©s) - login.php [#20]<br>'.mysql_error();
     }
     if(!$tiltott_IP_T[1]) {
         list($u_id,$u_login,$u_jogok,$u_lastlogin,$u_szavazott)=@mysql_fetch_row($lekerdez);
 
         //Ha van loginje:
         if($u_id>0 and $u_login!='*vendeg*') {
-            //MÈg nem j·rt le az azonosÌtÛja
+            //M√©g nem j√°rt le az azonos√≠t√≥ja
             if($u_lastlogin>$lejart) {
                 $belep=true;
                 $query="update session set lastlogin='$most', last='$last', modul_id='$m_id', rovat='$rovat' where sessid='$sessid'";                
@@ -38,10 +38,10 @@ function belepell() {
 				
             }
             else {
-                $hibauzenet='Az azonosÌtÛ lej·rt. KÈrlek lÈpj be ˙jra!';
+                $hibauzenet='Az azonos√≠t√≥ lej√°rt. K√©rlek l√©pj be √∫jra!';
             }
         }
-        //Ha vendÈg
+        //Ha vend√©g
         else {
             $query="update session set lastlogin='$most', last='$last', modul_id='$m_id', rovat='$rovat' where sessid='$sessid'";
             @mysql_db_query($db_name,$query);
@@ -49,7 +49,7 @@ function belepell() {
 			elseif($rovat>0) @mysql_db_query($db_name,"update rovatok set szamlalo=szamlalo+1 where id='$rovat'");		
         }
     }
-    //Ha a megadott sessid valamiÈrt nem szerepel az adatb·zisban, akkor csin·lunk neki ˙jat
+    //Ha a megadott sessid valami√©rt nem szerepel az adatb√°zisban, akkor csin√°lunk neki √∫jat
     if(@mysql_num_rows($lekerdez)==0) {
         $u_login='*vendeg*';
         $u_jogok='';
@@ -81,7 +81,7 @@ function beleptet() {
     if(!$lekerdez=@mysql_db_query($db_name,$query)) {
         $hiba=true;
         $hibauzenet.='';
-        $hibauzenet_prog.='HIBA a belÈptetÈsnÈl (adatb·zis ellenırzÈs) - login.php [#88]<br>'.mysql_error();
+        $hibauzenet_prog.='HIBA a bel√©ptet√©sn√©l (adatb√°zis ellen≈ërz√©s) - login.php [#88]<br>'.mysql_error();
     }
     if(@mysql_num_rows($lekerdez)>0 and !$tiltott_IP_T[1]) {
         $most=time();
@@ -110,7 +110,7 @@ function beleptet() {
     }
     else {
         $belep=false;
-        $hibauzenet='Hib·s bejelentkezÈsi nÈv, vagy jelszÛ!';
+        $hibauzenet='Hib√°s bejelentkez√©si n√©v, vagy jelsz√≥!';
     }
 
     $belepT[0]=$belep;
@@ -124,7 +124,7 @@ function beleptet() {
 }
 
 function addsessid($u_id,$u_login) {
-    //Sessid lÈtrehoz·sa
+    //Sessid l√©trehoz√°sa
 
     $betu1=$u_login[0];
     $datum=time();
@@ -140,12 +140,12 @@ function addsessid($u_id,$u_login) {
 function ellsessid($u_sessid,$u_id) {
     global $db_name;
     $sessid_ok=false;
-    //EllenırzÈs, hogy van-e m·r ilyen sessid
+    //Ellen≈ërz√©s, hogy van-e m√°r ilyen sessid
     $query="select uid from session where sessid='$u_sessid'";
     if(!@$lekerdez=mysql_db_query($db_name,$query)) {
         $hiba=true;
         $hibauzenet.='';
-        $hibauzenet_prog.='HIBA a belÈptetÈsnÈl (sessid ellenırzÈs) - login.php [#145]<br>'.mysql_error();
+        $hibauzenet_prog.='HIBA a bel√©ptet√©sn√©l (sessid ellen≈ërz√©s) - login.php [#145]<br>'.mysql_error();
     }
     if(@mysql_num_rows($lekerdez)==0) {
         $sessid_ok=true;
@@ -165,7 +165,7 @@ function kilepes() {
     if(!mysql_db_query($db_name,$query)) {
         $hiba=true;
         $hibauzenet.='';
-        $hibauzenet_prog.='HIBA a kilÈptetÈsnÈl (sessid tˆrlÈs) - login.php [#164]<br>'.mysql_error();
+        $hibauzenet_prog.='HIBA a kil√©ptet√©sn√©l (sessid t√∂rl√©s) - login.php [#164]<br>'.mysql_error();
     }
 }
 

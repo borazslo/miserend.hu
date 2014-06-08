@@ -58,23 +58,23 @@ function szavazas_index() {
 	$tartalom.='</tr></table>';
 
 	if($min>1) {
-		//VisszalÈptetÈs
+		//Visszal√©ptet√©s
 		$visszalink="<a href=?m_id=$m_id&min=$prev$linkveg class=link>Vissza</a>";
 	}
 
 	if($mennyi>$leptet+1) {
-		//elıre lÈptetÈs
-		$tovabblink="<a href=?m_id=$m_id&min=$next$linkveg class=link>Tov·bb</a>";
+		//el≈ëre l√©ptet√©s
+		$tovabblink="<a href=?m_id=$m_id&min=$next$linkveg class=link>Tov√°bb</a>";
 	}
 
 	$tartalom.="<br>$visszalink";
 	if(!empty($visszalink) and !empty($tovabblink)) $tartalom.= ' - ';
 	$tartalom.=$tovabblink;
 
-	if($mennyi<2) $tartalom="<span class=alap>MÈg nincs lej·rt szavaz·s</span>";
+	if($mennyi<2) $tartalom="<span class=alap>M√©g nincs lej√°rt szavaz√°s</span>";
 
-	//FıcÌm
-	$adatT[2]="<span class=alcim>Kor·bbi szavaz·sok eredmÈnyei</span><br><br>".$tartalom;
+	//F≈ëc√≠m
+	$adatT[2]="<span class=alcim>Kor√°bbi szavaz√°sok eredm√©nyei</span><br><br>".$tartalom;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);	
 

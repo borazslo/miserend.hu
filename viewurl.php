@@ -7,7 +7,7 @@ $id=$_GET['id'];
 $sessid=$_GET['sessid'];
 
 if($id==0) {
-    echo "<html><body><script><!-- JavaScript kód elrejtése \n close(); \n // --></SCRIPT></body></html>";
+    echo "<html><body><script><!-- JavaScript kÃ³d elrejtÃ©se \n close(); \n // --></SCRIPT></body></html>";
 	exit;
 }
 

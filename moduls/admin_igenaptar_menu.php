@@ -4,12 +4,12 @@ function admin_igenaptar_balmenu() {
     global $linkveg,$lang,$db_name;
 
 	
-	//Cím létrehozása
-	$adatT[0]=alapnyelv('aktuális hírek');
+	//CÃ­m lÃ©trehozÃ¡sa
+	$adatT[0]=alapnyelv('aktuÃ¡lis hÃ­rek');
 	$tipus='balmenucim';
 	$kod.=formazo($adatT,$tipus);
 
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	$query="select id,cim from hirek where lang='$lang' and ok='i' order by kiemelt asc, datum desc limit 0,4";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($hid,$hcim)=mysql_fetch_row($lekerdez)) {
@@ -26,18 +26,18 @@ function admin_igenaptar_aktivmenu() {
     global $linkveg,$db_name;
 
 	
-	//Cím létrehozása
-	$adatT[0]=alapnyelv('Liturgikus naptár');
+	//CÃ­m lÃ©trehozÃ¡sa
+	$adatT[0]=alapnyelv('Liturgikus naptÃ¡r');
 	$tipus='balmenucim';
 	$kod.=formazo($adatT,$tipus);
 
-	$menu.="<a href=?m_id=11&m_op=addige$linkveg class=kismenulink>gondolatok hozzáadása</a><br>";
-	$menu.="<a href=?m_id=11&m_op=gondolatok$linkveg class=kismenulink>gondolatok módosítása</a><br>";
-	$menu.="<a href=?m_id=11&m_op=addszent$linkveg class=kismenulink>szentek hozzáadása</a><br>";
-	$menu.="<a href=?m_id=11&m_op=szentek$linkveg class=kismenulink>szentek módosítása</a><br>";
-	$menu.="<a href=?m_id=11&m_op=naptar$linkveg class=kismenulink>liturgikus naptár beállítása</a><br>";
+	$menu.="<a href=?m_id=11&m_op=addige$linkveg class=kismenulink>gondolatok hozzÃ¡adÃ¡sa</a><br>";
+	$menu.="<a href=?m_id=11&m_op=gondolatok$linkveg class=kismenulink>gondolatok mÃ³dosÃ­tÃ¡sa</a><br>";
+	$menu.="<a href=?m_id=11&m_op=addszent$linkveg class=kismenulink>szentek hozzÃ¡adÃ¡sa</a><br>";
+	$menu.="<a href=?m_id=11&m_op=szentek$linkveg class=kismenulink>szentek mÃ³dosÃ­tÃ¡sa</a><br>";
+	$menu.="<a href=?m_id=11&m_op=naptar$linkveg class=kismenulink>liturgikus naptÃ¡r beÃ¡llÃ­tÃ¡sa</a><br>";
 
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	$adatT[2]=$menu;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);

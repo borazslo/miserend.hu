@@ -10,8 +10,8 @@ function feltoltes_balmenu() {
 		
 		if($mennyi>0) {
 			while(list($tid,$tnev,$tvaros,$teszrevetel)=mysql_fetch_row($lekerdez)) {
-				if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
-				elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";						
+				if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag.gif title='Ãšj Ã©szrevÃ©telt Ã­rtak hozzÃ¡!' align=absmiddle border=0></a> ";		
+				elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomagf.gif title='Ã‰szrevÃ©tel javÃ­tÃ¡sa folyamatban!' align=absmiddle border=0></a> ";						
 				else $jelzes='';
 				
 				$kod_tartalom.="\n<li class=link_kek>$jelzes<a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg class=link_kek title='$tvaros'>$tnev</a></li><img src=img/space.gif width=5 height=3>";
@@ -23,8 +23,8 @@ function feltoltes_balmenu() {
 	}
 	
 	if(!empty($kod_tartalom)) {
-		//Tartalom létrehozása
-		$kod_cim="<span class=hasabcimlink>Feltöltés</span>";
+		//Tartalom lÃ©trehozÃ¡sa
+		$kod_cim="<span class=hasabcimlink>FeltÃ¶ltÃ©s</span>";
 
 		$kodT[0]=$kod_cim;
 		$kodT[1]=$kod_tartalom;
@@ -41,17 +41,17 @@ function feltoltes_jobbmenu() {
 		$lekerdez=mysql_query($query);
 		list($mennyi)=mysql_fetch_row($lekerdez);
 
-		$kod_tartalom="\n<a href=?m_id=29&m_op=addhirek$linkveg class=kismenulink><img src=$design_url/img/tovabb1.gif border=0> <b>Új hír beküldése</b></a><br>";
+		$kod_tartalom="\n<a href=?m_id=29&m_op=addhirek$linkveg class=kismenulink><img src=$design_url/img/tovabb1.gif border=0> <b>Ãšj hÃ­r bekÃ¼ldÃ©se</b></a><br>";
 		
 		if($mennyi>0) {
-			$kod_tartalom.="\n<li class=felsomenulink><a href=?m_id=29$linkveg class=kismenulink>Feltöltött híreid szerkesztése</a>";
+			$kod_tartalom.="\n<li class=felsomenulink><a href=?m_id=29$linkveg class=kismenulink>FeltÃ¶ltÃ¶tt hÃ­reid szerkesztÃ©se</a>";
 			$kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
 		}
 	}
 	
 	if(!empty($kod_tartalom)) {
-		//Tartalom létrehozása
-		$kod_cim="<span class=hasabcimlink>Feltöltés</span>";
+		//Tartalom lÃ©trehozÃ¡sa
+		$kod_cim="<span class=hasabcimlink>FeltÃ¶ltÃ©s</span>";
 
 		$kodT[0]=$kod_cim;
 		$kodT[1]=$kod_tartalom;

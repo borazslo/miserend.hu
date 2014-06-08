@@ -52,7 +52,7 @@
 			}
 
 		$dayCount=1;
-//Színek
+//SzÃ­nek
 		$szin_query = "SELECT datum,szin FROM lnaptar WHERE datum LIKE '".$vars['currYear']."-".str_pad($vars['currMonth'], 2, '0', STR_PAD_LEFT)."-%' ORDER BY datum;";
 
 		$_szin = mysql_query($szin_query) or die(mysql_error());
@@ -97,7 +97,7 @@
 		$text .= '</tr>';
 		
 		
-		// az alsó "folyó hó" linket kihúztam
+		// az alsÃ³ "folyÃ³ hÃ³" linket kihÃºztam
 		/*
 		$text .= '<tr>';
 		$text .= '<td align="center" colspan="7">';
@@ -189,7 +189,7 @@
 		// find out which day the first of the month falls on
 		// set -1 on the end, while 'w' means English method 
 		
-// itt eredetileg a sor végén volt egy -1, de nemtom minek. rudanj
+// itt eredetileg a sor vÃ©gÃ©n volt egy -1, de nemtom minek. rudanj
 		
 		$firstDayOfMonth = date("w", mktime(0,0,0,$currMonth,1,$currYear)) - 1;
 

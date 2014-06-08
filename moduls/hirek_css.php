@@ -21,7 +21,7 @@ function hirek_index() {
 	}
 
 
-//Hírek keresése
+//HÃ­rek keresÃ©se
 	include_once("$design_url/hirlista.php");
 	$maxhir=15;
 
@@ -53,8 +53,8 @@ function hirek_index() {
 		}
 
 		$intro=nl2br($intro);
-		$intro=str_replace('href=?',"href=?$linkveg&",$intro); //link helyesbítése
-		$intro=str_replace('href="?',"href=\"?$linkveg&",$intro); //link helyesbítése		
+		$intro=str_replace('href=?',"href=?$linkveg&",$intro); //link helyesbÃ­tÃ©se
+		$intro=str_replace('href="?',"href=\"?$linkveg&",$intro); //link helyesbÃ­tÃ©se		
 
 		$rovatkat=str_replace('--','!',$rovatkat);
 		$rovatkat=str_replace('-','',$rovatkat);
@@ -64,7 +64,7 @@ function hirek_index() {
 		}
 
 		if($hol>0 and $hol<=6) {
-			if($rovattovabbiT[$hol]<2) {//Ha az adott rovatban még nincs meg a két további
+			if($rovattovabbiT[$hol]<2) {//Ha az adott rovatban mÃ©g nincs meg a kÃ©t tovÃ¡bbi
 				$rovattovabbiT[$hol]++;						
 				$hir_listaT['link']="?hir=$id$linkveg";
 				$hir_listaT['hid']=$id;
@@ -92,20 +92,20 @@ function hirek_index() {
 
 	if(is_array($hirlistaT)) $hirlista=implode("\n\n",$hirlistaT);
 
-//Rovatfõhírek
+//RovatfÅ‘hÃ­rek
 	$query="select id,cim,intro,kiemeles_hol,kiemeles_tol from hirek where ok='i' and datum<='$most' and kiemeles_tol<='$ma' and kiemeles_hol!='' order by kiemeles_tol desc limit 0,20";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($id,$cim,$intro,$kiemeles_hol,$kiemeles_tol)=mysql_fetch_row($lekerdez)) {
 
-		if(!$rovatT[$kiemeles_hol]) {//Ha az adott rovatban még nincs kiemelt
+		if(!$rovatT[$kiemeles_hol]) {//Ha az adott rovatban mÃ©g nincs kiemelt
 			$rovatT[$kiemeles_hol]=1;						
 
 			$r_id=$kiemeles_hol;
 			$r_cim=strtoupper($rovatnevT[$kiemeles_hol]);
-			$r_cim=str_replace('á','Á',$r_cim);
-			$r_cim=str_replace('é','É',$r_cim);
-			$r_cim=str_replace('ú','Ú',$r_cim);
-			$r_cim=str_replace('õ','Õ',$r_cim);
+			$r_cim=str_replace('Ã¡','Ã',$r_cim);
+			$r_cim=str_replace('Ã©','Ã‰',$r_cim);
+			$r_cim=str_replace('Ãº','Ãš',$r_cim);
+			$r_cim=str_replace('Å‘','Å',$r_cim);
 			$rovat['link']="?hir=$id$linkveg";
 			$rovat['cim']=$cim;
 			$rovat['intro']=$intro;
@@ -127,7 +127,7 @@ function hirek_index() {
 	$rovatok=implode("\n\n",$rovatokT);
 
 
-	//Közeli programok keresése
+	//KÃ¶zeli programok keresÃ©se
 	$ma=time();
 	$egynap=86400;
 	$hetvege=$ma+(7*$egynap);
@@ -178,7 +178,7 @@ function hirek_index() {
 	}
 	if(is_array($tovabbiesemenylistaT)) $tovabbiesemenylista=implode("\n\n",$tovabbiesemenylistaT);
 
-	//Közeli határidõk keresése
+	//KÃ¶zeli hatÃ¡ridÅ‘k keresÃ©se
 	$maxhatarido=10;
 	$ma=date('Y-m-d');
 	$egynap=86400;
@@ -201,7 +201,7 @@ function hirek_index() {
 			$hir_listaT['link']="?hir=$id$linkveg";
 			$hir_listaT['hid']=$id;
 			$hir_listaT['cim']=$cim;
-			$hir_listaT['idopont']="(határidõ: $nap)";
+			$hir_listaT['idopont']="(hatÃ¡ridÅ‘: $nap)";
 			$hir_listaT['lead']=$intro;
 			$hir_listaT['mi']='kh';
 			
@@ -209,15 +209,15 @@ function hirek_index() {
 	}
 
 	if(is_array($hataridokT) and count($hataridokT)>0) $hataridok=implode("\n\n",$hataridokT);
-	else $hataridok="<span class=alap>a következõ napokban nincs határidõ</span>";
+	else $hataridok="<span class=alap>a kÃ¶vetkezÅ‘ napokban nincs hatÃ¡ridÅ‘</span>";
 
-	//Archív ûrlap
+	//ArchÃ­v Å±rlap
 	$ma=date('Y-m-d');
 	$now=time();
 	$egynap=86400;
 	$tegnapido=$now-$egynap;
 	$tegnap=date('Y-m-d',$tegnapido);	
-	$archivurlap.= "\n<select name=datum class=urlap><option value=$ma>mai hírek</option><option value=$tegnap>tegnapi</option>";
+	$archivurlap.= "\n<select name=datum class=urlap><option value=$ma>mai hÃ­rek</option><option value=$tegnap>tegnapi</option>";
 	/*
 	$min=$tegnapido-(10*$egynap);
 	for($i=$tegnapido-$egynap; $i>$min; $i=$i-$egynap) {
@@ -225,11 +225,11 @@ function hirek_index() {
 		$archivurlap.="\n<option value=$datum>$datum</option>";
 	}
 	*/
-	$archivurlap.="\n<option value=0>teljes archívum</option>";
+	$archivurlap.="\n<option value=0>teljes archÃ­vum</option>";
 	$archivurlap.="\n</select><br><img src=img/space.gif width=5 height=8><br><div align=right><input type=image src=$design_url/img/keresgomb.jpg border=0></div>";
 
-	$elotercim="<a href='#'>Van idõnk a fájdalomra!</a>";
-	$eloterlead="Halálról, szenvedésrõl, és arról, hogy miért nehéz szembenézni velük...";
+	$elotercim="<a href='#'>Van idÅ‘nk a fÃ¡jdalomra!</a>";
+	$eloterlead="HalÃ¡lrÃ³l, szenvedÃ©srÅ‘l, Ã©s arrÃ³l, hogy miÃ©rt nehÃ©z szembenÃ©zni velÃ¼k...";
 	$eloterlink="#";
 
 	$tmpl_file = $design_url.'/sablon_fooldal.htm';
@@ -264,7 +264,7 @@ function hirek_rovat() {
 	    else $rovat=1;
 	}
 	
-	//Rovat szerinti kiírások lekérdezése
+	//Rovat szerinti kiÃ­rÃ¡sok lekÃ©rdezÃ©se
 	$query="select friss,k3,lista,datumkiir from rovatkat where id='$rovat'";
 	$lekerdez=mysql_db_query($db_name,$query);
 	list($frisshirek,$k3focim,$max,$datumkiirok)=mysql_fetch_row($lekerdez);
@@ -275,7 +275,7 @@ function hirek_rovat() {
 	$holvan="&rovat=$rovat";
 
 
-	//Ha alsóbb kategóriában vagyunk és van megadva érték, akkor felülírjuk a rovat szerinti értéket:
+	//Ha alsÃ³bb kategÃ³riÃ¡ban vagyunk Ã©s van megadva Ã©rtÃ©k, akkor felÃ¼lÃ­rjuk a rovat szerinti Ã©rtÃ©ket:
 	if($fokat>0) {
 		$query="select friss,k3,lista,datumkiir from rovatkat where id='$fokat'";
 		$lekerdez=mysql_db_query($db_name,$query);
@@ -322,7 +322,7 @@ function hirek_rovat() {
 	$prev=$min-$max;
 	$limit="limit $min,$max";
 
-//Gondolatok rovat -> include a communióról
+//Gondolatok rovat -> include a communiÃ³rÃ³l
 	if($rovat==6) {
 		$tmpl_file="http://www.communio.hu/szombathely/evangelium-kurir.php";
 		$thefile = implode("", file($tmpl_file));
@@ -346,15 +346,15 @@ function hirek_rovat() {
 			list($hid,$hcim,$halcim,$fokepfelirat,$hintro,$hszoveg,$datum,$hkulcsszo,$galeria)=mysql_fetch_row($lekerdez);
 			if(!mysql_db_query($db_name,"update hirek set szamlalo=szamlalo+1, napiszamlalo=napiszamlalo+1 where id='$id'")) echo 'HIBA!<br>'.mysql_error();
 
-			$hintro=str_replace('href="?',"href=\"?$linkveg&",$hintro); //link helyesbítése
-			$hintro=str_replace('href=?',"href=?$linkveg&",$hintro); //link helyesbítése
-			$hintro=str_replace('href="http://'," target=_blank href=\"http://",$hintro); //link helyesbítése
-			$hintro=str_replace(' target=_blank href="http://www.magyarkurir.hu/?'," href=\"http://www.magyarkurir.hu/?$linkveg&",$hintro); //link helyesbítése
+			$hintro=str_replace('href="?',"href=\"?$linkveg&",$hintro); //link helyesbÃ­tÃ©se
+			$hintro=str_replace('href=?',"href=?$linkveg&",$hintro); //link helyesbÃ­tÃ©se
+			$hintro=str_replace('href="http://'," target=_blank href=\"http://",$hintro); //link helyesbÃ­tÃ©se
+			$hintro=str_replace(' target=_blank href="http://www.magyarkurir.hu/?'," href=\"http://www.magyarkurir.hu/?$linkveg&",$hintro); //link helyesbÃ­tÃ©se
 
-			$hszoveg=str_replace('href="?',"href=\"?$linkveg&",$hszoveg); //link helyesbítése
-			$hszoveg=str_replace('href=?',"href=?$linkveg&",$hszoveg); //link helyesbítése
-			$hszoveg=str_replace('href="http://'," target=_blank href=\"http://",$hszoveg); //link helyesbítése
-			$hszoveg=str_replace(' target=_blank href="http://www.magyarkurir.hu/?'," href=\"http://www.magyarkurir.hu/?$linkveg&",$hszoveg); //link helyesbítése
+			$hszoveg=str_replace('href="?',"href=\"?$linkveg&",$hszoveg); //link helyesbÃ­tÃ©se
+			$hszoveg=str_replace('href=?',"href=?$linkveg&",$hszoveg); //link helyesbÃ­tÃ©se
+			$hszoveg=str_replace('href="http://'," target=_blank href=\"http://",$hszoveg); //link helyesbÃ­tÃ©se
+			$hszoveg=str_replace(' target=_blank href="http://www.magyarkurir.hu/?'," href=\"http://www.magyarkurir.hu/?$linkveg&",$hszoveg); //link helyesbÃ­tÃ©se
 
 			$datido=mktime(substr($datum,11,2),substr($datum,14,2),0,substr($datum,5,2),substr($datum,8,2),substr($datum,0,4));
 			$ev=substr($datum,0,4);
@@ -385,14 +385,14 @@ function hirek_rovat() {
 
 		}
 		else {
-			$adatT[2]="<span class='hiba'>HIBA! A keresett hír nem található!</span>";
+			$adatT[2]="<span class='hiba'>HIBA! A keresett hÃ­r nem talÃ¡lhatÃ³!</span>";
 		}
 
 		$tipus='doboz';
 		$kod.=formazo($adatT,$tipus);	
 	}
 	else {
-//Fõhír keresése -> csak ha nem a szemle rovatban vagyunk!
+//FÅ‘hÃ­r keresÃ©se -> csak ha nem a szemle rovatban vagyunk!
 	$query="select id,cim,alcim,fokepfelirat,intro,datum from hirek where ok='i' and datum<='$most' and datum>='$lejart' and (lejarat>='$ma' or lejarat='000-00-00') and nyelv='$lang' and megjelenhet like '%kurir%' $feltetelk1 order by datum desc";
 	$lekerdez=mysql_db_query($db_name,$query);
 	if(mysql_num_rows($lekerdez)>0) {
@@ -425,16 +425,16 @@ function hirek_rovat() {
 		if(!empty($alcim)) $alcimkiir="<span class=kiscim>$alcim</span><br>";
 
 		$intro=nl2br($intro);
-		$intro=str_replace('href=?',"href=?$linkveg&",$intro); //link helyesbítése
-		$intro=str_replace('href="?',"href=\"?$linkveg&",$intro); //link helyesbítése
+		$intro=str_replace('href=?',"href=?$linkveg&",$intro); //link helyesbÃ­tÃ©se
+		$intro=str_replace('href="?',"href=\"?$linkveg&",$intro); //link helyesbÃ­tÃ©se
 		if(is_file("kepek/hirek/$id/fokep/k1.jpg")) $fokep="<img src=kepek/hirek/$id/fokep/k1.jpg border=0 align=left vspace=10 hspace=10 alt='$fokepfelirat'>";
 		$fohir=$fokep."<a href=?m_id=1&m_op=view&id=$id$holvan$linkveg class=k1link>$cim</a><br>$alcimkiir$datumkiir<br><br><span class=alapkizart>$intro</span>";
 		$idnemT[]=$id;
 	}
 	}
 
-//Kiemelt hírek keresése
-	$feltetelnem=" and id!='$id'"; //a fõhír nem jelenhet meg kiemeltként is!
+//Kiemelt hÃ­rek keresÃ©se
+	$feltetelnem=" and id!='$id'"; //a fÅ‘hÃ­r nem jelenhet meg kiemeltkÃ©nt is!
 	$query="select id,cim,alcim,fokepfelirat,intro,datum from hirek where ok='i' and megjelenhet like '%kurir%' and datum<='$most' and datum>='$lejart' and (lejarat>='$ma' or lejarat='000-00-00') and nyelv='$lang' $feltetelk2 $feltetelnem order by datum desc limit 0,2";
 	$lekerdez=mysql_db_query($db_name,$query);
 	if(mysql_num_rows($lekerdez)>0) {
@@ -462,8 +462,8 @@ function hirek_rovat() {
 			else $alcimkiir='';
 
 			$intro=nl2br($intro);
-			$intro=str_replace('href=?',"href=?$linkveg&",$intro); //link helyesbítése
-			$intro=str_replace('href="?',"href=\"?$linkveg&",$intro); //link helyesbítése
+			$intro=str_replace('href=?',"href=?$linkveg&",$intro); //link helyesbÃ­tÃ©se
+			$intro=str_replace('href="?',"href=\"?$linkveg&",$intro); //link helyesbÃ­tÃ©se
 
 			if(is_file("kepek/hirek/$id/fokep/k2.jpg")) $kiemeltkep="<img src=kepek/hirek/$id/fokep/k2.jpg border=0 align=left vspace=5 hspace=5 alt='$fokepfelirat'>";
 			else $kiemeltkep='';
@@ -495,8 +495,8 @@ function hirek_rovat() {
 	    $kod .= $r_file;
 	}
 
-//További hírek listázása
-	//Kiemelt híreket nem listázunk!
+//TovÃ¡bbi hÃ­rek listÃ¡zÃ¡sa
+	//Kiemelt hÃ­reket nem listÃ¡zunk!
 	foreach($idnemT as $id_k) {
 		$feltetelT[]="id!='$id_k'";
 	}
@@ -540,12 +540,12 @@ function hirek_rovat() {
 		$kod.=formazo($adatT,$tipus);
 	}
 	elseif(empty($fohir) and empty($kiemelt1)) {
-		$adatT[2]='<span class=kiscim>'.alapnyelv('Jelenleg nincs hír a rovatban').'</span>';
+		$adatT[2]='<span class=kiscim>'.alapnyelv('Jelenleg nincs hÃ­r a rovatban').'</span>';
 		$tipus='doboz';
 		$kod.=formazo($adatT,$tipus);
 	}
 
-	//Léptetés a hírek között
+	//LÃ©ptetÃ©s a hÃ­rek kÃ¶zÃ¶tt
 		if($mennyiossz>$next) {
 			$link="?m_op=hirlista";
 			if($rovat>0) $link.="&rovat=$rovat";
@@ -554,7 +554,7 @@ function hirek_rovat() {
 			if($alkat>0) $link.="&alkat=$alkat";
 			$linkn=$link."&min=0";
 	
-			$leptetes="<table width=100% cellpadding=0 cellspacing=0 border=0><tr><td width=80%><img src=img/space.gif width=10 height=11></td><td rowspan=2 width=20% align=center bgcolor='#2672AC'><a href=$linkn$linkveg class=emllink>".alapnyelv('tovább')." <img src=$design_url/alap/img/nyilj.gif border=0></a></td></tr>";
+			$leptetes="<table width=100% cellpadding=0 cellspacing=0 border=0><tr><td width=80%><img src=img/space.gif width=10 height=11></td><td rowspan=2 width=20% align=center bgcolor='#2672AC'><a href=$linkn$linkveg class=emllink>".alapnyelv('tovÃ¡bb')." <img src=$design_url/alap/img/nyilj.gif border=0></a></td></tr>";
 			$leptetes.="<tr><td height=5 background=$design_url/alap/img/szaggatott_v.jpg><img src=img/space.gif width=10 height=5></td></tr></table>";
 		}
 		$adatT[2]=$leptetes;
@@ -563,8 +563,8 @@ function hirek_rovat() {
 
 	
 
-//Tudta-e kérdés
-	//-6 napos cikkek között keresgél
+//Tudta-e kÃ©rdÃ©s
+	//-6 napos cikkek kÃ¶zÃ¶tt keresgÃ©l
 	$now=time();
 	$egynap=86400;
 	$tegnapido=$now-(6*$egynap);
@@ -596,7 +596,7 @@ function hirek_rovat() {
 		$kod.=formazo($adatT,$tipus);
 	}
 
-//Alsó kiemelt hírek keresése
+//AlsÃ³ kiemelt hÃ­rek keresÃ©se
 	$query="select id,cim,alcim,fokepfelirat,intro,datum from hirek where ok='i' and megjelenhet like '%kurir%' and datum<='$most' and (lejarat>='$ma' or lejarat='000-00-00') and nyelv='$lang' $feltetelk3 $feltetel_id order by datum desc limit 0,10";
 	$lekerdez=mysql_db_query($db_name,$query);
 	if(mysql_num_rows($lekerdez)>0) {
@@ -662,7 +662,7 @@ function hirek_hirlista() {
 	    else $rovat=1;
 	}
 	
-	//Rovat szerinti kiírások lekérdezése
+	//Rovat szerinti kiÃ­rÃ¡sok lekÃ©rdezÃ©se
 	$query="select friss,k3,lista,datumkiir from rovatkat where id='$rovat'";
 	$lekerdez=mysql_db_query($db_name,$query);
 	list($frisshirek,$k3focim,$max,$datumkiirok)=mysql_fetch_row($lekerdez);
@@ -673,7 +673,7 @@ function hirek_hirlista() {
 	$holvan="&rovat=$rovat";
 
 
-	//Ha alsóbb kategóriában vagyunk és van megadva érték, akkor felülírjuk a rovat szerinti értéket:
+	//Ha alsÃ³bb kategÃ³riÃ¡ban vagyunk Ã©s van megadva Ã©rtÃ©k, akkor felÃ¼lÃ­rjuk a rovat szerinti Ã©rtÃ©ket:
 	if($fokat>0) {
 		$query="select friss,k3,lista,datumkiir from rovatkat where id='$fokat'";
 		$lekerdez=mysql_db_query($db_name,$query);
@@ -716,12 +716,12 @@ function hirek_hirlista() {
 		$holvan.="&alkat=$alkat";
 	}
 
-	$max=60; //hírlistánál csak a lista látszik
+	$max=60; //hÃ­rlistÃ¡nÃ¡l csak a lista lÃ¡tszik
 	$next=$min+$max;
 	$prev=$min-$max;
 	$limit1="limit $min,$max"; 
 
-//hírek listázása
+//hÃ­rek listÃ¡zÃ¡sa
 	$query="select id,cim,datum from hirek where ok='i' and megjelenhet like '%kurir%' and datum<='$most' and nyelv='$lang' $feltetel $feltetel_id";
 	$lekerdez=mysql_db_query($db_name,$query);
 	$mennyiossz=mysql_num_rows($lekerdez);
@@ -761,12 +761,12 @@ function hirek_hirlista() {
 		$kod.=formazo($adatT,$tipus);
 	}
 	elseif(empty($fohir) and empty($kiemelt1)) {
-		$adatT[2]='<span class=kiscim>'.alapnyelv('Jelenleg nincs hír a rovatban').'</span>';
+		$adatT[2]='<span class=kiscim>'.alapnyelv('Jelenleg nincs hÃ­r a rovatban').'</span>';
 		$tipus='doboz';
 		$kod.=formazo($adatT,$tipus);
 	}
 	
-	//Léptetés a hírek között
+	//LÃ©ptetÃ©s a hÃ­rek kÃ¶zÃ¶tt
 	if($min>0 or $mennyiossz>$next) {
 		$link="?m_op=hirlista";
 		if($rovat>0) $link.="&rovat=$rovat";
@@ -785,7 +785,7 @@ function hirek_hirlista() {
 			$leptetes.="<img src=img/space.gif width=5 height=5><img src=$design_url/alap/img/sgolyopici.gif border=0><img src=img/space.gif width=5 height=5>";
 
 		if($mennyiossz>$next)
-			$leptetes.="<a href=$linkn$linkveg class=emllink> ".alapnyelv('tovább')." <img src=$design_url/alap/img/nyilj.gif border=0></a>";
+			$leptetes.="<a href=$linkn$linkveg class=emllink> ".alapnyelv('tovÃ¡bb')." <img src=$design_url/alap/img/nyilj.gif border=0></a>";
 	
 		$leptetes.="</td></tr>";
 		$leptetes.="<tr><td height=5 background=$design_url/alap/img/szaggatott_v.jpg><img src=img/space.gif width=10 height=5></td></tr></table>";
@@ -820,10 +820,10 @@ function hirek_view() {
 		}
 		list($hcim,$hintro,$hszoveg,$horszag,$hmegye,$hvaros,$hegyhazmegye,$hespereskerulet,$datum,$haktualis,$hhatarido,$hrovatkat,$hkulcsszo,$hkapcsolodas)=mysql_fetch_row($lekerdez);
 
-		$hszoveg=str_replace('href="?',"href=\"?$linkveg&",$hszoveg); //link helyesbítése
-		$hszoveg=str_replace('href=?',"href=?$linkveg&",$hszoveg); //link helyesbítése
-		$hszoveg=str_replace('href="http://'," target=_blank href=\"http://",$hszoveg); //link helyesbítése
-		$hszoveg=str_replace(' target=_blank href="http://www.hirporta.hu/?'," href=\"http://www.hirporta.hu/?$linkveg&",$hszoveg); //link helyesbítése
+		$hszoveg=str_replace('href="?',"href=\"?$linkveg&",$hszoveg); //link helyesbÃ­tÃ©se
+		$hszoveg=str_replace('href=?',"href=?$linkveg&",$hszoveg); //link helyesbÃ­tÃ©se
+		$hszoveg=str_replace('href="http://'," target=_blank href=\"http://",$hszoveg); //link helyesbÃ­tÃ©se
+		$hszoveg=str_replace(' target=_blank href="http://www.hirporta.hu/?'," href=\"http://www.hirporta.hu/?$linkveg&",$hszoveg); //link helyesbÃ­tÃ©se
 
 		$datido=mktime(substr($datum,11,2),substr($datum,14,2),0,substr($datum,5,2),substr($datum,8,2),substr($datum,0,4));
 		$ev=substr($datum,0,4);
@@ -846,7 +846,7 @@ function hirek_view() {
  		if(!empty($hintro)) $hintro=nl2br($hintro);
 
 		if(strstr($u_jogok,'hirek')) {
-			$szerk="<a href=?m_id=10&m_op=add&hid=$id$linkveg><img src=img/edit.gif border=0 align=absmiddle alt=szerkesztés></a>";
+			$szerk="<a href=?m_id=10&m_op=add&hid=$id$linkveg><img src=img/edit.gif border=0 align=absmiddle alt=szerkesztÃ©s></a>";
 		}
 
 		$cikkcim="$hcim $szerk";
@@ -854,11 +854,11 @@ function hirek_view() {
 		$cikkid=$id;
 
 		
-		//Nyomtatási nézet + továbbküldés
-		$cikkszoveg.="<div class=\"tovabb\"><a href=\"javascript:OpenPrintWindow('pview.php?id=$id',690,600);\"><img align=absmiddle src=img/print.gif border=0> nyomtatási nézet</a> &nbsp;  <a href=\"javascript:OpenNewWindow('send.php?id=$id',500,350);\"><img align=absmiddle src=img/mail.gif border=0> hír továbbküldése</a></div>";
+		//NyomtatÃ¡si nÃ©zet + tovÃ¡bbkÃ¼ldÃ©s
+		$cikkszoveg.="<div class=\"tovabb\"><a href=\"javascript:OpenPrintWindow('pview.php?id=$id',690,600);\"><img align=absmiddle src=img/print.gif border=0> nyomtatÃ¡si nÃ©zet</a> &nbsp;  <a href=\"javascript:OpenNewWindow('send.php?id=$id',500,350);\"><img align=absmiddle src=img/mail.gif border=0> hÃ­r tovÃ¡bbkÃ¼ldÃ©se</a></div>";
 		
 
-		//Kapcsolódó hírek listázása
+		//KapcsolÃ³dÃ³ hÃ­rek listÃ¡zÃ¡sa
 		if(!empty($hkulcsszo)) {
 			$hkulcsszo=substr($hkulcsszo,1,-1);
 			$kT=explode('--',$hkulcsszo);
@@ -894,7 +894,7 @@ function hirek_view() {
 					$kod_lista .= hirlista_formazo($hir_listaT);	
 				}
 
-				$adatT[0]='Kapcsolódó hírek, cikkek';
+				$adatT[0]='KapcsolÃ³dÃ³ hÃ­rek, cikkek';
 				$adatT[1]='#';
 				$adatT[2]=$kod_lista;
 				$tipus='hirlistadoboz';
@@ -906,7 +906,7 @@ function hirek_view() {
 		$kod_lista='';
 
 	/*
-		//Kapcsolódó galéria
+		//KapcsolÃ³dÃ³ galÃ©ria
 		if(!empty($galeria)) {
 			$max=strlen($galeria);
 			$galeria=substr($galeria,1,$max-1);
@@ -927,7 +927,7 @@ function hirek_view() {
 				$kod_lista.=formazo($adatT,$tipus);
 			}
 			if($mennyi>0) {
-				$adatT[0]='Kapcsolódó galéria';
+				$adatT[0]='KapcsolÃ³dÃ³ galÃ©ria';
 				$adatT[1]='#';
 				$adatT[2]=$kod_lista;
 				$tipus='hirlistadoboz';
@@ -937,7 +937,7 @@ function hirek_view() {
 	*/
 
 
-		//Rovat hírei
+		//Rovat hÃ­rei
 		$most=date('Y-m-d H:i:s');
 		$rovat=$_GET['rovat'];
 		if(empty($rovat)) {
@@ -964,7 +964,7 @@ function hirek_view() {
 	}
 	else {
 		$rovatcim="HIBA";
-		$cikkszoveg="<span class='hiba'>A keresett hír nem található!</span>";
+		$cikkszoveg="<span class='hiba'>A keresett hÃ­r nem talÃ¡lhatÃ³!</span>";
 		$rovatid=99;
 	}
 
@@ -1001,8 +1001,8 @@ function hirek_kereso() {
 	
 	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=sessid value=$sessid>";
 	$urlap.="\n<input type=hidden name=m_op value=kereso>";
-	$urlap.="\n<span class=kiscim>Dátum:</span> <input type=text name=datumtol value='$datumtol' size=10 maxlength=10 class=urlap><span class=alap>-tól</span> &nbsp; <input type=text name=datumig value='$datumig' size=10 maxlength=10 class=urlap><span class=alap>-ig</span>";
-	$urlap.="\n&nbsp; &nbsp; &nbsp; <span class=kiscim>Kulcsszó: </span><input type=text name=kulcsszo value='$kulcsszo' size=20 class=urlap>";
+	$urlap.="\n<span class=kiscim>DÃ¡tum:</span> <input type=text name=datumtol value='$datumtol' size=10 maxlength=10 class=urlap><span class=alap>-tÃ³l</span> &nbsp; <input type=text name=datumig value='$datumig' size=10 maxlength=10 class=urlap><span class=alap>-ig</span>";
+	$urlap.="\n&nbsp; &nbsp; &nbsp; <span class=kiscim>KulcsszÃ³: </span><input type=text name=kulcsszo value='$kulcsszo' size=20 class=urlap>";
 	$urlap.="\n<br><img src=img/space.gif width=5 height=8><br><span class=kiscim>Rovatok: </span>";
 	$query="select id,nev from rovatkat where rovat=0 order by sorszam"; //Rovatok
 	$lekerdez=mysql_db_query($db_name,$query);
@@ -1012,8 +1012,8 @@ function hirek_kereso() {
 		$urlap.="><span class=alap>&nbsp;$nev  &nbsp;</span>";
 	}
 
-	$urlap.="\n<br><img src=img/space.gif width=5 height=8><br><span class=kiscim>Kategóriák: </span>";
-	$query1="select id,nev from rovatkat where rovat>0 order by sorszam"; //Fõkategóriák
+	$urlap.="\n<br><img src=img/space.gif width=5 height=8><br><span class=kiscim>KategÃ³riÃ¡k: </span>";
+	$query1="select id,nev from rovatkat where rovat>0 order by sorszam"; //FÅ‘kategÃ³riÃ¡k
 	$lekerdez1=mysql_db_query($db_name,$query1);
 	while(list($id,$nev)=mysql_fetch_row($lekerdez1)) {
 		$urlap.="\n<input type=checkbox name=kategoriaT[] value=$id";
@@ -1027,7 +1027,7 @@ function hirek_kereso() {
 
 	$kod_lista="<form method=post><tr><td colspan=3 bgcolor=#ECE5C8>$urlap</td></tr></form>";
 
-	$adatT[0]="Hírkeresõ";
+	$adatT[0]="HÃ­rkeresÅ‘";
 	$adatT[1]='#';
 	$adatT[2]=$kod_lista;
 	$tipus='hirlistadoboz';
@@ -1082,7 +1082,7 @@ function hirek_kereso() {
 		$kod_lista.=formazo($adatT,$tipus);
 	}
 	if($mennyi==0) {
-		$kod_lista="<tr><td colspan=3><span class=alap>Nincs találat.</span></td></tr>";
+		$kod_lista="<tr><td colspan=3><span class=alap>Nincs talÃ¡lat.</span></td></tr>";
 	}
 	else {
 		$kezd=$min+1;
@@ -1092,7 +1092,7 @@ function hirek_kereso() {
 		$kod_lista.='<tr><td colspan=3><img src=img/space.gif width=5 height=10><br><table width=250><tr><td>';
 		if($min>0) {
 			$kod_lista.="\n<form method=post><input type=hidden name=sessid value=$sessid><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=kereso><input type=hidden name=kulcsszo value='$kulcsszo'><input type=hidden name=datumtol value=$datumtol><input type=hidden name=datumig value=$datumig><input type=hidden name=min value=$prev>";
-			$kod_lista.="\n<input type=submit value=Elõzõ class=urlap><input type=text name=leptet value=$leptet class=urlap size=2></form>";
+			$kod_lista.="\n<input type=submit value=ElÅ‘zÅ‘ class=urlap><input type=text name=leptet value=$leptet class=urlap size=2></form>";
 		}
 		else {
 			$kod_lista.='&nbsp;';
@@ -1100,7 +1100,7 @@ function hirek_kereso() {
 		$kod_lista.='</td><td>';
 		if($mennyi>$next) {
 			$kod_lista.="\n<form method=post><input type=hidden name=sessid value=$sessid><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=kereso><input type=hidden name=kulcsszo value='$kulcsszo'><input type=hidden name=datumtol value=$datumtol><input type=hidden name=datumig value=$datumig><input type=hidden name=min value=$next>";
-			$kod_lista.="\n<input type=submit value=Következõ class=urlap><input type=text name=leptet value=$leptet class=urlap size=2></form>";
+			$kod_lista.="\n<input type=submit value=KÃ¶vetkezÅ‘ class=urlap><input type=text name=leptet value=$leptet class=urlap size=2></form>";
 		}
 		else $kod_lista.='&nbsp;';
 		$kod_lista.='</td></tr></table></td></tr>';
@@ -1108,7 +1108,7 @@ function hirek_kereso() {
 	}
 
 	if(isset($_POST['datumtol']) or isset($_POST['kulcsszo'])) {
-		$adatT[0]="Találatok $szamolas";
+		$adatT[0]="TalÃ¡latok $szamolas";
 		$adatT[1]='#';
 		$adatT[2]=$kod_lista;
 		$tipus='hirlistadoboz';
@@ -1176,10 +1176,10 @@ function hirek_archivlista() {
 			$kod_lista.=formazo($adatT,$tipus);
 		}
 		if($mennyi==0) {
-			$kod_lista="<tr><td colspan=3><span class=alap>Erre a napra nincs hírünk az adatbázisban</span></td></tr>";			
+			$kod_lista="<tr><td colspan=3><span class=alap>Erre a napra nincs hÃ­rÃ¼nk az adatbÃ¡zisban</span></td></tr>";			
 		}
 		
-		$adatT[0]="Archívum: $datumkiiras";
+		$adatT[0]="ArchÃ­vum: $datumkiiras";
 		$adatT[1]='#';
 		$adatT[2]=$kod_lista;
 		$tipus='hirlistadoboz';

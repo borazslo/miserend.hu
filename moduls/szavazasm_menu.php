@@ -11,7 +11,7 @@ function szavazas_jobbmenu() {
 		$tartalom=szavazas_jobbmenu_eredmenytartalom();
 	}
 	else {
-		//Tartalom lÈtrehoz·sa
+		//Tartalom l√©trehoz√°sa
 		$datum=date('Y-m-d');
 		$query="select id,kerdes,tipus from szavazask where datum<='$datum' and fooldal like '%-$fooldal_id-%' order by datum desc limit 0,1";
 		$lekerdez=mysql_query($query);
@@ -48,10 +48,10 @@ function szavazas_jobbmenu() {
 		}
 
 		$tartalom.="\n<br><div align=center><input type=submit value=".alapnyelv('Szavazok')." class=urlap>";
-		$tartalom.="\n<br><br><a href=?$parameterek&v_op=eredmeny$linkveg class=link>".alapnyelv('EredmÈny megtekintÈse')."</a></div></form>";
+		$tartalom.="\n<br><br><a href=?$parameterek&v_op=eredmeny$linkveg class=link>".alapnyelv('Eredm√©ny megtekint√©se')."</a></div></form>";
 	}	
 
-	$kodT[0]="<a href=?m_id=6$linkveg class=hasabcimlink>Szavaz·s</a>";
+	$kodT[0]="<a href=?m_id=6$linkveg class=hasabcimlink>Szavaz√°s</a>";
 	$kodT[1]=$tartalom;
 
 	return $kodT;
@@ -61,19 +61,19 @@ function szavazas_jobbmenu_add() {
     global $db_name,$_POST,$_SERVER,$szavazott,$sid,$fooldal_id,$u_id;
 	
 	if(!strstr($szavazott,$fooldal_id)) {
-		//CSAK akkor vessz¸k figyelembe, ha ezzel a sessionnel mÈg nem szavazott ezen az oldalon
-		//(˙j l·togatÛ, ˙j bˆngÈszıablakkal ˙j sessiont kap)
+		//CSAK akkor vessz√ºk figyelembe, ha ezzel a sessionnel m√©g nem szavazott ezen az oldalon
+		//(√∫j l√°togat√≥, √∫j b√∂ng√©sz≈ëablakkal √∫j sessiont kap)
 		$ip=$_SERVER['REMOTE_ADDR'];
 		$kid=$_POST['kid'];
 		$most=time();
-		$lejar=1800; //fÈl Ûr·n bel¸l nem sz·mÌt ˙j szavaz·snak
+		$lejar=1800; //f√©l √≥r√°n bel√ºl nem sz√°m√≠t √∫j szavaz√°snak
 
 		if($u_id>0) {
-			//Ha belÈpett felhaszn·lÛkÈnt szavaz
+			//Ha bel√©pett felhaszn√°l√≥k√©nt szavaz
 			$modkieg=", szamlaloreg=szamlaloreg+1";
 		}
 
-		//EllenırzÈs:
+		//Ellen≈ërz√©s:
 		$query="select datum from szavazasell where ip='$ip' and kid='$kid'";
 		$lekerdez=mysql_query($query);
 		list($datum)=mysql_fetch_row($lekerdez);
@@ -87,17 +87,17 @@ function szavazas_jobbmenu_add() {
 				$query="update szavazasv set szamlalo=szamlalo+1 $modkieg where id='$valasz'";
 			}
 			mysql_query($query);			
-			if($datum>0) //Ha kor·bban m·r szavazott, most frissÌtj¸k
-				mysql_query("update szavazasell set datum='$most' where ip='$ip' and kid='$kid'"); //milyen IP-rıl mikor szavazott
-			else //Ha mÈg nem szavazott, lÈtrehozzuk az ellenırzÈshez
-				mysql_query("insert szavazasell set datum='$most', ip='$ip', kid='$kid'"); //milyen IP-rıl mikor szavazott
+			if($datum>0) //Ha kor√°bban m√°r szavazott, most friss√≠tj√ºk
+				mysql_query("update szavazasell set datum='$most' where ip='$ip' and kid='$kid'"); //milyen IP-r≈ël mikor szavazott
+			else //Ha m√©g nem szavazott, l√©trehozzuk az ellen≈ërz√©shez
+				mysql_query("insert szavazasell set datum='$most', ip='$ip', kid='$kid'"); //milyen IP-r≈ël mikor szavazott
 		}
 		else {
-			//fÈl Ûr·n bel¸l m·r szavaztak errıl a gÈprıl, de azÈrt az idıt frissÌtj¸k, ˙jra indul a fÈl Ûra
-			mysql_query("update szavazasell set datum='$most' where ip='$ip' and kid='$kid'"); //milyen IP-rıl mikor szavazott
+			//f√©l √≥r√°n bel√ºl m√°r szavaztak err≈ël a g√©pr≈ël, de az√©rt az id≈ët friss√≠tj√ºk, √∫jra indul a f√©l √≥ra
+			mysql_query("update szavazasell set datum='$most' where ip='$ip' and kid='$kid'"); //milyen IP-r≈ël mikor szavazott
 		}
 		$ujszavazott=$szavazott.$fooldal_id;
-		mysql_query("update session set szavazott='$ujszavazott' where sessid='$sid'"); //sessionhˆz be·llÌtjuk, hogy szavazott
+		mysql_query("update session set szavazott='$ujszavazott' where sessid='$sid'"); //sessionh√∂z be√°ll√≠tjuk, hogy szavazott
 	}
 	
 }
@@ -144,7 +144,7 @@ function szavazas_jobbmenu_eredmeny() {
     global $linkveg,$db_name,$elso,$m_id,$m_op;
 
 	$tartalom=szavazas_jobbmenu_eredmenytartalom();
-	$adatT[0]="<a href=?m_id=6$linkveg class=hasabcimlink>Szavaz·s</a>";
+	$adatT[0]="<a href=?m_id=6$linkveg class=hasabcimlink>Szavaz√°s</a>";
 	$kodT[1]=$tartalom;
 
 	return $kodT;

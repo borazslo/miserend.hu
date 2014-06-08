@@ -12,13 +12,13 @@ function unnep_jobbmenu() {
 	
 		$kod_cim="Mindenszentek";
 
-		$kod_tartalom="\nAz ünnep célja, hogy az összes szentet - nemcsak azokat, akiket az Egyház külön szentnek nyilvánított - egy közös napon ünnepeljük. ";	
+		$kod_tartalom="\nAz Ã¼nnep cÃ©lja, hogy az Ã¶sszes szentet - nemcsak azokat, akiket az EgyhÃ¡z kÃ¼lÃ¶n szentnek nyilvÃ¡nÃ­tott - egy kÃ¶zÃ¶s napon Ã¼nnepeljÃ¼k. ";	
 
 		$kod_tipus='piros';
 
 	
 	if(!empty($kod_tartalom)) {
-		//Tartalom létrehozása
+		//Tartalom lÃ©trehozÃ¡sa
 		$kodT[0]=$kod_cim;
 		$kodT[1]=$kod_tartalom;
 		$kodT[2]=$kod_tipus;

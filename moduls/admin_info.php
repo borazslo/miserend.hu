@@ -18,9 +18,9 @@ function info_index() {
 function info_adminmenu() {
 	global $m_id,$linkveg;
 
-	$menu.='<span class=alcim>Statikus (tartalmi) oldalak/menük szerkesztése</span><br><br>';
-	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Új oldal feltöltése</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>Meglévõ oldal módosítása, törlése</a><br>";
+	$menu.='<span class=alcim>Statikus (tartalmi) oldalak/menÃ¼k szerkesztÃ©se</span><br><br>';
+	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Ãšj oldal feltÃ¶ltÃ©se</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>MeglÃ©vÅ‘ oldal mÃ³dosÃ­tÃ¡sa, tÃ¶rlÃ©se</a><br>";
 
 	$adatT[2]=$menu;
 	$tipus='doboz';
@@ -32,7 +32,7 @@ function info_adminmenu() {
 function info_add($id) {
 	global $m_id,$db_name,$onload,$sessid;;
 
-	$tartalomkod="<p class=alcim>Menü, oldal hozzáadása/módosítása</p>";
+	$tartalomkod="<p class=alcim>MenÃ¼, oldal hozzÃ¡adÃ¡sa/mÃ³dosÃ­tÃ¡sa</p>";
 
 	$tartalomkod.=include('editscript2.php');
 	$tartalomkod.=info_urlap($id);
@@ -48,7 +48,7 @@ function info_add($id) {
 function info_urlap($id) {
 	global $m_id,$db_name,$aloldal,$sessid;
 	
-	//Fõmenü
+	//FÅ‘menÃ¼
 	if($id>0) {
 		$query="select menucim,cim,leiras,helyzet,sorszam,rovat,mid,ok,nyelv from fomenu where id='$id'";
 		$lekerdez=mysql_db_query($db_name,$query);
@@ -61,16 +61,16 @@ function info_urlap($id) {
 	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=adding>";
 	$urlap.="\n<input type=hidden name=sessid value=$sessid><input type=hidden name=id value=$id>";
 
-	$urlap.="\n<br><br><span class=kiscim>Menücím</span><span class=alap> (Ami menüben megjelenik, ha be van állítva.)</span>";
+	$urlap.="\n<br><br><span class=kiscim>MenÃ¼cÃ­m</span><span class=alap> (Ami menÃ¼ben megjelenik, ha be van Ã¡llÃ­tva.)</span>";
 	$urlap.="\n<br><input type=text size=50 name=menucim maxlength=100 class=urlap value='$menucim'>";
 
-	$urlap.="\n<br><br><span class=kiscim>Cím</span><span class=alap> (Teljes cím)</span>";
+	$urlap.="\n<br><br><span class=kiscim>CÃ­m</span><span class=alap> (Teljes cÃ­m)</span>";
 	$urlap.="\n<br><input type=text size=60 name=cim maxlength=250 class=urlap value='$cim'>";
 
-	$urlap.="\n<br><br><span class=kiscim>Sorszám</span><span class=alap> (Elhelyezkedés a felsorolásban)</span>";
+	$urlap.="\n<br><br><span class=kiscim>SorszÃ¡m</span><span class=alap> (ElhelyezkedÃ©s a felsorolÃ¡sban)</span>";
 	$urlap.="\n<br><input type=text size=2 name=sorszam maxlength=2 class=urlap value='$sorszam'>";
 /*
-	$urlap.="\n<br><br><span class=kiscim>Menü nyelve</span>";
+	$urlap.="\n<br><br><span class=kiscim>MenÃ¼ nyelve</span>";
 	$urlap.="\n<br><select name=nyelv class=urlap>";
 	$lekerdez=mysql_db_query($db_name,"select kod,nevhu from nyelvek where ok='i'");
 	while(list($nyelvkod,$nyelvnev)=mysql_fetch_row($lekerdez)) {
@@ -80,44 +80,44 @@ function info_urlap($id) {
 	}
 	$urlap.='</select>';
 */
-	$urlap.="\n<br><br><span class=kiscim>Helyzet</span><span class=alap> (bal, jobb, felsõ, alsó menü vagy alapban nem látszik)</span>";
+	$urlap.="\n<br><br><span class=kiscim>Helyzet</span><span class=alap> (bal, jobb, felsÅ‘, alsÃ³ menÃ¼ vagy alapban nem lÃ¡tszik)</span>";
 	$urlap.="\n<br><select name=helyzet class=urlap>";
 	$urlap.="\n<option value=0";
 	if(empty($helyzet)) $urlap.=' selected';
 	$urlap.=">-</option>";
 	$urlap.="\n<option value=b";
 	if($helyzet=='b') $urlap.=' selected';
-	$urlap.=">balmenü</option>";
+	$urlap.=">balmenÃ¼</option>";
 	$urlap.="\n<option value=f";
 	if($helyzet=='f') $urlap.=' selected';
-	$urlap.=">felsõ menü</option>";
+	$urlap.=">felsÅ‘ menÃ¼</option>";
 	$urlap.="\n<option value=j";
 	if($helyzet=='j') $urlap.=' selected';
-	$urlap.=">jobb menü</option>";
+	$urlap.=">jobb menÃ¼</option>";
 	$urlap.="\n<option value=l";
 	if($helyzet=='l') $urlap.=' selected';
-	$urlap.=">alsó menü</option></select>";
+	$urlap.=">alsÃ³ menÃ¼</option></select>";
 	
-	$urlap.="\n<br><br><span class=kiscim>Engedélyezés</span><span class=alap> (A menü megjelenhet-e, mûködhet-e?)</span>";
+	$urlap.="\n<br><br><span class=kiscim>EngedÃ©lyezÃ©s</span><span class=alap> (A menÃ¼ megjelenhet-e, mÅ±kÃ¶dhet-e?)</span>";
 	$urlap.="\n<br><input type=checkbox name=ok value='i' class=urlap";
 	if($ok!='n') $urlap.=' checked';
 	$urlap.=">";	
 
 //Modul
-	$urlap.="\n<br><br><span class=kiscim>Modul (funkció) kiválasztása</span><br><span class=alap>(Csak, ha a menüponttal másik funkció jön be!)</span>";
-	$urlap.="\n<br><select name=mid class=urlap><option value=''>nem funkció</option>";
+	$urlap.="\n<br><br><span class=kiscim>Modul (funkciÃ³) kivÃ¡lasztÃ¡sa</span><br><span class=alap>(Csak, ha a menÃ¼ponttal mÃ¡sik funkciÃ³ jÃ¶n be!)</span>";
+	$urlap.="\n<br><select name=mid class=urlap><option value=''>nem funkciÃ³</option>";
 	$lekerdez=mysql_db_query($db_name,"select id,nev,zart from modulok where jogkod='' and funkcio='i' order by zart,nev");
 	while(list($mmid,$mmnev,$mmzart)=mysql_fetch_row($lekerdez)) {
 		$urlap.="<option value=$mmid";
 		if($mid==$mmid or (empty($mid) and $mmid==14)) $urlap.= ' selected';
 		$urlap.=">$mmnev";
-		if($mmzart>0) $urlap.=' (zárt)';
+		if($mmzart>0) $urlap.=' (zÃ¡rt)';
 		$urlap.="</option>";
 	}
 	$urlap.='</select>';
 
 	//Rovat
-		$urlap.="\n<br><br><span class=kiscim>Ha a menüpont egyben egy rovat</span><br><span class=alap>(Ilyenkor nem kell a leírás mezõt kitölteni!)</span>";
+		$urlap.="\n<br><br><span class=kiscim>Ha a menÃ¼pont egyben egy rovat</span><br><span class=alap>(Ilyenkor nem kell a leÃ­rÃ¡s mezÅ‘t kitÃ¶lteni!)</span>";
 		$urlap.="\n<br><select name=rovat class=urlap><option value=0>Nem rovat</option>";
 		$lekerdez=mysql_db_query($db_name,"select id,nev from rovatkat where ok='i'");
 		while(list($rid,$rnev)=mysql_fetch_row($lekerdez)) {
@@ -127,8 +127,8 @@ function info_urlap($id) {
 		}
 		$urlap.='</select>';
 
-		$urlap.="\n<br><br><span class=kiscim>Letölthetõ fájl(ok):</span>";
-		//Könyvtár tartalmát beolvassa
+		$urlap.="\n<br><br><span class=kiscim>LetÃ¶lthetÅ‘ fÃ¡jl(ok):</span>";
+		//KÃ¶nyvtÃ¡r tartalmÃ¡t beolvassa
 		if($id>0) {
 			$konyvtar="../fajlok/info/$id";
 			if(is_dir($konyvtar)) {
@@ -142,28 +142,28 @@ function info_urlap($id) {
 						}
 						else $meret.=' kB';
 						$filekiir=rawurlencode($file);
-						$urlap.="<br><li><a href='$konyvtar/$filekiir' class=alap><b>$file</b></a><span class=alap> ($meret) </span><input type=checkbox class=urlap name=delfajl[] value='$file'><span class=alap>Töröl</span></li>";
+						$urlap.="<br><li><a href='$konyvtar/$filekiir' class=alap><b>$file</b></a><span class=alap> ($meret) </span><input type=checkbox class=urlap name=delfajl[] value='$file'><span class=alap>TÃ¶rÃ¶l</span></li>";
 					}
 				}
 				closedir($handle);
 			}
 		}
-		$urlap.="\n<br><span class=alap>Új fájl: </span><input type=file size=60 name=fajl class=urlap>";
+		$urlap.="\n<br><span class=alap>Ãšj fÃ¡jl: </span><input type=file size=60 name=fajl class=urlap>";
 
-		$urlap.="\n<br><br><span class=kiscim>Képfeltöltés</span><span class=alap> (A kép bekerül a szövegmezõbe, ahol mozgatható. CSAK <b>jpg</b> fájl!)</span>";
+		$urlap.="\n<br><br><span class=kiscim>KÃ©pfeltÃ¶ltÃ©s</span><span class=alap> (A kÃ©p bekerÃ¼l a szÃ¶vegmezÅ‘be, ahol mozgathatÃ³. CSAK <b>jpg</b> fÃ¡jl!)</span>";
 		$urlap.="\n<br><input type=file size=60 name=kep class=urlap>";
 
-		$urlap.="\n<br><br><span class=kiscim>Kép igazítása szöveg-körbefuttatással</span>";
-		$urlap.="<br><select name=align class=urlap><option value='0'>kép külön</option><option value=left>balra</option><option value=right>jobbra</option></select>";
+		$urlap.="\n<br><br><span class=kiscim>KÃ©p igazÃ­tÃ¡sa szÃ¶veg-kÃ¶rbefuttatÃ¡ssal</span>";
+		$urlap.="<br><select name=align class=urlap><option value='0'>kÃ©p kÃ¼lÃ¶n</option><option value=left>balra</option><option value=right>jobbra</option></select>";
 
-		$urlap.="\n<br><br><span class=kiscim>Kicsinyítés:</span>";
+		$urlap.="\n<br><br><span class=kiscim>KicsinyÃ­tÃ©s:</span>";
 		$urlap.="\n<br><input type=text name=kicsinyit value=120 size=3 class=urlap>";
 
-	//Leírás
-		if($mid!='14') $urlap.="<br><br><span class=kiscim>Ehhez a menühöz funkció tartozik!</span><span class=alap><br>Lehet, hogy az itt beírt tartalom nem jelenik meg!</span>";
+	//LeÃ­rÃ¡s
+		if($mid!='14') $urlap.="<br><br><span class=kiscim>Ehhez a menÃ¼hÃ¶z funkciÃ³ tartozik!</span><span class=alap><br>Lehet, hogy az itt beÃ­rt tartalom nem jelenik meg!</span>";
 
-		$urlap.="<br><br><span class=kiscim>Leírás</span>";
-		$urlap.="<br><span class=alap>(Ha a menüpont átugrik egy másik oldalra, akkor a szövegrészbe a következõt kell írni: !*!=oldalcíme <br>Pl: !*!=?m_id=1&lang=en vagy lehet önálló oldal is: !*!=http://www.index.hu)</span>";
+		$urlap.="<br><br><span class=kiscim>LeÃ­rÃ¡s</span>";
+		$urlap.="<br><span class=alap>(Ha a menÃ¼pont Ã¡tugrik egy mÃ¡sik oldalra, akkor a szÃ¶vegrÃ©szbe a kÃ¶vetkezÅ‘t kell Ã­rni: !*!=oldalcÃ­me <br>Pl: !*!=?m_id=1&lang=en vagy lehet Ã¶nÃ¡llÃ³ oldal is: !*!=http://www.index.hu)</span>";
 		$urlap.="<textarea name=szoveg class=urlap cols=100 rows=30>$szoveg</textarea>";	
 
 
@@ -200,12 +200,12 @@ function info_adding() {
 	$kepnev=$_FILES['kep']['name'];
 
 	if(empty($id)){
-		//új fõmenü
+		//Ãºj fÅ‘menÃ¼
 		$query="insert fomenu set menucim='$menucim', cim='$cim', leiras='$leiras', sorszam='$sorszam', helyzet='$helyzet', rovat='$rovat', ok='$ok', nyelv='$nyelv', mid='$mid'";
 		$uj=true;
 	}
 	else {
-		//meglévõ fõmenü
+		//meglÃ©vÅ‘ fÅ‘menÃ¼
 		$query="update fomenu set menucim='$menucim', cim='$cim', leiras='$leiras', sorszam='$sorszam', helyzet='$helyzet', rovat='$rovat', ok='$ok', nyelv='$nyelv', mid='$mid' where id='$id'";
 		$uj=false;
 	}
@@ -227,29 +227,29 @@ function info_adding() {
 
 		if(!empty($fajl)) {
 			$konyvtar="fajlok/info";
-			//Könyvtár ellenõrzése
+			//KÃ¶nyvtÃ¡r ellenÅ‘rzÃ©se
 			if(!is_dir("$konyvtar/$id")) {
-				//létre kell hozni
+				//lÃ©tre kell hozni
 				if(!mkdir("$konyvtar/$id",0775)) {
-					echo '<p class=hiba>HIBA a könyvtár létrehozásánál!</p>';					
+					echo '<p class=hiba>HIBA a kÃ¶nyvtÃ¡r lÃ©trehozÃ¡sÃ¡nÃ¡l!</p>';					
 				}
 			}
-			//Másolás
-			if(!copy($fajl,"$konyvtar/$id/$fajlnev")) echo '<p>HIBA a másolásnál!</p>';
+			//MÃ¡solÃ¡s
+			if(!copy($fajl,"$konyvtar/$id/$fajlnev")) echo '<p>HIBA a mÃ¡solÃ¡snÃ¡l!</p>';
 			unlink($fajl);
 		}
 
 
 		if(!empty($kep)) {
 			$konyvtar="kepek/info";
-			//Könyvtár ellenõrzése
+			//KÃ¶nyvtÃ¡r ellenÅ‘rzÃ©se
 			if(!is_dir("$konyvtar/$id")) {
-				//létre kell hozni
+				//lÃ©tre kell hozni
 				if(!mkdir("$konyvtar/$id",0775)) {
-					echo '<p class=hiba>HIBA a könyvtár létrehozásánál!</p>';					
+					echo '<p class=hiba>HIBA a kÃ¶nyvtÃ¡r lÃ©trehozÃ¡sÃ¡nÃ¡l!</p>';					
 				}
 				if(!mkdir("$konyvtar/$id/kicsi",0775)) {
-					echo '<p class=hiba>HIBA a könyvtár létrehozásánál!</p>';					
+					echo '<p class=hiba>HIBA a kÃ¶nyvtÃ¡r lÃ©trehozÃ¡sÃ¡nÃ¡l!</p>';					
 				}
 			}
 			$info=getimagesize($kep);
@@ -262,9 +262,9 @@ function info_adding() {
 			}
 			else {
 				if ( !copy($kep, "$kimenet") )
-				print("HIBA a másolásnál ($kimenet)!<br>\n");
+				print("HIBA a mÃ¡solÃ¡snÃ¡l ($kimenet)!<br>\n");
 			}
-			//kicsinyítés
+			//kicsinyÃ­tÃ©s
 			$kimenet1="$konyvtar/$id/kicsi/$kepnev";
 			if (($hiba = exec("convert -geometry ".$kicsinyit.'x'.$kicsinyit." $kep $kimenet1")) != "") echo "Hiba: $hiba";
 
@@ -295,16 +295,16 @@ function info_adding() {
 function info_mod() {
 	global $m_id,$db_name,$_POST,$aloldal,$sessid,$linkveg;
 
-    $tartalom="<p class=alcim>Menü / oldal kiválasztása módosításra</p>";
+    $tartalom="<p class=alcim>MenÃ¼ / oldal kivÃ¡lasztÃ¡sa mÃ³dosÃ­tÃ¡sra</p>";
 
 	$query="select id,menucim,helyzet,nyelv,ok from fomenu order by helyzet,nyelv desc,sorszam";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($fmid,$fmcim,$fmhelyzet,$fmnyelv,$fmok)=mysql_fetch_row($lekerdez)) {
 		if(!empty($fmhell) and $fmhell!=$fmhelyzet) $tartalom.='<hr>';
 		$tartalom.="\n<a href=?m_id=$m_id&m_op=add&id=$fmid$linkveg class=kismenulink>$fmcim</a>";
-		if($fmok=='n') $tartalom.=' <span class=kismenulink><font color=red>(várakozó)</font></span>';
+		if($fmok=='n') $tartalom.=' <span class=kismenulink><font color=red>(vÃ¡rakozÃ³)</font></span>';
 		$tartalom.=" <span class=kismenulink><font color=blue>($fmnyelv)</font></span>";
-		$tartalom.="\n<a href=?m_id=$m_id&m_op=del&id=$fmid$linkveg><img src=img/del.jpg border=0 alt=Töröl></a>";
+		$tartalom.="\n<a href=?m_id=$m_id&m_op=del&id=$fmid$linkveg><img src=img/del.jpg border=0 alt=TÃ¶rÃ¶l></a>";
 		$tartalom.='<br>';
 		$fmhell=$fmhelyzet;
 	}
@@ -322,8 +322,8 @@ function info_del() {
 	$kod=$_GET['kod'];
 	$id=$_GET['id'];
 
-    $kiir="<p class=alcim>Admin / Menü törlése</p>";
-	$kiir.="\n<div class=kiscim>Biztosan törölni akarod a következõ menüt?</div><br>";
+    $kiir="<p class=alcim>Admin / MenÃ¼ tÃ¶rlÃ©se</p>";
+	$kiir.="\n<div class=kiscim>Biztosan tÃ¶rÃ¶lni akarod a kÃ¶vetkezÅ‘ menÃ¼t?</div><br>";
 
 	$query="select menucim from fomenu where id='$id'";
 	$lekerdez=mysql_db_query($db_name,$query);

@@ -14,21 +14,21 @@ function eszrevetelek_balmenu() {
 	}
 
 	if($fooldal_id==1 and !empty($hirid)) {		
-		$kod_cim="Észrevételek, kiegészítés";
+		$kod_cim="Ã‰szrevÃ©telek, kiegÃ©szÃ­tÃ©s";
 
-		$kod_tartalom="\nHa a hír / esemény adataival kapcsolatos észrevételed van, (javítás, kiegészítés, változás) kérünk írd meg nekünk! <b><i>Hálásan köszönjük a segítséged!</i></b>";
-		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$hirid&kod=hirek',450,530);\">Észrevételek beküldése</a></div>";	
+		$kod_tartalom="\nHa a hÃ­r / esemÃ©ny adataival kapcsolatos Ã©szrevÃ©teled van, (javÃ­tÃ¡s, kiegÃ©szÃ­tÃ©s, vÃ¡ltozÃ¡s) kÃ©rÃ¼nk Ã­rd meg nekÃ¼nk! <b><i>HÃ¡lÃ¡san kÃ¶szÃ¶njÃ¼k a segÃ­tsÃ©ged!</i></b>";
+		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$hirid&kod=hirek',450,530);\">Ã‰szrevÃ©telek bekÃ¼ldÃ©se</a></div>";	
 	}
 
 	elseif($fooldal_id==2 and !empty($templomid)) {		
-		$kod_cim="Észrevételek, kiegészítés";
+		$kod_cim="Ã‰szrevÃ©telek, kiegÃ©szÃ­tÃ©s";
 
-		$kod_tartalom="\nAmennyiben a templommal, adataival, vagy a miserenddel kapcsolatosan észrevételed van, kérünk írd meg nekünk! <b><i>Hálásan köszönjük a segítséged!</i></b>";
-		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$templomid&kod=templomok',450,530);\">Észrevételek beküldése</a></div>";	
+		$kod_tartalom="\nAmennyiben a templommal, adataival, vagy a miserenddel kapcsolatosan Ã©szrevÃ©teled van, kÃ©rÃ¼nk Ã­rd meg nekÃ¼nk! <b><i>HÃ¡lÃ¡san kÃ¶szÃ¶njÃ¼k a segÃ­tsÃ©ged!</i></b>";
+		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$templomid&kod=templomok',450,530);\">Ã‰szrevÃ©telek bekÃ¼ldÃ©se</a></div>";	
 	}
 
 	if(!empty($kod_tartalom)) {
-		//Tartalom létrehozása
+		//Tartalom lÃ©trehozÃ¡sa
 		$kodT[0]=$kod_cim;
 		$kodT[1]=$kod_tartalom;
 	
@@ -50,20 +50,20 @@ function eszrevetelek_jobbmenu() {
 	}
 
 	if($fooldal_id==1 and !empty($hirid)) {		
-		$kod_cim="Észrevételek, kiegészítés";
+		$kod_cim="Ã‰szrevÃ©telek, kiegÃ©szÃ­tÃ©s";
 
-		$kod_tartalom="\nHa a hír / esemény adataival kapcsolatos észrevételed van, (javítás, kiegészítés, változás) kérünk írd meg nekünk! <b><i>Hálásan köszönjük a segítséged!</i></b>";
-		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$hirid&kod=hirek',450,530);\">Észrevételek beküldése</a></div>";	
+		$kod_tartalom="\nHa a hÃ­r / esemÃ©ny adataival kapcsolatos Ã©szrevÃ©teled van, (javÃ­tÃ¡s, kiegÃ©szÃ­tÃ©s, vÃ¡ltozÃ¡s) kÃ©rÃ¼nk Ã­rd meg nekÃ¼nk! <b><i>HÃ¡lÃ¡san kÃ¶szÃ¶njÃ¼k a segÃ­tsÃ©ged!</i></b>";
+		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$hirid&kod=hirek',450,530);\">Ã‰szrevÃ©telek bekÃ¼ldÃ©se</a></div>";	
 	}
 	elseif($fooldal_id==2 and !empty($templomid)) {		
-		$kod_cim="Észrevételek, kiegészítés";
+		$kod_cim="Ã‰szrevÃ©telek, kiegÃ©szÃ­tÃ©s";
 
-		$kod_tartalom="\nAmennyiben a templommal, adataival, vagy a miserenddel kapcsolatosan észrevételed van, kérünk írd meg nekünk! <b><i>Hálásan köszönjük a segítséged!</i></b>";
-		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$templomid&kod=templomok',450,530);\">Észrevételek beküldése</a></div>";	
+		$kod_tartalom="\nAmennyiben a templommal, adataival, vagy a miserenddel kapcsolatosan Ã©szrevÃ©teled van, kÃ©rÃ¼nk Ã­rd meg nekÃ¼nk! <b><i>HÃ¡lÃ¡san kÃ¶szÃ¶njÃ¼k a segÃ­tsÃ©ged!</i></b>";
+		$kod_tartalom.="\n<div class=\"bekuld\"><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$templomid&kod=templomok',450,530);\">Ã‰szrevÃ©telek bekÃ¼ldÃ©se</a></div>";	
 	}
 	
 	if(!empty($kod_tartalom)) {
-		//Tartalom létrehozása
+		//Tartalom lÃ©trehozÃ¡sa
 		$kodT[0]=$kod_cim;
 		$kodT[1]=$kod_tartalom;
 

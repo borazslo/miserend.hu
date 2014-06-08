@@ -34,10 +34,10 @@ function galeria_index() {
 		$datumkiir=str_replace('-','.',$datum).'.';
 		$tartalom.="<a href=?m_id=$m_id&m_op=view&gid=$gid$linkveg class=k1link>$cim</a><span class=kicsi> ($datumkiir)</span><br>";
 
-		//pár mintakép behívása
+		//pÃ¡r mintakÃ©p behÃ­vÃ¡sa
 		$konyvtar="kepek/galeria/$gid";
 
-		//Könyvtár tartalmát beolvassa
+		//KÃ¶nyvtÃ¡r tartalmÃ¡t beolvassa
 		if(is_dir($konyvtar)) {
 			$handle=opendir($konyvtar);
 			while ($file = readdir($handle)) {
@@ -61,27 +61,27 @@ function galeria_index() {
 			$tartalom.=$kepekT[$i];
 		}
 		$kepekT='';
-		$tartalom.="\n<div align=right><a href=?m_id=$m_id&m_op=view&gid=$gid$linkveg class=link>további képek...</a></div>";
+		$tartalom.="\n<div align=right><a href=?m_id=$m_id&m_op=view&gid=$gid$linkveg class=link>tovÃ¡bbi kÃ©pek...</a></div>";
 		$tartalom.=$kiemelt_elvalaszto;
 		$tartalom.='<br>';
 		//<img src=img/space.gif width=5 height=10><br>";
 	}
 
 	if($min>1) {
-		//Visszaléptetés
+		//VisszalÃ©ptetÃ©s
 		$visszalink="<a href=?m_id=$m_id&min=$prev$linkveg class=link>Vissza</a>";
 	}
 
 	if($mennyi>$leptet+1) {
-		//elõre léptetés
-		$tovabblink="<a href=?m_id=$m_id&min=$next$linkveg class=link>Tovább</a>";
+		//elÅ‘re lÃ©ptetÃ©s
+		$tovabblink="<a href=?m_id=$m_id&min=$next$linkveg class=link>TovÃ¡bb</a>";
 	}
 
 	$tartalom.="<br>$visszalink";
 	if(!empty($visszalink) and !empty($tovabblink)) $tartalom.= ' - ';
 	$tartalom.=$tovabblink;
 
-	$adatT[2]="<span class=alcim>Galéria</span><br><br>".$tartalom;
+	$adatT[2]="<span class=alcim>GalÃ©ria</span><br><br>".$tartalom;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);	
 
@@ -104,7 +104,7 @@ function galeria_view() {
 
 	$konyvtar="kepek/galeria/$gid";
 /*
-	//Könyvtár tartalmát beolvassa
+	//KÃ¶nyvtÃ¡r tartalmÃ¡t beolvassa
 	if(is_dir($konyvtar)) {
 		$handle=opendir($konyvtar);
 		while ($file = readdir($handle)) {
@@ -122,7 +122,7 @@ function galeria_view() {
 		closedir($handle);
 	}
 */
-	//képcímek behívása
+	//kÃ©pcÃ­mek behÃ­vÃ¡sa
 	$kepek.="<table width=98%><tr>";
 	$query="select cim,fajlnev,sorszam from g_kepcimek where gid='$gid' order by sorszam";
 	if(!$lekerdez=mysql_db_query($db_name,$query)) echo "HIBA!<br>".mysql_error();
@@ -144,7 +144,7 @@ function galeria_view() {
 	$kepek.="</tr></table>";
 
 	
-	$adatT[2]="<span class=alcim>Galéria</span><br><br>";
+	$adatT[2]="<span class=alcim>GalÃ©ria</span><br><br>";
 	$adatT[2].="<span class=kiscim>$cim</span><br><span class=alap>$datumkiir</span><br><br>";
 	if(!empty($intro)) $adatT[2].="<span class=alap>$intro</span><br><br>";
 	$adatT[2].=$kepek;

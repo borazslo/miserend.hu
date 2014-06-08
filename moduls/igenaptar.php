@@ -24,8 +24,8 @@ function haview() {
 		$text .= '</tr>';
 		$text .= '<tr><td colspan="5">&nbsp;</td></tr>';
 
-		// fejlÈc-sor
-		$text .= '<tr><td><center><span class=kislink>'.alapnyelv('nap').'</span></center></td><td colspan="3"><center><span class=kislink>'.alapnyelv('¸nnep').'</span></center></td><td style="width: 4%;"><center><span class=kislink>'.alapnyelv('liturgikus szÌn').'</span></center></td></tr>';
+		// fejl√©c-sor
+		$text .= '<tr><td><center><span class=kislink>'.alapnyelv('nap').'</span></center></td><td colspan="3"><center><span class=kislink>'.alapnyelv('√ºnnep').'</span></center></td><td style="width: 4%;"><center><span class=kislink>'.alapnyelv('liturgikus sz√≠n').'</span></center></td></tr>';
 
 		$text .= '<tr>';
 
@@ -47,7 +47,7 @@ function haview() {
 			$ige=$eredmeny[1];
 			$szent=$eredmeny[2];
 
-			//Tov·bbi szent keresÈse
+			//Tov√°bbi szent keres√©se
 			$query="select id,nev,intro,leiras from szentek where ho='$ho' and nap='$nap' and id!='$szent'";
 			$lekerdez=mysql_db_query($db_name,$query);
 			while(list($szid,$sznev,$szintro,$szleiras)=mysql_fetch_row($lekerdez)) {
@@ -90,7 +90,7 @@ function haview() {
 			}
 		}
 
-		//Szentek lekÈrdezÈse
+		//Szentek lek√©rdez√©se
 		if(is_array($szentT)) {
 			$feltetel='where '. implode(' or ', $szentT);
 			$query="select id,nev from szentek $feltetel";
@@ -102,7 +102,7 @@ function haview() {
 			}
 		}
 
-		//‹nnep lekÈrdezÈse
+		//√únnep lek√©rdez√©se
 		if(is_array($igeT)) {
 			$feltetel=implode(' or ', $igeT);
 			$query="select id,ev,idoszak,nap,unnep from igenaptar where $feltetel";
@@ -111,7 +111,7 @@ function haview() {
 				$n=$napTg[$id];
 				if($n[0]=='0') $n=$n[1];
 				$igenap='';
-				if((!empty($ev)) and ($ev!='0')) $igenap.="$ev Èv, ";
+				if((!empty($ev)) and ($ev!='0')) $igenap.="$ev √©v, ";
 				if(!empty($idoszak)) $igenap.=idoszak($idoszak);
 				if(!empty($nap)) $igenap.=" $nap";
 				if(!empty($igenap) and !empty($unnep)) $igenap.='<br>';
@@ -137,14 +137,14 @@ function haview() {
 
 			if ($dayCount == date("j") && $vars['currYear'] == date("Y") && $vars['currMonth'] == date("n"))  // today
 				{
-				// napi d·tum kiÌr·sa
+				// napi d√°tum ki√≠r√°sa
 				$text .= '<td align="center" class="naptar_'.$class.'" style="border-width: 2px;">'.$linktext.$dayCount.'</a></td>';
 				$text .= '<td class="naptar_'.$class.'" colspan="3" style="border-width: 2px;">'.$linktext;
 				if(!empty($unnepT[$dayCount]))
 				{
 					$text .='<b>'.$unnepT[$dayCount].'</b></a>';
 				}
-				// ha nincs ¸nnep, semmit nem Ìrunk ki
+				// ha nincs √ºnnep, semmit nem √≠runk ki
 				else $text .='&nbsp;';
 				if(!empty($megszentT[$dayCount])) $text.='<br><span class=kislink>(</span>'.$megszentT[$dayCount].'<span class=kislink>)</span>';
 		        $text .= '</td>';
@@ -159,7 +159,7 @@ function haview() {
 				{
 					$text .= '<b>'.$unnepT[$dayCount].'</b></a>';
 				}
-				// ha nincs ¸nnep, semmit nem Ìrunk ki
+				// ha nincs √ºnnep, semmit nem √≠runk ki
 				else $text .='&nbsp;';
 				if(!empty($megszentT[$dayCount])) $text.='<br><span class=kislink>(</span>'.$megszentT[$dayCount].'<span class=kislink>)</span>';
 		        $text .= '</td>';
@@ -188,8 +188,8 @@ function haview() {
 function igenaptar_index() {
 	global $_GET,$linkveg,$db_name,$m_id;
 
-	//FıcÌm
-	$adatT[0]=alapnyelv('igenapt·r');
+	//F≈ëc√≠m
+	$adatT[0]=alapnyelv('igenapt√°r');
 	$tipus='fomenucim';
 	$kod.=formazo($adatT,$tipus);	
 
@@ -208,38 +208,38 @@ function igenaptar_viewnap($datum) {
 	
 	if(!isset($datum)) $datum=date('Y-m-d');
 
-	//FıcÌm
-	$adatT[0]=alapnyelv('igenapt·r');
+	//F≈ëc√≠m
+	$adatT[0]=alapnyelv('igenapt√°r');
 	$tipus='fomenucim';
 	$kod.=formazo($adatT,$tipus);	
 
-	//tartalom lÈtrehoz·sa
+	//tartalom l√©trehoz√°sa
 	//////////////////////////////
 
-	//A liturgikus napt·rbÛl kiszedj¸k, hogy mi kapcsolÛdik a d·tumhoz
+	//A liturgikus napt√°rb√≥l kiszedj√ºk, hogy mi kapcsol√≥dik a d√°tumhoz
 	$query="select ige,szent,szin from lnaptar where datum='$datum'";
 	list($ige,$szent,$szin)=mysql_fetch_row(mysql_db_query($db_name,$query));
 
-	//Az igenapt·rbÛl kikeress¸k a mai napot
+	//Az igenapt√°rb√≥l kikeress√ºk a mai napot
 	$query="select ev,idoszak,nap,oszov_hely,oszov,ujszov_hely,ujszov,evang_hely,evang,unnep,intro,gondolat from igenaptar where id='$ige'";
 	list($ev,$idoszak,$nap,$oszov_hely,$oszov,$ujszov_hely,$ujszov,$evang_hely,$evang,$unnep,$intro,$gondolat)=mysql_fetch_row(mysql_db_query($db_name,$query));
 	$napiuzenet=nl2br($intro);
 	if(!empty($gondolat)) {
-		//Tov·bb
-		$adatT[4]='tov·bbi gondolatok';
+		//Tov√°bb
+		$adatT[4]='tov√°bbi gondolatok';
 		$adatT[5]="?m_id=1&m_op=gview&id=$ige&date=$datum&szin=$_GET[szin]$linkveg";
 		$tipus='tovabb';
 		$tovabb=formazo($adatT,$tipus);	
 		$napiuzenet.=$tovabb;
 	}
 
-//	if(!empty($ev)) $igenap.="$ev Èv, ";
-	if((!empty($ev)) and ($ev!='0')) $igenap.="$ev Èv, ";
+//	if(!empty($ev)) $igenap.="$ev √©v, ";
+	if((!empty($ev)) and ($ev!='0')) $igenap.="$ev √©v, ";
 	if(!empty($idoszak)) $igenap.=idoszak($idoszak);
 	if(!empty($nap)) $igenap.=" $nap";
 
 	if(empty($unnep)) $igenap="<br><span class=alcim>$igenap</span>";
-	else $igenap="<br><span class=alcim>$igenap</span>";      // dˆlt bet˚t kivettem .
+	else $igenap="<br><span class=alcim>$igenap</span>";      // d√∂lt bet≈±t kivettem .
 
 
 	if($szent>0) {
@@ -251,8 +251,8 @@ function igenaptar_viewnap($datum) {
 		$igenap='';
 
 		if(!empty($szentleiras)) {
-			//Tov·bb
-			$adatT[4]='bıvebben';
+			//Tov√°bb
+			$adatT[4]='b≈ëvebben';
 			$adatT[5]="?m_id=1&m_op=szview&id=$szent&date=$datum&szin=$_GET[szin]$linkveg";
 			$tipus='tovabb';
 			$tovabb=formazo($adatT,$tipus);	
@@ -260,7 +260,7 @@ function igenaptar_viewnap($datum) {
 		}
 	}
 
-	//Tov·bbi szentek
+	//Tov√°bbi szentek
 	$s_ho=substr($datum,5,2);
 	$s_nap=substr($datum,8,2);
 	if($s_ho[0]=='0') $s_ho=$s_ho[1];
@@ -306,7 +306,7 @@ function igenaptar_viewnap($datum) {
 	}
 
 	$tartalom="<div align=center><span class=kiscim>$datumkiir</span>$igenap";
-	$tartalom.="$unnepkiir<br><a href=?m_id=7&m_op=view&id=7$linkveg class=kismenulink title='bıvebben a szÌnekrıl'><small>A nap liturgikus szÌne: <b>$szinkiir</b></small></a></div>";
+	$tartalom.="$unnepkiir<br><a href=?m_id=7&m_op=view&id=7$linkveg class=kismenulink title='b≈ëvebben a sz√≠nekr≈ël'><small>A nap liturgikus sz√≠ne: <b>$szinkiir</b></small></a></div>";
 	$tartalom.="<br><div class=alapkizart>$napiuzenet</div>";
 
 	$adatT[2]=$tartalom;
@@ -327,7 +327,7 @@ function igenaptar_viewnap($datum) {
 		$fej=$tomb3[1];
 		$vers=$tomb2[0];
 		$link="http://www.kereszteny.hu/biblia/showchapter.php?reftrans=1&abbook=$konyv&numch=$fej#$vers";
-		$oszov_biblia="<a href=$link target=_blank title='ez a rÈsz Ès a kˆrnyezete a Bibli·ba'><img src=img/biblia.gif border=0 align=absmiddle></a>";
+		$oszov_biblia="<a href=$link target=_blank title='ez a r√©sz √©s a k√∂rnyezete a Bibli√°ba'><img src=img/biblia.gif border=0 align=absmiddle></a>";
 
 	}
 	if(!empty($ujszov_hely)) {
@@ -339,7 +339,7 @@ function igenaptar_viewnap($datum) {
 		$fej=$tomb3[1];
 		$vers=$tomb2[0];
 		$link="http://www.kereszteny.hu/biblia/showchapter.php?reftrans=1&abbook=$konyv&numch=$fej#$vers";
-		$ujszov_biblia.="<a href=$link target=_blank title='ez a rÈsz Ès a kˆrnyezete a Bibli·ba'><img src=img/biblia.gif border=0 align=absmiddle></a>";
+		$ujszov_biblia.="<a href=$link target=_blank title='ez a r√©sz √©s a k√∂rnyezete a Bibli√°ba'><img src=img/biblia.gif border=0 align=absmiddle></a>";
 	}
 	if(!empty($evang_hely)) {
 		$van_e=true;
@@ -350,12 +350,12 @@ function igenaptar_viewnap($datum) {
 		$fej=$tomb3[1];
 		$vers=$tomb2[0];
 		$link="http://www.kereszteny.hu/biblia/showchapter.php?reftrans=1&abbook=$konyv&numch=$fej#$vers";
-		$evang_biblia.="<a href=$link target=_blank title='ez a rÈsz Ès a kˆrnyezete a Bibli·ba'><img src=img/biblia.gif border=0 align=absmiddle></a>";
+		$evang_biblia.="<a href=$link target=_blank title='ez a r√©sz √©s a k√∂rnyezete a Bibli√°ba'><img src=img/biblia.gif border=0 align=absmiddle></a>";
 	}
 
 	if($van_o or $van_u or $van_e) {
 		
-		//FıcÌm2
+		//F≈ëc√≠m2
 		$adatT[0]=alapnyelv('Napi igehelyek');
 		$tipus='fomenucim2';
 		$kod.=formazo($adatT,$tipus);	
@@ -376,8 +376,8 @@ function igenaptar_viewnap($datum) {
 
 function igenaptar_fooldal() {
 
-	//FıcÌm
-	$adatT[0]=alapnyelv('igenapt·r');
+	//F≈ëc√≠m
+	$adatT[0]=alapnyelv('igenapt√°r');
 	$tipus='fomenucim';
 	$cim1=formazo($adatT,$tipus);
 	
@@ -395,8 +395,8 @@ function igenaptar_gview() {
 	$id=$_GET['id'];
 	$kulcsszo=$_GET['kulcsszo'];
 
-	//FıcÌm
-	$adatT[0]=alapnyelv('igenapt·r');
+	//F≈ëc√≠m
+	$adatT[0]=alapnyelv('igenapt√°r');
 	$tipus='fomenucim';
 	$kod.=formazo($adatT,$tipus);	
 
@@ -412,7 +412,7 @@ function igenaptar_gview() {
 	$leiras=nl2br($leiras);
  	$intro=nl2br($intro);
 
-	if((!empty($ev)) and ($ev!='0')) $igenap.="$ev Èv, ";
+	if((!empty($ev)) and ($ev!='0')) $igenap.="$ev √©v, ";
 	if(!empty($idoszak)) $igenap.=idoszak($idoszak);
 	if(!empty($nap)) $igenap.=" $nap";
 
@@ -441,8 +441,8 @@ function igenaptar_szview() {
 	$id=$_GET['id'];
 	$kulcsszo=$_GET['kulcsszo'];
 
-	//FıcÌm
-	$adatT[0]=alapnyelv('igenapt·r');
+	//F≈ëc√≠m
+	$adatT[0]=alapnyelv('igenapt√°r');
 	$tipus='fomenucim';
 	$kod.=formazo($adatT,$tipus);	
 
@@ -457,7 +457,7 @@ function igenaptar_szview() {
 	$leiras=nl2br($leiras);
  	$intro=nl2br($intro);
 
-	$datumkiir='‹nnepe: '.alapnyelv('ho'.$ho)." $nap.";
+	$datumkiir='√únnepe: '.alapnyelv('ho'.$ho)." $nap.";
 
 	$tartalom="<div align=center><span class=alcim>$nev</span><br><span class=kiscim>$datumkiir</span></div>";
 	$tartalom.="<br><div class=alapkizart>$intro<br><br>$leiras</div>";

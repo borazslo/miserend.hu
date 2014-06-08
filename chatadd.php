@@ -5,7 +5,7 @@ $sid=$_GET['sid'];
 
 if(empty($u_login) and empty($sessid)) exit;
 
-$head='<html><head><title>VPP</title><meta http-equiv="Content-Type" content="text/html; charset=windows-1250"><link rel="stylesheet" href="design/miserend/img/style.css" type="text/css"></head><body bgcolor="#ECE5C8" text="#000000">';
+$head='<html><head><title>VPP</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" href="design/miserend/img/style.css" type="text/css"></head><body bgcolor="#ECE5C8" text="#000000">';
 
 $foot='</body></html>';
 
@@ -30,7 +30,7 @@ function index() {
 
 	if(!empty($szoveg)) {
 		$kinek=$_POST['kinek'];
-		//Hozzászólás volt
+		//HozzĂˇszĂłlĂˇs volt
 		$datum=date('Y-m-d H:i:s');
 		$query="insert chat set datum='$datum', user='$u_login', kinek='$kinek', szoveg='$szoveg', ip='$ipkiir'";
 		mysql_db_query($db_name,$query);
@@ -43,7 +43,7 @@ function index() {
 	$urlap.="<input type=hidden name=kinek value='$kinek'>";
 	if(!empty($kinek)) $urlap.="<a href=chatadd.php?u_login=$loginkiir1&kinek=&sid=$sid class=link title='visszavon'><img src=img/lakat.gif align=absmiddle border=0><i> $kinek</i></a><br>";
 	$urlap.="<textarea name=szoveg class=urlap cols=15 rows=4></textarea><br>";
-	$urlap.="<input type=submit value='Elküldés' class=urlap></form>";
+	$urlap.="<input type=submit value='ElkĂĽldĂ©s' class=urlap></form>";
 
 	echo $head;
 	echo $urlap;

@@ -5,14 +5,14 @@ include_once("szotar/datumok.php");
 function igenaptar_balmenu() {
     global $sessid,$db_name,$m_id,$dateh;
 	
-	//CÌm lÈtrehoz·sa
-	$adatT[0]=alapnyelv('igenapt·r');
+	//C√≠m l√©trehoz√°sa
+	$adatT[0]=alapnyelv('igenapt√°r');
 	$tipus='balmenucim';
 	$kod.=formazo($adatT,$tipus);
 
 	include_once("igenaptar_functions_havi.php");
 
-	//Tartalom lÈtrehoz·sa
+	//Tartalom l√©trehoz√°sa
 	$adatT[2] = naptari(); 
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);
@@ -24,14 +24,14 @@ function igenaptar_aktivmenu() {
     global $sessid, $db_name, $dateh;
 
 	
-	//CÌm lÈtrehoz·sa
-	$adatT[0]=alapnyelv('igenapt·r');
+	//C√≠m l√©trehoz√°sa
+	$adatT[0]=alapnyelv('igenapt√°r');
 	$tipus='balmenucim';
 	$kod.=formazo($adatT,$tipus);
 
 	include_once("igenaptar_functions_havi.php");
 
-	//Tartalom lÈtrehoz·sa
+	//Tartalom l√©trehoz√°sa
 	$adatT[2] = naptari(); 
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);

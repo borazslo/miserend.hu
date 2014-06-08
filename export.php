@@ -14,7 +14,7 @@ while(list($nev,$ismertnev,$varos,$cim,$plebania)=mysql_fetch_row($lekerdez)) {
 $adatok=implode("\n",$adatokT);
 $adatok1=implode("<br>",$adatokT);
 $adatok1=str_replace("\n","",$adatok1);
-$adatok1=str_replace("<b>PlÈb·nia:</b>","",$adatok1);
+$adatok1=str_replace("<b>Pl√©b√°nia:</b>","",$adatok1);
 $adatok=str_replace('<br>',"\n\n",$adatok1);
 
 echo "<textarea cols=80 rows=50>$adatok</textarea>";

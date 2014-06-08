@@ -5,7 +5,7 @@ function alap_balmenu() {
 	
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom lÈtrehoz·sa
+	//Tartalom l√©trehoz√°sa
 	$query="select id, menucim, intro, mid, op from fomenu where helyzet='b' and ok='i' order by sorszam";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($rid,$rcim,$rintro,$rmid,$rop)=mysql_fetch_row($lekerdez)) {
@@ -42,7 +42,7 @@ function alap_jobbmenu() {
 	
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom lÈtrehoz·sa
+	//Tartalom l√©trehoz√°sa
 	$query="select id, menucim, intro, mid, op from fomenu where helyzet='j' and ok='i' order by sorszam";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($rid,$rcim,$rintro,$rmid,$rop)=mysql_fetch_row($lekerdez)) {
@@ -58,7 +58,7 @@ function alap_jobbmenu() {
 		$tipus='jobbmenucim';
 		$kod_cim=formazo($adatT,$tipus);
 
-		$adatT[2]="<span class=rovatcikklink>$rintro</span><br><br><div align=right><a href=?m_id=17&fm=$rid$linkveg class=rovatcikklink>tov·bb >></a></div>";
+		$adatT[2]="<span class=rovatcikklink>$rintro</span><br><br><div align=right><a href=?m_id=17&fm=$rid$linkveg class=rovatcikklink>tov√°bb >></a></div>";
 		$tipus='jobbmenutartalom';
 		$kod_tartalom=formazo($adatT,$tipus);
 		

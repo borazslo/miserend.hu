@@ -5,9 +5,9 @@ function galeria_balmenu() {
 
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	
-	$kod_cim="<a href=?m_id=11$linkveg class=kiscimlink>Galéria</a>";
+	$kod_cim="<a href=?m_id=11$linkveg class=kiscimlink>GalÃ©ria</a>";
 
 	$ma=date('Y-m-d');
 	$query="select id,cim from galeria where ok='i' and datum<='$ma' order by datum desc limit 0,1";
@@ -15,7 +15,7 @@ function galeria_balmenu() {
 	list($gid,$cim)=mysql_fetch_row($lekerdez);
 	$konyvtar="kepek/galeria/$gid/kicsi";
 
-	//Könyvtár tartalmát beolvassa
+	//KÃ¶nyvtÃ¡r tartalmÃ¡t beolvassa
 	if(is_dir($konyvtar)) {
 		$handle=opendir($konyvtar);
 		while ($file = readdir($handle)) {
@@ -53,13 +53,13 @@ function galeria_jobbmenu() {
 
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	
-	$adatT[0]='Galéria';
+	$adatT[0]='GalÃ©ria';
 	$tipus='jobbmenucim';
 	$kod_cim=formazo($adatT,$tipus);
 
-	$adatT[0] = 'cím';
+	$adatT[0] = 'cÃ­m';
 	$adatT[1] = 'link';
 	$tipus='jobbmenutartalomcikk';
 	$kod_tartalom.=formazo($adatT,$tipus);

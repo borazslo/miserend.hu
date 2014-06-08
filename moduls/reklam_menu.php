@@ -4,7 +4,7 @@ function reklam_jobbmenu() {
     global $sessid,$db_name,$design;
 
 	if(!isset($design)) $design='alap';
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	$ma=date('Y-m-d');
 		$query="select id,url,title from reklam where sorszam>0 and hol='2' and (tol<='$ma' and (ig>='$ma' or ig='0000-00-00')) and ok='i' order by sorszam";
 	if(!$lekerdez=mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
@@ -20,7 +20,7 @@ function reklam_jobbmenu() {
 
 			$id=$idT[$szam];
 			if($id>0) {
-				if(strstr($urlT[$szam],'http://')) $target='target=_blank'; //Ha http, akkor új ablak
+				if(strstr($urlT[$szam],'http://')) $target='target=_blank'; //Ha http, akkor Ãºj ablak
 				$kep1="kepek/reklam/$id.jpg";
 				$kep2="kepek/reklam/$id.gif";
 				if(is_file($kep1)) {
@@ -69,7 +69,7 @@ $titleT='';
 			
 			$id=$idT[$szam];
 			if($id>0) {
-				if(strstr($urlT[$szam],'http://')) $target='target=_blank'; //Ha http, akkor új ablak
+				if(strstr($urlT[$szam],'http://')) $target='target=_blank'; //Ha http, akkor Ãºj ablak
 				$kep1="kepek/reklam/$id.jpg";
 				$kep2="kepek/reklam/$id.gif";
 				if(is_file($kep1)) {

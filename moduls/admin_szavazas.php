@@ -3,10 +3,10 @@
 function szavazas_index() {
 	global $linkveg,$m_id;
 
-	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=adminmenulink>⁄j szavaz·s - hozz·ad·s</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=adminmenulink>Szavaz·s mÛdosÌt·sa, tˆrlÈse</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=adminmenulink>√öj szavaz√°s - hozz√°ad√°s</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=adminmenulink>Szavaz√°s m√≥dos√≠t√°sa, t√∂rl√©se</a><br>";
 
-	$adatT[2]="<span class=alcim>Szavaz·s be·llÌt·sa</span><br><br>".$menu;
+	$adatT[2]="<span class=alcim>Szavaz√°s be√°ll√≠t√°sa</span><br><br>".$menu;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -40,18 +40,18 @@ function szavazas_add($kid) {
 	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=sessid value=$sessid>";
 	$urlap.="\n<input type=hidden name=m_op value=adding><input type=hidden name=kid value=$kid>";
 	
-	$urlap.="\n<span class=kiscim>KÈrdÈs: </span><br><input type=text name=kerdes value='$kerdes' class=urlap size=60 maxlength=200>";
+	$urlap.="\n<span class=kiscim>K√©rd√©s: </span><br><input type=text name=kerdes value='$kerdes' class=urlap size=60 maxlength=200>";
 	
-	$urlap.="\n<br><br><span class=kiscim>TÌpus: </span><br><select name=tipus class=urlap>";
+	$urlap.="\n<br><br><span class=kiscim>T√≠pus: </span><br><select name=tipus class=urlap>";
 	$urlap.="\n<option value=s";
 	if($tipus!='m') $urlap.=' selected';
-	$urlap.=">egy v·lasz</option><option value=m";
+	$urlap.=">egy v√°lasz</option><option value=m";
 	if($tipus=='m') $urlap.=' selected';
-	$urlap.=">tˆbb v·lasz</option></select>";
+	$urlap.=">t√∂bb v√°lasz</option></select>";
 
-	$urlap.="\n<br><br><span class=kiscim>D·tum</span><span class=alap> (amikortÛl megjelenik):</span><br><input type=text name=datum class=urlap maxlength=10 value='$datum' size=10>";
+	$urlap.="\n<br><br><span class=kiscim>D√°tum</span><span class=alap> (amikort√≥l megjelenik):</span><br><input type=text name=datum class=urlap maxlength=10 value='$datum' size=10>";
 
-	$urlap.="\n<br><br><span class=kiscim>LehetsÈges v·laszok</span><span class=alap> (v·lasz, sz·ml·lÛ):</span><br>";
+	$urlap.="\n<br><br><span class=kiscim>Lehets√©ges v√°laszok</span><span class=alap> (v√°lasz, sz√°ml√°l√≥):</span><br>";
 	for($i=0;$i<8;$i++) {
 		$j=$i+1;
 		$urlap.="\n<input type=hidden name=vid[$i] value=$vidT[$i]>";
@@ -59,7 +59,7 @@ function szavazas_add($kid) {
 		$urlap.="\n<input type=text name=szamlalo[$i] value='$szamlaloT[$i]' maxlength=5 size=3 class=urlap><br>";
 	}
 
-	$urlap.="\n<br><br><span class=kiscim>Fıoldalak: </span><br><span class=alap>Mely fıoldal(ak)on legyen ez a szavaz·s? Tˆbb is v·laszthatÛ!</span><br><select name=fooldalT[] multiple class=urlap>";
+	$urlap.="\n<br><br><span class=kiscim>F≈ëoldalak: </span><br><span class=alap>Mely f≈ëoldal(ak)on legyen ez a szavaz√°s? T√∂bb is v√°laszthat√≥!</span><br><select name=fooldalT[] multiple class=urlap>";
 	$lekerdez=mysql_db_query($db_name,"select id,menucim from fooldal where ok='i' order by menusorrend");
 	while(list($rid,$rnev)=mysql_fetch_row($lekerdez)) {
 		$urlap.="\n<option value=$rid";
@@ -70,7 +70,7 @@ function szavazas_add($kid) {
 
 	$urlap.="\n<br><br><input type=submit value=Mehet class=urlap></form>";
 
-	$adatT[2]="<span class=alcim>Szavaz·s be·llÌt·sa</span><br><br>".$urlap;
+	$adatT[2]="<span class=alcim>Szavaz√°s be√°ll√≠t√°sa</span><br><br>".$urlap;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -131,15 +131,15 @@ function szavazas_adding() {
 function szavazas_mod() {
 	global $db_name,$linkveg,$m_id;
 
-	$kiir.="<span class=kiscim>V·lassz az al·bbi szavaz·sok kˆz¸l:</span><br><br>";
+	$kiir.="<span class=kiscim>V√°lassz az al√°bbi szavaz√°sok k√∂z√ºl:</span><br><br>";
 
 	$query="select id,kerdes from szavazask order by datum desc";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($kid,$kerdes)=mysql_fetch_row($lekerdez)) {
-		$kiir.="\n<a href=?m_id=$m_id&m_op=add&kid=$kid$linkveg class=adminlink><b>- $kerdes</b></a> - <a href=?m_id=$m_id&m_op=del&kid=$kid$linkveg class=link><img src=img/del.jpg border=0 alt=Tˆrˆl align=absmiddle> tˆrˆl</a><br>";
+		$kiir.="\n<a href=?m_id=$m_id&m_op=add&kid=$kid$linkveg class=adminlink><b>- $kerdes</b></a> - <a href=?m_id=$m_id&m_op=del&kid=$kid$linkveg class=link><img src=img/del.jpg border=0 alt=T√∂r√∂l align=absmiddle> t√∂r√∂l</a><br>";
 	}
 
-	$adatT[2]="<span class=alcim>Szavaz·s be·llÌt·sa</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>Szavaz√°s be√°ll√≠t√°sa</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -154,7 +154,7 @@ function szavazas_del() {
 
 	$kid=$_GET['kid'];
 
-	$kiir="\n<span class=kiscim>Biztosan tˆrˆlni akarod a kˆvetkezı szavaz·st?</span>";
+	$kiir="\n<span class=kiscim>Biztosan t√∂r√∂lni akarod a k√∂vetkez≈ë szavaz√°st?</span>";
 	
 	$query="select kerdes from szavazask where id='$kid'";
 	list($kerdes)=mysql_fetch_row(mysql_db_query($db_name,$query));
@@ -163,7 +163,7 @@ function szavazas_del() {
 
 	$kiir.="<br><br><a href=?m_id=$m_id&m_op=delete&kid=$kid$linkveg class=adminlink>Igen</a> - <a href=?m_id=$m_id&m_op=mod$linkveg class=link>NEM</a>";
 
-	$adatT[2]="<span class=alcim>Szavaz·s be·llÌt·sa</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>Szavaz√°s be√°ll√≠t√°sa</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -188,7 +188,7 @@ function szavazas_delete() {
 	return $kod;
 }
 
-//Jogosults·g ellenırzÈse
+//Jogosults√°g ellen≈ërz√©se
 if(strstr($u_jogok,'szavazas')) {
 
 switch($m_op) {
@@ -219,6 +219,6 @@ switch($m_op) {
 }
 }
 else {
-	$tartalom="\n<span class=hiba>HIBA! Nincs hozz· jogosults·god!</span>";
+	$tartalom="\n<span class=hiba>HIBA! Nincs hozz√° jogosults√°god!</span>";
 }
 ?>

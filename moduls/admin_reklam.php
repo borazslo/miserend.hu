@@ -3,10 +3,10 @@
 function reklam_index() {
 	global $linkveg,$m_id;
 
-	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Új reklám - hozzáadás</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>Meglévõ módosítása, törlése</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Ãšj reklÃ¡m - hozzÃ¡adÃ¡s</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>MeglÃ©vÅ‘ mÃ³dosÃ­tÃ¡sa, tÃ¶rlÃ©se</a><br>";
 
-	$adatT[2]="<span class=alcim>Reklámok (logók) szerkesztése</span><br><br>".$menu;
+	$adatT[2]="<span class=alcim>ReklÃ¡mok (logÃ³k) szerkesztÃ©se</span><br><br>".$menu;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -32,19 +32,19 @@ function reklam_add($rid) {
 	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=sessid value=$sessid>";
 	$urlap.="\n<input type=hidden name=m_op value=adding><input type=hidden name=rid value=$rid>";
 	
-	$urlap.="\n<span class=kiscim>Cím: </span><span class=alap><br>Csak az adminban jelenik meg, a kereshetõség miatt.</span><br><input type=text name=cim value='$cim' class=urlap size=60 maxlength=100>";
-	$urlap.="\n<br><br><span class=kiscim>Képfelirat: </span><span class=alap><br>(nem kötelezõ)</span><br><input type=text name=title value='$title' class=urlap size=60 maxlength=100>";
-	$urlap.="\n<br><br><span class=kiscim>URL: </span><span class=alap><br>Klikkelésre hova menjen. Ha más weboldal, akkor http:// -rel kezdõdjön a hivatkozás, <br>ha oldalon belüli link, akkor ez nem kell!</span><br><input type=text name=url value='$url' class=urlap size=60 maxlength=100>";
-	$urlap.="\n<br><br><span class=kiscim>tól:</span><span class=alap><br>Amikortól megjelenhet</span><br><input type=text name=tol class=urlap maxlength=10 value='$tol' size=10>";
-	$urlap.="\n<br><br><span class=kiscim>ig:</span><span class=alap><br>Ameddig megjelenhet (ha nulla, akkor nincs lejárat!)</span><br><input type=text name=ig class=urlap maxlength=10 value='$ig' size=10>";
+	$urlap.="\n<span class=kiscim>CÃ­m: </span><span class=alap><br>Csak az adminban jelenik meg, a kereshetÅ‘sÃ©g miatt.</span><br><input type=text name=cim value='$cim' class=urlap size=60 maxlength=100>";
+	$urlap.="\n<br><br><span class=kiscim>KÃ©pfelirat: </span><span class=alap><br>(nem kÃ¶telezÅ‘)</span><br><input type=text name=title value='$title' class=urlap size=60 maxlength=100>";
+	$urlap.="\n<br><br><span class=kiscim>URL: </span><span class=alap><br>KlikkelÃ©sre hova menjen. Ha mÃ¡s weboldal, akkor http:// -rel kezdÅ‘djÃ¶n a hivatkozÃ¡s, <br>ha oldalon belÃ¼li link, akkor ez nem kell!</span><br><input type=text name=url value='$url' class=urlap size=60 maxlength=100>";
+	$urlap.="\n<br><br><span class=kiscim>tÃ³l:</span><span class=alap><br>AmikortÃ³l megjelenhet</span><br><input type=text name=tol class=urlap maxlength=10 value='$tol' size=10>";
+	$urlap.="\n<br><br><span class=kiscim>ig:</span><span class=alap><br>Ameddig megjelenhet (ha nulla, akkor nincs lejÃ¡rat!)</span><br><input type=text name=ig class=urlap maxlength=10 value='$ig' size=10>";
 
-	$urlap.="\n<br><br><span class=kiscim>Sorszám:</span><span class=alap><br>Ha van, akkor sorrendben mindenképp megjelenik, ha nincs, akkor elõzõek után véletlenszerûen maximum 5 db (csak alul érvényes)</span><br><input type=text name=sorszam class=urlap maxlength=2 value='$sorszam' size=2>";
+	$urlap.="\n<br><br><span class=kiscim>SorszÃ¡m:</span><span class=alap><br>Ha van, akkor sorrendben mindenkÃ©pp megjelenik, ha nincs, akkor elÅ‘zÅ‘ek utÃ¡n vÃ©letlenszerÅ±en maximum 5 db (csak alul Ã©rvÃ©nyes)</span><br><input type=text name=sorszam class=urlap maxlength=2 value='$sorszam' size=2>";
 	
 	$urlap.="<br><br><input type=checkbox name=ok value=i ";
 	if($ok!='n') $urlap.=' checked';
-	$urlap.="> <span class=alap>engedélyezés</span>";
+	$urlap.="> <span class=alap>engedÃ©lyezÃ©s</span>";
 	$urlap.="\n<br><br><span class=kiscim>Hol: </span><br><select name=hol class=urlap>";
-	$holnev=array('','Fõreklám (jobb fent)','Logó reklámok (jobb lent)');
+	$holnev=array('','FÅ‘reklÃ¡m (jobb fent)','LogÃ³ reklÃ¡mok (jobb lent)');
 	for($i=1;$i<=2;$i++) {
 		$urlap.="<option value=$i";
 		if($i==$hol) $urlap.=" selected";
@@ -52,9 +52,9 @@ function reklam_add($rid) {
 	}
 	$urlap.='</select>';
 	
-	$urlap.="\n<br><br><span class=kiscim>Kép: </span><span class=alap><br>CSAK jpg vagy gif fájlok!<br>Maximum 170×300-as képet jelenít meg, az ennél nagyobb képek NEM jelennek meg!</span><br><input type=file name=kep size=50 class=urlap>";
+	$urlap.="\n<br><br><span class=kiscim>KÃ©p: </span><span class=alap><br>CSAK jpg vagy gif fÃ¡jlok!<br>Maximum 170Ã—300-as kÃ©pet jelenÃ­t meg, az ennÃ©l nagyobb kÃ©pek NEM jelennek meg!</span><br><input type=file name=kep size=50 class=urlap>";
 
-	//Könyvtár tartalmát beolvassa
+	//KÃ¶nyvtÃ¡r tartalmÃ¡t beolvassa
 	if($rid>0) {
 		$konyvtar="kepek/reklam/";
 		$fajl1="$rid.jpg";
@@ -65,18 +65,18 @@ function reklam_add($rid) {
 		elseif(is_file("$konyvtar$fajl2")) {
 			$valoban=$fajl2;
 		}
-		if(!empty($valoban))	$urlap.="<br><br><img src=$konyvtar$valoban><input type=checkbox class=urlap name=delkep value='$valoban'><span class=alap>Töröl</span> ";
+		if(!empty($valoban))	$urlap.="<br><br><img src=$konyvtar$valoban><input type=checkbox class=urlap name=delkep value='$valoban'><span class=alap>TÃ¶rÃ¶l</span> ";
 	}
 	
 	//Log
 	if(!empty($log)) {
-		$urlap.="\n<br><br><span class=kiscim>történet:</span><br><textarea cols=40 rows=8 disabled>Számláló: $szamlalo\nKlikkelés: $klikk\n$log</textarea>";
+		$urlap.="\n<br><br><span class=kiscim>tÃ¶rtÃ©net:</span><br><textarea cols=40 rows=8 disabled>SzÃ¡mlÃ¡lÃ³: $szamlalo\nKlikkelÃ©s: $klikk\n$log</textarea>";
 	}
 
 	$urlap.="\n<br><br><input type=submit value=Mehet class=urlap>";
 	$urlap.='</form>';
 
-	$adatT[2]="<span class=alcim>Reklámok szerkesztése</span><br><br>".$urlap;
+	$adatT[2]="<span class=alcim>ReklÃ¡mok szerkesztÃ©se</span><br><br>".$urlap;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -119,11 +119,11 @@ function reklam_adding() {
 
 	$konyvtar="kepek/reklam/";
 
-//kijelölt képek törlése
+//kijelÃ¶lt kÃ©pek tÃ¶rlÃ©se
 	$delkep=$_POST['delkep'];
 	if(!empty($delkep)) unlink("$konyvtar/$delkep");
 
-//képek feltöltése
+//kÃ©pek feltÃ¶ltÃ©se
 	$kep=$_FILES['kep']['tmp_name'];
 	$kepnev=$_FILES['kep']['name'];
 	$kit=substr($kepnev,-3);
@@ -131,7 +131,7 @@ function reklam_adding() {
 		$kimenet=$konyvtar.$rid.'.'.$kit;
 		@unlink($konyvtar.$rid.".jpg");
 		@unlink($konyvtar.$rid.".gif");
-		if ( !copy($kep, "$kimenet") )	print("HIBA a másolásnál ($kimenet)!<br>\n");
+		if ( !copy($kep, "$kimenet") )	print("HIBA a mÃ¡solÃ¡snÃ¡l ($kimenet)!<br>\n");
 		unlink($kep);
 	}
 	
@@ -143,20 +143,20 @@ function reklam_adding() {
 function reklam_mod() {
 	global $db_name,$linkveg,$m_id;
 
-	$kiir.="<span class=kiscim>Válassz az alábbi reklámok közül:</span><br><br>";
+	$kiir.="<span class=kiscim>VÃ¡lassz az alÃ¡bbi reklÃ¡mok kÃ¶zÃ¼l:</span><br><br>";
 
 	$query="select id,cim,hol from reklam order by hol,id desc";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($rid,$cim,$hol)=mysql_fetch_row($lekerdez)) {
 		if($hol!=$holell) {
-			if($hol==1) $kiir.="<span class=kiscim>-----------------Felsõ reklámok----------------------</span><br><br>";
-			elseif($hol==2) $kiir.="<br><span class=kiscim>-----------------Alsó reklámok----------------------</span><br><br>";
+			if($hol==1) $kiir.="<span class=kiscim>-----------------FelsÅ‘ reklÃ¡mok----------------------</span><br><br>";
+			elseif($hol==2) $kiir.="<br><span class=kiscim>-----------------AlsÃ³ reklÃ¡mok----------------------</span><br><br>";
 		}
 		$holell=$hol;
-		$kiir.="\n<a href=?m_id=$m_id&m_op=add&rid=$rid$linkveg class=link><b>- $cim</b></a> - <a href=?m_id=$m_id&m_op=del&rid=$rid$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
+		$kiir.="\n<a href=?m_id=$m_id&m_op=add&rid=$rid$linkveg class=link><b>- $cim</b></a> - <a href=?m_id=$m_id&m_op=del&rid=$rid$linkveg class=link><img src=img/del.jpg border=0 alt=TÃ¶rÃ¶l align=absmiddle> tÃ¶rÃ¶l</a><br>";
 	}
 
-	$adatT[2]="<span class=alcim>Reklámok szerkesztése - módosítás</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>ReklÃ¡mok szerkesztÃ©se - mÃ³dosÃ­tÃ¡s</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -170,7 +170,7 @@ function reklam_del() {
 
 	$rid=$_GET['rid'];
 
-	$kiir="\n<span class=kiscim>Biztosan törölni akarod a következõ reklámot?</span>";
+	$kiir="\n<span class=kiscim>Biztosan tÃ¶rÃ¶lni akarod a kÃ¶vetkezÅ‘ reklÃ¡mot?</span>";
 	
 	$query="select cim from reklam where id='$rid'";
 	list($cim)=mysql_fetch_row(mysql_db_query($db_name,$query));
@@ -179,7 +179,7 @@ function reklam_del() {
 
 	$kiir.="<br><br><a href=?m_id=$m_id&m_op=delete&rid=$rid$linkveg class=link>Igen</a> - <a href=?m_id=$m_id&m_op=mod$linkveg class=link>NEM</a>";
 
-	$adatT[2]="<span class=alcim>Reklám szerkesztése - törlés</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>ReklÃ¡m szerkesztÃ©se - tÃ¶rlÃ©s</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -200,7 +200,7 @@ function reklam_delete() {
 	return $kod;
 }
 
-//Jogosultság ellenõrzése
+//JogosultsÃ¡g ellenÅ‘rzÃ©se
 if(strstr($u_jogok,'reklam')) {
 
 switch($m_op) {
@@ -231,6 +231,6 @@ switch($m_op) {
 }
 }
 else {
-	$tartalom="\n<span class=hiba>HIBA! Nincs hozzá jogosultságod!</span>";
+	$tartalom="\n<span class=hiba>HIBA! Nincs hozzÃ¡ jogosultsÃ¡god!</span>";
 }
 ?>

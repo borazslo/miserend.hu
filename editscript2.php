@@ -1,5 +1,5 @@
 <?php
-// ez az egész rész a TinyMCE miatt kell
+// ez az egÃ©sz rÃ©sz a TinyMCE miatt kell
 
     $tinymce_host = $_SERVER['SERVER_NAME'];
     $edit_script="\n";
@@ -20,7 +20,7 @@
 //    $edit_script.='      urlconvertor_callback: "convLinkVC",'."\n";
     
 	$edit_script.='	plugins : "table,save,advhr,advimage,advlink,emotions,iespell,preview,zoom,searchreplace,print,paste,fullscreen,noneditable,contextmenu",'."\n";
-	$edit_script.=' theme_advanced_styles : "alap=alap;alapkizárt=alapkizart;kicsi=kicsi;kiscim=kiscim;kozepescim=kozepescim;alcim=alcim;link=link;menülink=menulink;rovatcikklink=rovatcikklink",'."\n";
+	$edit_script.=' theme_advanced_styles : "alap=alap;alapkizÃ¡rt=alapkizart;kicsi=kicsi;kiscim=kiscim;kozepescim=kozepescim;alcim=alcim;link=link;menÃ¼link=menulink;rovatcikklink=rovatcikklink",'."\n";
 
 	$edit_script.='	theme_advanced_buttons1 : "styleselect,bold,italic,underline,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,link,unlink,separator,image,bullist,numlist,outdent,indent,separator",'."\n";    
 	$edit_script.='	theme_advanced_buttons2 : "search,replace,separator,forecolor,backcolor,separator,cut,copy,pastetext,pasteword,selectall,separator,undo,redo,cleanup,spearator,preview,code,separatorprint,zoom,fullscreen,separator",'."\n";
@@ -47,7 +47,7 @@
 	$edit_script.='	</script>';
 
 
-// idáig
+// idÃ¡ig
 
 Return $edit_script;
 

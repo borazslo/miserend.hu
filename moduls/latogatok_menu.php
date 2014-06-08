@@ -7,13 +7,13 @@ function latogatok_balmenu() {
     $limit=2400; //40 perc
     $lejart=$most-$limit;
 
-//LekÈrdezz¸k a session adatokat
+//Lek√©rdezz√ºk a session adatokat
     $query="select uid,login,becenev,nem,szulinap,nyilvanos,baratok,ismerosok,modul_id,host,ip from session where lastlogin>'$lejart' order by lastlogin desc";
     if(!$lekerdez=mysql_query($query)) echo 'HIBA!<br>'.mysql_error();
 
     while(list($uid,$ulogin,$ubecenev,$unem,$uszulinap,$unyilvanos,$ubaratok,$uismerosok,$umodul_id,$uhost,$uip)=mysql_fetch_row($lekerdez)) {
 		
-		//Adatok nyilv·noss·g·nak be·llÌt·si ÈrtÈkei
+		//Adatok nyilv√°noss√°g√°nak be√°ll√≠t√°si √©rt√©kei
 		$nyilvanosT=explode('*',$unyilvanos);
 		if(is_array($nyilvanosT)) {
 			foreach($nyilvanosT as $ertek) {
@@ -25,36 +25,36 @@ function latogatok_balmenu() {
 			}
 		}
 
-        if(empty($mcim[$umodul_id]) and $umodul_id>0) { //Ha mÈg nem kÈrdezt¸k le
+        if(empty($mcim[$umodul_id]) and $umodul_id>0) { //Ha m√©g nem k√©rdezt√ºk le
             list($mcim1,$jogkod1)=mysql_fetch_row(mysql_query("select nev,jogkod from modulok where id='$umodul_id'"));
 			$mcim[$umodul_id]=$mcim1;
 			$jogkod[$umodul_id]=$jogkod1;
         }
-		if(!empty($jogkod[$umodul_id])) { //Ha admin modulrÛl van szÛ
-			//Ès a felhaszn·lÛnak nincs ilyen jogosults·ga
+		if(!empty($jogkod[$umodul_id])) { //Ha admin modulr√≥l van sz√≥
+			//√©s a felhaszn√°l√≥nak nincs ilyen jogosults√°ga
 			if(!strstr($u_jogok,$jogkod[$umodul_id])) {
 				if($fooldal_id==2) $mcim[$umodul_id]='miserend';
-				elseif($fooldal_id==1) $mcim[$umodul_id]='hÌrek';
+				elseif($fooldal_id==1) $mcim[$umodul_id]='h√≠rek';
 			}
-			//akkor annyit l·t, hogy az illetı a fıoldalon van
+			//akkor annyit l√°t, hogy az illet≈ë a f≈ëoldalon van
 		}
-        if($umodul_id==0) $mcim[$umodul_id]='fıoldal';
+        if($umodul_id==0) $mcim[$umodul_id]='f≈ëoldal';
         if($ulogin!='*vendeg*' and $ulogin!=$u_login) {
 			if($unem=='f' and $unyilvanosT['nem']=='ok') $jel='<img src=img/fiu.png align=absmiddle hspace=2>';
 			elseif($unem=='n' and $unyilvanosT['nem']=='ok') $jel='<img src=img/lany.png align=absmiddle hspace=2>';
 			else $jel='<img src=img/user.png align=absmiddle hspace=2>';
 
-			if($uszulinap>0 and $unyilvanosT['szuldatum']=='ok') $jel.="<img src=img/szulinap.png align=absmiddle hspace=2 title='Boldog $uszulinap. sz¸linapot!'>";
+			if($uszulinap>0 and $unyilvanosT['szuldatum']=='ok') $jel.="<img src=img/szulinap.png align=absmiddle hspace=2 title='Boldog $uszulinap. sz√ºlinapot!'>";
             
 			if(!empty($ubecenev) and $ubecenev!=$ulogin) 
 				$belepettek.="$jel<a href=# title='($ulogin) $mcim[$umodul_id]' class=kismenulink>$ubecenev</a>, ";
 			else 
 				$belepettek.="$jel<a href=# title='$mcim[$umodul_id]' class=kismenulink>$ulogin</a>, ";
         }
-		//Keresırobotok sz˚rÈse
+		//Keres≈ërobotok sz≈±r√©se
 		if(!strstr($uhost,'google') and !strstr($uhost,'search') and !empty($uip))  {
 			$azonosipkT[$uip]++;
-			//Azonos IP-rıl 10 fˆlˆtt 1-nek sz·mÌt
+			//Azonos IP-r≈ël 10 f√∂l√∂tt 1-nek sz√°m√≠t
 			if($azonosipkT[$uip]<=10) $mennyi[$mcim[$umodul_id]]++;
 			elseif($azonosipkT[$uip]==11) $mennyi[$mcim[$umodul_id]]=$mennyi[$mcim[$umodul_id]]-9;
 		}
@@ -67,24 +67,24 @@ function latogatok_balmenu() {
         }
     }
     if($ossz>0) {
-        $keretmenutxt="<span class=alap>Oldalainkon jelenleg $ossz l·togatÛ van.</span><br>";
+        $keretmenutxt="<span class=alap>Oldalainkon jelenleg $ossz l√°togat√≥ van.</span><br>";
         $keretmenutxt.=$lista;
 		if($u_id>0) {
 			if(!empty($belepettek)) {
-				$keretmenutxt.="<br><br><span class=alap>Az al·bbi felhaszn·lÛk vannak bejelentkezve:</span><br>";
+				$keretmenutxt.="<br><br><span class=alap>Az al√°bbi felhaszn√°l√≥k vannak bejelentkezve:</span><br>";
 				$keretmenutxt.=$belepettek;
 			}
 			else {
-				$keretmenutxt.="<br><br><span class=alap>Rajtad kÌv¸l nincs belÈpett felhaszn·lÛ.</span><br>";
+				$keretmenutxt.="<br><br><span class=alap>Rajtad k√≠v√ºl nincs bel√©pett felhaszn√°l√≥.</span><br>";
 			}
 		}
 
 
     }
-    else $keretmenutxt="<span class=alap>Oldalainkon rajtad kÌv¸l jelenleg nincs m·s l·togatÛnk.</span>";
+    else $keretmenutxt="<span class=alap>Oldalainkon rajtad k√≠v√ºl jelenleg nincs m√°s l√°togat√≥nk.</span>";
 
-	//Tartalom lÈtrehoz·sa
-	$kodT[0]="<span class=hasabcimlink>L·togatÛk</span>";
+	//Tartalom l√©trehoz√°sa
+	$kodT[0]="<span class=hasabcimlink>L√°togat√≥k</span>";
 	$kodT[1]=$keretmenutxt;
 
     return $kodT;

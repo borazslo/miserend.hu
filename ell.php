@@ -1,25 +1,25 @@
 <?
 
 function url_ell() {
-// URL ellenırzÈse
+// URL ellen≈ërz√©se
 /////////////////////////////////
-// fooldal t·bla:
+// fooldal t√°bla:
 // id int(2) auto_increment primary
-// cim varchar(30) [A fıoldal cÌme, amit pl. a fejlÈcbe kiÌr a bˆngÈszı]
-// kod varchar(30) [kÛd Èkezet nÈk¸l, ami a fıoldalhoz kapcsolÛdÛ kˆnyvt·rakat, vagy ilyesmiket azonosÌthat]
-// domain varchar(20) [a fıoldal domainje - ebbıl azonosÌtjuk]
-// design varchar(30) [az alapÈrtelmezÈsben be·llÌtott design]
+// cim varchar(30) [A f≈ëoldal c√≠me, amit pl. a fejl√©cbe ki√≠r a b√∂ng√©sz≈ë]
+// kod varchar(30) [k√≥d √©kezet n√©k√ºl, ami a f≈ëoldalhoz kapcsol√≥d√≥ k√∂nyvt√°rakat, vagy ilyesmiket azonos√≠that]
+// domain varchar(20) [a f≈ëoldal domainje - ebb≈ël azonos√≠tjuk]
+// design varchar(30) [az alap√©rtelmez√©sben be√°ll√≠tott design]
 // bekerult datetime [amikor az oldal elindult]
 /////////////////////////////////
 
 // domain: $SERVER_NAME
-// a domain ut·ni URL: $REQUEST_URI
+// a domain ut√°ni URL: $REQUEST_URI
 
     global $_SERVER, $db_name, $hiba, $hibauzenet, $hibauzenet_prog, $_GET, $_POST;
     
 	$fooldal_id=$_REQUEST['fooldal_id'];
     if(!empty($fooldal_id)) {
-        //¡tugrasztjuk arra a fıoldalra
+        //√Åtugrasztjuk arra a f≈ëoldalra
         $query="select domain,ugras from fooldal where id='$fooldal_id'";
         $lekerdez=mysql_query($query);
         list($domain,$ugras)=mysql_fetch_row($lekerdez);
@@ -42,43 +42,43 @@ function url_ell() {
 
 
     $teljes_domain=$_SERVER['SERVER_NAME'];  // pl. www.plebania.net
-    if(substr_count($teljes_domain, '.')>1) {      // lebal·bb 2 pontn·l van aldomain
-        $domain2=strstr($teljes_domain,'.');     //pl. .plebania.net  !!!FIGYELEM! www.aldomain.plebania.net -nÈl aldomain.plebania.net lesz a domain!!!
+    if(substr_count($teljes_domain, '.')>1) {      // lebal√°bb 2 pontn√°l van aldomain
+        $domain2=strstr($teljes_domain,'.');     //pl. .plebania.net  !!!FIGYELEM! www.aldomain.plebania.net -n√©l aldomain.plebania.net lesz a domain!!!
         $karakterszam=strlen($domain2);
         $aldomain_karakterszam=strlen($teljes_domain)-$karakterszam;
         $domain=substr($domain2,1,$karakterszam);     //pl. plebania.net
         $aldomain=substr($teljes_domain,0,$aldomain_karakterszam); //pl www
-        if($aldomain=='www') $aldomain='';  //A www-t nem sz·mÌtjuk bele
+        if($aldomain=='www') $aldomain='';  //A www-t nem sz√°m√≠tjuk bele
     }
     else {
         $domain=$teljes_domain;
         $aldomain='';
     }
-    //MegnÈzz¸k, hogy aldomainnel van-e fıoldal
+    //Megn√©zz√ºk, hogy aldomainnel van-e f≈ëoldal
     if(!empty($aldomain)) $domainell="$aldomain.$domain";
     else $domainell=$domain;
     $query="select id,cim,design,nyitomodul,ugras,domain from fooldal where domain='$domainell' and ok='i'";
     if(!$lekerdez=mysql_query($query)) {
-        //Ha a lekÈrdezÈs nem siker¸lt...
+        //Ha a lek√©rdez√©s nem siker√ºlt...
         $hiba=true;
-        $hibauzenet.='Az oldal beazonosÌt·s·n·l hiba tˆrtÈnt.';
-        $hibauzenet_prog.="\n\nHIBA az adatb·zis lekÈrdezÈsnÈl (ell.inc #114 [url_ell]):\n" . mysql_error();
+        $hibauzenet.='Az oldal beazonos√≠t√°s√°n√°l hiba t√∂rt√©nt.';
+        $hibauzenet_prog.="\n\nHIBA az adatb√°zis lek√©rdez√©sn√©l (ell.inc #114 [url_ell]):\n" . mysql_error();
     }
     else if(mysql_num_rows($lekerdez) < 1 ) {
-        //Ha nincs be·llÌtva ez a domain, akkor a miserend.hu-t hozza be. Pont.
+        //Ha nincs be√°ll√≠tva ez a domain, akkor a miserend.hu-t hozza be. Pont.
         if($_POST['admin']!=0 or $_GET['admin']!=0) $adminoldal = true;
         $urlT = array (10, 'Miserend', 'miserend', $aldomain, 26, $adminoldal);
         return $urlT;
         //$hiba=true;
-        //$hibauzenet.='Az oldal beazonosÌt·s·n·l hiba tˆrtÈnt.';
-        //$hibauzenet_prog.="\n\nNINCS az adatb·zisban regisztr·lva az '$domainell' (ell.inc #114 [url_ell]):\n" . mysql_error();
+        //$hibauzenet.='Az oldal beazonos√≠t√°s√°n√°l hiba t√∂rt√©nt.';
+        //$hibauzenet_prog.="\n\nNINCS az adatb√°zisban regisztr√°lva az '$domainell' (ell.inc #114 [url_ell]):\n" . mysql_error();
     }
     else {
         $van=false;
         if(mysql_num_rows($lekerdez)==0) {
             $van=false;
-            //MegnÈzz¸k mÈg aldomain nÈlk¸l is
-            //(ez esetben csak nyitÛmodul van az aldomainhez, nem ˆn·llÛ oldal)
+            //Megn√©zz√ºk m√©g aldomain n√©lk√ºl is
+            //(ez esetben csak nyit√≥modul van az aldomainhez, nem √∂n√°ll√≥ oldal)
             if(!empty($aldomain)) {
                 $domainell=$domain;
                 $query="select id,cim,kod,design,nyitomodul,ugras,domain from fooldal where domain='$domainell' and ok='i'";
@@ -91,7 +91,7 @@ function url_ell() {
         
         if(!$van) {
             //HIBA, rossz helyen akarjuk megnyitni az oldalt
-            //ez esetben ·tir·nyÌtjuk az elsıkÈnt be·llÌtott fıoldalunkra
+            //ez esetben √°tir√°ny√≠tjuk az els≈ëk√©nt be√°ll√≠tott f≈ëoldalunkra
             list($ujdomain)=mysql_fetch_row(mysql_query("select domain from fooldal order by sorrend"));
             header("Location: http://www.$ujdomain");
             exit;
@@ -99,7 +99,7 @@ function url_ell() {
         else {
             list($fooldal_id,$fooldal_cim,$fooldal_design,$nyitomodul,$fooldal_ugras,$domain)=mysql_fetch_row($lekerdez);
             if(!empty($fooldal_ugras)) {
-				//Ha m·sik oldalra kell ·tugratni a domainrıl
+				//Ha m√°sik oldalra kell √°tugratni a domainr≈ël
                 header("Location: $fooldal_ugras");
                 exit;
             }
@@ -107,7 +107,7 @@ function url_ell() {
 			//???
             if($_POST['admin']!=0 or $_GET['admin']!=0) $adminoldal=true;
 
-            //Esetleges aldomain esetÈn megnÈzz¸k a nyitÛmodult
+            //Esetleges aldomain eset√©n megn√©zz√ºk a nyit√≥modult
             if(!empty($aldomain)) {
                 $query="select nyitomodul,ugras from fooldal_aldomain where f_id='$fooldal_id' and aldomain='$aldomain'";
                 $lekerdez=mysql_query($query);
@@ -131,26 +131,26 @@ function url_ell() {
 
 
 function modul_ell($fooldal_id,$aldomain) {
-//BehÌvandÛ modulok ellenırzÈse
+//Beh√≠vand√≥ modulok ellen≈ërz√©se
 /////////////////////////////////
-// fooldal_modulok t·bla:
+// fooldal_modulok t√°bla:
 // id int(3) auto_increment primary
-// fooldal_id int(2) [Melyik fıoldalhoz tartozik]
-// hova enum(f,b,t,j,l) [Hova ker¸l - fejlÈc, balmen¸, tartalom, jobbmen¸, l·blÈc]
-// tipus enum(a,d) [TÌpusa - ·llandÛ (a) vagy alapÈrtelmezett (d), melyet az egyes oldalak ·tÌrhatnak.
-// sorrend int(4) [Ha tˆbb modul is behÌv·sra ker¸l, itt lehet be·llÌtani a sorrendet]
-// modul int(3) [modul kÛdja]
+// fooldal_id int(2) [Melyik f≈ëoldalhoz tartozik]
+// hova enum(f,b,t,j,l) [Hova ker√ºl - fejl√©c, balmen√º, tartalom, jobbmen√º, l√°bl√©c]
+// tipus enum(a,d) [T√≠pusa - √°lland√≥ (a) vagy alap√©rtelmezett (d), melyet az egyes oldalak √°t√≠rhatnak.
+// sorrend int(4) [Ha t√∂bb modul is beh√≠v√°sra ker√ºl, itt lehet be√°ll√≠tani a sorrendet]
+// modul int(3) [modul k√≥dja]
 /////////////////////////////////
-// A fent behÌvott alapÈrtelmezett modulokat az url paramÈterei mÛdosÌthatj·k!
+// A fent beh√≠vott alap√©rtelmezett modulokat az url param√©terei m√≥dos√≠thatj√°k!
 
     global $hiba, $hibauzenet, $hibauzenet_prog, $html_kod;
     
     $query="select hova,tipus,sorrend,modul from fooldal_modulok where fooldal_id='$fooldal_id' order by hova, sorrend";
     if(!$lekerdez=mysql_query($query)) {
-        //Ha a lekÈrdezÈs nem siker¸lt...
+        //Ha a lek√©rdez√©s nem siker√ºlt...
         $hiba=true;
         $hibauzenet.='';
-        $hibauzenet_prog.="\n\nHIBA az adatb·zis lekÈrdezÈsnÈl (ell.inc #125 [modul_ell]):\n" . mysql_error();
+        $hibauzenet_prog.="\n\nHIBA az adatb√°zis lek√©rdez√©sn√©l (ell.inc #125 [modul_ell]):\n" . mysql_error();
     }
     else {
         while(list($fm_hova,$fm_tipus,$fm_sorrend,$fm_modul)=mysql_fetch_row($lekerdez)) {
@@ -160,7 +160,7 @@ function modul_ell($fooldal_id,$aldomain) {
             elseif($fm_hova=='j') $modulList['b'][]=$fm_modul;
             elseif($fm_hova=='l') $modulList['b'][]=$fm_modul;
         }
-        //Itt mÈg ellenırizni kell, hogy az URL adatai alapj·n v·ltozik-e valami!
+        //Itt m√©g ellen≈ërizni kell, hogy az URL adatai alapj√°n v√°ltozik-e valami!
         return $modulList;
     }
 }

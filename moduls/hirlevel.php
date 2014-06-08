@@ -11,31 +11,31 @@ function hirlevel_index() {
 
 	$email=$_POST['email'];
 	
-    $tartalomkod="<p class=alcim>Hírlevél - feliratkozás</p>";
+    $tartalomkod="<p class=alcim>HÃ­rlevÃ©l - feliratkozÃ¡s</p>";
 
 	if(!empty($email)) {
-		//Email ellenõrzés
+		//Email ellenÅ‘rzÃ©s
 		if(!strstr($email,'@')) $emailhiba=true;
 
 		if(!$emailhiba) {
-			$tartalomkod.="<p class=alap>Köszöntjük a listán! Feliratkozási kérelmét azonnal feldolgozzuk. Hogy nehogy tréfából valaki más akarjon az Ön emailcímével feliratkozni, ezért feliratkozási kérelmét mégegyszer jóvá kell hagyni. A jóváhagyás módjáról körülbelül 10-15 percen belül az <b>elõbb megadott</b> <font color=red>($email)</font> e-mail címre tájékoztatást küldünk!</p>";
+			$tartalomkod.="<p class=alap>KÃ¶szÃ¶ntjÃ¼k a listÃ¡n! FeliratkozÃ¡si kÃ©relmÃ©t azonnal feldolgozzuk. Hogy nehogy trÃ©fÃ¡bÃ³l valaki mÃ¡s akarjon az Ã–n emailcÃ­mÃ©vel feliratkozni, ezÃ©rt feliratkozÃ¡si kÃ©relmÃ©t mÃ©gegyszer jÃ³vÃ¡ kell hagyni. A jÃ³vÃ¡hagyÃ¡s mÃ³djÃ¡rÃ³l kÃ¶rÃ¼lbelÃ¼l 10-15 percen belÃ¼l az <b>elÅ‘bb megadott</b> <font color=red>($email)</font> e-mail cÃ­mre tÃ¡jÃ©koztatÃ¡st kÃ¼ldÃ¼nk!</p>";
 
 			$to='';
-			//mail($to,$targy,$szoveg,"From: $email"); //mail küldése a communio szerverre
+			//mail($to,$targy,$szoveg,"From: $email"); //mail kÃ¼ldÃ©se a communio szerverre
 		}
 		else  {
-			$tartalomkod.="<p class=alap><font color=red>HIBA!</font><br>Ön valószínûleg elírta emailcímét! Kérem nézze meg újra!";
+			$tartalomkod.="<p class=alap><font color=red>HIBA!</font><br>Ã–n valÃ³szÃ­nÅ±leg elÃ­rta emailcÃ­mÃ©t! KÃ©rem nÃ©zze meg Ãºjra!";
 			$tartalomkod.='<form method=post>';
 			$tartalomkod.="<input type=hidden name=m_id value=$m_id>";
-			$tartalomkod.="<input type=text name=email value='$email' size=25 class='urlap'><br><input type=submit value=Feliratkozás class=urlap>";
+			$tartalomkod.="<input type=text name=email value='$email' size=25 class='urlap'><br><input type=submit value=FeliratkozÃ¡s class=urlap>";
 			$tartalomkod.='</form>';
 		}
 	}
 	else {
-		$tartalomkod.="<p class=alap><b>Kedves Látogatónk!</b><br><br>Önnek lehetõsége van feliratkozni hírlevelünkre...</p>";
+		$tartalomkod.="<p class=alap><b>Kedves LÃ¡togatÃ³nk!</b><br><br>Ã–nnek lehetÅ‘sÃ©ge van feliratkozni hÃ­rlevelÃ¼nkre...</p>";
 		$tartalomkod.='<form method=post>';
 		$tartalomkod.="<input type=hidden name=m_id value=$m_id>";
-		$tartalomkod.="<input type=text name=email value='emailcím' size=25 class='urlap'><br><input type=submit value=Feliratkozás class=urlap>";
+		$tartalomkod.="<input type=text name=email value='emailcÃ­m' size=25 class='urlap'><br><input type=submit value=FeliratkozÃ¡s class=urlap>";
 		$tartalomkod.='</form>';
 	}
 

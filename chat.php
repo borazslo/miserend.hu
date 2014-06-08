@@ -5,7 +5,7 @@ $sid=$_GET['sid'];
 
 if(empty($u_login) and empty($sessid)) exit;
 
-$head='<html><head><title>VPP</title><meta http-equiv="Content-Type" content="text/html; charset=windows-1250"><meta http-equiv="refresh" content="15;URL=chat.php?u_login='.$u_login.'&sessid='.$sid.'"><link rel="stylesheet" href="design/miserend/img/style.css" type="text/css"></head><body bgcolor="#ECE5C8" text="#000000">';
+$head='<html><head><title>VPP</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="refresh" content="15;URL=chat.php?u_login='.$u_login.'&sessid='.$sid.'"><link rel="stylesheet" href="design/miserend/img/style.css" type="text/css"></head><body bgcolor="#ECE5C8" text="#000000">';
 
 $foot='</body></html>';
 
@@ -19,8 +19,8 @@ function index() {
 	$loginkiir1=urlencode($u_login);
 	$sid=$_GET['sid'];
 
-	$aktualis=date('Y-m-d H:i:s',time()-3600); //egy órán belül
-	$aktualis1=date('Y-m-d H:i:s',time()-36000); //10 órán belül
+	$aktualis=date('Y-m-d H:i:s',time()-3600); //egy ĂłrĂˇn belĂĽl
+	$aktualis1=date('Y-m-d H:i:s',time()-36000); //10 ĂłrĂˇn belĂĽl
 
 	$huszperc=60*20;
 	$huszperce=time()-$huszperc;
@@ -36,20 +36,20 @@ function index() {
 		}
 		$online.="</span><hr>";
 	}
-	else $online="\n<span class=alap>Nincs más admin</span><hr>";
+	else $online="\n<span class=alap>Nincs mĂˇs admin</span><hr>";
 
-	//üzenetek
+	//ĂĽzenetek
 	$query="select datum,user,kinek,szoveg from chat where datum>='$aktualis1' and (kinek='' or kinek='$u_login' or user='$u_login') order by datum desc limit 0,8";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($datum,$user,$kinek,$szoveg)=mysql_fetch_row($lekerdez)) {
 		if(!empty($kinek)) {
 			if($kinek==$u_login) $loginkiir2=urlencode($user);
 			else $loginkiir2=urlencode($kinek);
-			$jelzes="<a href=chatadd.php?u_login=$loginkiir1&kinek=$loginkiir2&sid=$sid target=chatadd class=link title='válasz'><img src=img/lakat.gif align=absmiddle border=0><i> $kinek</i></a><br>";
+			$jelzes="<a href=chatadd.php?u_login=$loginkiir1&kinek=$loginkiir2&sid=$sid target=chatadd class=link title='vĂˇlasz'><img src=img/lakat.gif align=absmiddle border=0><i> $kinek</i></a><br>";
 		}
 		else $jelzes='';
 		if($datum<=$aktualis and $volt<1) {
-			$uzenetek.="<br><span class=kicsi><font color=blue>-- 1 óránál korábbi üzenetek --</font></span><br>";
+			$uzenetek.="<br><span class=kicsi><font color=blue>-- 1 ĂłrĂˇnĂˇl korĂˇbbi ĂĽzenetek --</font></span><br>";
 			$volt=1;
 		}
 		if($user==$u_login) $szin='#394873';
@@ -59,7 +59,7 @@ function index() {
 		$uzenetek.="<span class=kicsi><b>$user</b> ($datumkiir)<br>$jelzes<font color=$szin>$szoveg</font></span><br><br>";
 	}
 	if(mysql_num_rows($lekerdez)==0) {
-		$uzenetek="<span class=alap>Az elmúlt 10 órában nem volt üzenet</span>";
+		$uzenetek="<span class=alap>Az elmĂşlt 10 ĂłrĂˇban nem volt ĂĽzenet</span>";
 	}
 
 	echo $head;

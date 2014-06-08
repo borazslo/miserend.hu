@@ -33,8 +33,8 @@ function nevnaptar_index($honap,$ev) {
     }
     $szoveg.= '</select><select name=honap class=urlap>';
 
-      $honapok=Array ("Január","Február","Március","Április","Május","Június","Július",
-               "Augusztus","Szeptember","Október","November","December");
+      $honapok=Array ("JanuÃ¡r","FebruÃ¡r","MÃ¡rcius","Ãprilis","MÃ¡jus","JÃºnius","JÃºlius",
+               "Augusztus","Szeptember","OktÃ³ber","November","December");
 
     for($x=1;$x<=count($honapok); $x++) {
         $szoveg.= "\t<option value=$x";
@@ -46,7 +46,7 @@ function nevnaptar_index($honap,$ev) {
 
 	$szoveg.="<form method=post><input type=hidden name=sessid value=$sessid><input type=hidden name=m_op value=adding><input type=hidden name=m_id value=$m_id><input type=hidden name=honap value=$honap><input type=hidden name=ev value=$ev>";
 
-    $napok = Array ("Hétfõ","Kedd","Szerda","Csütörtök","Péntek","Szombat","Vasárnap");
+    $napok = Array ("HÃ©tfÅ‘","Kedd","Szerda","CsÃ¼tÃ¶rtÃ¶k","PÃ©ntek","Szombat","VasÃ¡rnap");
 
     $szoveg.= '<table width=100% border=0 cellspacing=1 cellpadding=0 align=center bgcolor=#0D4081>
           <tr bgcolor=#E5B1A3 valign=middle align=center>
@@ -56,7 +56,7 @@ function nevnaptar_index($honap,$ev) {
     $kiirando=$kezdet;
     $napszamlalo=0;
 
-	//ünnepek adatbázisból
+	//Ã¼nnepek adatbÃ¡zisbÃ³l
 	$kezd=date('Y-m-d',$kezdet);
 	if(strlen($honap)==1) $honapkiir='0'.$honap;
 	else $honapkiir=$honap;
@@ -73,7 +73,7 @@ function nevnaptar_index($honap,$ev) {
 		$miseinfoT[$unnep_nap]=$miseinfo;
 	}
 
-	//névnapok adatbázisból 
+	//nÃ©vnapok adatbÃ¡zisbÃ³l 
 	$kezd=substr($kezd,5);
 	$kezd=str_replace('-','',$kezd);
 	$veg=substr($veg,5);
@@ -94,24 +94,24 @@ function nevnaptar_index($honap,$ev) {
         if(($szamlalo%7)==6) $unnep=1;
         else $unnep=0;
 
-        //Ha már új hónap jönne, akkor megszakítjuk!
+        //Ha mÃ¡r Ãºj hÃ³nap jÃ¶nne, akkor megszakÃ­tjuk!
         if($napTomb[mon]!=$honap) break;
         
-        //ünnepek:
-        if($napTomb[mon]==1 and $napTomb["mday"]==1) {$unnep=1;$msg='Újév';}
-        elseif($napTomb[mon]==3 and $napTomb["mday"]==15) {$unnep=1;$msg='Nemzeti ünnep';}
-		elseif($napTomb[mon]==5 and $napTomb["mday"]==1) {$unnep=1;$msg='Munka ünnepe';}
-        elseif($napTomb[mon]==8 and $napTomb["mday"]==20) {$unnep=1;$msg='Nemzeti ünnep';}
-        elseif($napTomb[mon]==10 and $napTomb["mday"]==23) {$unnep=1;$msg='Nemzeti ünnep';}
-        elseif($napTomb[mon]==11 and $napTomb["mday"]==1) {$unnep=1;$msg='Mindenszentek ünnepe';}
-        elseif($napTomb[mon]==12 and $napTomb["mday"]==25) {$unnep=1;$msg='Karácsony';}
-        elseif($napTomb[mon]==12 and $napTomb["mday"]==26) {$unnep=1;$msg='Karácsony';}
+        //Ã¼nnepek:
+        if($napTomb[mon]==1 and $napTomb["mday"]==1) {$unnep=1;$msg='ÃšjÃ©v';}
+        elseif($napTomb[mon]==3 and $napTomb["mday"]==15) {$unnep=1;$msg='Nemzeti Ã¼nnep';}
+		elseif($napTomb[mon]==5 and $napTomb["mday"]==1) {$unnep=1;$msg='Munka Ã¼nnepe';}
+        elseif($napTomb[mon]==8 and $napTomb["mday"]==20) {$unnep=1;$msg='Nemzeti Ã¼nnep';}
+        elseif($napTomb[mon]==10 and $napTomb["mday"]==23) {$unnep=1;$msg='Nemzeti Ã¼nnep';}
+        elseif($napTomb[mon]==11 and $napTomb["mday"]==1) {$unnep=1;$msg='Mindenszentek Ã¼nnepe';}
+        elseif($napTomb[mon]==12 and $napTomb["mday"]==25) {$unnep=1;$msg='KarÃ¡csony';}
+        elseif($napTomb[mon]==12 and $napTomb["mday"]==26) {$unnep=1;$msg='KarÃ¡csony';}
         else $msg='';
 
-		//mozgó ünnepek (adatbázisból)
-		$melyiknap=$napTomb["mday"]; //Elég csak a nap, az adatbázisban CSAK ebben a hónapban keres.
-		if(!empty($unnepdatumT[$melyiknap])) { //ha ezen a napon talált ünnepet
-			if($szabadnapT[$melyiknap]=='i') $unnep=1; //Csak, ha szabadnap is, akkor jelöljük a naptárban
+		//mozgÃ³ Ã¼nnepek (adatbÃ¡zisbÃ³l)
+		$melyiknap=$napTomb["mday"]; //ElÃ©g csak a nap, az adatbÃ¡zisban CSAK ebben a hÃ³napban keres.
+		if(!empty($unnepdatumT[$melyiknap])) { //ha ezen a napon talÃ¡lt Ã¼nnepet
+			if($szabadnapT[$melyiknap]=='i') $unnep=1; //Csak, ha szabadnap is, akkor jelÃ¶ljÃ¼k a naptÃ¡rban
 			$msg=$unnepdatumT[$melyiknap];
 		}
 
@@ -123,25 +123,25 @@ function nevnaptar_index($honap,$ev) {
             $szoveg.= "\t<tr><td width=25%";
             $datum=$ev.'-'.$honap.'-'.$napTomb['mday'];
 
-            //Ha ünnep, akkor piros
+            //Ha Ã¼nnep, akkor piros
             $szoveg.= $unnep==1 ? " bgcolor=#FFFAE4><a class=unnep title='$msg'":" bgcolor=#ECE5C8><a class=alap";
             $szoveg.= "><img src=$imgDIR/space.gif width=25% height=1 border=0>".$napTomb["mday"].'. ';
             
             $szoveg.= $napok[$napszamlalo].'</a></td><td valign=top width=75% ';
             $szoveg.= $unnep==1 ? " bgcolor=#FFFAE4>":" bgcolor=#FFFFFF>";
 
-            //Megnézzük, hogy van-e hozzá esemény
+            //MegnÃ©zzÃ¼k, hogy van-e hozzÃ¡ esemÃ©ny
 			$napunk=$napTomb['mday'];
 			if(strlen($napunk)==1) $napunk='0'.$napunk;
 			$datum=date('Y-m-',$kezdet).$napunk;
 
-            $szoveg.= "\n<span class=alap>Névnap: </span><input type=text name=nevnap[$melyiknap] value='$nevnapdatumT[$melyiknap]' class=urlap size=40><br><span class=alap>Ünnep: </span><input type=text name=unnepnap[$melyiknap] value='$unnepdatumT[$melyiknap]' class=urlap size=40><input type=checkbox name=szabadnap[$melyiknap] value='i' class=urlap";
+            $szoveg.= "\n<span class=alap>NÃ©vnap: </span><input type=text name=nevnap[$melyiknap] value='$nevnapdatumT[$melyiknap]' class=urlap size=40><br><span class=alap>Ãœnnep: </span><input type=text name=unnepnap[$melyiknap] value='$unnepdatumT[$melyiknap]' class=urlap size=40><input type=checkbox name=szabadnap[$melyiknap] value='i' class=urlap";
 			if($szabadnapT[$melyiknap]=='i') $szoveg.=' checked';
 			$szoveg.="><span class=alap>szabadnap</span><br><span class=alap>Miseinfo: </span><input type=text name=miseinfo[$melyiknap] value='$miseinfoT[$melyiknap]' class=urlap size=40><select name=mise[$melyiknap] class=urlap><option value='v'";
 			if($miseT[$melyiknap]=='v') $szoveg.=' selected';
 			$szoveg.=">napi miserend</option><option value='u'";
 			if($miseT[$melyiknap]=='u') $szoveg.=' selected';
-			$szoveg.=">vasárnapi miserend</option><option value='n'";
+			$szoveg.=">vasÃ¡rnapi miserend</option><option value='n'";
 			if($miseT[$melyiknap]=='n') $szoveg.=' selected';
 			$szoveg.=">nincs mise</option></select>";
 			if(!empty($nevnapdatumT[$melyiknap])) $szoveg.="<input type=hidden name='vannevnap[$melyiknap]' value=1>";
@@ -150,7 +150,7 @@ function nevnaptar_index($honap,$ev) {
             $kiirando += EGYNAP;
             $napszamlalo++;
             
-            //Ellenõrizzük, hogy az óraállításoknál ne legyen kétszer ugyanaz a nap!
+            //EllenÅ‘rizzÃ¼k, hogy az Ã³raÃ¡llÃ­tÃ¡soknÃ¡l ne legyen kÃ©tszer ugyanaz a nap!
             $ujnaptomb=getdate($kiirando);
             if($ujnaptomb[mday]==$napTomb[mday]) $kiirando += EGYNAP;
 
@@ -168,12 +168,12 @@ function nevnaptar_index($honap,$ev) {
 		$kovev=$ev+1;
 	}
 
-	$szoveg.="<div align=left><a href=?m_id=$m_id&ev=$kovev&honap=$kovhonap$linkveg class=link>Következõ hónap</a></div";
+	$szoveg.="<div align=left><a href=?m_id=$m_id&ev=$kovev&honap=$kovhonap$linkveg class=link>KÃ¶vetkezÅ‘ hÃ³nap</a></div";
 	
 	$tartalom=$szoveg;
 
 
-	$adatT[2]="<span class=alcim>Eseménynaptár</span><br><br>".$tartalom;
+	$adatT[2]="<span class=alcim>EsemÃ©nynaptÃ¡r</span><br><br>".$tartalom;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);	
 
@@ -240,7 +240,7 @@ function nevnaptar_adding() {
 
 
 if(strstr($u_jogok,'nevnaptar')) {
-	//Csak, ha van jogosultsága!
+	//Csak, ha van jogosultsÃ¡ga!
 
 switch($m_op) {
     case 'index':
@@ -258,7 +258,7 @@ switch($m_op) {
 }
 }
 else {
-	$tartalom='<span class=hiba>HIBA! Nincs hozzá jogosultságod!</span>';
+	$tartalom='<span class=hiba>HIBA! Nincs hozzÃ¡ jogosultsÃ¡god!</span>';
 }
 
 ?>

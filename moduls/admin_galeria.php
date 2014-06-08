@@ -3,10 +3,10 @@
 function galeria_index() {
 	global $linkveg,$m_id;
 
-	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Új galéria - hozzáadás</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>Meglévõ módosítása, törlése</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Ãšj galÃ©ria - hozzÃ¡adÃ¡s</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>MeglÃ©vÅ‘ mÃ³dosÃ­tÃ¡sa, tÃ¶rlÃ©se</a><br>";
 
-	$adatT[2]="<span class=alcim>Galéria szerkesztése</span><br><br>".$menu;
+	$adatT[2]="<span class=alcim>GalÃ©ria szerkesztÃ©se</span><br><br>".$menu;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -30,31 +30,31 @@ function galeria_add($gid) {
 	
 	$urlap.='<table width=100%><tr><td valign=top width=50%>';
 
-	$urlap.="\n<span class=kiscim>Cím: </span><br><input type=text name=cim value='$cim' class=urlap size=60 maxlength=100>";
-	$urlap.="\n<br><br><span class=kiscim>Dátum</span><span class=alap> (egyben amikortól megjelenik):</span><br><input type=text name=datum class=urlap maxlength=10 value='$datum' size=10> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
-	if($ok=='n') $urlap.="<img src=img/tilos.gif title='jelenleg nem engedélyezett'> ";
+	$urlap.="\n<span class=kiscim>CÃ­m: </span><br><input type=text name=cim value='$cim' class=urlap size=60 maxlength=100>";
+	$urlap.="\n<br><br><span class=kiscim>DÃ¡tum</span><span class=alap> (egyben amikortÃ³l megjelenik):</span><br><input type=text name=datum class=urlap maxlength=10 value='$datum' size=10> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
+	if($ok=='n') $urlap.="<img src=img/tilos.gif title='jelenleg nem engedÃ©lyezett'> ";
 	$urlap.="<input type=checkbox name=ok value=i ";
 	if($ok!='n') $urlap.=' checked';
-	$urlap.="> <span class=alap>engedélyezés</span>";
-	$urlap.="\n<br><br><span class=kiscim>Bevezetõ szöveg: </span><br><textarea name=intro class=urlap cols=60 rows=20>$intro</textarea>";
+	$urlap.="> <span class=alap>engedÃ©lyezÃ©s</span>";
+	$urlap.="\n<br><br><span class=kiscim>BevezetÅ‘ szÃ¶veg: </span><br><textarea name=intro class=urlap cols=60 rows=20>$intro</textarea>";
 	
 	$urlap.='</td><td width=50% valign=top>';
 
-	$urlap.="\n<span class=kiscim>Képek: </span><br><input type=file name=kepT[] size=50 class=urlap>";
+	$urlap.="\n<span class=kiscim>KÃ©pek: </span><br><input type=file name=kepT[] size=50 class=urlap>";
 	$urlap.='<br><br><input type=file name=kepT[] size=50 class=urlap><br><br><input type=file name=kepT[] size=50 class=urlap><br><br><input type=file name=kepT[] size=50 class=urlap><br><br><input type=file name=kepT[] size=50 class=urlap>';
 
 	$urlap.="\n<br><br><input type=submit value=Mehet class=urlap>";
 
 //Log
 	if(!empty($log)) {
-		$urlap.="\n<br><br><span class=kiscim>történet:</span><br><textarea cols=40 rows=8 disabled>Számláló: $szamlalo\n$log</textarea>";
+		$urlap.="\n<br><br><span class=kiscim>tÃ¶rtÃ©net:</span><br><textarea cols=40 rows=8 disabled>SzÃ¡mlÃ¡lÃ³: $szamlalo\n$log</textarea>";
 	}
 
 
 
-	$urlap.='</td></tr></table></form><hr><span class=alcim>Képcímek és sorbarendezés beállítása</span><hr><table width=100%><tr>';
+	$urlap.='</td></tr></table></form><hr><span class=alcim>KÃ©pcÃ­mek Ã©s sorbarendezÃ©s beÃ¡llÃ­tÃ¡sa</span><hr><table width=100%><tr>';
 
-	//Képcímek lekérdezése
+	//KÃ©pcÃ­mek lekÃ©rdezÃ©se
 	if($gid>0) {
 		$query="select cim,fajlnev,sorszam from g_kepcimek where gid='$gid' order by sorszam";
 		if(!$lekerdez=mysql_db_query($db_name,$query)) echo "HIBA!<br>".mysql_error();
@@ -67,18 +67,18 @@ function galeria_add($gid) {
 
 			if($a%3==0 and $a>0) $urlap.='</tr><tr><td colspan=3><hr></td></tr><tr>';
 			$a++;
-			$urlap.="<td valign=bottom><input type=text name='sorszamT[$kfnev]' value='$sszT[$kfnev]' size=2 maxlength=2 class=urlap> <img src=$konyvtar/$kfnev><input type=checkbox class=urlap name=delkepT[] value='$kfnev'><img src=img/del.jpg title=töröl>";
+			$urlap.="<td valign=bottom><input type=text name='sorszamT[$kfnev]' value='$sszT[$kfnev]' size=2 maxlength=2 class=urlap> <img src=$konyvtar/$kfnev><input type=checkbox class=urlap name=delkepT[] value='$kfnev'><img src=img/del.jpg title=tÃ¶rÃ¶l>";
 			$urlap.="<br><input type=text name=altT[$kfnev] value='$altT[$kfnev]' class=urlap size=35>";					
-			if($a%6==0) $urlap.="<input type=submit value=Módosít class=urlap>";
+			if($a%6==0) $urlap.="<input type=submit value=MÃ³dosÃ­t class=urlap>";
 			$urlap.="</td>";
 
 		}
-		$urlap.="</tr><td colspan=3><input type=submit value=Módosít class=urlap></td></form>";
+		$urlap.="</tr><td colspan=3><input type=submit value=MÃ³dosÃ­t class=urlap></td></form>";
 		
 	}
 	$urlap.='</tr></table>';
 
-	$adatT[2]="<span class=alcim>Galéria szerkesztése</span><br><br>".$urlap;
+	$adatT[2]="<span class=alcim>GalÃ©ria szerkesztÃ©se</span><br><br>".$urlap;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -107,22 +107,22 @@ function galeria_kepcimadding() {
 		}
 	}
 
-//kijelölt képek törlése
+//kijelÃ¶lt kÃ©pek tÃ¶rlÃ©se
 	$konyvtar="kepek/galeria/$gid";
 	$delkepT=$_POST['delkepT'];
 	if(is_array($delkepT)) {
 		foreach($delkepT as $delkep) {
 			unlink("$konyvtar/$delkep");
 			unlink("$konyvtar/kicsi/$delkep");
-			//adatbázisból is!
+			//adatbÃ¡zisbÃ³l is!
 			mysql_db_query($db_name,"delete from g_kepcimek where gid='$gid' and fajlnev='$delkep'");
 		}
 	}
 
-//log bejegyzés
+//log bejegyzÃ©s
 	$most=date('Y-m-d H:i:s');
 	list($log)=mysql_fetch_row(mysql_db_query($db_name,"select log from galeria where id='$gid'"));
-	$ujlog=$log."\n->képMod: $u_login ($most)";
+	$ujlog=$log."\n->kÃ©pMod: $u_login ($most)";
 	$query="update galeria set log='$ujlog' where id='$gid'";
 	mysql_db_query($db_name,$query);
 
@@ -163,21 +163,21 @@ function galeria_adding() {
 
 	$konyvtar="kepek/galeria/$gid";
 
-//képek feltöltése
+//kÃ©pek feltÃ¶ltÃ©se
 	$kepT=$_FILES['kepT']['tmp_name'];
 	$kepnevT=$_FILES['kepT']['name'];
 
 	if(is_array($kepT)) {
 		foreach($kepT as $id=>$kep) {
 			if(!empty($kep)) {			
-				//Könyvtár ellenõrzése
+				//KÃ¶nyvtÃ¡r ellenÅ‘rzÃ©se
 				if(!is_dir("$konyvtar")) {
-					//létre kell hozni
+					//lÃ©tre kell hozni
 					if(!mkdir("$konyvtar",0775)) {
-						echo '<p class=hiba>HIBA a könyvtár létrehozásánál!</p>';					
+						echo '<p class=hiba>HIBA a kÃ¶nyvtÃ¡r lÃ©trehozÃ¡sÃ¡nÃ¡l!</p>';					
 					}
 					if(!mkdir("$konyvtar/kicsi",0775)) {
-						echo '<p class=hiba>HIBA a könyvtár létrehozásánál!</p>';					
+						echo '<p class=hiba>HIBA a kÃ¶nyvtÃ¡r lÃ©trehozÃ¡sÃ¡nÃ¡l!</p>';					
 					}
 				}
 
@@ -185,9 +185,9 @@ function galeria_adding() {
 				$kimenet1="$konyvtar/kicsi/$kepnevT[$id]";
 	
 				if ( !copy($kep, "$kimenet") )
-					print("HIBA a másolásnál ($kimenet)!<br>\n");
+					print("HIBA a mÃ¡solÃ¡snÃ¡l ($kimenet)!<br>\n");
 				else  {
-					//Bejegyzés az adatbázisba
+					//BejegyzÃ©s az adatbÃ¡zisba
 					if(!mysql_db_query($db_name,"insert g_kepcimek set gid='$gid', fajlnev='$kepnevT[$id]'")) echo 'HIBA!<br>'.mysql_error();
 				}
 				
@@ -211,16 +211,16 @@ function galeria_adding() {
 function galeria_mod() {
 	global $db_name,$linkveg,$m_id;
 
-	$kiir.="<span class=kiscim>Válassz az alábbi galériák közül:</span><br><br>";
+	$kiir.="<span class=kiscim>VÃ¡lassz az alÃ¡bbi galÃ©riÃ¡k kÃ¶zÃ¼l:</span><br><br>";
 
 	$query="select id,cim,datum,ok from galeria order by datum desc";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($gid,$cim,$datum,$ok)=mysql_fetch_row($lekerdez)) {
-		if($ok!='i') $kiir.="<img src=img/tilos.gif align=absmiddle title='nem engedélyezett'>";
-		$kiir.="\n<a href=?m_id=$m_id&m_op=add&gid=$gid$linkveg class=link><b> - $cim</b> ($datum)</a> - <a href=?m_id=$m_id&m_op=del&gid=$gid$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
+		if($ok!='i') $kiir.="<img src=img/tilos.gif align=absmiddle title='nem engedÃ©lyezett'>";
+		$kiir.="\n<a href=?m_id=$m_id&m_op=add&gid=$gid$linkveg class=link><b> - $cim</b> ($datum)</a> - <a href=?m_id=$m_id&m_op=del&gid=$gid$linkveg class=link><img src=img/del.jpg border=0 alt=TÃ¶rÃ¶l align=absmiddle> tÃ¶rÃ¶l</a><br>";
 	}
 
-	$adatT[2]="<span class=alcim>Galéria szerkesztése - módosítás</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>GalÃ©ria szerkesztÃ©se - mÃ³dosÃ­tÃ¡s</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -234,7 +234,7 @@ function galeria_del() {
 
 	$gid=$_GET['gid'];
 
-	$kiir="\n<span class=kiscim>Biztosan törölni akarod a következõ galériát?</span>";
+	$kiir="\n<span class=kiscim>Biztosan tÃ¶rÃ¶lni akarod a kÃ¶vetkezÅ‘ galÃ©riÃ¡t?</span>";
 	
 	$query="select cim,datum from galeria where id='$gid'";
 	list($cim,$datum)=mysql_fetch_row(mysql_db_query($db_name,$query));
@@ -243,7 +243,7 @@ function galeria_del() {
 
 	$kiir.="<br><br><a href=?m_id=$m_id&m_op=delete&gid=$gid$linkveg class=link>Igen</a> - <a href=?m_id=$m_id&m_op=mod$linkveg class=link>NEM</a>";
 
-	$adatT[2]="<span class=alcim>Galéria szerkesztése - törlés</span><br><br>".$kiir;
+	$adatT[2]="<span class=alcim>GalÃ©ria szerkesztÃ©se - tÃ¶rlÃ©s</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
@@ -259,11 +259,11 @@ function galeria_delete() {
 	$query="delete from galeria where id='$id'";
 	mysql_db_query($db_name,$query);
 
-//képcímek törlése
+//kÃ©pcÃ­mek tÃ¶rlÃ©se
 	$query="delete from g_kepcimek where gid='$id'";
 	mysql_db_query($db_name,$query);
 
-//képek törlése
+//kÃ©pek tÃ¶rlÃ©se
 		$konyvtar="kepek/galeria/$id";
 		if(is_dir($konyvtar)) {
 			$handle=opendir($konyvtar);
@@ -281,7 +281,7 @@ function galeria_delete() {
 	return $kod;
 }
 
-//Jogosultság ellenõrzése
+//JogosultsÃ¡g ellenÅ‘rzÃ©se
 if(strstr($u_jogok,'galeria')) {
 
 switch($m_op) {
@@ -316,6 +316,6 @@ switch($m_op) {
 }
 }
 else {
-	$tartalom="\n<span class=hiba>HIBA! Nincs hozzá jogosultságod!</span>";
+	$tartalom="\n<span class=hiba>HIBA! Nincs hozzÃ¡ jogosultsÃ¡god!</span>";
 }
 ?>

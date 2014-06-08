@@ -5,9 +5,9 @@ function archivum_balmenu() {
 
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	
-	$kod_cim="<a href=?m_id=1&m_op=kereso$linkveg class=kiscimlink>Archívum</a>";
+	$kod_cim="<a href=?m_id=1&m_op=kereso$linkveg class=kiscimlink>ArchÃ­vum</a>";
 
 
 	$ma=date('Y-m-d');
@@ -16,14 +16,14 @@ function archivum_balmenu() {
 	$tegnapido=$now-$egynap;
 	$tegnap=date('Y-m-d',$tegnapido);
 	$adatT[2] = "<form method=post><input type=hidden name=m_id value=1><input type=hidden name=m_op value=archivlista>";
-	$adatT[2].= "\n<select name=datum class=urlap><option value=$ma>mai hírek</option><option value=$tegnap>tegnap</option>";
+	$adatT[2].= "\n<select name=datum class=urlap><option value=$ma>mai hÃ­rek</option><option value=$tegnap>tegnap</option>";
 
 	$min=$tegnapido-(10*$egynap);
 	for($i=$tegnapido-$egynap; $i>$min; $i=$i-$egynap) {
 		$datum=date('Y-m-d',$i);
 		$adatT[2].="\n<option value=$datum>$datum</option>";
 	}
-	$adatT[2].="\n<option value=0>Teljes archívum</option>";
+	$adatT[2].="\n<option value=0>Teljes archÃ­vum</option>";
 	$adatT[2].="\n</select><input type=submit value=Lista class=urlap></form>";
 
 	$tipus='balmenutartalomgaleria1';
@@ -42,13 +42,13 @@ function archivum_jobbmenu() {
 
 	if(!isset($design)) $design='alap';
 	
-	//Tartalom létrehozása
+	//Tartalom lÃ©trehozÃ¡sa
 	
-	$adatT[0]='Galéria';
+	$adatT[0]='GalÃ©ria';
 	$tipus='jobbmenucim';
 	$kod_cim=formazo($adatT,$tipus);
 
-	$adatT[0] = 'cím';
+	$adatT[0] = 'cÃ­m';
 	$adatT[1] = 'link';
 	$tipus='jobbmenutartalomcikk';
 	$kod_tartalom.=formazo($adatT,$tipus);

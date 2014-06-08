@@ -9,7 +9,7 @@ function admin_balmenu() {
 	}
 	if(is_array($jogellT)) $jogell=' and ('.implode(' or ',$jogellT).')';
 
-	//Tartalom lÈtrehoz·sa
+	//Tartalom l√©trehoz√°sa
 	$query="select id,mid,nev from adminmenu where ok='i' and fm='0' $jogell order by sorszam";
 	$lekerdez=mysql_db_query($db_name,$query);
 	while(list($aid,$mid,$mcim)=mysql_fetch_row($lekerdez)) {
@@ -24,8 +24,8 @@ function admin_balmenu() {
 		$kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
 	}
 
-	//Tartalom lÈtrehoz·sa
-	$kod_cim="<span class=admincimlink>Adminisztr·ciÛ</span>";
+	//Tartalom l√©trehoz√°sa
+	$kod_cim="<span class=admincimlink>Adminisztr√°ci√≥</span>";
 
 	$kodT[0]=$kod_cim;
 	$kodT[1]=$kod_tartalom;

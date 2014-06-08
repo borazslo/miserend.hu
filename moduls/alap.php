@@ -21,7 +21,7 @@ function alap_index() {
 
 
 	if(strstr($leiras,'!*!=')) {
-		//ugratni kell a megfelelõ oldalra
+		//ugratni kell a megfelelÅ‘ oldalra
 		$link=strip_tags($leiras);
 		$link=str_replace('!*!=','',$link);
 		$link=str_replace('&amp;','&',$link);
@@ -31,8 +31,8 @@ function alap_index() {
     $tartalomkod="<p class=alcim>$cim</p>";
 	$tartalomkod.="<p class=alap>$leiras</p>";
 
-	//Letölthetõ fájlok:
-	//Könyvtár tartalmát beolvassa
+	//LetÃ¶lthetÅ‘ fÃ¡jlok:
+	//KÃ¶nyvtÃ¡r tartalmÃ¡t beolvassa
 	$konyvtar="fajlok/info/$fm";
 	if(is_dir($konyvtar)) {
 		$handle=opendir($konyvtar);
@@ -62,7 +62,7 @@ function alap_index() {
 		closedir($handle);
 	}
 	if(!empty($letoltes)) {
-		$tartalomkod.="<hr><span class=kiscim>Letölthetõ anyagok:</span>$letoltes";
+		$tartalomkod.="<hr><span class=kiscim>LetÃ¶lthetÅ‘ anyagok:</span>$letoltes";
 	}
 
 	$adatT[2]=$tartalomkod;
