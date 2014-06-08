@@ -9,7 +9,7 @@ $config['connection'] = array(
         'user' => '***',
         'password' => '***',
         'database' => 'vpa_portal',
-        'prefix' => '', /* MÈg nem m˚kˆdik */
+        'prefix' => '', /* M√©g nem m≈±k√∂dik */
     );
 
 
@@ -28,18 +28,18 @@ function dbconnect() {
     if(!@mysql_connect($db_host, $db_uname, $db_upass)) {
     
         $hiba=true;
-        $hibauzenet.='ElnÈzÈst kÈr¸nk, a szolg·ltat·s jelenleg nem Èrhetı el.';
+        $hibauzenet.='Eln√©z√©st k√©r√ºnk, a szolg√°ltat√°s jelenleg nem √©rhet≈ë el.';
         $idopont=date('Y.m.d. H:i.s');
-        $hibauzenet_prog.="Adatb·zisszerverhez nem lehet csatlakozni!\n".mysql_error()."\n$idopont";
+        $hibauzenet_prog.="Adatb√°zisszerverhez nem lehet csatlakozni!\n".mysql_error()."\n$idopont";
     }
     
-    mysql_query("SET NAMES latin2");
+    mysql_query("SET NAMES UTF8");
     
     if(!mysql_select_db($db_name)) {
         $hiba=true;
-        $hibauzenet.='ElnÈzÈst kÈr¸nk, a szolg·ltat·s jelenleg nem Èrhetı el.';
+        $hibauzenet.='Eln√©z√©st k√©r√ºnk, a szolg√°ltat√°s jelenleg nem √©rhet≈ë el.';
         $idopont=date('Y.m.d. H:i.s');
-        $hibauzenet_prog.="Az '".$db_name."' adatb·zis nem lÈtezik, vagy nincs megfelelı jogosults·g elÈrni azt!\n".mysql_error()."\n$idopont";
+        $hibauzenet_prog.="Az '".$db_name."' adatb√°zis nem l√©tezik, vagy nincs megfelel≈ë jogosults√°g el√©rni azt!\n".mysql_error()."\n$idopont";
     }
 }
 

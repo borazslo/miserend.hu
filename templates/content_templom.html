@@ -1,0 +1,174 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td colspan="3">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#D0D6E4">
+        <tr>
+          <td width="10"><img src="img/space.gif" width="10" height="10"></td>
+          <td> 
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><img src="{{ design_url }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"> 
+                  <img src="img/space.gif" width="5" height="5"><span class="dobozfocim_fekete">{{ nev|raw }}</span></td>
+                <td>
+                  <div align="right"><span class="dobozfocim_fekete"><img src="{{ design_url }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle"></span></div>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td width="10"><img src="img/space.gif" width="10" height="10"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr> 
+    <td colspan="3" height="5"><img src="img/space.gif" width="10" height="5"></td>
+  </tr>
+  <tr> 
+    <td width="49%" valign="top">{{ ismertnev|raw }}
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" id="szentmisek">
+        <tr> 
+          <td bgcolor="#B51A7E" width="5"><img src="img/space.gif" width="5" height="5"></td>
+          <td bgcolor="#B51A7E" colspan="7"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_feher">Szentmisék 
+            rendje </span></td>
+          <td width="8" bgcolor="#B51A7E"><img src="img/space.gif" width="5" height="5"></td>
+        </tr>
+        <tr> 
+          <td width="5"></td>
+          <td>{{ frissites|raw }}</td>
+          <td class="alap" colspan="3">{{ nyari|raw }}</td>
+		  <td class="alap" colspan="3">{{ teli|raw }}</td>
+          <td width="5"></td>
+        </tr>
+		<tr> 
+          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+        </tr>
+		<tr> 
+           <td bgcolor="#E5EAEF" colspan="9" height=1><img src="img/space.gif" width="5" height="1"></td>
+        </tr>
+		<tr> 
+          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+        </tr>
+        {% for i in 1..7 %}
+        <tr> 
+          <td width="5"></td>
+          <td class="alap" valign="top" width="75">{{ napok[i]|raw  }}</td>
+          <td class="alap" valign="top" align="right" width="40%">{{ napokT[i]|raw }}</td>
+		  <td width="2"><img src=img/space.gif width=2 height=2></td>
+		  <td class="alap" valign="top" width="10%">{{ ikonT[i]|raw }}</td>
+		  <td class="alap" valign="top" align="right" width="40%">{{ napokT[i]|raw }}</td>
+		  <td width="2"><img src=img/space.gif width=2 height=2></td>
+		  <td class="alap" valign="top" width="10%">{{ tikonT[i]|raw  }}</td>
+          <td width="5"></td>
+        </tr>
+		<tr> 
+          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+        </tr>
+		<tr> 
+           <td bgcolor="#E5EAEF" colspan="9" height=1><img src="img/space.gif" width="5" height="1"></td>
+        </tr>
+		<tr> 
+          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+        </tr>
+       {% endfor %}       
+        <tr> 
+          <td bgcolor="#E5EAEF" colspan="9" height="5"><img src="img/space.gif" width="5" height="5"></td>
+        </tr>
+		<tr>
+		  <td colspan="9"><span class=kicsi><font color=red>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a plébánián!</font></span></td>
+		</tr>
+      </table>
+	  {{ eszrevetel|raw }}
+	  {{ androidreklam|raw }}
+    </td>
+<td width=15><img src=img/space.gif width=15 height=5></td>
+    <td width="49%" valign="top">{{ cim|raw }}{{ terkep|raw }}<br>
+      <img src="img/space.gif" width="5" height="10"><br>
+      {{ megkozelit |raw }}
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr bgcolor="#EAEDF1"> 
+          <td bgcolor="#244C8F" width="5"><img src="img/space.gif" width="5" height="5"></td>
+          <td bgcolor="#244C8F"><img src="{{ design_url }}/img/negyzet_feher.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_feher">Kapcsolat 
+            - elérhetőség</span></td>
+          <td width="5" bgcolor="#244C8F"><img src="img/space.gif" width="5" height="5"></td>
+        </tr>
+        <tr bgcolor="#F8F4F6"> 
+          <td width="5" bgcolor="#EAEDF1"></td>
+          <td bgcolor="#EAEDF1" class="alap">{{ kapcsolat|raw }}</td>
+          <td width="5" bgcolor="#EAEDF1"></td>
+        </tr>
+      </table>
+	  {{ misemegjegyzes|raw }}
+      <img src="img/space.gif" width="5" height="10"><br>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr bgcolor="#EAEDF1"> 
+          <td bgcolor="#F8F4F6" width="5"><img src="img/space.gif" width="5" height="5"></td>
+          <td bgcolor="#F8F4F6">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><img src="{{ design_url }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Szomszédos 
+                  templomok </span></td>
+                <td>
+                  <div align="right"><img src="{{ design_url }}/img/lilapontok_lila.jpg" width="43" height="6"></div>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td width="5" bgcolor="#F8F4F6"><img src="img/space.gif" width="5" height="5"></td>
+        </tr>
+      </table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr bgcolor="#FFFFFF"> 
+		<td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
+          <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
+          <td bgcolor="#FFFFFF"><b><span class="alap"><i>Legközelebbi:</i></span></b><br>
+            {{ sz1|raw }}<br>
+            <b><span class="alap"><i>10 km-en belül:</i></span></b><br>
+            {{ sz2 |raw }}</td>
+          <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
+          <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
+        </tr>
+		<tr>
+		<td colspan="5" bgcolor="#EAEDF1" height="1"><img src=img/space.gif width="5" height="1"></td>
+		</tr>
+</table>
+	
+    </td>
+  </tr>
+  <tr> 
+    <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
+  </tr>
+  <tr> 
+    <td colspan="3">{{ kepek|raw }}</td>
+  </tr>
+  <tr> 
+    <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
+  </tr>
+  <tr>
+    <td colspan="3">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr bgcolor="#EAEDF1"> 
+          <td bgcolor="#D0D6E4" width="5"><img src="img/space.gif" width="5" height="5"></td>
+          <td bgcolor="#D0D6E4">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><img src="{{ design_url }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_fekete">Bemutatkozás</span></td>
+                <td>
+                  <div align="right"><span class="dobozfocim_fekete"><img src="{{ design_url }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle"></span></div>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td width="5" bgcolor="#D0D6E4"><img src="img/space.gif" width="5" height="5"></td>
+        </tr>
+        <tr bgcolor="#F8F4F6"> 
+          <td width="5" bgcolor="#F3F3F5"></td>
+          <td bgcolor="#F3F3F5">
+		  {{ jotudni |raw }}
+		  {{ leiras		|raw }}
+		  </td>
+          <td width="5" bgcolor="#F3F3F5"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>

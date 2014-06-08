@@ -1,10 +1,10 @@
-<?
+ï»¿<?
 
 function loginurlap($belephiba) {
     global $_POST,$design_url,$sid,$linkveg;
 
-	$bal="<span class=alcim>Felhasználói oldal</span>";
-	$bal.="<br><br><span class=alap>Ezen oldal megtekintéséhez kérlek lépj be!<br>Ha még nincs felhasználóneved, <a href=?m_id=28&fm=11$linkveg class=felsomenulink>itt</a> tudsz regisztrálni egyet. </span>";
+	$bal="<span class=alcim>FelhasznÃ¡lÃ³i oldal</span>";
+	$bal.="<br><br><span class=alap>Ezen oldal megtekintÃ©sÃ©hez kÃ©rlek lÃ©pj be!<br>Ha mÃ©g nincs felhasznÃ¡lÃ³neved, <a href=?m_id=28&fm=11$linkveg class=felsomenulink>itt</a> tudsz regisztrÃ¡lni egyet. </span>";
 	
 	$adatT[2]=$bal;
 	$tipus='doboz';
@@ -33,37 +33,37 @@ function keret($helyzet) {
             $blocks[] = array('include'=>$modul_url.'/'.$fajl.'_menu.php','op'=>$helyzet,'mid'=>$mid);
         }
      } else {
-		//Ha a $helyzet=0, akkor admin menü
-        $blocks[] = array('include'=>$modul_url.'/admin_menu.php','op'=>$helyzet,'mid'=>$mid,'bgcolor'=>'#ECE5C8','header'=>array('bgcolor'=>'#F5CC4C'));			
+		//Ha a $helyzet=0, akkor admin menÃ¼
+        //!! FordÃ­toss sorrend!
         $blocks[] = array('include'=>$modul_url.'/chat_menu.php','op'=>$helyzet,'mid'=>$mid,'bgcolor'=>'#ECE5C8','header'=>array('bgcolor'=>'#F5CC4C'));			
+        $blocks[] = array('include'=>$modul_url.'/admin_menu.php','op'=>$helyzet,'mid'=>$mid,'bgcolor'=>'#ECE5C8','header'=>array('bgcolor'=>'#F5CC4C'));			
+        
      }
-     $keret = '';
+     $keret = array();
      foreach($blocks as $block) {
         $op = $block['op'];
         
         if(@include_once($block['include'])) {
             $a=$helyzet;
             if($a>1) $a=0;
-            $hmenuT[1] = iconv('ISO-8859-2','UTF-8',$hmenuT[1]);
-            $variables = array('content'=>$hmenuT[1],'bgcolor' => $tablabgT[$a]);            
+            $vars = array('content'=>$hmenuT[1],'bgcolor' => $tablabgT[$a]);            
             if(!empty($hmenuT[0])) {
-                $hmenuT[0] = iconv('ISO-8859-2','UTF-8',$hmenuT[0]);                
-                $variables['header'] = array('content'=>$hmenuT[0],'bgcolor'=>$fejlecbgT[$a]);
+                $vars['header'] = array('content'=>$hmenuT[0],'bgcolor'=>$fejlecbgT[$a]);
             }
-            // Áthozott értékek betöltése
+            // Ãthozott Ã©rtÃ©kek betÃ¶ltÃ©se
             foreach($block as $key => $value) {
                 if(is_array($value)) {
                     foreach($value as $k => $v)
-                        $variables[$key][$k] = $v; }
-                else  $variables[$key] = $value;
+                        $vars[$key][$k] = $v; }
+                else  $vars[$key] = $value;
             }
             
             $a++;		
 			$hmenuT='';		        
         } else {
-            $variables = array('content'=>"<font color='red' size='-3'>HIBA! file.".$block['include'].". mysql.oldalkeret</font>");
+            $vars = array('content'=>"<font color='red' size='-3'>HIBA! file.".$block['include'].". mysql.oldalkeret</font>");
         }
-        $keret .= "\n".iconv('UTF-8','ISO-8859-2',$twig->render('block.html',$variables));                    
+        $keret[] = $vars;                    
     }    
 	return $keret;
 }
@@ -73,15 +73,17 @@ function formazo($adatT,$tipus) {
 
 	if(!isset($design)) $design='alap';
 
+    if($tipus == 'doboz') return $adatT[2];
+    
 	$cim=$adatT[0];
 	$cimlink=$adatT[1];
 	$tartalom=$adatT[2];
-	$tartalom2=$adatT[3]; //híreknél 2. hasáb
-	$tovabb=$adatT[4]; //híreknél "cikk bõvebben"
-	$tovabblink=$adatT[5]; //általában a $cimlink
+	$tartalom2=$adatT[3]; //hÃ­reknÃ©l 2. hasÃ¡b
+	$tovabb=$adatT[4]; //hÃ­reknÃ©l "cikk bÅ‘vebben"
+	$tovabblink=$adatT[5]; //Ã¡ltalÃ¡ban a $cimlink
 		
     $tmpl_file = $design_url.'/'.$tipus.'.htm';
-
+    echo $tmpl_file;
     $thefile = implode("", file($tmpl_file));
     $thefile = addslashes($thefile);
     $thefile = "\$r_file=\"".$thefile."\";";
@@ -120,23 +122,31 @@ function fomenu($hol) {
 	$query="select id,menucim,domain from fooldal where ok='i' and menucim!='' order by menusorrend";
 	$lekerdez=mysql_query($query);
 	while(list($id,$menucim,$domain)=mysql_fetch_row($lekerdez)) {
-        $menucim = iconv('ISO-8859-2','UTF-8',$menucim);
         $item = array('id'=>$id,'title'=>$menucim,'domain'=>$domain);
 		$item['link'] = "?fooldal_id=$id&sid=$sid";
 		if($id==$fooldal_id) $item['aktiv'] = '1';
         $items[] = $item;		
 	}	 
-    $kod = iconv('UTF-8','ISO-8859-2',$twig->render('menu_main.html',array('items' => $items, 'hol'=>$hol, 'design_url' => $design_url)));
+    $kod = array('items' => $items, 'hol'=>$hol, 'design_url' => $design_url);
     return $kod;
 }
 
-function design() {
+function design(&$vars) {
     global $design_url,$db_name,$tartalom,$m_oldalsablon,$balkeret,$jobbkeret,$onload,$sid,$linkveg,$u_id,$u_login,$u_jogok,$belepve,$loginhiba,$script,$meta,$titlekieg;
 
-     
     global $twig;
+
+    if(!is_array($meta)) $vars['meta'][] = $meta;
+    else $vars['meta'] = $meta;
+
+    if(!is_array($script)) $vars['script'][] = $script;
+    else $vars['script'] = $script;
+    
 	if(!isset($design)) $design='alap';
-    $title='VPP - országos miserend'.$titlekieg;
+    
+    $vars['pagetitle'] = 'VPP - miserend';
+    if(isset($titlekieg)) $vars['pagetitle'] = preg_replace("/^( - )/i","",$titlekieg)." | ".$vars['pagetitle'];
+    
 	$top=alapnyelv('top');
 	
 	$nyelvlinkT=langmenu();
@@ -145,11 +155,11 @@ function design() {
 	$hulink=$nyelvlinkT[2];
 
 	if(!$belepve) {
-		if(empty($onload)) $onload='onload="fokusz();"';
-		else $onload="onload=\"$onload fokusz();\"";
+		if(empty($vars['body']['onload'])) $vars['body']['onload']='onload="fokusz();"';
+		else $vars['body']['onload']="onload=\"".$vars['body']['onload']." fokusz();\"";
 	}
-	elseif(!empty($onload)) {
-		$onload="onload=\"$onload;\"";
+	elseif(!empty($vars['body']['onload'])) {
+		$vars['body']['onload']="onload=\"".$vars['body']['onload'].";\"";
 	}
 
 //Scriptek////////////////////////////////////
@@ -205,9 +215,9 @@ function design() {
 	
 	$script.="\n".'<script language="JavaScript" type="text/javascript">
 	/**
-	* A Google Analytics kimenõ linkjeit követõ funkció.
-	* A függvény argumentuma egy érvényes URL string, és a függvény ezt a stringet használja
-	* az esemény címkéjeként.
+	* A Google Analytics kimenÅ‘ linkjeit kÃ¶vetÅ‘ funkciÃ³.
+	* A fÃ¼ggvÃ©ny argumentuma egy Ã©rvÃ©nyes URL string, Ã©s a fÃ¼ggvÃ©ny ezt a stringet hasznÃ¡lja
+	* az esemÃ©ny cÃ­mkÃ©jekÃ©nt.
 	*/
 	var trackOutboundLink = function(url) {
 	ga(\'send\', \'event\', \'outbound\', \'click\', url, {\'hitCallback\':
@@ -226,10 +236,11 @@ function design() {
 	$impkiir=alapnyelv('Impresszum');
 	$impfm=alapnyelv('impfm');
 	$impresszumlink="<a href=?m_id=17&fm=12$linkveg class=implink>$impkiir</a>";
+    $vars['bottom']['left']['content'] = $impresszumlink."<br/>".$emaillink_lablec;
+    
+	$vars['bottom']['right']['content'] = "<a href=http://www.b-gs.hu class=implink title='BGS artPart' target=_blank>design</a><br><a href=http://www.florka.hu class=implink title='Florka Kft.' target=_blank>programozÃ¡s</a>";
 
-	$keszitok="<a href=http://www.b-gs.hu class=implink title='BGS artPart' target=_blank>design</a><br><a href=http://www.florka.hu class=implink title='Florka Kft.' target=_blank>programozás</a>";
-
-//Névnap
+//NÃ©vnap
 	$ho=date('n');
 	$honap=alapnyelv("ho$ho");
 	$nap=date('j');
@@ -237,13 +248,13 @@ function design() {
 	$napnev=alapnyelv("nap$napszam");
 	$datumkiir="$honap $nap. $napnev";					  
 	
-	//Névnapok
+	//NÃ©vnapok
 	$datumn=date('md');
 	$query="select nevnap from nevnaptar where datum='$datumn'";
 	$lekerdez=mysql_query($query);
 	list($nevnapok)=mysql_fetch_row($lekerdez);
 
-	//Ünnepnapok
+	//Ãœnnepnapok
 	$datumu=date('Y-m-d');
 	$query="select unnep from unnepnaptar where datum='$datumu'";
 	$lekerdez=mysql_query($query);
@@ -252,51 +263,47 @@ function design() {
 	$nevnap="$datumkiir<br>";
 	if(!empty($unnepnapok)) $nevnap.="$unnepnapok, ";
 	$nevnap.=$nevnapok;
-
-//Loginûrlap
+    $vars['nevnap'] = $nevnap;
+    
+//LoginÅ±rlap
 	if($belepve) {
+        $vars['login']['loggedin'] = true;
 		//Ha bent van
-        $u_login = iconv('ISO-8859-2','UTF-8',$u_login);      
-        $loginurlap = iconv('UTF-8','ISO-8859-2',$twig->render('login_loggedin.html',array('linkveg' => $linkveg, 'design_url' => $design_url,'u_login'=>$u_login)));
+        $vars['login']['vars'] = array('linkveg' => $linkveg, 'design_url' => $design_url,'u_login'=>$u_login);
     }
 	else {
-		//Belépés
-        $loginhiba = iconv('ISO-8859-2','UTF-8',$loginhiba);
-        $loginurlap = iconv('UTF-8','ISO-8859-2',$twig->render('login_login.html',array('linkveg' => $linkveg, 'design_url' => $design_url,'login'=>$_POST['login'],'loginhiba'=>$loginhiba,'sid'=>$sid)));
+		//BelÃ©pÃ©s
+        $vars['login']['vars'] = array('linkveg' => $linkveg, 'design_url' => $design_url,'login'=>$_POST['login'],'loginhiba'=>$loginhiba,'sid'=>$sid);       
 	}
 
 
-//Fõmenü
-	$felsomenu=fomenu('felso');
-	$alsomenu=fomenu('also');
+//FÅ‘menÃ¼
+	$vars['mainmenu']['top'] = fomenu('felso');    
+	$vars['mainmenu']['bottom'] = fomenu('also');
 
 
-//Fõhasáb összeállítása
-	$fohasab=$tartalom;
+//FÅ‘hasÃ¡b Ã¶sszeÃ¡llÃ­tÃ¡sa
+    $vars['content'] = $tartalom;
 
-//Adminbal
-	if($belepve and !empty($u_jogok)) $adminbal=keret(0);
+//jobbkeret Ã¶sszeÃ¡llÃ­tÃ¡sa
+	$vars['sidebar']['right']['blocks'] = keret(2);
 
-//jobbkeret összeállítása
-	$jobbhasab=keret(2);
-
-//Balkeret összeállítása
-	$balhasab=$adminbal.keret(1);
-
-
-    if(empty($m_oldalsablon)) {
-		$m_oldalsablon='alap';
+//Balkeret Ã¶sszeÃ¡llÃ­tÃ¡sa
+	$vars['sidebar']['left']['blocks'] = keret(1);
+//Adminbal    
+    if($belepve and !empty($u_jogok)) {
+        foreach(keret(0) as $block)
+            array_unshift($vars['sidebar']['left']['blocks'],$block);
     }
-	$sablon="sablon_$m_oldalsablon.htm";
 
-	$tmpl_file = $design_url.'/'.$sablon;
+    $sablon = "page";
+    if($m_oldalsablon == 'aloldal') $sablon .= '_subadminpage';
+    elseif(!empty($m_oldalsablon) AND $m_oldalsablon != 'alap') $sablon .= '_'.$m_oldalsablon;
 
-    $thefile = implode("", file($tmpl_file));
-    $thefile = addslashes($thefile);
-    $thefile = "\$r_file=\"".$thefile."\";";
-    eval($thefile);
-    
-    return $html_kod = $r_file;
+    return $twig->render($sablon.'.html',$vars);
+
+
+	
 }
 
 

@@ -4,55 +4,55 @@ function alapnyelv($txt) {
    switch($txt) {
 
 
-//Általános
-    case 'title' : $tmp = 'MKR - Magyar Katolikus Rádió'; break;
-    case "További információk:":  $tmp = ""; break;
+//ÃltalÃ¡nos
+    case 'title' : $tmp = 'MKR - Magyar Katolikus RÃ¡diÃ³'; break;
+    case "TovÃ¡bbi informÃ¡ciÃ³k:":  $tmp = ""; break;
     case "Mehet":  $tmp = ""; break;
-    case "Letöltés":  $tmp = ""; break;
+    case "LetÃ¶ltÃ©s":  $tmp = ""; break;
 
-//Fõmenü  (adatbázis alapján)
-    case "igenaptár":  $tmp = "Ige- és liturgikus naptár"; break;
-    case "visszajelzés":  $tmp = "Visszajelzés"; break;
-    case "fõoldal":  $tmp = "Home"; break;
-    case "magunkról":  $tmp = "About us"; break;
-    case "mûsoraink":  $tmp = "Mûsoraink"; break;
-    case "rádiómûsor":  $tmp = "Rádiómûsor"; break;
-    case "hallgatás":  $tmp = "Hallgatás"; break;
-    case "hírek":  $tmp = "News"; break;
-    case "hírlevél":  $tmp = "Newsletter"; break;
+//FÅ‘menÃ¼  (adatbÃ¡zis alapjÃ¡n)
+    case "igenaptÃ¡r":  $tmp = "Ige- Ã©s liturgikus naptÃ¡r"; break;
+    case "visszajelzÃ©s":  $tmp = "VisszajelzÃ©s"; break;
+    case "fÅ‘oldal":  $tmp = "Home"; break;
+    case "magunkrÃ³l":  $tmp = "About us"; break;
+    case "mÅ±soraink":  $tmp = "MÅ±soraink"; break;
+    case "rÃ¡diÃ³mÅ±sor":  $tmp = "RÃ¡diÃ³mÅ±sor"; break;
+    case "hallgatÃ¡s":  $tmp = "HallgatÃ¡s"; break;
+    case "hÃ­rek":  $tmp = "News"; break;
+    case "hÃ­rlevÃ©l":  $tmp = "Newsletter"; break;
 
-//Modulok menüpontjai
-  //     #29 Imalánc
-    case "imalánc információk":  $tmp = ""; break;
-    case "püspöki köszöntõ":  $tmp = ""; break;
-    case "a kezdeményezésrõl":  $tmp = ""; break;
-    case "hogyan épül fel?":  $tmp = ""; break;
-    case "az imádság formája":  $tmp = ""; break;
-    case "felajánló ima":  $tmp = ""; break;
+//Modulok menÃ¼pontjai
+  //     #29 ImalÃ¡nc
+    case "imalÃ¡nc informÃ¡ciÃ³k":  $tmp = ""; break;
+    case "pÃ¼spÃ¶ki kÃ¶szÃ¶ntÅ‘":  $tmp = ""; break;
+    case "a kezdemÃ©nyezÃ©srÅ‘l":  $tmp = ""; break;
+    case "hogyan Ã©pÃ¼l fel?":  $tmp = ""; break;
+    case "az imÃ¡dsÃ¡g formÃ¡ja":  $tmp = ""; break;
+    case "felajÃ¡nlÃ³ ima":  $tmp = ""; break;
 
-  //     #35 Letöltés (Zarándok-imalánc)
-    case "letölthetõ anyagok":  $tmp = ""; break;
-    case "imalánc-szórólapok":  $tmp = ""; break;
-    case "imalánc-körlevél":  $tmp = ""; break;
+  //     #35 LetÃ¶ltÃ©s (ZarÃ¡ndok-imalÃ¡nc)
+    case "letÃ¶lthetÅ‘ anyagok":  $tmp = ""; break;
+    case "imalÃ¡nc-szÃ³rÃ³lapok":  $tmp = ""; break;
+    case "imalÃ¡nc-kÃ¶rlevÃ©l":  $tmp = ""; break;
 
-  //     #27 zarándok
-    case "zarándok oldal":  $tmp = ""; break;
-    case "bemutatkozás":  $tmp = ""; break;
+  //     #27 zarÃ¡ndok
+    case "zarÃ¡ndok oldal":  $tmp = ""; break;
+    case "bemutatkozÃ¡s":  $tmp = ""; break;
     case "kegyhelyek":  $tmp = ""; break;
-    case "üzenetek":  $tmp = ""; break;
-    case "engesztelés":  $tmp = ""; break;
+    case "Ã¼zenetek":  $tmp = ""; break;
+    case "engesztelÃ©s":  $tmp = ""; break;
 
-  //     #32 testvéroldalak
-    case "testvéroldalak":  $tmp = ""; break;
+  //     #32 testvÃ©roldalak
+    case "testvÃ©roldalak":  $tmp = ""; break;
     case "KeKT":  $tmp = ""; break;
-    case "Zarándok":  $tmp = ""; break;
+    case "ZarÃ¡ndok":  $tmp = ""; break;
     case "imperfectum":  $tmp = ""; break;
-    case "Virtuális Plébánia":  $tmp = ""; break;
+    case "VirtuÃ¡lis PlÃ©bÃ¡nia":  $tmp = ""; break;
     
-  //     #36 imádkozók
-    case "imádkozók":  $tmp = ""; break;
-    case "közösségek":  $tmp = ""; break;
-    case "vélemények":  $tmp = ""; break;
+  //     #36 imÃ¡dkozÃ³k
+    case "imÃ¡dkozÃ³k":  $tmp = ""; break;
+    case "kÃ¶zÃ¶ssÃ©gek":  $tmp = ""; break;
+    case "vÃ©lemÃ©nyek":  $tmp = ""; break;
 
   //     #
     case "":  $tmp = ""; break;
@@ -75,75 +75,75 @@ function alapnyelv($txt) {
 //Nyelvek
     case "hu":  $tmp = "magyar"; break;
     case "en":  $tmp = "angol"; break;
-    case "de":  $tmp = "német"; break;
+    case "de":  $tmp = "nÃ©met"; break;
     case "fr":  $tmp = "francia"; break;
     case "it":  $tmp = "olasz"; break;
     case "cz":  $tmp = "cseh"; break;
-    case "sk":  $tmp = "szlovák"; break;
-    case "si":  $tmp = "szlovén"; break;
-    case "hr":  $tmp = "horvát"; break;
+    case "sk":  $tmp = "szlovÃ¡k"; break;
+    case "si":  $tmp = "szlovÃ©n"; break;
+    case "hr":  $tmp = "horvÃ¡t"; break;
     case "pl":  $tmp = "lengyel"; break;
     case "ba":  $tmp = "szerb"; break;
 
-//Országok
+//OrszÃ¡gok
     case "Ausztria":  $tmp = ""; break;
     case "Belgium":  $tmp = ""; break;
-    case "Bulgária":  $tmp = ""; break;
+    case "BulgÃ¡ria":  $tmp = ""; break;
     case "Ciprus":  $tmp = ""; break;
-    case "Cseh Köztársaság":  $tmp = ""; break;
-    case "Dánia":  $tmp = ""; break;
-    case "Észtország":  $tmp = ""; break;
-    case "Finnország":  $tmp = ""; break;
-    case "Franciaország":  $tmp = ""; break;
-    case "Németország":  $tmp = ""; break;
-    case "Görögország":  $tmp = ""; break;
-    case "Magyarország":  $tmp = ""; break;
-    case "Olaszország":  $tmp = ""; break;
-    case "Írország":  $tmp = ""; break;
+    case "Cseh KÃ¶ztÃ¡rsasÃ¡g":  $tmp = ""; break;
+    case "DÃ¡nia":  $tmp = ""; break;
+    case "Ã‰sztorszÃ¡g":  $tmp = ""; break;
+    case "FinnorszÃ¡g":  $tmp = ""; break;
+    case "FranciaorszÃ¡g":  $tmp = ""; break;
+    case "NÃ©metorszÃ¡g":  $tmp = ""; break;
+    case "GÃ¶rÃ¶gorszÃ¡g":  $tmp = ""; break;
+    case "MagyarorszÃ¡g":  $tmp = ""; break;
+    case "OlaszorszÃ¡g":  $tmp = ""; break;
+    case "ÃrorszÃ¡g":  $tmp = ""; break;
     case "Izland":  $tmp = ""; break;
-    case "Lettország":  $tmp = ""; break;
+    case "LettorszÃ¡g":  $tmp = ""; break;
     case "Liechtenstein":  $tmp = ""; break;
     case "Luxemburg":  $tmp = ""; break;
-    case "Litvánia":  $tmp = ""; break;
-    case "Málta":  $tmp = ""; break;
+    case "LitvÃ¡nia":  $tmp = ""; break;
+    case "MÃ¡lta":  $tmp = ""; break;
     case "Hollandia":  $tmp = ""; break;
-    case "Norvégia":  $tmp = ""; break;
-    case "Lengyelország":  $tmp = ""; break;
-    case "Portugália":  $tmp = ""; break;
-    case "Románia":  $tmp = ""; break;
-    case "Szlovákia":  $tmp = ""; break;
-    case "Szlovénia":  $tmp = ""; break;
-    case "Spanyolország":  $tmp = ""; break;
-    case "Svédország":  $tmp = ""; break;
-    case "Egyesült Királyság":  $tmp = ""; break;
-    case "Törökország":  $tmp = ""; break;
-    case "Svájc":  $tmp = ""; break;
+    case "NorvÃ©gia":  $tmp = ""; break;
+    case "LengyelorszÃ¡g":  $tmp = ""; break;
+    case "PortugÃ¡lia":  $tmp = ""; break;
+    case "RomÃ¡nia":  $tmp = ""; break;
+    case "SzlovÃ¡kia":  $tmp = ""; break;
+    case "SzlovÃ©nia":  $tmp = ""; break;
+    case "SpanyolorszÃ¡g":  $tmp = ""; break;
+    case "SvÃ©dorszÃ¡g":  $tmp = ""; break;
+    case "EgyesÃ¼lt KirÃ¡lysÃ¡g":  $tmp = ""; break;
+    case "TÃ¶rÃ¶korszÃ¡g":  $tmp = ""; break;
+    case "SvÃ¡jc":  $tmp = ""; break;
     case "Bosznia-Hercegovina":  $tmp = ""; break;
-    case "Amerikai Egyesült Államok (USA)":  $tmp = ""; break;
+    case "Amerikai EgyesÃ¼lt Ãllamok (USA)":  $tmp = ""; break;
     case "Kanada":  $tmp = ""; break;
-    case "Brazília":  $tmp = ""; break;
-    case "Japán":  $tmp = ""; break;
-    case "Argentína":  $tmp = ""; break;
-    case "Kína":  $tmp = ""; break;
-    case "Mongólia":  $tmp = ""; break;
-    case "Ausztrália":  $tmp = ""; break;
-    case "Mexikó":  $tmp = ""; break;
+    case "BrazÃ­lia":  $tmp = ""; break;
+    case "JapÃ¡n":  $tmp = ""; break;
+    case "ArgentÃ­na":  $tmp = ""; break;
+    case "KÃ­na":  $tmp = ""; break;
+    case "MongÃ³lia":  $tmp = ""; break;
+    case "AusztrÃ¡lia":  $tmp = ""; break;
+    case "MexikÃ³":  $tmp = ""; break;
     case "Egyiptom":  $tmp = ""; break;
     case "Izrael":  $tmp = ""; break;
     case "Ukrajna":  $tmp = ""; break;
-    case "Egyéb":  $tmp = ""; break;
+    case "EgyÃ©b":  $tmp = ""; break;
 
-//Hónapok
-    case "január":  $tmp = ""; break;
-    case "február":  $tmp = ""; break;
-    case "március":  $tmp = ""; break;
-    case "április":  $tmp = ""; break;
-    case "május":  $tmp = ""; break;
-    case "június":  $tmp = ""; break;
-    case "július":  $tmp = ""; break;
+//HÃ³napok
+    case "januÃ¡r":  $tmp = ""; break;
+    case "februÃ¡r":  $tmp = ""; break;
+    case "mÃ¡rcius":  $tmp = ""; break;
+    case "Ã¡prilis":  $tmp = ""; break;
+    case "mÃ¡jus":  $tmp = ""; break;
+    case "jÃºnius":  $tmp = ""; break;
+    case "jÃºlius":  $tmp = ""; break;
     case "augusztus":  $tmp = ""; break;
     case "szeptember":  $tmp = ""; break;
-    case "október":  $tmp = ""; break;
+    case "oktÃ³ber":  $tmp = ""; break;
     case "november":  $tmp = ""; break;
     case "december":  $tmp = ""; break;
 
@@ -161,13 +161,13 @@ function alapnyelv($txt) {
     case "ho12":  $tmp = ""; break;
 
 //Napok
-    case "hétfõ":  $tmp = ""; break;
+    case "hÃ©tfÅ‘":  $tmp = ""; break;
     case "kedd":  $tmp = ""; break;
     case "szerda":  $tmp = ""; break;
-    case "csütörtök":  $tmp = ""; break;
-    case "péntek":  $tmp = ""; break;
+    case "csÃ¼tÃ¶rtÃ¶k":  $tmp = ""; break;
+    case "pÃ©ntek":  $tmp = ""; break;
     case "szombat":  $tmp = ""; break;
-    case "vasárnap":  $tmp = ""; break;
+    case "vasÃ¡rnap":  $tmp = ""; break;
 
     default: $tmp = $txt; break;
     }

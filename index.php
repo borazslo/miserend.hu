@@ -1,35 +1,36 @@
 <?php
 
 /////////////////////////////////
-// Fı v·ltozÛk:
+// F≈ë v√°ltoz√≥k:
 // $hiba (true,false)
-// $hibauzenet (hiba¸zenet a l·togatÛnak)
-// $hibauzenet_prog (hiba¸zenet a programozÛnak)
-// $html_kod (html kÛd, amit a vÈgÈn kiÌrunk)
+// $hibauzenet (hiba√ºzenet a l√°togat√≥nak)
+// $hibauzenet_prog (hiba√ºzenet a programoz√≥nak)
+// $html_kod (html k√≥d, amit a v√©g√©n ki√≠runk)
 /////////////////////////////////
 
 /////////////////////////////////
-//Alapadatok be·llÌt·sa (config)
+//Alapadatok be√°ll√≠t√°sa (config)
 /////////////////////////////////
     $hiba=false;
+    $vars = array();
 
-//Adatb·zis csatlakoz·s elıkÈszÌtÈse, elindÌt·sa
+//Adatb√°zis csatlakoz√°s el≈ëk√©sz√≠t√©se, elind√≠t√°sa
     if(!@include_once('config.inc')) {
         $hiba=true;
-        $hibauzenet_prog.='<br>HIBA! A konfigur·ciÛs f·jl behÌv·sakor!';
+        $hibauzenet_prog.='<br>HIBA! A konfigur√°ci√≥s f√°jl beh√≠v√°sakor!';
 	echo 'hiba';
     }
     dbconnect();
         
 /////////////////////////////////
-//EllenırzÈsek, be·llÌt·sok
+//Ellen≈ërz√©sek, be√°ll√≠t√°sok
 /////////////////////////////////
     if(!@include_once('ell.php')) {
         $hiba=true;
-        $hibauzenet_prog.='<br>HIBA! Az ellenırzı f·jl behÌv·sakor!';
+        $hibauzenet_prog.='<br>HIBA! Az ellen≈ërz≈ë f√°jl beh√≠v√°sakor!';
     }
 
-//URL ellenırzÈse
+//URL ellen≈ërz√©se
     if(!$hiba) {
         $urlT=url_ell();
 		
@@ -42,26 +43,27 @@
 
 		if(!empty($_GET['design'])) $design=$_GET['design'];
 
-        $design_url="design/$design";
+        $vars['design_url'] = $design_url="design/$design";
+        
 	}
 
 
-//Letiltott IP-rıl van-e szÛ
+//Letiltott IP-r≈ël van-e sz√≥
 /*
     if(!$hiba) {
         $tiltott_IP_T=ip_ell($fooldal_id);
-        //$tiltott_IP Ès belep_tiltott_IP true vagy false
+        //$tiltott_IP √©s belep_tiltott_IP true vagy false
     }
 */
 
-		//Be·llÌtott modulok
+		//Be√°ll√≠tott modulok
 		if($_GET['templom']>0) {
 			$M_ID=26;
 			$M_OP='view';
 			$TID=$_GET['templom'];
 		}
 
-		//Be·llÌtott modulok
+		//Be√°ll√≠tott modulok
 		if($_GET['hir']>0) {
 			$M_ID=1;
 			$M_OP='view';
@@ -76,18 +78,18 @@ $loader = new Twig_Loader_Filesystem('templates');
 $twig = new Twig_Environment($loader); // cache?
 
 /////////////////////////////////
-//designelemek behÌv·sa
+//designelemek beh√≠v√°sa
 /////////////////////////////////
     if(!$hiba) {
         if(!include("$design_url/design.php")) {
             $hiba=true;
-            $hibauzenet.='ElnÈzÈsÈt kÈrj¸k, az oldal nem jelenÌthetı meg.';
-            $hibauzenet_prog.='HIBA! A desing program nem hÌvhatÛ be!<br>'.$design_url.'/design.php';
+            $hibauzenet.='Eln√©z√©s√©t k√©rj√ºk, az oldal nem jelen√≠thet≈ë meg.';
+            $hibauzenet_prog.='HIBA! A desing program nem h√≠vhat√≥ be!<br>'.$design_url.'/design.php';
         }
     }
 
 /////////////////////////////////
-//modul kiv·laszt·sa
+//modul kiv√°laszt√°sa
 /////////////////////////////////
     if(!$hiba) {
         $m_id=$_POST['m_id'];
@@ -103,8 +105,8 @@ $twig = new Twig_Environment($loader); // cache?
             $query="select fajlnev,sablon,zart from modulok where id='$m_id' and ok='i'";
             if(!$lekerdez=mysql_query($query)) {
                 $hiba=true;
-                $hibauzenet.='A v·lasztott funkciÛ behÌv·sa sikertelen.';
-                $hibauzenet_prog.='HIBA a modul behÌv·s·n·l:<br>'.mysql_error();
+                $hibauzenet.='A v√°lasztott funkci√≥ beh√≠v√°sa sikertelen.';
+                $hibauzenet_prog.='HIBA a modul beh√≠v√°s√°n√°l:<br>'.mysql_error();
             }
             list($m_fajlnev,$m_oldalsablon,$m_zart)=mysql_fetch_row($lekerdez);
         }
@@ -118,7 +120,7 @@ $twig = new Twig_Environment($loader); // cache?
     }
 
 /////////////////////////////////
-//belÈpÈs ellenırzÈse
+//bel√©p√©s ellen≈ërz√©se
 /////////////////////////////////
     $belepve=false;
 	$sid=$_COOKIE['sid'];
@@ -136,7 +138,7 @@ $twig = new Twig_Environment($loader); // cache?
 	if(!empty($_POST['login'])) $kilep='';
 
 	include('login.php');
-    //Ha kilÈp
+    //Ha kil√©p
 	if($kilep>0) {
 		kilepes();
         $belepve=false;
@@ -152,7 +154,7 @@ $twig = new Twig_Environment($loader); // cache?
 		setcookie('sid','',time()-3600,'/','emberhalasz.net');
     }
 	else {
-		//Ha m·r van sid-je, akkor frissÌtj¸k
+		//Ha m√°r van sid-je, akkor friss√≠tj√ºk
         if (!empty($sid)) {
 			setcookie('sid',$sid,time()+86400,'/','miserend.hu');
 			setcookie('sid',$sid,time()+86400,'/','hirporta.hu');
@@ -162,7 +164,7 @@ $twig = new Twig_Environment($loader); // cache?
 	        $belepesT=belepell();
 			$belepve=$belepesT[0];
 		}
-        //Ha mÈg nincs, akkor adunk neki
+        //Ha m√©g nincs, akkor adunk neki
 	    else {
 		    $belepesT=ujvendeg();
 			$sid=$belepesT[10];
@@ -173,7 +175,7 @@ $twig = new Twig_Environment($loader); // cache?
 			setcookie('sid',$sid,time()+86400,'/','taborhely.info');
 			setcookie('sid',$sid,time()+86400,'/','emberhalasz.net');
         }
-	    //Ha z·rt oldalra akarna belÈpni Ès mÈg nincs belÈpve
+	    //Ha z√°rt oldalra akarna bel√©pni √©s m√©g nincs bel√©pve
 		if(($m_zart and !$belepve) or !empty($_POST['login'])) {
 			$belepesT=beleptet();
 			$belepve=$belepesT[0];
@@ -201,7 +203,7 @@ $twig = new Twig_Environment($loader); // cache?
 
 		if(strstr($belep_tiltott_IP,$fooldal_id)) {
 			$belepve=false;
-			$loginhiba='Felhaszn·lÛ kiz·rva!';
+			$loginhiba='Felhaszn√°l√≥ kiz√°rva!';
 		}
 		if(strstr($tiltott_IP,$fooldal_id)) {
 			header("location: http://www.plebania.net");
@@ -211,16 +213,16 @@ $twig = new Twig_Environment($loader); // cache?
 	}
 
 	if($vancookie) {
-		//Ha van a cookieban sid, akkor nem kell a linkek vÈgÈre kitenni
+		//Ha van a cookieban sid, akkor nem kell a linkek v√©g√©re kitenni
 		$linkveg_sid='';
 	}
 	else {
 		$linkveg_sid="&sid=$sid";
 	}
-	$linkveg=$linkveg_sid;
+	$vars['global']['linkveg'] = $linkveg = $linkveg_sid;
 
 /////////////////////////////////
-//jogosults·g ellenırzÈse
+//jogosults√°g ellen≈ërz√©se
 /////////////////////////////////
     $jogosult=false;
     $mjogell='-'.$m_id.'-';
@@ -231,12 +233,12 @@ $twig = new Twig_Environment($loader); // cache?
     elseif(!$m_zart) $mehet=true;
 
 /////////////////////////////////
-//nyelv be·llÌt·sa
+//nyelv be√°ll√≠t√°sa
 /////////////////////////////////
 	nyelvmeghatarozas();
 
 /////////////////////////////////
-//tartalmi rÈsz ˆssze·llÌt·sa
+//tartalmi r√©sz √∂ssze√°ll√≠t√°sa
 /////////////////////////////////
     if(!$hiba and !$tiltott_IP_T[0] and $mehet) {
         $m_op=$_POST['m_op'];
@@ -247,46 +249,46 @@ $twig = new Twig_Environment($loader); // cache?
 
 		if($atvett=='i') $m_op='atvett';
 
-        //BehÌvjuk a modulhoz a szÛt·r·t is
+        //Beh√≠vjuk a modulhoz a sz√≥t√°r√°t is
         $szotarfajl="$modul_url/szotar/$m_id$lang.inc";
         if($m_id>0 and is_file($szotarfajl)) {
             if(!@include_once($szotarfajl)) {
                 $hiba=true;
-                $hibauzenet_prog.='<br>HIBA a modul nyelvi f·jl behÌv·s·n·l!';
+                $hibauzenet_prog.='<br>HIBA a modul nyelvi f√°jl beh√≠v√°s√°n√°l!';
             }
         }
 
-		//BehÌvjuk a modulhoz az egyÈni designf·jlt is, ha van
+		//Beh√≠vjuk a modulhoz az egy√©ni designf√°jlt is, ha van
         $designfajl="$design_url/d_$m_id.php";
         if($m_id>0 and is_file($designfajl)) {
             if(!@include_once($designfajl)) {
                 $hiba=true;
-                $hibauzenet_prog.='<br>HIBA a modul design f·jl behÌv·s·n·l!';
+                $hibauzenet_prog.='<br>HIBA a modul design f√°jl beh√≠v√°s√°n√°l!';
             }
         }
-        //Mivel jogosult, behÌvjuk a modult
+        //Mivel jogosult, beh√≠vjuk a modult
         if(!include_once($modul)) {
             $hiba=true;
             $hibauzenet.='';
-            $hibauzenet_prog.='HIBA! A v·lasztott modul nem hÌvhatÛ be!<br>'.$modul;
+            $hibauzenet_prog.='HIBA! A v√°lasztott modul nem h√≠vhat√≥ be!<br>'.$modul;
         }
     }
-    //Nincs hozz· jogosults·ga!
+    //Nincs hozz√° jogosults√°ga!
     elseif(!$jogosult and $m_zart and $belepve) {
-        $tartalom='<big><br><span class=hiba>HIBA a modul megnyit·s·ban!</span></big>';
+        $tartalom='<big><br><span class=hiba>HIBA a modul megnyit√°s√°ban!</span></big>';
     }
-    //Nincs belÈpve, kirakjuk az ˚rlapot
+    //Nincs bel√©pve, kirakjuk az ≈±rlapot
     elseif($m_zart and !$belepve and !$tiltott_IP_T[1]) {
         $tartalom=loginurlap($belephiba);
-        $onload='onload="fokusz();"';
+        $vars['body']['onload'] = 'onload="fokusz();"';
     }
-	//Le van tiltva, nem lÈphet be
+	//Le van tiltva, nem l√©phet be
     elseif($m_zart and $tiltott_IP_T[1]) {
-        $tartalom='<big><br><span class=hiba>Nem lÈphetsz be!</span></big>';
+        $tartalom='<big><br><span class=hiba>Nem l√©phetsz be!</span></big>';
     }
 
 /////////////////////////////////
-//hiba¸zenetek kezelÈse
+//hiba√ºzenetek kezel√©se
 /////////////////////////////////
     if($hiba) {
         $html_kod=$hibauzenet_prog;
@@ -297,14 +299,14 @@ $twig = new Twig_Environment($loader); // cache?
 
 
 /////////////////////////////////
-//tartalom form·z·sa a sablonba
+//tartalom form√°z√°sa a sablonba
 /////////////////////////////////
     else {
-        $html_kod=design();
+        $html_kod=design($vars);
     }
 
 /////////////////////////////////
-//html kÛd kik¸ldÈse a bˆngÈszınek
+//html k√≥d kik√ºld√©se a b√∂ng√©sz≈ënek
 /////////////////////////////////
     print $html_kod;
 
