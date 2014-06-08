@@ -69,6 +69,11 @@
 			if(!empty($_GET['design'])) $M_ID=33;
 		}
 
+require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
+Twig_Autoloader::register();
+
+$loader = new Twig_Loader_Filesystem('templates');
+$twig = new Twig_Environment($loader); // cache?
 
 /////////////////////////////////
 //designelemek behívása

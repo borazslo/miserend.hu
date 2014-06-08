@@ -16,92 +16,56 @@ function loginurlap($belephiba) {
 
 function keret($helyzet) {
 	global $db_name,$m_id,$belepve,$modul_url,$lang,$elso,$szavazott,$_SERVER,$design_url,$design,$fooldal_id;
-	if(!isset($design)) $design='alap';
-	//$ip=$_SERVER['REMOTE_ADDR'];
+    global $twig;
 
 	if(!$belepve) $feltetel=" and zart=0";
 	$nyelv=$lang;
 	if(empty($nyelv)) $nyelv='hu';
 
-	$tmpl_file = $design_url.'/hasabdoboz.htm';
 	$tablabgT=array('#D1DDE9','#F4F2F5');
 	$fejlecbgT=array('#053D78','#8D317C');
-	
-	if($helyzet>0) {
-		$query="select modul_id,fajlnev from oldalkeret where helyzet='$helyzet' and fooldal_id='$fooldal_id' $feltetel order by sorrend";
-		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
-		while(list($mid,$fajl)=mysql_fetch_row($lekerdez)) {				
-			$include=$modul_url.'/'.$fajl.'_menu.php';
-			$op=$helyzet;
-			include_once($include);
-			if(!empty($hmenuT[0])) {
-				//Csak, ha van megadva cím
-				$a=$helyzet;
-				if($a>1) $a=0;
-
-				$hasabcim=$hmenuT[0];
-				$hasabtartalom=$hmenuT[1];
-				$tablabg=$tablabgT[$a];
-				$fejlecbg=$fejlecbgT[$a];
-				$a++;
-	
-				$thefile = implode("", file($tmpl_file));
-				$thefile = addslashes($thefile);
-				$thefile = "\$r_file=\"".$thefile."\";";
-			    eval($thefile);
     
-				$keret .= "\n".$r_file;
-				$hmenuT='';
-			}
-			else {
-				$keret .= "\n".$hmenuT[1];
-				$hmenuT='';
-			}
-			$keret.="\n<img src=img/space.gif width=5 height=4><br>";
-
-		}
-	}
-	else {
+    $blocks = array();
+	if($helyzet>0) {
+		$query="SELECT modul_id,fajlnev FROM oldalkeret WHERE helyzet='$helyzet' and fooldal_id='$fooldal_id' $feltetel order by sorrend";
+		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
+		while(list($mid,$fajl)=mysql_fetch_row($lekerdez)) {
+            $blocks[] = array('include'=>$modul_url.'/'.$fajl.'_menu.php','op'=>$helyzet,'mid'=>$mid);
+        }
+     } else {
 		//Ha a $helyzet=0, akkor admin menü
-		$op=$helyzet;
-		include_once("$modul_url/admin_menu.php");
-		if(!empty($hmenuT[0])) {
-			//Csak, ha van megadva cím
-			$hasabcim=$hmenuT[0];
-			$hasabtartalom=$hmenuT[1];
-			$tablabg="#ECE5C8";
-			$fejlecbg="#F5CC4C";
-
-			$thefile = implode("", file($tmpl_file));
-			$thefile = addslashes($thefile);
-			$thefile = "\$r_file=\"".$thefile."\";";
-		    eval($thefile);
-   
-			$keret .= "\n".$r_file;
-			$hmenuT='';
-		}
-		$keret.="\n<img src=img/space.gif width=5 height=4><br>";
-
-		include_once("$modul_url/chat_menu.php");
-		if(!empty($hmenuT[0])) {
-			//Csak, ha van megadva cím
-			$hasabcim=$hmenuT[0];
-			$hasabtartalom=$hmenuT[1];
-			$tablabg="#ECE5C8";
-			$fejlecbg="#F5CC4C";
-
-			$thefile = implode("", file($tmpl_file));
-			$thefile = addslashes($thefile);
-			$thefile = "\$r_file=\"".$thefile."\";";
-		    eval($thefile);
-   
-			$keret .= "\n".$r_file;
-			$hmenuT='';
-		}
-		$keret.="\n<img src=img/space.gif width=5 height=4><br>";
-	}
-
-	Return $keret;
+        $blocks[] = array('include'=>$modul_url.'/admin_menu.php','op'=>$helyzet,'mid'=>$mid,'bgcolor'=>'#ECE5C8','header'=>array('bgcolor'=>'#F5CC4C'));			
+        $blocks[] = array('include'=>$modul_url.'/chat_menu.php','op'=>$helyzet,'mid'=>$mid,'bgcolor'=>'#ECE5C8','header'=>array('bgcolor'=>'#F5CC4C'));			
+     }
+     $keret = '';
+     foreach($blocks as $block) {
+        $op = $block['op'];
+        
+        if(@include_once($block['include'])) {
+            $a=$helyzet;
+            if($a>1) $a=0;
+            $hmenuT[1] = iconv('ISO-8859-2','UTF-8',$hmenuT[1]);
+            $variables = array('content'=>$hmenuT[1],'bgcolor' => $tablabgT[$a]);            
+            if(!empty($hmenuT[0])) {
+                $hmenuT[0] = iconv('ISO-8859-2','UTF-8',$hmenuT[0]);                
+                $variables['header'] = array('content'=>$hmenuT[0],'bgcolor'=>$fejlecbgT[$a]);
+            }
+            // Áthozott értékek betöltése
+            foreach($block as $key => $value) {
+                if(is_array($value)) {
+                    foreach($value as $k => $v)
+                        $variables[$key][$k] = $v; }
+                else  $variables[$key] = $value;
+            }
+            
+            $a++;		
+			$hmenuT='';		        
+        } else {
+            $variables = array('content'=>"<font color='red' size='-3'>HIBA! file.".$block['include'].". mysql.oldalkeret</font>");
+        }
+        $keret .= "\n".iconv('UTF-8','ISO-8859-2',$twig->render('block.html',$variables));                    
+    }    
+	return $keret;
 }
 
 function formazo($adatT,$tipus) {
@@ -150,27 +114,27 @@ function langmenu() {
 
 function fomenu($hol) {
 	global $db_name,$fooldal_id,$m_id,$linkveg,$lang,$design_url,$sid;
-
-	$kod.='<table width="95%" height="34" border="0" cellspacing="0" cellpadding="0"><tr>';
-	$terkoz['felso']="<img src=img/space.gif width=5 height=4><br>";
-	$terkoz['also']="<img src=img/space.gif width=5 height=14><br>";
-
+    global $twig;
+	
+    $items = array();
 	$query="select id,menucim,domain from fooldal where ok='i' and menucim!='' order by menusorrend";
 	$lekerdez=mysql_query($query);
 	while(list($id,$menucim,$domain)=mysql_fetch_row($lekerdez)) {
-		$link="?fooldal_id=$id&sid=$sid";
-		if($id==$fooldal_id) $aktiv='1';
-		else $aktiv='';
-		$kod.="<td background='$design_url/img/".$hol."menuhatter$aktiv.jpg' align=center valign=top>$terkoz[$hol]<a href='$link' title='$domain' class='".$hol."menulink'>$menucim</a></td>";
-	}
-	$kod.='</tr></table>';
- 
+        $menucim = iconv('ISO-8859-2','UTF-8',$menucim);
+        $item = array('id'=>$id,'title'=>$menucim,'domain'=>$domain);
+		$item['link'] = "?fooldal_id=$id&sid=$sid";
+		if($id==$fooldal_id) $item['aktiv'] = '1';
+        $items[] = $item;		
+	}	 
+    $kod = iconv('UTF-8','ISO-8859-2',$twig->render('menu_main.html',array('items' => $items, 'hol'=>$hol, 'design_url' => $design_url)));
     return $kod;
 }
 
 function design() {
     global $design_url,$db_name,$tartalom,$m_oldalsablon,$balkeret,$jobbkeret,$onload,$sid,$linkveg,$u_id,$u_login,$u_jogok,$belepve,$loginhiba,$script,$meta,$titlekieg;
 
+     
+    global $twig;
 	if(!isset($design)) $design='alap';
     $title='VPP - országos miserend'.$titlekieg;
 	$top=alapnyelv('top');
@@ -292,36 +256,13 @@ function design() {
 //Loginûrlap
 	if($belepve) {
 		//Ha bent van
-		$loginurlap="\n<table cellpadding=0 cellspacing=0 width=100% height=44><tr>";
-		$loginurlap.="<td><div align=left class=kicsi><img src=img/space.gif width=4 height=4>Belépve:</div><div align=center class=alcim>$u_login</div></td>";
-		$loginurlap.="<td><img src=img/space.gif width=10 height=2><br><a href=?m_id=28&m_op=add$linkveg class=loginlink><img src=$design_url/img/negyzet.jpg border=0 align=absmiddle> Beállítások</a><br><a href=?kilep=1$linkveg class=loginlink><img src=$design_url/img/negyzet.jpg border=0 align=absmiddle> Kilépés</a></td></tr></table>";
-	}
+        $u_login = iconv('ISO-8859-2','UTF-8',$u_login);      
+        $loginurlap = iconv('UTF-8','ISO-8859-2',$twig->render('login_loggedin.html',array('linkveg' => $linkveg, 'design_url' => $design_url,'u_login'=>$u_login)));
+    }
 	else {
 		//Belépés
-		$loginurlap="\n<table cellpadding=0 cellspacing=0 border=0 width=100% height=44><form method=post name=loginurlap><input type=hidden name=kilep value=0><tr>";
-		$loginurlap.="\n<td><img src=img/space.gif width=8 height=5></td>";
-		$loginurlap.="\n<td><img src=img/space.gif width=5 height=3><br><span class=loginlink>Felhasználónév:</span><br><img src=img/space.gif width=5 height=3><br><input type=text name=login value='".$_POST['login']."' size=16 class=loginurlap><br><img src=img/space.gif width=5 height=3></td>";
-
-		$loginurlap.="\n<td><img src=img/space.gif width=8 height=5></td>";
-		
-		$loginurlap.="\n<td><img src=img/space.gif width=5 height=3><br><span class=loginlink>&nbsp; Jelszó:</span><br><img src=img/space.gif width=5 height=3><br><input type=password name=passw size=16 class=loginurlap><br><img src=img/space.gif width=5 height=3></td>";
-		
-		$loginurlap.="\n<td><img src=img/space.gif width=8 height=5></td>";
-        
-		$loginurlap.="<td rowspan=2 width=65 align=center>";
-		if(!empty($_POST['login'])) {
-			$loginurlap.="<span class=loginlink><font color=red>$loginhiba</font></span><br><img src=img/space.gif width=5 height=3><br>";
-		}
-		$loginurlap.="<input type=image border=0 src=$design_url/img/belepesgomb.jpg align=absmiddle></td>";
-		
-		$loginurlap.="\n</tr><tr>";
-		$loginurlap.="\n<td><img src=img/space.gif width=8 height=5></td>";
-		$loginurlap.="\n<td><a href=?m_id=28&fm=11$linkveg class=loginlink>Regisztráció <img src=$design_url/img/negyzet.jpg align=absmiddle border=0></a><br><img src=img/space.gif width=5 height=3></td>";
-		$loginurlap.="\n<td><img src=img/space.gif width=8 height=5></td>";
-		$loginurlap.="\n<td><a href=?m_id=28&m_op=jelszo$linkveg class=loginlink title='Jelszó emlékeztetõ'>Jelszó emlékeztetõ <img src=$design_url/img/negyzet.jpg border=0 align=absmiddle></a><br><img src=img/space.gif width=5 height=3></td>";
-		$loginurlap.="\n<td><img src=img/space.gif width=8 height=5></td>";
-		
-		$loginurlap.="</tr><input type=hidden name=sid value=$sid></form></table>";
+        $loginhiba = iconv('ISO-8859-2','UTF-8',$loginhiba);
+        $loginurlap = iconv('UTF-8','ISO-8859-2',$twig->render('login_login.html',array('linkveg' => $linkveg, 'design_url' => $design_url,'login'=>$_POST['login'],'loginhiba'=>$loginhiba,'sid'=>$sid)));
 	}
 
 

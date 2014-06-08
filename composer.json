@@ -1,0 +1,7 @@
+{
+    "name": "miserend.hu/miserend-webapp",
+    "description": "Miserend.hu web application",
+    "require": {
+        "twig/twig": "1.*"
+    }
+}

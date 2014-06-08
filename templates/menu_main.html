@@ -1,0 +1,14 @@
+<table width="95%" height="34" border="0" cellspacing="0" cellpadding="0">
+    <tr>    
+    {% for item in items %}
+        <td background='{{ design_url }}/img/{{ hol }}menuhatter{{ item.aktiv }}.jpg' align=center valign=top>
+            {% if hol == "felso" %}
+                <img src=img/space.gif width=5 height=4><br>
+            {% elseif hol == "also" %}
+                <img src=img/space.gif width=5 height=14><br>
+            {% endif %}
+            <a href='{{ item.link|raw }}' title='{{ item.domain }}' class='{{ hol }}menulink'>{{ item.title }}</a>
+        </td>
+    {% endfor %}
+    </tr>
+</table>
