@@ -9,94 +9,70 @@
 <meta name="author" content="miserend.hu">
 
 <link rel="stylesheet" href="templates/style.css" type="text/css">
+<link rel="stylesheet" href="templates/newstyle.css" type="text/css">
 {% for s in script %}{{ s|raw }}{% endfor %}
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" {{ body.onload|raw }}>
-<div align="center">
-<table width="775" border="0" cellspacing="0" cellpadding="0">
-  <tr>     
-    <td colspan="4" background="{{ design_url }}/img/felsocsik.jpg" height="4"><img src="{{ design_url }}/img/felsocsik.jpg" width="1" height="4"></td>    
-  </tr>
-  <tr> 
-	<td rowspan="4" width="2" background="{{ design_url }}/img/balcsik.jpg"><img src="{{ design_url }}/img/balcsik.jpg" width="2" height="1"></td>
-    <td height="34">
-      <table width="631" border="0" cellspacing="0" cellpadding="0" background="{{ design_url }}/img/fenthatter.jpg" height="34">
+<div id="container">
+
+{% block header %}
+<div class="csik" id="felsocsik"></div>
+<div id="header">
+    <div id="jobblogo"><img src="{{ design_url }}/img/jobblogo.jpg" width="84" height="78" style="margin-right:auto;margin-left:auto;display:block"></div>
+    
+      <table width="635" border="0" cellspacing="0" cellpadding="0" background="{{ design_url }}/img/fenthatter.jpg" height="34">
         <tr>
           <td width="145"><div align="center" class="nevnap">{{ nevnap|raw }}</div></td>
-          <td width="486" valign="top">{% if login.mainmenu.top %}{% include 'mainmenu.html' with mainmenu.top %}{% endif %}</td>
+          <td width="486" valign="top">{% if mainmenu.top %}{% include 'mainmenu.html' with mainmenu.top %}{% endif %}</td>
         </tr>
       </table>
-    </td>
-    <td rowspan="2" width="140"> 
-      <div align="center"><img src="{{ design_url }}/img/jobblogo.jpg" width="84" height="78"></div>
-    </td>
-	  <td rowspan="4" width="2" background="{{ design_url }}/img/jobbcsik.jpg"><img src="{{ design_url }}/img/jobbcsik.jpg" width="2" height="1"></td>
-  </tr>
-  <tr> 
-    <td height=44>
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr> 
-          <td width="300" height="44"><a href=?{{ global.linkveg|raw }}><img src="{{ design_url }}/img/ballogo.jpg" width="300" height="44" border="0" title="Főoldal"></a></td>
-          <td width="2"><img src="{{ design_url }}/img/elvalasztocsik.jpg" width="2" height="44"></td>
-          <td>
+               
+          <div id="ballogo"><!--<td width="300" height="44">-->
+            <a href=?{{ global.linkveg|raw }}><img src="{{ design_url }}/img/ballogo.jpg" width="300" height="44" border="0" title="Főoldal"></a>
+            <img src="{{ design_url }}/img/elvalasztocsik.jpg" width="2" height="44">
+          </div>
+          <!--<td width="2"></td>-->
+          
+          <div id="login">
+            <img src="{{ design_url }}/img/elvalasztocsik.jpg" width="2" height="44" style="float:right">
           {% if login.loggedin %}
             {% include 'login_loggedin.html' with login.vars %}
           {% else %}
             {% include 'login_login.html' with login.vars %}
-          {% endif %}
-          </td>
-          <td width="2"><img src="{{ design_url }}/img/elvalasztocsik.jpg" width="2" height="44"></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  <tr> 
-    <td colspan="2" height="20" background="{{ design_url }}/img/elvalasztocsikfent.jpg"><img src="{{ design_url }}/img/elvalasztocsikfent.jpg" width="7" height="20"></td>
-  </tr>
-</table>
-<table width="775" border="0" cellspacing="0" cellpadding="0">
-  <tr> 
-    <td rowspan="3" background="{{ design_url }}/img/balcsik.jpg" width="2"><img src="{{ design_url }}/img/balcsik.jpg" width="2" height="1"></td>
-    <td width="135" valign="top">{% for block in sidebar.left.blocks %}{% include 'block.html' with block %}{% endfor %}
-    <iframe src="http://hirporta.hu/hirek.php?limit=5" width=135 height=280 frameborder=0 scrolling=no></iframe></td>
-    <td width="8">&nbsp;</td>
-    <td width="480" valign="top">
-    <!-- <div class=alcim style="padding: 3px; border: 2px solid #ff0000">Figyelem! November 1. Mindenszentek &uuml;nnep&eacute;n, a miserend elt&eacute;r&otilde; lehet a megadott h&eacute;tf&otilde;i tal&aacute;latokt&oacute;l!</div>-->    
-    {{ content|raw }}</td>
-    <td width="8">&nbsp;</td>    
+          {% endif %}          
+          </div>     
+          
+</div>
+<div class="csik" id="elvalasztocsik"></div>
+{% endblock %}
+
+    <div class="leftside">
+        {% for block in sidebar.left.blocks %}{% include 'block.html' with block %}{% endfor %}
+        <iframe src="http://hirporta.hu/hirek.php?limit=5" width=135 height=280 frameborder=0 scrolling=no></iframe>
+    </div>
+    
+    <!--<td width="8">&nbsp;</td>-->
+    
+    <div class="center">
+        <!-- <div class=alcim style="padding: 3px; border: 2px solid #ff0000">Figyelem! November 1. Mindenszentek &uuml;nnep&eacute;n, a miserend elt&eacute;r&otilde; lehet a megadott h&eacute;tf&otilde;i tal&aacute;latokt&oacute;l!</div>-->    
+        {{ content|raw }}
+    </div>
+        
     {% block right %}
-    <td width="140" valign="top">
+    <div class="rightside">
         {% for block in sidebar.right.blocks %}{% include 'block.html' with block %}{% endfor %}
         <a href="http://www.szentsegimadas.hu" target="_blank"><img src="/img/banner/szentsegimadas-banner.jpg" border="0" /></a>
-    </td>
+    </div>
     {% endblock %}    
-    <td rowspan="3" background="{{ design_url }}/img/jobbcsik.jpg" width="2"><img src="{{ design_url }}/img/jobbcsik.jpg" width="2" height="1"></td>
-  </tr>
-  <tr> 
-    <td colspan="5" height="10"><img src="{{ design_url }}/img/space.gif" width="5" height="10"></td>
-  </tr>
-  <tr> 
-    <td background="{{ design_url }}/img/lenthatter.jpg"><div align=center>{{ bottom.left.content|raw }}</div></td>
-    <td colspan="3" background="{{ design_url }}/img/lenthatter.jpg"><div align=center>{% if mainmenu.top %}{% include 'mainmenu.html' with mainmenu.top %}{% endif %}</div></td>
-    <td background="{{ design_url }}/img/lenthatter.jpg"><div align=center>{{ bottom.right.content|raw }}</div></td>
-  </tr>
-  <tr> 
-    <td colspan="7" background="{{ design_url }}/img/alsocsik.jpg" height="5"><img src="{{ design_url }}/img/alsocsik.jpg" width="1" height="5"></td>
-  </tr>
-</table>
+<div id="footer">
+    <div class="leftside footer"><div align=center>{{ bottom.left.content|raw }}</div></div>
+    <div class="center footer"><div align=center>{% if mainmenu.bottom %}{% include 'mainmenu.html' with mainmenu.bottom %}{% endif %}</div></div>
+    <div class="rightside footer"><div align=center>{{ bottom.right.content|raw }}</div></div>
+</div>
+<div class="csik" id="alsocsik"></div>
 </div>
 
-<!--
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-var pageTracker = _gat._getTracker("UA-3987621-4");
-pageTracker._initData();
-pageTracker._trackPageview();
-</script>-->
 <script type="text/javascript">
 	(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
 	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -107,33 +83,5 @@ pageTracker._trackPageview();
   ga("send", "pageview");
 
 </script>
-<!--<script>
-function _gaLt(event){
-	var el = event.srcElement || event.target;
-
-	/* Loop up the tree through parent elements if clicked element is not a link (eg: an image in a link) */
-	while(el && (typeof el.tagName == "undefined" || el.tagName.toLowerCase() != "a" || !el.href))
-		el = el.parentNode;
-
-	if(el && el.href){
-		if(el.href.indexOf(location.host) == -1){ /* external link */
-			ga("send", "event", "Outgoing Links", el.href, document.location.pathname + document.location.search);
-			/* if target not set then delay opening of window by 0.5s to allow tracking */
-			if(!el.target || el.target.match(/^_(self|parent|top)$/i)){
-				setTimeout(function(){
-					document.location.href = el.href;
-				}.bind(el),500);
-				/* Prevent standard click */
-				event.preventDefault ? event.preventDefault() : event.returnValue = !1;
-			}
-		}
-
-	}
-}
-
-/* Attach the event to all clicks in the document */
-var d = document;
-d.addEventListener ? d.addEventListener("click",_gaLt,!1) : d.attachEvent && d.attachEvent("onclick",_gaLt);
-</script>-->
 </body>
 </html>
