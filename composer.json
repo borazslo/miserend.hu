@@ -2,6 +2,7 @@
     "name": "miserend.hu/miserend-webapp",
     "description": "Miserend.hu web application",
     "require": {
-        "twig/twig": "1.*"
+        "twig/twig": "1.*",
+        "mobiledetect/mobiledetectlib": "2.*"
     }
 }
