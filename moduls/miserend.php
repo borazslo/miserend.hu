@@ -41,6 +41,8 @@ function miserend_index() {
         });
 			
         </script>';
+        
+    $variables['scripts'] = $script;
     
 	$ma=date('Y-m-d');
 	$holnap=date('Y-m-d',(time()+86400));
@@ -244,6 +246,7 @@ function miserend_index() {
         file_put_contents($file,$xmlstr);
     }
     
+    
     $xmlcont = new SimpleXMLElement($xmlstr);
     
         $url = $xmlcont->CalendarDay;
@@ -263,7 +266,7 @@ function miserend_index() {
        $where = " WHERE ( ev = '{$ev}' AND idoszak = '{$idoszak}' AND nap = '{$nap}' ) OR (".implode(' OR ',$readingsId)." ) LIMIT 1";       
        //echo $where."<br>";
     
-    
+   /* */
     
     /*
 	//A liturgikus naptárból kiszedjük, hogy mi kapcsolódik a dátumhoz
@@ -1313,8 +1316,8 @@ function androidreklam() {
 	//$dobozszoveg=nl2br($misemegj);
 	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz-kep')\"><img src=\"http://terkep.miserend.hu/images/device-2014-03-24-230146_framed.png\" height=\"180\" style=\"float:right\"></a>Megjelent a <a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz')\">miserend androidos mobiltelefonokra</a> készült változata is. Ám még meg kell találni néhány templomnak a pontos helyét a térképen. Kérem segítsen nekünk!<br/><center><a href=\"http://terkep.miserend.hu\" onclick=\"ga('send','event','Advertisment','terkep.miserend.hu','liladoboz')\">terkep.miserend.hu</a></center>";
 	
-	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\">
-  <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" /></a>";
+	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\"  onclick=\"ga('send','event','Advertisment','play.google.com','liladoboz-kep')\">
+  <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" style=\"display:block;margin-right:auto;margin-left:auto\" /></a>";
 
 	global $design_url;
 	$variables = array(

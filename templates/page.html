@@ -1,19 +1,25 @@
 <html>
 <head>
 <title>{{ pagetitle }}</title>
-{% for m in meta %}{{ m|raw }}{% endfor %}
+{% if meta %}{% for m in meta %}{{ m|raw }}{% endfor %}{% endif %}
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="description" content="Magyarország és a Kárpát-medence magyar nyelvű katolikus templomainak és szentmiséinek gyűjtőhelye.">
 <meta name="keywords" content="katolikus, keresztény, templom, kápolna, miséhőzhely, mise, szentmise, miserend, liturgia, vasárnap, hétköznap, térkép">
 <meta name="author" content="miserend.hu">
 
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
 <link rel="stylesheet" href="templates/style.css" type="text/css">
 <link rel="stylesheet" href="templates/newstyle.css" type="text/css">
-{% for s in script %}{{ s|raw }}{% endfor %}
+{% if script %}{% for s in script %}{{ s|raw }}{% endfor %}{% endif %}
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" {{ body.onload|raw }}>
+{% block container %}
 <div id="container">
 
 {% block header %}
@@ -72,7 +78,8 @@
 </div>
 <div class="csik" id="alsocsik"></div>
 </div>
-
+{% endblock %}
+{% block analytics %}
 <script type="text/javascript">
 	(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
 	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -83,5 +90,6 @@
   ga("send", "pageview");
 
 </script>
+{% endblock %}
 </body>
 </html>

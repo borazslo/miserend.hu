@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 /////////////////////////////////
 // Fő változók:
@@ -75,12 +76,23 @@
 			if(!empty($_GET['design'])) $M_ID=33;
 		}
 
+//Twig        
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
-
 $loader = new Twig_Loader_Filesystem('templates');
-$twig = new Twig_Environment($loader); // cache?
+$twig = new Twig_Environment($loader); // cache?        
 
+//MobileDetect
+require_once 'vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php';        
+$detect = new Mobile_Detect;
+//$isMobile = $detect->isMobile();
+//$isTablet = $detect->isTablet();
+if($detect->isAndroidOS() == 1 AND $_SESSION['isAndroidOS'] != 'shown' OR 1 == 1) {
+    echo $twig->render('android_advertisment.html',$vars);
+    $_SESSION['isAndroidOS'] = 'shown';
+    exit;
+}
+       
 /////////////////////////////////
 //designelemek behívása
 /////////////////////////////////
