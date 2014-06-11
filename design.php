@@ -163,7 +163,7 @@ function design(&$vars) {
 	}
 
 //Scriptek////////////////////////////////////
-	$script.="\n".'<script language="JavaScript" type="text/javascript">
+	$vars['script'][] = '<script language="JavaScript" type="text/javascript">
 	<!--
 	function fokusz() {
       document.loginurlap.login.focus();
@@ -213,7 +213,7 @@ function design(&$vars) {
 	// -->
 	</script>';
 	
-	$script.="\n".'<script language="JavaScript" type="text/javascript">
+	$vars['script'][] = '<script language="JavaScript" type="text/javascript">
 	/**
 	* A Google Analytics kimenő linkjeit követő funkció.
 	* A függvény argumentuma egy érvényes URL string, és a függvény ezt a stringet használja
