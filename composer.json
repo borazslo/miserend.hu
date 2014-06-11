@@ -4,15 +4,5 @@
     "require": {
         "twig/twig": "1.*",
         "mobiledetect/mobiledetectlib": "2.*"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "bower install",
-            "php install.php"
-        ],
-        "post-update-cmd": [
-            "bower install",
-            "php install.php"
-        ]
     }
 }

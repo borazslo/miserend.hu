@@ -25,6 +25,10 @@
 /////////////////////////////////
 //Ellenőrzések, beállítások
 /////////////////////////////////
+    if (!is_dir('fajlok/igenaptar')) {
+        include_once('install.php');
+    }
+
     if(!@include_once('ell.php')) {
         $hiba=true;
         $hibauzenet_prog.='<br>HIBA! Az ellenőrző fájl behívásakor!';
