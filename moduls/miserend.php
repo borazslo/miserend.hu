@@ -404,10 +404,10 @@ function miserend_index() {
 				$ujw=$w1;
 			}
             
-           $kepek .= "<li class='als-item colorbox'><a href=\"".$random['konyvtar']."/".$random['fajlnev']."\" title=\"".$random['title']."\" class='als-color'>
+           $kepek .= "<li class='als-item colorbox'><a href=\"".$random['konyvtar']."/".$random['fajlnev']."\" title=\"".$random['title']."\" class='als-color' onclick=\"ga('send','event','Inbound Links','Photos','?templom=".$random['id']."')\">
             <img src=\"".$random['konyvtar']."/kicsi/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' ></a>
             
-                <div style='display:none;text-align:center'>
+                <div tid='".$random['id']."' style='display:none;text-align:center'>
                     <a href=\"?templom=".$random['id']."\" title=\"".$random['title']."\">
                     <img src=\"".$random['konyvtar']."/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' align=\"center\" style=\"max-height:80%;display:block;margin-left:auto;margin-right:auto\">
                     <div style=\"background-color:rgba(255,255,255,0.3);padding:10px;\" class=\"felsomenulink\">".$random['nev']." (".$random['varos'].")</div>
@@ -437,7 +437,7 @@ function miserend_index() {
                         maxHeight:"98%"
                     },
                     function() {
-                        ga(\'send\',\'event\',\'Photos\',\'fooldal\',\''.$tid.'\');
+                        ga(\'send\',\'event\',\'Photos\',\'fooldal\',$(this).find("div").attr("tid"));
                     }                        
                    );
                 });

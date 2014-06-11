@@ -87,7 +87,8 @@ require_once 'vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php';
 $detect = new Mobile_Detect;
 //$isMobile = $detect->isMobile();
 //$isTablet = $detect->isTablet();
-if($detect->isAndroidOS() == 1 AND $_SESSION['isAndroidOS'] != 'shown' OR 1 == 1) {
+if($detect->isAndroidOS() == 1 AND $_SESSION['isAndroidOS'] != 'shown') {
+    $vars['title'] = 'Miserend androidra is!';
     echo $twig->render('android_advertisment.html',$vars);
     $_SESSION['isAndroidOS'] = 'shown';
     exit;

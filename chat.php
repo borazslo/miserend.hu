@@ -5,7 +5,7 @@ $sid=$_GET['sid'];
 
 if(empty($u_login) and empty($sessid)) exit;
 
-$head='<html><head><title>VPP</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="refresh" content="15;URL=chat.php?u_login='.$u_login.'&sessid='.$sid.'"><link rel="stylesheet" href="design/miserend/img/style.css" type="text/css"></head><body bgcolor="#ECE5C8" text="#000000">';
+$head='<html><head><title>VPP</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="refresh" content="15;URL=chat.php?u_login='.$u_login.'&sessid='.$sid.'"><link rel="stylesheet" href="templates/style.css" type="text/css"></head><body bgcolor="#ECE5C8" text="#000000">';
 
 $foot='</body></html>';
 
