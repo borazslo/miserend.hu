@@ -42,7 +42,7 @@ function index() {
 	$urlap.="<input type=hidden name=u_login value='$u_login'>";
 	$urlap.="<input type=hidden name=kinek value='$kinek'>";
 	if(!empty($kinek)) $urlap.="<a href=chatadd.php?u_login=$loginkiir1&kinek=&sid=$sid class=link title='visszavon'><img src=img/lakat.gif align=absmiddle border=0><i> $kinek</i></a><br>";
-	$urlap.="<textarea name=szoveg class=urlap cols=15 rows=4></textarea><br>";
+	$urlap.="<textarea name=szoveg class=urlap cols=15 rows=4 style=\"width:100%\"></textarea><br>";
 	$urlap.="<input type=submit value='Elküldés' class=urlap></form>";
 
 	echo $head;

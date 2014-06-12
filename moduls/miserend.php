@@ -183,12 +183,15 @@ function miserend_index() {
 	}
 
 //Templom űrlap
-	$templomurlap="\n<div style='display: none'><form method=post id=\"tkereses\"><input type=hidden id=tsid name=sid value=$sid><input type=hidden id=tm_id name=m_id value=$m_id><input type=hidden name=m_op id=tm_op value=templomkeres></div>";
-	$templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos id=tvaros size=20 class=keresourlap><br><img src=img/space.gif width=5 height=8>";
-	$templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text id=tkulcsszo name=kulcsszo size=20 class=keresourlap><br><img src=img/space.gif width=5 height=8>";
+	$templomurlap="\n<form method=post id=\"tkereses\">
+        <input type=hidden id=tsid name=sid value=$sid>
+        <input type=hidden id=tm_id name=m_id value=$m_id>
+        <input type=hidden name=m_op id=tm_op value=templomkeres>\n";
+	$templomurlap.="<span class=kiscim>Település: </span><input type=text name=varos id=tvaros size=20 class=keresourlap>";
+	$templomurlap.="<br/><span class=kiscim>Kulcsszó: </span><input type=text id=tkulcsszo name=kulcsszo size=20 class=keresourlap>";
 	
 	//Egyházmegye
-	$templomurlap.="<br><span class=kiscim>Egyházmegye: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5><select id=tehm name=ehm class=keresourlap onChange=\"if(this.value!=0) {";
+	$templomurlap.="<br/><span class=kiscim>Egyházmegye: </span><select id=tehm name=ehm class=keresourlap style=\"width:100%\" onChange=\"if(this.value!=0) {";
 	foreach($ehmT as $id=>$nev) {
 		$templomurlap.="document.getElementById($id).style.display='none'; ";
 	} 
@@ -208,23 +211,15 @@ function miserend_index() {
 		}
 		$espkerurlap.="</select>";
 	}
-	$templomurlap.="</select><br><img src=img/space.gif width=5 height=8>";
+	$templomurlap.="</select>";
 
 	//Espereskerület
-	$templomurlap.="<br><span class=kiscim>Espereskerület: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5>";
-	$templomurlap.="<div id='valassz' style='display: inline' class=keresourlap>Először válassz egyházmegyét.</div>";
+	$templomurlap.="<span class=kiscim>Espereskerület: </span><img src=img/space.gif width=10 height=5>";
+	$templomurlap.="<br/><div id='valassz' style='display: inline' class=keresourlap>Először válassz egyházmegyét.</div>";
 	$templomurlap.=$espkerurlap;
-	$templomurlap.="<br><img src=img/space.gif width=5 height=8>";
+	$templomurlap.="";
 	
-	//Megye
-	/*
-	$templomurlap.="<br><span class=kiscim>Megye: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5><select name=megye class=keresourlap><option value=0>mindegy</option>";	
-	foreach($megyeT as $id=>$nev) {
-		$templomurlap.="<option value=$id>$nev</option>";
-	}
-	$templomurlap.="</select>";
-	*/
-	$templomurlap.="\n<br><img src=img/space.gif width=5 height=10><div align=right><input type=submit value=keresés class=keresourlap><br><img src=img/space.gif width=5 height=10></div><div style='display: none'></form></div>";
+	$templomurlap.="\n<div align=right><input type=submit value=keresés class=keresourlap></div></form>";
 
 
 	//AndroidReklám
@@ -1317,7 +1312,7 @@ function androidreklam() {
 	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz-kep')\"><img src=\"http://terkep.miserend.hu/images/device-2014-03-24-230146_framed.png\" height=\"180\" style=\"float:right\"></a>Megjelent a <a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz')\">miserend androidos mobiltelefonokra</a> készült változata is. Ám még meg kell találni néhány templomnak a pontos helyét a térképen. Kérem segítsen nekünk!<br/><center><a href=\"http://terkep.miserend.hu\" onclick=\"ga('send','event','Advertisment','terkep.miserend.hu','liladoboz')\">terkep.miserend.hu</a></center>";
 	
 	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\"  onclick=\"ga('send','event','Advertisment','play.google.com','liladoboz-kep')\">
-  <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" style=\"display:block;margin-right:auto;margin-left:auto\" /></a>";
+  <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" style=\"display:block;margin-right:auto;margin-left:auto;width:100%;max-width:172px\" /></a>";
 
 	global $design_url;
 	$variables = array(

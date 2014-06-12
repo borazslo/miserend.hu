@@ -6,11 +6,11 @@
 }
 </style>
  
- <div class="focim_fekete block" style="background-color: #D0D6E4;width:100%;margin-bottom:5px">
+ <div class="focim_fekete block" style="background-color: #D0D6E4;width:98.9677419355%;margin-bottom:5px">
 	<img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
 	<span class="dobozfocim_fekete">Szentmise kereső</span>
 	
-	<div class="focim_fekete" style="float:right;margin-right:10px;height:7px;">&nbsp;
+	<div class="focim_fekete screenonly" style="float:right;margin-right:10px;height:7px;">&nbsp;
 		<img src="{{ design_url|raw }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
 	</div>
 </div>	
@@ -20,9 +20,9 @@
 	<div class="keresourlap" style="float:right;width:49%;background-color:#EAEDF1;">
 		<div style="background-color:#244C8F;height:15px">
 			<img src="{{ design_url|raw }}/img/negyzet_feher.gif" width="6" height="8" align="absmiddle" style="margin-left:5px;margin-right:5px;">
-			<span class="dobozcim_feher">Keresés a templomok között</span>
+			<span class="dobozcim_feher">Templom kereső</span>
 		</div>
-		<div style="padding-left:5px;padding-right:5px;">{{ templomurlap|raw }}</div>
+		<div style="padding-left:5px;padding-right:5px;line-height:29px">{{ templomurlap|raw }}</div>
 	</div>
 	<div align="center" style="margin-top:5px;width:49%;float:right">
 		{{ androidreklam|raw }}
@@ -30,7 +30,7 @@
  </div>
   
 <div style="background-color:#CCCCCC;height:3px;margin-top:10px;margin-bottom:10px;width:100%"></div>
-{{ kepek|raw }}
+<div class="screenonly">{{ kepek|raw }}</div>
  <!--
 <table width="100%" border="0" cellspacing="0" cellpadding="0">   
   <tr> 
