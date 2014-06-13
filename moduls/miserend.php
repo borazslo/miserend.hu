@@ -958,7 +958,7 @@ function miserend_view() {
 	//Miseidőpontok
 	$query="select nap,ido,idoszamitas,nyelv,milyen,megjegyzes from misek where templom='$tid' and torles=0 order by nap,idoszamitas,ido";
 	$lekerdez=mysql_query($query);
-	while(list($nap,$ido,$idoszamitas,$nyelv,$milyen,$mmegjegyzes)=mysql_fetch_row($lekerdez)) {
+	while(list($nap,$ido,$idoszamitas,$nyelv,$milyen,$mmegjegyzes)=mysql_fetch_row($lekerdez)) {    
 		$idokiir=$ido;
 		if($idokiir[0]=='0') $idokiir=substr($idokiir,1,4);
 		else $idokiir=substr($idokiir,0,5);
