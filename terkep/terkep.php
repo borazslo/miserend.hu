@@ -325,7 +325,7 @@ var selectFeature = new OpenLayers.Control.SelectFeature(
 			$.ajax({
 				'async': false,
 				'global': false,
-				'url': "http://terkep.miserend.hu/api.php?q=json&id=" + tid,
+				'url': "api.php?q=json&id=" + tid,
 				'dataType': "json",
 				'success': function (data) {
 					json = data;
