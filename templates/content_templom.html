@@ -1,30 +1,14 @@
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr> 
-    <td colspan="3">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#D0D6E4">
-        <tr>
-          <td width="10"><img src="img/space.gif" width="10" height="10"></td>
-          <td> 
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td><img src="{{ design_url }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"> 
-                  <img src="img/space.gif" width="5" height="5"><span class="dobozfocim_fekete">{{ nev|raw }}</span></td>
-                <td>
-                  <div align="right"><span class="dobozfocim_fekete"><img src="{{ design_url }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle"></span></div>
-                </td>
-              </tr>
-            </table>
-          </td>
-          <td width="10"><img src="img/space.gif" width="10" height="10"></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  <tr> 
-    <td colspan="3" height="5"><img src="img/space.gif" width="10" height="5"></td>
-  </tr>
-  <tr> 
-    <td width="49%" valign="top">{{ ismertnev|raw }}
+ <div class="focim_fekete block" style="background-color: #D0D6E4;width:98.9677419355%;margin-bottom:5px">
+	<img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
+	<span class="dobozfocim_fekete">{{ nev|raw }}</span>
+	
+	<div class="focim_fekete screenonly" style="float:right;margin-right:10px;height:7px;">&nbsp;
+		<img src="{{ design_url|raw }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
+	</div>
+</div>	
+
+
+  <div id="containerleft" width="49%" valign="top">{{ ismertnev|raw }}
       <table width="100%" border="0" cellspacing="0" cellpadding="0" id="szentmisek">
         <tr> 
           <td bgcolor="#B51A7E" colspan="5" style="padding-left:5px"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_feher">Szentmisék rendje</span></td>
@@ -70,9 +54,9 @@
       </table>
 	  {{ eszrevetel|raw }}
 	  {{ androidreklam|raw }}
-    </td>
-<td width=15><img src=img/space.gif width=15 height=5></td>
-    <td width="49%" valign="top">{{ cim|raw }}{{ terkep|raw }}<br>
+    </div>
+<div id="containerright" valign="top" width="49%">
+    {{ cim|raw }}{{ terkep|raw }}<br>
       <img src="img/space.gif" width="5" height="10"><br>
       {{ megkozelit |raw }}
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -123,8 +107,10 @@
 		</tr>
 </table>
 	
-    </td>
-  </tr>
+    </div>
+  
+  
+<table width="100%" border="0" cellspacing="0" cellpadding="0">  
   <tr> 
     <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
   </tr>

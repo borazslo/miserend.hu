@@ -89,6 +89,17 @@
 div.rightside.footer , div.leftside.footer {
     padding-top: 3px;
 }
+
+#containerleft{
+        width: 48%;
+        float:left
+    }
+#containerright {
+        width: 48%;
+        float:left;
+        margin-left: 2%;
+    }
+    
 @media all and (max-width: 767px) {
     .mobileonly {
         display:block;
@@ -113,4 +124,15 @@ div.rightside.footer , div.leftside.footer {
     .center {
         
     }
+       
 }
+
+@media all and (max-width: 480px) {
+    #containerleft{
+        width: 100%;
+    }
+    #containerright{
+        width: 100%;
+        margin-left: 0px;
+    }
+}    
