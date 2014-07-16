@@ -958,6 +958,7 @@ function miserend_view() {
 	//Miseidőpontok
 	$query="select nap,ido,idoszamitas,nyelv,milyen,megjegyzes from misek where templom='$tid' and torles=0 order by nap,idoszamitas,ido";
 	$lekerdez=mysql_query($query);
+    $napokT = array();
 	while(list($nap,$ido,$idoszamitas,$nyelv,$milyen,$mmegjegyzes)=mysql_fetch_row($lekerdez)) {    
 		$idokiir=$ido;
 		if($idokiir[0]=='0') $idokiir=substr($idokiir,1,4);
@@ -968,50 +969,13 @@ function miserend_view() {
 		if($idoszamitas=='t') $tnapokT[$nap].=$idokiir.'<br>'; //téli
 		else $napokT[$nap].=$idokiir.'<br>'; //nyári
 
-		if(strstr($nyelv,'de'))  {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/de.gif width=16 height=11 vspace=2 align=absmiddle title='német nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/de.gif width=16 height=11 vspace=2 align=absmiddle title='német nyelvű mise'>";
-		}
-		if(strstr($nyelv,'it'))  {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/it.gif width=16 height=11 vspace=2 align=absmiddle title='olasz nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/it.gif width=16 height=11 align=absmiddle vspace=2 title='olasz nyelvű mise'>";
-		}
-		if(strstr($nyelv,'en')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/en.gif width=16 height=11 vspace=2 align=absmiddle title='angol nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/en.gif width=16 height=11 align=absmiddle vspace=2 title='angol nyelvű mise'>";
-		}
-		if(strstr($nyelv,'gr')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/gr.gif width=16 height=11 vspace=2 align=absmiddle title='görög nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/gr.gif width=16 height=11 align=absmiddle vspace=2 title='görög nyelvű mise'>";
-		}
-		if(strstr($nyelv,'va')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/va.gif width=16 height=11 vspace=2 align=absmiddle title='latin nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/va.gif width=16 height=11 align=absmiddle vspace=2 title='latin nyelvű mise'>";
-		}
-		if(strstr($nyelv,'ro')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/ro.gif width=16 height=11 vspace=2 align=absmiddle title='román nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/ro.gif width=16 height=11 align=absmiddle vspace=2 title='román nyelvű mise'>";
-		}
-		if(strstr($nyelv,'sk')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/sk.gif width=16 height=11 vspace=2 align=absmiddle title='szlovák nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/sk.gif width=16 height=11 align=absmiddle vspace=2 title='szlovák nyelvű mise'>";
-		}
-		if(strstr($nyelv,'si')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/si.gif width=16 height=11 vspace=2 align=absmiddle title='szlovén nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/si.gif width=16 height=11 align=absmiddle vspace=2 title='szlovén nyelvű mise'>";
-		}
-		if(strstr($nyelv,'hr')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/hr.gif width=16 height=11 vspace=2 align=absmiddle title='horvát nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/hr.gif width=16 height=11 align=absmiddle vspace=2 title='horvát nyelvű mise'>";
-		}
-		if(strstr($nyelv,'pl')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/pl.gif width=16 height=11 vspace=2 align=absmiddle title='lengyel nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/pl.gif width=16 height=11 align=absmiddle vspace=2 title='lengyel nyelvű mise'>";
-		}
-		if(strstr($nyelv,'fr')) {
-			if($idoszamitas=='t') $tikonT[$nap].="<img src=img/zaszloikon/fr.gif width=16 height=11 vspace=2 align=absmiddle title='francia nyelvű mise'>";
-			else $ikonT[$nap].="<img src=img/zaszloikon/fr.gif width=16 height=11 align=absmiddle vspace=2 title='francia nyelvű mise'>";
-		}
+        foreach(array('de'=>'német','it'=>'olasz','en'=>'olasz','gr'=>'görög','va'=>'latin','ro'=>'román','sk'=>'szlobák','si'=>'szlovén','hr'=>'horvát','pl'=>'lengyel','fr'=>'francia') as $key => $item) {
+            if(strstr($nyelv,$key)) {
+                $zaszloikon = "<img src=img/zaszloikon/".$key.".gif width=16 height=11 align=absmiddle vspace=2 title='".$value." nyelvű mise'>";
+                if($idoszamitas=='t') $tikonT[$nap] .= $zaszloikon; 
+                else $ikonT[$nap] .= $zaszloikon;
+            }
+        }
 
 		if(!empty($mmegjegyzes)) {
 			if($idoszamitas=='t') $tikonT[$nap].="<img src=$design_url/img/info2.gif title='$mmegjegyzes' width=16 height=16 align=absmiddle>";
@@ -1034,6 +998,7 @@ function miserend_view() {
 		}
 		if($idoszamitas=='ny') $ikonT[$nap].='<br>';
 		else $tikonT[$nap].='<br>';
+        
 	}
 
 	if(strstr($u_jogok,'miserend')) {

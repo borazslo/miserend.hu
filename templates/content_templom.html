@@ -27,54 +27,45 @@
     <td width="49%" valign="top">{{ ismertnev|raw }}
       <table width="100%" border="0" cellspacing="0" cellpadding="0" id="szentmisek">
         <tr> 
-          <td bgcolor="#B51A7E" width="5"><img src="img/space.gif" width="5" height="5"></td>
-          <td bgcolor="#B51A7E" colspan="7"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_feher">Szentmisék 
-            rendje </span></td>
-          <td width="8" bgcolor="#B51A7E"><img src="img/space.gif" width="5" height="5"></td>
+          <td bgcolor="#B51A7E" colspan="5" style="padding-left:5px"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_feher">Szentmisék rendje</span></td>
         </tr>
-        <tr> 
-          <td width="5"></td>
-          <td>{{ frissites|raw }}</td>
-          <td class="alap" colspan="3">{{ nyari|raw }}</td>
-		  <td class="alap" colspan="3">{{ teli|raw }}</td>
-          <td width="5"></td>
+        <tr style="margin-bottom:4px"> 
+          <td style="padding-left:5px">{{ frissites|raw }}</td>
+          <td class="alap" colspan="2">{{ nyari|raw }}</td>
+		  <td class="alap" colspan="2" style="padding-right:5px">{{ teli|raw }}</td>
         </tr>
 		<tr> 
-          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+          <td colspan="5" height="3"><img src="img/space.gif" width="5" height="3"></td>
         </tr>
 		<tr> 
-           <td bgcolor="#E5EAEF" colspan="9" height=1><img src="img/space.gif" width="5" height="1"></td>
+           <td bgcolor="#E5EAEF" colspan="5" height=1><img src="img/space.gif" width="5" height="1"></td>
         </tr>
 		<tr> 
-          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+          <td colspan="5" height="3"><img src="img/space.gif" width="5" height="3"></td>
         </tr>
         {% for i in 1..7 %}
         <tr> 
-          <td width="5"></td>
-          <td class="alap" valign="top" width="75">{{ napok[i]|raw  }}</td>
-          <td class="alap" valign="top" align="right" width="40%">{{ napokT[i]|raw }}</td>
-		  <td width="2"><img src=img/space.gif width=2 height=2></td>
-		  <td class="alap" valign="top" width="10%">{{ ikonT[i]|raw }}</td>
-		  <td class="alap" valign="top" align="right" width="40%">{{ tnapokT[i]|raw }}</td>
-		  <td width="2"><img src=img/space.gif width=2 height=2></td>
-		  <td class="alap" valign="top" width="10%">{{ tikonT[i]|raw  }}</td>
-          <td width="5"></td>
+          <td class="alap" valign="top" width="75" style="padding-left:5px">{{ napok[i]|raw  }}</td>
+          <td class="alap" valign="top" align="right" style="padding-right:2px">{{ napokT[i]|raw }}</td>
+		  <td class="alap" valign="top" >{{ ikonT[i]|raw }}</td>
+		  <td class="alap" valign="top" align="right" style="padding-right:2px">{{ tnapokT[i]|raw }}</td>
+		  <td class="alap" valign="top" style="padding-left:5px">{{ tikonT[i]|raw  }}</td>
         </tr>
 		<tr> 
-          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+          <td colspan="5" height="3"><img src="img/space.gif" width="5" height="3"></td>
         </tr>
 		<tr> 
-           <td bgcolor="#E5EAEF" colspan="9" height=1><img src="img/space.gif" width="5" height="1"></td>
+           <td bgcolor="#E5EAEF" colspan="5" height=1><img src="img/space.gif" width="5" height="1"></td>
         </tr>
 		<tr> 
-          <td colspan="9" height="3"><img src="img/space.gif" width="5" height="3"></td>
+          <td colspan="5" height="3"><img src="img/space.gif" width="5" height="3"></td>
         </tr>
        {% endfor %}       
         <tr> 
-          <td bgcolor="#E5EAEF" colspan="9" height="5"><img src="img/space.gif" width="5" height="5"></td>
+          <td bgcolor="#E5EAEF" colspan="5" height="5"><img src="img/space.gif" width="5" height="5"></td>
         </tr>
 		<tr>
-		  <td colspan="9"><span class=kicsi><font color=red>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a plébánián!</font></span></td>
+		  <td colspan="5"><span class=kicsi><font color=red>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a plébánián!</font></span></td>
 		</tr>
       </table>
 	  {{ eszrevetel|raw }}
