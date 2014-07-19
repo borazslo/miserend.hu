@@ -1041,10 +1041,12 @@ function miserend_view() {
 	}
 	$eszrevetel='<img src=img/space.gif width=5 height=10><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr bgcolor="#EAEDF1">'; 
 	$eszrevetel.='<td bgcolor="#EAEDF1" width="5"><img src="img/space.gif" width="5" height="5"></td>';
-	$eszrevetel.='<td><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><!--<img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle">--><img src=img/alert.gif align=top width=16 height=15><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Észrevételek, kiegészítés</span></td><td>';
+	$eszrevetel.='<td><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><!--<img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle">--><img src=img/alert.gif align=top width=16 height=15><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Segítsd munkánkat!</span></td><td>';
 	$eszrevetel.='<div align="right"><img src="'.$design_url.'/img/lilapontok_kek.jpg" width="43" height="6"></div></td></tr></table>';			
 	$eszrevetel.='</td><td width="5"><img src="img/space.gif" width="5" height="5"></td></tr><tr bgcolor="#F8F4F6"><td width="5"></td><td>';
-	$eszrevetel.="<p class=alapkizart>Amennyiben a templommal, adataival, vagy a miserenddel kapcsolatosan észrevételed van, kérünk írd meg nekünk! <b><i>Hálásan köszönjük a segítséged!</i></b><br><div align=center><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$tid&kod=templomok',450,530);\" class=link><font color=#8D317C><b>Észrevételek beküldése</b></font></a></div>";
+	$eszrevetel.="<p class=alapkizart>Ha észrevételed van a templommal vagy a miserenddel kapcsolatban, írd meg nekünk!</p>
+    <div align=center><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$tid&kod=templomok',450,530);\" class=link><font color=#8D317C size='+1'><b>Észrevétel beküldése</b></font></a></div>
+    <div align=center><a href=\"javascript:OpenNewWindow('kepkuldes.php?sid=$sid&id=$tid&kod=templomok',450,530);\" class=link><font color=#8D317C size=''><b>Új kép beküldése</b></font></a></div>";
 	$eszrevetel.='</td><td width="5"></td></tr></table>';
 
 	//AndroidReklam
