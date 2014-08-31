@@ -22,6 +22,7 @@ class Mail
 		if($this->debug == 1) {
 			$this->header .= 'Bcc: '. $this->debugger . "\r\n";
 		} elseif ($this->debug == 2) {
+			$this->content .= ".<br/>\n<i>Originally to: ".print_r($this->to,1)."</i>";
 			$this->to = array($this->debugger);
 		}
 
@@ -30,10 +31,10 @@ class Mail
 			if($this->debug == 3) { print_r($this); }
 			else {
 				if(!mail(implode(',',$this->to),$this->subject,$this->content,$this->header))
-					echo 'Valami hivba tortent ay email kuldes kozen. Kar';
+					echo 'Valami hiba történt az email küldése közben. Kár';
 			}
 		} else {
-			echo 'Nem tudtuk elkuldeni a mailt. Keves az adat.';
+			echo 'Nem tudtuk elküldeni az emailt. Kevés az adat.';
 		}
 
 	}
@@ -56,23 +57,28 @@ class Remark
 		$mail = new Mail();
 		$mail->subject = "Miserend - észrevétel érkezett";
 
+		$mail->content .= "------------------<br/>\n";
+
 		switch ($type) {
 			case 'diocese':
-				$mail->content = "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
+				$mail->content .= "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
 				$mail->content .= $this->PreparedText4Email;
 			break;
 			
 			case 'contact':
-				$mail->content = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomod adataihoz észrevétel érkezett.<br/>\n";
+				$mail->content .= "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomod adataihoz észrevétel érkezett.<br/>\n";
 				$mail->content .= $this->PreparedText4Email;
 			break;
 
 			case 'debug':
-				$mail->content = "Kedves admin!\n\n<br/><br/>Az egyik templom adataihoz észrevétel érkezett.<br/>\n";
+				$mail->content .= "Kedves admin!\n\n<br/><br/>Az egyik templom adataihoz észrevétel érkezett.<br/>\n";
 				$mail->content .= $this->PreparedText4Email;
 			break;
 
 		}
+
+		$mail->content .= "------------------<br/>\n";
+		$mail->content .= "Köszönjük a munkádat!<br/>\nVPP";
 
 		$mail->to = $to;
 		$mail->send();

@@ -1,0 +1,17 @@
+{% extends "page.html" %}
+
+{% block container %}
+<div style="width:100%-10px;background-color:#ffffff;padding:5">
+  <div style="width:100%-20px;background-color:#F5CC4C;padding:5;margin-bottom:6px" class="alap">
+    <big>{{ title|raw }}</big><br/>
+    <i>{{ description }}</i>
+  </div>
+  {{ content|raw }}
+  {% if disclaimer %}
+    <div style="width:100%-20px;background-color:#F5CC4C;padding:5;margin-bottom:6px" class="alap">
+        {{ disclaimer|raw }}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
