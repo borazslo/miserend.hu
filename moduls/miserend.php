@@ -241,6 +241,7 @@ function miserend_index() {
         file_put_contents($file,$xmlstr);
     }
     
+    if($xmlstr != '') {
     
     $xmlcont = new SimpleXMLElement($xmlstr);
     
@@ -319,6 +320,8 @@ function miserend_index() {
 			$link='';
 			$a++;
 		}
+	}
+
 	}
     
 	if(!empty($unnep)) {
