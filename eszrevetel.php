@@ -1,13 +1,5 @@
 <?php
-include("config.inc");
-dbconnect();
-
-//Twig       
-require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
-Twig_Autoloader::register();
-$loader = new Twig_Loader_Filesystem('templates');
-$twig = new Twig_Environment($loader); // cache?        
-
+include("load.php");
 
 $op=$_POST['op'];
 if(empty($op)) $op=$_GET['op'];
@@ -22,12 +14,6 @@ switch($op) {
     	break;        	
 }
 
-?>
-
-	</body>
-</html>
-
-<?
 
 function urlap() {
 	global $db_name,$twig;
@@ -126,7 +112,7 @@ function adatadd() {
 	
 
 	$content .= "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br></br>".$remark->PreparedText4Email."<br/><input type='button' value='Ablak bezárása' onclick='self.close()'>";
-	//$content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
+	$content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
 
 	$vars = array(
 			'pagetitle' => 'Észrevétel beküldése',
@@ -137,10 +123,5 @@ function adatadd() {
 	echo $twig->render('remark.html',$vars);
 }
 
-function sanitize($text) {
-	$text = preg_replace('/\n/i','<br/>',$text);
-	$text = strip_tags($text,'<a><i><b><strong><br>');
 
-	return $text;
-}
 ?>

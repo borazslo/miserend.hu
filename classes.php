@@ -1,5 +1,38 @@
 <?php
 /**
+ * user class
+ *
+ * @package default
+ * @author 
+ **/
+class User
+{
+	function __construct($uid = false) {
+		if(!isset($uid) OR !is_numeric($uid)) {
+			$this->loggedin = false;
+			$this->uid = 0;
+			$this->username = '*vendeg*';
+			$this->nickname = '*vendeg*';
+		} else {
+			$query = "SELECT * FROM user WHERE uid = $uid AND ok = 'i' LIMIT 1";
+			$result = mysql_query($query);
+            $x = mysql_fetch_assoc($result);
+            if(is_array($x)) {
+            	foreach ($x as $key => $value) {
+            		$this->$key = $value;
+            	}
+            	$this->loggedin = true;
+				$this->username = $x['login'];
+				$this->nickname = $x['becenev'];
+            } else {
+            	// There is no user with this uid;
+            	return false;
+            }
+		}
+	}
+} // END class 
+
+/**
  * email
  *
  * @package default
