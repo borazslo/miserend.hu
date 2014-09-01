@@ -16,9 +16,8 @@ switch($op) {
 
 
 function urlap() {
-	global $db_name,$twig;
+	global $db_name,$twig, $user;
 
-	$sid=$_GET['sid'];
 	$id=$_GET['id'];
 	$kod=$_GET['kod'];
 
@@ -30,11 +29,17 @@ function urlap() {
 		$form = "Hibás templom azonosító. Ennyike.<script language=Javascript>close();</script>";
 	}	
 	else {
-		$form ="<form method=post action=?op=add><input type=hidden name=sid value='$sid'><input type=hidden name=id value='$id'>";
+		$form ="<form method=post action=?op=add><input type=hidden name=id value='$id'>";
 		$form.="<input type=hidden name=ehm value=$ehm>";
-		$form.="<span class=alap>Nevem: </span><input type=text size=40 name=nev class=urlap>";
-		$form.="<br><span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap>";
-		$form.="<br><br><span class=alap>Észrevételeim a templom adataihoz: </span><br><textarea name=leiras class=urlap cols=70 rows=20></textarea>";
+		if(!$user->loggedin) {
+			$form.="<span class=alap>Nevem: </span><input type=text size=40 name=nev class=urlap >";
+			$form.="<br><span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap >";
+			$form.="<br><br><span class=alap>Észrevételeim a templom adataihoz: </span><br>";
+		} else {
+			$form.="<input type=hidden size=40 name=nev value='".$user->nev."'>";
+			$form.="<input type=hidden size=40 name=email value='".$user->email."'>";
+		}
+		$form .= "<textarea name=leiras class=urlap cols=70 rows=20></textarea>";
 		$form.="<br><input type=submit value=Elküld class=urlap></td></tr></table></form>";
 		}
 	$vars = array(
@@ -49,11 +54,10 @@ function urlap() {
 }
 
 function adatadd() {
-	global $_POST,$db_name,$config,$twig;
+	global $_POST,$config,$twig,$user;
 
 	include_once('classes.php');
 
-	$sid=$_POST['sid'];
 	$id=$_POST['id'];
 
 	$nev=$_POST['nev'];
@@ -61,11 +65,7 @@ function adatadd() {
 	$leiras=$_POST['leiras'];
 	$ehm=$_POST['ehm'];
 
-	$query="select login,oldlogin from session where sessid='$sid'";
-	$lekerdez=mysql_query($query);
-	list($login,$oldlogin)=mysql_fetch_row($lekerdez);
-
-	if($login=='*vendeg*' and !empty($oldlogin)) $login=$oldlogin;
+	$login = $user->username;
 
 	$most=date('Y-m-d H:i:s');
 	
@@ -112,7 +112,7 @@ function adatadd() {
 	
 
 	$content .= "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br></br>".$remark->PreparedText4Email."<br/><input type='button' value='Ablak bezárása' onclick='self.close()'>";
-	$content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
+	if($config['debug']<1) $content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
 
 	$vars = array(
 			'pagetitle' => 'Észrevétel beküldése',
