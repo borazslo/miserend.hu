@@ -22,6 +22,7 @@ function miserend_index() {
     
     $script .= '<link rel="stylesheet" href="templates/colorbox.css" />';
     $script .= '<link rel="stylesheet" href="templates/als.css" />';
+
     $script .= '
         <script>
         $(function() { //shorthand document.ready function
@@ -48,95 +49,125 @@ function miserend_index() {
 	$holnap=date('Y-m-d',(time()+86400));
 	$mikor='8:00-19:00';
 
-	$query="select id,nev from egyhazmegye where ok='i' order by sorrend";
-	$lekerdez=mysql_query($query);
-	while(list($id,$nev)=mysql_fetch_row($lekerdez)) {
-		$ehmT[$id]=$nev;
-	}
-
 	$query="select id,ehm,nev from espereskerulet";
 	$lekerdez=mysql_query($query);
 	while(list($id,$ehm,$nev)=mysql_fetch_row($lekerdez)) {
 		$espkerT[$ehm][$id]=$nev;
-	}
+	} 
 
-	//Miserend űrlap
-	$miseurlap="\n<div style='display: none'><form method=post id=\"mkereses\"><input type=hidden name=sid id=msid value=$sid><input type=hidden name=m_id id=m_id value=$m_id><input type=hidden id=m_op name=m_op value=misekeres></div>";
+	//MISEREND űRLAP
+	$formnyit  = "<form method=post name=\"kereses\" id=\"kereses\">";
 
+	$formvalaszt = "<span id=misek onClick=\"
+			document.getElementById('misekis').style.display='inline';
+			document.getElementById('templomok').style.color='#ffffff';
+			document.getElementById('misek').style.color='#000000';
+			document.getElementById('keresestipus').value = 1;
+
+		\">Szentmise kereső</span> / ";
+	$formvalaszt.= "<span id=templomok style=\"color:#ffffff\" onClick=\"
+			document.getElementById('misekis').style.display='none';
+			document.getElementById('templomok').style.color='#000000';
+			document.getElementById('misek').style.color='#ffffff';
+			document.getElementById('keresestipus').value = 0;
+
+		\">Templom kereső</span>";
+			   
+
+
+	$urlap .="<input type=hidden id=keresestipus name=keresestipus value=1>";
+
+	$urlap .= "<input type=hidden name=m_id id=m_id value=$m_id><input type=hidden id=m_op name=m_op value=keres>";
+
+//Hol
+	$urlap .= "<span class=kiscim style='margin-left:5px;'>Hol:</span><br>";
+	$urlap.="<span class=alap style='margin-left:5px;'>- kulcsszó: </span><input type=text id=kulcsszo name=kulcsszo size=20 class=keresourlap><br/>";	
+	$urlap.="<span class=alap style='margin-left:5px;margin-right:5px'>- település:</span><input type=text name=varos id=varos size=20 class=keresourlap style=\"margin-left:10px\"><br/>";	
+	
+	$urlap.="<span class=alap style='margin-left:5px;margin-right:5px'>- egyházmegye: </span>
+				<select name=ehm id=ehm class=keresourlap style=\"margin-left:10px\" onChange=\"
+						var a = document.getElementsByName('espker');	
+						for (index = 0; index < a.length; ++index) {
+						    console.log(a[index]);
+						    a[index].style.display = 'none';
+						}
+
+						if(this.value!=0) {	
+							document.getElementById('espkerlabel').style.display='inline';
+							document.getElementById('ehm'+this.value).style.display='inline';
+
+						} else {
+							document.getElementById('espkerlabel').style.display='none';
+						}
+				\">
+					<option value=0>mindegy</option>";	
+	
+					$query="select id,nev from egyhazmegye where ok='i' order by sorrend";
+					$lekerdez=mysql_query($query);
+					while(list($id,$nev)=mysql_fetch_row($lekerdez)) {
+						$urlap.="<option value=$id>$nev</option>";
+					}
+	$urlap.="</select>";
+
+	$urlap.="<span class=alap id=espkerlabel style='margin-left:5px;margin-right:5px;display:none'><br/> -- espereskerület: </span>";
+		foreach($espkerT as $ehm =>$espker) {
+			$urlap.="<select id='ehm$ehm' name=espker class=keresourlap style='display: none'>
+					<option value=0>mindegy</option>";	
+					if(is_array($espker)) { foreach($espker as $espid=>$espnev) {
+						$urlap.="<option value=$espid>$espnev</option>";
+			    	}}
+			$urlap.="</select>";
+		}
+
+	$urlap .= "<br/>";
 //Mikor
+	$urlap .= "<div id='misekis'><br/>";
 	$mainap=date('w');
 	if($mainap==0) $vasarnap=$ma;
 	else {
 		$kulonbseg=7-$mainap;
 		$vasarnap=date('Y-m-d',(time()+(86400*$kulonbseg)));
 	}
-	$miseurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Mikor: </span><br><img src=img/space.gif width=10 height=5><select name=mikor id=mmikor class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md').style.display='inline';} else {document.getElementById('md').style.display='none';}\">";
-	$miseurlap.="<option value='$vasarnap'>vasárnap</option><option value='$ma'>ma</option><option value='$holnap'>holnap</option><option value=x>adott napon:</option>";
-	$miseurlap.="</select> <input type=text name=mikordatum id=md style='display: none' class=keresourlap maxlength=10 size=10 value='$ma'>";
+	$urlap.="\n<span class=kiscim style='margin-left:5px;margin-right:5px'>Mikor: </span>";
+	$urlap .= "<br><select style='margin-left:10px;margin-right:5px' name=mikor id=mikor class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md').style.display='inline';} else {document.getElementById('md').style.display='none';}\">";
+	$urlap.="<option value='$vasarnap'>vasárnap</option><option value='$ma'>ma</option><option value='$holnap'>holnap</option><option value=x>adott napon:</option>";
+	$urlap.="</select> <input type=text name=mikordatum id=md style='display: none' class=keresourlap maxlength=10 size=10 value='$ma'>";
 
-	$miseurlap.="<br><img src=img/space.gif width=10 height=5><br><img src=img/space.gif width=10 height=5><select name=mikor2 id=mmikor2 class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md2').style.display='inline'; alert('FIGYELEM! Fontos a formátum!');} else {document.getElementById('md2').style.display='none';}\">";
-	$miseurlap.="<option value=0>egész nap</option><option value='de'>délelőtt</option><option value='du'>délután</option><option value=x>adott időben:</option>";
-	$miseurlap.="</select> <input type=text name=mikorido id=md2 style='display: none' class=keresourlap maxlength=11 size=10 value='$mikor'>";
-	$miseurlap.="<br><img src=img/space.gif width=5 height=8>";
-
-//Hol
-	$miseurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Hol:</span><br><span class=alap>- település: </span><br><input type=text name=varos id=mvaros size=20 class=keresourlap style=\"margin-left:10px\">";	
-	$miseurlap.="<br><img src=img/space.gif width=5 height=8>";
-
-	$miseurlap.="<br><span class=alap>- egyházmegye: </span><br><img src=img/space.gif width=5 height=5><br><select name=ehm id=mehm class=keresourlap style=\"margin-left:10px\" onChange=\"if(this.value!=0) {";
-	foreach($ehmT as $id=>$nev) {
-		$miseurlap.="document.getElementById('esp$id').style.display='none'; ";
-	} 
-	$miseurlap.="document.getElementById('esp'+this.value).style.display='inline'; document.getElementById('valassz1').style.display='none'; } else {";
-	foreach($ehmT as $id=>$nev) {
-		$miseurlap.="document.getElementById('esp$id').style.display='none'; ";
-	} 
-	$miseurlap.="document.getElementById('valassz1').style.display='inline';}\"><option value=0>mindegy</option>";	
-	foreach($ehmT as $id=>$nev) {
-		$miseurlap.="<option value=$id>$nev</option>";
-	
-		$espkerurlap.="<select id='esp$id' name=espkerT[$id] class=keresourlap style='display: none'><option value=0>mindegy</option>";	
-		if(is_array($espkerT[$id])) {
-    		    foreach($espkerT[$id] as $espid=>$espnev) {
-			$espkerurlap.="<option value=$espid>$espnev</option>";
-		    }
-		}
-		$espkerurlap.="</select>";
-	}
-	$miseurlap.="</select><br><img src=img/space.gif width=5 height=8>";
-	$miseurlap.="<br><span class=alap>- espereskerület: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5>";
-	$miseurlap.="<div id='valassz1' style='display: inline' class=keresourlap>Először válassz egyházmegyét.</div>";
-	$miseurlap.=$espkerurlap;
-	$espkerurlap='';
+	$urlap.=" <select style='margin-left:10px;margin-right:5px' name=mikor2 id=mikor2 class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md2').style.display='inline'; alert('FIGYELEM! Fontos a formátum!');} else {document.getElementById('md2').style.display='none';}\">";
+	$urlap.="<option value=0>egész nap</option><option value='de'>délelőtt</option><option value='du'>délután</option><option value=x>adott időben:</option>";
+	$urlap.="</select> <input type=text name=mikorido id=md2 style='display: none' class=keresourlap maxlength=11 size=10 value='$mikor'>";
 
 //Milyen
-	$miseurlap.="\n<br><img src=img/space.gif width=5 height=10><br><span class=kiscim>Milyen:</span><br>";
-	$miseurlap.="<table width=100% cellpadding=0 cellspacing=0><tr><td><span class=alap>- nyelv: </span><br><select name=nyelv id=mnyelv class=keresourlap>
-    <option value=0>mindegy</option>
-    <option value=h>magyar</option>
-    <option value=en>angol</option>
-    <option value=fr>francia</option>
-    <option value=gr>görög</option>    
-    <option value=hr>horvát</option>    
-    <option value=va>latin</option>
-    <option value=pl>lengyel</option>
-    <option value=de>német</option>
-    <option value=it>olasz</option>    
-    <option value=ro>román</option>
-    <option value=es>spanyol</option>    
-    <option value=sk>szlovák</option>
-    <option value=si>szlovén</option>
-    </select></td>";
+	$urlap.="\n<br><br><span class=kiscim style='margin-left:5px;margin-right:5px'>Milyen:</span><br>";
+	$urlap.="<table width=100% cellpadding=0 cellspacing=0><tr><td><span class=alap>- nyelv: </span><br><select name=nyelv id=nyelv class=keresourlap>
+			    <option value=0>mindegy</option>
+			    <option value=h>magyar</option>
+			    <option value=en>angol</option>
+			    <option value=fr>francia</option>
+			    <option value=gr>görög</option>    
+			    <option value=hr>horvát</option>    
+			    <option value=va>latin</option>
+			    <option value=pl>lengyel</option>
+			    <option value=de>német</option>
+			    <option value=it>olasz</option>    
+			    <option value=ro>román</option>
+			    <option value=es>spanyol</option>    
+			    <option value=sk>szlovák</option>
+			    <option value=si>szlovén</option>
+	    </select></td>";
 
-	$miseurlap.="<td><span class=alap>- zene: </span><br><select name=zene id=mzene class=keresourlap><option value=0>mindegy</option><option value=cs>csendes</option><option value=g>gitáros</option><option value=o>orgonás</option>";	
-	$miseurlap.="</select></td>";
-	$miseurlap.="<td><span class=alap>- diák: </span><br><select name=diak id=mdiak class=keresourlap><option value=0>mindegy</option><option value=d>diák</option><option value=nd>nem diák</option>";	
-	$miseurlap.="</select></td></tr></table>";
+	$urlap.="<td><span class=alap>- zene: </span><br><select name=zene id=zene class=keresourlap><option value=0>mindegy</option><option value=cs>csendes</option><option value=g>gitáros</option><option value=o>orgonás</option>";	
+	$urlap.="</select></td>";
+	$urlap.="<td><span class=alap>- diák: </span><br><select name=diak id=diak class=keresourlap><option value=0>mindegy</option><option value=d>diák</option><option value=nd>nem diák</option>";	
+	$urlap.="</select></td></tr></table>";
 
+	$urlap .= "</div>";
+	$urlap.="<div align=center><input type=submit value=keresés class=keresourlap></div></form>";
 
-	$miseurlap.="<br><img src=img/space.gif width=5 height=10><div align=center><input type=submit value=keresés class=keresourlap><br><img src=img/space.gif width=5 height=8></div><div style='display: none'></form></div>";
+	
 
 //Következő mise a közelben
+/* Talan mar nem is mukodik. Mintha biztosan nem csinlana semmit.
 	$mainap=date('w');
 	$mostido=date('H:i:s');
 	if($mainap==0) $mainap=7;
@@ -181,8 +212,11 @@ function miserend_index() {
 		if(!$vanmise) $kovetkezomise.='<span class=alap>Adatbázisunkban mára már nincs több miseidőpont a településen.</span>';
 		$kovetkezomise.='<img src=img/space.gif width=5 height=8></td><td width="5" bgcolor="#F8F4F6"></td></tr></table>';
 	}
+/* */
+
 
 //Templom űrlap
+/* torolhessuk lassan	
 	$templomurlap="\n<form method=post id=\"tkereses\">
         <input type=hidden id=tsid name=sid value=$sid>
         <input type=hidden id=tm_id name=m_id value=$m_id>
@@ -220,8 +254,9 @@ function miserend_index() {
 	$templomurlap.="";
 	
 	$templomurlap.="\n<div align=right><input type=submit value=keresés class=keresourlap></div></form>";
-
-
+	/* */
+	$templomurlap = '';
+	$miseurlap = $urlap;
 	//AndroidReklám
 	$androidreklam = androidreklam();
 	
@@ -454,6 +489,8 @@ function miserend_index() {
     
 	global $twig;
 	$variables = array(
+		'formnyit' => $formnyit,
+		'formvalaszt' => $formvalaszt,
         'miseurlap'=>$miseurlap,
         'androidreklam' => $androidreklam,
         'templomurlap' => $templomurlap,
@@ -484,7 +521,7 @@ function miserend_templomkeres() {
 	$varos=$_POST['varos'];
 	$kulcsszo=$_POST['kulcsszo'];
 	$ehm=$_POST['ehm'];
-//	$megye=$_POST['megye'];
+	//	$megye=$_POST['megye'];
 	if(empty($_POST['espker'])) {
 		$espkerpT=$_POST['espkerT'];
 		$espker=$espkerpT[$ehm];
@@ -493,7 +530,9 @@ function miserend_templomkeres() {
 
 
 	//Templom űrlap
-	$templomurlap="\n<div style='display: none'><form method=post><input type=hidden name=sid value=$sid><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=templomkeres></div>";
+	$templomurlap="\n<div style='display: none'><form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres></div>";
+	$templomurlap .="<input type=hidden id=keresestipus name=keresestipus value=0>";
+
 	$templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos size=20 class=keresourlap value='$varos'><br><img src=img/space.gif width=5 height=8>";
 	$templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text name=kulcsszo size=20 class=keresourlap value='$kulcsszo'><br><img src=img/space.gif width=5 height=8>";
 	
@@ -1332,13 +1371,13 @@ switch($m_op) {
         $tartalom=miserend_index();
         break;
 
-	case 'templomkeres':
-		$tartalom=miserend_templomkeres();
+	case 'keres':
+		if($_REQUEST['keresestipus'] == 1)
+			$tartalom=miserend_misekeres();
+		else
+			$tartalom=miserend_templomkeres();
 		break;
 
-	case 'misekeres':
-		$tartalom=miserend_misekeres();
-		break;
 
 	case 'view':
 		$tartalom=miserend_view();
