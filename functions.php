@@ -17,6 +17,7 @@ function dbconnect() {
         if($config['debug'] > 0)  die("Az '".$db_name."' adatbázis nem létezik, vagy nincs megfelelő jogosultság elérni azt!\n".mysql_error()."\n$idopont");
         else die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
     }
+
 }
 
 function kicsinyites($forras,$kimenet,$max) {
@@ -140,5 +141,72 @@ function nyelvmeghatarozas() {
     if(!empty($lang)) {
         $linkveg.="&lang=$lang";
     }
+}
+
+function neighboursUpdate($tid = false) {
+    global $config;
+
+    $query = 'SELECT szomszedos1, szomszedos2, templomok.id, lng, lat,  templomok.varos, templomok.nev 
+            FROM templomok LEFT JOIN terkep_geocode ON id = tid 
+            WHERE templomok.ok = "i" ORDER BY frissites DESC ';
+    $result = mysql_query($query);
+    
+    while(($row = mysql_fetch_array($result))) $templomok[$row['id']] = $row;    
+
+    $i = 0;
+    foreach($templomok as $templom) { if($tid == false OR $templom['id'] == $tid) { 
+
+        set_time_limit('600');
+        $ds10 = $ds = array();
+        $c = 0;
+        $szomszedsag = array();
+        $szomszedsag10 = array();
+        foreach($templomok as $szomszed) {
+            
+            $lat1 = $templom['lat'] * M_PI / 180;
+            $lat2 = $szomszed['lat'] * M_PI / 180;
+            $long1 = $templom['lng'] * M_PI / 180;
+            $long2 = $szomszed['lng'] * M_PI / 180;
+            $R = 6371; // km
+            $d = $R * acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($long2 - $long1)) * 1000;
+            
+            if($d < 10000 AND $szomszed['id'] <> $templom['id']) {
+                $szomszedsag10[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
+                $ds10[$d] = $d;
+                }
+            if($szomszed['id'] <> $templom['id']) {
+                $szomszedsag[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);            
+                $ds[$d] = $d;
+            }
+            //if($c>10) break; $c++;
+        }
+        array_multisort($ds10, SORT_ASC, $szomszedsag10);
+        array_multisort($ds, SORT_ASC, $szomszedsag);
+        
+        $szomszedsag = array_slice($szomszedsag, 0, 1); 
+        //ksort($szomszedsag10);
+        //reset($szomszedsag10);
+        $szomszedsag10 = array_slice($szomszedsag10, 0, 11); 
+        
+        $nyers = '';
+        if($config['debug'] > 0) echo " ".$templom['frissites']." <a href=\"http://miserend.hu/?templom=".$templom['id']."\">".$templom['nev']." (".$templom['varos'].")</a><br/>";
+        foreach($szomszedsag10 as $szomszed) {
+            $nyers .= $szomszed['id'].",";      
+            //echo "<div style='margin-left:40px;'>".print_r($szomszed,1)."</div>";
+        }
+        
+        $elso = array_shift(array_values($szomszedsag));
+        $elso = "".$elso['id']."";
+        if($nyers == '') $nyers = '';
+        if($templom['szomszedos1'] == "") {}
+        
+            $query = "UPDATE templomok SET szomszedos1 = '".$elso."' WHERE id = ".$templom['id']." LIMIT 1";
+            if($config['debug'] > 1) echo $query."<br/>";
+            mysql_query($query);
+            $query = "UPDATE templomok SET szomszedos2 = '".$nyers."' WHERE id = ".$templom['id']." LIMIT 1";
+            if($config['debug'] > 1) echo $query."<br/>";
+            mysql_query($query);
+    } }
+
 }
 ?>

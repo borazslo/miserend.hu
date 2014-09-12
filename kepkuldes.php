@@ -119,7 +119,7 @@ $header = "
 
 $footer = "</body></html>";
 
-include("config.inc");
+include("load.php");
 dbconnect();
 
 function urlap() {

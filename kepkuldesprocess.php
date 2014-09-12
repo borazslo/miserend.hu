@@ -1,5 +1,5 @@
 <?php
-include 'config.inc';
+include 'load.php';
 if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 {
     $sid =$_POST['sid'];
@@ -102,31 +102,26 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 		$query="select email from egyhazmegye where id='$ehm'";
 		$lekerdez=mysql_query($query);
 		list($felelosmail)=mysql_fetch_row($lekerdez);
+		
+		$mail = new Mail();
+		$mail->subject = "Miserend - új kép érkezett";
+
 		if(!empty($felelosmail)) {
 			//Mail küldés az egyházmegyei felelősnek
-			$targy = "Miserend - új kép érkezett";
-			$szoveg = "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templomhoz új kép érkezett.<br/>\n";
-			$szoveg .= $eszrevetel;
-			$fejlec = $headers; //.'To: ' . $felelosmail . "\r\n";
-			//mail($felelosmail,$targy,$szoveg,$fejlec);
+			$mail->content = "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templomhoz új kép érkezett.<br/>\n". $eszrevetel;
+			$mail->send($felelosmail);
 		}
 		
 		if(!empty($templom['kontaktmail'])) {
 			//Mail küldés az karbantartónak felelősnek
-			$targy = "Miserend - új kép érkezett";
-			$szoveg = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomhoz új kép érkezett.<br/>\n";
-			$szoveg .= $eszrevetel;
-			$fejlec = $headers; //.'To: ' . $templom['kontaktmail'] . "\r\n";
-			//mail($templom['kontaktmail'],$targy,$szoveg,$fejlec);
+			$mail->content = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomhoz új kép érkezett.<br/>\n". $eszrevetel;
+			$mail->send($templom['kontaktmail']);
 		}
 		
-		//Mail küldése Elek Lacinak, hogy boldog legyen
-		$targy = "Miserend - új kép érkezett";
-		$szoveg = "Kedves admin!\n\n<br/><br/>Az egyik templomhoz új kép érkezett.<br/>\n";
-		$szoveg .= $eszrevetel;
-		$fejlec = $headers; //.'To: ' . $templom['kontaktmail'] . "\r\n";
-		mail('eleklaszlosj@gmail.com',$targy,$szoveg,$fejlec);
-              
+		//Mail küldése a debuggernek, hogy boldog legyen
+		$mail->content = "Kedves admin!\n\n<br/><br/>Az egyik templomhoz új kép érkezett.<br/>\n". $eszrevetel;
+		$mail->send($config['mail']['debugger']);
+	          
 		echo 'Siker! Feltöltöttük. Jöhet a következő!'; //.$UploadDirectory.$NewFileName );
         echo "<br/><img src='".$UploadDirectory.'kicsi/'.$NewFileName."'>";
         exit;

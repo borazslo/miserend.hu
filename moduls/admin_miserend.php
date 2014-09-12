@@ -451,6 +451,7 @@ function miserend_addtemplom($tid) {
 
 function miserend_addingtemplom() {
 	global $_POST,$_SERVER,$db_name,$_FILES,$u_login,$u_beosztas;
+	global $config;
 
 	$ip=$_SERVER['REMOTE_ADDR'];
     $host = gethostbyaddr($ip);
@@ -567,7 +568,7 @@ function miserend_addingtemplom() {
 		$query = "SELECT * FROM terkep_geocode WHERE tid = ".$tid." LIMIT 1 ";
 		$result = mysql_query($query);
 		$geocode = mysql_fetch_assoc($result);
-		echo $geocode['lng']."->".$lng.";".$geocode['lat']."->".$lat;
+		if($config['debug'] > 0) echo $geocode['lng']."->".$lng.";".$geocode['lat']."->".$lat;
 		if($lng != $geocode['lng'] OR $lat != $geocode['lat']) {
 			if($geocode != array() ) {
 				mysql_query("DELETE FROM terkep_geocode WHERE tid = ".$tid." LIMIT 1 ");
@@ -577,6 +578,7 @@ function miserend_addingtemplom() {
 			mysql_query($query);
 			$query = "INSERT INTO terkep_geocode_suggestion (tid,tchecked,slng,slat,uid) VALUES (".$tid.",".$geocode['checked'].",".$lng.",".$lat.",'".$u_login."')";
 			mysql_query($query);
+			neighboursUpdate($tid);
 			
 		} 
 
