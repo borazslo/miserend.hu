@@ -145,16 +145,16 @@ if(empty($op)) $op=$_GET['op'];
 
 switch($op) {
 	default:
-        	urlap();
-        	break;
+        urlap();
+        break;
 
 	case 'add':
 		adatadd();
-        	break;
+        break;
         	
-        case 'bezar':
-        	bezar();
-        	break;
+    case 'bezar':
+        bezar();
+        break;
 }
 
 function sanitize($text) {

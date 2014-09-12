@@ -95,9 +95,9 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
         $eszrevetel = "<a href=\"http://miserend.hu/?templom=".$id."\">".$templom['nev']." (";
 		if($templom['ismertnev'] != "" ) $eszrevetel .= $templom['ismertnev'].", ";
 		$eszrevetel .= $templom['varos'].")</a><br/>\n";
-        $eszrevetel .= "<img src='".$UploadDirectory.$NewFileName."'><br/>\n";
+        $eszrevetel .= "<img src='http://miserend.hu/".$UploadDirectory.$NewFileName."'><br/>\n";
         $eszrevetel .= $felirat."<br/><br/>\n";
-        $eszrevetel .= $UploadDirectory.$NewFileName."\n";
+        $eszrevetel .= "http://miserend.hu/".$UploadDirectory.$NewFileName."\n";
         
 		$query="select email from egyhazmegye where id='$ehm'";
 		$lekerdez=mysql_query($query);
