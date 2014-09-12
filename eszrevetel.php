@@ -1,71 +1,71 @@
 <?php
+include("load.php");
 
-$header="<html><head><title>VPP - Észrevételek</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n<style TYPE=\"text/css\">\n.alap { font-family: Arial, Verdana; font-size: 10pt; text-align: justify; }\n.urlap { font-family: Arial, Verdana;  font-size: 70%; color: #000000; background-color: #FFFFFF; }\n</style>\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">";
+$op=$_POST['op'];
+if(empty($op)) $op=$_GET['op'];
 
-$footer="</body></html>";
+switch($op) {
+	default:
+    	urlap();
+    	break;
 
-include("config.inc");
-dbconnect();
+	case 'add':
+		adatadd();
+    	break;        	
+}
+
 
 function urlap() {
-	global $db_name,$header,$footer;
+	global $db_name,$twig, $user;
 
-	$sid=$_GET['sid'];
 	$id=$_GET['id'];
 	$kod=$_GET['kod'];
 
-	if(!is_numeric($id)) {		
-		echo $header."<script language=Javascript>close();</script>".$footer;
-		exit();
-	}
-	
-	$kiir.="<form method=post action=?op=add><input type=hidden name=kod value='$kod'><input type=hidden name=sid value='$sid'><input type=hidden name=id value='$id'>";
+	$query="select nev,ismertnev,varos,egyhazmegye from templomok where id='$id' and ok='i'";
+	if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
+	list($nev,$ismertnev,$varos,$ehm)=mysql_fetch_row($lekerdez);
 
-	if($kod=='templomok') {
-		$query="select nev,ismertnev,varos,egyhazmegye from templomok where id='$id' and ok='i'";
-		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
-		list($nev,$ismertnev,$varos,$ehm)=mysql_fetch_row($lekerdez);
-		$kiir.="<input type=hidden name=ehm value=$ehm>";
-		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b>$nev</b> $ismertnev - <u>$varos</u></big><br><i>Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban</i></big></td></tr></table>";
-		$kiir.="\n<table width=100% bgcolor=#ECD9A4 cellpadding=5 cellspacing=1><tr><td bgcolor=#FFFFFF>";
-		$kiir.="<span class=alap>Nevem: </span><input type=text size=40 name=nev class=urlap>";
-		$kiir.="<br><span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap>";
-		$kiir.="<br><br><span class=alap>Észrevételeim a templom adataihoz: </span><br><textarea name=leiras class=urlap cols=70 rows=20></textarea>";
-	}
-	if($kod=='hirek') {
-		$query="select cim,datum from hirek where id='$id' and ok='i'";
-		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
-		list($cim,$datum)=mysql_fetch_row($lekerdez);
-		$datum=substr($datum,0,10);
-		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b>$cim</b></big> - $datum<br><i>Javítások, változások bejelentése a hír / esemény adataival kapcsolatban</i></big></td></tr></table>";
-		$kiir.="\n<table width=100% bgcolor=#ECD9A4 cellpadding=5 cellspacing=1><tr><td bgcolor=#FFFFFF>";
-		$kiir.="<span class=alap>Nevem: </span><input type=text size=40 name=nev class=urlap>";
-		$kiir.="<br><span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap>";
-		$kiir.="<br><br><span class=alap>Észrevételeim a hírhez, eseményhez: </span><br><textarea name=leiras class=urlap cols=70 rows=20></textarea>";
-	}
+	if(!is_numeric($id)) {	
+		$form = "Hibás templom azonosító. Ennyike.<script language=Javascript>close();</script>";
+	}	
+	else {
+		$form ="<form method=post action=?op=add><input type=hidden name=id value='$id'>";
+		$form.="<input type=hidden name=ehm value=$ehm>";
+		if(!$user->loggedin) {
+			$form.="<span class=alap>Nevem: </span><input type=text size=40 name=nev class=urlap >";
+			$form.="<br><span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap >";
+			$form.="<br><br><span class=alap>Észrevételeim a templom adataihoz: </span><br>";
+		} else {
+			$form.="<input type=hidden size=40 name=nev value='".$user->nev."'>";
+			$form.="<input type=hidden size=40 name=email value='".$user->email."'>";
+		}
+		$form .= "<textarea name=leiras class=urlap cols=70 rows=20></textarea>";
+		$form.="<br><input type=submit value=Elküld class=urlap></td></tr></table></form>";
+		}
+	$vars = array(
+			'pagetitle' => 'Észrevétel beküldése',
+			'title' => "<b>$nev</b> $ismertnev - <u>$varos</u>",
+			'description' => 'Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban.',
+			'content' => $form,
+			'disclaimer' => 'Figyelem! Nem állunk közvetlen kapcsolatban a plébániákkal ezért plébániai ügyekben (pl. keresztelési okiratok, stb.) sajnos nem tudunk segíteni.' );
 
-	$kiir.="<br><input type=submit value=Elküld class=urlap></td></tr></table></form>";
+	echo $twig->render('remark_form.html',$vars);
 
-	echo $header.$kiir.$footer;
 }
 
 function adatadd() {
-	global $_POST,$db_name,$header,$footer;
+	global $_POST,$config,$twig,$user;
 
-	$sid=$_POST['sid'];
+	include_once('classes.php');
+
 	$id=$_POST['id'];
-	$kod=$_POST['kod'];
 
 	$nev=$_POST['nev'];
 	$email=$_POST['email'];
 	$leiras=$_POST['leiras'];
 	$ehm=$_POST['ehm'];
 
-	$query="select login,oldlogin from session where sessid='$sid'";
-	$lekerdez=mysql_query($query);
-	list($login,$oldlogin)=mysql_fetch_row($lekerdez);
-
-	if($login=='*vendeg*' and !empty($oldlogin)) $login=$oldlogin;
+	$login = $user->username;
 
 	$most=date('Y-m-d H:i:s');
 	
@@ -78,89 +78,50 @@ function adatadd() {
 		list($megbizhato)=mysql_fetch_row($lekerdez);
 	}
 	if(!empty($megbizhato)) $mbiz="megbizhato='$megbizhato', ";
-	$query="insert eszrevetelek set nev='$nev', login='$login', email='$email', $mbiz datum='$most', hol='$kod', hol_id='$id', allapot='u', leiras='".sanitize($leiras)."'";
+	$query="insert eszrevetelek set nev='$nev', login='$login', email='$email', $mbiz datum='$most', hol_id='$id', allapot='u', leiras='".sanitize($leiras)."'";
 	mysql_query($query);
 
 	$query="update $kod set eszrevetel='i' where id='$id'";
 	mysql_query($query);
-
-	if($kod=='templomok') {
-		
-		$query="select nev,ismertnev,varos,kontaktmail from templomok where id = ".$id." limit 0,1";
-		$lekerdez=mysql_query($query);
-		$templom=mysql_fetch_assoc($lekerdez);
-					
-		$eszrevetel ="------------------<br/>\n";
-		$eszrevetel.= "<a href=\"http://miserend.hu/?templom=".$id."\">".$templom['nev']." (";
-		if($templom['ismertnev'] != "" ) $eszrevetel .= $templom['ismertnev'].", ";
-		$eszrevetel .= $templom['varos'].")</a><br/>\n";
-		$eszrevetel.= "<i><a href=\"mailto:".$email."\" target=\"_blank\">".$nev."</a>"; if($login != '') $eszrevetel .= ' ('.$login.') '; $eszrevetel .= ":</i><br/>\n";
-		$eszrevetel.= sanitize($leiras)."<br/>\n";
-		$eszrevetel.="------------------<br/>\n";
-		$eszrevetel.="Köszönjük munkádat!<br/>\nVPP";
-
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		//$headers .= 'Bcc: eleklaszlosj@gmail.com' . "\r\n";
-		$headers .= 'From: miserend.hu <info@miserend.hu>' . "\r\n";
-
-		$query="select email from egyhazmegye where id='$ehm'";
-		$lekerdez=mysql_query($query);
-		list($felelosmail)=mysql_fetch_row($lekerdez);
-		if(!empty($felelosmail)) {
-			//Mail küldés az egyházmegyei felelősnek
-			$targy = "Miserend - észrevétel érkezett";
-			$szoveg = "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
-			$szoveg .= $eszrevetel;
-			$fejlec = $headers; //.'To: ' . $felelosmail . "\r\n";
-			mail($felelosmail,$targy,$szoveg,$fejlec);
-		}
-		
-		if(!empty($templom['kontaktmail'])) {
-			//Mail küldés az karbantartónak felelősnek
-			$targy = "Miserend - észrevétel érkezett";
-			$szoveg = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomod adataihoz észrevétel érkezett.<br/>\n";
-			$szoveg .= $eszrevetel;
-			$fejlec = $headers; //.'To: ' . $templom['kontaktmail'] . "\r\n";
-			mail($templom['kontaktmail'],$targy,$szoveg,$fejlec);
-		}
-		
-		//Mail küldése Elek Lacinak, hogy boldog legyen
-		$targy = "Miserend - észrevétel érkezett";
-		$szoveg = "Kedves admin!\n\n<br/><br/>Az egyik templom adataihoz észrevétel érkezett.<br/>\n";
-		$szoveg .= $eszrevetel;
-		$fejlec = $headers; //.'To: ' . $templom['kontaktmail'] . "\r\n";
-		mail('eleklaszlosj@gmail.com',$targy,$szoveg,$fejlec);
 	
-	}
-	echo $header."<script language=Javascript>close();</script>".$footer;
+	$query="select nev,ismertnev,varos,kontaktmail from templomok where id = ".$id." limit 0,1";
+	$lekerdez=mysql_query($query);
+	$templom=mysql_fetch_assoc($lekerdez);
+				
+	$eszrevetel.= "<a href=\"http://miserend.hu/?templom=".$id."\">".$templom['nev']." (";
+	if($templom['ismertnev'] != "" ) $eszrevetel .= $templom['ismertnev'].", ";
+	$eszrevetel .= $templom['varos'].")</a><br/>\n";
+	$eszrevetel.= "<i><a href=\"mailto:".$email."\" target=\"_blank\">".$nev."</a>"; if($login != '') $eszrevetel .= ' ('.$login.') '; $eszrevetel .= ":</i><br/>\n";
+	$eszrevetel.= sanitize($leiras)."<br/>\n";
+	
+	$query="select email from egyhazmegye where id='$ehm'";
+	$lekerdez=mysql_query($query);
+	list($felelosmail)=mysql_fetch_row($lekerdez);
+
+	$remark = new Remark();
+	$remark->PreparedText4Email = $eszrevetel;
+
+	//Mail küldés az egyházmegyei felelősnek
+	if(!empty($felelosmail)) { $remark->SendMail('diocese',$felelosmail);}
+	
+	//Mail küldés a karbantartónak / felelősnek
+	if(!empty($templom['kontaktmail'])) { $remark->SendMail('contact',$felelosmail);}
+
+	//Mail küldése a debuggernek, hogy boldog legyen
+	$remark->SendMail('debug',$config['mail']['debugger']);
+	
+
+	$content .= "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br></br>".$remark->PreparedText4Email."<br/><input type='button' value='Ablak bezárása' onclick='self.close()'>";
+	if($config['debug']<1) $content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
+
+	$vars = array(
+			'pagetitle' => 'Észrevétel beküldése',
+			'title' => "<b>".$templom['nev']." </b> ".$templom['ismertnev']."  - <u>".$templom['varos']." </u>",
+			'description' => 'Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban.',
+			'content' => $content);
+
+	echo $twig->render('remark.html',$vars);
 }
 
-function bezar() {
-	echo $header."<script language=Javascript>close();</script>".$footer;
-}
 
-$op=$_POST['op'];
-if(empty($op)) $op=$_GET['op'];
-
-switch($op) {
-	default:
-        urlap();
-        break;
-
-	case 'add':
-		adatadd();
-        break;
-        	
-    case 'bezar':
-        bezar();
-        break;
-}
-
-function sanitize($text) {
-	$text = preg_replace('/\n/i','<br/>',$text);
-	$text = strip_tags($text,'<a><i><b><strong><br>');
-
-	return $text;
-}
 ?>
