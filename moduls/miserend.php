@@ -263,29 +263,13 @@ function miserend_index() {
 	//Napi gondolatok
 	//Napi igehely
 
-	$datum=$_GET['datum'];
-	if(empty($datum)) $datum=$ma;
-    
-    $file = 'fajlok/igenaptar/'.$datum.'.xml';
-    if(file_exists($file)) { 
-        $xmlstr = file_get_contents($file);
-        }
-    else {
-        $source = "http://breviar.sk/cgi-bin/l.cgi?qt=pxml&d=".substr($datum,8,2)."&m=".substr($datum,5,2)."&r=".substr($datum,0,4)."&j=hu";
-        $xmlstr = file_get_contents($source);
-        @file_put_contents($file,$xmlstr);
-    }
-    
-    if($xmlstr != '') {
-    
-    $xmlcont = new SimpleXMLElement($xmlstr);
-    
-        $url = $xmlcont->CalendarDay;
-        $readingsId = array();
-        foreach($url->Celebration as $celebration) {
-            $unnep .= $celebration->StringTitle->span[0]." (".$celebration->LiturgicalCelebrationType.") <br/>\n";
-            $readingsId[] = " id = '".$celebration->LiturgicalReadingsId."' ";
-       }
+	$url = LirugicalDay();
+	   if($url != false)  { 
+	    $readingsId = array();
+	    foreach($url->Celebration as $celebration) {
+	        $unnep .= $celebration->StringTitle->span[0]." (".$celebration->LiturgicalCelebrationType.") <br/>\n";
+	        $readingsId[] = " id = '".$celebration->LiturgicalReadingsId."' ";
+	   }
        
        $ev = $celebration->LiturgicalYearLetter;
        if(preg_match("/évközi/i",$celebration->LiturgicalSeason)) $idoszak = 'e';
@@ -498,7 +482,8 @@ function miserend_index() {
         'uzenet' => $uzenet,
         'igehelyek' => $igehelyek,
         'elmelkedes' => $elmelkedes,
-        'design_url' => $design_url);		
+        'design_url' => $design_url,
+        'alert' => LiturgicalDayAlert('html'));		
     return $twig->render('content_fooldal.html',$variables);
 }
 
@@ -781,7 +766,7 @@ function miserend_misekeres() {
 		$leptet_urlap.="<input type=hidden name=diak value='$diak'>";
 	}
 
-	$tartalom.="</span><br>";
+	$tartalom.="</span><br/><br/>".LiturgicalDayAlert('html',$mikordatum);
 
 	if(!empty($_POST['leptet'])) $visszalink="?$linkveg";
 	else $visszalink="javascript:history.go(-1);";
@@ -1303,7 +1288,9 @@ function miserend_view() {
             'sz1' => $sz1,
             'sz2' => $sz2,
             'napok' => array('','hétfő','kedd','szerda','csütörtök','péntek','szombat','<font color=#AC282B><b>vasárnap</b></font>'),
-            'design_url'=>$design_url);
+            'design_url'=>$design_url,
+            'alert' => LiturgicalDayAlert('html'));		
+
         return $twig->render('content_templom.html',$variables);    
 	}
 	else {

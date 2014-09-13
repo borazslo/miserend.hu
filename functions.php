@@ -209,4 +209,51 @@ function neighboursUpdate($tid = false) {
     } }
 
 }
+
+function LirugicalDay($datum = false) {
+    global $config;
+
+    if(empty($datum)) $datum=  date('Y-m-d');
+    
+    $file = 'fajlok/igenaptar/'.$datum.'.xml';
+    if(file_exists($file) AND $config['debug'] == 0) { 
+        $xmlstr = file_get_contents($file);
+        }
+    else {
+        $source = "http://breviar.sk/cgi-bin/l.cgi?qt=pxml&d=".substr($datum,8,2)."&m=".substr($datum,5,2)."&r=".substr($datum,0,4)."&j=hu";
+        $xmlstr = file_get_contents($source);
+        @file_put_contents($file,$xmlstr);
+    }
+    
+    if($xmlstr != '') {
+    
+        $xmlcont = new SimpleXMLElement($xmlstr);
+        return $xmlcont->CalendarDay;
+    } else 
+        return false;    
+ }
+
+ function LiturgicalDayAlert($html = false,$date = false) {
+    global $design_url;
+
+    $alert = false;
+    $day = LirugicalDay($date);
+    if($day != false AND isset($day->Celebration))  { 
+        if($day->Celebration->LiturgicalCelebrationLevel <= 4 ) {
+            $alert = true;
+        } 
+    }
+
+    if($html == false ) {
+        if($alert == false) return false;
+        else return true;
+    } else {
+        if($alert == false) return '';
+        else {
+            global $twig;
+            return $twig->render('alert_liturgicalday.html',array('design_url'=>$design_url));
+        }
+    }
+
+ }
 ?>
