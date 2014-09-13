@@ -400,8 +400,8 @@ function miserend_index() {
 	//Képek
 	$query = "SELECT t.id, t.nev, t.ismertnev, t.varos, k.fajlnev
     FROM kepek  k
-    JOIN templomok t ON t.id=k.kid AND k.kat = 'templomok'
-	 WHERE k.kiemelt = 'i'
+    JOIN templomok t ON t.id=k.tid 
+	 WHERE k.kiemelt = 'i' AND k.width < k.height AND k.height > 599 
     GROUP BY t.id 
     ORDER by RAND()
     LIMIT 15";
@@ -1166,7 +1166,7 @@ function miserend_view() {
 	}
 
 	//képek	
-	$query="select fajlnev,felirat from kepek where kat='templomok' and kid='$tid' order by sorszam";
+	$query="select fajlnev,felirat from kepek where tid='$tid' order by sorszam";
 	$lekerdez=mysql_query($query);
 	$mennyi=mysql_num_rows($lekerdez);
 	if($mennyi>0) {		

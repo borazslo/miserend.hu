@@ -80,11 +80,10 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 		$lekerdez=mysql_query($query);
 		$templom=mysql_fetch_assoc($lekerdez);
         
-        $katnev=$templom['nev']." (".$templom['varos'].")";
         $felirat = htmlspecialchars ($_REQUEST['description']);
         if($felirat == '') $felirat = $katnev;
         
-        if(!mysql_db_query($db_name,"insert kepek set kat='templomok', kid='$tid', katnev='$katnev', fajlnev='$NewFileName', felirat='$felirat'")) echo 'HIBA!<br>'.mysql_error();
+        if(!mysql_db_query($db_name,"insert kepek set tid='$tid', fajlnev='$NewFileName', felirat='$felirat', width=$w, height=$h ")) echo 'HIBA!<br>'.mysql_error();
        
         /* email */
         $headers  = 'MIME-Version: 1.0' . "\r\n";

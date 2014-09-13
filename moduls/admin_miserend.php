@@ -323,7 +323,7 @@ function miserend_addtemplom($tid) {
 	$urlap.="\n<tr><td><div class=kiscim align=right>Képek:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=11',200,450);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td><span class=alap><font color=red>FIGYELEM!</font><br>Azonos nevű képek felülírják egymást!!! A fájlnévben ne legyen ékezet és szóköz!</span><br><input type=file name=kepT[] class=urlap size=20> <span class=alap>Képfelirat: </span><input type=text name=kepfeliratT[] size=40 maxlength=100 class=urlap><br><input type=file name=kepT[] class=urlap size=20> <span class=alap>Képfelirat: </span><input type=text name=kepfeliratT[] size=40 maxlength=100 class=urlap><br><input type=file name=kepT[] class=urlap size=20> <span class=alap>Képfelirat: </span><input type=text name=kepfeliratT[] size=40 maxlength=100 class=urlap>";
 	if($tid>0) {
 		//Meglévő képek listája
-		$query="select fajlnev,felirat,sorszam,kiemelt from kepek where kat='templomok' and kid='$tid' order by sorszam";
+		$query="select fajlnev,felirat,sorszam,kiemelt from kepek where tid='$tid' order by sorszam";
 		$lekerdez=mysql_db_query($db_name,$query);
 		$konyvtar="kepek/templomok/$tid/kicsi";
 		$urlap.="\n<table width=100% cellpadding=0 cellspacing=0><tr>";
@@ -561,7 +561,7 @@ function miserend_addingtemplom() {
 		if($uj) $tid=mysql_insert_id();	
 		else {
 			$katnev="$nev ($varos)";
-			if(!mysql_db_query($db_name,"update kepek set katnev='$katnev' where kat='templomok' and kid='$tid'")); 
+			if(!mysql_db_query($db_name,"update kepek set katnev='$katnev' where tid='$tid'")); 
 		}
 		
 		//geolokáció
@@ -581,7 +581,7 @@ function miserend_addingtemplom() {
 			neighboursUpdate($tid);
 			
 		} 
-
+/*
 	//Szomszédos 1 (legközelebbi templomok)
 		if(is_array($oldsz1T)) {
 			if(is_array($delsz1T)) {
@@ -653,7 +653,7 @@ function miserend_addingtemplom() {
 				mysql_db_query($db_name,"update templomok set szomszedos2='$masiksz2' where id='$ertek'");
 			}
 		}
-
+*/
 	//fájlkezelés
 		$fajl=$_FILES['fajl']['tmp_name'];
 		$fajlnev=$_FILES['fajl']['name'];
@@ -688,7 +688,7 @@ function miserend_addingtemplom() {
 			foreach($delkepT as $ertek) {
 				@unlink("$konyvtar/$ertek");
 				@unlink("$konyvtar/kicsi/$ertek");
-				if(!mysql_db_query($db_name,"delete from kepek where kat='templomok' and kid='$tid' and fajlnev='$ertek'")) echo 'HIBA!<br>'.mysql_error();
+				if(!mysql_db_query($db_name,"delete from kepek where tid='$tid' and fajlnev='$ertek'")) echo 'HIBA!<br>'.mysql_error();
 			}		
 		}
 
@@ -713,19 +713,21 @@ function miserend_addingtemplom() {
 					$kimenet="$konyvtar/$kepnevT[$id]";
 					$kimenet1="$konyvtar/kicsi/$kepnevT[$id]";
 	
+					$info=getimagesize($kimenet);
+					$w=$info[0];
+					$h=$info[1];
+
 					if ( !copy($kep, "$kimenet") )
 						print("HIBA a másolásnál ($kimenet)!<br>\n");
 					else  {
 						//Bejegyzés az adatbázisba
 						$katnev="$nev ($varos)";
-						if(!mysql_db_query($db_name,"insert kepek set kat='templomok', kid='$tid', katnev='$katnev', fajlnev='$kepnevT[$id]', felirat='$kepfeliratT[$id]'")) echo 'HIBA!<br>'.mysql_error();
+						if(!mysql_db_query($db_name,"insert kepek set tid='$tid', nev='$katnev', fajlnev='$kepnevT[$id]', felirat='$kepfeliratT[$id]', width=$w, height=$h ")) echo 'HIBA!<br>'.mysql_error();
 					}
 					
 					unlink($kep);
 	
-					$info=getimagesize($kimenet);
-					$w=$info[0];
-					$h=$info[1];
+					
       
 					if($w>800 or $h>600) kicsinyites($kimenet,$kimenet,800);
 			  		kicsinyites($kimenet,$kimenet1,120);
