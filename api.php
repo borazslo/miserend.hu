@@ -7,7 +7,7 @@
 
 
 
-	include_once('db.php');
+	include_once('load.php');
   // Set default timezone
   date_default_timezone_set('UTC +1');
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'json') { 
@@ -19,20 +19,23 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'json') {
 					LEFT JOIN megye ON megye.id = megye 
 					LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id 
 					WHERE t.id = ".$_REQUEST['id']." 
-					LIMIT 1";    
-	$templomok = db_query($query);
-	unset($templomok[0]['log']);
-	$return['templom'] = $templomok[0];
+					LIMIT 1";
+	$result = mysql_query($query);    
+	$templomok =  mysql_fetch_array($result);
+
+	unset($templomok['log']);
+	$return['templom'] = $templomok;
 					
 	$query = "
 			SELECT * FROM misek 
 					WHERE torles = '0000-00-00 00:00:00' 
 					AND templom = ".$_REQUEST['id']."
 					LIMIT ".$limit;
-	$misek = db_query($query);
-	//echo "<pre>".print_r($misek,1)."</pre>";
-	
-	$return['misek'] = $misek;
+	$result = mysql_query($query);    
+	$return['misek'] = array();
+	while(($mise = mysql_fetch_array($result))) {
+		$return['misek'][] = $mise;
+	}
 					
 	//echo "<pre>".print_r($return,1);
 	echo json_encode($return);
@@ -47,11 +50,11 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 		die('Kérlek adj meg egy verziót, hogy biztosan kapj eredményt!');	
 	}
 	elseif($v > 3) exit;
- 
-	$sqllitefile = 'sqlite/miserend_v'.$v.'.sqlite3';
-	if (file_exists($sqllitefile) && strtotime("-1 day") < filemtime($sqllitefile)) {
+
+	$sqllitefile = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
+	if (file_exists($sqllitefile) && strtotime("-1 day") < filemtime($sqllitefile) AND 4 == 6) {
 		include($sqllitefile);
-		
+		/*
 		$file = 'stats.txt';
 		// Open the file to get existing content
 		$current = file_get_contents($file);
@@ -59,21 +62,21 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 		$current .= json_encode(array('timestamp'=>date('Y-m-d H:i:s'),'v'=>$v,'cached'=>'true'))."\n";
 		// Write the contents back to the file
 		file_put_contents($file, $current);
+		*/
 		exit;
 	}
- 
+
   try {
     /**************************************
     * Create databases and                *
     * open connections                    *
     **************************************/
- 
+
     // Create (connect to) SQLite database in file
-    $file_db = new PDO('sqlite:sqlite/miserend_v'.$v.'.sqlite3');
+    $file_db = new PDO('sqlite:fajlok/sqlite/miserend_v'.$v.'.sqlite3');
     // Set errormode to exceptions
     $file_db->setAttribute(PDO::ATTR_ERRMODE, 
                             PDO::ERRMODE_EXCEPTION);
- 
  
 	$file_db->exec("DROP TABLE IF EXISTS templomok");
 	$file_db->exec("DROP TABLE IF EXISTS misek");
@@ -145,20 +148,21 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	if(isset($datum)) $query .= ' WHERE  moddatum >= "'.$datum.'" ';											
 	$query .= " LIMIT ".$limit;
 	//echo $query."<br>";
-   $templomok = db_query($query);
-	//echo "<pre>".print_r($templomok,1);
+	$templomok = array();
+	$result = mysql_query($query);
+   	while($tmp = mysql_fetch_array($result)) {
+   		$templomok[] = $tmp; 
+   	}
 	
 	// mysql select kepek
 	$query = "SELECT * 
 			FROM  `kepek` 
-			WHERE kat =  'templomok'
-			ORDER BY kid, kiemelt, sorszam DESC , id ASC ";
+			ORDER BY tid, kiemelt, sorszam DESC , id ASC ";
 			//AND kiemelt =  'i'
-   $tmp = db_query($query);
-   //echo"<pre>"; print_r($tmp);
+   $result = mysql_query($query);
    $kiemeltkepek = array();
    $kepek = array();
-   foreach($tmp as $kep) {
+	while($kep = mysql_fetch_array($result)) {
 		if(!isset($kiemeltkepek[$kep['kid']])) { // AND $kep['kiemelt'] == 'i')
 			$kiemeltkepek[$kep['kid']] = $kep;
 			/*if($kep['kiemelt'] != 'i') { 
@@ -179,10 +183,13 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	if(isset($datum)) $query .= '  AND moddatum >= "'.$datum.'" ';															
 	$query .= " LIMIT ".$limit;
 	//echo $query;
-   $misek = db_query($query);
+	$misek = array();
+	$result = mysql_query($query);
+   	while($tmp = mysql_fetch_array($result)) {
+   		$misek[] = $tmp;
+    }
 	//echo "<pre>".print_r($misek,1)."</pre>";
  
-
     /**************************************
     * Play with databases and tables      *
     **************************************/
@@ -212,12 +219,13 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	  $lat = $templom['lat'];
 	  $nyariido = $templom['nyariido'];
 	  $teliido = $templom['teliido'];
-	  if(isset($kiemeltkepek[$tid])) $kep = "http://miserend.hu/kepek/templomok/".$tid."/".$kiemeltkepek[$tid]['fajlnev'];
+	  if(isset($kiemeltkepek[$tid])) $kep = "kepek/templomok/".$tid."/".$kiemeltkepek[$tid]['fajlnev'];
 	  else { $kep = ''; }
 	  
 	  
 	  
-	  if(!checkRemoteFile($kep)) $kep = '';
+	  if(!file_exists($kep)) $kep = '';
+	  else $kep = "http://miserend.hu/".$kep;
 	  $megkozelites = '..'; //$templom['megkozelites']; 
  
 		foreach(array('ismertnev','cim') as $var) {
@@ -259,8 +267,8 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	  $milyen = $mise['milyen'];
 	  $megjegyzes = $mise['megjegyzes'];
 
-	  if($v > 2) { echo $insert."<br>\n";
-	  $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
+	  if($v > 2) { 
+	   $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
                 VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
 	  } else {
 	  $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen) 
@@ -283,10 +291,11 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
       $kid = $kep['id']; //Nem megy, mert nem unique.
       $tid = $kep['kid'];
 	  $url = "http://miserend.hu/kepek/templomok/".$kep['kid']."/".$kep['fajlnev'];
+	  $file = "kepek/templomok/".$kep['kid']."/".$kep['fajlnev'];
 	  $insert = "INSERT INTO kepek (kid, tid, kep) 
                 VALUES ('".$kid."','".$tid."','".$url."')";
       // Execute statement
-	  if(checkRemoteFile($url))
+	  if(file_exists(file))
 		$file_db->query($insert);
 		//else echo $kid." - ".$tid." - /".$kep['kid']."/".$kep['fajlnev'].";<br/>";
     } 
@@ -304,7 +313,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
  
     // Close file db connection
     $file_db = null;
-	
+	/*
 	$file = 'stats.txt';
 	// Open the file to get existing content
 	$current = file_get_contents($file);
@@ -312,7 +321,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	$current .= json_encode(array('timestamp'=>date('Y-m-d H:i:s'),'v'=>$v))."\n";
 	// Write the contents back to the file
 	file_put_contents($file, $current);
-	
+	*/
 	
 	echo file_get_contents($sqllitefile, FILE_USE_INCLUDE_PATH);
   }
@@ -322,21 +331,4 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
   }
 }
 
-function checkRemoteFile($url)
-{
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL,$url);
-    // don't download content
-    curl_setopt($ch, CURLOPT_NOBODY, 1);
-    curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    if(curl_exec($ch)!==FALSE)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 ?>
