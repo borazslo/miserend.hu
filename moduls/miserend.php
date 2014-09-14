@@ -953,7 +953,7 @@ function miserend_view() {
 	if($frissites>0) {
         $frissitve = $frissites;
 		$frissites=str_replace('-','.',$frissites).'.';
-		$frissites="<span class=kicsi_kek><b><u>Frissítve:</u></b><br>$frissites</span>";
+		//$frissites="<span class=kicsi_kek><b><u>Frissítve:</u></b><br>$frissites</span>";
 	}
 
 	$titlekieg=" - $nev ($varos)";
@@ -983,6 +983,8 @@ function miserend_view() {
 	}
 
 	//Miseidőpontok
+	$misek = getMasses($tid);
+	/*
 	$query="select nap,ido,idoszamitas,nyelv,milyen,megjegyzes from misek where templom='$tid' and torles=0 order by nap,idoszamitas,ido";
 	$lekerdez=mysql_query($query);
     $napokT = array();
@@ -1027,7 +1029,7 @@ function miserend_view() {
 		else $tikonT[$nap].='<br>';
         
 	}
-
+	*/
 	if(strstr($u_jogok,'miserend')) {
 		$nev.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 	
@@ -1271,10 +1273,7 @@ function miserend_view() {
             'frissites' => $frissites,
             'nyari' => $nyari,
             'teli' => $teli,
-            'napokT' => $napokT,
-            'ikonT' => $ikonT,
-            'tnapokT' => $tnapokT,
-            'tikonT' => $tikonT,
+            'miserend' => $misek, 
             'eszrevetel' => $eszrevetel,
             'androidreklam' => $androidreklam,
             'kepek' => $kepek,

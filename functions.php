@@ -42,7 +42,7 @@ function kicsinyites($forras,$kimenet,$max) {
             $dst_img = ImageCreateTrueColor($new_w,$new_h);
             /*imageantialias($dst_img, true);*/
 
-/*          ImageCopyResized($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img));*/
+            /* ImageCopyResized($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img));*/
             ImageCopyResampled($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img));
             ImageJpeg($dst_img, "$kimenet");
 }
@@ -128,7 +128,7 @@ function cookieSave($uid,$name) {
 
 function nyelvmeghatarozas() {
     global $modul_url,$linkveg;
-//Nyelv meghatározása
+    //Nyelv meghatározása
     $lang=$_POST['lang'];
     if(!isset($lang)) $lang=$_GET['lang'];
     if($lang=='hu') $lang='';
@@ -207,7 +207,6 @@ function neighboursUpdate($tid = false) {
             if($config['debug'] > 1) echo $query."<br/>";
             mysql_query($query);
     } }
-
 }
 
 function LirugicalDay($datum = false) {
@@ -233,7 +232,7 @@ function LirugicalDay($datum = false) {
         return false;    
  }
 
- function LiturgicalDayAlert($html = false,$date = false) {
+function LiturgicalDayAlert($html = false,$date = false) {
     global $design_url;
 
     $alert = false;
@@ -255,5 +254,113 @@ function LirugicalDay($datum = false) {
         }
     }
 
+    }
+
+function checkDateBetween($date,$start,$end) {
+        global $config;
+        if($config['debug'] > 1) echo "Is ".$date." between ".$start." and ".$end."? <br/>";
+
+        $year = date('Y',strtotime($date));
+        if(strtotime($year."-".$start) <= strtotime($year."-".$end)) {
+            if(strtotime($year."-".$start) <= strtotime($date) AND strtotime($date) <= strtotime($year."-".$end)) return true;
+            else return false;
+        } else {
+            if(strtotime($year."-".$start) > strtotime($date) AND strtotime($date) > strtotime($year."-".$end)) return false;
+            else return true;
+        }
  }
+
+function event2Date($event, $year = false) {
+    if($year == false) $year = date('Y');
+
+    $event = preg_replace('/1$/', '1 day', $event);
+
+    $events = array();
+    $query = "SELECT name, date FROM events WHERE year = '".$year."' ";
+    $result = mysql_query($query);    
+    while(($row = mysql_fetch_array($result))) {
+            $events['name'][] = '/^'.$row['name'].'/i';
+            $events['date'][] = $row['date'];
+         }
+    $event = preg_replace($events['name'], $events['date'], $event);
+    $event = date('m-d',strtotime($event));
+    
+    return $event;
+}
+
+function getMasses($tid,$date = false) {
+    if($date == false) $date = date('Y-m-d');
+
+    $napok = array('x','vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat');
+   
+    $return = array();
+    $query = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid GROUP BY idoszamitas ";
+    $result = mysql_query($query);
+    while(($row = mysql_fetch_array($result))) {
+        $tmp = array();
+        $tmp['nev'] = $row['idoszamitas'];
+        $tmp['tol'] = $row['tol'];
+        $tmp['ig'] = $row['ig'];
+        $tmp['datumtol'] = $datumtol = event2Date($row['tol']);
+        $tmp['datumig'] = $datumig = event2Date($row['ig']);
+        if(checkDateBetween($date,$datumtol,$datumig)) $tmp['now'] = true;
+        
+        for ($i=1; $i < 8 ; $i++) {  $tmp['napok'][$i]['nev'] = $napok[$i];    }
+        unset($tmp['napok'][1]);  $tmp['napok'][1]['nev'] = $napok[1];
+
+        $query2 = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid AND idoszamitas = '".$row['idoszamitas']."'  ORDER BY nap, ido";
+        $result2 = mysql_query($query2);
+        while(($row2 = mysql_fetch_array($result2,MYSQL_ASSOC))) {
+            if($row2['milyen'] != '') {
+                $row2['milyen'] = decodeMassAttr($row2['milyen']);
+            } else $row2['milyen'] = array();
+            $row2['milyen'] = array_merge($row2['milyen'],decodeMassAttr($row2['nyelv']));
+            
+            $ido = (int) substr($row2['ido'],0,2);
+            $row2['ido'] = $ido.":".substr($row2['ido'],3,2);
+
+            $row2['napid'] = $row2['nap'];
+            $row2['nap'] = $napok[$row2['nap']];
+            $tmp['napok'][$row2['napid']]['misek'][] = $row2;
+            $tmp['napok'][$row2['napid']]['nev'] = $row2['nap'];
+        }
+        $return[] = $tmp;
+
+    }
+
+    return $return;
+}
+
+function decodeMassAttr($text) {
+    $return  = array();
+
+    $milyen = array('d','g','cs');
+    $d = array('file' => 'diak.gif','name'=>'diák mise');
+    $g = array('file' => 'gitar.gif','name'=>'gitáros mise');
+    $cs = array('file' => 'csendes.gif','name'=>'csendes mise');
+
+    $nyelvek = array('h'=>'magyar', 'en'=>'angol', 'de'=>'német', 'it'=>'olasz', 'va'=>'latin', 'gr'=>'görög', 'sk'=>'szlovák', 'hr'=>'horvát', 'pl'=>'lengyel', 'si'=>'szlovén', 'ro'=>'román', 'fr'=>'francia', 'es'=>'spanyol','uk'=>'ukrán');
+    foreach($nyelvek as $k => $v) {
+        $$k = array('file' => 'zaszloikon/'.$k.'.gif','name'=>$v." nyelven");
+        $milyen[] = $k;
+    }
+
+    preg_match_all("/(".implode('|',$milyen).")([0-5])/i", $text,$matches,PREG_SET_ORDER);
+    foreach ($matches as $match) {
+        if($match[1] != 'h' OR $match[2] != 0) {
+            $tmp = $match[1]; $tmp = $$tmp;
+            $tmp['abbrev'] = $match[1];
+            if($match[2] != 0) {
+                $tmp['week'] = $match[2];
+                $tmp['weektext'] = $match[2].". héten";
+            }
+            $return[] = $tmp;
+        }
+    }
+    //print_r($return);
+    return $return;
+
+
+
+}
 ?>
