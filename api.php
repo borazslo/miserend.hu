@@ -5,11 +5,22 @@
 	if(isset($_REQUEST['datum']) AND preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$_REQUEST['datum'])) $datum = $_REQUEST['datum'];
 	if(isset($_REQUEST['v']) AND preg_match('/^[0-9]{1,3}$/',$_REQUEST['v'])) $v = $_REQUEST['v'];
 
-
-
 	include_once('load.php');
   // Set default timezone
   date_default_timezone_set('UTC +1');
+
+if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'updated') {
+	if(!isset($datum)) die('Dátum nélkül mit érek én');
+	if(!isset($v) OR ( $v != 3 AND $v != 2)) die('Ez az API verzió ezt nem támogatja.');
+
+	$query = "SELECT id, moddatum FROM templomok WHERE  moddatum >= '".$datum."' ";											
+    $result = mysql_query($query);
+    //echo "-".print_r($result,1)."-";
+    if(mysql_num_rows($result) > 0) echo "1";
+    else echo "0";
+	exit;
+} 
+
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'json') { 
 	if(isset($_REQUEST['id']) AND is_numeric($_REQUEST['id'])) {
 	
@@ -29,7 +40,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'json') {
 	$query = "
 			SELECT * FROM misek 
 					WHERE torles = '0000-00-00 00:00:00' 
-					AND templom = ".$_REQUEST['id']."
+					AND tid = ".$_REQUEST['id']."
 					LIMIT ".$limit;
 	$result = mysql_query($query);    
 	$return['misek'] = array();
@@ -51,8 +62,10 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	}
 	elseif($v > 3) exit;
 
+	print_r($config);
+
 	$sqllitefile = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
-	if (file_exists($sqllitefile) && strtotime("-1 day") < filemtime($sqllitefile) AND 4 == 6) {
+	if (file_exists($sqllitefile) && strtotime("-1 day") < filemtime($sqllitefile) AND $config['debug'] == 0 AND !isset($datum)) {
 		include($sqllitefile);
 		/*
 		$file = 'stats.txt';
@@ -179,7 +192,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	$query  = "
 			SELECT * FROM misek 
 					WHERE torles = '0000-00-00 00:00:00' 
-					AND templom <> 0";
+					AND tid <> 0";
 	if(isset($datum)) $query .= '  AND moddatum >= "'.$datum.'" ';															
 	$query .= " LIMIT ".$limit;
 	//echo $query;
@@ -259,7 +272,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	  set_time_limit(60);
       // Set values to bound variables
       $mid = $mise['id'];
-      $tid = $mise['templom'];
+      $tid = $mise['tid'];
 	  $telnyar = $mise['idoszamitas'];
 	  $nap = $mise['nap'];
 	  $ido = $mise['ido'];
