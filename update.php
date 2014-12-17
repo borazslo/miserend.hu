@@ -34,6 +34,8 @@ CREATE TABLE `miserend`.`events` (
 
   img/zaszloikon/hu.gif -> img/zaszloikon/h.gid
 
+ALTER TABLE misek ADD COLUMN nap2 varchar(4) AFTER ido;
+
 */
 
 //misek

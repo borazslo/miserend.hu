@@ -950,11 +950,8 @@ function miserend_addmise($tid) {
 	$script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>'."\n";
 	$script .= "<script type='text/javascript' src='js/miserend_addmise.js'></script>\n";
 
-
-
 	$church = getChurch($tid);	
 	$masses = getMasses($tid);
-
 
 	$urlap.="\n<FORM ENCTYPE='multipart/form-data' method=post>";
 
@@ -971,47 +968,11 @@ function miserend_addmise($tid) {
 	$urlap.="&nbsp;</td></tr>";
 
 
-	foreach($masses as $pkey=>$period) {
-		$c = 0;
-		$urlap.="\n<tr><td bgcolor=#D6F8E6><span class=kiscim>Periódus:</span></td>
-						<td bgcolor=#D6F8E6><input type=text name=period[".$pkey."][name] value=\"".$period['nev']."\" class=urlap size=30>
-						<input type=hidden name=period[".$pkey."][origname] value='".$period['nev']."'>
-						<span class='alap deleteperiod'>[töröl]</span></td></tr>";
-
-
-		$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>határok:</div></td><td bgcolor=#efefef>
-							<input type=text name=period[".$pkey."][from] value=\"".trim(preg_replace('/\+1$/i','',$period['tol']))."\" class=urlap size=20>\n
-							<select name=period[".$pkey."][from2] ><option value='0'>≤</option><option value='1' ";
-							if(preg_match('/\+1$/i',$period['tol'])) $urlap .= ' selected ';
-							$urlap .="><</option></select>
-							<span class=alap>napok</span>
-							<select name=period[".$pkey."][to2] ><option value='0'>≤</option><option value='1' ";
-							if(preg_match('/-1$/i',$period['ig'])) $urlap .= ' selected ';
-							$urlap .="><</option></select>
-							<input type=text name=period[".$pkey."][to] value=\"".trim(preg_replace('/-1$/i','',$period['ig']))."\" class=urlap size=20>\n
-							</td></tr>";
-
-		$urlap.='<tr><td colspan="2"><table cellpadding=4 width=100% id="period'.$pkey.'">';
-
-		foreach($period['napok'] as $dkey=>$day) {
-			if(isset($day['misek']))
-			foreach($day['misek'] as $mkey=>$mass) {
-				$c++;
-				$urlap.="\n<tr><td bgcolor=#efefef><span class='alap hidemise'>[töröl]</span> <input type=hidden name=period[".$pkey."][".$c."][id] value=\"".$mass['id']."\" >";
-				$urlap .= formSelectDay("period[".$pkey."][".$c."][napid]",$mass['napid'])." <input type=text style='margin-top:4px' name=period[".$pkey."][".$c."][ido] value=\"".$mass['ido']."\" class=urlap size=1></td><td bgcolor=#efefef>";
-				$urlap.="<input type=text name=period[".$pkey."][".$c."][nyelv] value=\"".$mass['nyelv']."\" class=urlap size=12><span class=alap> nyelvek </span>";
-				$urlap.="<input style='margin-left:10px' type=text name=period[".$pkey."][".$c."][milyen] value=\"".$mass['milyen']."\" class=urlap size=12><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák </span>";
-				$urlap.="<br><input type='text' name=period[".$pkey."][".$c."][megjegyzes] class=urlap  style='margin-top:4px;width:244px' value='".$mass['megjegyzes']."' ><span class=alap> megjegyzések</span>";
-				$urlap.="</td></tr>";
-			}
-		}
-
-		$urlap .= '<tr><td colspan="2" bgcolor=#efefef><span class="alap addmise" period="'.$pkey.'" last="'.$c.'">[új mise hozzáadása]</span></td></tr>';
-		$urlap.='</table>';
-		$urlap .= '</td></tr>';
-
+	foreach($masses as $pkey=>$period) {	
+		$urlap .= formPeriod($pkey,$period);
 	}
-	$urlap .= '<tr><td colspan="2"><span class="alap addperiod" last="'.$pkey.'" >[új periódus hozzáadása]</span>';
+
+	$urlap .= '<tr class="addperiod"><td colspan="2"><span class="alap addperiod" last="'.$pkey.'" >[új periódus hozzáadása]</span>';
 	$urlap .= '</td></tr>';
 	
 //Misemegjegyzés
@@ -1057,101 +1018,70 @@ function miserend_addmise($tid) {
 }
 
 function miserend_addingmise() {
-	global $_POST,$_SERVER,$sid,$m_id,$db_name,$u_login;
+	global $user;
 
-	print_r($_REQUEST); exit;
+	$most=date('Y-m-d H:i:s');
 
+	foreach($_REQUEST as $k=>$i) $_REQUEST[$k] = sanitize($i);
+	if(!is_numeric($_REQUEST['tid'])) die('tid csak numeric');
+
+	//DELETE
+	if(isset($_REQUEST['delete']['period'])) {
+		foreach($_REQUEST['delete']['period'] as $period) {
+			$query = "UPDATE misek SET torles = '".$most."', torolte = '".$user->login."' WHERE tid = ".$_REQUEST['tid']." AND idoszamitas = '".$period."' ;";
+			mysql_query($query);
+		}
+	}
+	if(isset($_REQUEST['delete']['mass'])) {
+		foreach($_REQUEST['delete']['mass'] as $mid) {
+			$query = "UPDATE misek SET torles = '".$most."', torolte = '".$user->login."' WHERE tid = ".$_REQUEST['tid']." AND id = '".$mid."' LIMIT 1;";
+			mysql_query($query);
+		}
+	}
+
+	//UPDATE
+	if(is_array($_REQUEST['period'])) {
+	foreach($_REQUEST['period'] as $period) {
+		foreach($period as $key => $mass) {
+		if(is_numeric($key)) {
+			$mass['tid'] = $_REQUEST['tid'];
+			$mass['idoszamitas'] = sanitize($period['name']);
+			$mass['tol'] = sanitize($period['from']);
+			if($period['fro2'] == 1) $mass['tol'] .= ' +1';
+			$mass['ig'] = sanitize($period['to']);
+			if($period['to2'] == 1) $mass['ig'] .= ' -1';
+
+			if($mass['id'] != 'new') {
+				$query = "UPDATE misek SET ";
+				$query .= "nap='".$mass['napid']."',ido='".$mass['ido'].":00',nap2='".$mass['nap2']."',idoszamitas='".$mass['idoszamitas']."',tol='".$mass['tol']."',ig='".$mass['ig']."',nyelv='".$mass['nyelv']."',milyen='".$mass['milyen']."',megjegyzes='".$mass['megjegyzes']."',";
+				$query .= "modositotta='".$user->login."',moddatum='".$most."'";
+				$query .= " WHERE tid = ".$mass['tid']." AND id = ".$mass['id']." LIMIT 1";
+			} else {
+				$query = "INSERT INTO misek ";
+				$query .= " (tid,nap,ido,nap2,idoszamitas,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
+				$query .= " VALUES ('".$mass['tid']."','".$mass['napid']."','".$mass['ido'].":00','".$mass['nap2']."','".$mass['idoszamitas']."','".$mass['tol']."','".$mass['ig']."','".$mass['nyelv']."','".$mass['milyen']."','".$mass['megjegyzes']."',";
+				$query .= "'".$user->login."','".$most."')";
+			}
+			mysql_query($query);
+		}
+		}
+	}
+	}
+
+	//LOG
 	$ip=$_SERVER['REMOTE_ADDR'];
     $host = gethostbyaddr($ip);
-
-	$tid=$_POST['tid'];
-	$frissit=$_POST['frissit'];
-	$idopontT=$_POST['idopontT'];
-	$idoponttT=$_POST['idoponttT'];
-	$nyelvT=$_POST['nyelvT'];
-	$nyelvtT=$_POST['nyelvtT'];
-	$gitarosT=$_POST['gitarosT'];
-	$gitarostT=$_POST['gitarostT'];
-	$misemegj=$_POST['misemegj'];
-	$megjT=$_POST['megjT'];
-	$megjT=str_replace("\n",'',$megjT);
-	$megjtT=$_POST['megjtT'];
-	$megjtT=str_replace("\n",'',$megjtT);
-	$modosit=$_POST['modosit'];
-	$datumtol=$_POST['datumtol'];
-	$datumig=$_POST['datumig'];
-
-	if($tid>0) {
-		$ma=date('Y-m-d');
-		$most=date('Y-m-d H:i:s');
-		$query="update misek set torles='$most', torolte='$u_login' where templom='$tid' and torolte=''";
-		mysql_db_query($db_name,$query);
-		list($log)=mysql_fetch_row(mysql_db_query($db_name,"select log from templomok where id='$tid'"));
-		$log.="\nMISE_MOD: $u_login ($most - [$ip - $host])";
-		if($frissit=='i') $frissites=", frissites='$ma'";
-		$query="update templomok set misemegj='$misemegj', log='$log' $frissites where id='$tid'";
-		mysql_db_query($db_name,$query);
-	}
+    $tid = $_REQUEST['tid'];
+	$ma=date('Y-m-d');
+	list($log)=mysql_fetch_row(mysql_query("select log from templomok where id='$tid'"));
+	$log.="\nMISE_MOD: ".$user->login." ($most - [$ip - $host])";
+	if($_REQUEST['frissit']=='i') $frissites=", frissites='$ma'";
+	$query="update templomok set misemegj='".$_REQUEST['misemegj']."', log='$log' $frissites where id='$tid' LIMIT 1";
+	mysql_query($query);
 
 
-	for($nap=1;$nap<=7;$nap++) {
-		$miseT=$idopontT[$nap];
-		$misetT=$idoponttT[$nap]; //téli
-		$nyelvekT=explode('+',$nyelvT[$nap]);
-		$milyenT=explode('+',$gitarosT[$nap]);
-		$megjegyzesT=explode('+',$megjT[$nap]);
-
-		if(empty($miseT)) { 
-			//ha nincs kitöltve, akkor a hétfőit vesszük át
-			$miseT=$idopontT[1];
-			$misetT=$idoponttT[1];
-			$nyelvekT=explode('+',$nyelvT[1]);
-			$milyenT=explode('+',$gitarosT[1]);
-			$megjegyzesT=explode('+',$megjT[1]);
-		}		
-
-		$miseT=str_replace(',',':',$miseT); // a ,-őt átalakítjuk : ponttá a rögzítéshez
-		$misekT=explode('+',$miseT); //ha több lett megadva
-		if(!empty($misetT)) {
-			//Ha ki lett töltve (tehát különbözik a nyáritól)
-			$misetT=str_replace(',',':',$misetT); // téliben is átalakítjuk
-			$misektT=explode('+',$misetT); //ha több lett megadva
-		}
-		else {
-			//Ha nem lett kitöltve, akkor a nyári érvényes télre is
-			$misektT=$misekT;
-		}
-
-		if(!empty($nyelvtT[$nap])) $nyelvektT=explode('+',$nyelvtT[$nap]); 
-		else $nyelvektT=$nyelvekT; 
-		if(!empty($gitarostT[$nap])) $milyentT=explode('+',$gitarostT[$nap]);
-		else $milyentT=$milyenT;
-		if(!empty($megjtT[$nap])) $megjegyzestT=explode('+',$megjtT[$nap]);
-		else $megjegyzestT=$megjegyzesT;
-
-		foreach($misekT as $id=>$mise) {
-			if($mise!='-' and !empty($mise)) {
-				if(empty($nyelvekT[$id])) $nyelvekT[$id]='h0';
-				$query="insert misek set templom='$tid', nap='$nap', ido='$mise', idoszamitas='ny', datumtol='$datumtol', datumig='$datumig', nyelv='$nyelvekT[$id]', milyen='$milyenT[$id]', megjegyzes='$megjegyzesT[$id]', modositotta='$u_login', moddatum='$most'";
-				mysql_db_query($db_name,$query);
-			}
-		
-		}
-		foreach($misektT as $id=>$mise) {
-			if($mise!='-' and !empty($mise)) {
-				if(empty($nyelvektT[$id])) $nyelvektT[$id]='h0';
-				$query="insert misek set templom='$tid', nap='$nap', ido='$mise', idoszamitas='t', datumtol='$datumtol', datumig='$datumig', nyelv='$nyelvektT[$id]', milyen='$milyentT[$id]', megjegyzes='$megjegyzestT[$id]', modositotta='$u_login', moddatum='$most'";
-				mysql_db_query($db_name,$query);
-			}
-		
-		}
-
-	}
-
-
-
-	if($modosit=='i') {
-		$kod=miserend_addmise($tid);
+	if($_REQUEST['modosit']=='i') {
+		$kod = miserend_addmise($tid);
 	}
 	else {
 		$kod=miserend_modtemplom();

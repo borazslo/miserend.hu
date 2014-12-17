@@ -48,9 +48,12 @@ function kicsinyites($forras,$kimenet,$max) {
 }
 
 function sanitize($text) {
-    $text = preg_replace('/\n/i','<br/>',$text);
-    $text = strip_tags($text,'<a><i><b><strong><br>');
-
+    if(is_array($text)) foreach($text as $k=>$i) $text[$k] = sanitize($i);
+    else {
+        $text = preg_replace('/\n/i','<br/>',$text);
+        $text = strip_tags($text,'<a><i><b><strong><br>');
+        $text = trim($text);
+    }
     return $text;
 }
 
@@ -344,6 +347,12 @@ function getMasses($tid,$date = false) {
     return $return;
 }
 
+function updateMass() {
+
+
+
+}
+
 function decodeMassAttr($text) {
     $return  = array();
 
@@ -377,18 +386,125 @@ function decodeMassAttr($text) {
 
 }
 
-function formSelectDay($name,$selected = false) {
+
+function formMass($pkey,$mkey,$mass = false) {
+    global $twig;
+
+    if($mass == false) {
+        $mass = array(
+            'id' => 'new',
+            'napid' => 7,
+            'ido' => '00:00',
+            'nyelv' => '',
+            'milyen' => '',
+            'megjegyzes' => '',
+            );
+    }
+
+    $nap2options = array(
+        0 => 'minden héten',
+        1 => 'első héten',2 => 'második héten',3 => 'harmadik héten',4 => 'negyedik héten',5 => 'ötödik héten',
+        '-1' => 'utolsó héten',
+        'ps' => 'páros héten','pt'=>'páratlan héten');
+
+    $form = array(
+        'id' => array(
+            'type' => 'hidden',
+            'name' => "period[".$pkey."][".$mkey."][id]",
+            'value' => $mass['id']),
+        'nap' => array(
+            'name' => "period[".$pkey."][".$mkey."][napid]",
+            'options' => array('válassz','hétfő','kedd','szerda','csütörtök','péntek','szombat','vasárnap'),
+            'selected' => $mass['napid']),
+        'nap2' => array(
+            'name' => "period[".$pkey."][".$mkey."][nap2]",
+            'options' => $nap2options,
+            'selected' => $mass['nap2']),
+        'ido' => array(
+            'name' => "period[".$pkey."][".$mkey."][ido]",
+            'value' => $mass['ido'],
+            'size' => 1 ),
+        'nyelv' => array(
+            'label' => 'nyelvek',
+            'name' => "period[".$pkey."][".$mkey."][nyelv]",
+            'value' => $mass['nyelv']),
+        'milyen' => array(
+            'label' => '[<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák',
+            'name' => "period[".$pkey."][".$mkey."][milyen]",
+            'value' => $mass['milyen'],
+            'style'=>'margin-left:10px' ),
+        'megjegyzes' => array(
+            'label' => 'megjegyzések',
+            'name' => "period[".$pkey."][".$mkey."][megjegyzes]",
+            'value' => $mass['megjegyzes'],
+            'style' => 'margin-top:4px;width:244px')
+        );
+    return $form;
+}
+
+function formPeriod($pkey,$period = false) {
+    global $twig;
+
+    $c = 0;
+    if($period == false) {
+        $period = array(
+            'nev' => 'új időszak',
+            'tol' => '',
+            'ig' => '',
+            'napok' => array('new','new','new'));
+    }
     
-    $return = "<select name=\"".$name."\">";
-    $days = array('válassz','hétfő','kedd','szerda','csütörtök','péntek','szombat','vasárnap');
-    foreach ($days as $key => $value) {
-        $return .=   "<option value=\"".$key."\"";
-        if($key == $selected) $return .= ' selected ';
-        $return .= ">".$value."</option>";
-    }  
-    $return .= "</select>";
+    $form = array(
+        'nev1' => array(
+            'type' => 'hidden',
+            'name' => "period[".$pkey."][origname]",
+            'value' => $period['nev'] ),
+        'nev' => array(
+            'name' => "period[".$pkey."][name]",
+            'value' => $period['nev'],
+            'size' => 30 ),
+        'from' => array(
+            'name' => "period[".$pkey."][from]",
+            'value' => trim(preg_replace('/\+1$/i','',$period['tol'])),
+            'size' => 20),
+        'to' => array(
+            'name' => "period[".$pkey."][to]",
+            'value' => trim(preg_replace('/-1$/i','',$period['ig'])),
+            'size' => 20),
+        'from2' => array(
+            'name' => "period[".$pkey."][from2]",
+            'options'=> array(
+                0 => '≤',
+                1 => '<')),
+        'to2' => array(
+            'name' => "period[".$pkey."][to2]",
+            'options'=> array(
+                0 => '≤',
+                1 => '<'))
+    );
+    
+    if(preg_match('/\+1$/i',$period['tol'])) $form['form2']['selected'] = 1;
+    if(preg_match('/-1$/i',$period['ig'])) $form['to2']['selected'] = 1;
+
+
+    $form['pkey'] = $pkey;
+
+    foreach($period['napok'] as $dkey=>$day) {
+        if(isset($day['misek'])) {
+            foreach($day['misek'] as $mkey=>$mass) {
+                $c++;
+                $form['napok'][] = formMass($pkey,$c,$mass);
+            }
+        }
+        elseif($day == 'new') $form['napok'][] = formMass($pkey,$dkey);
+    }
+
+    $form['last'] = $c;
+    $return = $twig->render('admin_form_period.html', $form);  
+
 
     return $return;
+
 }
 
 ?>

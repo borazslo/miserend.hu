@@ -1,0 +1,17 @@
+{% import "forms.twig" as forms %}
+
+<tr>
+	<td bgcolor=#efefef>
+		{{ forms.input(id) }}
+    	{{ forms.select(nap2) }}
+    	{{ forms.select(nap) }}
+		{{ forms.input(ido) }}
+		    	<span class='alap deletemise'>[töröl]</span>
+
+	</td>
+	<td bgcolor=#efefef>
+		{{ forms.input(nyelv) }}
+		{{ forms.input(milyen) }}<br/>
+		{{ forms.input(megjegyzes) }}
+	</td>
+</tr>

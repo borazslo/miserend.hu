@@ -1,0 +1,15 @@
+{% macro input(array) %}
+    <input class="urlap" type="{{ array.type|default('text') }}" style="{{ array.style }}" name="{{ array.name }}" value="{{ array.value|e }}" size="{{ array.size|default(12) }}" />
+    {% if array.label %}<span class=alap> {{array.label|raw}} </span>{% endif %}
+{% endmacro %}
+
+{% macro select(array) %}
+	<select name="{{ array.name }}">
+		{% for key, option in array.options %}
+			<option value="{{ key }}" 
+			{% if key == array.selected %} selected {% endif %}
+			>{{ option }}</option>
+		{% endfor %}
+	</select>
+    {% if array.label %}<span class=alap> {{array.label|raw}} </span>{% endif %}
+{% endmacro %}
