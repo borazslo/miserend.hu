@@ -56,8 +56,8 @@ $(document).ready(function(){
         
         <div style="float:right;width:121px" class="alap" style="line-height:16px">  
           {% for mise in nap.misek %}
-            {% if mise.milyen %}{% for milyen in mise.milyen %} 
-             <img src="{{ design_url }}/img/{{ milyen.file }}" width=16 title='{{ milyen.weektext }} {{ milyen.name }}' height=16 align=absmiddle style="margin-top:0px;margin-left:1px"><span class="alap" style="display:none" id="2">{{ milyen.weektext }} {{ milyen.name }}</span>
+            {% if mise.attr %}{% for attr in mise.attr %} 
+             <img src="{{ design_url }}/img/{{ attr.file }}" width=16 title='{{ attr.weektext }} {{ attr.name }}' height=16 align=absmiddle style="margin-top:0px;margin-left:1px"><span class="alap" style="display:none" id="2">{{ attr.weektext }} {{ attr.name }}</span>
              {% endfor %}{% endif %}  
 
              {% if mise.megjegyzes %}<img src={{ design_url }}/img/info2.gif border=0 title='{{ mise.megjegyzes }}' align=absmiddle width=16 height=16 style="margin-top:0px">{% endif %}       

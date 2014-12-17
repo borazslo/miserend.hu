@@ -864,7 +864,7 @@ function miserend_modtemplom() {
 	if(is_array($feltetelT)) $feltetel=' where '.implode(' and ',$feltetelT);
 
 //Misék lekérdezése
-	$querym="select distinct(templom) from misek where torolte=''";
+	$querym="select distinct(tid) from misek where torolte=''";
 	if(!$lekerdezm=mysql_db_query($db_name,$querym)) echo "HIBA!<br>$querym<br>".mysql_error();
 	while(list($templom)=mysql_fetch_row($lekerdezm)) {
 		$vanmiseT[$templom]=true;
@@ -944,207 +944,84 @@ function miserend_modtemplom() {
 }
 
 function miserend_addmise($tid) {
-	global $sid,$linkveg,$m_id,$db_name,$onload,$u_beosztas,$u_login;	
-	
-	$most=date("Y-m-d H:i:s");		
-	
-	$query="select nap,ido,idoszamitas,nyelv,milyen,megjegyzes from misek where templom='$tid' and torolte='' order by nap,ido";
-	if(!$lekerdez=mysql_db_query($db_name,$query)) echo 'HIBA!<br>'.mysql_error();	
-	if(mysql_num_rows($lekerdez)>0) {
-		$idopontT=array('','-','-','-','-','-','-','-');
-		$idoponttT=array('','-','-','-','-','-','-','-');
-	}
-	while(list($nap,$ido,$idoszamitas,$nyelv,$milyen,$megjegyzes)=mysql_fetch_row($lekerdez)) {
-		$ido=substr($ido,0,-3);
-		$ido=str_replace(':',',',$ido);
-		if($idoszamitas=='ny') {
-			$misenyaridb[$nap]++;
-			if($idopontT[$nap]!='-') $idopontT[$nap].='+'.$ido;
-			else $idopontT[$nap]=$ido;
-			if(!empty($nyelvT[$nap])) $nyelvT[$nap].='+'.$nyelv;
-			else $nyelvT[$nap]=$nyelv;
-			if(!empty($gitarosT[$nap])) $gitarosT[$nap].=$milyen.'+';
-			else $gitarosT[$nap]=$milyen.'+';
-			if(!empty($megjT[$nap])) $megjT[$nap].=$megjegyzes."+";
-			else $megjT[$nap]=$megjegyzes."+";		
-		}
-		if($idoszamitas=='t') {
-			$misetelidb[$nap]++;
-			if($idoponttT[$nap]!='-') $idoponttT[$nap].='+'.$ido;
-			else $idoponttT[$nap]=$ido;
-			if(!empty($nyelvtT[$nap])) $nyelvtT[$nap].='+'.$nyelv;
-			else $nyelvtT[$nap]=$nyelv;
-			if(!empty($gitarostT[$nap])) $gitarostT[$nap].=$milyen.'+';
-			else $gitarostT[$nap]=$milyen.'+';
-			if(!empty($megjtT[$nap])) $megjtT[$nap].=$megjegyzes."+";
-			else $megjtT[$nap]=$megjegyzes."+";	
-		}
-	}
-	list($tnev,$tvaros,$datumtol,$datumig,$misemegj,$frissites)=mysql_fetch_row(mysql_db_query($db_name,"select nev,varos,nyariido,teliido,misemegj,frissites from templomok where id='$tid'"));
+	global $m_id;	
 
-	if(is_array($gitarosT)) {
-		foreach($gitarosT as $kulcs=>$ertek) {
-			$csakplusz='';
-			$hossz=strlen($gitarosT[$kulcs]);
-			$ujhossz=$hossz-1;
-			$gitarosT[$kulcs]=substr($gitarosT[$kulcs],0,$ujhossz);
-			for($i=0;$i<($misenyaridb[$kulcs]-1);$i++) {
-				$csakplusz.='+';
-			}
-			if($gitarosT[$kulcs]==$csakplusz) $gitarosT[$kulcs]='';
-		}
-	}
-	
-	if(is_array($megjT)) {
-		foreach($megjT as $kulcs=>$ertek) {
-			$csakplusz='';
-			$hossz=strlen($megjT[$kulcs]);
-			$ujhossz=$hossz-1;
-			$megjT[$kulcs]=substr($megjT[$kulcs],0,$ujhossz);
-			for($i=0;$i<($misenyaridb[$kulcs]-1);$i++) {
-				$csakplusz.="+";
-			}
-			if($megjT[$kulcs]==$csakplusz) $megjT[$kulcs]='';
-			else str_replace("+","\n+",$megjT[$kulcs]);
-		}
-	}
+	global $script;
+	$script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>'."\n";
+	$script .= "<script type='text/javascript' src='js/miserend_addmise.js'></script>\n";
+
+
+
+	$church = getChurch($tid);	
+	$masses = getMasses($tid);
+
 
 	$urlap.="\n<FORM ENCTYPE='multipart/form-data' method=post>";
 
-	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=sid value=$sid>";
+	$urlap.="\n<input type=hidden name=m_id value=$m_id>";
 	$urlap.="\n<input type=hidden name=m_op value=addingmise><input type=hidden name=tid value=$tid>";
-	$urlap.="\n<input type=hidden name=datumtol value=$datumtol><input type=hidden name=datumig value=$datumig>";
 	
 	$urlap.='<table cellpadding=4 width=100%>';
 
-//név
-	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><span class=kiscim>$tnev ($tvaros)</span></td></tr>";
-
-//időszámítás
-	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Nyári időszámítás:</div></td><td bgcolor=#efefef><span class=kiscim>$datumtol - $datumig</span><span class=alap> (a templom adatainál módosítható!)</span></td></tr>";
-
-//Misemegjegyzés
-	$urlap.="\n<tr><td bgcolor=#D6F8E6><span class=kiscim>Kiegészítő infók:</span><br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td><td bgcolor=#D6F8E6>";
-	$urlap.="<span class=alap>Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span><br><textarea name=misemegj class=urlap cols=50 rows=10>$misemegj</textarea></td></tr>";
-
-//miserend
+	//név
+	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><span class=kiscim>".$church['nev']." (".$church['varos'].")</span></td></tr>";
+	
+	//miserend
 	$urlap.="\n<tr><td><span class=kiscim>Miseidőpontok:</span></td><td>";
 	$urlap.="&nbsp;</td></tr>";
 
-	$ma=date('Y-m-d');
-	$urlap.="\n<tr><td bgcolor=#D6F8E6><span class=kiscim>Frissítés:</span></td><td bgcolor=#D6F8E6>";
-	$urlap.="<input type=checkbox name=frissit value='i' checked class=urlap><span class=alap>Dátum frissítése módosítás esetén (utolsó frissítés: $frissites)</span></td></tr>";
 
-//hétfő
-	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>hétfő:</div></td><td bgcolor=#efefef>";
-	$urlap.="<input type=text name=idopontT[1] value=\"$idopontT[1]\" class=urlap size=30><span class=alap> nyári misekezdések</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=idoponttT[1] value=\"$idoponttT[1]\" class=urlap size=30><span class=alap> téli misekezdések, ha különbözik</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=nyelvT[1] value=\"$nyelvT[1]\" class=urlap size=30><span class=alap> nyelvek nyáron -> </span><a title='latin' class=alap>va, </a><a title='német' class=alap>de, </a><a title='szlovák' class=alap>sk, </a><a title='lengyel' class=alap>pl, </a><a title='szlovén' class=alap>si, </a><a title='horvát' class=alap>hr, </a><a title='olasz' class=alap>it, </a><a title='görög' class=alap>gr, </a><a title='angol' class=alap>en, </a><a title='francia' class=alap>fr, </a>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=nyelvtT[1] value=\"$nyelvtT[1]\" class=urlap size=30><span class=alap> nyelvek télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=gitarosT[1] value=\"$gitarosT[1]\" class=urlap size=30><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák nyáron</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=gitarostT[1] value=\"$gitarostT[1]\" class=urlap size=30><span class=alap> télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><textarea name=megjT[1] class=urlap cols=60 rows=4>$megjT[1]</textarea><span class=alap> megjegyzések</span>";
-	$urlap.="<br><textarea name=megjtT[1] class=urlap cols=60 rows=4>$megjtT[1]</textarea><span class=alap> téli megjegyzések</span>";
-	$urlap.="</td></tr>";
+	foreach($masses as $pkey=>$period) {
+		$c = 0;
+		$urlap.="\n<tr><td bgcolor=#D6F8E6><span class=kiscim>Periódus:</span></td>
+						<td bgcolor=#D6F8E6><input type=text name=period[".$pkey."][name] value=\"".$period['nev']."\" class=urlap size=30>
+						<input type=hidden name=period[".$pkey."][origname] value='".$period['nev']."'>
+						<span class='alap deleteperiod'>[töröl]</span></td></tr>";
 
-//kedd
-	$urlap.="\n<tr><td bgcolor=#D6F8E6><div class=kiscim align=right>kedd:</div></td><td bgcolor=#D6F8E6>";
-	$urlap.="<input type=text name=idopontT[2] value=\"$idopontT[2]\" class=urlap size=30><span class=alap> nyári misekezdések</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=idoponttT[2] value=\"$idoponttT[2]\" class=urlap size=30><span class=alap> téli misekezdések, ha különbözik</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=nyelvT[2] value=\"$nyelvT[2]\" class=urlap size=30><span class=alap> nyelvek nyáron -> </span><a title='latin' class=alap>va, </a><a title='német' class=alap>de, </a><a title='szlovák' class=alap>sk, </a><a title='lengyel' class=alap>pl, </a><a title='szlovén' class=alap>si, </a><a title='horvát' class=alap>hr, </a><a title='olasz' class=alap>it, </a><a title='görög' class=alap>gr, </a><a title='angol' class=alap>en, </a><a title='francia' class=alap>fr, </a>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=nyelvtT[2] value=\"$nyelvtT[2]\" class=urlap size=30><span class=alap> nyelvek télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=gitarosT[2] value=\"$gitarosT[2]\" class=urlap size=30><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák nyáron</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=gitarostT[2] value=\"$gitarostT[2]\" class=urlap size=30><span class=alap> télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><textarea name=megjT[2] class=urlap cols=60 rows=4>$megjT[2]</textarea><span class=alap> megjegyzések</span>";
-	$urlap.="<br><textarea name=megjtT[2] class=urlap cols=60 rows=4>$megjtT[2]</textarea><span class=alap> téli megjegyzések</span>";
-	$urlap.="</td></tr>";
 
-//szerda
-	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>szerda:</div></td><td bgcolor=#efefef>";
-	$urlap.="<input type=text name=idopontT[3] value=\"$idopontT[3]\" class=urlap size=30><span class=alap> nyári misekezdések</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=idoponttT[3] value=\"$idoponttT[3]\" class=urlap size=30><span class=alap> téli misekezdések, ha különbözik</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=nyelvT[3] value=\"$nyelvT[3]\" class=urlap size=30><span class=alap> nyelvek nyáron -> </span><a title='latin' class=alap>va, </a><a title='német' class=alap>de, </a><a title='szlovák' class=alap>sk, </a><a title='lengyel' class=alap>pl, </a><a title='szlovén' class=alap>si, </a><a title='horvát' class=alap>hr, </a><a title='olasz' class=alap>it, </a><a title='görög' class=alap>gr, </a><a title='angol' class=alap>en, </a><a title='francia' class=alap>fr, </a>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=nyelvtT[3] value=\"$nyelvtT[3]\" class=urlap size=30><span class=alap> nyelvek télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=gitarosT[3] value=\"$gitarosT[3]\" class=urlap size=30><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák nyáron</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=gitarostT[3] value=\"$gitarostT[3]\" class=urlap size=30><span class=alap> télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><textarea name=megjT[3] class=urlap cols=60 rows=4>$megjT[3]</textarea><span class=alap> megjegyzések</span>";
-	$urlap.="<br><textarea name=megjtT[3] class=urlap cols=60 rows=4>$megjtT[3]</textarea><span class=alap> téli megjegyzések</span>";
-	$urlap.="</td></tr>";
+		$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>határok:</div></td><td bgcolor=#efefef>
+							<input type=text name=period[".$pkey."][from] value=\"".trim(preg_replace('/\+1$/i','',$period['tol']))."\" class=urlap size=20>\n
+							<select name=period[".$pkey."][from2] ><option value='0'>≤</option><option value='1' ";
+							if(preg_match('/\+1$/i',$period['tol'])) $urlap .= ' selected ';
+							$urlap .="><</option></select>
+							<span class=alap>napok</span>
+							<select name=period[".$pkey."][to2] ><option value='0'>≤</option><option value='1' ";
+							if(preg_match('/-1$/i',$period['ig'])) $urlap .= ' selected ';
+							$urlap .="><</option></select>
+							<input type=text name=period[".$pkey."][to] value=\"".trim(preg_replace('/-1$/i','',$period['ig']))."\" class=urlap size=20>\n
+							</td></tr>";
 
-//csütörtök
-	$urlap.="\n<tr><td bgcolor=#D6F8E6><div class=kiscim align=right>csütörtök:</div></td><td bgcolor=#D6F8E6>";
-	$urlap.="<input type=text name=idopontT[4] value=\"$idopontT[4]\" class=urlap size=30><span class=alap> nyári misekezdések</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=idoponttT[4] value=\"$idoponttT[4]\" class=urlap size=30><span class=alap> téli misekezdések, ha különbözik</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=nyelvT[4] value=\"$nyelvT[4]\" class=urlap size=30><span class=alap> nyelvek nyáron -> </span><a title='latin' class=alap>va, </a><a title='német' class=alap>de, </a><a title='szlovák' class=alap>sk, </a><a title='lengyel' class=alap>pl, </a><a title='szlovén' class=alap>si, </a><a title='horvát' class=alap>hr, </a><a title='olasz' class=alap>it, </a><a title='görög' class=alap>gr, </a><a title='angol' class=alap>en, </a><a title='francia' class=alap>fr, </a>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=nyelvtT[4] value=\"$nyelvtT[4]\" class=urlap size=30><span class=alap> nyelvek télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=gitarosT[4] value=\"$gitarosT[4]\" class=urlap size=30><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák nyáron</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=gitarostT[4] value=\"$gitarostT[4]\" class=urlap size=30><span class=alap> télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><textarea name=megjT[4] class=urlap cols=60 rows=4>$megjT[4]</textarea><span class=alap> megjegyzések</span>";
-	$urlap.="<br><textarea name=megjtT[4] class=urlap cols=60 rows=4>$megjtT[4]</textarea><span class=alap> téli megjegyzések</span>";
-	$urlap.="</td></tr>";
+		$urlap.='<tr><td colspan="2"><table cellpadding=4 width=100% id="period'.$pkey.'">';
 
-//péntek
-	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>péntek:</div></td><td bgcolor=#efefef>";
-	$urlap.="<input type=text name=idopontT[5] value=\"$idopontT[5]\" class=urlap size=30><span class=alap> nyári misekezdések</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=idoponttT[5] value=\"$idoponttT[5]\" class=urlap size=30><span class=alap> téli misekezdések, ha különbözik</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=nyelvT[5] value=\"$nyelvT[5]\" class=urlap size=30><span class=alap> nyelvek nyáron -> </span><a title='latin' class=alap>va, </a><a title='német' class=alap>de, </a><a title='szlovák' class=alap>sk, </a><a title='lengyel' class=alap>pl, </a><a title='szlovén' class=alap>si, </a><a title='horvát' class=alap>hr, </a><a title='olasz' class=alap>it, </a><a title='görög' class=alap>gr, </a><a title='angol' class=alap>en, </a><a title='francia' class=alap>fr, </a>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=nyelvtT[5] value=\"$nyelvtT[5]\" class=urlap size=30><span class=alap> nyelvek télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=gitarosT[5] value=\"$gitarosT[5]\" class=urlap size=30><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák nyáron</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=gitarostT[5] value=\"$gitarostT[5]\" class=urlap size=30><span class=alap> télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><textarea name=megjT[5] class=urlap cols=60 rows=4>$megjT[5]</textarea><span class=alap> megjegyzések</span>";
-	$urlap.="<br><textarea name=megjtT[5] class=urlap cols=60 rows=4>$megjtT[5]</textarea><span class=alap> téli megjegyzések</span>";
-	$urlap.="</td></tr>";
+		foreach($period['napok'] as $dkey=>$day) {
+			if(isset($day['misek']))
+			foreach($day['misek'] as $mkey=>$mass) {
+				$c++;
+				$urlap.="\n<tr><td bgcolor=#efefef><span class='alap hidemise'>[töröl]</span> <input type=hidden name=period[".$pkey."][".$c."][id] value=\"".$mass['id']."\" >";
+				$urlap .= formSelectDay("period[".$pkey."][".$c."][napid]",$mass['napid'])." <input type=text style='margin-top:4px' name=period[".$pkey."][".$c."][ido] value=\"".$mass['ido']."\" class=urlap size=1></td><td bgcolor=#efefef>";
+				$urlap.="<input type=text name=period[".$pkey."][".$c."][nyelv] value=\"".$mass['nyelv']."\" class=urlap size=12><span class=alap> nyelvek </span>";
+				$urlap.="<input style='margin-left:10px' type=text name=period[".$pkey."][".$c."][milyen] value=\"".$mass['milyen']."\" class=urlap size=12><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák </span>";
+				$urlap.="<br><input type='text' name=period[".$pkey."][".$c."][megjegyzes] class=urlap  style='margin-top:4px;width:244px' value='".$mass['megjegyzes']."' ><span class=alap> megjegyzések</span>";
+				$urlap.="</td></tr>";
+			}
+		}
 
-//szombat
-	$urlap.="\n<tr><td bgcolor=#F1BF8F><div class=kiscim align=right>szombat:</div></td><td bgcolor=#F1BF8F>";
-	$urlap.="<input type=text name=idopontT[6] value=\"$idopontT[6]\" class=urlap size=30><span class=alap> nyári misekezdések</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=idoponttT[6] value=\"$idoponttT[6]\" class=urlap size=30><span class=alap> téli misekezdések, ha különbözik</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=nyelvT[6] value=\"$nyelvT[6]\" class=urlap size=30><span class=alap> nyelvek nyáron -> </span><a title='latin' class=alap>va, </a><a title='német' class=alap>de, </a><a title='szlovák' class=alap>sk, </a><a title='lengyel' class=alap>pl, </a><a title='szlovén' class=alap>si, </a><a title='horvát' class=alap>hr, </a><a title='olasz' class=alap>it, </a><a title='görög' class=alap>gr, </a><a title='angol' class=alap>en, </a><a title='francia' class=alap>fr, </a>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=nyelvtT[6] value=\"$nyelvtT[6]\" class=urlap size=30><span class=alap> nyelvek télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=gitarosT[6] value=\"$gitarosT[6]\" class=urlap size=30><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák nyáron</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=gitarostT[6] value=\"$gitarostT[6]\" class=urlap size=30><span class=alap> télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><textarea name=megjT[6] class=urlap cols=60 rows=4>$megjT[6]</textarea><span class=alap> megjegyzések</span>";
-	$urlap.="<br><textarea name=megjtT[6] class=urlap cols=60 rows=4>$megjtT[6]</textarea><span class=alap> téli megjegyzések</span>";
-	$urlap.="</td></tr>";
+		$urlap .= '<tr><td colspan="2" bgcolor=#efefef><span class="alap addmise" period="'.$pkey.'" last="'.$c.'">[új mise hozzáadása]</span></td></tr>';
+		$urlap.='</table>';
+		$urlap .= '</td></tr>';
 
-//vasárnap
-	$urlap.="\n<tr><td bgcolor=#E67070><div class=kiscim align=right>vasárnap:</div></td><td bgcolor=#E67070>";
-	$urlap.="<input type=text name=idopontT[7] value=\"$idopontT[7]\" class=urlap size=30><span class=alap> nyári misekezdések</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=idoponttT[7] value=\"$idoponttT[7]\" class=urlap size=30><span class=alap> téli misekezdések, ha különbözik</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=nyelvT[7] value=\"$nyelvT[7]\" class=urlap size=30><span class=alap> nyelvek nyáron -> </span><a title='latin' class=alap>va, </a><a title='német' class=alap>de, </a><a title='szlovák' class=alap>sk, </a><a title='lengyel' class=alap>pl, </a><a title='szlovén' class=alap>si, </a><a title='horvát' class=alap>hr, </a><a title='olasz' class=alap>it, </a><a title='görög' class=alap>gr, </a><a title='angol' class=alap>en, </a><a title='francia' class=alap>fr, </a>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=nyelvtT[7] value=\"$nyelvtT[7]\" class=urlap size=30><span class=alap> nyelvek télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><input type=text name=gitarosT[7] value=\"$gitarosT[7]\" class=urlap size=30><span class=alap> [<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák nyáron</span>";
-	$urlap.="<br>&nbsp; &nbsp;<input type=text name=gitarostT[7] value=\"$gitarostT[7]\" class=urlap size=30><span class=alap> télen</span>";
-	$urlap.="<br><img src=img/space.gif width=5 height=4>";
-	$urlap.="<br><textarea name=megjT[7] class=urlap cols=60 rows=4>$megjT[7]</textarea><span class=alap> megjegyzések</span>";
-	$urlap.="<br><textarea name=megjtT[7] class=urlap cols=60 rows=4>$megjtT[7]</textarea><span class=alap> téli megjegyzések</span>";
-	$urlap.="</td></tr>";
+	}
+	$urlap .= '<tr><td colspan="2"><span class="alap addperiod" last="'.$pkey.'" >[új periódus hozzáadása]</span>';
+	$urlap .= '</td></tr>';
+	
+//Misemegjegyzés
+	$urlap.="\n<tr><td bgcolor=#D6F8E6><span class=kiscim>Kiegészítő infók:</span><br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td><td bgcolor=#D6F8E6>";
+	$urlap.="<span class=alap>Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span><br><textarea name=misemegj class=urlap cols=50 rows=10>".$church['misemegj']."</textarea></td></tr>";
+
+
 
 //súgó
 	$urlap.="\n<tr><td><span class=kiscim>Kitöltési útmutató:</span></td><td>";
-	$urlap.="<span class=alap>Kitöltésnél a hétfő az alapnap, a többi napnál, ha nincs kitöltve, a hétfői miseadatokat másolja be automatikusan (csak, ha nincs kitöltve miseidőpont!). Ha valamelyik napon nincs mise, ott ki kell húzni egy gondolatjellel (<b>-</b>), így akkor nem másolja. A téli adatoknál mindig a nyári az alapértelmezett, ha ott nincs kitöltve, akkor a nyárit másolja be automatikusan, nem a hétfői télit. Itt is érvényes, ha télen valami nincs, akkor ki kell húzni!</span>";
-
-	$urlap.="<br><br><span class=alap> <b>misekezdések</b> <input type=text value=\"9,00+18,00\" class=urlap size=10 disabled> Az időpontnál <b>óra,perc (0,00)</b> a formátum, több időpontnál az <b>elválasztó a +</b> jel (példa az űrlapban). <br>Téli adatokat csak akkor kell megadni, ha az eltérő a nyáritól.</span>";
 	
 	$urlap.="<br><br><span class=alap><b>nyelvek</b> (h, hu vagy üres=magyar, en=angol, de=német, it=olasz, fr=francia, va=latin, gr=görög, sk=szlovák, hr=horvát, pl=lengyel, si=szlovén => további nyelvek esetén az internetes 2 betűs végződés az irányadó!)<br>A nyelvek a beállított miseidőpontokhoz tartoznak, így az elválasztó itt is a <b>+</b> jel. Előfordulhatnak periódusok is, ebben az esetben a nyelv mellett a periódus számát kell feltüntetni, pl de2,va3 -> minden hónap második hetén német, harmadik hetén latin (A vessző nem fontos, csak jobban tagolja). Ha minden héten az adott nyelven van mise, akkor nem kell megjegyzést írni, viszont <u>periódusok vagy egyéni esetekben a mejegyzés rovatba szövegesen is tüntessük föl</u>!<br>";
 	$urlap.="\n<u>Példa 1:</u> a fenti 9-es mise magyar nyelvű, az esti 6-os viszont minden hónap második vasárnapján latin: <input type=text disabled class=urlap value=\"h0+,va2\" size=10> (<b>h0+va2</b>)";
@@ -1181,6 +1058,8 @@ function miserend_addmise($tid) {
 
 function miserend_addingmise() {
 	global $_POST,$_SERVER,$sid,$m_id,$db_name,$u_login;
+
+	print_r($_REQUEST); exit;
 
 	$ip=$_SERVER['REMOTE_ADDR'];
     $host = gethostbyaddr($ip);

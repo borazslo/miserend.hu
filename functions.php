@@ -288,6 +288,19 @@ function event2Date($event, $year = false) {
     return $event;
 }
 
+function getChurch($tid) {
+    $return = array();
+    $query = "SELECT * FROM templomok WHERE id = $tid LIMIT 1";
+    $result = mysql_query($query);
+    while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
+        foreach($row as $k => $v) {
+            $return[$k] = $v;
+        }
+        unset($return['log']);
+    }
+    return $return;
+}
+
 function getMasses($tid,$date = false) {
     if($date == false) $date = date('Y-m-d');
 
@@ -312,9 +325,9 @@ function getMasses($tid,$date = false) {
         $result2 = mysql_query($query2);
         while(($row2 = mysql_fetch_array($result2,MYSQL_ASSOC))) {
             if($row2['milyen'] != '') {
-                $row2['milyen'] = decodeMassAttr($row2['milyen']);
-            } else $row2['milyen'] = array();
-            $row2['milyen'] = array_merge($row2['milyen'],decodeMassAttr($row2['nyelv']));
+                $row2['attr'] = decodeMassAttr($row2['milyen']);
+            } else $row2['attr'] = array();
+            $row2['attr'] = array_merge($row2['attr'],decodeMassAttr($row2['nyelv']));
             
             $ido = (int) substr($row2['ido'],0,2);
             $row2['ido'] = $ido.":".substr($row2['ido'],3,2);
@@ -363,4 +376,19 @@ function decodeMassAttr($text) {
 
 
 }
+
+function formSelectDay($name,$selected = false) {
+    
+    $return = "<select name=\"".$name."\">";
+    $days = array('válassz','hétfő','kedd','szerda','csütörtök','péntek','szombat','vasárnap');
+    foreach ($days as $key => $value) {
+        $return .=   "<option value=\"".$key."\"";
+        if($key == $selected) $return .= ' selected ';
+        $return .= ">".$value."</option>";
+    }  
+    $return .= "</select>";
+
+    return $return;
+}
+
 ?>
