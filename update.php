@@ -1,6 +1,8 @@
 <?php
 include 'load.php';
 
+echo 'hajrá';
+/*
 //$tid = rand(1,4111);
 //print_r(getMasses(rand(1,1)));
 //exit;
@@ -35,9 +37,9 @@ LOCK TABLES `events` WRITE;
 INSERT INTO `events` VALUES (1,'utolsó tanítási nap','2014','2014-06-01'),(2,'utolsó tanítási nap','2015','2015-06-07'),(3,'első tanítási nap','2014','2014-09-01'),(4,'első tanítási nap','2015','2015-09-03');
 UNLOCK TABLES;
 ALTER TABLE misek ADD COLUMN nap2 varchar(4) AFTER ido;
-ALTER TABLE misek ADD COLUMN tmp_datumig DATE AFTER ig;
+ALTER TABLE misek ADD COLUMN tmp_datumig VARCHAR(5) AFTER ig;
 ALTER TABLE misek ADD COLUMN tmp_relation CHAR(1) AFTER ig;
-ALTER TABLE misek ADD COLUMN tmp_datumtol DATE AFTER ig;
+ALTER TABLE misek ADD COLUMN tmp_datumtol VARCHAR(5) AFTER ig;
 ";
 
 //UPDATE misek SET torolte = datumig, datumig = datumtol, datumtol = torolte, torolte = ''  WHERE idoszamitas = 't' AND datumtol LIKE '2014-%' AND datumig LIKE '2014-%';
@@ -46,8 +48,18 @@ $queries = explode(';',$query);
 foreach($queries as $query) {
 	if(trim($query) != '') if(!$lekerdez=mysql_query($query)) die( "<p>HIBA #711!<br>$query<br>".mysql_error());	
 }
-
 echo 'mysql ok';
+
+
+mysql_query("SET collation_connection = 'utf8_general_ci'");
+mysql_query("ALTER DATABASE db CHARACTER SET utf8 COLLATE utf8_general_ci");
+$result=mysql_query('show tables');
+while($tables = mysql_fetch_array($result)) {
+        foreach ($tables as $key => $value) {
+         mysql_query("ALTER TABLE $value CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci");
+   }}
+echo "The collation of your database has been successfully changed!";
+
 
 //misek
 $idoszamitas = array('t' => 'télen', 'ny'=> 'nyáron');
@@ -80,21 +92,25 @@ $query = 'SELECT * FROM kepek WHERE width IS NULL OR height IS NULL OR width = 0
 $result = mysql_query($query);    
 while(($kep = mysql_fetch_array($result))) {
 
-	$file = "kepek/templomok/".$kep['kid']."/".$kep['fajlnev'];
+	$file = "kepek/templomok/".$kep['tid']."/".$kep['fajlnev'];
 
 	if(file_exists($file)) {
-		$src_img == ImagecreateFromJpeg($file);
-	 	$kep['height'] = imagesy($src_img);  # original height
-	    $kep['width'] = imagesx($src_img);  # original width
+		if(preg_match('/(jpg|jpeg)$/i',$file)) {
+			$src_img = ImagecreateFromJpeg($file);
+		 	$kep['height'] = imagesy($src_img);  # original height
+		    $kep['width'] = imagesx($src_img);  # original width
 
-		$query =  "UPDATE kepek SET height = '".$kep['height']."', width = '".$kep['width']."' WHERE id = ".$kep['id']." LIMIT 1";
-		if($config['debug'] > 0) echo $query."<br>";
-		mysql_query($query);
+			$query =  "UPDATE kepek SET height = '".$kep['height']."', width = '".$kep['width']."' WHERE id = ".$kep['id']." LIMIT 1";
+			if($config['debug'] > 0) echo $query."<br>";
+			mysql_query($query);
+		} else {
+			if($config['debug'] > 0) echo "A kép nem jpg: ".$file."<br>";
+		}
 	} else {
 		if($config['debug'] > 0) echo "Hiányzó kép: ".$file."<br>";
 	}
 
 }
 
-
+/**/
 ?>

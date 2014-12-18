@@ -500,10 +500,7 @@ function miserend_addingtemplom() {
 			
 		} 
 
-		// tmp
-		generateMassTmp('tid = '.$tid);
-
-
+	
 	//fájlkezelés
 		$fajl=$_FILES['fajl']['tmp_name'];
 		$fajlnev=$_FILES['fajl']['name'];
@@ -917,6 +914,9 @@ function miserend_addingmise() {
 		}
 	}
 	}
+
+	generateMassTmp('tid = '.$_REQUEST['tid']);
+
 
 	//LOG
 	$ip=$_SERVER['REMOTE_ADDR'];

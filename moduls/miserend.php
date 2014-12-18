@@ -79,7 +79,7 @@ function miserend_index() {
 
 	$urlap .= "<input type=hidden name=m_id id=m_id value=$m_id><input type=hidden id=m_op name=m_op value=keres>";
 
-//Hol
+	//Hol
 	$urlap .= "<span class=kiscim style='margin-left:5px;'>Hol:</span><br>";
 	$urlap.="<span class=alap style='margin-left:5px;'>- kulcsszó: </span><input type=text id=kulcsszo name=kulcsszo size=20 class=keresourlap><br/>";	
 	$urlap.="<span class=alap style='margin-left:5px;margin-right:5px'>- település:</span><input type=text name=varos id=varos size=20 class=keresourlap style=\"margin-left:10px\"><br/>";	
@@ -120,7 +120,7 @@ function miserend_index() {
 		}
 
 	$urlap .= "<br/>";
-//Mikor
+	//Mikor
 	$urlap .= "<div id='misekis'><br/>";
 	$mainap=date('w');
 	if($mainap==0) $vasarnap=$ma;
@@ -137,7 +137,7 @@ function miserend_index() {
 	$urlap.="<option value=0>egész nap</option><option value='de'>délelőtt</option><option value='du'>délután</option><option value=x>adott időben:</option>";
 	$urlap.="</select> <input type=text name=mikorido id=md2 style='display: none' class=keresourlap maxlength=11 size=10 value='$mikor'>";
 
-//Milyen
+	//Milyen
 	$urlap.="\n<br><br><span class=kiscim style='margin-left:5px;margin-right:5px'>Milyen:</span><br>";
 	$urlap.="<table width=100% cellpadding=0 cellspacing=0><tr><td><span class=alap>- nyelv: </span><br><select name=nyelv id=nyelv class=keresourlap>
 			    <option value=0>mindegy</option>
@@ -166,8 +166,8 @@ function miserend_index() {
 
 	
 
-//Következő mise a közelben
-/* Talan mar nem is mukodik. Mintha biztosan nem csinlana semmit.
+	//Következő mise a közelben
+	/* Talan mar nem is mukodik. Mintha biztosan nem csinlana semmit.
 	$mainap=date('w');
 	$mostido=date('H:i:s');
 	if($mainap==0) $mainap=7;
@@ -212,11 +212,11 @@ function miserend_index() {
 		if(!$vanmise) $kovetkezomise.='<span class=alap>Adatbázisunkban mára már nincs több miseidőpont a településen.</span>';
 		$kovetkezomise.='<img src=img/space.gif width=5 height=8></td><td width="5" bgcolor="#F8F4F6"></td></tr></table>';
 	}
-/* */
+	/* */
 
 
-//Templom űrlap
-/* torolhessuk lassan	
+	//Templom űrlap
+	/* torolhessuk lassan	
 	$templomurlap="\n<form method=post id=\"tkereses\">
         <input type=hidden id=tsid name=sid value=$sid>
         <input type=hidden id=tm_id name=m_id value=$m_id>
@@ -287,7 +287,7 @@ function miserend_index() {
 	//A liturgikus naptárból kiszedjük, hogy mi kapcsolódik a dátumhoz
 	$query="select ige,szent,szin from lnaptar where datum='$datum'";
 	list($ige,$szent,$szin)=mysql_fetch_row(mysql_query($query));
-*/
+	*/
 	//Az igenaptárból kikeressük a mai napot
 	//$query="select ev,idoszak,nap,oszov_hely,ujszov_hely,evang_hely,unnep,intro,gondolat from igenaptar where id='$ige'";
     $query="select ev,idoszak,nap,oszov_hely,ujszov_hely,evang_hely,unnep,intro,gondolat from igenaptar ".$where; 
@@ -647,11 +647,14 @@ function miserend_templomkeres() {
 }
 
 function miserend_misekeres() {
-	global $db_name,$design_url,$linkveg,$m_id,$_POST,$_GET,$u_jogok;
+	global $db_name,$design_url,$linkveg,$m_id,$_POST,$_GET;
+	global $user;
 
 	$mikor=$_POST['mikor'];
 	$mikordatum=$_POST['mikordatum'];
 	if($mikor!='x') $mikordatum=$mikor;
+
+	
 	$mikor2=$_POST['mikor2'];
 	$mikorido=$_POST['mikorido'];
 	$varos=$_POST['varos'];
@@ -668,9 +671,6 @@ function miserend_misekeres() {
 
 	$ma=date('Y-m-d');
 	$holnap=date('Y-m-d',(time()+86400));
-
-	$results = searchMasses($_POST,$min,$leptet);
-
 
 	if($ehm>0) {
 		$query="select nev from egyhazmegye where id=$ehm and ok='i'";
@@ -764,88 +764,11 @@ function miserend_misekeres() {
 	else $visszalink="javascript:history.go(-1);";
 	$templomurlap="<img src=img/space.gif width=5 height=6><br><a href=$visszalink class=link><img src=img/search.gif width=16 height=16 border=0 align=absmiddle hspace=2><b>Vissza a főoldali keresőhöz</b></a><br><img src=img/space.gif width=5 height=6>";
 
-
-
-
-	if(!empty($varos)) $feltetelT[]="(t.varos like '%$varos%')";
-	if(!empty($ehm)) {
-		$feltetelT[]="(t.egyhazmegye='$ehm')";
-		if(!empty($espkerT[$ehm])) $feltetelT[]="(t.espereskerulet='$espkerT[$ehm]')";
-	}
-	
-	$feltetelT[]="((t.nyariido<='$mikordatum' and t.teliido>='$mikordatum' and m.idoszamitas='ny') or ((t.nyariido>'$mikordatum' or t.teliido<'$mikordatum') and m.idoszamitas='t'))";
-
-	//milyennap
-	$ev=substr($mikordatum,0,4);
-	$ho=substr($mikordatum,5,2);
-	$nap=substr($mikordatum,8,2);
-	$time=mktime(0,0,0,$ho,$nap,$ev);
-	$milyennap=date('w',$time);
-	if($milyennap==0) $milyennap=7;
-	//Ünnep esetén lehet vasárnapi mise!
-	$query="select unnep,mise,miseinfo from unnepnaptar where datum='$mikordatum'";
-	list($unnep,$mise,$miseinfo)=mysql_fetch_row(mysql_query($query));
-	if($mise=='u') $milyennap=7;
-	elseif($mise=='n') $milyennap=0;
-
-	$feltetelT[]="(m.nap='$milyennap')";
-
-	if($mikor2=='de') {
-		$mikoridotol='0:00';
-		$mikoridoig='11:59';
-	}
-	elseif($mikor2=='du') {
-		$mikoridotol='12:00';
-		$mikoridoig='23:59';
-	}
-	elseif($mikor2=='x') {
-		$mikoridoT=explode('-',$mikorido);
-		$mikoridotol=$mikoridoT[0];
-		$mikoridoig=$mikoridoT[1];
-	}
-	if($mikor2!='0') $feltetelT[]="(m.ido>='$mikoridotol' and m.ido<='$mikoridoig')";
-
-//A dátum hanyadik hétnek felel meg
-	$osztas=$nap/7;
-	$egesz=intval($nap/7);
-	if($osztas>$egesz) $hanyadik=$egesz+1;
-	else $hanyadik=$egesz;
-
-	if(!empty($nyelv)) {
-		$feltetelT[]="(m.nyelv like '%".$nyelv."0%' or m.nyelv like '%$nyelv$hanyadik%')";
-	}
-
-	if(!empty($zene)) {
-		if($zene=='o') $feltetelT[]="(m.milyen not like '%g0%' and m.milyen not like 'g$hanyadik%' and m.milyen not like '%cs0%' and m.milyen not like 'cs$hanyadik%')";
-		else $feltetelT[]="(m.milyen like '%".$zene."0%' or m.milyen like '%$zene$hanyadik%')";
-	}
-	
-	if($diak=='d') {
-		$feltetelT[]="(m.milyen like '%d0%' or m.milyen like '%d$hanyadik%')";
-	}
-	elseif($diak=='nd') {
-		$feltetelT[]="(m.milyen not like '%d0%' and m.milyen not like '%d$hanyadik%')";
-	}
-
-	$feltetelT[]="t.ok='i'";
-	$feltetelT[]="m.torles='0000-00-00'";
-
-	if(is_array($feltetelT)) {
-		$feltetel=implode(' and ',$feltetelT);
-	}
 	/*
-	$query="select t.id,t.nev,t.ismertnev,t.varos,t.letrehozta, m.ido,m.nyelv,m.megjegyzes from templomok t, misek m where m.templom = t.id and $feltetel order by t.varos, t.nev, m.ido";
-	if(!$lekerdez=mysql_query($query)) echo "<p>HIBA #711!<br>$query<br>".mysql_error();
-	$mennyi=mysql_num_rows($lekerdez);
-	$query.=" limit $min,$leptet";
-	if(!$lekerdez=mysql_query($query)) echo "<p>HIBA #714!<br>$query<br>".mysql_error();
-	$mostido=date('H:i');
-	while(list($tid,$tnev,$tismertnev,$tvaros,$letrehozta,$mido,$mnyelv,$mmegjegyzes)=mysql_fetch_row($lekerdez)) {
-	*/
- 	foreach($results['results'] as $result) { 
+
+ 	if(isset($results['results'])) foreach($results['results'] as $result) { 
  		$tid = $result['tid'];
  		//$tnev = $result['']; ,$tismertnev,$tvaros,$letrehozta,$mido,$mnyelv,$mmegjegyzes
- 		echo 'ok';
 
 		$nyelvikon='';
 		if(empty($templom[$tid])) {
@@ -877,28 +800,60 @@ function miserend_misekeres() {
 		else $mido="<b>$mido</b>";
 		$miseT[$tid][]="<img src=img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>$mido</span>$nyelvikon$megj &nbsp; ";
 	}
-	if($mennyi==0) {
-		$tartalom.="<br>";
-		if(!empty($unnep)) {
-			$tartalom.="<span class=alcim_lila>$unnep</span>";
-			if(!empty($miseinfo)) $tartalom.="<br><span class=kiscim_kek>$miseinfo</span>";
-			$tartalom.='<br><span class=kicsi><font color=red>(Az ünnep miatt a miserend eltérhet az itt megjelenőtől.)</font></span><br><br>';
+	*/
+	$results = searchMasses($_POST,$min,$leptet,'tid');
+	$mennyi = $results['sum'];
+
+	$kezd=$min+1;
+	$prev=$min-$leptet;
+	if($prev<0) $prev=0;
+	$veg=$mennyi;
+	if($min>0) {
+		$leptetprev.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=sid value=$sid><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
+		$leptetprev.=$leptet_urlap;
+		$leptetprev.="<input type=hidden name=min value=$prev>";		
+		$leptetprev.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
+	}
+	if($mennyi>$leptet) {		
+		$veg=$min+$leptet;
+		
+		$next=$min+$leptet;	
+
+		if($mennyi>$min+$leptet) {
+			$leptetnext.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=sid value=$sid><input type=hidden name=min value=$next><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
+			$leptetnext.=$leptet_urlap;
+			$leptetnext.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
 		}
+	}
+
+
+
+	if($mennyi==0) {	
 		$tartalom.='<span class=alap>Sajnos nincs találat</span>';
 		//$tartalom.='<span class=alap>Elnézést kérünk, a kereső technikai hiba miatt nem üzemel. Javításán már dolgozunk.</span>';
 	}
 	else {
-		$tartalom.="<span class=kiscim>Összesen $mennyi miseidőpont</span><br><br>";
-		if(!empty($unnep)) {
-			$tartalom.="<span class=alcim_lila>$unnep</span>";
-			if(!empty($miseinfo)) $tartalom.="<br><span class=kiscim_kek>$miseinfo</span>";
-			$tartalom.='<br><span class=kicsi><font color=red>(Az ünnep miatt a miserend eltérhet az itt megjelenőtől.)</font></span><br><br>';
-		}
-		foreach($templomT as $tid=>$ertek) {
+		//$tartalom.="<span class=kiscim>Összesen $mennyi templomban van megfelelő mise.</span><br><br>";
+		$tartalom.="<br><span class=alap>Összesen: $mennyi templomban van megfelelő mise.<br>Listázás: $kezd - $veg</span><br><br>";
+
+
+		foreach($results['results'] as $result) {
+			$tartalom .= "<img src=img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
+				<a href=?templom=".$result['tid']."$linkveg class=felsomenulink><b>".$result['nev']."</b> <font color=#8D317C>(".$result['varos'].")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">".$result['ismertnev']."</span>";
+			if(strstr($user->jogok,'miserend')) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=".$result['tid']."$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=".$result['tid']."$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+			elseif($result['letrehozta']==$user->login) $tartalom.=" <a href=?m_id=29&m_op=addtemplom&tid=".$result['tid']."$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=".$result['tid']."$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+			
 			$tartalom.=$ertek.'<br> &nbsp; &nbsp; &nbsp;';
-			foreach($miseT[$tid] as $misek) {
-				$tartalom.=$misek;
+
+			if($_REQUEST['mikor'] == 'x') $_REQUEST['mikor'] = $_REQUEST['mikordatum'];
+			//$masses = getMasses($result['tid'],$_REQUEST['mikordatum']);
+			$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_POST));
+			foreach($masses['results'] as $mass) {
+				$tartalom .="<img src=img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>".substr($mass['ido'],0,5)."</span>";
+				$tartalom .= " ".$mass['ido2']." ".$mass['nyelv']." ".$mass['milyen']." ".$mass['megjegyzes']." &nbsp; ";
 			}
+			//$tartalom .= print_r($masses,1);
+
 			$tartalom.="<br><img src=img/space.gif width=4 height=8><br>";
 		}
 	}
@@ -906,11 +861,11 @@ function miserend_misekeres() {
 	//Léptetés
 	if($mennyi>$min+$leptet) {
 		$next=$min+$leptet;
-		$leptetes="<br><form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=misekeres>";
+		$leptetes="<br><form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
 		$leptetes.=$leptet_urlap;
 		$leptetes.="<input type=submit value=Következő class=urlap><input type=text name=leptet value=$leptet class=urlap size=2><input type=hidden name=min value=$next></form>";
 	}
-	$tartalom.=$leptetes;
+	$tartalom.=$leptetprev.$leptetnext;
 
 
 	$focim="Szentmise kereső";
@@ -925,7 +880,7 @@ function miserend_misekeres() {
 
 function miserend_view() {
 	global $TID,$linkveg,$db_name,$elso,$m_id,$m_op,$_GET,$design_url,$deisgn,$u_login,$u_jogok,$onload,$script,$sid,$titlekieg, $meta;
-    global $twig;
+    global $twig,$user;
     
 	$tid=$_GET['tid'];
 	if(!empty($TID)) $tid=$TID;
