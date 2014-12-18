@@ -87,8 +87,8 @@ function miserend_addtemplom($tid) {
 		$most=date("Y-m-d H:i:s");
 		$urlap.=include('editscript2.php'); //Csak, ha módosításról van szó
 
-		$query="select nev,ismertnev,turistautak,orszag,megye,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,espereskerulet,leiras,megjegyzes,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,kontakt,kontaktmail,adminmegj,log,ok,letrehozta,megbizhato,eszrevetel,lat,lng from templomok LEFT JOIN terkep_geocode ON id=tid where id='$tid'";
-		if(!$lekerdez=mysql_db_query($db_name,$query)) echo 'HIBA!<br>'.mysql_error();	list($nev,$ismertnev,$turistautak,$orszag,$megye,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$espereskerulet,$szoveg,$megjegyzes,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$kontakt,$kontaktmail,$adminmegj,$log,$ok,$feltolto,$megbizhato,$teszrevetel,$lat,$lng)=mysql_fetch_row($lekerdez);
+		$query="select nev,ismertnev,turistautak,orszag,megye,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,espereskerulet,leiras,megjegyzes,misemegj,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,kontakt,kontaktmail,adminmegj,log,ok,letrehozta,megbizhato,eszrevetel,lat,lng from templomok LEFT JOIN terkep_geocode ON id=tid where id='$tid'";
+		if(!$lekerdez=mysql_db_query($db_name,$query)) echo 'HIBA!<br>'.mysql_error();	list($nev,$ismertnev,$turistautak,$orszag,$megye,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$espereskerulet,$szoveg,$megjegyzes,$misemegj,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$kontakt,$kontaktmail,$adminmegj,$log,$ok,$feltolto,$megbizhato,$teszrevetel,$lat,$lng)=mysql_fetch_row($lekerdez);
 	}
 	else {
 		$datum=date('Y-m-d H:i');
@@ -105,17 +105,6 @@ function miserend_addtemplom($tid) {
 	
 	$urlap.='<table cellpadding=4>';
 
-/*
-//megnyitva
-	if($hid>0 and !empty($megnyitva)) {
-		$kod=rawurlencode($megnyitva);
-		$urlap.="\n<tr><td>&nbsp;</td><td><img src=img/edit.gif align=absmiddle><span class=alap><font color=red>Megnyitva!</font> $megnyitva</span><br><a href=?m_id=$m_id&m_op=addmegse&hid=$hid&kod=$kod$linkveg class=link><b><font color=red>Vissza, mégsem szerkesztem</font></b></a></td></tr>";
-	}
-*/
-/*
-//előnézet
-	if($hid>0) $urlap.="\n<tr><td bgcolor='#efefef'>&nbsp;</td><td bgcolor='#efefef'><a href=?m_id=19&id=$hid$linkveg class=link><b>>> Hír megtekintése (előnézet) <<</b></a></td></tr>";
-*/
 //Észrevétel
 //Észrevételek lekérdezése
 	$querye="select distinct(hol_id) from eszrevetelek where hol='templomok'";
@@ -286,8 +275,11 @@ function miserend_addtemplom($tid) {
 //megjegyzés
 	$urlap.="\n<tr><td bgcolor=#ffffff><div class=kiscim align=right>Megjegyzés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=10',200,360);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td bgcolor=#ffffff><textarea name=megjegyzes class=urlap cols=50 rows=3>$megjegyzes</textarea><br><span class=alap> ami a \"jó tudni...\" dobozban megjelenik (pl. búcsú, védőszent, \"reklám\" stb.)</span></td></tr>";
 
+//megjegyzés
+	$urlap.="\n<tr><td bgcolor=#ffffff><div class=kiscim align=right>Mise megjegyzés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,360);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td bgcolor=#ffffff><textarea name=misemegj class=urlap cols=50 rows=3>$misemegj</textarea><br><span class=alap> Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span></td></tr>";
+
 //nyári-téli időszámítás
-	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Nyári időszámítás:</div></td><td bgcolor=#efefef><input type=text name=nyariido value=\"$nyariido\" class=urlap size=10 maxlength=10><span class=alap> - </span><input type=text name=teliido value=\"$teliido\" class=urlap size=10 maxlength=10> <a href=\"javascript:OpenNewWindow('sugo.php?id=8',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
+//	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Nyári időszámítás:</div></td><td bgcolor=#efefef><input type=text name=nyariido value=\"$nyariido\" class=urlap size=10 maxlength=10><span class=alap> - </span><input type=text name=teliido value=\"$teliido\" class=urlap size=10 maxlength=10> <a href=\"javascript:OpenNewWindow('sugo.php?id=8',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
 
 //Szöveg
 	$urlap.="<tr><td valign=top><div class=kiscim align=right>Részletes leírás, templom története:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=9',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td valign=top><span class=alap><font color=red><b>FONTOS!</b></font> A szöveghez MINDIG legyen stílus rendelve!</span><br><textarea name=szoveg class=urlap cols=90 rows=30>$szoveg</textarea>";
@@ -338,76 +330,6 @@ function miserend_addtemplom($tid) {
 	}
 	$urlap.='</td></tr>';
 
-
-/*
-	$query="select id,nev,ismertnev,varos from templomok where id!='$tid' order by varos";
-	$lekerdez=mysql_db_query($db_name,$query);
-	while(list($eid,$enev,$eismert,$evaros)=mysql_fetch_row($lekerdez)) {
-		if(strlen($enev)>65) $enev=substr($enev,0,65).'...';
-		$ismT[$eid]=" title='$eismert'>$evaros -> [$enev]";
-	}
-
-//szomszédos 1
-	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Szomszédos templomok (legközelebbi):<br><a href=\"javascript:OpenNewWindow('sugo.php?id=13',200,500);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td bgcolor=#efefef>";
-	
-	if(!empty($szomszedos1)) {
-		$sz1=str_replace('--','!',$szomszedos1);
-		$sz1=str_replace('-','',$sz1);
-		$sz1T=explode('!',$sz1);
-		if(is_array($sz1T)) {
-			$urlap.="\n<table width=100% bgcolor=#ECE5C8><tr><td colspan=2><span class=kiscim>Kiválasztott legközelebbi templomok:</span></td></tr>";
-
-			foreach($sz1T as $ertek) {
-				if($ertek!=$tid) {
-					$urlap.="<input type=hidden name=oldsz1T[] value=$ertek>";
-					$urlap.="\n<tr><td bgcolor=#FEFDFA><a href=?m_id=27&m_op=addtemplom&tid=$ertek target=_blank class=link ".$ismT[$ertek]."</a></td><td bgcolor=#FEFDFA><input type=checkbox name='delsz1T[]' value='$ertek' class=urlap><span class=alap> töröl</span></td></tr>";
-				}
-			}
-			$urlap.='</table><hr>';
-		}
-	}
-	
-	$urlap.="<span class=kiscim>Hozzáadás:</span><br><span class=alap>CTRL-lal több is kijelölhető, illetve visszavonható!<br></span><select name=szomszedos1T[] class=urlap multiple size=10>";
-	foreach($ismT as $eid=>$enev) {		
-		if(!strstr($szomszedos1,"-$eid-")) {
-			$urlap.="\n<option value='$eid'";
-			$urlap.="$enev</option>";
-		}
-	}
-	$urlap.="</select>";
-	$urlap.="</td></tr>";
-
-//szomszédos 2
-	$urlap.="\n<tr><td><div class=kiscim align=right>Szomszédos templomok (10km-en belüli):<br><a href=\"javascript:OpenNewWindow('sugo.php?id=13',200,500);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td>";
-
-	if(!empty($szomszedos2)) {
-		$sz2=str_replace('--','!',$szomszedos2);
-		$sz2=str_replace('-','',$sz2);
-		$sz2T=explode('!',$sz2);
-		if(is_array($sz2T)) {
-			$urlap.="\n<table width=100% bgcolor=#ECE5C8><tr><td colspan=2><span class=kiscim>Kiválasztott 10km-en belüli templomok:</span></td></tr>";
-
-			foreach($sz2T as $ertek) {
-				if($ertek!=$tid) {
-					$urlap.="<input type=hidden name=oldsz2T[] value=$ertek>";
-					$urlap.="\n<tr><td bgcolor=#FEFDFA><a href=?m_id=27&m_op=addtemplom&tid=$ertek target=_blank class=link ".$ismT[$ertek]."</a></td><td bgcolor=#FEFDFA><input type=checkbox name='delsz2T[]' value='$ertek' class=urlap><span class=alap> töröl</span></td></tr>";
-				}
-			}
-			$urlap.='</table><hr>';
-		}
-	}
-
-	$urlap.="<span class=kiscim>Hozzáadás:</span><br><span class=alap>CTRL-lal több is kijelölhető, illetve visszavonható!<br></span><select name=szomszedos2T[] class=urlap multiple size=10>";
-	foreach($ismT as $eid=>$enev) {		
-		if(!strstr($szomszedos1,"-$eid-") and !strstr($szomszedos2,"-$eid-")) {
-			$urlap.="\n<option value='$eid'";
-			$urlap.="$enev</option>";
-		}
-	}
-	$urlap.="</select>";
-	$urlap.="</td></tr>";
-
-*/
 //Frissítés dátuma
 	if($tid>0) {
 		$urlap.="\n<tr><td valign=top><div class=kiscim align=right>Frissítés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=14',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td valign=top><input type=text disabled value='$frissites' size=10 class=urlap><br><input type=checkbox name=frissit value=i class=urlap><span class=alap> Frissítsük a dátumot</span></td></tr>";
@@ -492,16 +414,12 @@ function miserend_addingtemplom() {
 	$nyariido=$_POST['nyariido'];
 	$teliido=$_POST['teliido'];
 	$megjegyzes=$_POST['megjegyzes'];
+	$misemegj=$_POST['misemegj'];
 	$frissit=$_POST['frissit'];
 	if($frissit=='i') $frissites=" frissites='$ma', ";
 	$kontakt=$_POST['kontakt'];
 	$kontaktmail=$_POST['kontaktmail'];
-	$szomszedos1T=$_POST['szomszedos1T'];
-	$delsz1T=$_POST['delsz1T'];
-	$oldsz1T=$_POST['oldsz1T'];
-	$szomszedos2T=$_POST['szomszedos2T'];
-	$oldsz2T=$_POST['oldsz2T'];
-	$delsz2T=$_POST['delsz2T'];
+	
 	$bucsu=$_POST['bucsu'];
 	$ok=$_POST['ok'];
 	$feltolto=$_POST['feltolto'];
@@ -556,7 +474,7 @@ function miserend_addingtemplom() {
 			$frissites=" frissites='$ma', ";
 		}
 
-		$query="$parameter1 templomok set nev='$nev', ismertnev='$ismertnev', turistautak='$turistautak', orszag='$orszag', megye='$megye', varos='$varos', cim='$cim', megkozelites='$megkozelites', plebania='$plebania', pleb_url='$pleb_url', pleb_eml='$pleb_eml', egyhazmegye='$egyhazmegye', espereskerulet='$espereskerulet', leiras='$szoveg', megjegyzes='$megjegyzes', szomszedos1='$szomszedos1', szomszedos2='$szomszedos2', bucsu='$bucsu', nyariido='$nyariido', teliido='$teliido', $frissites kontakt='$kontakt', kontaktmail='$kontaktmail', adminmegj='$adminmegj', letrehozta='$feltolto', megbizhato='$megbizhato', ok='$ok' $parameter2";
+		$query="$parameter1 templomok set nev='$nev', ismertnev='$ismertnev', turistautak='$turistautak', orszag='$orszag', megye='$megye', varos='$varos', cim='$cim', megkozelites='$megkozelites', plebania='$plebania', pleb_url='$pleb_url', pleb_eml='$pleb_eml', egyhazmegye='$egyhazmegye', espereskerulet='$espereskerulet', leiras='$szoveg', megjegyzes='$megjegyzes',  misemegj='$misemegj', bucsu='$bucsu', nyariido='$nyariido', teliido='$teliido', $frissites kontakt='$kontakt', kontaktmail='$kontaktmail', adminmegj='$adminmegj', letrehozta='$feltolto', megbizhato='$megbizhato', ok='$ok' $parameter2";
 		if(!mysql_db_query($db_name,$query)) echo 'HIBA!<br>'.mysql_error();
 		if($uj) $tid=mysql_insert_id();	
 		else {
@@ -581,79 +499,11 @@ function miserend_addingtemplom() {
 			neighboursUpdate($tid);
 			
 		} 
-/*
-	//Szomszédos 1 (legközelebbi templomok)
-		if(is_array($oldsz1T)) {
-			if(is_array($delsz1T)) {
-				foreach($oldsz1T as $ertek) {
-					if(!in_array($ertek,$delsz1T)) {
-						$ujsz1T[]=$ertek;
-					}
-				}
-			}
-			else {
-				$ujsz1T=$oldsz1T;
-			}
-			if(is_array($szomszedos1T)) {
-				$ujsz1T=array_merge($ujsz1T,$szomszedos1T);
-			}
-		}
-		elseif(is_array($szomszedos1T)) {
-			$ujsz1T=$szomszedos1T;
-		}
-		if(is_array($ujsz1T)) {
-			$ujsz1='-'.implode('--',$ujsz1T).'-';
-		}
-	
-	//Szomszédos 2 (10km-en belüli templomok)
-		if(is_array($oldsz2T)) {
-			if(is_array($delsz2T)) {
-				foreach($oldsz2T as $ertek) {
-					if(!in_array($ertek,$delsz2T)) {
-						$ujsz2T[]=$ertek;
-					}
-				}
-			}
-			else {
-				$ujsz2T=$oldsz2T;
-			}
-			if(is_array($szomszedos2T)) {
-				$ujsz2T=array_merge($ujsz2T,$szomszedos2T);
-			}
-		}
-		elseif(is_array($szomszedos2T)) {
-			$ujsz2T=$szomszedos2T;
-		}
-		if(is_array($ujsz2T)) {
-			$ujsz2='-'.implode('--',$ujsz2T).'-';
-		}
-		
-		$query="update templomok set szomszedos1='$ujsz1', szomszedos2='$ujsz2' where id='$tid'";
-		if(!mysql_db_query($db_name,$query)) echo "<br>HIBA!<br>$query<br>".mysql_error();
+
+		// tmp
+		generateMassTmp('tid = '.$tid);
 
 
-	//És hozzáteszi az új szomszédosokat!!!
-		if(is_array($szomszedos2T)) {
-			foreach($szomszedos2T as $ertek) {
-				$query="select szomszedos2 from templomok where id='$ertek'";
-				$lekerdez=mysql_db_query($db_name,$query);
-				list($masiksz2)=mysql_fetch_row($lekerdez);
-				$masiksz2.="-$tid-";
-				mysql_db_query($db_name,"update templomok set szomszedos2='$masiksz2' where id='$ertek'");
-			}
-		}
-
-	//És kiszedi a törölt szomszédosokat!!!
-		if(is_array($delsz2T)) {
-			foreach($delsz2T as $ertek) {
-				$query="select szomszedos2 from templomok where id='$ertek'";
-				$lekerdez=mysql_db_query($db_name,$query);
-				list($masiksz2)=mysql_fetch_row($lekerdez);
-				$masiksz2=str_replace("-$tid-",'',$masiksz2);
-				mysql_db_query($db_name,"update templomok set szomszedos2='$masiksz2' where id='$ertek'");
-			}
-		}
-*/
 	//fájlkezelés
 		$fajl=$_FILES['fajl']['tmp_name'];
 		$fajlnev=$_FILES['fajl']['name'];
@@ -742,7 +592,7 @@ function miserend_addingtemplom() {
 				if($fooldalkepT[$melyikkep]=='i') $kiemelt='i';
 				else $kiemelt='n';
 				//Módosítás az adatbázisban
-				if(!mysql_db_query($db_name,"update kepek set felirat='$kepfeliratmodT[$melyikkep]', sorszam='$ertek', kiemelt='$kiemelt' where kat='templomok' and kid='$tid' and fajlnev='$melyikkep'")) echo 'HIBA!<br>'.mysql_error();
+				if(!mysql_db_query($db_name,"update kepek set felirat='$kepfeliratmodT[$melyikkep]', sorszam='$ertek', kiemelt='$kiemelt' where tid='$tid' and fajlnev='$melyikkep'")) echo 'HIBA!<br>'.mysql_error();
 			}
 		}		
 	

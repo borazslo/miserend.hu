@@ -10,8 +10,8 @@ $footer ="</body></html>";
 $kidob="<Script languate=javascript> close(); </script>";
 
 
-include("config.inc");
-dbconnect();
+include("load.php");
+
 $op=$_POST['op'];
 
 function teendok($id,$kod) {

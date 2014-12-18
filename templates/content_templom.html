@@ -54,8 +54,9 @@ $(document).ready(function(){
           {% endfor %}       
         </div>
         
-        <div style="float:right;width:121px" class="alap" style="line-height:16px">  
+        <div style="float:right;width:121px" class="alap" style="line-height:16px">
           {% for mise in nap.misek %}
+            {% if mise.nap2_raw != "0" %}<span class="alap">{{ mise.nap2 }} </span>{% endif %}  
             {% if mise.attr %}{% for attr in mise.attr %} 
              <img src="{{ design_url }}/img/{{ attr.file }}" width=16 title='{{ attr.weektext }} {{ attr.name }}' height=16 align=absmiddle style="margin-top:0px;margin-left:1px"><span class="alap" style="display:none" id="2">{{ attr.weektext }} {{ attr.name }}</span>
              {% endfor %}{% endif %}  

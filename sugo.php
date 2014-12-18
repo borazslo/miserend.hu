@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>VPP - Súgó</title>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1250">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <style TYPE="text/css">
 
 .alap { font-family: Arial, Verdana; font-size: 10pt; text-align: justify; }
@@ -13,15 +13,14 @@
 
 <?php
 
-include("config.inc");
-dbconnect();
+include("load.php");
 
 $id=$_GET['id'];
 $idT=explode('-',$id);
 
 foreach($idT as $idk) {
 	$query="select leiras from sugo where id='$idk'";
-	$lekerdez=mysql_db_query($db_name,$query);
+	$lekerdez=mysql_query($query);
 	list($leiras)=mysql_fetch_row($lekerdez);
 	$kod.="<p class=alap>$leiras</p>";
 }

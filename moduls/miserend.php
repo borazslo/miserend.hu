@@ -488,6 +488,7 @@ function miserend_index() {
 }
 
 function miserend_templomkeres() {
+	global $user;
 	global $db_name,$design_url,$linkveg,$m_id,$_POST,$_GET,$u_jogok,$u_login,$sid;
 
 	$query="select id,nev from egyhazmegye where ok='i' order by sorrend";
@@ -557,35 +558,20 @@ function miserend_templomkeres() {
 	
 	$templomurlap.="\n<br><img src=img/space.gif width=5 height=10><div align=right><input type=submit value=keresés class=keresourlap><br><img src=img/space.gif width=5 height=10></div><div style='display: none'></form></div>";
 
-	if(!empty($varos)) {
-		$feltetelT[]="(varos like '%$varos%' or ismertnev like '%$varos%')";
-		$postdata.="<input type=hidden name=varos value='$varos'>";
-	}
-	if(!empty($kulcsszo)) {
-		$feltetelT[]="(nev like '%$kulcsszo%' or ismertnev like '%$kulcsszo%' or cim like '%$kulcsszo%' or plebania like '%$kulcsszo%')";
-		$postdata.="<input type=hidden name=kulcsszo value='$kulcsszo'>";
-	}
-	if(!empty($espker)) {
-		$feltetelT[]="espereskerulet='$espker'";
-		$postdata.="<input type=hidden name=espker value='$espker'>";
-	}
-	elseif(!empty($ehm)) {
-		$feltetelT[]="egyhazmegye='$ehm'";
-		$postdata.="<input type=hidden name=ehm value='$ehm'>";
-	}
-
-	if(is_array($feltetelT)) {
-		$feltetel='and '.implode(' and ',$feltetelT);
-	}
-
+	
+	$postdata.="<input type=hidden name=varos value='$varos'>";
+	$postdata.="<input type=hidden name=kulcsszo value='$kulcsszo'>";
+	$postdata.="<input type=hidden name=espker value='$espker'>";
+	$postdata.="<input type=hidden name=ehm value='$ehm'>";
+	
 	$min=$_POST['min'];
 	$leptet=$_POST['leptet'];
 	if($min<0 or empty($min)) $min=0;
 	if(empty($leptet)) $leptet=20;
-	
-	$query="select id,nev,ismertnev,varos,letrehozta from templomok where ok='i' $feltetel order by varos,nev";
-	if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
-	$mennyi=mysql_num_rows($lekerdez);
+
+	$results = searchChurches($_POST,$min,$leptet);
+
+	$mennyi=$results['sum'];
 
     if($mennyi == 1) {
         $talalat = mysql_fetch_assoc($lekerdez);
@@ -611,7 +597,7 @@ function miserend_templomkeres() {
 	$kezd=$min+1;
 	$veg=$mennyi;
 	if($min>0) {
-		$leptetprev.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=templomkeres><input type=hidden name=sid value=$sid>";
+		$leptetprev.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=sid value=$sid>";
 		$leptetprev.=$postdata;
 		$leptetprev.="<input type=hidden name=min value=$prev>";		
 		$leptetprev.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
@@ -623,7 +609,7 @@ function miserend_templomkeres() {
 		$next=$min+$leptet;	
 
 		if($mennyi>$min+$leptet) {
-			$leptetnext.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=templomkeres><input type=hidden name=sid value=$sid><input type=hidden name=min value=$next>";
+			$leptetnext.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=sid value=$sid><input type=hidden name=min value=$next>";
 			$leptetnext.=$postdata;
 			$leptetnext.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
 		}
@@ -631,20 +617,23 @@ function miserend_templomkeres() {
 
 	$tartalom.="<br><span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
 
-	$query.=" limit $min,$leptet";
-	$lekerdez=mysql_query($query);
 	if($mennyi>0) {
-		while(list($tid,$tnev,$tismertnev,$tvaros,$letrehozta)=mysql_fetch_row($lekerdez)) {
+		foreach($results['results'] as $templom) {
+			$tid = $templom['tid'];
+			$tnev = $templom['nev'];
+			$tismertnev = $templom['ismertnev'];
+			$tvaros = $templom['varos'];
+			$letrehozta = $templom['letrehozta'];
 			$tartalom.="<a href=?templom=$tid$linkveg class=felsomenulink title='$tismertnev'><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a>";
-			if(strstr($u_jogok,'miserend')) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-			elseif($letrehozta==$u_login) $tartalom.=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";			
+			if(strstr($user->jogok,'miserend')) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+			elseif($letrehozta==$user->login) $tartalom.=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";			
 			if($tismertnev != '') $tartalom .= "<br/><span class=\"alap\" style=\"margin-left: 20px; font-style: italic;\">".$tismertnev."</span>";
 			$tartalom.="<br><img src=img/space.gif width=4 height=5><br>";
 		}		
 		$tartalom.='<br>'.$leptetprev.$leptetnext;
 	}
 	else {
-		$tartalom='<span class=alap>A keresés nem hozott eredményt</span>';
+		$tartalom.='<span class=alap>A keresés nem hozott eredményt</span>';
 	}
 
 	$focim="Keresés a templomok között";
@@ -679,6 +668,9 @@ function miserend_misekeres() {
 
 	$ma=date('Y-m-d');
 	$holnap=date('Y-m-d',(time()+86400));
+
+	$results = searchMasses($_POST,$min,$leptet);
+
 
 	if($ehm>0) {
 		$query="select nev from egyhazmegye where id=$ehm and ok='i'";
@@ -841,7 +833,7 @@ function miserend_misekeres() {
 	if(is_array($feltetelT)) {
 		$feltetel=implode(' and ',$feltetelT);
 	}
-
+	/*
 	$query="select t.id,t.nev,t.ismertnev,t.varos,t.letrehozta, m.ido,m.nyelv,m.megjegyzes from templomok t, misek m where m.templom = t.id and $feltetel order by t.varos, t.nev, m.ido";
 	if(!$lekerdez=mysql_query($query)) echo "<p>HIBA #711!<br>$query<br>".mysql_error();
 	$mennyi=mysql_num_rows($lekerdez);
@@ -849,6 +841,12 @@ function miserend_misekeres() {
 	if(!$lekerdez=mysql_query($query)) echo "<p>HIBA #714!<br>$query<br>".mysql_error();
 	$mostido=date('H:i');
 	while(list($tid,$tnev,$tismertnev,$tvaros,$letrehozta,$mido,$mnyelv,$mmegjegyzes)=mysql_fetch_row($lekerdez)) {
+	*/
+ 	foreach($results['results'] as $result) { 
+ 		$tid = $result['tid'];
+ 		//$tnev = $result['']; ,$tismertnev,$tvaros,$letrehozta,$mido,$mnyelv,$mmegjegyzes
+ 		echo 'ok';
+
 		$nyelvikon='';
 		if(empty($templom[$tid])) {
 			$templomT[$tid]="<img src=img/templom1.gif align=absmiddle width=16 height=16 hspace=2><a href=?templom=$tid$linkveg class=felsomenulink><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">$tismertnev</span>";
@@ -1353,7 +1351,6 @@ function miserend_printRegi() {
     return $return;
     
 }
-	
 switch($m_op) {
     case 'index':
         $tartalom=miserend_index();

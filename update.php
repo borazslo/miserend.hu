@@ -36,6 +36,10 @@ CREATE TABLE `miserend`.`events` (
 
 ALTER TABLE misek ADD COLUMN nap2 varchar(4) AFTER ido;
 
+ALTER TABLE misek ADD COLUMN tmp_datumig DATE AFTER ig;
+ALTER TABLE misek ADD COLUMN tmp_relation CHAR(1) AFTER ig;
+ALTER TABLE misek ADD COLUMN tmp_datumtol DATE AFTER ig;
+
 */
 
 //misek
