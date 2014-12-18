@@ -312,7 +312,7 @@ function getChurch($tid) {
 function getMasses($tid,$date = false) {
     if($date == false) $date = date('Y-m-d');
 
-    $napok = array('x','vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat');
+    $napok = array('x','hétfő','kedd','szerda','csütörtök','péntek','szombat','vasárnap');
     $nap2options = array(
         0 => 'minden héten',
         1 => 'első héten',2 => 'második héten',3 => 'harmadik héten',4 => 'negyedik héten',5 => 'ötödik héten',
@@ -332,8 +332,8 @@ function getMasses($tid,$date = false) {
         $tmp['datumig'] = $datumig = event2Date($row['ig']);
         if(checkDateBetween($date,$datumtol,$datumig)) $tmp['now'] = true;
 
-        for ($i=1; $i < 8 ; $i++) {  $tmp['napok'][$i]['nev'] = $napok[$i];    }
-        unset($tmp['napok'][1]);  $tmp['napok'][1]['nev'] = $napok[1];
+        for ($i=1; $i < 8 ; $i++) {  $tmp['napok'][$i]['nev'] = $napok[($i)];    }
+        //unset($tmp['napok'][1]);  $tmp['napok'][1]['nev'] = $napok[1];
 
         $query2 = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid AND idoszamitas = '".$row['idoszamitas']."'  ORDER BY nap, ido";
         $result2 = mysql_query($query2);
@@ -349,7 +349,7 @@ function getMasses($tid,$date = false) {
             $row2['nap2'] = $nap2options[$row2['nap2']];
 
             $row2['napid'] = $row2['nap'];
-            $row2['nap'] = $napok[$row2['nap']];
+            $row2['nap'] = $napok[$row2['nap'] ];
             $tmp['napok'][$row2['napid']]['misek'][] = $row2;
             $tmp['napok'][$row2['napid']]['nev'] = $row2['nap'];
         }

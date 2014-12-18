@@ -15,19 +15,18 @@ include("load.php");
 $op=$_POST['op'];
 
 function teendok($id,$kod) {
+	global $user;
 	global $header,$footer,$kidob;
 
 	$sid=$_GET['sid'];
 
-	$query="select login,jogok from session where sessid='$sid'";
-	$lekerdez=mysql_query($query);
-	list($login,$jogok)=mysql_fetch_row($lekerdez);
+	$jogok = $user->jogok;
 
 	if($kod=='templomok') {
 		$query="select nev,ismertnev,varos,letrehozta,megbizhato from templomok where id='$id'";
 		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
 		list($nev,$ismertnev,$varos,$feltolto,$megbizhato)=mysql_fetch_row($lekerdez);
-		if(!strstr($jogok,'miserend') and !($login==$feltolto and $megbizhato=='i')) {
+		if(!strstr($jogok,'miserend') and !($user->login==$feltolto and $megbizhato=='i')) {
 			echo $header.$kidob.$footer;
 			exit();
 		}
@@ -105,7 +104,7 @@ function teendok($id,$kod) {
 		$query="select cim,datum,feltette,megbizhato from hirek where id='$id'";
 		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
 		list($cim,$datum,$feltolto,$megbizhato)=mysql_fetch_row($lekerdez);
-		if(!strstr($jogok,'hirek') and !($login==$feltolto and $megbizhato=='i')) {
+		if(!strstr($jogok,'hirek') and !($user->login==$feltolto and $megbizhato=='i')) {
 			echo $header.$kidob.$footer;			
 			exit();
 		}
@@ -174,6 +173,7 @@ function teendok($id,$kod) {
 
 function mod() {
 	global $header,$footer;
+	global $user;
 
 	$sid=$_POST['sid'];
 	$id=$_POST['id'];
@@ -184,10 +184,7 @@ function mod() {
 	$adminmegj=$_POST['adminmegj'];
 	$megbizhato=$_POST['megbizhato'];
 
-	$query="select login,jogok from session where sessid='$sid'";
-	$lekerdez=mysql_query($query);
-	list($login,$jogok)=mysql_fetch_row($lekerdez);
-
+	$jogok = $user->jogok;
 
 	$most=date('Y-m-d H:i:s');
 	$mostkiir=date('Y-m-d H:i');
@@ -196,7 +193,7 @@ function mod() {
 
 	if($adminmegj!='') {		
 		if(!empty($amegj)) $amegj.="\n";
-		$query="update eszrevetelek set adminmegj=\"$amegj<img src=img/edit.gif align=absmiddle title='$login ($mostkiir)'> $adminmegj \" where id='$eid'";
+		$query="update eszrevetelek set adminmegj=\"$amegj<img src=img/edit.gif align=absmiddle title='".$user->login." ($mostkiir)'> $adminmegj \" where id='$eid'";
 		if(!mysql_query($query)) echo "HIBA!<br>".mysql_error();
 	}
 
@@ -235,7 +232,7 @@ function mod() {
 	}
 
 	if($allapot!='0') {	
-		$query="update eszrevetelek set admin='$login', admindatum='$most', allapot='$allapot' $adminmegjegyzes where id='$eid'";
+		$query="update eszrevetelek set admin='".$user->login."', admindatum='$most', allapot='$allapot' $adminmegjegyzes where id='$eid'";
 		mysql_query($query);
 
 		if($allapot=='u') $allapot1='i';

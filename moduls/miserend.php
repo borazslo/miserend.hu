@@ -619,7 +619,7 @@ function miserend_templomkeres() {
 
 	if($mennyi>0) {
 		foreach($results['results'] as $templom) {
-			$tid = $templom['tid'];
+			$tid = $templom['id'];
 			$tnev = $templom['nev'];
 			$tismertnev = $templom['ismertnev'];
 			$tvaros = $templom['varos'];

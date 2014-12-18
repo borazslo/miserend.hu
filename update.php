@@ -1,46 +1,53 @@
 <?php
 include 'load.php';
 
-$tid = rand(1,4111);
+//$tid = rand(1,4111);
+//print_r(getMasses(rand(1,1)));
+//exit;
+//
 
-print_r(getMasses(rand(1,1)));
+//  img/zaszloikon/hu.gif -> img/zaszloikon/h.gid
 
-exit;
-
-/*
+$query = " 
 ALTER TABLE kepek ADD COLUMN height integer;
 ALTER TABLE kepek ADD COLUMN width integer;
 DELETE FROM kepek wHERE kat <> 'templomok';
 ALTER TABLE kepek DROP COLUMN kat;
 ALTER TABLE kepek DROP COLUMN katnev;
 ALTER TABLE kepek CHANGE kid tid int;
-
 DELETE FROM misek WHERE torles > '0000-00-00';
 ALTER TABLE misek CHANGE templom tid int(5);
 ALTER TABLE misek CHANGE idoszamitas idoszamitas varchar(255);
 DELETE FROM misek WHERE tid = '0';
-UPDATE misek SET torolte = datumig, datumig = datumtol, datumtol = torolte, torolte = ''  WHERE idoszamitas = 't' AND datumtol LIKE '2014-%' AND datumig LIKE '2014-%';
 ALTER TABLE misek CHANGE datumtol tol varchar(100);
 ALTER TABLE misek CHANGE datumig ig varchar(100);
-
-CREATE TABLE `miserend`.`events` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL,
-  `year` VARCHAR(4) NULL,
-  `date` DATE NULL,
+DROP TABLE IF EXISTS `events`;
+CREATE TABLE `events` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_hungarian_ci DEFAULT NULL,
+  `year` varchar(4) COLLATE utf8_hungarian_ci DEFAULT NULL,
+  `date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `name+year` (`name` ASC, `year` ASC));
-
-  img/zaszloikon/hu.gif -> img/zaszloikon/h.gid
-
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `name+year` (`name`,`year`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
+LOCK TABLES `events` WRITE;
+INSERT INTO `events` VALUES (1,'utolsó tanítási nap','2014','2014-06-01'),(2,'utolsó tanítási nap','2015','2015-06-07'),(3,'első tanítási nap','2014','2014-09-01'),(4,'első tanítási nap','2015','2015-09-03');
+UNLOCK TABLES;
 ALTER TABLE misek ADD COLUMN nap2 varchar(4) AFTER ido;
-
 ALTER TABLE misek ADD COLUMN tmp_datumig DATE AFTER ig;
 ALTER TABLE misek ADD COLUMN tmp_relation CHAR(1) AFTER ig;
 ALTER TABLE misek ADD COLUMN tmp_datumtol DATE AFTER ig;
+";
 
-*/
+//UPDATE misek SET torolte = datumig, datumig = datumtol, datumtol = torolte, torolte = ''  WHERE idoszamitas = 't' AND datumtol LIKE '2014-%' AND datumig LIKE '2014-%';
+
+$queries = explode(';',$query);
+foreach($queries as $query) {
+	if(trim($query) != '') if(!$lekerdez=mysql_query($query)) die( "<p>HIBA #711!<br>$query<br>".mysql_error());	
+}
+
+echo 'mysql ok';
 
 //misek
 $idoszamitas = array('t' => 'télen', 'ny'=> 'nyáron');
@@ -52,17 +59,21 @@ $result = mysql_query($query);
 while(($mise = mysql_fetch_array($result))) {
 	if(date('Y',strtotime($mise['tol'])) != date('Y') AND date('Y',strtotime($mise['ig'])) != date('Y') AND preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/i', $mise['ig'])) {
 		$tmp = array('t','ny');
-		$query =  "UPDATE misek SET idoszamitas = '".$idoszamitas[$mise['idoszamitas']]."', tol = 'utolsó tanítási nap".$plusznap[$mise['idoszamitas']]."', ig = 'első tanítási nap".$minusznap[$mise['idoszamitas']]."' WHERE id = ".$mise['id']." LIMIT 1";
+		if($mise['idoszamitas'] == 't') { $tol = 'ig'; $ig = 'tol'; }
+		elseif($mise['idoszamitas'] == 'ny') { $tol = 'tol'; $ig = 'ig'; }
+		$query =  "UPDATE misek SET idoszamitas = '".$idoszamitas[$mise['idoszamitas']]."', ".$tol." = 'utolsó tanítási nap".$plusznap[$mise['idoszamitas']]."', ".$ig." = 'első tanítási nap".$minusznap[$mise['idoszamitas']]."' WHERE id = ".$mise['id']." LIMIT 1";
 		echo $query."<br>";
 		mysql_query($query);
+
 	}
 
 }
 
-
-
 //neighbour
 neighboursUpdate();
+
+//
+generateMassTmp();
 
 //kepek
 $query = 'SELECT * FROM kepek WHERE width IS NULL OR height IS NULL OR width = 0 OR height = 0 ';
@@ -84,5 +95,6 @@ while(($kep = mysql_fetch_array($result))) {
 	}
 
 }
+
 
 ?>
