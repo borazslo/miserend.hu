@@ -12,6 +12,7 @@ function dbconnect() {
     }
     
     mysql_query("SET NAMES UTF8");
+    //mysql_query("SET CHARACTER SET 'UTF8'");
     
     if(!mysql_select_db($db_name)) {
         if($config['debug'] > 0)  die("Az '".$db_name."' adatbázis nem létezik, vagy nincs megfelelő jogosultság elérni azt!\n".mysql_error()."\n$idopont");
@@ -238,10 +239,11 @@ function LirugicalDay($datum = false) {
 function LiturgicalDayAlert($html = false,$date = false) {
     global $design_url;
 
+    if($date == false) $date = date('Y-m-d'); 
     $alert = false;
     $day = LirugicalDay($date);
     if($day != false AND isset($day->Celebration))  { 
-        if($day->Celebration->LiturgicalCelebrationLevel <= 4 ) {
+        if($day->Celebration->LiturgicalCelebrationLevel <= 4 AND date('N',strtotime($date)) != 7 ) {
             $alert = true;
         } 
     }
@@ -276,10 +278,10 @@ function checkDateBetween($date,$start,$end) {
 function event2Date($event, $year = false) {
     if($year == false) $year = date('Y');
 
-    if(preg_match('/([0-9]{4})(\.|-)([0-9]{2})(\.|-)([0-9]{2})/i',$event)) return date('m-d',strtotime($event));
-
-    $event = preg_replace('/1$/', '1 day', $event);
-
+    if(preg_match('/^([0-9]{4})(\.|-)([0-9]{2})(\.|-)([0-9]{2})(\.|)/i',$event,$match)) return $match[3]."-".$match[5];
+    if(preg_match('/^([0-9]{2})(\.|-)([0-9]{2})(\.|)/i',$event,$match)) return date('m-d',strtotime(date('Y')."-".$match[1]."-".$match[3]));
+    
+    $event = preg_replace('/(\+|-)1$/', '${1}1 day', $event);
     $events = array();
     $query = "SELECT name, date FROM events WHERE year = '".$year."' ";
     $result = mysql_query($query);    
@@ -290,9 +292,7 @@ function event2Date($event, $year = false) {
     $event = preg_replace($events['name'], $events['date'], $event);
     
     $event = preg_replace('/^([0-9]{2})(\.|-)([0-9]{2})/i',date('Y').'$2$1$2$3',$event);
-
     $event = date('m-d',strtotime($event));
-    
     return $event;
 }
 
@@ -328,8 +328,9 @@ function getMasses($tid,$date = false) {
         $tmp['nev'] = $row['idoszamitas'];
         $tmp['tol'] = $row['tol'];
         $tmp['ig'] = $row['ig'];
-        $tmp['datumtol'] = $datumtol = event2Date($row['tol']);
-        $tmp['datumig'] = $datumig = event2Date($row['ig']);
+        $tmp['datumtol'] = $datumtol = $row['tmp_datumtol']; //event2Date($row['tol']);
+        $tmp['datumig'] = $datumig = $row['tmp_datumig']; //event2Date($row['ig']);
+
         if(checkDateBetween($date,$datumtol,$datumig)) $tmp['now'] = true;
 
         for ($i=1; $i < 8 ; $i++) {  $tmp['napok'][$i]['nev'] = $napok[($i)];    }
@@ -426,7 +427,7 @@ function formMass($pkey,$mkey,$mass = false) {
             'value' => $mass['id']),
         'nap' => array(
             'name' => "period[".$pkey."][".$mkey."][napid]",
-            'options' => array(0=>'válassz',2=>'hétfő',3=>'kedd',4=>'szerda',5=>'csütörtök',6=>'péntek',7=>'szombat',1=>'vasárnap'),
+            'options' => array(0=>'válassz',1=>'hétfő',2=>'kedd',3=>'szerda',4=>'csütörtök',5=>'péntek',6=>'szombat',7=>'vasárnap'),
             'selected' => $mass['napid']),
         'nap2' => array(
             'name' => "period[".$pkey."][".$mkey."][nap2]",
@@ -553,7 +554,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 
     if($args['ehm'] != 0) $where[] = "egyhazmegye='".$args['ehm']."'";
     if(isset($args['espkerT'][$args['ehm']]) AND $args['espkerT'][$args['ehm']] != 0) $where[] = "espereskerulet='".$args['espkerT'][$args['ehm']]."'";
-    
+
     $query = "SELECT id,nev,ismertnev,varos,letrehozta FROM templomok "; 
     if(count($where)>0) $query .= "WHERE ".implode(' AND ',$where);
     $query .= " ORDER BY nev ";
@@ -570,14 +571,19 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     return $return;
 }
 
-function searchMasses($args, $offset = 0, $limit = 20) {
+function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
      $return = array(
         'offset' => $offset,
         'limit' => $limit );
     $where = array(" torles = '0000:00:00 00:00:00' ");
 
     //templomok
-    if($args['varos'] != '' OR $args['kulcsszo'] != '' OR $args['egyhazmegye'] != '') {
+    if(isset($args['templom']) AND is_numeric($args['templom']) ) {
+        $where[] = ' tid = '.$args['templom']; }
+    elseif($args['varos'] != '' OR $args['kulcsszo'] != '' OR $args['egyhazmegye'] != '') {
+        $tmp = $args;
+        if(isset($tmp['leptet'])) unset($tmp['leptet']);
+        if(isset($tmp['min'])) unset($tmp['min']);
         $results = searchChurches($args,0,1000000);
         if(isset($results['results'])) foreach($results['results'] as $r) $subwhere[] = " tid = ".$r['id']." ";
         if(!$subwhere) $where[] = " tid = 'nincs templom' ";
@@ -590,13 +596,14 @@ function searchMasses($args, $offset = 0, $limit = 20) {
 
 
     //milyen időszakban
-    $day = date('m-d',strtotime($args['mikordatum']));
+    $day = date('m-d',strtotime($args['mikor']));
     $where[] = "( ( tmp_datumtol <= '".$day."' AND '".$day."' <= tmp_datumig AND tmp_relation = '<' )
     OR  ( ( tmp_datumig <= '".$day."' OR '".$day."' <= tmp_datumtol ) AND tmp_relation = '>' ) )";
 
     //milyen héten
     $subwhere = array();
-    if ( date('W',strtotime($args['mikor'])) & 1 ) { $subwhere[] = "nap2='pt'"; } else $subwhere[] = "nap2='ps'";
+    if ( date('W',strtotime($args['mikor'])) & 1 ) { $parossag ='pt'; } else $parossag = "ps";
+    $subwhere[] = "nap2='".$parossag."'";
     $hanyadikP = getWeekInMonth($args['mikor']);
     $hanyadikM = getWeekInMonth($args['mikor'],'-');
     $subwhere[] = "nap2='".$hanyadikP."'";
@@ -615,28 +622,30 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     }
 
     //nyelv és egyéb tulajdonságok
-    if($args['nyelv'] != '0') $where[] = " nyelv REGEXP '(^|,)(".$args['nyelv'].")([-]{0,1})([0-5]{0,1})(,|$)' ";
+    if($args['nyelv'] != '0' AND $args['nyelv'] != '') $where[] = "( nyelv REGEXP '(^|,)(".$args['nyelv'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' )";
 
-    if($args['diak'] == 'd') $where[] = " milyen REGEXP '(^|,)(d)([-]{0,1})([0-5]{0,1})(,|$)' ";
-    elseif($args['diak'] == 'nd') $where[] = " milyen NOT REGEXP '(^|,)(d)([-]{0,1})([0-5]{0,1})(,|$)' ";
+    if($args['diak'] == 'd') $where[] = " milyen REGEXP '(^|,)(d)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+    elseif($args['diak'] == 'nd') $where[] = " milyen NOT REGEXP '(^|,)(d)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
     
-    if($args['zene'] != '0') {
-        if($args['zene'] == 'o')  $where[] = " milyen NOT REGEXP '(^|,)(g|cs)([-]{0,1})([0-5]{0,1})(,|$)' ";
-        else $where[] = " milyen REGEXP '(^|,)(".$args['zene'].")([-]{0,1})([0-5]{0,1})(,|$)' ";
+    if($args['zene'] != '0' AND $args['zene'] != '') {
+        if($args['zene'] == 'o')  $where[] = " milyen NOT REGEXP '(^|,)(g|cs)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+        else $where[] = " milyen REGEXP '(^|,)(".$args['zene'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
     }
     
 
     //mehet a lekérés
-    $query = "SELECT * FROM misek "; 
+    $query = "SELECT misek.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta FROM misek "; 
+    $query .= " LEFT JOIN templomok ON misek.tid = templomok.id ";
     if(count($where)>0) $query .= "WHERE ".implode(' AND ',$where);
-    $query .= " ORDER BY ido ";
-    echo $query;
+    if($groupby != false) $query .= " GROUP BY ".$groupby;
+    $query .= " ORDER BY ido, templomok.varos, templomok.nev ";
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
     $mennyi=mysql_num_rows($lekerdez);
     $return['sum'] = $mennyi;
 
 
-    $query .= " LIMIT ".($offset ).",".($limit + $offset);
+    $query .= " LIMIT ".($offset ).",".($limit);
+    //echo $query; exit;
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
     while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
         $row['datumtol'] = $datumtol = event2Date($row['tol']);
@@ -669,13 +678,15 @@ function sugolink($id) {
 }
 
 function generateMassTmp($where = false) {
-
+    global $config;
     $updates = array();
-    $query = "SELECT id, tol, ig FROM misek ";
-    if($where != false) $query .= "WHERE ".$where;
+    $query = "SELECT id, tol, ig FROM misek WHERE torles = '0000-00-00 00:00:00' ";
+    if($where != false) $query .= "AND ( ".$where." ) ";
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
     while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
+        if($row['tol'] == '')  $row['tol'] = '01-01';
         $row['tmp_datumtol'] = event2Date($row['tol']);
+        if($row['ig'] == '')  $row['ig'] = '12-31';
         $row['tmp_datumig'] = event2Date($row['ig']);
         if($row['tmp_datumig'] > $row['tmp_datumtol']) $row['tmp_relation'] = '<';
         else $row['tmp_relation'] = '>';
@@ -684,6 +695,7 @@ function generateMassTmp($where = false) {
 
     foreach($updates as $update) {
         $query = "UPDATE misek SET tmp_datumtol = '".$update['tmp_datumtol']."',tmp_datumig = '".$update['tmp_datumig']."',tmp_relation = '".$update['tmp_relation']."' WHERE id = ".$update['id']." LIMIT 1";
+        if($global['config']>1) echo $query."<br/>";
         mysql_query($query);
     }
 }
