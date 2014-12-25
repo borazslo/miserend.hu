@@ -81,10 +81,17 @@ function chat_html() {
 
     });
 
+	var c = 1;
+	var lim = 1;
 	setInterval(function(){
-		chat_update();
-	},5000);
+		chat_update('update');
+		if(c === lim) {
+			c = 1;
+			chat_users();
+		} else c++;
+	},2000);
 
+	
 	function chat_send() {
 		if($("#chat_text").text() != "") {
 
@@ -145,6 +152,15 @@ function chat_html() {
 	  			} 
 		},'json');
 	}
+
+	function chat_users() {
+		$.post( "ajax.php", { q: "ChatUsers" }, function( data ) {
+	  			if(data.result === "loaded") { 
+	  				console.log(data);
+	  				$("#chat_users").html(data.text);
+	  			}
+	  	},'json');
+	}
 EOD;
 
 	global $twig;
@@ -168,6 +184,7 @@ function chat_getcomments($args = array()) {
 	while($row=mysql_fetch_array($lekerdez,MYSQL_ASSOC)) {
 		$row['datum_raw'] = $row['datum'];
 		if(date('Y',strtotime($row['datum'])) < date('Y')) $row['datum'] = date('Y.m.d.',strtotime($row['datum']));
+		elseif(date('m',strtotime($row['datum'])) < date('m')) $row['datum'] = date('m.d.',strtotime($row['datum']));
 		elseif(date('d',strtotime($row['datum'])) < date('d')) $row['datum'] = date('m.d. H:i',strtotime($row['datum']));
 		else $row['datum'] = date('H:i',strtotime($row['datum']));
 
@@ -186,6 +203,38 @@ function chat_getcomments($args = array()) {
 	}
 
 	return $return;
+}
+
+function chat_getusers() {
+	global $user;
+	$return = array();
+	$query="select login from user where jogok!='' and lastactive >= '".date('Y-m-d H:i:s',strtotime("-5 minutes"))."' and login <> '".$user->login."' order by lastactive desc";
+	if(!$lekerdez=mysql_query($query)) $online.="HIBA<br>$query<br>".mysql_error();
+	if(mysql_num_rows($lekerdez)>0) {
+		while(list($loginnev)=mysql_fetch_row($lekerdez)) {
+			$return[] = $loginnev;
+		}
+	}	
+	return $return;
+}
+
+function chat_balmenu() {
+    global $user;
+
+	$loginkiir=urlencode($u_login);
+   
+	//Tartalom létrehozása
+	$kod_cim="<span class=admincimlink>Admin üzenőfal</span>";
+
+	$kod_tartalom = chat_html();
+    if($user->jogok == '') { $kod_tartalom = 'Hiányzó jogosultság.'; }
+
+	
+	$kodT[0]=$kod_cim;
+	$kodT[1]=$kod_tartalom;
+
+    return $kodT;
+
 }
 
 ?>

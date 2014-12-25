@@ -1,5 +1,8 @@
 <?php
 include("load.php");
+if($user->loggedin) mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$user->uid." LIMIT 1;");
+
+if(isset($_GET['q'])) { include $_GET['q'].".php"; exit;}
 
 $vars = array();
         
@@ -113,6 +116,8 @@ else {
 /////////////////////////////////
 //tartalmi rész összeállítása
 /////////////////////////////////
+    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>';
+
     if(!$hiba and !$tiltott_IP_T[0] and $mehet) {
         $m_op=$_POST['m_op'];
         if(empty($m_op)) $m_op=$_GET['m_op'];

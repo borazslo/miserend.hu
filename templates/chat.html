@@ -1,6 +1,7 @@
 
 <div id='chat_text' class=urlap style="width:134px;height:50px;overflow: auto;"></div>
 <div id='chat_submit' class='kicsi link' style='float:right;margin-top:-14px'>[Elküldés]</div>
+<div id='chat_users' class='kicsi' style='border-bottom: 1px;border-color: black;border-bottom-style: double'>Mindjárt kitaláljuk, van-e valaki itt.</div>
 <div id='chat_comments' data-last="{{ lastcomment }}" data-unread="0" style="max-height:400px;width:134px;overflow:auto;margin-top:4px">
 	{% for comment in comments %}
     	{% include "chat_comment.html" %}

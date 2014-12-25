@@ -40,7 +40,10 @@ ALTER TABLE misek ADD COLUMN nap2 varchar(4) AFTER ido;
 ALTER TABLE misek ADD COLUMN tmp_datumig VARCHAR(5) AFTER ig;
 ALTER TABLE misek ADD COLUMN tmp_relation CHAR(1) AFTER ig;
 ALTER TABLE misek ADD COLUMN tmp_datumtol VARCHAR(5) AFTER ig;
+ALTER TABLE user ADD COLUMN lastactive DATETIME AFTER lastlogin;
 ";
+
+DATETIME
 
 //UPDATE misek SET torolte = datumig, datumig = datumtol, datumtol = torolte, torolte = ''  WHERE idoszamitas = 't' AND datumtol LIKE '2014-%' AND datumig LIKE '2014-%';
 

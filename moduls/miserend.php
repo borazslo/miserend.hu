@@ -15,7 +15,6 @@ function idoszak($i) {
 function miserend_index() {
 	global $linkveg,$db_name,$m_id,$u_login,$sid,$design_url,$_GET,$u_varos,$onload,$script;
     
-    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>';
 	$script .= '<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>';
     $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
    	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';

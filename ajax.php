@@ -1,6 +1,7 @@
 <?php
 include 'load.php';
 
+
 switch ($_REQUEST['q']) {
     case 'FromMassEmpty':
     	$form = formMass($_POST['period'],$_POST['count']);
@@ -10,6 +11,7 @@ switch ($_REQUEST['q']) {
     	echo formPeriod($_POST['period']);
         break;
     case 'ChatSave':
+        if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
         $text = sanitize($_REQUEST['text']);
         if(preg_match('/^\$(\w+)/si',$text,$match)) { 
             $kinek = $match[1]; 
@@ -17,7 +19,7 @@ switch ($_REQUEST['q']) {
         }  else $kinek = "";
         if(trim(preg_replace('/^((\$|@)\w+(:*))/si',"",$text)) == '') {
             echo json_encode(array('result'=>'error','text'=>'Nem volt igazán üzenet, amit elküldhettünk volna.'));
-            exit;
+            break;
         }
         $ip=$_SERVER['REMOTE_ADDR'];
         $host = gethostbyaddr($ip);
@@ -32,16 +34,28 @@ switch ($_REQUEST['q']) {
         //code to be executed if n=label3;
         break;
     case 'ChatLoad':
+        if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
         $date = date('Y-m-d H:i:s',strtotime($_REQUEST['date']));
         if(!isset($_REQUEST['rev']))
             $comments = chat_getcomments(array('last'=>$date));
         else
             $comments = chat_getcomments(array('first'=>$date));
 
-        foreach($comments as $k => $i)
+        $alert = 0;
+        foreach($comments as $k => $i) {
             $comments[$k]['html'] =  $twig->render('chat_comment.html',array('comment'=>$i));
+            if($i['user'] != $user->login) $alert ++;
+        }
 
-        echo json_encode(array('result'=>'loaded','comments'=>$comments,'new'=>count($comments)));
+        echo json_encode(array('result'=>'loaded','comments'=>$comments,'new'=>count($comments),'alert'=>$alert));
+        break;
+    case 'ChatUsers':
+        if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
+        $users = chat_getusers();
+        foreach($users as $k=>$i) $users[$k] = '<span class="response_open" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
+        $text = '<strong>Online adminok:</strong> '.implode(', ', $users);
+        if(count($users)==0) $text = '<strong><i>Nincs (más) admin online.</i></strong>';
+        echo json_encode(array('result'=>'loaded','text'=>$text));
         break;
     default:
         //code to be executed if n is different from all labels;
