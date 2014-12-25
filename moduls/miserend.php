@@ -38,6 +38,14 @@ function miserend_index() {
                 ga(\'send\',\'event\',\'Search\',\'mise\',data);
                 $(this).unbind(\'submit\').submit();
             });
+
+            $(\'#form_church_getdetails\').on(\'click\', function(e) {                 
+                $(\'#form_church_details\').toggle(\'slow\');
+            });
+
+			$(\'#form_mass_getdetails\').on(\'click\', function(e) {                 
+                $(\'#form_mass_details\').toggle(\'slow\');
+            });
         });
 			
         </script>';
@@ -54,37 +62,35 @@ function miserend_index() {
 		$espkerT[$ehm][$id]=$nev;
 	} 
 
-	//MISEREND űRLAP
-	$formnyit  = "<form method=post name=\"kereses\" id=\"kereses\">";
+	//MISEREND űRLAP	
+	$searchform = array(
+        'm_id' => array(
+            'type' => 'hidden',
+            'name' => "m_id",
+            'value' => $m_id),
+        'm_op' => array(
+            'type' => 'hidden',
+            'name' => "m_op",
+            'value' => "keres"),
 
-	$formvalaszt = "<span id=misek onClick=\"
-			document.getElementById('misekis').style.display='inline';
-			document.getElementById('templomok').style.color='#ffffff';
-			document.getElementById('misek').style.color='#000000';
-			document.getElementById('keresestipus').value = 1;
+        'kulcsszo' => array(
+            'name' => "kulcsszo",
+            'size' => 20,
+            'class' => 'keresourlap',
+            'style' => 'margin-left:36px'),
+        'varos' => array(
+            'name' => "varos",
+            'size' => 20,
+            'class' => 'keresourlap',
+            'style' => 'margin-left:40px')
+      );
+        
 
-		\">Szentmise kereső</span> / ";
-	$formvalaszt.= "<span id=templomok style=\"color:#ffffff\" onClick=\"
-			document.getElementById('misekis').style.display='none';
-			document.getElementById('templomok').style.color='#000000';
-			document.getElementById('misek').style.color='#ffffff';
-			document.getElementById('keresestipus').value = 0;
-
-		\">Templom kereső</span>";
-			   
-
-
-	$urlap .="<input type=hidden id=keresestipus name=keresestipus value=1>";
-
-	$urlap .= "<input type=hidden name=m_id id=m_id value=$m_id><input type=hidden id=m_op name=m_op value=keres>";
-
-	//Hol
-	$urlap .= "<span class=kiscim style='margin-left:5px;'>Hol:</span><br>";
-	$urlap.="<span class=alap style='margin-left:5px;'>- kulcsszó: </span><input type=text id=kulcsszo name=kulcsszo size=20 class=keresourlap><br/>";	
-	$urlap.="<span class=alap style='margin-left:5px;margin-right:5px'>- település:</span><input type=text name=varos id=varos size=20 class=keresourlap style=\"margin-left:10px\"><br/>";	
-	
-	$urlap.="<span class=alap style='margin-left:5px;margin-right:5px'>- egyházmegye: </span>
-				<select name=ehm id=ehm class=keresourlap style=\"margin-left:10px\" onChange=\"
+    $searchform['ehm'] = array(
+            'name' => "ehm",
+            'style' => "margin-left:40px",
+            'class' => 'keresourlap',
+         	'onChange'=> "
 						var a = document.getElementsByName('espker');	
 						for (index = 0; index < a.length; ++index) {
 						    console.log(a[index]);
@@ -97,71 +103,112 @@ function miserend_index() {
 
 						} else {
 							document.getElementById('espkerlabel').style.display='none';
-						}
-				\">
-					<option value=0>mindegy</option>";	
-	
-					$query="select id,nev from egyhazmegye where ok='i' order by sorrend";
-					$lekerdez=mysql_query($query);
-					while(list($id,$nev)=mysql_fetch_row($lekerdez)) {
-						$urlap.="<option value=$id>$nev</option>";
-					}
-	$urlap.="</select>";
-
-	$urlap.="<span class=alap id=espkerlabel style='margin-left:5px;margin-right:5px;display:none'><br/> -- espereskerület: </span>";
-		foreach($espkerT as $ehm =>$espker) {
-			$urlap.="<select id='ehm$ehm' name=espker class=keresourlap style='display: none'>
-					<option value=0>mindegy</option>";	
-					if(is_array($espker)) { foreach($espker as $espid=>$espnev) {
-						$urlap.="<option value=$espid>$espnev</option>";
-			    	}}
-			$urlap.="</select>";
+						}");
+    	$searchform['ehm']['options'][0] = 'mindegy';
+		$query="select id,nev from egyhazmegye where ok='i' order by sorrend";
+		$lekerdez=mysql_query($query);
+		while(list($id,$nev)=mysql_fetch_row($lekerdez)) {
+			$searchform['ehm']['options'][$id] = $nev;
 		}
 
-	$urlap .= "<br/>";
+	foreach($espkerT as $ehm =>$espker) {
+		$searchform['espker'][$ehm] = array(
+            'name' => "espker",
+            'id' => "ehm".$ehm,
+            'style' => "margin-left:40px;display:none",
+            'class' => 'keresourlap');
+	    	$searchform['espker'][$ehm]['options'][0] = 'mindegy';
+			if(is_array($espker)) { foreach($espker as $espid=>$espnev) {
+				$searchform['espker'][$ehm]['options'][$espid] = $espnev;
+	    	}}
+	}
+
 	//Mikor
-	$urlap .= "<div id='misekis'><br/>";
 	$mainap=date('w');
 	if($mainap==0) $vasarnap=$ma;
 	else {
 		$kulonbseg=7-$mainap;
 		$vasarnap=date('Y-m-d',(time()+(86400*$kulonbseg)));
 	}
-	$urlap.="\n<span class=kiscim style='margin-left:5px;margin-right:5px'>Mikor: </span>";
-	$urlap .= "<br><select style='margin-left:10px;margin-right:5px' name=mikor id=mikor class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md').style.display='inline';} else {document.getElementById('md').style.display='none';}\">";
-	$urlap.="<option value='$vasarnap'>vasárnap</option><option value='$ma'>ma</option><option value='$holnap'>holnap</option><option value=x>adott napon:</option>";
-	$urlap.="</select> <input type=text name=mikordatum id=md style='display: none' class=keresourlap maxlength=10 size=10 value='$ma'>";
-
-	$urlap.=" <select style='margin-left:10px;margin-right:5px' name=mikor2 id=mikor2 class=keresourlap onChange=\"if(this.value == 'x') {document.getElementById('md2').style.display='inline'; alert('FIGYELEM! Fontos a formátum!');} else {document.getElementById('md2').style.display='none';}\">";
-	$urlap.="<option value=0>egész nap</option><option value='de'>délelőtt</option><option value='du'>délután</option><option value=x>adott időben:</option>";
-	$urlap.="</select> <input type=text name=mikorido id=md2 style='display: none' class=keresourlap maxlength=11 size=10 value='$mikor'>";
+	$searchform['mikor'] = array(
+            'name' => "mikor",
+            'id' => "mikor",
+            'style' => "margin-left:40px",
+            'class' => 'keresourlap',
+         	'onChange'=> "
+						if(this.value == 'x') {document.getElementById('md').style.display='inline';} 
+						else {document.getElementById('md').style.display='none';}",
+			'options'=> array($vasarnap => 'vasárnap',$ma=>'ma',$holnap=>'holnap','x'=>'adott napon:')
+	);
+	$searchform['mikordatum'] = array(
+            'name' => "mikordatum",
+            'id' => "md",
+            'style' => "display:none",
+            'class' => "keresourlap",
+            'size' => "10",
+            'value' => $ma
+    );
+	$searchform['mikor2'] = array(
+            'name' => "mikor2",
+            'id' => "mikor2",
+            'style' => "margin-left:40px;margin-top:12px",
+            'class' => 'keresourlap',
+         	'onChange'=> "
+						if(this.value == 'x') {
+							document.getElementById('md2').style.display='inline'; 
+							alert('FIGYELEM! Fontos a formátum!');} 
+						else {document.getElementById('md2').style.display='none';}",
+			'options'=> array(0 => 'egész nap','de'=>'délelőtt','du'=>'délután','x'=>'adott időben:')
+	);
+	$searchform['mikorido'] = array(
+            'name' => "mikorido",
+            'id' => "md2",
+            'style' => "display:none;",
+            'class' => "keresourlap",
+            'size' => "7",
+            'value' => $mikor
+    );
 
 	//Milyen
-	$urlap.="\n<br><br><span class=kiscim style='margin-left:5px;margin-right:5px'>Milyen:</span><br>";
-	$urlap.="<table width=100% cellpadding=0 cellspacing=0><tr><td><span class=alap>- nyelv: </span><br><select name=nyelv id=nyelv class=keresourlap>
-			    <option value=0>mindegy</option>
-			    <option value=h>magyar</option>
-			    <option value=en>angol</option>
-			    <option value=fr>francia</option>
-			    <option value=gr>görög</option>    
-			    <option value=hr>horvát</option>    
-			    <option value=va>latin</option>
-			    <option value=pl>lengyel</option>
-			    <option value=de>német</option>
-			    <option value=it>olasz</option>    
-			    <option value=ro>román</option>
-			    <option value=es>spanyol</option>    
-			    <option value=sk>szlovák</option>
-			    <option value=si>szlovén</option>
-	    </select></td>";
-
-	$urlap.="<td><span class=alap>- zene: </span><br><select name=zene id=zene class=keresourlap><option value=0>mindegy</option><option value=cs>csendes</option><option value=g>gitáros</option><option value=o>orgonás</option>";	
-	$urlap.="</select></td>";
-	$urlap.="<td><span class=alap>- diák: </span><br><select name=diak id=diak class=keresourlap><option value=0>mindegy</option><option value=d>diák</option><option value=nd>nem diák</option>";	
-	$urlap.="</select></td></tr></table>";
-
-	$urlap .= "</div>";
-	$urlap.="<div align=center><input type=submit value=keresés class=keresourlap></div></form>";
+	$searchform['nyelv'] = array(
+            'name' => "nyelv",
+            'id' => "nyelv",
+            'style' => "margin-left:40px",
+            'class' => 'keresourlap',
+			'options'=> array(0=>'mindegy',
+					'h' => 'magyar',
+					'en' => 'angol',
+					'fr' => 'francia',
+					'gr' => 'görög',
+					'hr' => 'horvát',
+					'va' => 'latin',
+					'pl' => 'lengyel',
+					'de' => 'német',
+					'it' => 'olasz',
+					'ro' => 'román',
+					'es' => 'spanyol',
+					'sk' => 'szlovák',
+					'si' => 'szlovén')
+	);
+	$searchform['zene'] = array(
+            'name' => "zene",
+            'id' => "zene",
+            'style' => "margin-left:40px",
+            'class' => 'keresourlap',
+			'options'=> array(0=>'mindegy',
+					'cs' => 'csendes',
+					'g' => 'gitáros',
+					'o' => 'orgonás')
+	);
+	$searchform['diak'] = array(
+            'name' => "diak",
+            'id' => "diak",
+            'style' => "margin-left:40px",
+            'class' => 'keresourlap',
+			'options'=> array(0=>'mindegy',
+					'd' => 'diák',
+					'nd' => 'nem diák')
+	);
 
 	
 
@@ -475,6 +522,7 @@ function miserend_index() {
 		'formnyit' => $formnyit,
 		'formvalaszt' => $formvalaszt,
         'miseurlap'=>$miseurlap,
+        'searchform' => $searchform,
         'androidreklam' => $androidreklam,
         'templomurlap' => $templomurlap,
         'kepek' => $kepek,
@@ -1305,13 +1353,14 @@ function miserend_printRegi() {
     return $return;
     
 }
+
 switch($m_op) {
     case 'index':
         $tartalom=miserend_index();
         break;
 
 	case 'keres':
-		if($_REQUEST['keresestipus'] == 1)
+		if(isset($_REQUEST['misekereses']))
 			$tartalom=miserend_misekeres();
 		else
 			$tartalom=miserend_templomkeres();

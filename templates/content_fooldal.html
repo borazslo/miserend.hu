@@ -1,3 +1,5 @@
+{% import "forms.twig" as forms %}
+
 <style>
 .block:after{
     clear: both;
@@ -5,10 +7,9 @@
     display: block;
 }
 </style>
- {{ formnyit|raw }}
  <div class="focim_fekete block" style="background-color: #D0D6E4;width:98.9677419355%;margin-bottom:5px">
 	<img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
-	<span class="dobozfocim_fekete">{{ formvalaszt|raw }}</span>
+	<span class="dobozfocim_fekete">Keresés</span>
 	
 	<div class="focim_fekete screenonly" style="float:right;margin-right:10px;height:7px;">&nbsp;
 		<img src="{{ design_url|raw }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle">
@@ -17,7 +18,43 @@
 {{ alert|raw }}
 
 <div class="block">
-	<div class="miseurlap" style="width:100%;float:left">{{ miseurlap|raw }}</div>
+
+	<div class="miseurlap" style="width:100%;float:left">
+    <form method=post name="kereses" id="kereses">
+    {{ forms.input(searchform.m_op) }}{{ forms.input(searchform.m_id) }}
+    <div id="form_church">
+      <div class="kiscim" style='margin-left:5px;'>Hol:
+        <div id="form_church_getdetails" style="float:right" class="link kicsi">[részletek]</div>
+        <br/>{{ forms.input(searchform.kulcsszo) }}
+      </div>
+      <div id="form_church_details" style="display:none">
+        <div class=alap style='margin-left:5px;margin-top:6px'>- település:</div>{{ forms.input(searchform.varos) }}
+        <div class=alap style='margin-left:5px;margin-top:6px;width:100%'>- egyházmegye: </div>{{ forms.select(searchform.ehm) }}<br/>
+        <div class=alap id="espkerlabel" style='margin-left:5px;margin-top:6px;display:none'>- esperes kerület: </div><br/>
+              {% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}
+      </div>
+
+    </div>
+    <div id="form_mass" style="margin-top:12px">
+      <div class="kiscim" style='margin-left:5px;'>Mikor:
+        <div id="form_mass_getdetails" style="float:right" class="link kicsi">[részletek]</div>
+        <br/>{{ forms.select(searchform.mikor) }} {{ forms.input(searchform.mikordatum) }}
+        <br/>{{ forms.select(searchform.mikor2) }} {{ forms.input(searchform.mikorido) }}
+      </div>
+      <div id="form_mass_details" style="display:none">
+        <div class=alap style='margin-left:5px;margin-top:6px'>- nyelv:</div>{{ forms.select(searchform.nyelv) }}
+        <div class=alap style='margin-left:5px;margin-top:6px'>- zene: </div>{{ forms.select(searchform.zene) }}
+        <div class=alap style='margin-left:5px;margin-top:6px'>- diák: </div>{{ forms.select(searchform.diak) }}
+      </div>
+    </div>
+
+  <div align=center style="margin-top:12px">
+    <input type=submit name="misekereses" value="Mise keresése" class=keresourlap>
+    <input type=submit name="templomkereses" value="Templom keresése" class=keresourlap>
+  </div>
+  
+  </form>
+  </div>
 	<!--<div align="center" style="margin-top:5px;width:49%;float:left">{{ androidreklam|raw }}</div>-->
  </div>
   

@@ -1,10 +1,16 @@
 {% macro input(array) %}
-    <input class="urlap" type="{{ array.type|default('text') }}" style="{{ array.style }}" name="{{ array.name }}" value="{{ array.value|e }}" size="{{ array.size|default(12) }}" />
+    <input 
+    {% if array.id %} id="{{array.id}}" {% endif %}
+    class="urlap {{ array.class }}" type="{{ array.type|default('text') }}" style="{{ array.style }}" name="{{ array.name }}" value="{{ array.value|e }}" size="{{ array.size|default(12) }}" />
     {% if array.label %}<span class=alap> {{array.label|raw}} </span>{% endif %}
 {% endmacro %}
 
 {% macro select(array) %}
-	<select name="{{ array.name }}">
+	<select name="{{ array.name }}"
+    {% if array.id %} id="{{array.id}}" {% endif %}
+    {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
+    {% if array.style %} style="{{array.style}}" {% endif %}
+	>
 		{% for key, option in array.options %}
 			<option value="{{ key }}" 
 			{% if key == array.selected %} selected {% endif %}
