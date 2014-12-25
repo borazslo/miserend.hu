@@ -1,6 +1,8 @@
 <?php
-include_once('load.php');
 
+
+
+/*
 $u_login=$_GET['u_login'];
 
 if(empty($u_login) ) exit;
@@ -71,5 +73,5 @@ switch($op) {
         index();
         break;
 }
-
+*/
 ?>

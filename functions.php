@@ -1,4 +1,7 @@
 <?php
+
+include('function_chat.php');
+
 function dbconnect() {
     global $config;
     $db_host = $config['connection']['host'];
