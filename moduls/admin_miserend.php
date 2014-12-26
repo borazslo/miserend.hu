@@ -838,9 +838,10 @@ function miserend_addmise($tid) {
 	
 	$urlap.="<br><br><span class=alap><b>nyelvek</b> (h, hu vagy üres=magyar, en=angol, de=német, it=olasz, fr=francia, va=latin, gr=görög, sk=szlovák, hr=horvát, pl=lengyel, si=szlovén => további nyelvek esetén az internetes 2 betűs végződés az irányadó!) Előfordulhatnak periódusok is, ebben az esetben a nyelv mellett a periódus számát kell feltüntetni, pl de2,va3 -> minden hónap második hetén német, harmadik hetén latin (A vessző fontos, merty az tagolja).<br>
 		<br/><b>Lehetséges periódusok</b>: <b> 0</b>=mindig<b>, 1, 2, 3, 4, 5, -1</b>=utolsó héten<b>, ps</b>=páros héten<b>, pt</b>=páratlan héten.<br>";
-	$urlap.="\nAlapeset, minden mise magyar: ebben az esetben nem kell kitölteni</span>";
+	$urlap.="\nAlapeset, minden mise magyar: ebben az esetben nem kell kitölteni. Alapesetben a templomnak megfelelő rítusú a liturgia: csak akkor kell feltüntetni gor/rom, ha eltér a templom rítusától.</span>";
 
-	$urlap.="<br><br><span class=alap>A mise-tulajdonságok (<b>gitáros, diák, csendes</b>) a nyelvekhez hasonlóan működnek. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni. (Periódus nélkül 0-át lehet a betükód mögé írni, de nem szökséges.)<br>Betükódok: gitáros = g, csendes = cs, diák = d";
+	$urlap.="<br><br><span class=alap>A mise-tulajdonságok a nyelvekhez hasonlóan működnek. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni. (Periódus nélkül 0-át lehet a betükód mögé írni, de nem szökséges.)
+		<br><b>Betükódok</b>: gitáros = g, csendes = cs<br>családos/gyerek = csal, diák = d, egyetemista/ifjúsági = ifi<br/>igeliturgia = ige, görög katolikus = gor, római katolikus = rom";
 	$urlap.="\n<br>Több tulajdonságot vesszővel kell egymástól elválasztani.";
 
 	$urlap.="<br><br><span class=alap>A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.</span>";

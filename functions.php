@@ -372,10 +372,18 @@ function updateMass() {
 function decodeMassAttr($text) {
     $return  = array();
 
-    $milyen = array('d','g','cs');
+    $milyen = array('d','g','cs','gor','rom','ige','ifi','csal');
     $d = array('file' => 'diak.gif','name'=>'diák mise');
     $g = array('file' => 'gitar.gif','name'=>'gitáros mise');
     $cs = array('file' => 'csendes.gif','name'=>'csendes mise');
+
+    $gor = array('file' => 'jelzes1.png','name'=>'görög katolikus liturgia');
+    $rom = array('file' => 'jelzes10.png','name'=>'római katolikus szentmise');
+    $ige = array('file' => 'biblia.gif','name'=>'igeliturgia');
+
+    $ifi = array('file' => 'fiu.png','name'=>'ifjúsági/egyetemise');
+    $csal = array('file' => 'lany.png','name'=>'családos/mocorgós');
+
 
     $nyelvek = array('h'=>'magyar', 'en'=>'angol', 'de'=>'német', 'it'=>'olasz', 'va'=>'latin', 'gr'=>'görög', 'sk'=>'szlovák', 'hr'=>'horvát', 'pl'=>'lengyel', 'si'=>'szlovén', 'ro'=>'román', 'fr'=>'francia', 'es'=>'spanyol','uk'=>'ukrán');
     foreach($nyelvek as $k => $v) {
@@ -383,12 +391,12 @@ function decodeMassAttr($text) {
         $milyen[] = $k;
     }
 
-    preg_match_all("/(".implode('|',$milyen).")([0-5]{1}|-1|ps|pt)/i", $text,$matches,PREG_SET_ORDER);
+    preg_match_all("/(".implode('|',$milyen).")([0-5]{1}|-1|ps|pt|)(,|$)/i", $text,$matches,PREG_SET_ORDER);
     foreach ($matches as $match) {
         if($match[1] != 'h' OR $match[2] != 0) {
             $tmp = $match[1]; $tmp = $$tmp;
             $tmp['abbrev'] = $match[1];
-            if($match[2] != '0') {
+            if($match[2] != '0' AND $match[2] != '' ) {
                 $tmp['week'] = $match[2];
                 if($match[2] == '-1') $match[2] = 'utolsó';
                 elseif($match[2] == 'ps') $match[2] = 'páros';
@@ -559,6 +567,11 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         } else {
             $where[] = "varos='".$args['varos']."'";
         }
+    }
+
+    if($args['gorog'] == 'gorog') {
+        $where[] = "( egyhazmegye=17 OR egyhazmegye=18 )";
+
     }
 
     if($args['ehm'] != 0) $where[] = "egyhazmegye='".$args['ehm']."'";

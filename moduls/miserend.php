@@ -123,6 +123,14 @@ function miserend_index() {
 	    	}}
 	}
 
+	$searchform['gorog'] = array(
+			'type' => 'checkbox',
+            'name' => "gorog",
+            'id' => "gorog",
+            'class' => "keresourlap",
+            'value' => "gorog"
+    );
+
 	//Mikor
 	$mainap=date('w');
 	if($mainap==0) $vasarnap=$ma;
@@ -190,16 +198,18 @@ function miserend_index() {
 					'sk' => 'szlovák',
 					'si' => 'szlovén')
 	);
-	$searchform['zene'] = array(
-            'name' => "zene",
-            'id' => "zene",
-            'style' => "margin-left:40px",
-            'class' => 'keresourlap',
-			'options'=> array(0=>'mindegy',
-					'cs' => 'csendes',
-					'g' => 'gitáros',
-					'o' => 'orgonás')
-	);
+	
+	foreach(array('cs'=>'csendes','g'=>'gitáros','o'=>'sem csendes, sem gitáros') as $value => $label) {
+		$searchform['zene'][] = array(
+				'type' => 'radio',
+	            'name' => "zene",
+	            'class' => "keresourlap",
+	            'value' => $value,
+	            'checked' => true,
+	            'style' => 'margin-left:80px',
+	            'labelback' => $label,
+	    );
+	}
 	$searchform['diak'] = array(
             'name' => "diak",
             'id' => "diak",
@@ -210,6 +220,17 @@ function miserend_index() {
 					'nd' => 'nem diák')
 	);
 
+	foreach(array('csal'=>'családi/mocorgós','d'=>'diák','ifi'=>'ifjúsági/egyetemista','na' => '<i>meghatározatlan</i>') as $value => $label) {
+		$searchform['kor'][] = array(
+				'type' => 'checkbox',
+	            'name' => "kor",
+	            'class' => "keresourlap",
+	            'value' => $value,
+	            'checked' => true,
+	            'style' => 'margin-left:80px',
+	            'labelback' => $label,
+	    );
+	}
 	
 
 	//Következő mise a közelben
