@@ -409,9 +409,6 @@ function decodeMassAttr($text) {
     }
     //print_r($return);
     return $return;
-
-
-
 }
 
 
@@ -534,7 +531,6 @@ function formPeriod($pkey,$period = false) {
 
 
     return $return;
-
 }
  
 function searchChurches($args, $offset = 0, $limit = 20) {
@@ -597,7 +593,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 
 function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
-     $return = array(
+    $return = array(
         'offset' => $offset,
         'limit' => $limit );
     $where = array(" torles = '0000:00:00 00:00:00' ");
@@ -715,7 +711,6 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     }
     //echo "<pre>".print_r($return,1); exit;
     return $return;
-
 }
 
 function getWeekInMonth($date,$order = '+') {
@@ -732,6 +727,7 @@ function getWeekInMonth($date,$order = '+') {
         }
     return $num;
 }
+
 function sugolink($id) {
     return '<a href="javascript:OpenNewWindow(\'sugo.php?id=".$id."\',200,300);"><img src=img/sugo.gif border=0 title=\'Súgó\'></a>';
 }
@@ -757,6 +753,35 @@ function generateMassTmp($where = false) {
         if($global['config']>1) echo $query."<br/>";
         mysql_query($query);
     }
+}
+
+function getRemarkMark($tid) {
+    $return = array();
+
+    $querye="SELECT allapot FROM eszrevetelek WHERE hol='templomok' and hol_id = $tid GROUP BY allapot LIMIT 3";
+    if(!$lekerdeze=mysql_query($querye)) echo "HIBA!<br>$querym<br>".mysql_error();
+    while(list($cell)=mysql_fetch_row($lekerdeze)) {
+        $allapot[$cell] = true;
+    }
+    if(isset($allapot['u'])) { 
+        $return['html'] = "<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> "; 
+        $return['text'] = "Új észrevételt írtak hozzá!";
+        $return['mark'] = 'u';
+    } elseif (isset($allapot['f'])) { 
+        $return['html'] = "<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> "; 
+        $return['text'] = "Észrevétel javítása folyamatban!";
+        $return['mark'] = 'f';
+    } elseif(isset($allapot['j'])) { 
+        $return['html'] = "<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag1.gif title='Észrevételek' align=absmiddle border=0></a> "; 
+        $return['text'] = "Észrevételek";
+        $return['mark'] = 'j';
+    } else {
+        $return['html'] = "<span class='alap'>(nincs)</span>"; 
+        $return['text'] = "Nincsenek észrevételek";
+        $return['mark'] = false; 
+    }
+
+    return $return;
 }
 
 ?>

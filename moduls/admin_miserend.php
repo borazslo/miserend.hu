@@ -106,19 +106,8 @@ function miserend_addtemplom($tid) {
 	$urlap.='<table cellpadding=4>';
 
   //Észrevétel
-  //Észrevételek lekérdezése
-	$querye="select distinct(hol_id) from eszrevetelek where hol='templomok' and hold_id = $tid ";
-	if(!$lekerdeze=mysql_db_query($db_name,$querye)) echo "HIBA!<br>$querym<br>".mysql_error();
-	while(list($templom)=mysql_fetch_row($lekerdeze)) {
-		$vaneszrevetelT[$templom]=true;
-	}
-
-	if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
-	elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";		
-	elseif($vaneszrevetelT[$tid]) $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";		
-	else $jelzes='<span class=alap>Nincs</span>';
-
-	$urlap.="\n<tr><td colspan=2><span class=kiscim>Észrevétel: </span>$jelzes</td></tr>";
+	$jelzes = getRemarkMark($tid);
+	$urlap.="\n<tr><td colspan=2><span class=kiscim>Észrevétel: </span>".$jelzes['html']."</td></tr>";
 
 	if($tid>0) {
   //Megnéz
@@ -761,9 +750,10 @@ function miserend_modtemplom() {
 	else $kiir.="<span class=alap>Jelenleg nincs módosítható templom az adatbázisban.</span>";
 	while(list($tid,$tnev,$tismert,$tvaros,$tok,$teszrevetel,$miseaktiv)=mysql_fetch_row($lekerdez)) {
 		$jelzes='';
-		if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
-		elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a>";		
-		elseif($vaneszrevetelT[$tid]) $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid&sid=$sid',550,500);\"><img src=img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";		
+		//Észrevétel
+		$RemarkMark = getRemarkMark($tid);
+		if($RemarkMark['mark'] != false) $jelzes.=$RemarkMark['html'];
+
 		if(!$vanmiseT[$tid] AND $miseaktiv == 1) {
 			$jelzes.="<img src=img/lampa.gif title='Nincs hozzá mise!' align=absmiddle> ";
 		}		
@@ -817,6 +807,11 @@ function miserend_addmise($tid) {
 	$urlap.="\n<input type=hidden name=m_id value=$m_id>";
 	$urlap.="\n<input type=hidden name=m_op value=addingmise><input type=hidden name=tid value=$tid>";
 	
+	//Észrevétel
+	$jelzes = getRemarkMark($tid);
+	$urlap.="\n<tr><td colspan=2><span class=kiscim>Észrevétel: </span>".$jelzes['html']."</td></tr>";
+
+
 	$urlap.='<table cellpadding=4 width=100%>';
 
 	//név
