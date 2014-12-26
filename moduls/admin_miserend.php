@@ -808,11 +808,12 @@ function miserend_addmise($tid) {
 	$urlap.='<table cellpadding=4 width=100%>';
 
 	//név
-	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><span class=kiscim>".$church['nev']." (".$church['varos'].")</span></td></tr>";
+	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><span class=kiscim><a href='?templom=".$church['id']."' title='A templom nyilvános oldalának megnyitás' target='_blank'>".$church['nev']." (".$church['varos'].")</a></span></td></tr>";
 	
 	//miserend
 	$urlap.="\n<tr><td><span class=kiscim>Miseidőpontok:</span></td><td>";
 	$urlap.="&nbsp;</td></tr>";
+
 
 
 	foreach($masses as $pkey=>$period) {	
@@ -823,8 +824,12 @@ function miserend_addmise($tid) {
 	$urlap .= '</td></tr>';
 	
 //Misemegjegyzés
-	$urlap.="\n<tr><td bgcolor=#D6F8E6><span class=kiscim>Kiegészítő infók:</span><br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td><td bgcolor=#D6F8E6>";
-	$urlap.="<span class=alap>Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span><br><textarea name=misemegj class=urlap cols=50 rows=10>".$church['misemegj']."</textarea></td></tr>";
+	$urlap.="\n<tr><td bgcolor=#D6F8E6><div class=kiscim>Kiegészítő infók:</div><br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td><td bgcolor=#D6F8E6>";
+	$urlap.="<span class=alap>Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span><br><textarea name=misemegj  style='width:100%'  class=urlap cols=50 rows=10>".$church['misemegj']."</textarea></td></tr>";
+
+//megjegyzés
+	$urlap.="\n<tr><td bgcolor=#ECE5C8><div class=kiscim align=right>Szerkesztői megjegyzés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=1',200,300);\"><img src=img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#ECE5C8><textarea name=adminmegj style='width:100%' class=urlap cols=50 rows=3>".$church['adminmegj']."</textarea><span class=alap>A templom szerkesztésével kacsolatosan.</span></td></tr>";
+
 
 
 
@@ -924,7 +929,9 @@ function miserend_addingmise() {
 	list($log)=mysql_fetch_row(mysql_query("select log from templomok where id='$tid'"));
 	$log.="\nMISE_MOD: ".$user->login." ($most - [$ip - $host])";
 	if($_REQUEST['frissit']=='i') $frissites=", frissites='$ma'";
-	$query="update templomok set misemegj='".$_REQUEST['misemegj']."', log='$log' $frissites where id='$tid' LIMIT 1";
+	$_REQUEST['misemegj'] = preg_replace('/<br\/>/i',"\n", $_REQUEST['misemegj']);
+	$_REQUEST['adminmegj'] = preg_replace('/<br\/>/i',"\n", $_REQUEST['adminmegj']);
+	$query="update templomok set misemegj='".$_REQUEST['misemegj']."', adminmegj='".$_REQUEST['adminmegj']."', log='$log' $frissites where id='$tid' LIMIT 1";
 	mysql_query($query);
 
 
