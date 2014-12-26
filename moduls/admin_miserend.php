@@ -105,8 +105,8 @@ function miserend_addtemplom($tid) {
 	
 	$urlap.='<table cellpadding=4>';
 
-//Észrevétel
-//Észrevételek lekérdezése
+  //Észrevétel
+  //Észrevételek lekérdezése
 	$querye="select distinct(hol_id) from eszrevetelek where hol='templomok'";
 	if(!$lekerdeze=mysql_db_query($db_name,$querye)) echo "HIBA!<br>$querym<br>".mysql_error();
 	while(list($templom)=mysql_fetch_row($lekerdeze)) {
@@ -121,16 +121,16 @@ function miserend_addtemplom($tid) {
 	$urlap.="\n<tr><td colspan=2><span class=kiscim>Észrevétel: </span>$jelzes</td></tr>";
 
 	if($tid>0) {
-//Megnéz
+  //Megnéz
 		$urlap.="\n<tr><td colspan=2><span class=kiscim>Nyilvános oldal megnyitása:</span><span class=alap> (új ablakban)</span> <a href=?templom=$tid class=link target=_blank><u>$nev</u></a></td></tr>";
 	}
 
-//megjegyzés
+  //megjegyzés
 	$urlap.="\n<tr><td bgcolor=#ECE5C8><div class=kiscim align=right>Megjegyzés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=1',200,300);\"><img src=img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#ECE5C8><textarea name=adminmegj class=urlap cols=50 rows=3>$adminmegj</textarea><span class=alap> a szerkesztéssel kapcsolatosan</span></td></tr>";
 
-//kontakt
+  //kontakt
 	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Felelős:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=2',200,300);\"><img src=img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#efefef><textarea name=kontakt class=urlap cols=50 rows=2>$kontakt</textarea><span class=alap> név és telefonszám</span><br><input type=text name=kontaktmail size=40 class=urlap value='$kontaktmail'><span class=alap> emailcím</span></td></tr>";
-//feltöltő
+  //feltöltő
 	if(empty($feltolto)) $feltolto=$u_login;
 	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Feltöltő (jogosult):</div></td><td bgcolor=#efefef>";
 	$urlap.="<select name=feltolto class=urlap><option value=''>Nincs</option>";
@@ -145,14 +145,14 @@ function miserend_addtemplom($tid) {
 	if($megbizhato!='n') $urlap.=" checked";
 	$urlap.="><span class=alap> megbízható, nem kell külön engedélyezni</span></td></tr>";
 
-//név
+  //név
 	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><input type=text name=nev value=\"$nev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('sugo.php?id=3',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
 	$urlap.="\n<tr><td bgcolor=#FAE19C><div class=kiscim align=right>közismert neve:</div></td><td bgcolor=#FAE19C><input type=text name=ismertnev value=\"$ismertnev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('sugo.php?id=4',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a><br><span class=alap>(Helyben elfogadott (ismert) templomnév, valamint település, vagy település résznév, amennyiben eltérő a település hivatalos nevétől, pl. <u>izbégi templom</u>)</span></td></tr>";
 
-//túristautak
+  //túristautak
 	$urlap.="\n<tr><td bgcolor=#EFEFEF><div class=kiscim align=right>turistautak.hu ID:</div></td><td bgcolor=#EFEFEF><input type=text name=turistautak value=\"$turistautak\" class=urlap size=5 maxlength=10> <a href=\"javascript:OpenNewWindow('sugo.php?id=16',240,320);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a><br><span class=alap>(<a href=http://turistautak.hu/search.php?s=templom target=_blank class=link><u>ebből a listából</u></a> ha bennevan)</span></td></tr>";
 
-//cím
+  //cím
 	$urlap.="\n<tr><td><div class=kiscim align=right>Templom címe:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=5',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td>";
 
 	//Egyházmegye
@@ -265,28 +265,28 @@ function miserend_addtemplom($tid) {
 	$urlap.="<input type=text name=lng value=\"$lng\" class=urlap size=10 maxlength=7><span class=alap> (hosszúság)</span>";
 	$urlap.="</td></tr>";
 
-//plébánia
+  //plébánia
 	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Plébánia adatai:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=6',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td bgcolor=#efefef><textarea name=plebania class=urlap cols=50 rows=3>$plebania</textarea><span class=alap> cím, telefon, fax, kontakt</span>";
 	$urlap.="<br><input type=text name=pleb_eml value='$pleb_eml' size=40 class=urlap maxlength=100><span class=alap> email</span>";
 	$urlap.="<br><input type=text name=pleb_url value='$pleb_url' size=40 class=urlap maxlength=100><span class=alap> web http://-rel együtt!!!</span>";
 	$urlap.="</td></tr>";
 
 
-//megjegyzés
+  //megjegyzés
 	$urlap.="\n<tr><td bgcolor=#ffffff><div class=kiscim align=right>Megjegyzés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=10',200,360);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td bgcolor=#ffffff><textarea name=megjegyzes class=urlap cols=50 rows=3>$megjegyzes</textarea><br><span class=alap> ami a \"jó tudni...\" dobozban megjelenik (pl. búcsú, védőszent, \"reklám\" stb.)</span></td></tr>";
 
-//megjegyzés
+  //megjegyzés
 	$urlap.="\n<tr><td bgcolor=#ffffff><div class=kiscim align=right>Mise megjegyzés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,360);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td bgcolor=#ffffff><textarea name=misemegj class=urlap cols=50 rows=3>$misemegj</textarea><br><span class=alap> Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span></td></tr>";
 
-//nyári-téli időszámítás
-//	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Nyári időszámítás:</div></td><td bgcolor=#efefef><input type=text name=nyariido value=\"$nyariido\" class=urlap size=10 maxlength=10><span class=alap> - </span><input type=text name=teliido value=\"$teliido\" class=urlap size=10 maxlength=10> <a href=\"javascript:OpenNewWindow('sugo.php?id=8',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
+  //nyári-téli időszámítás
+  //	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Nyári időszámítás:</div></td><td bgcolor=#efefef><input type=text name=nyariido value=\"$nyariido\" class=urlap size=10 maxlength=10><span class=alap> - </span><input type=text name=teliido value=\"$teliido\" class=urlap size=10 maxlength=10> <a href=\"javascript:OpenNewWindow('sugo.php?id=8',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
 
-//Szöveg
+  //Szöveg
 	$urlap.="<tr><td valign=top><div class=kiscim align=right>Részletes leírás, templom története:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=9',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td valign=top><span class=alap><font color=red><b>FONTOS!</b></font> A szöveghez MINDIG legyen stílus rendelve!</span><br><textarea name=szoveg class=urlap cols=90 rows=30>$szoveg</textarea>";
 
 	$urlap.="\n</td></tr>";
 
-//Fájlok
+  //Fájlok
 	$urlap.="\n<tr><td bgcolor=#efefef valign=top><div class=kiscim align=right>Letölthető fájl(ok):</td><td bgcolor=#efefef valign=top>";
 	$urlap.="\n<span class=alap>Kapcsolódó dokumentum, ha van ilyen:</span><br>";
 	$urlap.="\n<span class=alap>Új fájl: </span><input type=file size=60 name=fajl class=urlap> <a href=\"javascript:OpenNewWindow('sugo.php?id=12',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a><br>";
@@ -311,7 +311,7 @@ function miserend_addtemplom($tid) {
 		}
 	}
 
-//Képek
+  //Képek
 	$urlap.="\n<tr><td><div class=kiscim align=right>Képek:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=11',200,450);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td><span class=alap><font color=red>FIGYELEM!</font><br>Azonos nevű képek felülírják egymást!!! A fájlnévben ne legyen ékezet és szóköz!</span><br><input type=file name=kepT[] class=urlap size=20> <span class=alap>Képfelirat: </span><input type=text name=kepfeliratT[] size=40 maxlength=100 class=urlap><br><input type=file name=kepT[] class=urlap size=20> <span class=alap>Képfelirat: </span><input type=text name=kepfeliratT[] size=40 maxlength=100 class=urlap><br><input type=file name=kepT[] class=urlap size=20> <span class=alap>Képfelirat: </span><input type=text name=kepfeliratT[] size=40 maxlength=100 class=urlap>";
 	if($tid>0) {
 		//Meglévő képek listája
@@ -330,12 +330,12 @@ function miserend_addtemplom($tid) {
 	}
 	$urlap.='</td></tr>';
 
-//Frissítés dátuma
+  //Frissítés dátuma
 	if($tid>0) {
 		$urlap.="\n<tr><td valign=top><div class=kiscim align=right>Frissítés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=14',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td valign=top><input type=text disabled value='$frissites' size=10 class=urlap><br><input type=checkbox name=frissit value=i class=urlap><span class=alap> Frissítsük a dátumot</span></td></tr>";
 	}
 	
-//Engedélyezés
+  //Engedélyezés
 	$urlap.="\n<tr><td bgcolor=#efefef valign=top><div class=kiscim align=right>Megjelenhet:</div></td><td bgcolor=#efefef valign=top><input type=radio name=ok value=i";
 	if($ok!='n' and $ok!='f') $urlap.=" checked";
 	$urlap.="><span class=alap> igen</span>";
@@ -347,7 +347,7 @@ function miserend_addtemplom($tid) {
 	$urlap.="><span class=alap> nem</span>";
 	$urlap.=" <a href=\"javascript:OpenNewWindow('sugo.php?id=15',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
 
-//Log
+  //Log
 	$urlap.="\n<tr><td valign=top><div class=kiscim align=right>Történet:</div></td><td valign=top><textarea cols=50 rows=6 disabled>Számláló: $szamlalo\n$log</textarea></td></tr>";
 
 	$urlap.="\n<tr><td><div align=right><input type=submit value=Mehet class=urlap>&nbsp;</div></td><td>";
@@ -380,7 +380,7 @@ function miserend_addingtemplom() {
 
 	$hiba=false;
 	$tid=$_POST['tid'];
-/*
+  /*
 	if($tid>0) {
 		//Ha módosítás történt
 		$lekerdez=mysql_db_query($db_name,"select megnyitva from hirek where id='$hid'");
@@ -389,7 +389,7 @@ function miserend_addingtemplom() {
 			mysql_db_query($db_name,"update hirek set megnyitva='' where id='$hid'"); //akkor töröljük a bejegyzést
 		}
 	}
-*/
+  */
 	$ma=date('Y-m-d');
 
 	$modosit=$_POST['modosit'];
@@ -669,7 +669,7 @@ function miserend_modtemplom() {
 			
 	$kiir.="\n <input type=text name=kkulcsszo value='$kulcsszo' class=urlap size=20>";
 
-//Állapot szerinti szűrés
+  //Állapot szerinti szűrés
 	$kiir.="\n <select name=allapot class=urlap><option value=0>Mind</option><option value=i";
 	if($allapot=='i') $kiir.=" selected";
 	$kiir.=">csak engedélyezett templomok</option><option value=f";
@@ -682,8 +682,8 @@ function miserend_modtemplom() {
 	if($allapot=='ef') $kiir.=" selected";
 	$kiir.=">javítás alatt lévő templomok</option>";
 	//$kiir.="<opton value=m";
-//	if($allapot=='m') $kiir.=" selected";
-//	$kiir.=">miserend nélküli templomok</option>";
+  //	if($allapot=='m') $kiir.=" selected";
+  //	$kiir.=">miserend nélküli templomok</option>";
 	$kiir.="</select>";
 
 	$kiir.="\n<br><span class=alap>rendezés: </span><select name=sort class=urlap> ";
@@ -710,14 +710,14 @@ function miserend_modtemplom() {
 	}
 	if(is_array($feltetelT)) $feltetel=' where '.implode(' and ',$feltetelT);
 
-//Misék lekérdezése
+  //Misék lekérdezése
 	$querym="select distinct(tid) from misek where torolte=''";
 	if(!$lekerdezm=mysql_db_query($db_name,$querym)) echo "HIBA!<br>$querym<br>".mysql_error();
 	while(list($templom)=mysql_fetch_row($lekerdezm)) {
 		$vanmiseT[$templom]=true;
 	}
 
-//Észrevételek lekérdezése
+  //Észrevételek lekérdezése
 	$querye="select distinct(hol_id) from eszrevetelek where hol='templomok'";
 	if(!$lekerdeze=mysql_db_query($db_name,$querye)) echo "HIBA!<br>$querym<br>".mysql_error();
 	while(list($templom)=mysql_fetch_row($lekerdeze)) {
@@ -831,16 +831,14 @@ function miserend_addmise($tid) {
 //súgó
 	$urlap.="\n<tr><td><span class=kiscim>Kitöltési útmutató:</span></td><td>";
 	
-	$urlap.="<br><br><span class=alap><b>nyelvek</b> (h, hu vagy üres=magyar, en=angol, de=német, it=olasz, fr=francia, va=latin, gr=görög, sk=szlovák, hr=horvát, pl=lengyel, si=szlovén => további nyelvek esetén az internetes 2 betűs végződés az irányadó!)<br>A nyelvek a beállított miseidőpontokhoz tartoznak, így az elválasztó itt is a <b>+</b> jel. Előfordulhatnak periódusok is, ebben az esetben a nyelv mellett a periódus számát kell feltüntetni, pl de2,va3 -> minden hónap második hetén német, harmadik hetén latin (A vessző nem fontos, csak jobban tagolja). Ha minden héten az adott nyelven van mise, akkor nem kell megjegyzést írni, viszont <u>periódusok vagy egyéni esetekben a mejegyzés rovatba szövegesen is tüntessük föl</u>!<br>";
-	$urlap.="\n<u>Példa 1:</u> a fenti 9-es mise magyar nyelvű, az esti 6-os viszont minden hónap második vasárnapján latin: <input type=text disabled class=urlap value=\"h0+,va2\" size=10> (<b>h0+va2</b>)";
-	$urlap.="\n<br><u>Példa 2:</u> a 9-es mise mindig német nyelvű, az esti 6-os viszont minden hónap második vasárnapján angol, egyébként latin:  <input type=text disabled class=urlap value=\"de0+va1,en2,va3,va4\" size=10> (<b>de0+va1,en2,va3,va4</b>)";
-	$urlap.="\n<br><u>Példa 3:</u> alapeset, minden mise magyar: ebben az esetben nem kell kitölteni</span>";
+	$urlap.="<br><br><span class=alap><b>nyelvek</b> (h, hu vagy üres=magyar, en=angol, de=német, it=olasz, fr=francia, va=latin, gr=görög, sk=szlovák, hr=horvát, pl=lengyel, si=szlovén => további nyelvek esetén az internetes 2 betűs végződés az irányadó!) Előfordulhatnak periódusok is, ebben az esetben a nyelv mellett a periódus számát kell feltüntetni, pl de2,va3 -> minden hónap második hetén német, harmadik hetén latin (A vessző fontos, merty az tagolja).<br>
+		<br/><b>Lehetséges periódusok</b>: <b> 0</b>=mindig<b>, 1, 2, 3, 4, 5, -1</b>=utolsó héten<b>, ps</b>=páros héten<b>, pt</b>=páratlan héten.<br>";
+	$urlap.="\nAlapeset, minden mise magyar: ebben az esetben nem kell kitölteni</span>";
 
-	$urlap.="<br><br><span class=alap><b>gitáros, diák, csendes</b> misék esetén a nyelvekhez hasonlóan, a beállított miseidőpontokhoz tartoznak, így az elválasztó itt is a <b>+</b> jel. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni, periódus nélkül 0-át kell a betükód mögé írni. Fontos, hogy minden esetben a mejegyzés rovatba is tüntessük föl!<br>Betükódok: gitáros = g, csendes = cs, diák = d";
-	$urlap.="\n<br><u>Példa 1:</u> a fenti 9-es mise gitáros, az esti 6-os viszont csendes: <input type=text disabled class=urlap value=\"g0+cs0\" size=10> (<b>g0+cs0</b>)";
-	$urlap.="\n<br><u>Példa 2:</u> a 9-es mise diák mise és a hónap minden második vasárnapján gitáros, az esti 6-os viszont rendes orgonás:  <input type=text disabled class=urlap value=\"d0,g2+\" size=10> (<b>d0,g2+</b>)";
+	$urlap.="<br><br><span class=alap>A mise-tulajdonságok (<b>gitáros, diák, csendes</b>) a nyelvekhez hasonlóan működnek. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni. (Periódus nélkül 0-át lehet a betükód mögé írni, de nem szökséges.)<br>Betükódok: gitáros = g, csendes = cs, diák = d";
+	$urlap.="\n<br>Több tulajdonságot vesszővel kell egymástól elválasztani.";
 
-	$urlap.="<br><br><span class=alap><b>megjegyzés</b> mivel nem minden paramétert tudunk pontosan beállítani, illetve lehetnek egyéb eltérések is, a megjegyzés rovatba mindig tüntessük föl a bizonytalan dolgokat. Pl. minden második héten gitáros mise, de ünnepeknél, betegségeknél csúszhat. A megjegyzésnél is a <b>+</b> jel az elválasztó az egyes miseidőpontoknak megfelelően. Tagolni lehet sortöréssel, nincs jelentősége.</span>";
+	$urlap.="<br><br><span class=alap>A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.</span>";
 
 	$urlap.="</td></tr>";
 

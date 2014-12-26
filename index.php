@@ -117,6 +117,8 @@ else {
 //tartalmi rész összeállítása
 /////////////////////////////////
     $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>';
+    $script .= '<script src="js/miserend.js"></script>';
+
 
     if(!$hiba and !$tiltott_IP_T[0] and $mehet) {
         $m_op=$_POST['m_op'];

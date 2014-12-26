@@ -621,7 +621,6 @@ function miserend_templomkeres() {
 	$mennyi=$results['sum'];
 
     if($mennyi == 1) {
-        $talalat = mysql_fetch_assoc($lekerdez);
         //ga('send','event','Outgoing Links','click','".$pleb_url."');
         //header ("Location: ?templom=".$talalat['id']);
         echo "
@@ -634,7 +633,7 @@ function miserend_templomkeres() {
     ga(\"create\", \"UA-3987621-4\", \"miserend.hu\");
     ga('send','event','Search','fast','".$varos.$kulcsszo.$ehm."');
     
-    window.location = '?templom=".$talalat['id']."';
+    window.location = '?templom=".$results['results'][0]['id']."';
            
          </script>";
         
@@ -856,7 +855,7 @@ function miserend_misekeres() {
 	if($prev<0) $prev=0;
 	$veg=$mennyi;
 	if($min>0) {
-		$leptetprev.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=sid value=$sid><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
+		$leptetprev.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
 		$leptetprev.=$leptet_urlap;
 		$leptetprev.="<input type=hidden name=min value=$prev>";		
 		$leptetprev.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
@@ -867,7 +866,7 @@ function miserend_misekeres() {
 		$next=$min+$leptet;	
 
 		if($mennyi>$min+$leptet) {
-			$leptetnext.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=sid value=$sid><input type=hidden name=min value=$next><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
+			$leptetnext.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
 			$leptetnext.=$leptet_urlap;
 			$leptetnext.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
 		}
@@ -897,7 +896,21 @@ function miserend_misekeres() {
 			$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_POST));
 			foreach($masses['results'] as $mass) {
 				$tartalom .="<img src=img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>".substr($mass['ido'],0,5)."</span>";
-				$tartalom .= " ".$mass['ido2']." ".$mass['nyelv']." ".$mass['milyen']." ".$mass['megjegyzes']." &nbsp; ";
+
+				$mass['nyelv'] = decodeMassAttr($mass['nyelv']);
+				foreach($mass['nyelv'] as $milyen)
+					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['weektext'].' '.$milyen['name'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+    					<span class="" style="display:none" >'.$milyen['weektext'].' '.$milyen['name'].'</span>';
+    					
+				$mass['milyen'] = decodeMassAttr($mass['milyen']);
+				foreach($mass['milyen'] as $milyen)
+					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['weektext'].' '.$milyen['name'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+    					<span class="" style="display:none">'.$milyen['weektext'].' '.$milyen['name'].'</span>';
+
+    			if($mass['megjegyzes'] != '')
+				$tartalom.= '<img src="'.$design_url.'img/info2.gif" class="massinfo" width=14 title="'.$milyen['megjegyzes'].'"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+					<span class="" style="display:none">'.$mass['megjegyzes'].'</span>';
+			
 			}
 			//$tartalom .= print_r($masses,1);
 

@@ -318,7 +318,7 @@ function getMasses($tid,$date = false) {
     $napok = array('x','hétfő','kedd','szerda','csütörtök','péntek','szombat','vasárnap');
     $nap2options = array(
         0 => 'minden héten',
-        1 => 'első héten',2 => 'második héten',3 => 'harmadik héten',4 => 'negyedik héten',5 => 'ötödik héten',
+        1 => '1. héten',2 => '2. héten',3 => '3. héten',4 => '4. héten',5 => '5. héten',
         '-1' => 'utolsó héten',
         'ps' => 'páros héten','pt'=>'páratlan héten');
 
@@ -350,7 +350,7 @@ function getMasses($tid,$date = false) {
             $ido = (int) substr($row2['ido'],0,2);
             $row2['ido'] = $ido.":".substr($row2['ido'],3,2);
             $row2['nap2_raw'] = $row2['nap2'];
-            $row2['nap2'] = $nap2options[$row2['nap2']];
+            if($row2['nap2']!='') $row2['nap2'] = '('.$nap2options[$row2['nap2']].')';
 
             $row2['napid'] = $row2['nap'];
             $row2['nap'] = $napok[$row2['nap'] ];
@@ -383,14 +383,18 @@ function decodeMassAttr($text) {
         $milyen[] = $k;
     }
 
-    preg_match_all("/(".implode('|',$milyen).")([0-5])/i", $text,$matches,PREG_SET_ORDER);
+    preg_match_all("/(".implode('|',$milyen).")([0-5]{1}|-1|ps|pt)/i", $text,$matches,PREG_SET_ORDER);
     foreach ($matches as $match) {
         if($match[1] != 'h' OR $match[2] != 0) {
             $tmp = $match[1]; $tmp = $$tmp;
             $tmp['abbrev'] = $match[1];
-            if($match[2] != 0) {
+            if($match[2] != '0') {
                 $tmp['week'] = $match[2];
-                $tmp['weektext'] = $match[2].". héten";
+                if($match[2] == '-1') $match[2] = 'utolsó';
+                elseif($match[2] == 'ps') $match[2] = 'páros';
+                elseif($match[2] == 'pt') $match[2] = 'páratlan';
+                else $match[2] = $match[2].".";
+                $tmp['weektext'] = $match[2]." héten";
             }
             $return[] = $tmp;
         }
@@ -435,7 +439,7 @@ function formMass($pkey,$mkey,$mass = false) {
         'nap2' => array(
             'name' => "period[".$pkey."][".$mkey."][nap2]",
             'options' => $nap2options,
-            'selected' => $mass['nap2']),
+            'selected' => $mass['nap2_raw']),
         'ido' => array(
             'name' => "period[".$pkey."][".$mkey."][ido]",
             'value' => $mass['ido'],
@@ -443,17 +447,19 @@ function formMass($pkey,$mkey,$mass = false) {
         'nyelv' => array(
             'label' => 'nyelvek',
             'name' => "period[".$pkey."][".$mkey."][nyelv]",
-            'value' => $mass['nyelv']),
+            'value' => $mass['nyelv'],
+            'style'=>'margin-right:10px',
+            'size'=>7),
         'milyen' => array(
-            'label' => '[<b>g</b>]itáros, [<b>cs</b>]endes, [<b>d</b>]iák',
+            'label' => 'milyen',
             'name' => "period[".$pkey."][".$mkey."][milyen]",
             'value' => $mass['milyen'],
-            'style'=>'margin-left:10px' ),
+            'size'=>7 ),
         'megjegyzes' => array(
             'label' => 'megjegyzések',
             'name' => "period[".$pkey."][".$mkey."][megjegyzes]",
             'value' => $mass['megjegyzes'],
-            'style' => 'margin-top:4px;width:244px')
+            'style' => 'margin-top:4px;width:204px')
         );
     return $form;
 }

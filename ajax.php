@@ -51,10 +51,7 @@ switch ($_REQUEST['q']) {
         break;
     case 'ChatUsers':
         if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
-        $users = chat_getusers();
-        foreach($users as $k=>$i) $users[$k] = '<span class="response_open" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
-        $text = '<strong>Online adminok:</strong> '.implode(', ', $users);
-        if(count($users)==0) $text = '<strong><i>Nincs (más) admin online.</i></strong>';
+        $text = chat_getusers('html');
         echo json_encode(array('result'=>'loaded','text'=>$text));
         break;
     default:

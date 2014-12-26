@@ -82,14 +82,14 @@ function chat_html() {
     });
 
 	var c = 1;
-	var lim = 1;
+	var lim = 10;
 	setInterval(function(){
 		chat_update('update');
 		if(c === lim) {
 			c = 1;
 			chat_users();
 		} else c++;
-	},2000);
+	},5000);
 
 	
 	function chat_send() {
@@ -162,7 +162,7 @@ function chat_html() {
 	  	},'json');
 	}
 EOD;
-
+	$vars['users'] = chat_getusers('html');
 	global $twig;
     return $twig->render('chat.html',$vars);
 }
@@ -175,7 +175,7 @@ function chat_getcomments($args = array()) {
 
 	$loginkiir1 = urlencode($user->login);
 
-	$query="select datum,user,kinek,szoveg from chat where (kinek=''  or kinek <> '' or kinek='".$user->login."' or user='".$user->login."') ";
+	$query="select datum,user,kinek,szoveg from chat where (kinek='' or kinek='".$user->login."' or user='".$user->login."') ";
 	if(isset($args['last'])) $query .= " AND datum > '".$args['last']."' ";
 	if(isset($args['first'])) $query .= " AND datum < '".$args['first']."' ";
 
@@ -205,7 +205,7 @@ function chat_getcomments($args = array()) {
 	return $return;
 }
 
-function chat_getusers() {
+function chat_getusers($format = false) {
 	global $user;
 	$return = array();
 	$query="select login from user where jogok!='' and lastactive >= '".date('Y-m-d H:i:s',strtotime("-5 minutes"))."' and login <> '".$user->login."' order by lastactive desc";
@@ -214,7 +214,13 @@ function chat_getusers() {
 		while(list($loginnev)=mysql_fetch_row($lekerdez)) {
 			$return[] = $loginnev;
 		}
-	}	
+	}
+	if($format == 'html') {
+		foreach($return as $k=>$i) $return[$k] = '<span class="response_closed" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
+    	$text = '<strong>Online adminok:</strong> '.implode(', ', $return);
+    	if(count($return)==0) $text = '<strong><i>Nincs (más) admin online.</i></strong>';
+    	$return = $text;
+	}
 	return $return;
 }
 

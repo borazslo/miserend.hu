@@ -41,40 +41,48 @@ $(document).ready(function(){
 
   <div style="padding-left:5px;background-color:#B51A7E;"><span class="dobozcim_feher" style="margin-left:0px;">A szentmisék rendje:</span></div><div class=kicsi_kek style="margin-bottom:5px"><b>Frissítve:</b> {{ frissites|raw }}</div>
 
-    {% for key,idoszak in miserend %}
-      <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="idoszak_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></div>
-      <div id="idoszak_{{ key }}">
-      {% for nap in idoszak.napok %}
+  {% for key,idoszak in miserend %}
+    <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="idoszak_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></div>
+
+    <div id="idoszak_{{ key }}">
+    {% for nap in idoszak.napok %}
+
       <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
-        <div class="alap" valign="top" style="float:left;width:60px;padding-left:5px;line-height:16px">{{ nap.nev }}</div>
-        
-         <div style="float:left;width:40px;text-align:right;line-height:16px" class="alap">  
-          {% for mise in nap.misek %}
-            {{ mise.ido }}<br/>
-          {% endfor %}       
-        </div>
-        
-        <div style="float:right;width:121px" class="alap" style="line-height:16px">
-          {% for mise in nap.misek %}
-            {% if mise.nap2_raw != "0" %}<span class="alap">{{ mise.nap2 }} </span>{% endif %}  
-            {% if mise.attr %}{% for attr in mise.attr %} 
-             <img src="{{ design_url }}/img/{{ attr.file }}" width=16 title='{{ attr.weektext }} {{ attr.name }}' height=16 align=absmiddle style="margin-top:0px;margin-left:1px"><span class="alap" style="display:none" id="2">{{ attr.weektext }} {{ attr.name }}</span>
-             {% endfor %}{% endif %}  
+      {% if nap.misek|length < 1 %}
+            <div style="display: table-row;">
 
-             {% if mise.megjegyzes %}<img src={{ design_url }}/img/info2.gif border=0 title='{{ mise.megjegyzes }}' align=absmiddle width=16 height=16 style="margin-top:0px">{% endif %}       
-            <br/>
-          {% endfor %}       
+          <div class="alap" valign="top" style="display: table-cell;width:60px;padding-left:5px;line-height:16px">{{ nap.nev }}</div></div>
+
+      {% endif %}
+
+      {% for key, mise in nap.misek %}
+      <div style="display: table-row;">
+        <div class="alap" valign="top" style="display: table-cell;width:60px;padding-left:5px;line-height:16px">{% if key == 0 %}{{ nap.nev }}{% endif %}&nbsp;</div>
+
+        <div style="display: table-cell;width:40px;text-align:right;line-height:16px" class="alap">{{ nap.misek[key].ido }}</div>
+
+        <div style="width:121px;display: table-cell;" class="alap" style="line-height:16px">
+          {% if nap.misek[key].nap2_raw != "0" %}
+              <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
+          {% if nap.misek[key].attr %}
+              {% for attr in nap.misek[key].attr %} 
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+              {% endfor %}
+          {% endif %}  
+          {% if nap.misek[key].megjegyzes %}
+              {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
+          {% endif %}       
         </div>
-      </div>
-        
-         
+</div>
       {% endfor %}  
-      </div>     
+      </div>
+
     {% endfor %}       
+    </div> 
+
+  {% endfor %}       
+
     </div>  
-
-
-
 
       <table width="100%" border="0" cellspacing="0" cellpadding="0" id="szentmisek">
        
@@ -179,3 +187,8 @@ $(document).ready(function(){
     </td>
   </tr>
 </table>
+
+{% macro info(img,text,design_url) %}
+    <img src="{{ design_url }}/img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+    <span class="" style="display:none" id="2">{{ text }}</span>
+{% endmacro %}
