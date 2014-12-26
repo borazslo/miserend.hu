@@ -107,7 +107,7 @@ function miserend_addtemplom($tid) {
 
   //Észrevétel
   //Észrevételek lekérdezése
-	$querye="select distinct(hol_id) from eszrevetelek where hol='templomok'";
+	$querye="select distinct(hol_id) from eszrevetelek where hol='templomok' and hold_id = $tid ";
 	if(!$lekerdeze=mysql_db_query($db_name,$querye)) echo "HIBA!<br>$querym<br>".mysql_error();
 	while(list($templom)=mysql_fetch_row($lekerdeze)) {
 		$vaneszrevetelT[$templom]=true;
@@ -362,6 +362,7 @@ function miserend_addtemplom($tid) {
 		$urlap.="<input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span>";
 		$urlap.="<br><input type=radio name=modosit value=m class=urlap><span class=alap> és tovább a miserendre</span>";
 		$urlap.="<br><input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span>";
+		$urlap.="<br><input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>";
 	}
 	else $urlap.="<input type=hidden name=modosit value=i>";
 
@@ -602,6 +603,10 @@ function miserend_addingtemplom() {
 	
 		if($modosit=='i') $kod=miserend_addtemplom($tid);
 		elseif($modosit=='m') $kod=miserend_addmise($tid);
+		elseif($modosit=='t') {
+			header('Location: ?templom='.$tid);
+			die();
+		}
 		else $kod=miserend_modtemplom();
 	}
 
@@ -841,6 +846,8 @@ function miserend_addmise($tid) {
 	$urlap .= '<tr class="addperiod"><td colspan="2"><span class="alap addperiod" last="'.$pkey.'" >[új periódus hozzáadása]</span>';
 	$urlap .= '</td></tr>';
 	
+		$urlap.='</table><table id="mehet" cellpadding=4 width=100% ';
+
   //Misemegjegyzés
 	$urlap.="\n<tr><td bgcolor=#D6F8E6><div class=kiscim>Kiegészítő infók:</div><br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td><td bgcolor=#D6F8E6>";
 	$urlap.="<span class=alap>Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span><br><textarea name=misemegj  style='width:100%'  class=urlap cols=50 rows=10>".$church['misemegj']."</textarea></td></tr>";
@@ -863,15 +870,23 @@ function miserend_addmise($tid) {
 
 	$urlap.="</td></tr>";
 
+	$urlap.="<tr><td align='right'>";
+
+	$urlap.="\n<input type=submit value=Mehet class=urlap>";
+
+	$urlap.="</td><td>";
+
+	if($tid>0) {
+		$urlap.="<input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span>";
+		$urlap.="<br><input type=radio name=modosit value=m class=urlap><span class=alap> és vissza a templom szerkesztéséhez</span>";
+		$urlap.="<br><input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span>";
+		$urlap.="<br><input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>";
+	}
+	else $urlap.="<input type=hidden name=modosit value=i>";
+	$urlap.="</td></tr>";
 
 	$urlap.='</table>';
 
-	$urlap.="\n<br><input type=submit value=Mehet class=urlap>";
-	if($tid>0) {
-		$urlap.="<input type=checkbox name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span>";
-		//$urlap.=" &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href=?m_id=$m_id&m_op=addmegse&hid=$hid&kod=$kod$linkveg class=link><font color=red>Kilépés módosítás nélkül</font></a>";
-	}
-	else $urlap.="<input type=hidden name=modosit value=i>";
 	$urlap.="\n</form>";
 
 	$adatT[2]='<span class=alcim>Templom feltöltése / módosítása</span><br><br>'.$urlap;
@@ -951,12 +966,16 @@ function miserend_addingmise() {
 	mysql_query($query);
 
 
-	if($_REQUEST['modosit']=='i') {
-		$kod = miserend_addmise($tid);
+	$modosit = $_REQUEST['modosit'];
+
+	if($modosit=='i') $kod=miserend_addmise($tid);
+	elseif($modosit=='m') $kod=miserend_addtemplom($tid);
+	elseif($modosit=='t') {
+		header('Location: ?templom='.$tid);
+		die();
 	}
-	else {
-		$kod=miserend_modtemplom();
-	}
+	else $kod=miserend_modtemplom();
+
 	
 	return $kod;
 }
