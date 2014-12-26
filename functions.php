@@ -611,6 +611,9 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
         if(!$subwhere) $where[] = " tid = 'nincs templom' ";
         else $where[] = " (".implode(' OR ', $subwhere).")";
     }
+    if($args['gorog'] == 'gorog') {
+        $where[] = "( egyhazmegye=17 OR egyhazmegye=18 )";
+    }
 
     //milyen nap
     if($args['mikor'] == 'x') $args['mikor'] = $args['mikordatum']; 
@@ -654,6 +657,14 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
         else $where[] = " milyen REGEXP '(^|,)(".$args['zene'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
     }
     
+    if($args['ritus'] != '0') {
+        if($args['ritus'] == 'gor') {
+            $where[] = "( milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen NOT REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+        } elseif($args['ritus'] == 'rom') {
+            $where[] = "( (milyen NOT REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+        }
+        
+    }
 
     //mehet a lekérés
     $query = "SELECT misek.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta FROM misek "; 

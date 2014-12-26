@@ -205,7 +205,6 @@ function miserend_index() {
 	            'name' => "zene",
 	            'class' => "keresourlap",
 	            'value' => $value,
-	            'checked' => true,
 	            'style' => 'margin-left:80px',
 	            'labelback' => $label,
 	    );
@@ -231,6 +230,16 @@ function miserend_index() {
 	            'labelback' => $label,
 	    );
 	}
+
+	$searchform['ritus'] = array(
+            'name' => "ritus",
+            'id' => "ritus",
+            'style' => "margin-left:40px",
+            'class' => 'keresourlap',
+			'options'=> array(0=>'mindegy',
+					'rom' => 'római katolikus',
+					'gor' => 'görög katolikus')
+	);
 	
 
 	//Következő mise a közelben

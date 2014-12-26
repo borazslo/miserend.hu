@@ -47,8 +47,9 @@
         <div class=alap style='margin-left:5px;margin-top:6px'>- zene: </div>
               {% for key, item in searchform.zene %}{{ forms.input(item) }}<br/>{% endfor %}
         <div class=alap style='margin-left:5px;margin-top:6px'>- diák: </div>{{ forms.select(searchform.diak) }}
-         <div class=alap style='margin-left:5px;margin-top:6px'>- korosztály: </div>
+        <div class=alap style='margin-left:5px;margin-top:6px'>- korosztály: </div>
               {% for key, item in searchform.kor %}{{ forms.input(item) }}<br/>{% endfor %}
+        <div class=alap style='margin-left:5px;margin-top:6px'>- rítus: </div>{{ forms.select(searchform.ritus) }}
       </div>
     </div>
 
