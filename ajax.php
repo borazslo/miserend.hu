@@ -54,6 +54,14 @@ switch ($_REQUEST['q']) {
         $text = chat_getusers('html');
         echo json_encode(array('result'=>'loaded','text'=>$text));
         break;
+    case 'AutocompleteCity':
+        $query = "SELECT varos, orszag FROM templomok WHERE varos LIKE '".$_REQUEST['text']."%' GROUP BY varos ORDER BY varos LIMIT 10";
+        if(!$lekerdez=mysql_query($query)) echo "HIBA a város keresőben!<br>$query<br>".mysql_error();
+        while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
+            $return[] = array('label' => $row['varos'],'value'=>$row['varos']);
+        }
+        echo json_encode(array('results'=>$return));
+        break;
     default:
         //code to be executed if n is different from all labels;
 }

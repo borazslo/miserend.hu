@@ -1,6 +1,10 @@
 /* http://learn.shayhowe.com/advanced-html-css/responsive-web-design/ */
 /* http://cheesetoast.co.uk/demos/responsive.html */
 /* http://www.responsinator.com/?url=magyarkurir.hu */
+.ui-menu-item {
+    font-size: 10px;
+}
+
 
 #header:after{
     clear: both;

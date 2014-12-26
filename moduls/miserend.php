@@ -77,10 +77,12 @@ function miserend_index() {
             'name' => "kulcsszo",
             'size' => 20,
             'class' => 'keresourlap',
-            'style' => 'margin-left:36px'),
+            'style' => 'margin-left:36px',
+            'labelback' => '<i>(kulcsszó)</i>'),
         'varos' => array(
             'name' => "varos",
             'size' => 20,
+            'id'=>'varos',
             'class' => 'keresourlap',
             'style' => 'margin-left:40px')
       );
@@ -199,30 +201,22 @@ function miserend_index() {
 					'si' => 'szlovén')
 	);
 	
-	foreach(array('cs'=>'csendes','g'=>'gitáros','o'=>'sem csendes, sem gitáros') as $value => $label) {
+	foreach(array('cs'=>'csendes','g'=>'gitáros','na'=>'<i>meghatározatlan</i>') as $value => $label) {
 		$searchform['zene'][] = array(
-				'type' => 'radio',
-	            'name' => "zene",
+				'type' => 'checkbox',
+	            'name' => "zene[]",
 	            'class' => "keresourlap",
 	            'value' => $value,
 	            'style' => 'margin-left:80px',
 	            'labelback' => $label,
+	            'checked' => true,
 	    );
 	}
-	$searchform['diak'] = array(
-            'name' => "diak",
-            'id' => "diak",
-            'style' => "margin-left:40px",
-            'class' => 'keresourlap',
-			'options'=> array(0=>'mindegy',
-					'd' => 'diák',
-					'nd' => 'nem diák')
-	);
-
+	
 	foreach(array('csal'=>'családi/mocorgós','d'=>'diák','ifi'=>'ifjúsági/egyetemista','na' => '<i>meghatározatlan</i>') as $value => $label) {
 		$searchform['kor'][] = array(
 				'type' => 'checkbox',
-	            'name' => "kor",
+	            'name' => "kor[]",
 	            'class' => "keresourlap",
 	            'value' => $value,
 	            'checked' => true,
@@ -241,7 +235,14 @@ function miserend_index() {
 					'gor' => 'görög katolikus')
 	);
 	
-
+	$searchform['ige'] = array(
+			'type' => 'checkbox',
+            'name' => "ige",
+            'id' => "ige",
+            'checked' => true,
+            'class' => "keresourlap",
+            'value' => "ige"
+    );
 	//Következő mise a közelben
 	/* Talan mar nem is mukodik. Mintha biztosan nem csinlana semmit.
 	$mainap=date('w');
@@ -596,7 +597,7 @@ function miserend_templomkeres() {
 	$templomurlap="\n<div style='display: none'><form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres></div>";
 	$templomurlap .="<input type=hidden id=keresestipus name=keresestipus value=0>";
 
-	$templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos size=20 class=keresourlap value='$varos'><br><img src=img/space.gif width=5 height=8>";
+	$templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos id=varos size=20 class=keresourlap value='$varos'><br><img src=img/space.gif width=5 height=8>";
 	$templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text name=kulcsszo size=20 class=keresourlap value='$kulcsszo'><br><img src=img/space.gif width=5 height=8>";
 	
 	//Egyházmegye
@@ -691,7 +692,7 @@ function miserend_templomkeres() {
 		}
 	}
 
-	$tartalom.="<br><span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
+	$tartalom.="<span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
 
 	if($mennyi>0) {
 		foreach($results['results'] as $templom) {
@@ -738,7 +739,10 @@ function miserend_misekeres() {
 	$espkerT=$_POST['espkerT'];
 	$nyelv=$_POST['nyelv'];
 	$zene=$_POST['zene'];
-	$diak=$_POST['diak'];
+	$kor=$_POST['kor'];
+	$ritus=$_POST['ritus'];
+	$ige=$_POST['ige'];
+
 
 	$min=$_POST['min'];
 	if(!isset($min)) $min=0;
@@ -760,10 +764,34 @@ function miserend_misekeres() {
 		list($espkernev)=mysql_fetch_row($lekerdez); 
 	}
 
-	$zeneT=array('g'=>'gitáros', 'o'=>'orgonás', 'cs'=>'csendes');
+	$zeneT=array('g'=>'gitáros', 'o'=>'orgonás', 'cs'=>'csendes','na'=>'meghátorazatlan');
+	$korT=array('csal'=>'családos', 'd'=>'diák', 'ifi'=>'ifjúsági','na'=>'meghátorazatlan');
+	$ritusT=array('gor'=>'görög katolikus', 'rom'=>'római katolikus');
 	$nyelvekT=array('h'=>'magyar', 'en'=>'angol', 'de'=>'német', 'it'=>'olasz', 'va'=>'latin', 'gr'=>'görög', 'sk'=>'szlovák', 'hr'=>'horvát', 'pl'=>'lengyel', 'si'=>'szlovén', 'ro'=>'román', 'fr'=>'francia', 'es'=>'spanyol');
 
 	$tartalom.="\n<span class=kiscim>Keresési paraméterek:</span><br><span class=alap>";
+	if(isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {
+		$tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> Kulcsszó: ".$_REQUEST['kulcsszo']."<br/>";
+		$leptet_urlap.="<input type=hidden name=kulcsszo value='".$_REQUEST['kulcsszo']."'>";
+	}
+	if(!empty($varos)) {
+		$varos=ucfirst($varos);
+		$tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> $varos településen<br/>";
+		$leptet_urlap.="<input type=hidden name=varos value='$varos'>";
+	}
+	if(isset($_REQUEST['gorog']) AND $_REQUEST['gorog'] == 'gorog') {
+		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.";
+		$leptet_urlap.="<input type=hidden name=gorog value='gorog'>";
+	}
+	if(!empty($ehmnev)) {
+		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $ehmnev egyházmegyében,";
+		$leptet_urlap.="<input type=hidden name=ehm value='$ehm'>";
+	}
+	if(!empty($espkernev)) {
+		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $espkernev espereskerületben,";
+		$leptet_urlap.="<input type=hidden name=espkerT[$ehm] value='$espkerT[$ehm]'>";
+	}
+	if(!empty($ehmnev)) $tartalom .= '<br/>';
 	$tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> ";
 	if($mikordatum==$ma) {
 		$tartalom.='ma';
@@ -803,38 +831,33 @@ function miserend_misekeres() {
 		$tartalom.='egész nap,';
 		$leptet_urlap.="<input type=hidden name=mikor2 value='0'>";
 	}
-	if(!empty($varos)) {
-		$varos=ucfirst($varos);
-		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $varos településen";
-		$leptet_urlap.="<input type=hidden name=varos value='$varos'>";
-	}
-	if(!empty($ehmnev)) {
-		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $ehmnev egyházmegyében,";
-		$leptet_urlap.="<input type=hidden name=ehm value='$ehm'>";
-	}
-	if(!empty($espkernev)) {
-		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $espkernev espereskerületben,";
-		$leptet_urlap.="<input type=hidden name=espkerT[$ehm] value='$espkerT[$ehm]'>";
-	}
-	if(!empty($nyelv) or !empty($zene) or !empty($diak)) $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> ";
+	if(!empty($nyelv) or (!empty($zene) AND count($zene) < 3) or ( !empty($kor) AND count($kor)<4))  $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> ";
 	if(!empty($nyelv)) {
 		$tartalom.="$nyelvekT[$nyelv] nyelvű, ";
 		$leptet_urlap.="<input type=hidden name=nyelv value='$nyelv'>";
 	}
 	if(!empty($zene)) {
-		$tartalom.=$zeneT[$zene].', ';
-		$leptet_urlap.="<input type=hidden name=zene value='$zene'>";
+		foreach($zene as $z) {
+			if(count($zene)<3) $tartalom.="$zeneT[$z], ";
+			$leptet_urlap.="<input type=hidden name=zene[] value='$z'>";
+		}
 	}
-	if($diak=='d') {
-		$tartalom.="diák mise,";
-		$leptet_urlap.="<input type=hidden name=diak value='$diak'>";
+	if(!empty($kor)) {
+		foreach($kor as $k) {
+			if(count($kor)<4)  $tartalom.="$korT[$k], ";
+			$leptet_urlap.="<input type=hidden name=kor[] value='$k'>";
+		}
 	}
-	elseif($diak=='nd') {
-		$tartalom.="nem diák mise,";
-		$leptet_urlap.="<input type=hidden name=diak value='$diak'>";
+	if(!empty($ritus)) {
+		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $ritusT[$ritus]";
+		$leptet_urlap.="<input type=hidden name=ritus value='$ritus'>";
 	}
-
-	$tartalom.="</span><br/><br/>".LiturgicalDayAlert('html',$mikordatum);
+	if(!empty($ige)) {
+		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> igeliturgiák is";
+		$leptet_urlap.="<input type=hidden name=ige value='ige'>";
+	}
+	
+	$tartalom.="</span><br/>".LiturgicalDayAlert('html',$mikordatum);
 
 	if(!empty($_POST['leptet'])) $visszalink="?$linkveg";
 	else $visszalink="javascript:history.go(-1);";
@@ -905,7 +928,7 @@ function miserend_misekeres() {
 
 
 	if($mennyi==0) {	
-		$tartalom.='<span class=alap>Sajnos nincs találat</span>';
+		$tartalom.='<br/><span class=alap><strong>Sajnos nincs találat</strong></span>';
 		//$tartalom.='<span class=alap>Elnézést kérünk, a kereső technikai hiba miatt nem üzemel. Javításán már dolgozunk.</span>';
 	}
 	else {

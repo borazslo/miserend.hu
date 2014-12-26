@@ -560,6 +560,8 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     }
 
     if($args['varos'] != '') {
+        if($args['varos'] == 'Budapest') $args['varos'] = 'Budapest*';
+
         if(preg_match('(\*|\?)',$args['varos'])) {
             $regexp = preg_replace('/\*/i','.*',$args['varos']);
             $regexp = preg_replace('/\?/i','.{1}',$regexp);
@@ -594,6 +596,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 }
 
 function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
+
      $return = array(
         'offset' => $offset,
         'limit' => $limit );
@@ -603,6 +606,8 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     if(isset($args['templom']) AND is_numeric($args['templom']) ) {
         $where[] = ' tid = '.$args['templom']; }
     elseif($args['varos'] != '' OR $args['kulcsszo'] != '' OR $args['egyhazmegye'] != '') {
+        if($args['varos'] == 'Budapest') $args['varos'] = 'Budapest*';
+
         $tmp = $args;
         if(isset($tmp['leptet'])) unset($tmp['leptet']);
         if(isset($tmp['min'])) unset($tmp['min']);
@@ -649,12 +654,28 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     //nyelv és egyéb tulajdonságok
     if($args['nyelv'] != '0' AND $args['nyelv'] != '') $where[] = "( nyelv REGEXP '(^|,)(".$args['nyelv'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' )";
 
-    if($args['diak'] == 'd') $where[] = " milyen REGEXP '(^|,)(d)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
-    elseif($args['diak'] == 'nd') $where[] = " milyen NOT REGEXP '(^|,)(d)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
-    
-    if($args['zene'] != '0' AND $args['zene'] != '') {
-        if($args['zene'] == 'o')  $where[] = " milyen NOT REGEXP '(^|,)(g|cs)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
-        else $where[] = " milyen REGEXP '(^|,)(".$args['zene'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+    if(isset($args['kor'])) {
+        $wherekor = array();
+        foreach($args['kor'] as $kor) {
+            if(in_array($kor, array('csal','d','ifi'))) {
+                 $wherekor[] = " milyen REGEXP '(^|,)(".$kor.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+            } elseif($kor == 'na') {
+                 $wherekor[] = " milyen NOT REGEXP '(^|,)(csal|d|ifi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+            }
+        }
+        $where[] = " ( ".implode(' OR ',$wherekor).") ";
+    }
+
+    if(isset($args['zene'])) {
+        $wherezene = array();
+        foreach($args['zene'] as $zene) {
+            if(in_array($zene, array('g','cs'))) {
+                 $wherezene[] = " milyen REGEXP '(^|,)(".$zene.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+            } elseif($zene == 'na') {
+                 $wherezene[] = " milyen NOT REGEXP '(^|,)(g|cs)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+            }
+        }
+        $where[] = " ( ".implode(' OR ',$wherezene).") ";
     }
     
     if($args['ritus'] != '0') {
@@ -662,8 +683,11 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
             $where[] = "( milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen NOT REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } elseif($args['ritus'] == 'rom') {
             $where[] = "( (milyen NOT REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
-        }
-        
+        }    
+    }
+
+    if(!isset($args['ige']) OR $args['ige'] != 'ige') {
+        $where[] = " milyen NOT REGEXP '(^|,)(ige)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
     }
 
     //mehet a lekérés

@@ -116,7 +116,10 @@ else {
 /////////////////////////////////
 //tartalmi rész összeállítása
 /////////////////////////////////
-    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>';
+    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>'."\n";
+    $script .= '<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>'."\n";
+    $script .= '<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">'."\n";
+
     $script .= '<script src="js/miserend.js"></script>';
 
 
