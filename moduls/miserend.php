@@ -998,7 +998,7 @@ function miserend_view() {
 	$tid=$_GET['tid'];
 	if(!empty($TID)) $tid=$TID;
 
-	$query="SELECT nev,ismertnev,turistautak,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,leiras,megjegyzes,misemegj,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,letrehozta,lat,lng,checked,eszrevetel FROM templomok 
+	$query="SELECT nev,ismertnev,turistautak,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,leiras,megjegyzes,miseaktiv, misemegj,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,letrehozta,lat,lng,checked,eszrevetel FROM templomok 
 	LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id 
 	WHERE id='$tid' and ok='i' LIMIT 1";
 	
@@ -1014,7 +1014,7 @@ function miserend_view() {
     $script .= '<link rel="stylesheet" href="templates/als.css" />';
 
 	$ma=date('Y-m-d');
-	list($nev,$ismertnev,$turistautak,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$leiras,$megjegyzes,$misemegj,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$letrehozta,$lat,$lng,$checked)=mysql_fetch_row($lekerdez);
+	list($nev,$ismertnev,$turistautak,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$leiras,$megjegyzes,$miseaktiv, $misemegj,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$letrehozta,$lat,$lng,$checked)=mysql_fetch_row($lekerdez);
 
 	if($frissites>0) {
         $frissitve = $frissites;
@@ -1349,6 +1349,7 @@ function miserend_view() {
             'terkepk' => $terkep,
             'megkozelit' => $megkozelit,
             'kapcsolat' => $kapcsolat,
+            'miseaktiv' => $miseaktiv,
             'misemegjegyzes' => $misemegjegyzes,
             'sz1' => $sz1,
             'sz2' => $sz2,

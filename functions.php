@@ -619,6 +619,8 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     if($args['gorog'] == 'gorog') {
         $where[] = "( egyhazmegye=17 OR egyhazmegye=18 )";
     }
+    $where[] = "miseaktiv = 1";
+
 
     //milyen nap
     if($args['mikor'] == 'x') $args['mikor'] = $args['mikordatum']; 

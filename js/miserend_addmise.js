@@ -1,5 +1,14 @@
  $(document).ready(function() { 
 
+                 $('input[type=radio][name=miseaktiv]').change(function() {
+                    if(this.value == 1) {
+                        $('#miserend').show('slow');
+                    } else {
+                        $('#miserend').hide('slow');
+                    }
+                    //$('#miseaktiv').val($(this).is(':checked'));        
+                });
+
 //                 $('.addmise').click(function() {
                 $("body").on('click', '.addmise', function() {
                         var c = 1 + parseInt($( this ).attr('last'));

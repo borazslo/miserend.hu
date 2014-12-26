@@ -36,10 +36,13 @@ $(document).ready(function(){
 
 
   <div id="containerleft" width="49%" valign="top">{{ ismertnev|raw }}
+
     
     <div id="szentmisek">
 
   <div style="padding-left:5px;background-color:#B51A7E;"><span class="dobozcim_feher" style="margin-left:0px;">A szentmisék rendje:</span></div><div class=kicsi_kek style="margin-bottom:5px"><b>Frissítve:</b> {{ frissites|raw }}</div>
+
+  {% if miseaktiv == 1 %}
 
   {% for key,idoszak in miserend %}
     <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="idoszak_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></div>
@@ -73,14 +76,19 @@ $(document).ready(function(){
               {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
           {% endif %}       
         </div>
-</div>
+      </div>
       {% endfor %}  
       </div>
 
-    {% endfor %}       
+    {% endfor %}   
     </div> 
+    {% endfor %}
 
-  {% endfor %}       
+    {% else %}
+    <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
+    {% endif %}
+
+
 
     </div>  
 
@@ -90,6 +98,9 @@ $(document).ready(function(){
 		  <td colspan="5"><span class=kicsi><font color=red>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a plébánián!</font></span></td>
 		</tr>
       </table>
+
+    
+
 	  {{ eszrevetel|raw }}
 	  {{ androidreklam|raw }}
     </div>

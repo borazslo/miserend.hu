@@ -41,6 +41,8 @@ ALTER TABLE misek ADD COLUMN tmp_datumig VARCHAR(5) AFTER ig;
 ALTER TABLE misek ADD COLUMN tmp_relation CHAR(1) AFTER ig;
 ALTER TABLE misek ADD COLUMN tmp_datumtol VARCHAR(5) AFTER ig;
 ALTER TABLE user ADD COLUMN lastactive DATETIME AFTER lastlogin;
+ALTER TABLE templomok ADD COLUMN miseaktiv INT DEFAULT 1 AFTER megjegyzes;
+
 ";
 
 DATETIME
