@@ -71,6 +71,9 @@ function login($name,$password) {
         return false;
     }
 
+    $query = "UPDATE user SET lastlogin = '".date('Y-m-d H:i:s')."' WHERE uid = ".$x['uid'].";";
+    mysql_query($query);
+    
     cookieSave($x['uid'],$name);
     
     return true;

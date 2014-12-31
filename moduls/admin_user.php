@@ -19,8 +19,8 @@ function user_add($uid) {
 	global $sessid,$m_id,$db_name,$u_id;
 
 	if($uid>0) {
-		$query="select login,jogok,ok,regdatum,lastlogin,email,becenev,nev,kontakt,magamrol,msn,skype,vallas,orszag,varos,csaladiallapot,szuldatum,nevnap,foglalkozas from user where uid='$uid'";
-		list($ulogin,$ujogok,$ok,$regdatum,$lastlogin,$email,$becenev,$nev,$kontakt,$magamrol,$msn,$skype,$vallas,$orszag,$varos,$csaladiallapot,$szuldatum,$nevnap,$foglalkozas)=mysql_fetch_row(mysql_db_query($db_name,$query));
+		$query="select login,jogok,ok,regdatum,lastlogin,lastactive,email,becenev,nev,kontakt,magamrol,msn,skype,vallas,orszag,varos,csaladiallapot,szuldatum,nevnap,foglalkozas from user where uid='$uid'";
+		list($ulogin,$ujogok,$ok,$regdatum,$lastlogin,$lastactive,$email,$becenev,$nev,$kontakt,$magamrol,$msn,$skype,$vallas,$orszag,$varos,$csaladiallapot,$szuldatum,$nevnap,$foglalkozas)=mysql_fetch_row(mysql_db_query($db_name,$query));
 	}
 
 	$urlap="\n<form method=post>";
@@ -33,7 +33,7 @@ function user_add($uid) {
 	$urlap.=">";
 
 //regdátum, lastlogin
-	$urlap.="<br><br><span class=kiscim>Belépések:</span><br><textarea readonly cols=40 rows=2 class=urlap>Regisztráció: $regdatum\nUtolsó belépés: $lastlogin</textarea>";
+	$urlap.="<br><br><span class=kiscim>Belépések:</span><br><textarea readonly cols=40 rows=3 class=urlap>Regisztráció: $regdatum\nUtolsó belépés: $lastlogin\nUtolsó aktivitás: $lastactive</textarea>";
 
 //Becenév
 	$urlap.="\n<br><br><span class=kiscim>Becenév, megszólítás: </span><br><input type=text name=becenev value='$becenev' class=urlap size=20 maxlength=50>";
@@ -186,6 +186,10 @@ function user_mod() {
 	$sortT['becenév']='becenev';
 	$sortT['név']='nev';
 	$sortT['utolsó belépés']='lastlogin desc';	
+	$sortT['utolsó aktivitás']='lastactive desc';	
+	$sortT['regisztráció']='regdatum desc';	
+
+
 	
 	foreach($sortT as $kulcs=>$ertek) {
 		$kiir.="<option value='$ertek'";
