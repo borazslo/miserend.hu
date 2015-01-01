@@ -844,7 +844,7 @@ function miserend_addmise($tid) {
 		<br/><b>Lehetséges periódusok</b>: <b> 0</b>=mindig<b>, 1, 2, 3, 4, 5, -1</b>=utolsó héten<b>, ps</b>=páros héten<b>, pt</b>=páratlan héten.<br>
 		Alapeset, minden mise magyar: ebben az esetben nem kell kitölteni. Alapesetben a templomnak megfelelő rítusú a liturgia: csak akkor kell feltüntetni gor/rom, ha eltér a templom rítusától.</span>
 		<br><br><span class=alap>A mise-tulajdonságok a nyelvekhez hasonlóan működnek. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni. (Periódus nélkül 0-át lehet a betükód mögé írni, de nem szökséges.)
-		<br><b>Betükódok</b>: gitáros = g, csendes = cs<br>családos/gyerek = csal, diák = d, egyetemista/ifjúsági = ifi<br/>igeliturgia = ige, görögkatolikus = gor, római katolikus = rom
+		<br><b>Betükódok</b>: gitáros = g, csendes = cs<br>családos/gyerek = csal, diák = d, egyetemista/ifjúsági = ifi<br/>igeliturgia = ige, görögkatolikus = gor, római katolikus = rom, régi rítusú = regi
 		<br>Több tulajdonságot vesszővel kell egymástól elválasztani.
 		<br><br><span class=alap>A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.</span>
 EOT;

@@ -499,14 +499,17 @@ function updateMass() {
 function decodeMassAttr($text) {
     $return  = array();
 
-    $milyen = array('d','g','cs','gor','rom','ige','ifi','csal');
+    $milyen = array('d','g','cs','gor','rom','regi','ige','ifi','csal');
     $d = array('file' => 'diak.gif','name'=>'diák mise');
     $g = array('file' => 'gitar.gif','name'=>'gitáros mise');
     $cs = array('file' => 'csendes.gif','name'=>'csendes mise');
 
     $gor = array('file' => 'jelzes1.png','name'=>'görög katolikus liturgia');
     $rom = array('file' => 'jelzes10.png','name'=>'római katolikus szentmise');
+    $regi = array('file' => 'jelzes6.png','name'=>'régi rítusú szentmise');
+
     $ige = array('file' => 'biblia.gif','name'=>'igeliturgia');
+
 
     $ifi = array('file' => 'fiu.png','name'=>'ifjúsági/egyetemise');
     $csal = array('file' => 'lany.png','name'=>'családos/mocorgós');
@@ -902,6 +905,8 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
             $where[] = "( milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen NOT REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } elseif($args['ritus'] == 'rom') {
             $where[] = "( (milyen NOT REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+        } elseif($args['ritus'] == 'regi') {
+            $where[] = " milyen REGEXP '(^|,)(regi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
         }    
     }
 
