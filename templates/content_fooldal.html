@@ -29,10 +29,11 @@
       </div>
       <div id="form_church_details" style="display:none">
         <div class=alap style='margin-left:5px;margin-top:6px'>- település:</div>{{ forms.input(searchform.varos) }}
+        <div class=alap style='margin-left:5px;margin-top:6px'>- adott helyszín körül:</div>{{ forms.input(searchform.hely) }}+{{ forms.input(searchform.tavolsag) }}
         <div class=alap style='margin-left:5px;margin-top:6px;width:100%'>- egyházmegye: </div>{{ forms.select(searchform.ehm) }}<br/>
         <div class=alap id="espkerlabel" style='margin-left:5px;margin-top:6px;display:none'>- esperes kerület: </div><br/>
               {% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}
-        <div class=alap style='margin-left:5px;margin-top:0px'>- csak görög katolikus: {{ forms.input(searchform.gorog) }}</div>
+        <div class=alap style='margin-left:5px;margin-top:0px'>- csak görögkatolikus: {{ forms.input(searchform.gorog) }}</div>
       </div>
 
     </div>
@@ -62,6 +63,11 @@
   </div>
 	<!--<div align="center" style="margin-top:5px;width:49%;float:left">{{ androidreklam|raw }}</div>-->
  </div>
+
+<div style="width:100%">
+  {{ user.jogok }}
+</div>
+
   
 <div style="background-color:#CCCCCC;height:3px;margin-top:10px;margin-bottom:10px;width:100%"></div>
 <div class="screenonly">{{ kepek|raw }}</div>

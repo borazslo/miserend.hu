@@ -85,7 +85,21 @@ function miserend_index() {
             'size' => 20,
             'id'=>'varos',
             'class' => 'keresourlap',
-            'style' => 'margin-left:40px')
+            'style' => 'margin-left:40px'),
+        'hely' => array(
+            'name' => "hely",
+            'size' => 20,
+            'id'=>'varos',
+            'class' => 'keresourlap',
+            'style' => 'margin-left:40px'),
+        'tavolsag' => array(
+            'name' => "tavolsag",
+            'size' => 1,
+            'id'=>'tavolsag',
+            'class' => 'keresourlap',
+            'style' => 'margin-left:4px',
+            'labelback' => 'km',
+            'value' => 4)
       );
         
 
@@ -597,8 +611,10 @@ function miserend_templomkeres() {
 	//Templom űrlap
 	$templomurlap="\n<div style='display: none'><form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres></div>";
 	$templomurlap .="<input type=hidden id=keresestipus name=keresestipus value=0>";
-
+	//$templomurlap .= "<input type=hidden name=tavolsag id=tavolsag size=20 class=keresourlap value='".$_REQUEST['tavolsag']."'>";
+	//$templomurlap .= "<input type=hidden name=hely id=tavolsag size=20 class=keresourlap value='".$_REQUEST['hely']."'>";
 	$templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos id=varos size=20 class=keresourlap value='$varos'><br><img src=img/space.gif width=5 height=8>";
+
 	$templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text name=kulcsszo size=20 class=keresourlap value='$kulcsszo'><br><img src=img/space.gif width=5 height=8>";
 	
 	//Egyházmegye
@@ -639,7 +655,10 @@ function miserend_templomkeres() {
 
 	
 	$postdata.="<input type=hidden name=varos value='$varos'>";
+	$postdata.="<input type=hidden name=tavolsag value='".$_REQUEST['tavolsag']."'>";
+	$postdata.="<input type=hidden name=hely value='".$_REQUEST['hely']."'>";
 	$postdata.="<input type=hidden name=kulcsszo value='$kulcsszo'>";
+	$postdata.="<input type=hidden name=gorog value='".$_REQUEST['gorog']."'>";
 	$postdata.="<input type=hidden name=espker value='$espker'>";
 	$postdata.="<input type=hidden name=ehm value='$ehm'>";
 	
@@ -687,7 +706,7 @@ function miserend_templomkeres() {
 		$next=$min+$leptet;	
 
 		if($mennyi>$min+$leptet) {
-			$leptetnext.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=sid value=$sid><input type=hidden name=min value=$next>";
+			$leptetnext.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next>";
 			$leptetnext.=$postdata;
 			$leptetnext.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
 		}
@@ -774,6 +793,13 @@ function miserend_misekeres() {
 	if(isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {
 		$tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> Kulcsszó: ".$_REQUEST['kulcsszo']."<br/>";
 		$leptet_urlap.="<input type=hidden name=kulcsszo value='".$_REQUEST['kulcsszo']."'>";
+	}
+	if(isset($_REQUEST['hely']) AND $_REQUEST['hely'] != '') {
+		$_REQUEST['hely_geocode'] = mapquestGeocode($_REQUEST['hely']);
+		$tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> ".$_REQUEST['hely']." + ".$_REQUEST['tavolsag']." km<br/><img src='".$_REQUEST['hely_geocode']['mapUrl']."'><br/>";
+		$leptet_urlap.="<input type=hidden name=hely value='".$_REQUEST['hely']."'>";
+		$leptet_urlap.="<input type=hidden name=tavolsag value='".$_REQUEST['tavolsag']."'>";
+
 	}
 	if(!empty($varos)) {
 		$varos=ucfirst($varos);

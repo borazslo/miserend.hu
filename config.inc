@@ -13,6 +13,11 @@ $config['connection'] = array(
 
 $config['path']['domain'] = '';
 
+$config['mapquest'] = array(
+    'appkey' => '***',
+    'useitforsearch' => false
+);
+
 
 $config['mail'] = array(
         'sender' => 'miserend.hu <info@miserend.hu>',

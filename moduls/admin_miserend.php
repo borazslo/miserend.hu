@@ -485,7 +485,7 @@ function miserend_addingtemplom() {
 		$query = "SELECT * FROM terkep_geocode WHERE tid = ".$tid." LIMIT 1 ";
 		$result = mysql_query($query);
 		$geocode = mysql_fetch_assoc($result);
-		if($config['debug'] > 0) echo $geocode['lng']."->".$lng.";".$geocode['lat']."->".$lat;
+		if($config['debug'] > 1) echo $geocode['lng']."->".$lng.";".$geocode['lat']."->".$lat;
 		if($lng != $geocode['lng'] OR $lat != $geocode['lat']) {
 			if($geocode != array() ) {
 				mysql_query("DELETE FROM terkep_geocode WHERE tid = ".$tid." LIMIT 1 ");
