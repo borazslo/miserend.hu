@@ -1,0 +1,37 @@
+{% import "forms.twig" as forms %}
+
+<h3>Esemény kifejezések</h3>
+<p>Miserend periódusok és különleges miseidőpontok beállításánál használható kifejezések és értékeik</p>
+
+<FORM ENCTYPE='multipart/form-data' method=post>
+	<input type=hidden name=m_id value={{ m_id }}>
+	<input type=hidden name=m_op value=events>
+
+<div style="display:table;padding:5px">
+	<div style="display:table-row">
+		<div style="display:table-cell">
+			<strong>kifejezés</strong>
+		</div>
+		{% for year in years %}
+			<div style="display:table-cell;text-align:center">
+			<strong>{{ year }}</strong>
+			</div>
+		{% endfor %}
+	</div>
+
+	{% for key,input in form %}
+		<div style="display:table-row">
+			<div style="display:table-cell;padding:5px">
+				{{ names[key] }}
+			</div>
+			{% for year in years %}
+				<div style="display:table-cell;padding:5px">
+				{% if form[key][year]['id'] %}{{ forms.input( form[key][year]['id'] ) }}{% endif %}
+
+				{{ forms.input( form[key][year]['input'] ) }}
+				</div>
+			{% endfor %}
+		</div>
+	{% endfor %}
+</div>
+<input type="submit" name="save" value="Mentés">

@@ -15,6 +15,8 @@ function miserend_adminmenu() {
 
 	$menu.="<a href=?m_id=$m_id&m_op=addtemplom$linkveg class=kismenulink>Új templom feltöltése</a><br>";
 	$menu.="<a href=?m_id=$m_id&m_op=modtemplom$linkveg class=kismenulink>Meglévő templom módosítása, törlése, miserend hozzáadása, módosítása</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=events class=kismenulink>Kifejezések dátummá alakítása</a><br>";
+
 
 	$adatT[2]=$menu;
 	$tipus='doboz';
@@ -796,7 +798,6 @@ function miserend_addmise($tid) {
 	global $m_id;	
 
 	global $script;
-	$script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>'."\n";
 	$script .= "<script type='text/javascript' src='js/miserend_addmise.js'></script>\n";
 
 	$vars['church'] = $church = getChurch($tid);	
@@ -1196,6 +1197,14 @@ switch($m_op) {
 	case 'deletemise':
         $tartalom=miserend_deletemise();
         break;
+
+    case 'events':
+        if(isset($_REQUEST['save'])) events_save($_REQUEST);
+
+        $form=events_form();
+        $form['m_id'] = $m_id;
+        $tartalom = $twig->render('content_admin_editevents.html',$form);
+        break;    
 }
 }
 else {

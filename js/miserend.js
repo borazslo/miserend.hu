@@ -25,7 +25,13 @@ $(document).ready(function() {
 	        });
       	},
       	minLength: 2,
-	    });
+	    }).each(function() {
+                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                            return $("<li></li>").data("item.ui-autocomplete", item).append(
+                            item.label)
+                            .appendTo(ul);
+                        };
+                    });    
   });
 
 

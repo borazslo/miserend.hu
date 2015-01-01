@@ -138,6 +138,42 @@
                     console.log();
                 });
 
+    $(function() {
+
+                 $( ".events" ).autocomplete({
+                      source: function( request, response ) {
+                        $.ajax({
+                          url: "ajax.php",
+                          dataType: "json",
+                          data: {
+                            q: 'AutocompleteEvents',
+                            text: request.term,
+                          },
+                          success: function( data ) {
+                            if(data.results != null)
+
+                            response( 
+                                $.map( data.results, function( item ) {
+                                return {
+                                    label: item.label,
+                                    value: item.value
+                                }
+
+                            }));
+                          }
+                        });
+                    },
+                    minLength: 0,
+
+                    }).each(function() {
+                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                            return $("<li></li>").data("item.ui-autocomplete", item).append(
+                            item.label)
+                            .appendTo(ul);
+                        };
+                    }); 
+                  });
+
  });
 
  function addMassForm(period, c) {

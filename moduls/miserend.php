@@ -18,6 +18,7 @@ function miserend_index() {
 	$script .= '<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>';
     $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
    	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
+   	$script .= '<script src="js/miserend.js"></script>';
     
     $script .= '<link rel="stylesheet" href="templates/colorbox.css" />';
     $script .= '<link rel="stylesheet" href="templates/als.css" />';
