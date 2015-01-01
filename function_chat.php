@@ -175,7 +175,7 @@ function chat_getcomments($args = array()) {
 
 	$loginkiir1 = urlencode($user->login);
 
-	$query="select datum,user,kinek,szoveg from chat where (kinek='' or kinek='".$user->login."' or user='".$user->login."') ";
+	$query="select id,datum,user,kinek,szoveg from chat where (kinek='' or kinek='".$user->login."' or user='".$user->login."') ";
 	if(isset($args['last'])) $query .= " AND datum > '".$args['last']."' ";
 	if(isset($args['first'])) $query .= " AND datum < '".$args['first']."' ";
 
@@ -188,6 +188,10 @@ function chat_getcomments($args = array()) {
 		elseif(date('d',strtotime($row['datum'])) < date('d')) $row['datum'] = date('m.d. H:i',strtotime($row['datum']));
 		else $row['datum'] = date('H:i',strtotime($row['datum']));
 
+		if($row['user'] == $user->login) $row['color'] ='#394873';
+		elseif($row['kinek'] == $user->login) $row['color'] ='red';
+		elseif(preg_match('/@'.$user->login.'([^a-zA-Z]{1}|$)/i',$row['szoveg'])) $row['color']='red';
+
 		if($row['kinek'] != '') {
 			if($row['kinek']==$user->login) $loginkiir2=urlencode($user->login);
 			else $loginkiir2=urlencode($row['kinek']);
@@ -198,6 +202,7 @@ function chat_getcomments($args = array()) {
 
 
 		$row['szoveg'] = preg_replace('/@(\w+)/i','<span class="response_open" data-to="$1" style="background-color: rgba(0,0,0,0.15);">$1</span>',$row['szoveg']);
+		
 		
 		$return[] = $row;
 	}
