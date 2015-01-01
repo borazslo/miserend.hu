@@ -3,12 +3,21 @@ include 'load.php';
 
 
 switch ($_REQUEST['q']) {
-    case 'FromMassEmpty':
-    	$form = formMass($_POST['period'],$_POST['count']);
+    case 'FormMassEmpty':
+    	$form = formMass($_POST['period'],$_POST['count'],false,'period');
     	echo $twig->render('admin_form_mass.html', $form);  
         break;
-    case 'FromPeriodEmpty':
-    	echo formPeriod($_POST['period']);
+    case 'FormMassParticularEmpty':
+        $form = formMass($_POST['particular'],$_POST['count'],false,'particular');
+        echo $twig->render('admin_form_mass_particular.html', $form);  
+        break;    
+    case 'FormPeriodEmpty':
+    	$form = formPeriod($_POST['period'],false,'period');
+        echo $twig->render('admin_form_period.html', $form);  
+        break;
+    case 'FormParticularEmpty':
+        $form = formPeriod($_POST['particular'],false,'particular');
+        echo $twig->render('admin_form_particular.html', $form);  
         break;
     case 'ChatSave':
         if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
@@ -61,6 +70,9 @@ switch ($_REQUEST['q']) {
             $return[] = array('label' => $row['varos'],'value'=>$row['varos']);
         }
         echo json_encode(array('results'=>$return));
+        break;
+    case 'OSMOsszeKapcsol':
+        echo osm_kapcsol_ment($_POST['oid'],$_POST['tid']);
         break;
     default:
         //code to be executed if n is different from all labels;

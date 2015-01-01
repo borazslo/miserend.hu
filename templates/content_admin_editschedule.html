@@ -1,0 +1,104 @@
+{% import "forms.twig" as forms %}
+
+<span class=alcim>Miserend feltöltése / módosítása</span><br/><br/>
+
+<FORM ENCTYPE='multipart/form-data' method=post>
+	<input type=hidden name=m_id value={{ m_id }}>
+	<input type=hidden name=m_op value=addingmise>
+	<input type=hidden name=tid value={{ tid }}>
+
+<table cellpadding=4 width=100%>
+	<tr><td colspan=2><span class=kiscim>Észrevétel: </span>{{ jelzes.html|raw }}</td></tr>
+	<tr>
+		<td bgcolor=#F5CC4C>
+			<div class=kiscim align=right>Templom neve:</div>
+		</td>
+		<td bgcolor=#F5CC4C>
+			<span class=kiscim><a href="?templom={{ church.id }}" title='A templom nyilvános oldalának megnyitás' target='_blank'>{{ church.nev }} ({{ church.varos }})</a></span>
+		</td>
+	</tr>
+	<tr>
+		<td bgcolor=#D6F8E6>
+			<div class=kiscim align=right>Aktív:</div>
+		</td>
+		<td bgcolor=#D6F8E6>
+			<input type=radio name=miseaktiv class=urlap value=1 {{ active.yes }}> <span class=alap>Van rendszeresen mise.</span>
+			<input type=radio name=miseaktiv class=urlap value=0 {{ active.no }}> <span class=alap>Nincs rendszeres mise.</span>
+		</td>
+	</tr>
+</table>
+
+<table id="miserend" cellpadding=4 width=100% {% if active.no %} style="display:none" {% endif %}>
+	<tr>
+		<td>
+			<span class=kiscim>Miseidőpontok:</span>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	
+	{% for period in periods %}
+		{% include 'admin_form_period.html' with period %}
+	{% endfor %}
+
+	<tr class="addperiod">
+		<td colspan="2">
+			<span class="alap addperiod" last="{{ lastperiod }}" >[új periódus hozzáadása]</span>
+		</td>
+	</tr>
+
+	{% for particular in particulars %}
+		{% include 'admin_form_particular.html' with particular %}
+	{% endfor %}
+
+	<tr class="addparticular">
+		<td colspan="2">
+			<span class="alap addparticular" last="{{ lastparticular }}" >[új különleges miserend hozzáadása]</span>
+		</td>
+	</tr>
+
+
+
+</table>
+
+<table id="mehet" cellpadding=4 width="100%">
+	<tr>
+		<td bgcolor=#D6F8E6>
+			<div class=kiscim>Kiegészítő infók:</div>
+			{% include 'help_link.html' with { id: 41 } %}
+		</td>
+		<td bgcolor=#D6F8E6>
+			{{ forms.textarea(misemegj) }}
+		</td>
+	</tr>
+	<tr>
+		<td bgcolor=#ECE5C8>
+			<div class=kiscim>Szerkesztői megjegyzés:</div>
+			{% include 'help_link.html' with { id: 1 } %}
+		</td>
+		<td bgcolor=#ECE5C8>
+			{{ forms.textarea(adminmegj) }}
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<span class=kiscim>Kitöltési útmutató:</span>
+		</td>
+		<td>
+			{{ helptext|raw }}
+		</td>
+	</tr>
+	<tr>
+		<td align='right'>
+			<input type=submit value=Mehet class=urlap>
+		</td>
+		<td>
+			<input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span><br/>
+			<input type=radio name=modosit value=m class=urlap><span class=alap> és vissza a templom szerkesztéséhez</span><br/>
+			<input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span><br/>
+			<input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>
+		</td>
+	</tr>
+</table>
+
+</form>

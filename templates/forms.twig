@@ -1,23 +1,47 @@
 {% macro input(array) %}
     {% if array.label %}<span class=alap> {{array.label|raw}}:</span>{% endif %}
+    
     <input 
     {% if array.id %} id="{{array.id}}" {% endif %}
     {% if array.checked %} checked {% endif %}
     class="urlap {{ array.class }}" type="{{ array.type|default('text') }}" style="{{ array.style }}" name="{{ array.name }}" value="{{ array.value|e }}" size="{{ array.size|default(12) }}" />
+    
     {% if array.labelback %} <span class=alap> {{array.labelback|raw}}</span>{% endif %}
 {% endmacro %}
 
 {% macro select(array) %}
-	<select name="{{ array.name }}"
+    {% if array.label %}<span class=alap> {{array.label|raw}} </span>{% endif %}
+	
+    <select name="{{ array.name }}"
     {% if array.id %} id="{{array.id}}" {% endif %}
     {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
     {% if array.style %} style="{{array.style}}" {% endif %}
+    class="urlap {{ array.class }}" 
 	>
 		{% for key, option in array.options %}
 			<option value="{{ key }}" 
 			{% if key == array.selected %} selected {% endif %}
 			>{{ option }}</option>
 		{% endfor %}
-	</select>
+	
+    </select>
+    {% if array.labelback %} <span class=alap> {{array.labelback|raw}}</span>{% endif %}
+
+{% endmacro %}
+
+
+{% macro textarea(array) %}
     {% if array.label %}<span class=alap> {{array.label|raw}} </span>{% endif %}
+    
+    <textarea name="{{ array.name }}" class="urlap"
+    {% if array.id %} id="{{array.id}}" {% endif %}
+    {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
+    {% if array.style %} style="{{array.style}}" {% else %} style="width:100%" {% endif %}
+    {% if array.cols %} cols="{{array.cols}}" {% else %} cols="50" {% endif %}
+    {% if array.rows %} rows="{{array.rows}}" {% else %} rows="10" {% endif %}
+    >
+    {% if array.value %}{{ array.value }}{% endif %}
+    </textarea>
+    
+    {% if array.labelback %} <span class=alap> {{array.labelback|raw}}</span>{% endif %}
 {% endmacro %}

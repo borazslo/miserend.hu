@@ -799,98 +799,57 @@ function miserend_addmise($tid) {
 	$script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>'."\n";
 	$script .= "<script type='text/javascript' src='js/miserend_addmise.js'></script>\n";
 
-	$church = getChurch($tid);	
+	$vars['church'] = $church = getChurch($tid);	
 	$masses = getMasses($tid);
 
-	$urlap.="\n<FORM ENCTYPE='multipart/form-data' method=post>";
-
-	$urlap.="\n<input type=hidden name=m_id value=$m_id>";
-	$urlap.="\n<input type=hidden name=m_op value=addingmise><input type=hidden name=tid value=$tid>";
+	$vars['m_id'] = $m_id;
+	$vars['tid'] = $tid;
 	
 	//Észrevétel
 	$jelzes = getRemarkMark($tid);
-	$urlap.="\n<tr><td colspan=2><span class=kiscim>Észrevétel: </span>".$jelzes['html']."</td></tr>";
-
-
-	$urlap.='<table cellpadding=4 width=100%>';
-
-	//név
-	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><span class=kiscim><a href='?templom=".$church['id']."' title='A templom nyilvános oldalának megnyitás' target='_blank'>".$church['nev']." (".$church['varos'].")</a></span></td></tr>";
-	
+	$vars['jelzes'] = $jelzes;
 
 	//miseaktív
-	if($church['miseaktiv'] == 1) $van = ' checked '; else $nincs = ' checked ';
-	$urlap.="\n<tr><td bgcolor=#D6F8E6><div class=kiscim align=right>Aktív:</div></td><td bgcolor=#D6F8E6>
-	<input type=radio name=miseaktiv class=urlap value=1 ".$van."> <span class=alap>Van rendszeresen mise.</span>
-	<input type=radio name=miseaktiv class=urlap value=0 ".$nincs."> <span class=alap>Nincs rendszeres mise.</span></td></tr>";
+	if($church['miseaktiv'] == 1) $vars['active']['yes']  = ' checked '; else $vars['active']['no'] = ' checked ';
 
 
-	$urlap.='</table><table id="miserend" cellpadding=4 width=100% ';
-	if($church['miseaktiv'] != 1) $urlap .= ' style="display:none" ';
-	$urlap .= '>';
-	//miserend
-	$urlap.="\n<tr><td><span class=kiscim>Miseidőpontok:</span></td><td>";
-	$urlap.="&nbsp;</td></tr>";
-
-
-
-	foreach($masses as $pkey=>$period) {	
-		$urlap .= formPeriod($pkey,$period);
+	$vars['lasperiod'] = 0;
+	if(isset($masses['periods']))
+	foreach($masses['periods'] as $pkey=>$period) {	
+		$vars['periods'][] = formPeriod($pkey,$period,'period');
 	}
+	$vars['lasperiod'] = $pkey;
 
-	$urlap .= '<tr class="addperiod"><td colspan="2"><span class="alap addperiod" last="'.$pkey.'" >[új periódus hozzáadása]</span>';
-	$urlap .= '</td></tr>';
-	
-		$urlap.='</table><table id="mehet" cellpadding=4 width=100% ';
-
-  //Misemegjegyzés
-	$urlap.="\n<tr><td bgcolor=#D6F8E6><div class=kiscim>Kiegészítő infók:</div><br><a href=\"javascript:OpenNewWindow('sugo.php?id=41',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td><td bgcolor=#D6F8E6>";
-	$urlap.="<span class=alap>Rendszeres rózsafűzér, szentségimádás, hittan, stb.</span><br><textarea name=misemegj  style='width:100%'  class=urlap cols=50 rows=10>".$church['misemegj']."</textarea></td></tr>";
-
-  //megjegyzés
-	$urlap.="\n<tr><td bgcolor=#ECE5C8><div class=kiscim align=right>Szerkesztői megjegyzés:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=1',200,300);\"><img src=img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#ECE5C8><textarea name=adminmegj style='width:100%' class=urlap cols=50 rows=3>".$church['adminmegj']."</textarea><span class=alap>A templom szerkesztésével kacsolatosan.</span></td></tr>";
-
-  //súgó
-	$urlap.="\n<tr><td><span class=kiscim>Kitöltési útmutató:</span></td><td>";
-	
-	$urlap.="<br><br><span class=alap><b>nyelvek</b> (h, hu vagy üres=magyar, en=angol, de=német, it=olasz, fr=francia, va=latin, gr=görög, sk=szlovák, hr=horvát, pl=lengyel, si=szlovén => további nyelvek esetén az internetes 2 betűs végződés az irányadó!) Előfordulhatnak periódusok is, ebben az esetben a nyelv mellett a periódus számát kell feltüntetni, pl de2,va3 -> minden hónap második hetén német, harmadik hetén latin (A vessző fontos, merty az tagolja).<br>
-		<br/><b>Lehetséges periódusok</b>: <b> 0</b>=mindig<b>, 1, 2, 3, 4, 5, -1</b>=utolsó héten<b>, ps</b>=páros héten<b>, pt</b>=páratlan héten.<br>";
-	$urlap.="\nAlapeset, minden mise magyar: ebben az esetben nem kell kitölteni. Alapesetben a templomnak megfelelő rítusú a liturgia: csak akkor kell feltüntetni gor/rom, ha eltér a templom rítusától.</span>";
-
-	$urlap.="<br><br><span class=alap>A mise-tulajdonságok a nyelvekhez hasonlóan működnek. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni. (Periódus nélkül 0-át lehet a betükód mögé írni, de nem szökséges.)
-		<br><b>Betükódok</b>: gitáros = g, csendes = cs<br>családos/gyerek = csal, diák = d, egyetemista/ifjúsági = ifi<br/>igeliturgia = ige, görög katolikus = gor, római katolikus = rom";
-	$urlap.="\n<br>Több tulajdonságot vesszővel kell egymástól elválasztani.";
-
-	$urlap.="<br><br><span class=alap>A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.</span>";
-
-	$urlap.="</td></tr>";
-
-	$urlap.="<tr><td align='right'>";
-
-	$urlap.="\n<input type=submit value=Mehet class=urlap>";
-
-	$urlap.="</td><td>";
-
-	if($tid>0) {
-		$urlap.="<input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span>";
-		$urlap.="<br><input type=radio name=modosit value=m class=urlap><span class=alap> és vissza a templom szerkesztéséhez</span>";
-		$urlap.="<br><input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span>";
-		$urlap.="<br><input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>";
+	$vars['lastparticular'] = 0;
+	if(isset($masses['particulars']))
+	foreach($masses['particulars'] as $pkey=>$particular) {	
+		$vars['particulars'][] = formPeriod($pkey,$particular,'particular');
 	}
-	else $urlap.="<input type=hidden name=modosit value=i>";
-	$urlap.="</td></tr>";
+	$vars['lastparticular'] = $pkey;
 
-	$urlap.='</table>';
-
-	$urlap.="\n</form>";
-
-	$adatT[2]='<span class=alcim>Templom feltöltése / módosítása</span><br><br>'.$urlap;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
-	
-	$kod=$tartalom;
-
-	return $kod;
+	$vars['misemegj'] =  array(
+            'type' => 'textbox',
+            'name' => "misemefj",
+            'value' => $church['misemegj'],
+            'label'=> 'Rendszeres rózsafűzér, szentségimádás, hittan, stb.<br/>');
+	$vars['adminmegj'] =  array(
+            'type' => 'textbox',
+            'name' => "adminmegj",
+            'value' => $church['adminmegj'],
+            'labelback'=> ' A templom szerkesztésével kacsolatosan.');
+	  	  
+	$vars['helptext'] = <<<'EOT'
+  <br><br><span class=alap><b>nyelvek</b> (h, hu vagy üres=magyar, en=angol, de=német, it=olasz, fr=francia, va=latin, gr=görög, sk=szlovák, hr=horvát, pl=lengyel, si=szlovén => további nyelvek esetén az internetes 2 betűs végződés az irányadó!) Előfordulhatnak periódusok is, ebben az esetben a nyelv mellett a periódus számát kell feltüntetni, pl de2,va3 -> minden hónap második hetén német, harmadik hetén latin (A vessző fontos, merty az tagolja).<br>
+		<br/><b>Lehetséges periódusok</b>: <b> 0</b>=mindig<b>, 1, 2, 3, 4, 5, -1</b>=utolsó héten<b>, ps</b>=páros héten<b>, pt</b>=páratlan héten.<br>
+		Alapeset, minden mise magyar: ebben az esetben nem kell kitölteni. Alapesetben a templomnak megfelelő rítusú a liturgia: csak akkor kell feltüntetni gor/rom, ha eltér a templom rítusától.</span>
+		<br><br><span class=alap>A mise-tulajdonságok a nyelvekhez hasonlóan működnek. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni. (Periódus nélkül 0-át lehet a betükód mögé írni, de nem szökséges.)
+		<br><b>Betükódok</b>: gitáros = g, csendes = cs<br>családos/gyerek = csal, diák = d, egyetemista/ifjúsági = ifi<br/>igeliturgia = ige, görögkatolikus = gor, római katolikus = rom
+		<br>Több tulajdonságot vesszővel kell egymástól elválasztani.
+		<br><br><span class=alap>A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.</span>
+EOT;
+	 
+	global $twig;
+	return $twig->render('content_admin_editschedule.html',$vars); 
 }
 
 function miserend_addingmise() {
@@ -905,6 +864,12 @@ function miserend_addingmise() {
 	if(isset($_REQUEST['delete']['period'])) {
 		foreach($_REQUEST['delete']['period'] as $period) {
 			$query = "UPDATE misek SET torles = '".$most."', torolte = '".$user->login."' WHERE tid = ".$_REQUEST['tid']." AND idoszamitas = '".$period."' ;";
+			mysql_query($query);
+		}
+	}
+	if(isset($_REQUEST['delete']['particular'])) {
+		foreach($_REQUEST['delete']['particular'] as $particular) {
+			$query = "UPDATE misek SET torles = '".$most."', torolte = '".$user->login."' WHERE tid = ".$_REQUEST['tid']." AND idoszamitas = '".$particular."' ;";
 			mysql_query($query);
 		}
 	}
@@ -923,9 +888,9 @@ function miserend_addingmise() {
 			$mass['tid'] = $_REQUEST['tid'];
 			$mass['idoszamitas'] = sanitize($period['name']);
 			$mass['tol'] = sanitize($period['from']);
-			if($period['fro2'] == 1) $mass['tol'] .= ' +1';
+			if($period['from2'] != 0) $mass['tol'] .= ' '.$period['from2'];
 			$mass['ig'] = sanitize($period['to']);
-			if($period['to2'] == 1) $mass['ig'] .= ' -1';
+			if($period['to2'] != 0) $mass['ig'] .= ' '.$period['to2'];
 
 			if($mass['id'] != 'new') {
 				$query = "UPDATE misek SET ";
@@ -943,7 +908,33 @@ function miserend_addingmise() {
 		}
 	}
 	}
+	if(is_array($_REQUEST['particular'])) {
+	foreach($_REQUEST['particular'] as $particular) {
+		foreach($particular as $key => $mass) {
+		if(is_numeric($key)) {
+			$mass['tid'] = $_REQUEST['tid'];
+			$mass['idoszamitas'] = sanitize($particular['name']);
+			$mass['tol'] = sanitize($particular['from']);
+			if($particular['from2'] != 0) $mass['tol'] .= ' '.$particular['from2'];
+			$mass['ig'] = $mass['tol'];
+			$mass['napid'] = 0;
 
+			if($mass['id'] != 'new') {
+				$query = "UPDATE misek SET ";
+				$query .= "nap='".$mass['napid']."',ido='".$mass['ido'].":00',nap2='".$mass['nap2']."',idoszamitas='".$mass['idoszamitas']."',tol='".$mass['tol']."',ig='".$mass['ig']."',nyelv='".$mass['nyelv']."',milyen='".$mass['milyen']."',megjegyzes='".$mass['megjegyzes']."',";
+				$query .= "modositotta='".$user->login."',moddatum='".$most."'";
+				$query .= " WHERE tid = ".$mass['tid']." AND id = ".$mass['id']." LIMIT 1";
+			} else {
+				$query = "INSERT INTO misek ";
+				$query .= " (tid,nap,ido,nap2,idoszamitas,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
+				$query .= " VALUES ('".$mass['tid']."','".$mass['napid']."','".$mass['ido'].":00','".$mass['nap2']."','".$mass['idoszamitas']."','".$mass['tol']."','".$mass['ig']."','".$mass['nyelv']."','".$mass['milyen']."','".$mass['megjegyzes']."',";
+				$query .= "'".$user->login."','".$most."')";
+			}
+			mysql_query($query);
+		}
+		}
+	}
+	}
 	generateMassTmp('tid = '.$_REQUEST['tid']);
 
 
@@ -962,7 +953,6 @@ function miserend_addingmise() {
 
 
 	$modosit = $_REQUEST['modosit'];
-
 	if($modosit=='i') $kod=miserend_addmise($tid);
 	elseif($modosit=='m') $kod=miserend_addtemplom($tid);
 	elseif($modosit=='t') {

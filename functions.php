@@ -73,7 +73,7 @@ function login($name,$password) {
 
     $query = "UPDATE user SET lastlogin = '".date('Y-m-d H:i:s')."' WHERE uid = ".$x['uid'].";";
     mysql_query($query);
-    
+
     cookieSave($x['uid'],$name);
     
     return true;
@@ -285,7 +285,11 @@ function event2Date($event, $year = false) {
     if($year == false) $year = date('Y');
 
     if(preg_match('/^([0-9]{4})(\.|-)([0-9]{2})(\.|-)([0-9]{2})(\.|)/i',$event,$match)) return $match[3]."-".$match[5];
-    if(preg_match('/^([0-9]{2})(\.|-)([0-9]{2})(\.|)/i',$event,$match)) return date('m-d',strtotime(date('Y')."-".$match[1]."-".$match[3]));
+    if(preg_match('/^([0-9]{2})(\.|-)([0-9]{2})(\.|)(( \-| \+)[0-9]{1,3}|$)/i',$event,$match)) {
+        if($match[5] != '') $extra = $match[5]." days";
+        return date('m-d',strtotime(date('Y')."-".$match[1]."-".$match[3]." ".$extra));
+    }
+
     
     $event = preg_replace('/(\+|-)1$/', '${1}1 day', $event);
     $events = array();
@@ -360,7 +364,9 @@ function getMasses($tid,$date = false) {
             $tmp['napok'][$row2['napid']]['misek'][] = $row2;
             $tmp['napok'][$row2['napid']]['nev'] = $row2['nap'];
         }
-        $return[] = $tmp;
+        if($tmp['tol'] == $tmp['ig']) 
+            $return['particulars'][] = $tmp;
+        else $return['periods'][] = $tmp;
     }
 
     return $return;
@@ -415,7 +421,7 @@ function decodeMassAttr($text) {
 }
 
 
-function formMass($pkey,$mkey,$mass = false) {
+function formMass($pkey,$mkey,$mass = false,$group = false) {
     global $twig;
 
     if($mass == false) {
@@ -427,7 +433,10 @@ function formMass($pkey,$mkey,$mass = false) {
             'milyen' => '',
             'megjegyzes' => '',
             );
+        if($group == 'particular') $mass['napid'] = 0;
     }
+
+    if($group == false) $group = 'period';
 
     $nap2options = array(
         0 => 'minden héten',
@@ -438,83 +447,113 @@ function formMass($pkey,$mkey,$mass = false) {
     $form = array(
         'id' => array(
             'type' => 'hidden',
-            'name' => "period[".$pkey."][".$mkey."][id]",
+            'name' => $group."[".$pkey."][".$mkey."][id]",
             'value' => $mass['id']),
         'nap' => array(
-            'name' => "period[".$pkey."][".$mkey."][napid]",
+            'name' => $group."[".$pkey."][".$mkey."][napid]",
             'options' => array(0=>'válassz',1=>'hétfő',2=>'kedd',3=>'szerda',4=>'csütörtök',5=>'péntek',6=>'szombat',7=>'vasárnap'),
-            'selected' => $mass['napid']),
+            'selected' => $mass['napid'],
+            'class' => 'nap'),
         'nap2' => array(
-            'name' => "period[".$pkey."][".$mkey."][nap2]",
+            'name' => $group."[".$pkey."][".$mkey."][nap2]",
             'options' => $nap2options,
             'selected' => $mass['nap2_raw']),
         'ido' => array(
-            'name' => "period[".$pkey."][".$mkey."][ido]",
+            'name' => $group."[".$pkey."][".$mkey."][ido]",
             'value' => $mass['ido'],
             'size' => 1 ),
         'nyelv' => array(
             'label' => 'nyelvek',
-            'name' => "period[".$pkey."][".$mkey."][nyelv]",
+            'name' => $group."[".$pkey."][".$mkey."][nyelv]",
             'value' => $mass['nyelv'],
             'style'=>'margin-right:10px',
             'size'=>7),
         'milyen' => array(
             'label' => 'milyen',
-            'name' => "period[".$pkey."][".$mkey."][milyen]",
+            'name' => $group."[".$pkey."][".$mkey."][milyen]",
             'value' => $mass['milyen'],
             'size'=>7 ),
         'megjegyzes' => array(
             'label' => 'megjegyzések',
-            'name' => "period[".$pkey."][".$mkey."][megjegyzes]",
+            'name' => $group."[".$pkey."][".$mkey."][megjegyzes]",
             'value' => $mass['megjegyzes'],
             'style' => 'margin-top:4px;width:204px')
         );
     return $form;
 }
 
-function formPeriod($pkey,$period = false) {
+function formPeriod($pkey,$period = false,$group = false) {
     global $twig;
+
+    if($group == false) $group = 'period';
 
     $c = 0;
     if($period == false) {
+        $groups = array('particular' => 'különleges miserend','period'=>' időszak');
         $period = array(
-            'nev' => 'új időszak',
+            'nev' => 'új '.$groups[$group],
             'tol' => '',
             'ig' => '',
-            'napok' => array('new','new','new'));
+            'napok' => array('new'));
+    
     }
     
     $form = array(
         'nev1' => array(
             'type' => 'hidden',
-            'name' => "period[".$pkey."][origname]",
+            'name' => $group."[".$pkey."][origname]",
             'value' => $period['nev'] ),
         'nev' => array(
-            'name' => "period[".$pkey."][name]",
+            'name' => $group."[".$pkey."][name]",
             'value' => $period['nev'],
             'size' => 30 ),
         'from' => array(
-            'name' => "period[".$pkey."][from]",
-            'value' => trim(preg_replace('/\+1$/i','',$period['tol'])),
+            'name' => $group."[".$pkey."][from]",
+            'value' => trim(preg_replace('/(\+|-)([0-9]{1})$/i','',$period['tol'])),
             'size' => 20),
         'to' => array(
-            'name' => "period[".$pkey."][to]",
-            'value' => trim(preg_replace('/-1$/i','',$period['ig'])),
-            'size' => 20),
-        'from2' => array(
-            'name' => "period[".$pkey."][from2]",
-            'options'=> array(
-                0 => '≤',
-                1 => '<')),
-        'to2' => array(
-            'name' => "period[".$pkey."][to2]",
-            'options'=> array(
-                0 => '≤',
-                1 => '<'))
+            'name' => $group."[".$pkey."][to]",
+            'value' => trim(preg_replace('/(\+|-)([0-9]{1})$/i','',$period['ig'])),
+            'size' => 20,
+        )
     );
+
+    if($group == 'period') {
+        $form['from2'] = array(
+            'name' => $group."[".$pkey."][from2]",
+            'options'=> array(
+                0 => '≤',
+                '-1' => '<'));
+        $form['to2'] = array(
+            'name' => $group."[".$pkey."][to2]",
+            'options'=> array(
+                0 => '≤',
+                '+1' => '<'));
+    } elseif($group == 'particular') {
+        $form['from2'] = array(
+            'name' => $group."[".$pkey."][from2]",
+            'options'=> array(
+                '-8' => '-8 nap',
+                '-7' => '-7 nap',
+                '-6' => '-6 nap',
+                '-5' => '-5 nap',
+                '-4' => '-4 nap',
+                '-3' => '-3 nap',
+                '-2' => '-2 nap',
+                '-1' => '-1 nap',
+                0 => '',
+                '+1' => '+1 nap',
+                '+2' => '+2 nap',
+                '+3' => '+3 nap',
+                '+4' => '+4 nap',
+                '+5' => '+5 nap',
+                '+6' => '+6 nap',
+                '+7' => '+7 nap',
+                '+8' => '+8 nap'));
+    }
     
-    if(preg_match('/\+1$/i',$period['tol'])) $form['form2']['selected'] = 1;
-    if(preg_match('/-1$/i',$period['ig'])) $form['to2']['selected'] = 1;
+    if(preg_match('/(\+|-)([0-9]{1})$/i',$period['tol'],$match)) $form['from2']['selected'] = $match[1].$match[2];
+    if(preg_match('/(\+|-)([0-9]{1})$/i',$period['ig'],$match)) $form['to2']['selected'] = $match[1].$match[2];
 
 
     $form['pkey'] = $pkey;
@@ -523,17 +562,15 @@ function formPeriod($pkey,$period = false) {
         if(isset($day['misek'])) {
             foreach($day['misek'] as $mkey=>$mass) {
                 $c++;
-                $form['napok'][] = formMass($pkey,$c,$mass);
+                $form['napok'][] = formMass($pkey,$c,$mass,$group);
             }
         }
-        elseif($day == 'new') $form['napok'][] = formMass($pkey,$dkey);
+        elseif($day == 'new') $form['napok'][] = formMass($pkey,$dkey,false,$group);
     }
 
     $form['last'] = $c;
-    $return = $twig->render('admin_form_period.html', $form);  
 
-
-    return $return;
+    return $form;
 }
  
 function searchChurches($args, $offset = 0, $limit = 20) {
@@ -623,13 +660,14 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
     //milyen nap
     if($args['mikor'] == 'x') $args['mikor'] = $args['mikordatum']; 
-    $where[] = " nap = '".date('N',strtotime($args['mikor']))."'";
+    $where[] = "( nap = '".date('N',strtotime($args['mikor']))."' OR nap = 0 )";
+
 
 
     //milyen időszakban
     $day = date('m-d',strtotime($args['mikor']));
-    $where[] = "( ( tmp_datumtol <= '".$day."' AND '".$day."' <= tmp_datumig AND tmp_relation = '<' )
-    OR  ( ( tmp_datumig <= '".$day."' OR '".$day."' <= tmp_datumtol ) AND tmp_relation = '>' ) )";
+    $where[] = "( ( tmp_datumtol <= '".$day."' AND '".$day."' <= tmp_datumig AND (tmp_relation = '<' OR  tmp_relation = '=') )
+    OR  ( ( tmp_datumig <= '".$day."' OR '".$day."' <= tmp_datumtol ) AND ( tmp_relation = '>'  OR  tmp_relation = '=') ) )";
 
     //milyen héten
     $subwhere = array();
@@ -641,6 +679,7 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     $subwhere[] = "nap2='".$hanyadikM."'";
     $subwhere[] = "nap2='0'";
     $subwhere[] = "nap2 IS NULL";
+    $subwhere[] = "nap2 = '' ";
     $where[] = " (".implode(' OR ', $subwhere).")";
 
     //milyen órákban
@@ -732,8 +771,10 @@ function getWeekInMonth($date,$order = '+') {
 }
 
 function sugolink($id) {
-    return '<a href="javascript:OpenNewWindow(\'sugo.php?id=".$id."\',200,300);"><img src=img/sugo.gif border=0 title=\'Súgó\'></a>';
+    global $twig;
+    return $twig->render('help_link.html', array('id'=>$id))  ; 
 }
+
 
 function generateMassTmp($where = false) {
     global $config;
@@ -747,6 +788,7 @@ function generateMassTmp($where = false) {
         if($row['ig'] == '')  $row['ig'] = '12-31';
         $row['tmp_datumig'] = event2Date($row['ig']);
         if($row['tmp_datumig'] > $row['tmp_datumtol']) $row['tmp_relation'] = '<';
+        elseif($row['tmp_datumtol'] == $row['tmp_datumig']) $row['tmp_relation'] = '=';
         else $row['tmp_relation'] = '>';
         $updates[] = $row;
     }

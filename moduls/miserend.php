@@ -232,7 +232,7 @@ function miserend_index() {
             'class' => 'keresourlap',
 			'options'=> array(0=>'mindegy',
 					'rom' => 'római katolikus',
-					'gor' => 'görög katolikus')
+					'gor' => 'görögkatolikus')
 	);
 	
 	$searchform['ige'] = array(
@@ -766,7 +766,7 @@ function miserend_misekeres() {
 
 	$zeneT=array('g'=>'gitáros', 'o'=>'orgonás', 'cs'=>'csendes','na'=>'meghátorazatlan');
 	$korT=array('csal'=>'családos', 'd'=>'diák', 'ifi'=>'ifjúsági','na'=>'meghátorazatlan');
-	$ritusT=array('gor'=>'görög katolikus', 'rom'=>'római katolikus');
+	$ritusT=array('gor'=>'görögkatolikus', 'rom'=>'római katolikus');
 	$nyelvekT=array('h'=>'magyar', 'en'=>'angol', 'de'=>'német', 'it'=>'olasz', 'va'=>'latin', 'gr'=>'görög', 'sk'=>'szlovák', 'hr'=>'horvát', 'pl'=>'lengyel', 'si'=>'szlovén', 'ro'=>'román', 'fr'=>'francia', 'es'=>'spanyol');
 
 	$tartalom.="\n<span class=kiscim>Keresési paraméterek:</span><br><span class=alap>";

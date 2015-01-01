@@ -1,0 +1,35 @@
+{% import "forms.twig" as forms %}
+
+<tr>
+	<td bgcolor=#D6F8E6>
+		<span class=kiscim>Különleges miserend:</span>
+	</td>
+	<td bgcolor=#D6F8E6>
+		{{ forms.input(nev1) }}
+		{{ forms.input(nev) }}
+		<span class='alap deleteparticular'>[töröl]</span>
+	</td>
+</tr>
+<tr>
+	<td bgcolor=#efefef>
+		<div class=kiscim align=right>ünnep/dátum/stb.:</div>
+	</td>
+	<td bgcolor=#efefef>
+		{{ forms.input(from) }} {{ forms.select(from2) }}
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+		<table cellpadding=4 width=100% id="particular{{ pkey }}">
+			{% for nap in napok %}
+				{% include "admin_form_mass_particular.html" with nap %}
+			{% endfor %}
+        	<tr class="addmass">
+        		<td colspan="2" bgcolor=#efefef>
+        			<span class="alap addparticularmise" particular="{{ pkey }}" last="{{ last }}">[új mise hozzáadása]</span>
+        		</td>
+        	</tr>
+        </table>
+    </td>
+</tr>
+

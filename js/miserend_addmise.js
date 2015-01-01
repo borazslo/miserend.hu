@@ -16,10 +16,27 @@
                         
                          $.ajax({
                                type:"POST",
-                               url:"ajax.php?q=FromMassEmpty",
+                               url:"ajax.php?q=FormMassEmpty",
                                data:"period="+period+"&count="+c,
                                success:function(response){
                                     $('#period'+ period +' tr.addmass').before(response);
+                                },
+                        });
+                        
+                        $( this ).attr('last',c); 
+                        return false; 
+                }); 
+
+                $("body").on('click', '.addparticularmise', function() {
+                        var c = 1 + parseInt($( this ).attr('last'));
+                        var particular = $( this ).attr('particular');
+                        
+                         $.ajax({
+                               type:"POST",
+                               url:"ajax.php?q=FormMassParticularEmpty",
+                               data:"particular="+particular+"&count="+c,
+                               success:function(response){
+                                    $('#particular'+ particular +' tr.addmass').before(response);
                                 },
                         });
                         
@@ -32,10 +49,26 @@
                         
                         $.ajax({
                                type:"POST",
-                               url:"ajax.php?q=FromPeriodEmpty",
+                               url:"ajax.php?q=FormPeriodEmpty",
                                data:"period="+c,
                                success:function(response){
                                     $('tr.addperiod').before(response);
+                                },
+                        });
+                        
+                        $( this ).attr('last',c); 
+                        return false; 
+                }); 
+
+                $('.addparticular').click(function() {
+                        var c = 1 + parseInt($( this ).attr('last'));
+                        
+                        $.ajax({
+                               type:"POST",
+                               url:"ajax.php?q=FormParticularEmpty",
+                               data:"particular="+c,
+                               success:function(response){
+                                    $('tr.addparticular').before(response);
                                 },
                         });
                         
@@ -75,6 +108,36 @@
                         return false; 
                     }); 
 
+                 $("table").on('click', '.deleteparticular', function(e) {
+                        e.preventDefault();
+                        if (window.confirm("Biztos, hogy törölni szeretnéd ezt a különleges miserendet és minden hozzá tartozó misét?")) {
+                            var html = 'Ez a különleges miserend törölve lesz: ';
+                            $( this ).parent().parent().find('input,select').each(function(index, element){
+                                html += ' ' + $ (element).val();
+                            });         
+                            $( this ).parent().parent().next().remove();
+                            $( this ).parent().parent().next().remove();     
+                            console.log($( this ).parent().parent().next().html());
+
+                            $( this ).parent().parent().html('<td bgcolor="#efefef" colspan="2"><span class="alap"><i>' + html + '</i></span> \
+                                <input type="hidden" name="delete[particular][]" value="' +  $( this ).parent().parent().find("[name$='][origname]']").val(  ) + '"> \
+                                </td>');
+                        }
+                        return false; 
+                    }); 
+
+                $("table").on('change', '.urlap.nap', function(e) {
+                    if($( this ).val() == 7) {
+                        $( this ).parent().parent().css("background-color", "#E67070");
+                    } else if ($( this ).val() == 6) {
+                        $( this ).parent().parent().css("background-color", "#F1BF8F");
+                    } else {
+                        $( this ).parent().parent().css("background-color", "#efefef");
+                    }
+                    console.log('ok');
+                    console.log();
+                });
+
  });
 
  function addMassForm(period, c) {
@@ -82,7 +145,7 @@
     var html = '';
      $.ajax({
        type:"POST",
-       url:"ajax.php?q=FromMassEmpty",
+       url:"ajax.php?q=FormMassEmpty",
        data:"period="+period+"&count="+c,
        success:function(response){
             console.log(response);
