@@ -1,18 +1,19 @@
 <?php
+include_once('load.php');
+
  ini_set('memory_limit', '256M');
 	$limit = 1650000;
 	
 	if(isset($_REQUEST['datum']) AND preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$_REQUEST['datum'])) $datum = $_REQUEST['datum'];
 	if(isset($_REQUEST['v']) AND preg_match('/^[0-9]{1,3}$/',$_REQUEST['v'])) $v = $_REQUEST['v'];
 
-	include_once('load.php');
   // Set default timezone
   date_default_timezone_set('UTC +1');
 
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'updated') {
-	if(!isset($datum)) die('Dátum nélkül mit érek én');
-	if(!isset($v) OR ( $v != 3 AND $v != 2)) die('Ez az API verzió ezt nem támogatja.');
-
+	if(!isset($datum)) { die('Nincs \'datum\' megadva.'); }
+	if(!isset($v) OR ( $v < 2 AND $v > 4)) { die('Ez az API verzió ezt nem támogatja.'); }	
+		
 	$query = "SELECT id, moddatum FROM templomok WHERE  moddatum >= '".$datum."' ";											
     $result = mysql_query($query);
     //echo "-".print_r($result,1)."-";
@@ -23,7 +24,12 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'updated') {
 
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'json') { 
 	if(isset($_REQUEST['id']) AND is_numeric($_REQUEST['id'])) {
-	
+
+	if( $v < 4 ) {
+		echo json_encode(array('error'=>'Ez a funkció csak v3 fölött érhető el.'));
+		exit;
+	}
+
 	$query = "
 			SELECT t.*,orszagok.nev as orszag, megye.megyenev as megye,lat,lng, checked FROM templomok as t 
 					LEFT JOIN orszagok ON orszagok.id = t.orszag 
@@ -60,23 +66,11 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	if(!isset($v)) {
 		die('Kérlek adj meg egy verziót, hogy biztosan kapj eredményt!');	
 	}
-	elseif($v > 3) exit;
-
-	print_r($config);
+	elseif($v > 4) exit;
 
 	$sqllitefile = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
 	if (file_exists($sqllitefile) && strtotime("-1 day") < filemtime($sqllitefile) AND $config['debug'] == 0 AND !isset($datum)) {
-		include($sqllitefile);
-		/*
-		$file = 'stats.txt';
-		// Open the file to get existing content
-		$current = file_get_contents($file);
-		// Append a new person to the file
-		$current .= json_encode(array('timestamp'=>date('Y-m-d H:i:s'),'v'=>$v,'cached'=>'true'))."\n";
-		// Write the contents back to the file
-		file_put_contents($file, $current);
-		*/
-		exit;
+		//include($sqllitefile); exit;
 	}
 
   try {
@@ -116,28 +110,46 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 			[geocim] vARCHAR(255)  NULL,
 			[megkozelites] vARCHAR(255)  NULL,
 			[lng] fLOAT  NULL,
-			[lat] flOAT  NULL,
+			[lat] flOAT  NULL,";
+
+	if($v < 4) $createtabletemplomok .= "
 			[nyariido] vARCHAR(10)  NULL,
-			[teliido]vARCHAR(10)  NULL,
+			[teliido]vARCHAR(10)  NULL,";
+
+	$createtabletemplomok .= "
 			[kep] vARCHAR(255)  NULL
 		
 		)";
     $file_db->exec($createtabletemplomok);
  
 	// Create table misek
-	$createtabletemplomok = "CREATE TABLE IF NOT EXISTS [misek] (
+	$createtablemisek = "CREATE TABLE IF NOT EXISTS [misek] (
 			[mid] INTEGER  PRIMARY KEY NOT NULL,
-			[tid] iNTEGER  NULL,
-			[telnyar] VARCHAR(1)  NULL,
+			[tid] iNTEGER  NULL,";
+
+	if($v < 4)
+		$createtablemisek .= "		[telnyar] VARCHAR(1)  NULL,";
+	
+	if($v > 3) {
+		$createtablemisek .= "		
+				[periodus] VARCHAR(4)  NULL,
+				[idoszak] VARCHAR(255)  NULL,
+				[tol] VARCHAR(100)  NULL,
+				[ig] VARCHAR(100)  NULL,
+				[datumtol] VARCHAR(5)  NULL,
+				[datumig] VARCHAR(5)  NULL,";
+	}
+
+	$createtablemisek .= "
 			[nap] inTEGER  NULL,
 			[ido] TIME  NULL,
 			[nyelv] VARCHAR(3)  NULL,
 			[milyen] VARCHAR(10)  NULL";
 
-	if($v > 2) $createtabletemplomok .= "
+	if($v > 2) $createtablemisek .= "
 			, [megjegyzes] VARCHAR(255) NULL";
-	$createtabletemplomok .= "	)";
-    $file_db->exec($createtabletemplomok);
+	$createtablemisek .= "	)";
+    $file_db->exec($createtablemisek);
  
 	
     if($v > 1) {
@@ -157,8 +169,9 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 			SELECT t.*,orszagok.nev as orszag, megye.megyenev as megye,lat,lng, address2 as geocim FROM templomok as t 
 					LEFT JOIN orszagok ON orszagok.id = t.orszag 
 					LEFT JOIN megye ON megye.id = megye 
-					LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id ";					
-	if(isset($datum)) $query .= ' WHERE  moddatum >= "'.$datum.'" ';											
+					LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id 
+					WHERE t.ok = 'i' ";					
+	if(isset($datum)) $query .= ' AND  moddatum >= "'.$datum.'" ';											
 	$query .= " LIMIT ".$limit;
 	//echo $query."<br>";
 	$templomok = array();
@@ -166,7 +179,6 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
    	while($tmp = mysql_fetch_array($result)) {
    		$templomok[] = $tmp; 
    	}
-	
 	// mysql select kepek
 	$query = "SELECT * 
 			FROM  `kepek` 
@@ -176,8 +188,8 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
    $kiemeltkepek = array();
    $kepek = array();
 	while($kep = mysql_fetch_array($result)) {
-		if(!isset($kiemeltkepek[$kep['kid']])) { // AND $kep['kiemelt'] == 'i')
-			$kiemeltkepek[$kep['kid']] = $kep;
+		if(!isset($kiemeltkepek[$kep['id']])) { // AND $kep['kiemelt'] == 'i')
+			$kiemeltkepek[$kep['id']] = $kep;
 			/*if($kep['kiemelt'] != 'i') { 
 				echo 'jaj - <a href="http://www.miserend.hu/?templom='.$kep['kid'].'">'.$kep['kid'].'</a><br/>'; 
 				echo $c++;
@@ -195,7 +207,6 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 					AND tid <> 0";
 	if(isset($datum)) $query .= '  AND moddatum >= "'.$datum.'" ';															
 	$query .= " LIMIT ".$limit;
-	//echo $query;
 	$misek = array();
 	$result = mysql_query($query);
    	while($tmp = mysql_fetch_array($result)) {
@@ -230,34 +241,36 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	  $geocim = $templom['geocim'];
 	  $lng = $templom['lng'];
 	  $lat = $templom['lat'];
-	  $nyariido = $templom['nyariido'];
-	  $teliido = $templom['teliido'];
+	  if($v < 4) {
+	  	$nyariido = $templom['nyariido'];
+	  	$teliido = $templom['teliido'];
+	  }
 	  if(isset($kiemeltkepek[$tid])) $kep = "kepek/templomok/".$tid."/".$kiemeltkepek[$tid]['fajlnev'];
 	  else { $kep = ''; }
 	  
-	  
-	  
 	  if(!file_exists($kep)) $kep = '';
 	  else $kep = "http://miserend.hu/".$kep;
-	  $megkozelites = '..'; //$templom['megkozelites']; 
+	  
+	  $megkozelites = $templom['megkozelites']; 
  
 		foreach(array('ismertnev','cim') as $var) {
 			//if(preg_match("/'/",$$var)) echo $nev." (".$tid."): ".$$var."<br>\n";
 			$$var = preg_replace("/'/","",$$var);
 		}
  
-	if($v > 2) {
+ 	if($v > 3) {
+	  $insert = "INSERT INTO templomok (tid, nev, ismertnev, gorog, orszag, megye, varos, cim, lng, lat,megkozelites,geocim,kep) 
+                VALUES ('".$tid."','".$nev."','".$ismertnev."','".$gorog."','".$orszag."','".$megye."','".$varos."','".$cim."','".$lng."','".$lat."','".$megkozelites."','".$geocim."','".$kep."')";
+	} elseif($v > 2) {
 	  $insert = "INSERT INTO templomok (tid, nev, ismertnev, gorog, orszag, megye, varos, cim, lng, lat,nyariido,teliido,megkozelites,geocim,kep) 
                 VALUES ('".$tid."','".$nev."','".$ismertnev."','".$gorog."','".$orszag."','".$megye."','".$varos."','".$cim."','".$lng."','".$lat."','".$nyariido."','".$teliido."','".$megkozelites."','".$geocim."','".$kep."')";
-	
-	}
-	else {
+	} else {
 		
 	$insert = "INSERT INTO templomok (tid, nev, ismertnev, orszag, megye, varos, cim, lng, lat,nyariido,teliido,megkozelites,geocim,kep) 
                 VALUES ('".$tid."','".$nev."','".$ismertnev."','".$orszag."','".$megye."','".$varos."','".$cim."','".$lng."','".$lat."','".$nyariido."','".$teliido."','".$megkozelites."','".$geocim."','".$kep."')";
 				
 	}
-	
+
       // Execute statement
       $file_db->query($insert);
     }
@@ -273,26 +286,38 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
       // Set values to bound variables
       $mid = $mise['id'];
       $tid = $mise['tid'];
-	  $telnyar = $mise['idoszamitas'];
+
+      if($v > 3) {
+      	$tmp = $mise['idoszamitas'];
+      	if(preg_match('/^(t$|tél)/i',$tmp)) $telnyar = 't';
+      	elseif(preg_match('/^(ny$|nyár)/i',$tmp)) $telnyar = 'ny';
+      	else $telnyar = false;
+	  } 
+	  
 	  $nap = $mise['nap'];
 	  $ido = $mise['ido'];
 	  $nyelv = $mise['nyelv'];
 	  $milyen = $mise['milyen'];
 	  $megjegyzes = $mise['megjegyzes'];
 
-	  if($v > 2) { 
+	  if($v > 3) { 
+	  	if($telnyar != false) {
+			$insert = "INSERT INTO misek (mid, tid, periodus, idoszak, tol, ig, datumtol, datumig, nap, ido, nyelv, milyen, megjegyzes) 
+            	VALUES ('".$mid."','".$tid."','".$mise['nap2']."','".$mise['idoszamitas']."','".$mise['tol']."','".$mise['ig']."','".$mise['tmp_datumtol']."','".$mise['tmp_datumig']."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+      		} else $insert = '';
+	  } elseif($v > 2) { 
 	   $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
                 VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
 	  } else {
-	  $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen) 
+	  	$insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen) 
                 VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."')";
       // Execute statement
 	  }
-      $file_db->query($insert);
+      if($insert !='') $file_db->query($insert);
     }
 	$file_db->commit();
 	//echo "Misék feltöltve<br>\n";
-	
+
 	// Loop thru all messages and execute prepared insert statement
 	if($v > 1) {
 	$file_db->beginTransaction();
@@ -302,15 +327,15 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	  set_time_limit(60);
       // Set values to bound variables
       $kid = $kep['id']; //Nem megy, mert nem unique.
-      $tid = $kep['kid'];
-	  $url = "http://miserend.hu/kepek/templomok/".$kep['kid']."/".$kep['fajlnev'];
-	  $file = "kepek/templomok/".$kep['kid']."/".$kep['fajlnev'];
+      $tid = $kep['tid'];
+	  $url = "http://miserend.hu/kepek/templomok/".$kep['tid']."/".$kep['fajlnev'];
+	  $file = "kepek/templomok/".$kep['tid']."/".$kep['fajlnev'];
 	  $insert = "INSERT INTO kepek (kid, tid, kep) 
                 VALUES ('".$kid."','".$tid."','".$url."')";
       // Execute statement
-	  if(file_exists(file))
+	  if(file_exists($file))
 		$file_db->query($insert);
-		//else echo $kid." - ".$tid." - /".$kep['kid']."/".$kep['fajlnev'].";<br/>";
+		//else echo $kid." - ".$tid." - /".$kep['tid']."/".$kep['fajlnev'].";<br/>";
     } 
 	$file_db->commit();
 	//echo "Képek feltöltve<br>\n";
