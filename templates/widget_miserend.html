@@ -1,0 +1,89 @@
+
+  <div style="padding-left:5px;background-color:#B51A7E;"><span class="dobozcim_feher" style="margin-left:0px;">A szentmisék rendje:</span></div><div class=kicsi_kek style="margin-bottom:5px"><b>Frissítve:</b> {{ frissites|raw }}</div>
+
+  {% if miseaktiv == 1 %}
+
+  {% for key,idoszak in miserend.periods %}
+    <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="idoszak_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></div>
+
+    <div id="idoszak_{{ key }}">
+    {% for nap in idoszak.napok %}
+
+      <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
+      {% if nap.misek|length < 1 %}
+            <div style="display: table-row;">
+
+          <div class="alap" valign="top" style="display: table-cell;width:60px;padding-left:5px;line-height:16px">{{ nap.nev }}</div></div>
+
+      {% endif %}
+
+      {% for key, mise in nap.misek %}
+      <div style="display: table-row;">
+        <div class="alap" valign="top" style="display: table-cell;width:60px;padding-left:5px;line-height:16px">{% if key == 0 %}{{ nap.nev }}{% endif %}&nbsp;</div>
+
+        <div style="display: table-cell;width:40px;text-align:right;line-height:16px" class="alap">{{ nap.misek[key].ido }}</div>
+
+        <div style="width:121px;display: table-cell;" class="alap" style="line-height:16px">
+          {% if nap.misek[key].nap2_raw != "0" %}
+              <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
+          {% if nap.misek[key].attr %}
+              {% for attr in nap.misek[key].attr %} 
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+              {% endfor %}
+          {% endif %}  
+          {% if nap.misek[key].megjegyzes %}
+              {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
+          {% endif %}       
+        </div>
+      </div>
+      {% endfor %}  
+      </div>
+
+    {% endfor %}   
+    </div> 
+    {% endfor %}
+
+     {% for key,idoszak in miserend.particulars %}
+    <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="particular_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:11px">({{ idoszak.datumtol }})</span></div>
+
+    <div id="particular_{{ key }}">
+    {% for nap in idoszak.napok %}
+      {% for key, mise in nap.misek %}
+
+      <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
+      {% if mise.length > 4 %} {% endif %}
+      <div style="display: table-row;">
+
+        <div style="display: table-cell;width:40px;text-align:right;line-height:16px" class="alap">{{ nap.misek[key].ido }}</div>
+
+        <div style="width:121px;display: table-cell;" class="alap" style="line-height:16px">
+          {% if nap.misek[key].nap2_raw != "0" %}
+              <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
+          {% if nap.misek[key].attr %}
+              {% for attr in nap.misek[key].attr %} 
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+              {% endfor %}
+          {% endif %}  
+          {% if nap.misek[key].megjegyzes %}
+              {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
+          {% endif %}       
+        </div>
+      </div>
+      </div>
+      {% endfor %}  
+
+    {% endfor %}   
+    </div> 
+    {% endfor %}
+
+    {% else %}
+    <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
+    {% endif %}
+
+
+
+
+    {% macro info(img,text,design_url) %}
+    <img src="{{ design_url }}img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+    <span class="" style="display:none" id="2">{{ text }}</span>
+{% endmacro %}

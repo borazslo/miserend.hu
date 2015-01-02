@@ -186,7 +186,9 @@ function neighboursUpdate($tid = false,$type = false) {
             else $maxdist = 10000;
 
             if($d < $maxdist AND $szomszed['id'] <> $templom['id']) {
-                if($type == 'mapquest') $d = mapquestDistance($templom,$szomszed);
+                if($type == 'mapquest') {
+                    $d = mapquestDistance($templom,$szomszed);
+                }
                 if($d < 10000) {
                     $szomszedsag10[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
                     $ds10[$d] = $d;
@@ -1011,6 +1013,20 @@ function getRemarkMark($tid) {
     }
 
     return $return;
+}
+
+function widget_miserend($args) {
+    global $twig,$config;
+    $tid = $args['tid'];
+    $vars = getChurch($tid);
+    if($vars == array()) $html = 'Nincs ilyen templom.';
+    else {
+        $vars['design_url'] = $config['path']['domain'];
+        $vars['miserend'] = getMasses($tid);
+        $html = $twig->render('widget_miserend.html', $vars);  
+    };
+    if(!isset($args['callback'])) return $html;
+    else return $args['callback'] . '(' . json_encode(array('html'=>$html)). ')';
 }
 
 ?>

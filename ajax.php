@@ -89,6 +89,10 @@ switch ($_REQUEST['q']) {
     case 'OSMOsszeKapcsol':
         echo osm_kapcsol_ment($_POST['oid'],$_POST['tid']);
         break;
+    case 'JSONP_miserend':
+        echo widget_miserend($_REQUEST);
+        break;
+
     default:
         //code to be executed if n is different from all labels;
 }
