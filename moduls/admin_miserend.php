@@ -495,10 +495,12 @@ function miserend_addingtemplom() {
 			mysql_query($query);
 			$query = "INSERT INTO terkep_geocode_suggestion (tid,tchecked,slng,slat,uid) VALUES (".$tid.",".$geocode['checked'].",".$lng.",".$lat.",'".$u_login."')";
 			mysql_query($query);
-			neighboursUpdate($tid);
+			
+			//neighboursUpdate($tid);
 			
 		} 
-
+		neighboursUpdate($tid);
+			
 	
 	//fájlkezelés
 		$fajl=$_FILES['fajl']['tmp_name'];
@@ -814,12 +816,12 @@ function miserend_addmise($tid) {
 	if($church['miseaktiv'] == 1) $vars['active']['yes']  = ' checked '; else $vars['active']['no'] = ' checked ';
 
 
-	$vars['lasperiod'] = 0;
+	$vars['lastperiod'] = 0;
 	if(isset($masses['periods']))
 	foreach($masses['periods'] as $pkey=>$period) {	
 		$vars['periods'][] = formPeriod($pkey,$period,'period');
 	}
-	$vars['lasperiod'] = $pkey;
+	$vars['lastperiod'] = $pkey;
 
 	$vars['lastparticular'] = 0;
 	if(isset($masses['particulars']))
@@ -1157,7 +1159,8 @@ switch($m_op) {
 		break;
 
     case 'index':
-        $tartalom=miserend_index();
+        $tartalom=miserend_modtemplom();
+        //$tartalom=miserend_index();
         break;
 
 	case 'addtemplom':

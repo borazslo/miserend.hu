@@ -11,17 +11,63 @@ var events = new Array();
         $("input.time").each(function(index,element) {
           if($(this).is(":visible")) if(!validate_time($(this).val())) seterror(this);
         })
+        var periods = new Array();
+        var particulars = new Array();
+        var names = new Array();
+
         $("input.events").each(function() {
           if($(this).is(":visible")) if(!validate_event($(this).val())) seterror(this);
           if(reg = $(this).attr('name').match(/^period\[(\d+)\]\[to\]$/)) {
-              var last = $("input[name='period[" + reg[1] + "][from]']");
-              if($(this).val() == $(last).val() ) {
+              var from = $("input[name='period[" + reg[1] + "][from]']");
+              if($(this).val() == $(from).val() ) {
                   seterror(this);
-                  seterror(last);
+                  seterror(from);
                   error.push("Az időszak kezdő és záró dátuma nem lehet ugyan az, hiszen akkor az nem periódus, hanem egyetlen különleges miserend.");
 
               }
+              var from2 = $("select[name='period[" + reg[1] + "][from2]']");
+              var to2 = $("select[name='period[" + reg[1] + "][to2]']");
+              var to = $( this );
+              var name = $("input[name='period[" + reg[1] + "][name]']")
+
+              var current = from.val() + from2.val() + to2.val() + to.val();
+              if(periods.indexOf(current) == -1) { periods.push(current); } 
+              else {
+                seterror(from);
+                seterror(from2);
+                seterror(to2);
+                seterror(to);
+                validated = false;
+                error.push("Több időszaknak megegyeznek a határai. Vagyis azok igazából egyetlen időszakhoz tartoznak: " + name.val());
+              } 
+              if(names.indexOf(name.val()) == -1) { names.push(name.val()); } 
+              else {
+                seterror(name);
+                validated = false;
+                error.push("Több időszaknak megegyeznek a nevei. Ezt jelenleg nem tudjuk támogatni: " + name.val());
+              }      
           }
+          if(reg = $(this).attr('name').match(/^particular\[(\d+)\]\[from\]$/)) {
+              var from = $("input[name='particular[" + reg[1] + "][from]']");
+              var from2 = $("select[name='particular[" + reg[1] + "][from2]']");
+              var name = $("input[name='particular[" + reg[1] + "][name]']")
+
+              var current = from.val() + from2.val();
+              if(particulars.indexOf(current) == -1) { particulars.push(current); } 
+              else {
+                seterror(from);
+                seterror(from2);
+                validated = false;
+                error.push("Több különleges miserendnek megegyeznek a határai. Vagyis azok igazából egyetlen időszakhoz tartoznak: " + name.val());
+              }
+              if(names.indexOf(name.val()) == -1) { names.push(name.val()); } 
+              else {
+                seterror(name);
+                validated = false;
+                error.push("Több időszaknak megegyeznek a nevei. Ezt jelenleg nem tudjuk támogatni: " + name.val());
+              } 
+          }
+
         })
          $("input.language").each(function() {
           if($(this).is(":visible")) if(!validate_language($(this).val())) seterror(this);
@@ -89,6 +135,8 @@ var events = new Array();
 
                 $('.addperiod').click(function() {
                         var c = 1 + parseInt($( this ).attr('last'));
+                        console.log(c);
+                        if(isNaN(c)) c = 0;
                         
                         $.ajax({
                                type:"POST",
@@ -149,6 +197,78 @@ var events = new Array();
                         }
                         return false; 
                     }); 
+
+                $("table").on('click', '.copyperiod', function(e) {
+                        var tr = $( this ).parent().parent(); 
+                        var html = tr[0].outerHTML + tr.next()[0].outerHTML + tr.next().next()[0].outerHTML; 
+
+                        var regs = $( this ).prev().prev().attr('name').match(/period\[(\d+)\]\[name\]/);
+                        var copiedid = regs[1];
+                        var newid = 1 + parseInt($('span.addperiod').attr('last'));
+                      
+                        re = new RegExp("period\\[" + copiedid + "\\]","g");
+                        var replaced = html.replace(re,"period[" + newid + "]");
+                        html = replaced;
+
+                        re = new RegExp("period" + copiedid ,"g");
+                        var replaced = html.replace(re,"period" + newid );
+                        html = replaced;
+
+                        re = new RegExp("period=\"" + copiedid + "\"","g");
+                        var replaced = html.replace(re,"period=\"" + newid + "\"");
+                        html = replaced;
+
+                        $('tr.addperiod').before(html);
+
+                        $("[name*='period[" + regs[1] + "]']").each( function() {
+                          $("[name='" + $(this).attr('name') + "]'").val($( this ).val());
+                        });
+
+                        $("input[name*='period[" + newid + "]']input[name*='[id]']").val('new');
+                        $("input[name='period[" + newid + "][name]']").val($("input[name='period[" + copiedid + "][name]']").val() + " (másolat)");
+
+                        $(window).scrollTop($("input[name='period[" + newid + "][name]']").offset().top - 12);
+                        $("input[name='period[" + newid + "][name]']").focus();
+
+                        $('span.addperiod').attr('last',newid); 
+                        return true; 
+                }); 
+
+                $("table").on('click', '.copyparticular', function(e) {
+                        var tr = $( this ).parent().parent(); 
+                        var html = tr[0].outerHTML + tr.next()[0].outerHTML + tr.next().next()[0].outerHTML; 
+
+                        var regs = $( this ).prev().prev().attr('name').match(/particular\[(\d+)\]\[name\]/);
+                        var copiedid = regs[1];
+                        var newid = 1 + parseInt($('span.addparticular').attr('last'));
+                      
+                        re = new RegExp("particular\\[" + copiedid + "\\]","g");
+                        var replaced = html.replace(re,"particular[" + newid + "]");
+                        html = replaced;
+
+                        re = new RegExp("particular" + copiedid ,"g");
+                        var replaced = html.replace(re,"particular" + newid );
+                        html = replaced;
+
+                        re = new RegExp("particular=\"" + copiedid + "\"","g");
+                        var replaced = html.replace(re,"particular=\"" + newid + "\"");
+                        html = replaced;
+
+                        $('tr.addparticular').before(html);
+
+                        $("[name*='particular[" + regs[1] + "]']").each( function() {
+                          $("[name='" + $(this).attr('name') + "]'").val($( this ).val());
+                        });
+
+                        $("input[name*='particular[" + newid + "]']input[name*='[id]']").val('new');
+                        $("input[name='particular[" + newid + "][name]']").val($("input[name='particular[" + copiedid + "][name]']").val() + " (másolat)");
+
+                        $(window).scrollTop($("input[name='particular[" + newid + "][name]']").offset().top - 12);
+                        $("input[name='particular[" + newid + "][name]']").focus();
+
+                        $('span.addperiod').attr('last',newid); 
+                        return true; 
+                });                        
 
                  $("table").on('click', '.deleteparticular', function(e) {
                         e.preventDefault();
