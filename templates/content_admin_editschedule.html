@@ -2,7 +2,7 @@
 
 <span class=alcim>Miserend feltöltése / módosítása</span><br/><br/>
 
-<FORM ENCTYPE='multipart/form-data' method=post>
+<FORM ENCTYPE='multipart/form-data' method=post id="formschedule">
 	<input type=hidden name=m_id value={{ m_id }}>
 	<input type=hidden name=m_op value=addingmise>
 	<input type=hidden name=tid value={{ tid }}>
@@ -102,3 +102,6 @@
 </table>
 
 </form>
+<div id="alertlayer" class="error" style="padding:10px;width:100%;height:100%;background-color:rgba(255,255,255,0.8);position:fixed;top:0;left:0;display:none"></div>
+<div id="errormessage" class="error" style="display:none;padding:5px;width:400px;background-color:#efefef;position:fixed;top:33%;left:50%;margin-top:0px; /* negative half the size of height */margin-left:-200px; /* negative half the size of width */">
+<div class='header' style="padding:5px;background-color:#F5CC4C;text-align:center"><span class="alcim">Hibás adatok!</span></div><span id="errortext" class="alap"></span><div class='footer' style="padding:5px;background-color:#F5CC4C;text-align:center"><span class="alap">[bezár]</span></div></div>
