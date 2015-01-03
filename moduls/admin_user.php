@@ -272,7 +272,8 @@ if(strstr($u_jogok,'user')) {
 
 switch($m_op) {
     case 'index':
-        $tartalom=user_index();
+        $tartalom=user_mod();
+        //$tartalom=user_index();
         break;
 
 	case 'add':

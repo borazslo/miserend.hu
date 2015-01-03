@@ -100,6 +100,7 @@ function adatadd() {
 
 	$remark = new Remark();
 	$remark->PreparedText4Email = $eszrevetel;
+	$remark->EmailSubject = "Miserend - észrevétel (".$id.")";
 
 	//Mail küldés az egyházmegyei felelősnek
 	if(!empty($felelosmail)) { $remark->SendMail('diocese',$felelosmail);}

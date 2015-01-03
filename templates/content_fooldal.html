@@ -26,9 +26,10 @@
       <div class="kiscim" style='margin-left:5px;'>Hol:
         <div id="form_church_getdetails" style="float:right" class="link kicsi">[részletek]</div>
         <br/>{{ forms.input(searchform.kulcsszo) }}
+        <div class=alap style='margin-left:5px;margin-top:6px'>- település:</div>{{ forms.input(searchform.varos) }}
+
       </div>
       <div id="form_church_details" style="display:none">
-        <div class=alap style='margin-left:5px;margin-top:6px'>- település:</div>{{ forms.input(searchform.varos) }}
         <div class=alap style='margin-left:5px;margin-top:6px'>- adott helyszín körül:</div>{{ forms.input(searchform.hely) }}+{{ forms.input(searchform.tavolsag) }}
         <div class=alap style='margin-left:5px;margin-top:6px;width:100%'>- egyházmegye: </div>{{ forms.select(searchform.ehm) }}<br/>
         <div class=alap id="espkerlabel" style='margin-left:5px;margin-top:6px;display:none'>- esperes kerület: </div><br/>

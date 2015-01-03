@@ -70,7 +70,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 
 	$sqllitefile = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
 	if (file_exists($sqllitefile) && strtotime("-1 day") < filemtime($sqllitefile) AND $config['debug'] == 0 AND !isset($datum)) {
-		//include($sqllitefile); exit;
+		include($sqllitefile); exit;
 	}
 
   try {

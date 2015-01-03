@@ -88,7 +88,8 @@ class Remark
 
 	function sendMail($type,$to) {
 		$mail = new Mail();
-		$mail->subject = "Miserend - észrevétel érkezett";
+		if(!isset($this->EmailSubject)) $mail->subject = "Miserend - észrevétel";
+		else $mail->subject = $this->EmailSubject;
 
 		$mail->content .= "------------------<br/>\n";
 
