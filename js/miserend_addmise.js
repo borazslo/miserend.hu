@@ -2,6 +2,8 @@ var validated = true;
 var error = new Array();
 var events = new Array();
 
+              
+
  $(document).ready(function() { 
     $( "#formschedule" ).submit(function( event ) {
         $( "input,select,textarea" ).css('border','');
@@ -109,10 +111,16 @@ var events = new Array();
                                data:"period="+period+"&count="+c,
                                success:function(response){
                                     $('#period'+ period +' tr.addmass').before(response);
+
+                                    reload_autocomplete();
+
+                                   
+
                                 },
                         });
                         
                         $( this ).attr('last',c); 
+  
                         return false; 
                 }); 
 
@@ -129,7 +137,8 @@ var events = new Array();
                                 },
                         });
                         
-                        $( this ).attr('last',c); 
+                        $( this ).attr('last',c);
+                        reload_autocomplete();
                         return false; 
                 }); 
 
@@ -147,7 +156,8 @@ var events = new Array();
                                 },
                         });
                         
-                        $( this ).attr('last',c); 
+                        $( this ).attr('last',c);
+                        reload_autocomplete();
                         return false; 
                 }); 
 
@@ -163,7 +173,8 @@ var events = new Array();
                                 },
                         });
                         
-                        $( this ).attr('last',c); 
+                        $( this ).attr('last',c);
+                        reload_autocomplete();
                         return false; 
                 }); 
 
@@ -230,7 +241,8 @@ var events = new Array();
                         $(window).scrollTop($("input[name='period[" + newid + "][name]']").offset().top - 12);
                         $("input[name='period[" + newid + "][name]']").focus();
 
-                        $('span.addperiod').attr('last',newid); 
+                        $('span.addperiod').attr('last',newid);
+                        reload_autocomplete();
                         return true; 
                 }); 
 
@@ -267,6 +279,7 @@ var events = new Array();
                         $("input[name='particular[" + newid + "][name]']").focus();
 
                         $('span.addperiod').attr('last',newid); 
+                        reload_autocomplete();
                         return true; 
                 });                        
 
@@ -297,9 +310,48 @@ var events = new Array();
                     }
                 });
 
-    $(function() {
+    reload_autocomplete();
 
-                 $( ".events" ).autocomplete({
+$( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
+    var alert = false;
+
+    var reg = $(this).attr('name').match(/period\[(\d+)\]\[name\]/);
+    var id = reg[1];
+
+    var vars = ["from","to"];
+    for (var i = 0; i < 2; i++) {
+      var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");   
+      if( input.val() != '') alert = true;
+    }
+
+    if (alert != false) {
+      if ( window.confirm("Az '" + ui.item.value + "' névhez találtunk határokat: \n" + ui.item.from + " - " + ui.item.to + "\n Jó lesz?") ) {
+          var vars = ["from","from2","to2","to"];
+          for (var i = 0; i < 4; i++) {
+            var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
+            input.val(ui.item[vars[i]]);
+          }
+
+      }
+    } else {
+      var vars = ["from","from2","to2","to"];
+        for (var i = 0; i < 4; i++) {
+          var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
+          input.val(ui.item[vars[i]]);
+      }
+    }
+    
+         
+    
+} );
+
+ function reload_autocomplete() {
+
+
+
+
+
+                  var autcoEvents = {
                       source: function( request, response ) {
                         $.ajax({
                           url: "ajax.php",
@@ -324,6 +376,49 @@ var events = new Array();
                     },
                     minLength: 0,
 
+                    }
+
+
+                 $( ".events" ).autocomplete(autcoEvents).each(function() {
+                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                            return $("<li></li>").data("item.ui-autocomplete", item).append(
+                            item.label)
+                            .appendTo(ul);
+                        };
+                  }); 
+               
+               $( "input.name.period" ).autocomplete({
+                      source: function( request, response ) {
+                        $.ajax({
+                          url: "ajax.php",
+                          dataType: "json",
+                          data: {
+                            q: 'AutocompleteName',
+                            text: request.term,
+                            type: 'period',
+                          },
+                          success: function( data ) {
+                            if(data.results != null) {
+                            response( 
+
+                                $.map( data.results, function( item ) {
+
+                                return {
+                                    label: item.label,
+                                    value: item.value,
+                                    from: item.from,
+                                    from2: item.from2,
+                                    to2: item.to2,
+                                    to: item.to
+                                }
+
+                            }));
+                          }
+                          }
+                        });
+                    },
+                    minLength: 1,
+
                     }).each(function() {
                         $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
                             return $("<li></li>").data("item.ui-autocomplete", item).append(
@@ -331,7 +426,41 @@ var events = new Array();
                             .appendTo(ul);
                         };
                     }); 
-               
+
+                  $( "input.name.particular" ).autocomplete({
+                      source: function( request, response ) {
+                        $.ajax({
+                          url: "ajax.php",
+                          dataType: "json",
+                          data: {
+                            q: 'AutocompleteName',
+                            text: request.term,
+                            type: 'particular',
+                          },
+                          success: function( data ) {
+                            if(data.results != null)
+
+                            response( 
+                                $.map( data.results, function( item ) {
+                                return {
+                                    label: item.label,
+                                    value: item.value
+                                }
+
+                            }));
+                          }
+                        });
+                    },
+                    minLength: 1,
+
+                    }).each(function() {
+                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                            return $("<li></li>").data("item.ui-autocomplete", item).append(
+                            item.label)
+                            .appendTo(ul);
+                        };
+                    }); 
+
                    function split( val ) {
                       return val.split( /,/ );
                     }
@@ -401,7 +530,13 @@ var events = new Array();
                             .appendTo(ul);
                         };
                     }); 
-                   
+                   $( ".events" ).autocomplete(autcoEvents).each(function() {
+                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                            return $("<li></li>").data("item.ui-autocomplete", item).append(
+                            item.label)
+                            .appendTo(ul);
+                        };
+                  }); 
 
                    $( "input.language" )
                       // don't navigate away from the field on tab when selecting an item
@@ -466,7 +601,11 @@ var events = new Array();
                         };
                     }); 
                   
-   });
+   
+};
+
+});
+
   $.ajax({
       type:"POST",
       dataType: "json",
@@ -479,7 +618,7 @@ var events = new Array();
   });
 
 
- });
+ 
 
  function addMassForm(period, c) {
     
@@ -633,4 +772,9 @@ function validate_date(str) {
     if (e.keyCode == 27) {       $('.error').hide("fast");  }   // esc
   });
 
- }
+ };
+
+
+  
+
+

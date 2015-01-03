@@ -66,10 +66,28 @@ switch ($_REQUEST['q']) {
     case 'AutocompleteCity':
         $return[] = array('label' => $_REQUEST['text']."* <i>(Minden ".$_REQUEST['text']."-al kezdődő)</i>",'value'=>$_REQUEST['text']."*");
 
-        $query = "SELECT varos, orszag FROM templomok WHERE varos LIKE '".$_REQUEST['text']."%' GROUP BY varos ORDER BY varos LIMIT 10";
+        $query = "SELECT varos, orszag FROM templomok WHERE varos LIKE '".$_REQUEST['text']."%' ";
+        $query .= "GROUP BY varos ORDER BY varos LIMIT 10";
         if(!$lekerdez=mysql_query($query)) echo "HIBA a város keresőben!<br>$query<br>".mysql_error();
         while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
             $return[] = array('label' => $row['varos'],'value'=>$row['varos']);
+        }
+        echo json_encode(array('results'=>$return));
+        break;
+    case 'AutocompleteName':
+        $text = sanitize($_REQUEST['text']);
+
+        $query = "SELECT idoszamitas, tol, ig FROM misek WHERE torles = '0000-00-00 00:00:00' AND idoszamitas LIKE '%".$text."%' ";
+        if($_REQUEST['type'] == 'period') $query .= " AND tmp_datumtol <> tmp_datumig ";
+        elseif($_REQUEST['type'] == 'particular') $query .= " AND tmp_datumtol == tmp_datumig ";
+        $query .= " GROUP BY idoszamitas ORDER BY idoszamitas LIMIT 10";
+
+        if(!$lekerdez=mysql_query($query)) echo "HIBA a város keresőben!<br>$query<br>".mysql_error();
+        while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
+            preg_match('/^(.*?)( -1| \+1|)$/',$row['tol'],$from);
+            preg_match('/^(.*?)( -1| \+1|)$/',$row['ig'],$to);
+            if($to[2] == '') $to[2] = '0'; if($from[2] == '') $from[2] = '0';
+            $return[] = array('label' => preg_replace('/('.$text.')/i','<b>$1</b>',$row['idoszamitas']),'value'=>$row['idoszamitas'],'from'=>$from[1],'from2'=>trim($from[2]),'to'=>$to[1],'to2'=>trim($to[2]));
         }
         echo json_encode(array('results'=>$return));
         break;

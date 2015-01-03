@@ -506,14 +506,14 @@ function decodeMassAttr($text) {
     $g = array('file' => 'gitar.gif','name'=>'gitáros mise');
     $cs = array('file' => 'csendes.gif','name'=>'csendes mise');
 
-    $gor = array('file' => 'jelzes1.png','name'=>'görög katolikus liturgia');
+    $gor = array('file' => 'jelzes1.png','name'=>'görögkatolikus liturgia');
     $rom = array('file' => 'jelzes10.png','name'=>'római katolikus szentmise');
     $regi = array('file' => 'jelzes6.png','name'=>'régi rítusú szentmise');
 
     $ige = array('file' => 'biblia.gif','name'=>'igeliturgia');
 
 
-    $ifi = array('file' => 'fiu.png','name'=>'ifjúsági/egyetemise');
+    $ifi = array('file' => 'fiu.png','name'=>'ifjúsági/egyetemista');
     $csal = array('file' => 'lany.png','name'=>'családos/mocorgós');
 
 
@@ -597,7 +597,7 @@ function formMass($pkey,$mkey,$mass = false,$group = false) {
             'label' => 'milyen',
             'name' => $group."[".$pkey."][".$mkey."][milyen]",
             'value' => $mass['milyen'],
-            'size'=>7,
+            'size'=>17,
             'class'=>'attributes' ),
         'megjegyzes' => array(
             'label' => 'megjegyzések',
@@ -633,7 +633,7 @@ function formPeriod($pkey,$period = false,$group = false) {
             'name' => $group."[".$pkey."][name]",
             'value' => $period['nev'],
             'size' => 30,
-            'class'=> 'name' ),
+            'class'=> 'name '.$group),
         'from' => array(
             'name' => $group."[".$pkey."][from]",
             'value' => trim(preg_replace('/(\+|-)([0-9]{1})$/i','',$period['tol'])),
@@ -652,33 +652,33 @@ function formPeriod($pkey,$period = false,$group = false) {
             'name' => $group."[".$pkey."][from2]",
             'options'=> array(
                 0 => '≤',
-                '-1' => '<'));
+                '+1' => '<'));
         $form['to2'] = array(
             'name' => $group."[".$pkey."][to2]",
             'options'=> array(
                 0 => '≤',
-                '+1' => '<'));
+                '-1' => '<'));
     } elseif($group == 'particular') {
         $form['from2'] = array(
             'name' => $group."[".$pkey."][from2]",
             'options'=> array(
-                '-8' => '-8. nap',
-                '-7' => '-7. nap',
-                '-6' => '-6. nap',
-                '-5' => '-5. nap',
-                '-4' => '-4. nap',
-                '-3' => '-3. nap',
-                '-2' => '-2. nap',
-                '-1' => '-1. nap',
+                '-8' => 'előtti 8. nap',
+                '-7' => 'előtti 7. nap',
+                '-6' => 'előtti 6. nap',
+                '-5' => 'előtti 5. nap',
+                '-4' => 'előtti 4. nap',
+                '-3' => 'előtti 3. nap',
+                '-2' => 'előtti 2. nap',
+                '-1' => 'előtti 1. nap',
                 0 => '',
-                '+1' => '+1. nap',
-                '+2' => '+2. nap',
-                '+3' => '+3. nap',
-                '+4' => '+4. nap',
-                '+5' => '+5. nap',
-                '+6' => '+6. nap',
-                '+7' => '+7. nap',
-                '+8' => '+8. nap'));
+                '+1' => 'utáni 1. nap',
+                '+2' => 'utáni 2. nap',
+                '+3' => 'utáni 3. nap',
+                '+4' => 'utáni 4. nap',
+                '+5' => 'utáni 5. nap',
+                '+6' => 'utáni 6. nap',
+                '+7' => 'utáni 7. nap',
+                '+8' => 'utáni 8. nap'));
     }
     
     if(preg_match('/(\+|-)([0-9]{1})$/i',$period['tol'],$match)) $form['from2']['selected'] = $match[1].$match[2];
@@ -770,7 +770,7 @@ function searchChurchesWhere($args) {
         } else {
             $text = " LIKE '%".$args['kulcsszo']."%'";
         }
-        foreach(array('nev','ismertnev','varos','cim','megkozelites','plebania','leiras','megjegyzes','misemegj') as $column ) {
+        foreach(array('nev','ismertnev','varos','cim','megkozelites','plebania','megjegyzes','misemegj') as $column ) {
             $subwhere[] = $column.$text;
         }
         $where[] = " (". implode(' OR ', $subwhere).") ";
