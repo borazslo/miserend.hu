@@ -331,9 +331,142 @@ var events = new Array();
                             .appendTo(ul);
                         };
                     }); 
-                  });
+               
+                   function split( val ) {
+                      return val.split( /,/ );
+                    }
+                    function extractLast( term ) {
+                      return split( term ).pop();
+                    }
+                  
 
+                 $( "input.attributes" )
+                      // don't navigate away from the field on tab when selecting an item
+                      .bind( "keydown", function( event ) {
+                        if ( event.keyCode === $.ui.keyCode.TAB &&
+                            $( this ).autocomplete( "instance" ).menu.active ) {
+                          event.preventDefault();
+                        }
+                      }).autocomplete({
+                      source: function( request, response ) {
+                        $.ajax({
+                          url: "ajax.php",
+                          dataType: "json",
+                          data: {
+                            q: 'AutocompleteAttributes',
+                            text: extractLast( request.term ) 
+                          },
+                          success: function( data ) {
+                            if(data.results != null)
 
+                            response( 
+                                $.map( data.results, function( item ) {
+                                return {
+                                    label: item.label,
+                                    value: item.value
+                                }
+
+                            }));
+                          }
+                        });
+                    },
+                    minLength: 0,
+                    search: function() {
+                      // custom minLength
+                      var term = extractLast( this.value );
+                      if ( term && term.length < 0 ) {
+                        return false;
+                      }
+                    },
+                    focus: function() {
+                      // prevent value inserted on focus
+                      return false;
+                    },
+                    select: function( event, ui ) {
+                      var terms = split( this.value );
+                      // remove the current input
+                      terms.pop();
+                      // add the selected item
+                      terms.push( ui.item.value );
+                      // add placeholder to get the comma-and-space at the end
+                      terms.push( "" );
+                      this.value = terms.join( "," );
+                      return false;
+                    }
+
+                    }).each(function() {
+                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                            return $("<li></li>").data("item.ui-autocomplete", item).append(
+                            item.label)
+                            .appendTo(ul);
+                        };
+                    }); 
+                   
+
+                   $( "input.language" )
+                      // don't navigate away from the field on tab when selecting an item
+                      .bind( "keydown", function( event ) {
+                        if ( event.keyCode === $.ui.keyCode.TAB &&
+                            $( this ).autocomplete( "instance" ).menu.active ) {
+                          event.preventDefault();
+                        }
+                      }).autocomplete({
+                      source: function( request, response ) {
+                        $.ajax({
+                          url: "ajax.php",
+                          dataType: "json",
+                          data: {
+                            q: 'AutocompleteAttributes',
+                            text: extractLast( request.term ),
+                            type: 'language'
+                          },
+                          success: function( data ) {
+                            if(data.results != null)
+
+                            response( 
+                                $.map( data.results, function( item ) {
+                                return {
+                                    label: item.label,
+                                    value: item.value
+                                }
+
+                            }));
+                          }
+                        });
+                    },
+                    minLength: 0,
+                    search: function() {
+                      // custom minLength
+                      var term = extractLast( this.value );
+                      if ( term && term.length < 0 ) {
+                        return false;
+                      }
+                    },
+                    focus: function() {
+                      // prevent value inserted on focus
+                      return false;
+                    },
+                    select: function( event, ui ) {
+                      var terms = split( this.value );
+                      // remove the current input
+                      terms.pop();
+                      // add the selected item
+                      terms.push( ui.item.value );
+                      // add placeholder to get the comma-and-space at the end
+                      terms.push( "" );
+                      this.value = terms.join( "," );
+                      return false;
+                    }
+
+                    }).each(function() {
+                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+                            return $("<li></li>").data("item.ui-autocomplete", item).append(
+                            item.label)
+                            .appendTo(ul);
+                        };
+                    }); 
+                  
+   });
   $.ajax({
       type:"POST",
       dataType: "json",
