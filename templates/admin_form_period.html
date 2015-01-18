@@ -1,6 +1,6 @@
 {% import "forms.twig" as forms %}
 
-<table class="portlet" style="width:100%;padding:0px;background-color:white">
+<table class="portlet" style="width:611px;padding:0px;background-color:white">
 
 <tr>
 	<td bgcolor=#D6F8E6>
@@ -26,9 +26,9 @@
 		{% include 'help_link.html' with {'id': 50, 'height': 18} %}
 	</td>
 </tr>
-<tr>
+<tr class="period">
 	<td colspan="2">
-		<table cellpadding=4 width=100% id="period{{ pkey }}">
+		<table cellpadding=4 width=100% id="period{{ pkey }}" >
 			{% for nap in napok %}
 				{% include "admin_form_mass.html" with nap %}
 			{% endfor %}

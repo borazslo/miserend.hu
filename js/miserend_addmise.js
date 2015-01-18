@@ -95,9 +95,9 @@ var events = new Array();
 
                  $('input[type=radio][name=miseaktiv]').change(function() {
                     if(this.value == 1) {
-                        $('#miserend').show('slow');
+                        $('#periods').show('slow');
                     } else {
-                        $('#miserend').hide('slow');
+                        $('#periods').hide('slow');
                     }
                     //$('#miseaktiv').val($(this).is(':checked'));        
                 });
@@ -140,22 +140,33 @@ var events = new Array();
                   handle: ".portlet-header",
                   update: function(event,ui){ 
                     $("#particulars").find(".portlet").each(function(index) { 
-                      console.log(index)
                       $( this ).find("input.weight").val(index + 1);
                     });
                   },
-                  sort: function(e) {
+                  sort: function( e ) {
+                      //  console.log('start');
+
+                  },
+                  start: function(e) {
+                    /*
                     $("#particulars").find('.close').each( function() {
-                        $( this ).parent().parent().next().next().hide();;
+                        console.log('sort');
+                        $( this ).parent().parent().next().next().hide();
                         $( this ).switchClass('close','open');
                         $(this).attr("src", "img/plusz.jpg");
 
                     })
+                    */
                   }
                 });
 
                 }; 
 
+          
+        $("body").on('mousedown', '.portlet-header', function() {
+                  $(this).parent().parent().parent().find('.particular,.period').hide();
+              });
+          
            portletParticulars();
            portletPeriods();
              
