@@ -351,7 +351,7 @@ function event2Date($event, $year = false) {
     $query = "SELECT name, date FROM events WHERE year = '".$year."' ";
     $result = mysql_query($query);    
     while(($row = mysql_fetch_array($result))) {
-            $events['name'][] = '/^'.$row['name'].'( (\+|-)([0-9]{1,3})|)$/i';
+            $events['name'][] = '/^'.$row['name'].'( (\+|-)([0-9]{1,3})|)( day|)$/i';
             $events['date'][] = $row['date'];
          }
     $event = preg_replace($events['name'], $events['date'], $event);
@@ -494,8 +494,8 @@ function getMasses($tid,$date = false) {
     function cmp($a, $b) {
         return $a["weight"] - $b["weight"];
     }
-    usort($return['periods'], "cmp");
-    usort($return['particulars'], "cmp");
+    if(is_array($return['periods'])) usort($return['periods'], "cmp");
+    if(is_array($return['particulars'])) usort($return['particulars'], "cmp");
 
 
     return $return;
@@ -862,8 +862,9 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
     //milyen időszakban
     $day = date('m-d',strtotime($args['mikor']));
-    $where[] = "( ( tmp_datumtol <= '".$day."' AND '".$day."' <= tmp_datumig AND (tmp_relation = '<' OR  tmp_relation = '=') )
-    OR  ( ( tmp_datumig <= '".$day."' OR '".$day."' <= tmp_datumtol ) AND ( tmp_relation = '>'  OR  tmp_relation = '=') ) )";
+    $where[] = "( ( tmp_datumtol <= '".$day."' AND '".$day."' <= tmp_datumig AND tmp_relation = '<'  )
+    OR  ( ( tmp_datumig <= '".$day."' OR '".$day."' <= tmp_datumtol ) AND ( tmp_relation = '>' ) )  
+    OR ( tmp_datumig = '".$day."' AND tmp_datumig = '".$day."' AND  tmp_relation = '=' ) )";
 
     //milyen héten
     $subwhere = array();
@@ -941,6 +942,7 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
     $query .= " LIMIT ".($offset ).",".($limit);
     //echo $query; //exit;
+    $return['results'] = false;
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
     while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
         $row['datumtol'] = $datumtol = event2Date($row['tol']);
@@ -949,7 +951,29 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
         $return['results'][] = $row; 
     }
-    //echo "<pre>".print_r($return,1); exit;
+
+    //Ha van particular akkor periodot törli az eredmények közül.
+    $particular = false; $tmp = array();
+    if(is_array($return['results'])) foreach ($return['results'] as $key => $mass) {
+        if($mass['tmp_relation'] == '=') {
+            $tmp[] = $mass;
+            $particular = true;
+        }
+    }
+    if($particular == true) $return['results'] = $tmp;
+
+
+    //Ha több period is van,akkor a nagyobb súlyút engedi csak át
+    $weight = 0; $tmp = array();
+    if(is_array($return['results'])) foreach ($return['results'] as $key => $mass) {
+        if($mass['tmp_relation'] != '=' AND is_numeric($mass['weight']) ) { 
+            if($mass['weight'] > $weight) $weight = $mass['weight'];
+            $tmp[$mass['weight']][] = $mass;
+        }
+    }
+    if($weight != false) $return['results'] = $tmp[$weight];
+
+    //echo "<pre>".print_r($return,1); 
     return $return;
 }
 

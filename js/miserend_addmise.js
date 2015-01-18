@@ -165,7 +165,16 @@ var events = new Array();
           
         $("body").on('mousedown', '.portlet-header', function() {
                   $(this).parent().parent().parent().find('.particular,.period').hide();
-              });
+        
+
+                  $(this).parent().parent().parent().find('.close').each( function() {
+                        $( this ).switchClass('close','open');
+                        $(this).attr("src", "img/plusz.jpg");
+
+                   })
+
+
+        });
           
            portletParticulars();
            portletPeriods();

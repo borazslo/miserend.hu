@@ -841,7 +841,7 @@ function miserend_addmise($tid) {
             'value' => $church['adminmegj'],
             'labelback'=> ' A templom szerkesztésével kacsolatosan.');
 	  	  
-	$vars['helptext'] = '';
+	$vars['helptext'] = '<span class="alap">Figyelem! Ha átfedés van két periódus/időszak vagy különleges miserend között, akkor a listában lejjebb lévő vagyis „nehezebb” periódus vagy különleges miserend jelenik meg a keresőben!</span>';
 	 
 	global $twig;
 	return $twig->render('content_admin_editschedule.html',$vars); 
