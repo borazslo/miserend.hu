@@ -5,6 +5,8 @@ var events = new Array();
               
 
  $(document).ready(function() { 
+
+
     $( "#formschedule" ).submit(function( event ) {
         $( "input,select,textarea" ).css('border','');
 
@@ -100,6 +102,64 @@ var events = new Array();
                     //$('#miseaktiv').val($(this).is(':checked'));        
                 });
 
+
+               $("body").on('click', '.close', function() { 
+                  $( this ).parent().parent().next().next().hide();;
+                  $( this ).switchClass('close','open');
+                  $(this).attr("src", "img/plusz.jpg");
+
+               });
+               $("body").on('click', '.open', function() { 
+                  $( this ).parent().parent().next().next().show();;
+                  $( this ).switchClass('open','close');
+                  $(this).attr("src", "img/minusz.jpg");
+               });
+
+
+             var portletPeriods = function() {  $( "#periods" ).sortable({
+                  handle: ".portlet-header",
+                  update: function(event,ui){ 
+                    $("#periods").find(".portlet").each(function(index) { 
+                      console.log(index)
+                      $( this ).find("input.weight").val(index + 1);
+                    });
+                  },
+                  sort: function(e) {
+                    $("#periods").find('.close').each( function() {
+                        $( this ).parent().parent().next().next().hide();;
+                        $( this ).switchClass('close','open');
+                        $(this).attr("src", "img/plusz.jpg");
+
+                    })
+                  }
+                });
+
+                };
+
+            var portletParticulars = function() {  $( "#particulars" ).sortable({
+                  handle: ".portlet-header",
+                  update: function(event,ui){ 
+                    $("#particulars").find(".portlet").each(function(index) { 
+                      console.log(index)
+                      $( this ).find("input.weight").val(index + 1);
+                    });
+                  },
+                  sort: function(e) {
+                    $("#particulars").find('.close').each( function() {
+                        $( this ).parent().parent().next().next().hide();;
+                        $( this ).switchClass('close','open');
+                        $(this).attr("src", "img/plusz.jpg");
+
+                    })
+                  }
+                });
+
+                }; 
+
+           portletParticulars();
+           portletPeriods();
+             
+
 //                 $('.addmise').click(function() {
                 $("body").on('click', '.addmise', function() {
                         var c = 1 + parseInt($( this ).attr('last'));
@@ -152,7 +212,10 @@ var events = new Array();
                                url:"ajax.php?q=FormPeriodEmpty",
                                data:"period="+c,
                                success:function(response){
-                                    $('tr.addperiod').before(response);
+                                    $('.addperiod').before(response);
+
+                                      portletPeriods();
+             
                                 },
                         });
                         
@@ -169,7 +232,9 @@ var events = new Array();
                                url:"ajax.php?q=FormParticularEmpty",
                                data:"particular="+c,
                                success:function(response){
-                                    $('tr.addparticular').before(response);
+                                    $('.addparticular').before(response);
+                                    portletParticulars();
+
                                 },
                         });
                         
@@ -178,7 +243,7 @@ var events = new Array();
                         return false; 
                 }); 
 
-                $("table").on('click', '.deletemise', function(e) {
+                $("body").on('click', '.deletemise', function(e) {
                         e.preventDefault();
                         if (window.confirm("Biztos, hogy törölni szeretnéd ezt a misét?")) {
                             var html = 'Ez a mise törölve lesz: ';
@@ -192,7 +257,7 @@ var events = new Array();
                         return false; 
                     }); 
 
-                $("table").on('click', '.deleteperiod', function(e) {
+                $("#periods").on('click', '.deleteperiod', function(e) {
                         e.preventDefault();
                         if (window.confirm("Biztos, hogy törölni szeretnéd ezt a periódust és minden hozzá tartozó misét?")) {
                             var html = 'Ez a periódus törölve lesz: ';
@@ -209,9 +274,10 @@ var events = new Array();
                         return false; 
                     }); 
 
-                $("table").on('click', '.copyperiod', function(e) {
+                $("#periods").on('click', '.copyperiod', function(e) {
                         var tr = $( this ).parent().parent(); 
-                        var html = tr[0].outerHTML + tr.next()[0].outerHTML + tr.next().next()[0].outerHTML; 
+                        //var html = tr[0].outerHTML + tr.next()[0].outerHTML + tr.next().next()[0].outerHTML; 
+                        var html = tr[0].outerHTML;
 
                         var regs = $( this ).prev().prev().attr('name').match(/period\[(\d+)\]\[name\]/);
                         var copiedid = regs[1];
@@ -229,7 +295,7 @@ var events = new Array();
                         var replaced = html.replace(re,"period=\"" + newid + "\"");
                         html = replaced;
 
-                        $('tr.addperiod').before(html);
+                        $('.addperiod').before(html);
 
                         $("[name*='period[" + regs[1] + "]']").each( function() {
                           $("[name='" + $(this).attr('name') + "]'").val($( this ).val());
@@ -246,9 +312,10 @@ var events = new Array();
                         return true; 
                 }); 
 
-                $("table").on('click', '.copyparticular', function(e) {
-                        var tr = $( this ).parent().parent(); 
-                        var html = tr[0].outerHTML + tr.next()[0].outerHTML + tr.next().next()[0].outerHTML; 
+                $("#particulars").on('click', '.copyparticular', function(e) {
+                        var tr = $( this ).parent().parent().parent().parent(); 
+                        //var html = tr[0].outerHTML + tr.next()[0].outerHTML + tr.next().next()[0].outerHTML; 
+                        var html = tr[0].outerHTML;
 
                         var regs = $( this ).prev().prev().attr('name').match(/particular\[(\d+)\]\[name\]/);
                         var copiedid = regs[1];
@@ -266,7 +333,7 @@ var events = new Array();
                         var replaced = html.replace(re,"particular=\"" + newid + "\"");
                         html = replaced;
 
-                        $('tr.addparticular').before(html);
+                        $('.addparticular').before(html);
 
                         $("[name*='particular[" + regs[1] + "]']").each( function() {
                           $("[name='" + $(this).attr('name') + "]'").val($( this ).val());
@@ -283,7 +350,7 @@ var events = new Array();
                         return true; 
                 });                        
 
-                 $("table").on('click', '.deleteparticular', function(e) {
+                 $("#particulars").on('click', '.deleteparticular', function(e) {
                         e.preventDefault();
                         if (window.confirm("Biztos, hogy törölni szeretnéd ezt a különleges miserendet és minden hozzá tartozó misét?")) {
                             var html = 'Ez a különleges miserend törölve lesz: ';
@@ -300,7 +367,7 @@ var events = new Array();
                         return false; 
                     }); 
 
-                $("table").on('change', '.urlap.nap', function(e) {
+                $("body").on('change', '.urlap.nap', function(e) {
                     if($( this ).val() == 7) {
                         $( this ).parent().parent().css("background-color", "#E67070");
                     } else if ($( this ).val() == 6) {

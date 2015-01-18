@@ -4,12 +4,11 @@
 	<td >
 		{{ forms.input(id) }}
 		{{ forms.input(ido) }}
-		    	<span class='alap deletemise'>[töröl]</span>
-
+		<img src="img/buttons/deleteup.gif" class='alap deletemise' style="vertical-align: middle;" height="18" title="Mise törlése">
 	</td>
 	<td>
-		{{ forms.input(nyelv) }}
-		{{ forms.input(milyen) }}<br/>
-		{{ forms.input(megjegyzes) }}
+		{{ forms.input(nyelv) }}{% include 'help_link.html' with {'id': 46, 'height': 15, 'style':'margin-right:5px'} %}
+		{{ forms.input(milyen) }}{% include 'help_link.html' with {'id': 47, 'height': 15} %}<br/>
+		{{ forms.input(megjegyzes) }}{% include 'help_link.html' with {'id': 48, 'height': 15} %}
 	</td>
 </tr>

@@ -28,34 +28,21 @@
 	</tr>
 </table>
 
-<table id="miserend" cellpadding=4 width=100% {% if active.no %} style="display:none" {% endif %}>
-	<tr>
-		<td>
-			<span class=kiscim>Miseidőpontok:</span>
-		</td>
-		<td>&nbsp;</td>
-	</tr>
+<span class=kiscim>Miseidőpontok:</span>
 	
+<div id="periods" style="margin-bottom:5px">
 	{% for period in periods %}
 		{% include 'admin_form_period.html' with period %}
 	{% endfor %}
+	<span class="urlap button addperiod" last="{{ lastperiod }}" >Új periódus hozzáadása</span>
+</div>
 
-	<tr class="addperiod">
-		<td colspan="2">
-			<span class="alap addperiod" last="{{ lastperiod }}" >[új periódus hozzáadása]</span>
-		</td>
-	</tr>
-
+<div id="particulars" style="margin-bottom:5px">
 	{% for particular in particulars %}
 		{% include 'admin_form_particular.html' with particular %}
 	{% endfor %}
-
-	<tr class="addparticular">
-		<td colspan="2">
-			<span class="alap addparticular" last="{{ lastparticular }}" >[új különleges miserend hozzáadása]</span>
-		</td>
-	</tr>
-
+	<span class="urlap button addparticular" last="{{ lastparticular }}" >Új különleges miserend hozzáadása</span>
+</div>
 
 
 </table>

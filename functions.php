@@ -451,11 +451,12 @@ function getMasses($tid,$date = false) {
 
    
     $return = array();
-    $query = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid GROUP BY idoszamitas ";
+    $query = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid GROUP BY idoszamitas ORDER BY weight DESC";
     $result = mysql_query($query);
     while(($row = mysql_fetch_array($result))) {
         $tmp = array();
         $tmp['nev'] = $row['idoszamitas'];
+        $tmp['weight'] = $row['weight'];
         $tmp['tol'] = $row['tol'];
         $tmp['ig'] = $row['ig'];
         $tmp['datumtol'] = $datumtol = $row['tmp_datumtol']; //event2Date($row['tol']);
@@ -488,6 +489,14 @@ function getMasses($tid,$date = false) {
             $return['particulars'][] = $tmp;
         else $return['periods'][] = $tmp;
     }
+
+    //order byweight
+    function cmp($a, $b) {
+        return $a["weight"] - $b["weight"];
+    }
+    usort($return['periods'], "cmp");
+    usort($return['particulars'], "cmp");
+
 
     return $return;
 }
@@ -590,20 +599,19 @@ function formMass($pkey,$mkey,$mass = false,$group = false) {
             'label' => 'nyelvek',
             'name' => $group."[".$pkey."][".$mkey."][nyelv]",
             'value' => $mass['nyelv'],
-            'style'=>'margin-right:10px',
-            'size'=>7,
+            'size'=>5,
             'class'=>'language'),
         'milyen' => array(
             'label' => 'milyen',
             'name' => $group."[".$pkey."][".$mkey."][milyen]",
             'value' => $mass['milyen'],
-            'size'=>17,
+            'size'=>13,
             'class'=>'attributes' ),
         'megjegyzes' => array(
             'label' => 'megjegyzések',
             'name' => $group."[".$pkey."][".$mkey."][megjegyzes]",
             'value' => $mass['megjegyzes'],
-            'style' => 'margin-top:4px;width:204px')
+            'style' => 'margin-top:4px;width:194px')
         );
     return $form;
 }
@@ -637,12 +645,12 @@ function formPeriod($pkey,$period = false,$group = false) {
         'from' => array(
             'name' => $group."[".$pkey."][from]",
             'value' => trim(preg_replace('/(\+|-)([0-9]{1})$/i','',$period['tol'])),
-            'size' => 20,
+            'size' => 18,
             'class' => 'events'),
         'to' => array(
             'name' => $group."[".$pkey."][to]",
             'value' => trim(preg_replace('/(\+|-)([0-9]{1})$/i','',$period['ig'])),
-            'size' => 20,
+            'size' => 18,
             'class' => 'events',
         )
     );
@@ -960,9 +968,11 @@ function getWeekInMonth($date,$order = '+') {
     return $num;
 }
 
-function sugolink($id) {
+function sugolink($id,$height=false) {
     global $twig;
-    return $twig->render('help_link.html', array('id'=>$id))  ; 
+    $args['id'] = $id;
+    if($height != false) $args['height'] = $height;
+    return $twig->render('help_link.html', $args)  ; 
 }
 
 
@@ -993,11 +1003,14 @@ function generateMassTmp($where = false) {
 function getRemarkMark($tid) {
     $return = array();
 
-    $querye="SELECT allapot FROM eszrevetelek WHERE hol='templomok' and hol_id = $tid GROUP BY allapot LIMIT 3";
-    if(!$lekerdeze=mysql_query($querye)) echo "HIBA!<br>$querym<br>".mysql_error();
-    while(list($cell)=mysql_fetch_row($lekerdeze)) {
-        $allapot[$cell] = true;
+    if(is_numeric($tid)) {
+        $querye="SELECT allapot FROM eszrevetelek WHERE hol='templomok' and hol_id = $tid GROUP BY allapot LIMIT 3";
+        if(!$lekerdeze=mysql_query($querye)) echo "HIBA!<br>$querym<br>".mysql_error();
+        while(list($cell)=mysql_fetch_row($lekerdeze)) {
+            $allapot[$cell] = true;
+        }
     }
+
     if(isset($allapot['u'])) { 
         $return['html'] = "<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> "; 
         $return['text'] = "Új észrevételt írtak hozzá!";

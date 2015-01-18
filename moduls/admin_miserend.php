@@ -841,15 +841,7 @@ function miserend_addmise($tid) {
             'value' => $church['adminmegj'],
             'labelback'=> ' A templom szerkesztésével kacsolatosan.');
 	  	  
-	$vars['helptext'] = <<<'EOT'
-  <br><br><span class=alap><b>nyelvek</b> (h, hu vagy üres=magyar, en=angol, de=német, it=olasz, fr=francia, va=latin, gr=görög, sk=szlovák, hr=horvát, pl=lengyel, si=szlovén => további nyelvek esetén az internetes 2 betűs végződés az irányadó!) Előfordulhatnak periódusok is, ebben az esetben a nyelv mellett a periódus számát kell feltüntetni, pl de2,va3 -> minden hónap második hetén német, harmadik hetén latin (A vessző fontos, merty az tagolja).<br>
-		<br/><b>Lehetséges periódusok</b>: <b> 0</b>=mindig<b>, 1, 2, 3, 4, 5, -1</b>=utolsó héten<b>, ps</b>=páros héten<b>, pt</b>=páratlan héten.<br>
-		Alapeset, minden mise magyar: ebben az esetben nem kell kitölteni. Alapesetben a templomnak megfelelő rítusú a liturgia: csak akkor kell feltüntetni gor/rom, ha eltér a templom rítusától.</span>
-		<br><br><span class=alap>A mise-tulajdonságok a nyelvekhez hasonlóan működnek. Előfordulhatnak periódusok is, ebben az esetben a hét számát is fel kell tüntetni. (Periódus nélkül 0-át lehet a betükód mögé írni, de nem szökséges.)
-		<br><b>Betükódok</b>: gitáros = g, csendes = cs<br>családos/gyerek = csal, diák = d, egyetemista/ifjúsági = ifi<br/>igeliturgia = ige, görögkatolikus = gor, római katolikus = rom, régi rítusú = regi
-		<br>Több tulajdonságot vesszővel kell egymástól elválasztani.
-		<br><br><span class=alap>A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.</span>
-EOT;
+	$vars['helptext'] = '';
 	 
 	global $twig;
 	return $twig->render('content_admin_editschedule.html',$vars); 
@@ -890,20 +882,22 @@ function miserend_addingmise() {
 		if(is_numeric($key)) {
 			$mass['tid'] = $_REQUEST['tid'];
 			$mass['idoszamitas'] = sanitize($period['name']);
+			$mass['weight'] = $period['weight'];
 			$mass['tol'] = sanitize($period['from']);
+
 			if($period['from2'] != 0) $mass['tol'] .= ' '.$period['from2'];
 			$mass['ig'] = sanitize($period['to']);
 			if($period['to2'] != 0) $mass['ig'] .= ' '.$period['to2'];
 
 			if($mass['id'] != 'new') {
 				$query = "UPDATE misek SET ";
-				$query .= "nap='".$mass['napid']."',ido='".$mass['ido'].":00',nap2='".$mass['nap2']."',idoszamitas='".$mass['idoszamitas']."',tol='".$mass['tol']."',ig='".$mass['ig']."',nyelv='".$mass['nyelv']."',milyen='".$mass['milyen']."',megjegyzes='".$mass['megjegyzes']."',";
+				$query .= "nap='".$mass['napid']."',ido='".$mass['ido'].":00',nap2='".$mass['nap2']."',idoszamitas='".$mass['idoszamitas']."',weight='".$mass['weight']."',tol='".$mass['tol']."',ig='".$mass['ig']."',nyelv='".$mass['nyelv']."',milyen='".$mass['milyen']."',megjegyzes='".$mass['megjegyzes']."',";
 				$query .= "modositotta='".$user->login."',moddatum='".$most."'";
 				$query .= " WHERE tid = ".$mass['tid']." AND id = ".$mass['id']." LIMIT 1";
 			} else {
 				$query = "INSERT INTO misek ";
-				$query .= " (tid,nap,ido,nap2,idoszamitas,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
-				$query .= " VALUES ('".$mass['tid']."','".$mass['napid']."','".$mass['ido'].":00','".$mass['nap2']."','".$mass['idoszamitas']."','".$mass['tol']."','".$mass['ig']."','".$mass['nyelv']."','".$mass['milyen']."','".$mass['megjegyzes']."',";
+				$query .= " (tid,nap,ido,nap2,idoszamitas,weight,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
+				$query .= " VALUES ('".$mass['tid']."','".$mass['napid']."','".$mass['ido'].":00','".$mass['nap2']."','".$mass['idoszamitas']."','".$mass['weight']."','".$mass['tol']."','".$mass['ig']."','".$mass['nyelv']."','".$mass['milyen']."','".$mass['megjegyzes']."',";
 				$query .= "'".$user->login."','".$most."')";
 			}
 			mysql_query($query);
@@ -917,6 +911,7 @@ function miserend_addingmise() {
 		if(is_numeric($key)) {
 			$mass['tid'] = $_REQUEST['tid'];
 			$mass['idoszamitas'] = sanitize($particular['name']);
+			$mass['weight'] = $particular['weight'];
 			$mass['tol'] = sanitize($particular['from']);
 			if($particular['from2'] != 0) $mass['tol'] .= ' '.$particular['from2'];
 			$mass['ig'] = $mass['tol'];
@@ -924,13 +919,13 @@ function miserend_addingmise() {
 
 			if($mass['id'] != 'new') {
 				$query = "UPDATE misek SET ";
-				$query .= "nap='".$mass['napid']."',ido='".$mass['ido'].":00',nap2='".$mass['nap2']."',idoszamitas='".$mass['idoszamitas']."',tol='".$mass['tol']."',ig='".$mass['ig']."',nyelv='".$mass['nyelv']."',milyen='".$mass['milyen']."',megjegyzes='".$mass['megjegyzes']."',";
+				$query .= "nap='".$mass['napid']."',ido='".$mass['ido'].":00',nap2='".$mass['nap2']."',idoszamitas='".$mass['idoszamitas']."',weight='".$mass['weight']."',tol='".$mass['tol']."',ig='".$mass['ig']."',nyelv='".$mass['nyelv']."',milyen='".$mass['milyen']."',megjegyzes='".$mass['megjegyzes']."',";
 				$query .= "modositotta='".$user->login."',moddatum='".$most."'";
 				$query .= " WHERE tid = ".$mass['tid']." AND id = ".$mass['id']." LIMIT 1";
 			} else {
 				$query = "INSERT INTO misek ";
-				$query .= " (tid,nap,ido,nap2,idoszamitas,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
-				$query .= " VALUES ('".$mass['tid']."','".$mass['napid']."','".$mass['ido'].":00','".$mass['nap2']."','".$mass['idoszamitas']."','".$mass['tol']."','".$mass['ig']."','".$mass['nyelv']."','".$mass['milyen']."','".$mass['megjegyzes']."',";
+				$query .= " (tid,nap,ido,nap2,idoszamitas,weight,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
+				$query .= " VALUES ('".$mass['tid']."','".$mass['napid']."','".$mass['ido'].":00','".$mass['nap2']."','".$mass['idoszamitas']."','".$mass['weight']."','".$mass['tol']."','".$mass['ig']."','".$mass['nyelv']."','".$mass['milyen']."','".$mass['megjegyzes']."',";
 				$query .= "'".$user->login."','".$most."')";
 			}
 			mysql_query($query);

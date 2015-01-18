@@ -104,6 +104,20 @@ div.rightside.footer , div.leftside.footer {
         margin-left: 2%;
     }
     
+
+.button, input {
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    border-radius:3px;
+    background-color:#ffffff;
+    border:1px solid #c7bdc7;
+    display:inline-block;
+    cursor:pointer;
+    color:#000000;
+    padding:2px 5px;
+    text-decoration:none;
+}
+
 @media all and (max-width: 767px) {
     .mobileonly {
         display:block;

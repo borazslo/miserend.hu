@@ -1,3 +1,8 @@
-<a href="javascript:OpenNewWindow('sugo.php?id={{ id }}',200,300);">
-	<img src=img/sugo.gif border=0 title="Súgó">
-</a>
+<img 
+	src=img/sugo.gif 
+	border=0   
+	onClick="OpenNewWindow('sugo.php?id={{ id }}',200,300);" 
+	title="Súgó" 
+	{% if height %} height="{{ height }}"{% endif %} 
+	style="vertical-align: middle;{% if style %}{{ style }}{% endif %}"
+/>
