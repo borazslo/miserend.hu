@@ -35,6 +35,7 @@
         <div class=alap id="espkerlabel" style='margin-left:5px;margin-top:6px;display:none'>- esperes kerület: </div><br/>
               {% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}
         <div class=alap style='margin-left:5px;margin-top:0px'>- csak görögkatolikus: {{ forms.input(searchform.gorog) }}</div>
+        <div class=alap style='margin-left:5px;margin-top:6px'>- ahol van adott nyelvű mise is: {{ forms.select(searchform.tnyelv) }}</div>
       </div>
 
     </div>

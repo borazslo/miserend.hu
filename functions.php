@@ -732,9 +732,16 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     $where = searchChurchesWhere($args);
 
     
-    $query = "SELECT id,nev,ismertnev,varos,letrehozta,lat,lng FROM templomok "; 
+    $query = "SELECT templomok.id,nev,ismertnev,varos,letrehozta,lat,lng FROM templomok "; 
     $query .= "LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id ";
+    if($args['tnyelv'] != '0' ) { 
+        $query .= " INNER JOIN misek ON misek.tid = templomok.id ";
+        if($args['tnyelv'] == 'h') $args['tnyelv'] = 'hu|h';
+        $where[] = " misek.nyelv  REGEXP '(^|,)(".$args['tnyelv'].")([0-5]{0,1}|-1|ps|pt)(,|$)' ";
+    }
     if(count($where)>0) $query .= "WHERE ".implode(' AND ',$where);
+    if($args['tnyelv'] != '0' ) $query .= " GROUP BY templomok.id ";
+
     $query .= " ORDER BY nev ";
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
     $return['sum']=mysql_num_rows($lekerdez);
@@ -832,20 +839,20 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     $return = array(
         'offset' => $offset,
         'limit' => $limit );
-    $where = array(" torles = '0000:00:00 00:00:00' ");
+    $where = array(" m.torles = '0000:00:00 00:00:00' ");
 
     //templomok
     if(isset($args['templom']) AND is_numeric($args['templom']) ) {
-        $where[] = ' tid = '.$args['templom']; }
-    elseif($args['varos'] != '' OR $args['kulcsszo'] != '' OR $args['egyhazmegye'] != '' OR $args['gorog'] == 'gorog' OR $args['hely'] != '' ) {
+        $where[] = ' m.tid = '.$args['templom']; }
+    elseif($args['varos'] != '' OR $args['kulcsszo'] != '' OR $args['egyhazmegye'] != '' OR $args['gorog'] == 'gorog' OR $args['hely'] != '' OR $args['tnyelv'] != '0' ) {
         if($args['varos'] == 'Budapest') $args['varos'] = 'Budapest*';
 
         $tmp = $args;
         if(isset($tmp['leptet'])) unset($tmp['leptet']);
         if(isset($tmp['min'])) unset($tmp['min']);
         $results = searchChurches($args,0,1000000);
-        if(isset($results['results'])) foreach($results['results'] as $r) $subwhere[] = " tid = ".$r['id']." ";
-        if(!$subwhere) $where[] = " tid = 'nincs templom' ";
+        if(isset($results['results'])) foreach($results['results'] as $r) $subwhere[] = " m.tid = ".$r['id']." ";
+        if(!$subwhere) $where[] = " m.tid = 'nincs templom' ";
         else $where[] = " (".implode(' OR ', $subwhere).")";
     }
     if($args['gorog'] == 'gorog') {
@@ -856,48 +863,48 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
     //milyen nap
     if($args['mikor'] == 'x') $args['mikor'] = $args['mikordatum']; 
-    $where[] = "( nap = '".date('N',strtotime($args['mikor']))."' OR nap = 0 )";
+    $where[] = "( m.nap = '".date('N',strtotime($args['mikor']))."' OR m.nap = 0 )";
 
 
 
     //milyen időszakban
     $day = date('m-d',strtotime($args['mikor']));
-    $where[] = "( ( tmp_datumtol <= '".$day."' AND '".$day."' <= tmp_datumig AND tmp_relation = '<'  )
-    OR  ( ( tmp_datumig <= '".$day."' OR '".$day."' <= tmp_datumtol ) AND ( tmp_relation = '>' ) )  
-    OR ( tmp_datumig = '".$day."' AND tmp_datumig = '".$day."' AND  tmp_relation = '=' ) )";
+    $where[] = "( ( m.tmp_datumtol <= '".$day."' AND '".$day."' <= m.tmp_datumig AND m.tmp_relation = '<'  )
+    OR  ( ( m.tmp_datumig <= '".$day."' OR '".$day."' <= m.tmp_datumtol ) AND ( m.tmp_relation = '>' ) )  
+    OR ( m.tmp_datumig = '".$day."' AND m.tmp_datumig = '".$day."' AND  m.tmp_relation = '=' ) )";
 
     //milyen héten
     $subwhere = array();
     if ( date('W',strtotime($args['mikor'])) & 1 ) { $parossag ='pt'; } else $parossag = "ps";
-    $subwhere[] = "nap2='".$parossag."'";
+    $subwhere[] = "m.nap2='".$parossag."'";
     $hanyadikP = getWeekInMonth($args['mikor']);
     $hanyadikM = getWeekInMonth($args['mikor'],'-');
-    $subwhere[] = "nap2='".$hanyadikP."'";
-    $subwhere[] = "nap2='".$hanyadikM."'";
-    $subwhere[] = "nap2='0'";
-    $subwhere[] = "nap2 IS NULL";
-    $subwhere[] = "nap2 = '' ";
+    $subwhere[] = "m.nap2='".$hanyadikP."'";
+    $subwhere[] = "m.nap2='".$hanyadikM."'";
+    $subwhere[] = "m.nap2='0'";
+    $subwhere[] = "m.nap2 IS NULL";
+    $subwhere[] = "m.nap2 = '' ";
     $where[] = " (".implode(' OR ', $subwhere).")";
 
     //milyen órákban
-    if($args['mikor2'] == 'de') $where[] = " ido < '12:00:01' AND ido > '00:00:01' ";
-    elseif($args['mikor2'] == 'du') $where[] = " ido > '11:59:59'";
+    if($args['mikor2'] == 'de') $where[] = " m.ido < '12:00:01' AND m.ido > '00:00:01' ";
+    elseif($args['mikor2'] == 'du') $where[] = " m.ido > '11:59:59'";
     elseif($args['mikor2'] == 'x') {
         $idok = explode('-',$args['mikorido']);
-        $where[] = " ido >= '".$idok[0].":00'"; 
-        $where[] = " ido <= '".$idok[1].":00'"; 
+        $where[] = " m.ido >= '".$idok[0].":00'"; 
+        $where[] = " m.ido <= '".$idok[1].":00'"; 
     }
 
     //nyelv és egyéb tulajdonságok
-    if($args['nyelv'] != '0' AND $args['nyelv'] != '') $where[] = "( nyelv REGEXP '(^|,)(".$args['nyelv'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' )";
+    if($args['nyelv'] != '0' AND $args['nyelv'] != '') $where[] = "( m.nyelv REGEXP '(^|,)(".$args['nyelv'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' )";
 
     if(isset($args['kor'])) {
         $wherekor = array();
         foreach($args['kor'] as $kor) {
             if(in_array($kor, array('csal','d','ifi'))) {
-                 $wherekor[] = " milyen REGEXP '(^|,)(".$kor.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+                 $wherekor[] = " m.milyen REGEXP '(^|,)(".$kor.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             } elseif($kor == 'na') {
-                 $wherekor[] = " milyen NOT REGEXP '(^|,)(csal|d|ifi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+                 $wherekor[] = " m.milyen NOT REGEXP '(^|,)(csal|d|ifi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             }
         }
         $where[] = " ( ".implode(' OR ',$wherekor).") ";
@@ -907,9 +914,9 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
         $wherezene = array();
         foreach($args['zene'] as $zene) {
             if(in_array($zene, array('g','cs'))) {
-                 $wherezene[] = " milyen REGEXP '(^|,)(".$zene.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+                 $wherezene[] = " m.milyen REGEXP '(^|,)(".$zene.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             } elseif($zene == 'na') {
-                 $wherezene[] = " milyen NOT REGEXP '(^|,)(g|cs)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+                 $wherezene[] = " m.milyen NOT REGEXP '(^|,)(g|cs)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             }
         }
         $where[] = " ( ".implode(' OR ',$wherezene).") ";
@@ -917,21 +924,22 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     
     if($args['ritus'] != '0') {
         if($args['ritus'] == 'gor') {
-            $where[] = "( milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen NOT REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+            $where[] = "( m.milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen NOT REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } elseif($args['ritus'] == 'rom') {
-            $where[] = "( (milyen NOT REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+            $where[] = "( (m.milyen NOT REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } elseif($args['ritus'] == 'regi') {
-            $where[] = " milyen REGEXP '(^|,)(regi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
+            $where[] = " m.milyen REGEXP '(^|,)(regi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
         }    
     }
 
     if(!isset($args['ige']) OR $args['ige'] != 'ige') {
-        $where[] = " milyen NOT REGEXP '(^|,)(ige)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
+        $where[] = " m.milyen NOT REGEXP '(^|,)(ige)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
     }
 
     //mehet a lekérés
-    $query = "SELECT misek.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta FROM misek "; 
-    $query .= " LEFT JOIN templomok ON misek.tid = templomok.id ";
+    $query = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta FROM misek m "; 
+    $query .= " LEFT JOIN templomok ON m.tid = templomok.id ";
+
     if(count($where)>0) $query .= "WHERE ".implode(' AND ',$where);
     if($groupby != false) $query .= " GROUP BY ".$groupby;
     $query .= " ORDER BY ido, templomok.varos, templomok.nev ";

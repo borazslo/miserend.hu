@@ -148,6 +148,26 @@ function miserend_index() {
             'value' => "gorog"
     );
 
+	$searchform['tnyelv'] = array(
+            'name' => "tnyelv",
+            'id' => "tnyelv",
+            'class' => 'keresourlap',
+			'options'=> array(0=>'bármilyen',
+					'h' => 'magyar',
+					'en' => 'angol',
+					'fr' => 'francia',
+					'gr' => 'görög',
+					'hr' => 'horvát',
+					'va' => 'latin',
+					'pl' => 'lengyel',
+					'de' => 'német',
+					'it' => 'olasz',
+					'ro' => 'román',
+					'es' => 'spanyol',
+					'sk' => 'szlovák',
+					'si' => 'szlovén')
+	);
+
 	//Mikor
 	$mainap=date('w');
 	if($mainap==0) $vasarnap=$ma;
@@ -660,6 +680,8 @@ function miserend_templomkeres() {
 	$postdata.="<input type=hidden name=hely value='".$_REQUEST['hely']."'>";
 	$postdata.="<input type=hidden name=kulcsszo value='$kulcsszo'>";
 	$postdata.="<input type=hidden name=gorog value='".$_REQUEST['gorog']."'>";
+	$postdata.="<input type=hidden name=tnyelv value='".$_REQUEST['tnyelv']."'>";
+
 	$postdata.="<input type=hidden name=espker value='$espker'>";
 	$postdata.="<input type=hidden name=ehm value='$ehm'>";
 	
@@ -810,6 +832,10 @@ function miserend_misekeres() {
 	if(isset($_REQUEST['gorog']) AND $_REQUEST['gorog'] == 'gorog') {
 		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.";
 		$leptet_urlap.="<input type=hidden name=gorog value='gorog'>";
+	}
+	if(isset($_REQUEST['tnyelv']) AND $_REQUEST['tnyelv'] != '0') {
+		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle>Amelyik templomban van '".$_REQUEST['tnyelv']."' nyelvű mise.<br/>";
+		$leptet_urlap.="<input type=hidden name=tnyelv value='".$_REQUEST['tnyelv']."'>";
 	}
 	if(!empty($ehmnev)) {
 		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $ehmnev egyházmegyében,";

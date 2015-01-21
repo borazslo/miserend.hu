@@ -84,8 +84,8 @@ switch ($_REQUEST['q']) {
 
         if(!$lekerdez=mysql_query($query)) echo "HIBA az időszak keresőben!<br>$query<br>".mysql_error();
         while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
-            preg_match('/^(.*?)( -[0-9]{1,3}| \+[0-9]{1,3})$/',$row['tol'],$from);
-            preg_match('/^(.*?)( -[0-9]{1,3}| \+[0-9]{1,3})$/',$row['ig'],$to);
+            preg_match('/^(.*?)( -[0-9]{1,3}| \+[0-9]{1,3}|)$/',$row['tol'],$from);
+            preg_match('/^(.*?)( -[0-9]{1,3}| \+[0-9]{1,3}|)$/',$row['ig'],$to);
             if($to[2] == '') $to[2] = '0'; if($from[2] == '') $from[2] = '0';
             $return[] = array('label' => preg_replace('/('.$text.')/i','<b>$1</b>',$row['idoszamitas']),'value'=>$row['idoszamitas'],'from'=>$from[1],'from2'=>trim($from[2]),'to'=>$to[1],'to2'=>trim($to[2]));
         }
