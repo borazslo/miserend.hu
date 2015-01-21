@@ -140,7 +140,7 @@ var events = new Array();
                   handle: ".portlet-header",
                   update: function(event,ui){ 
                     $("#particulars").find(".portlet").each(function(index) { 
-                      $( this ).find("input.weight").val(index + 1);
+                      $( this ).find("input.weight").val(index + 101);
                     });
                   },
                   sort: function( e ) {
@@ -194,7 +194,7 @@ var events = new Array();
 
                                     reload_autocomplete();
 
-                                   
+            
 
                                 },
                         });
@@ -214,17 +214,17 @@ var events = new Array();
                                data:"particular="+particular+"&count="+c,
                                success:function(response){
                                     $('#particular'+ particular +' tr.addmass').before(response);
+                                    reload_autocomplete();
                                 },
                         });
                         
                         $( this ).attr('last',c);
-                        reload_autocomplete();
+                        
                         return false; 
                 }); 
 
                 $('.addperiod').click(function() {
                         var c = 1 + parseInt($( this ).attr('last'));
-                        console.log(c);
                         if(isNaN(c)) c = 0;
                         
                         $.ajax({
@@ -235,12 +235,13 @@ var events = new Array();
                                     $('.addperiod').before(response);
 
                                       portletPeriods();
+                                      reload_autocomplete();
              
                                 },
                         });
                         
                         $( this ).attr('last',c);
-                        reload_autocomplete();
+                       
                         return false; 
                 }); 
 
@@ -254,12 +255,13 @@ var events = new Array();
                                success:function(response){
                                     $('.addparticular').before(response);
                                     portletParticulars();
+                                    reload_autocomplete();
+
 
                                 },
                         });
                         
                         $( this ).attr('last',c);
-                        reload_autocomplete();
                         return false; 
                 }); 
 
@@ -399,38 +401,7 @@ var events = new Array();
 
     reload_autocomplete();
 
-$( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
-    var alert = false;
 
-    var reg = $(this).attr('name').match(/period\[(\d+)\]\[name\]/);
-    var id = reg[1];
-
-    var vars = ["from","to"];
-    for (var i = 0; i < 2; i++) {
-      var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");   
-      if( input.val() != '') alert = true;
-    }
-
-    if (alert != false) {
-      if ( window.confirm("Az '" + ui.item.value + "' névhez találtunk határokat: \n" + ui.item.from + " - " + ui.item.to + "\n Jó lesz?") ) {
-          var vars = ["from","from2","to2","to"];
-          for (var i = 0; i < 4; i++) {
-            var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
-            input.val(ui.item[vars[i]]);
-          }
-
-      }
-    } else {
-      var vars = ["from","from2","to2","to"];
-        for (var i = 0; i < 4; i++) {
-          var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
-          input.val(ui.item[vars[i]]);
-      }
-    }
-    
-         
-    
-} );
 
  function reload_autocomplete() {
 
@@ -466,7 +437,9 @@ $( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
                     }
 
 
-                 $( ".events" ).autocomplete(autcoEvents).each(function() {
+                 $( ".events" ).autocomplete(autcoEvents).focus(function () {
+                      $(this).autocomplete("search");
+                    }).each(function() {
                         $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
                             return $("<li></li>").data("item.ui-autocomplete", item).append(
                             item.label)
@@ -531,7 +504,10 @@ $( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
                                 $.map( data.results, function( item ) {
                                 return {
                                     label: item.label,
-                                    value: item.value
+                                    value: item.value,
+                                    from: item.from,
+                                    from2: item.from2,
+                                   
                                 }
 
                             }));
@@ -610,6 +586,8 @@ $( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
                       return false;
                     }
 
+                    }).focus(function () {
+                      $(this).autocomplete("search");
                     }).each(function() {
                         $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
                             return $("<li></li>").data("item.ui-autocomplete", item).append(
@@ -680,6 +658,8 @@ $( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
                       return false;
                     }
 
+                    }).focus(function () {
+                      $(this).autocomplete("search");
                     }).each(function() {
                         $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
                             return $("<li></li>").data("item.ui-autocomplete", item).append(
@@ -689,6 +669,68 @@ $( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
                     }); 
                   
    
+
+
+
+    $( "input.name.period" ).on( "autocompleteselect", function( event, ui ) {
+        var alert = false;
+
+        var reg = $(this).attr('name').match(/period\[(\d+)\]\[name\]/);
+        var id = reg[1];
+
+        var vars = ["from","to"];
+        for (var i = 0; i < 2; i++) {
+          var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");   
+          if( input.val() != '') alert = true;
+        }
+
+        if (alert != false) {
+          if ( window.confirm("Az '" + ui.item.value + "' névhez találtunk határokat: \n" + ui.item.from + " - " + ui.item.to + "\n Jó lesz?") ) {
+              var vars = ["from","from2","to2","to"];
+              for (var i = 0; i < 4; i++) {
+                var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
+                input.val(ui.item[vars[i]]);
+              }
+
+          }
+        } else {
+          var vars = ["from","from2","to2","to"];
+            for (var i = 0; i < 4; i++) {
+              var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
+              input.val(ui.item[vars[i]]);
+          }
+        }  
+    } );
+  $( "input.name.particular" ).on( "autocompleteselect", function( event, ui ) {
+        var alert = false;
+
+        var reg = $(this).attr('name').match(/particular\[(\d+)\]\[name\]/);
+        var id = reg[1];
+
+        var vars = ["from"];
+        for (var i = 0; i < 1; i++) {
+          var input = $(".urlap[name='particular[" + id + "][" + vars[i] +"]']");   
+          if( input.val() != '') alert = true;
+        }
+
+        if (alert != false) {
+          if ( window.confirm("Az '" + ui.item.value + "' névhez találtunk adatot: \n" + ui.item.from + " " + ui.item.from2 + "\n Jó lesz?") ) {
+              var vars = ["from","from2"];
+              for (var i = 0; i < 2; i++) {
+                var input = $(".urlap[name='particular[" + id + "][" + vars[i] +"]']");          
+                input.val(ui.item[vars[i]]);
+              }
+
+          }
+        } else {
+          var vars = ["from","from2"];
+            for (var i = 0; i < 2; i++) {
+              var input = $(".urlap[name='particular[" + id + "][" + vars[i] +"]']");          
+              input.val(ui.item[vars[i]]);
+          }
+        }  
+    } );
+
 };
 
 });

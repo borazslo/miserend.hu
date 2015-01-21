@@ -69,7 +69,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	elseif($v > 4) exit;
 
 	$sqllitefile = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
-	if (file_exists($sqllitefile) && strtotime("-1 day") < filemtime($sqllitefile) AND $config['debug'] == 0 AND !isset($datum)) {
+	if (file_exists($sqllitefile) && strtotime("-1 sec") < filemtime($sqllitefile) AND $config['debug'] == 0 AND !isset($datum)) {
 		include($sqllitefile); exit;
 	}
 
@@ -134,10 +134,11 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 		$createtablemisek .= "		
 				[periodus] VARCHAR(4)  NULL,
 				[idoszak] VARCHAR(255)  NULL,
+				[suly] INT NULL,
 				[tol] VARCHAR(100)  NULL,
 				[ig] VARCHAR(100)  NULL,
-				[datumtol] VARCHAR(5)  NULL,
-				[datumig] VARCHAR(5)  NULL,";
+				[datumtol] INT  NULL,
+				[datumig] INT  NULL,";
 	}
 
 	$createtablemisek .= "
@@ -172,7 +173,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 					LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id 
 					WHERE t.ok = 'i' ";					
 	if(isset($datum)) $query .= ' AND  moddatum >= "'.$datum.'" ';											
-	$query .= " LIMIT ".$limit;
+	$query .= " ORDER BY t.id desc LIMIT ".$limit;
 	//echo $query."<br>";
 	$templomok = array();
 	$result = mysql_query($query);
@@ -301,13 +302,17 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	  $megjegyzes = $mise['megjegyzes'];
 
 	  if($v > 3) { 
-	  	if($telnyar != false) {
-			$insert = "INSERT INTO misek (mid, tid, periodus, idoszak, tol, ig, datumtol, datumig, nap, ido, nyelv, milyen, megjegyzes) 
-            	VALUES ('".$mid."','".$tid."','".$mise['nap2']."','".$mise['idoszamitas']."','".$mise['tol']."','".$mise['ig']."','".$mise['tmp_datumtol']."','".$mise['tmp_datumig']."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
-      		} else $insert = '';
+	  	$mise['tmp_datumtol'] = preg_replace('/-/i', '', $mise['tmp_datumtol']);
+	  	$mise['tmp_datumig'] = preg_replace('/-/i', '', $mise['tmp_datumig']);
+
+
+		$insert = "INSERT INTO misek (mid, tid, periodus, idoszak, suly, tol, ig, datumtol, datumig, nap, ido, nyelv, milyen, megjegyzes) 
+        	VALUES ('".$mid."','".$tid."','".$mise['nap2']."','".$mise['idoszamitas']."','".$mise['weight']."','".$mise['tol']."','".$mise['ig']."','".$mise['tmp_datumtol']."','".$mise['tmp_datumig']."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
 	  } elseif($v > 2) { 
-	   $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
-                VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+	  		 if($telnyar != false) {
+	   			$insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
+                	VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+             } else $insert = '';
 	  } else {
 	  	$insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen) 
                 VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."')";
