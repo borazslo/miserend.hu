@@ -69,7 +69,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	elseif($v > 4) exit;
 
 	$sqllitefile = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
-	if (file_exists($sqllitefile) && strtotime("-1 sec") < filemtime($sqllitefile) AND $config['debug'] == 0 AND !isset($datum)) {
+	if (file_exists($sqllitefile) && strtotime("-20 hours") < filemtime($sqllitefile) AND $config['debug'] == 0 AND !isset($datum)) {
 		include($sqllitefile); exit;
 	}
 
@@ -120,6 +120,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 			[kep] vARCHAR(255)  NULL
 		
 		)";
+
     $file_db->exec($createtabletemplomok);
  
 	// Create table misek
@@ -135,8 +136,6 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 				[periodus] VARCHAR(4)  NULL,
 				[idoszak] VARCHAR(255)  NULL,
 				[suly] INT NULL,
-				[tol] VARCHAR(100)  NULL,
-				[ig] VARCHAR(100)  NULL,
 				[datumtol] INT  NULL,
 				[datumig] INT  NULL,";
 	}
@@ -288,7 +287,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
       $mid = $mise['id'];
       $tid = $mise['tid'];
 
-      if($v > 3) {
+      if($v < 4) {
       	$tmp = $mise['idoszamitas'];
       	if(preg_match('/^(t$|tél)/i',$tmp)) $telnyar = 't';
       	elseif(preg_match('/^(ny$|nyár)/i',$tmp)) $telnyar = 'ny';
@@ -306,8 +305,8 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 	  	$mise['tmp_datumig'] = preg_replace('/-/i', '', $mise['tmp_datumig']);
 
 
-		$insert = "INSERT INTO misek (mid, tid, periodus, idoszak, suly, tol, ig, datumtol, datumig, nap, ido, nyelv, milyen, megjegyzes) 
-        	VALUES ('".$mid."','".$tid."','".$mise['nap2']."','".$mise['idoszamitas']."','".$mise['weight']."','".$mise['tol']."','".$mise['ig']."','".$mise['tmp_datumtol']."','".$mise['tmp_datumig']."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+		$insert = "INSERT INTO misek (mid, tid, periodus, idoszak, suly, datumtol, datumig, nap, ido, nyelv, milyen, megjegyzes) 
+        	VALUES ('".$mid."','".$tid."','".$mise['nap2']."','".$mise['idoszamitas']."','".$mise['weight']."','".$mise['tmp_datumtol']."','".$mise['tmp_datumig']."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
 	  } elseif($v > 2) { 
 	  		 if($telnyar != false) {
 	   			$insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
