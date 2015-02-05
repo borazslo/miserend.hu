@@ -1,3 +1,6 @@
+{% extends "page.html" %}
+
+{% block content %}
  <style>
 .nap:after{
     clear: both;
@@ -24,6 +27,7 @@ $(document).ready(function(){
   });
 });
 </script>
+
  <div class="focim_fekete block" style="background-color: #D0D6E4;width:98.9677419355%;margin-bottom:5px">
 	<img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
 	<span class="dobozfocim_fekete">{{ nev|raw }}</span>
@@ -35,7 +39,13 @@ $(document).ready(function(){
 {{ alert|raw }}
 
 
-  <div id="containerleft" width="49%" valign="top">{{ ismertnev|raw }}
+  <div id="containerleft" width="49%" valign="top">
+
+      {% if ismertnev != ''  %}
+        <span class=alap><i><b>Közismert nevén:</b></i></span><br/>
+        <span class=dobozfocim_fekete><b><font color=#AC007A>{{ ismertnev }}</font></b></span><br/>
+        <img src=img/space.gif width=5 height=7><br/>
+      {% endif %}
 
     
     <div id="szentmisek">
@@ -132,15 +142,47 @@ $(document).ready(function(){
 		</tr>
       </table>
 
-    
+  <img src=img/space.gif width=5 height=10><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr bgcolor="#EAEDF1">
+  <td bgcolor="#EAEDF1" width="5"><img src="img/space.gif" width="5" height="5"></td>
+  <td><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><!--<img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle">--><img src=img/alert.gif align=top width=16 height=15><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Segítsd munkánkat!</span></td><td>
+  <div align="right"><img src="'.$design_url.'/img/lilapontok_kek.jpg" width="43" height="6"></div></td></tr></table>  
+  </td><td width="5"><img src="img/space.gif" width="5" height="5"></td></tr><tr bgcolor="#F8F4F6"><td width="5"></td><td>
+  {{ eszrevetel|raw }}
+  </td><td width="5"></td></tr></table>
 
-	  {{ eszrevetel|raw }}
-	  {{ androidreklam|raw }}
+	  {% if androidreklam %}{% include "doboz_lila.html" with {'settings': { 'width':'width=100%' },'content': androidreklam|raw, 'design_url':design_url } %}{% endif %}
+
     </div>
 <div id="containerright" valign="top" width="49%">
     {{ cim|raw }}{{ terkep|raw }}<br>
       <img src="img/space.gif" width="5" height="10"><br>
-      {{ megkozelit |raw }}
+
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr bgcolor="#EAEDF1">
+        <td bgcolor="#EAEDF1" width="5"><img src="img/space.gif" width="5" height="5"></td>
+        <td>
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td>
+                  <img src="{{ design_url }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle">
+                  <img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Megközelítés</span>
+                </td>
+              <td>
+                <div align="right"><img src="{{ design_url }}/img/lilapontok_kek.jpg" width="43" height="6"></div>
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td width="5"><img src="img/space.gif" width="5" height="5">
+        </td>
+      </tr>
+      <tr bgcolor="#F8F4F6">
+        <td width="5"></td>
+        <td class="alap">{{ megkozelites |raw }}</td>
+        <td width="5"></td>
+      </tr>
+    </table><img src=img/space.gif width=5 height=10>
+
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr bgcolor="#EAEDF1"> 
           <td bgcolor="#244C8F" width="5"><img src="img/space.gif" width="5" height="5"></td>
@@ -154,7 +196,8 @@ $(document).ready(function(){
           <td width="5" bgcolor="#EAEDF1"></td>
         </tr>
       </table>
-	  {{ misemegjegyzes|raw }}
+    {% if misemegjegyzes %}{% include "doboz_lila.html" with {'header':{'content':'Kapcsolódó információk'},'content': misemegjegyzes|raw, 'design_url':design_url } %}{% endif %}
+
       <img src="img/space.gif" width="5" height="10"><br>
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr bgcolor="#EAEDF1"> 
@@ -197,7 +240,9 @@ $(document).ready(function(){
     <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
   </tr>
   <tr> 
-    <td colspan="3">{{ kepek|raw }}</td>
+    <td colspan="3">
+    <img src={{ design_url }}/img/negyzet_kek.gif align=absmiddle><img src=img/space.gif width=5 height=5><span class=dobozcim_fekete>Képek a templomról</span><br>
+      {{ kepek|raw }}</td>
   </tr>
   <tr> 
     <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
@@ -231,6 +276,8 @@ $(document).ready(function(){
     </td>
   </tr>
 </table>
+{%  endblock %}
+
 
 {% macro info(img,text,design_url) %}
     <img src="{{ design_url }}img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">

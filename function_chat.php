@@ -1,7 +1,7 @@
 <?php
 
 
-function chat_html() {
+function chat_vars() {
 	global $user;
 	//$urlap.="<input type=hidden name=kinek value='$kinek'>";
 	//if(!empty($kinek)) $urlap.="<a href=chatadd.php?u_login=$loginkiir1&kinek= class=link title='visszavon'><img src=img/lakat.gif align=absmiddle border=0><i> $kinek</i></a><br>";
@@ -163,8 +163,13 @@ function chat_html() {
 	}
 EOD;
 	$vars['users'] = chat_getusers('html');
+	return $vars;
+}
+
+function chat_html() {
+	$vars = chat_vars();
 	global $twig;
-    return $twig->render('chat.html',$vars);
+    return $twig->render('chat/chatBox.twig',$vars);
 }
 
 function chat_getcomments($args = array()) {

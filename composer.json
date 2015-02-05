@@ -1,8 +1,17 @@
 {
     "name": "miserend.hu/miserend-webapp",
     "description": "Miserend.hu web application",
+
     "require": {
-        "twig/twig": "1.*",
+        "twig/extensions": "1.0.*",
         "mobiledetect/mobiledetectlib": "2.*"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "bower install"
+        ],
+        "post-update-cmd": [
+            "bower install"
+        ]
     }
 }

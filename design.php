@@ -114,22 +114,6 @@ function langmenu() {
 	Return $nyelvlinkT;	
 }
 
-function fomenu($hol) {
-	global $db_name,$fooldal_id,$m_id,$linkveg,$lang,$design_url,$sid;
-    global $twig;
-	
-    $items = array();
-	$query="select id,menucim,domain from fooldal where ok='i' and menucim!='' order by menusorrend";
-	$lekerdez=mysql_query($query);
-	while(list($id,$menucim,$domain)=mysql_fetch_row($lekerdez)) {
-        $item = array('id'=>$id,'title'=>$menucim,'domain'=>$domain);
-		$item['link'] = "?fooldal_id=$id&sid=$sid";
-		if($id==$fooldal_id) $item['aktiv'] = '1';
-        $items[] = $item;		
-	}	 
-    $kod = array('items' => $items, 'hol'=>$hol, 'design_url' => $design_url);
-    return $kod;
-}
 
 function design(&$vars) {
     global $design_url,$db_name,$tartalom,$m_oldalsablon,$balkeret,$jobbkeret,$onload,$sid,$linkveg,$u_id,$u_login,$u_jogok,$belepve,$loginhiba,$script,$meta,$titlekieg;
@@ -277,13 +261,6 @@ function design(&$vars) {
 	}
 
 
-//Főmenü
-	$vars['mainmenu']['top'] = fomenu('felso');    
-	$vars['mainmenu']['bottom'] = fomenu('also');
-
-
-//Főhasáb összeállítása
-    $vars['content'] = $tartalom;
 
 //jobbkeret összeállítása
 	$vars['sidebar']['right']['blocks'] = keret(2);
@@ -295,6 +272,16 @@ function design(&$vars) {
         foreach(keret(0) as $block)
             array_unshift($vars['sidebar']['left']['blocks'],$block);
     }
+
+    global $user; 
+    if($user->checkRole('miserend'))
+    	$vars['user']['isadmin'] = true;
+    
+    //Főhasáb összeállítása
+
+    if(is_array($tartalom)) return $twig->render($tartalom['template'].".twig",array_merge($vars,$tartalom));
+    else  $vars['content'] = $tartalom;
+
 
     $sablon = "page";
     if($m_oldalsablon == 'aloldal') $sablon .= '_subadminpage';

@@ -30,6 +30,11 @@ class User
             }
 		}
 	}
+
+	function checkRole($role) {
+		if(preg_match('/(^|-)'.$role.'(-|$)/i',$this->jogok)) return true;
+		else return false;
+	}
 } // END class 
 
 /**

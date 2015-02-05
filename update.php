@@ -68,6 +68,34 @@ INSERT INTO sugo VALUES (51,'<h4>Különleges miserend</h4>Mindig be kell állí
 
 ALTER TABLE misek ADD COLUMN weight INT AFTER idoszamitas;
 
+UPDATE misek LEFT JOIN templomok on misek.tid = templomok.id SET nyelv = NULL  WHERE ( nyelv = 'h0' OR nyelv = 'h') AND templomok.orszag = 12;
+
+DROP TABLE 0kurir;
+DROP TABLE 0log;
+DROP TABLE 0nyelvek;
+DROP TABLE 0sorozatok;
+DROP TABLE 0statisztika;
+DROP TABLE enghirkat;
+DROP TABLE fooldal;
+DROP TABLE galeria;
+DROP TABLE g_kepcimek;
+DROP TABLE hirek;
+DROP TABLE kiemelthirkat;
+DROP TABLE kulcsszo;
+DROP TABLE rovatkat;
+DROP TABLE statkat;
+DROP TABLE szervezotipus;
+DROP TABLE templom_exp;
+DROP TABLE templomok1;
+DROP TABLE terkep_rank;
+DROP TABLE terkep_misek_next;
+DROP TABLE terkep_geocode_suggestion;
+DROP TABLE szavazasv;
+DROP TABLE szavazask;
+DROP TABLE szavazasell;
+
+UPDATE `miserend`.`fomenu` SET `leiras`='<p class=\"kiscim\">A regisztr&aacute;ci&oacute;ra &eacute;s a port&aacute;lrendszer haszn&aacute;lat&aacute;ra az al&aacute;bbi szab&aacute;lyok &eacute;rv&eacute;nyesek, k&eacute;rj&uuml;k olvasd el figyelmesen!</p>           <table width=\"100%\" cellspacing=\"1\" cellpadding=\"4\" border=\"0\">   <tbody>      <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\" style=\"background-color: #ffffff\">1.</td>            <td class=\"alap\">  <p>      A Virtu&aacute;lis Pl&eacute;b&aacute;nia Port&aacute;lcsoport, melyhez a főmen&uuml;ben tal&aacute;lhat&oacute; aloldalak (h&iacute;rporta, miserend, t&aacute;borhely, m&eacute;diat&aacute;r, pl&eacute;b&aacute;nia) tartoznak, magyar katolikus oldalak. Tartalm&aacute;t papok      &eacute;s elk&ouml;telezett h&iacute;vek friss&iacute;tik. <strong>A port&aacute;lon megjelenő anyagok tekintet&eacute;ben      a Katolikus Egyh&aacute;z hivatalos tan&iacute;t&aacute;sa a m&eacute;rvad&oacute;!</strong></p>   </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">2.</td>            <td class=\"alap\">  <p>      Felhaszn&aacute;l&oacute;ink k&ouml;z&ouml;tt term&eacute;szetesen korra, nemre, felekezetre val&oacute; tekintet      n&eacute;lk&uuml;l mindenkit szeretettel l&aacute;tunk! Azonban k&eacute;rj&uuml;k az 1. pont tudom&aacute;sulv&eacute;tel&eacute;t &eacute;s egym&aacute;s k&ouml;lcs&ouml;n&ouml;s tiszteletbentart&aacute;s&aacute;t!</p>   <p><strong>FONTOS!</strong> Oldalunkon b&aacute;rki, b&aacute;rmilyen sz&aacute;nd&eacute;kkal jelen lehet, a regisztr&aacute;ci&oacute;, illetve a k&uuml;l&ouml;nb&ouml;ző kapcsolatok sor&aacute;n szem&eacute;lyes adataid mindig kellő &oacute;vatoss&aacute;ggal kezeld! <u>Felhaszn&aacute;l&oacute;ink publikusan megadott adatainak val&oacute;s&aacute;gtartalm&aacute;&eacute;rt nem tudunk felelőss&eacute;get v&aacute;llalni!</u><br />  </p>  </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">3.</td>            <td class=\"alap\">      A port&aacute;lon lehetős&eacute;get biztos&iacute;tunk besz&eacute;lget&eacute;sekre, ismerked&eacute;sre, kapcsolattart&aacute;sra, azonban mindezt csak kultur&aacute;lt keretek k&ouml;z&ouml;tt, az 1. pont figyelembev&eacute;tel&eacute;vel. Oldalunkon, t&eacute;mak&ouml;reinkben val&oacute; provok&aacute;l&aacute;s, m&aacute;sok zaklat&aacute;sa kiz&aacute;r&aacute;ssal j&aacute;r!      </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">4.</td>            <td class=\"alap\">  <p>A regisztr&aacute;ci&oacute; sor&aacute;n k&ouml;telező megadni emailc&iacute;med, valamint egy bejelentkez&eacute;si nevet. A v&aacute;lasztott <u>bejelentkez&eacute;si n&eacute;v</u> viszont <u>mindig egy &eacute;s csak egy konkr&eacute;t szem&eacute;lyt k&eacute;pviselhet</u> (szervezetet, int&eacute;zm&eacute;nyt vagy csoportot, k&ouml;z&ouml;ss&eacute;get, csal&aacute;dot nem) &eacute;s azt <u>csak egy ember haszn&aacute;lhatja</u>.</p>   <p><strong>FONTOS!</strong> Figyelj, hogy <u>emailc&iacute;med mindig aktu&aacute;lis legyen</u>, v&aacute;ltoz&aacute;s eset&eacute;n oldalunkon is m&oacute;dos&iacute;tsd. K&eacute;retlen rekl&aacute;mleveleket nem k&uuml;ld&uuml;nk, harmadik f&eacute;lnek nem adjuk ki, de adott esetben az itt megadott c&iacute;mre k&uuml;ld&uuml;nk oldalunkkal kapcsolatos &eacute;rtes&iacute;t&eacute;st, figyelmeztet&eacute;st. Saj&aacute;t &eacute;rdeked, hogy ezt mindig időben megkaphasd.<br />  </p>  </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">5.</td>            <td class=\"alap\"><p>Regisztr&aacute;lt felhaszn&aacute;l&oacute;inknak lehetős&eacute;g&uuml;k van egym&aacute;s k&ouml;zti kapcsolatokat be&aacute;ll&iacute;tani. Ennek megfelelően a regisztr&aacute;ci&oacute; sor&aacute;n megadott adatok szűrhetőek, hogy mely k&ouml;r l&aacute;thassa. A nyilv&aacute;nosan megadott adatok mellett lehetős&eacute;g van csak ismerős&ouml;k &eacute;s bar&aacute;tok, vagy csak bar&aacute;tok r&eacute;sz&eacute;re megadni adatokat.</p><p>A kapcsolatok jel&ouml;l&eacute;se nem k&ouml;lcs&ouml;n&ouml;sen műk&ouml;dik, akit az egyik f&eacute;l bar&aacute;tj&aacute;nak jel&ouml;l, nem sz&uuml;ks&eacute;ges, hogy a m&aacute;sik f&eacute;l is elfogadja, mivel itt csup&aacute;n az adatok kezel&eacute;s&eacute;ről van sz&oacute;, kapcsolatrendszert nem &eacute;p&iacute;t&uuml;nk.<br /> </p>  </td>   </tr> <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">6.</td>            <td class=\"alap\">  <p>A Virtu&aacute;lis Pl&eacute;b&aacute;nia Port&aacute;l regisztr&aacute;lt felhaszn&aacute;l&oacute;jak&eacute;nt haszn&aacute;lhatod a Pl&eacute;b&aacute;nia &aacute;ltal ny&uacute;jtott szolg&aacute;ltat&aacute;sokat, funkci&oacute;kat, bőv&iacute;theted a Pl&eacute;b&aacute;nia adatb&aacute;zis&aacute;t, illetve felhaszn&aacute;lhatod azt munk&aacute;d, szem&eacute;lyes fejlőd&eacute;sed vagy sz&oacute;rakoz&aacute;sod &eacute;rdek&eacute;ben.</p>   <p>      A Pl&eacute;b&aacute;ni&aacute;n tal&aacute;lhat&oacute; anyagokat felhaszn&aacute;lhatod, azokra hivatkozhatsz,      azonban ez esetben k&eacute;rj&uuml;k megjel&ouml;lni a forr&aacute;st! <br />  </p>  </td>   </tr>                </tbody></table>   <br /> <br /> ' WHERE `id`='11';
+
 
 ";
 
@@ -143,4 +171,11 @@ while(($kep = mysql_fetch_array($result))) {
 }
 
 /**/
+
+
+
+
+
+
+
 ?>

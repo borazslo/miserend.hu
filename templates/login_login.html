@@ -1,34 +1,36 @@
-<table cellpadding=0 cellspacing=0 border=0  height=44>
 <form method=post name=loginurlap><input type=hidden name=kilep value=0>
+<table cellpadding=0 cellspacing=0 border=0  height=44 style="margin-left:5px;margin-top:8px">
     <tr>
-        <td><img src=img/space.gif width=8 height=5></td>
-        <td><img src=img/space.gif width=5 height=3><br>
-            <span class=loginlink>Felhasználónév:</span><br><img src=img/space.gif width=5 height=3><br>
-            <input type=text name=login value='{{ login }}' size=16 class=loginurlap><br>
-            <img src=img/space.gif width=5 height=3></td>
-        <td><img src=img/space.gif width=8 height=5></td>
-        <td><img src=img/space.gif width=5 height=3><br>
-            <span class=loginlink>&nbsp; Jelszó:</span><br>
-            <img src=img/space.gif width=5 height=3><br>
-            <input type=password name=passw size=16 class=loginurlap><br>
-            <img src=img/space.gif width=5 height=3></td>
-        <td><img src=img/space.gif width=8 height=5></td>
+        <td style="padding-left:3px;padding-right:3px;line-height:18px">
+            <span class=loginlink>Felhasználónév:</span><br/>
+            <input type=text name=login value='{{ login }}' size=14 class=loginurlap>
+        </td>
         
-        <td rowspan=2 width=65 align=center>
-            {% if (login) %}
-    			<span class=loginlink><font color=red>{{ loginhiba }}</font></span><br>
-                <img src=img/space.gif width=5 height=3><br>
-            {% endif %}
-            <input type=image border=0 src={{ design_url }}/img/belepesgomb.jpg align=absmiddle></td>	
+        <td style="padding-left:3px;padding-right:3px;line-height:18px">
+            <span class=loginlink>Jelszó:</span><br/>
+            <input type=password name=passw size=14 class=loginurlap>
+        </td>
+        
+        <td style="padding-left:3px;padding-right:3px;line-height:18px">
+            <br/><input type=submit value="Belépés" style="background-color:#053D78;color:#ffffff">
+        </td>	
     </tr>
+
     <tr>
-        <td><img src=img/space.gif width=8 height=5></td>
-        <td><a href=?m_id=28&fm=11{{ linkveg }} class=loginlink>Regisztráció <img src={{ design_url }}/img/negyzet.jpg align=absmiddle border=0></a><br><img src=img/space.gif width=5 height=3></td>
-        <td><img src=img/space.gif width=8 height=5></td>
-        <td><a href=?m_id=28&m_op=jelszo {{ linkveg }} class=loginlink title='Jelszó emlékeztető'>Jelszó emlékeztető <img src={{ design_url }}/img/negyzet.jpg border=0 align=absmiddle></a><br>
-            <img src=img/space.gif width=5 height=3></td>
-        <td><img src=img/space.gif width=8 height=5></td>
+        <td style="padding-left:3px;padding-right:3px;line-height:18px">
+            <a href="?m_id=28&fm=11" class="loginlink elotte">Regisztráció</a>
+        </td>
+        <td colspan="2" style="padding-left:3px;padding-right:3px;line-height:18px">
+            <a href="?m_id=28&m_op=jelszo" class="loginlink elotte" title='Jelszó emlékeztető'>Jelszó emlékeztető</a>
+        </td>
     </tr>
-<input type=hidden name=sid value={{ sid }}>
-</form>
+
+    {% if (login) %}
+        <tr>
+            <td colspan="3" style="padding-left:3px;padding-right:3px;line-height:18px">
+                <span class=loginlink><font color=red>{{ loginhiba }}</font></span>
+            </td>
+        </tr>
+    {% endif %}
 </table>
+</form>

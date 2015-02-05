@@ -785,7 +785,7 @@ function searchChurchesWhere($args) {
         } else {
             $text = " LIKE '%".$args['kulcsszo']."%'";
         }
-        foreach(array('nev','ismertnev','varos','cim','megkozelites','plebania','megjegyzes','misemegj') as $column ) {
+        foreach(array('nev','ismertnev','varos','cim','megkozelites','plebania','templomok.megjegyzes','misemegj') as $column ) {
             $subwhere[] = $column.$text;
         }
         $where[] = " (". implode(' OR ', $subwhere).") ";

@@ -1,5 +1,8 @@
 {% import "forms.twig" as forms %}
 
+{% extends "page.html" %}
+
+{% block content %}
 <style>
 .block:after{
     clear: both;
@@ -7,6 +10,7 @@
     display: block;
 }
 </style>
+
  <div class="focim_fekete block" style="background-color: #D0D6E4;width:98.9677419355%;margin-bottom:5px">
 	<img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle" style="margin-right:5px;margin-left:10px;">                 
 	<span class="dobozfocim_fekete">Keresés</span>
@@ -25,15 +29,17 @@
     <div id="form_church">
       <div class="kiscim" style='margin-left:5px;'>Hol:
         <div id="form_church_getdetails" style="float:right" class="link kicsi">[részletek]</div>
-        <br/>{{ forms.input(searchform.kulcsszo) }}
-        <div class=alap style='margin-left:5px;margin-top:6px'>- település:</div>{{ forms.input(searchform.varos) }}
+          <br/><span style="margin-left:36px"></span>{{ forms.input(searchform.kulcsszo) }} <i>(kulcsszó)</i>
+        <div class=alap style='margin-left:5px;margin-top:6px'>- település:</div>
+          <span style="margin-left:40px"></span>{{ forms.input(searchform.varos) }}
 
       </div>
       <div id="form_church_details" style="display:none">
-        <div class=alap style='margin-left:5px;margin-top:6px'>- adott helyszín körül:</div>{{ forms.input(searchform.hely) }}+{{ forms.input(searchform.tavolsag) }}
-        <div class=alap style='margin-left:5px;margin-top:6px;width:100%'>- egyházmegye: </div>{{ forms.select(searchform.ehm) }}<br/>
+        <div class=alap style='margin-left:5px;margin-top:6px'>- adott helyszín körül:</div>
+          <span style="margin-left:40px"></span>{{ forms.input(searchform.hely) }}&nbsp;+&nbsp;{{ forms.input(searchform.tavolsag) }} km
+        <div class=alap style='margin-left:5px;margin-top:6px;width:100%'>- egyházmegye: </div><span style="margin-left:40px"></span>{{ forms.select(searchform.ehm) }}<br/>
         <div class=alap id="espkerlabel" style='margin-left:5px;margin-top:6px;display:none'>- esperes kerület: </div><br/>
-              {% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}
+              {% for key, item in searchform.espker %}<span style="margin-left:40px"></span>{{ forms.select(item) }}{% endfor %}
         <div class=alap style='margin-left:5px;margin-top:0px'>- csak görögkatolikus: {{ forms.input(searchform.gorog) }}</div>
         <div class=alap style='margin-left:5px;margin-top:6px'>- ahol van adott nyelvű mise is: {{ forms.select(searchform.tnyelv) }}</div>
       </div>
@@ -42,16 +48,16 @@
     <div id="form_mass" style="margin-top:12px">
       <div class="kiscim" style='margin-left:5px;'>Milyen:
         <div id="form_mass_getdetails" style="float:right" class="link kicsi">[részletek]</div>
-        <br/>{{ forms.select(searchform.mikor) }} {{ forms.input(searchform.mikordatum) }}
-        <br/>{{ forms.select(searchform.mikor2) }} {{ forms.input(searchform.mikorido) }}
+        <br/><span style="margin-left:40px"></span>{{ forms.select(searchform.mikor) }} {{ forms.input(searchform.mikordatum) }}
+        <br/><span style="margin-left:40px"></span>{{ forms.select(searchform.mikor2) }} {{ forms.input(searchform.mikorido) }}
       </div>
       <div id="form_mass_details" style="display:none">
-        <div class=alap style='margin-left:5px;margin-top:6px'>- nyelv:</div>{{ forms.select(searchform.nyelv) }}
+        <div class=alap style='margin-left:5px;margin-top:6px'>- nyelv:</div><span style="margin-left:40px"></span>{{ forms.select(searchform.nyelv) }}
         <div class=alap style='margin-left:5px;margin-top:6px'>- zene: </div>
-              {% for key, item in searchform.zene %}{{ forms.input(item) }}<br/>{% endfor %}
+              {% for key, item in searchform.zene %}<span style="margin-left:80px"></span>{{ forms.input(item) }}<br/>{% endfor %}
         <div class=alap style='margin-left:5px;margin-top:6px'>- korosztály: </div>
-              {% for key, item in searchform.kor %}{{ forms.input(item) }}<br/>{% endfor %}
-        <div class=alap style='margin-left:5px;margin-top:6px'>- rítus: </div>{{ forms.select(searchform.ritus) }}
+              {% for key, item in searchform.kor %}<span style="margin-left:80px"></span>{{ forms.input(item) }}<br/>{% endfor %}
+        <div class=alap style='margin-left:5px;margin-top:6px'>- rítus: </div><span style="margin-left:40px"></span>{{ forms.select(searchform.ritus) }}
         <div class=alap style='margin-left:5px;margin-top:6px'>- igeliturgiák is: {{ forms.input(searchform.ige) }}</div>
       </div>
     </div>
@@ -146,4 +152,5 @@
     </td>
   </tr>
 </table>-->
+{% endblock %}
 

@@ -14,45 +14,8 @@ function idoszak($i) {
 
 function miserend_index() {
 	global $linkveg,$db_name,$m_id,$u_login,$sid,$design_url,$_GET,$u_varos,$onload,$script;
-    
-	$script .= '<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>';
-    $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
-   	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
-   	$script .= '<script src="js/miserend.js"></script>';
-    
-    $script .= '<link rel="stylesheet" href="templates/colorbox.css" />';
-    $script .= '<link rel="stylesheet" href="templates/als.css" />';
-
-    $script .= '
-        <script>
-        $(function() { //shorthand document.ready function
-            $(\'#tkereses\').on(\'submit\', function(e) { //use on if jQuery 1.7+
-                e.preventDefault();  //prevent form from submitting               
-                var data = $(\'#tvaros\').val() + \'&\' + $(\'#tkulcsszo\').val() + \'&\' + $(\'#tehm\').val();
-                ga(\'send\',\'event\',\'Search\',\'templom\',data);
-                $(this).unbind(\'submit\').submit();
-            });
-        
-            $(\'#mkereses\').on(\'submit\', function(e) { //use on if jQuery 1.7+
-                e.preventDefault();  //prevent form from submitting                                             
-                var data = $("#mmikor option:selected").text() + \'&\' + $(\'#mmikor2\').val() + \'&\' + $(\'#mvaros\').val() + \'&\' + $(\'#mehm\').val() + \'&\' + $(\'#mnyelv\').val() + \'&\' + $(\'#mzene\').val() + \'&\' + $(\'#mdiak\').val();
-                ga(\'send\',\'event\',\'Search\',\'mise\',data);
-                $(this).unbind(\'submit\').submit();
-            });
-
-            $(\'#form_church_getdetails\').on(\'click\', function(e) {                 
-                $(\'#form_church_details\').toggle(\'slow\');
-            });
-
-			$(\'#form_mass_getdetails\').on(\'click\', function(e) {                 
-                $(\'#form_mass_details\').toggle(\'slow\');
-            });
-        });
-			
-        </script>';
-        
-    $variables['scripts'] = $script;
-    
+   
+       
 	$ma=date('Y-m-d');
 	$holnap=date('Y-m-d',(time()+86400));
 	$mikor='8:00-19:00';
@@ -78,34 +41,28 @@ function miserend_index() {
             'name' => "kulcsszo",
             'size' => 20,
             'class' => 'keresourlap',
-            'style' => 'margin-left:36px',
-            'labelback' => '<i>(kulcsszó)</i>'),
+            'placeholder' => 'kulcsszó'),
         'varos' => array(
             'name' => "varos",
             'size' => 20,
             'id'=>'varos',
-            'class' => 'keresourlap',
-            'style' => 'margin-left:40px'),
+            'class' => 'keresourlap'),
         'hely' => array(
             'name' => "hely",
             'size' => 20,
             'id'=>'varos',
-            'class' => 'keresourlap',
-            'style' => 'margin-left:40px'),
+            'class' => 'keresourlap'),
         'tavolsag' => array(
             'name' => "tavolsag",
             'size' => 1,
             'id'=>'tavolsag',
             'class' => 'keresourlap',
-            'style' => 'margin-left:4px',
-            'labelback' => 'km',
             'value' => 4)
       );
         
 
     $searchform['ehm'] = array(
             'name' => "ehm",
-            'style' => "margin-left:40px",
             'class' => 'keresourlap',
          	'onChange'=> "
 						var a = document.getElementsByName('espker');	
@@ -132,7 +89,7 @@ function miserend_index() {
 		$searchform['espker'][$ehm] = array(
             'name' => "espker",
             'id' => "ehm".$ehm,
-            'style' => "margin-left:40px;display:none",
+            'style' => "display:none",
             'class' => 'keresourlap');
 	    	$searchform['espker'][$ehm]['options'][0] = 'mindegy';
 			if(is_array($espker)) { foreach($espker as $espid=>$espnev) {
@@ -178,7 +135,6 @@ function miserend_index() {
 	$searchform['mikor'] = array(
             'name' => "mikor",
             'id' => "mikor",
-            'style' => "margin-left:40px",
             'class' => 'keresourlap',
          	'onChange'=> "
 						if(this.value == 'x') {document.getElementById('md').style.display='inline';} 
@@ -196,7 +152,7 @@ function miserend_index() {
 	$searchform['mikor2'] = array(
             'name' => "mikor2",
             'id' => "mikor2",
-            'style' => "margin-left:40px;margin-top:12px",
+            'style' => "margin-top:12px",
             'class' => 'keresourlap',
          	'onChange'=> "
 						if(this.value == 'x') {
@@ -218,7 +174,6 @@ function miserend_index() {
 	$searchform['nyelv'] = array(
             'name' => "nyelv",
             'id' => "nyelv",
-            'style' => "margin-left:40px",
             'class' => 'keresourlap',
 			'options'=> array(0=>'mindegy',
 					'h' => 'magyar',
@@ -242,7 +197,6 @@ function miserend_index() {
 	            'name' => "zene[]",
 	            'class' => "keresourlap",
 	            'value' => $value,
-	            'style' => 'margin-left:80px',
 	            'labelback' => $label,
 	            'checked' => true,
 	    );
@@ -255,7 +209,6 @@ function miserend_index() {
 	            'class' => "keresourlap",
 	            'value' => $value,
 	            'checked' => true,
-	            'style' => 'margin-left:80px',
 	            'labelback' => $label,
 	    );
 	}
@@ -263,7 +216,6 @@ function miserend_index() {
 	$searchform['ritus'] = array(
             'name' => "ritus",
             'id' => "ritus",
-            'style' => "margin-left:40px",
             'class' => 'keresourlap',
 			'options'=> array(0=>'mindegy',
 					'rom' => 'római katolikus',
@@ -279,95 +231,7 @@ function miserend_index() {
             'class' => "keresourlap",
             'value' => "ige"
     );
-	//Következő mise a közelben
-	/* Talan mar nem is mukodik. Mintha biztosan nem csinlana semmit.
-	$mainap=date('w');
-	$mostido=date('H:i:s');
-	if($mainap==0) $mainap=7;
-	if(!empty($u_varos)) {
-		$kovetkezomise.='<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr bgcolor="#EAEDF1"><td bgcolor="#EAEDF1" width="5"><img src="img/space.gif" width="5" height="5"></td><td bgcolor="#EAEDF1"><img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Következő misék ('.$u_varos.'):</span></td>';
-        $kovetkezomise.='<td width="5" bgcolor="#EAEDF1"><img src="img/space.gif" width="5" height="5"></td></tr><tr bgcolor="#F8F4F6">';
-        $kovetkezomise.='<td width="5" bgcolor="#F8F4F6"></td><td bgcolor="#F8F4F6">';
-		$vanmise=false;
-		$query="select id,nev,ismertnev,nyariido,teliido from templomok where ok='i' and varos='$u_varos'";
-		$lekerdez=mysql_query($query);
-		while(list($tid,$tnev,$tismnev,$nyariido,$teliido)=mysql_fetch_row($lekerdez)) {
-			//misekeres
-			if($ma<$nyariido or $ma>$teliido) $idoszamitas='t';
-			else $idoszamitas='ny';
-			$querym="select ido,nyelv,milyen,megjegyzes from misek where templom='$tid' and nap='$mainap' and idoszamitas='$idoszamitas' and ido>='$mostido' and torles=0 order by ido limit 0,3";
-			$lekerdezm=mysql_query($querym);
-			if(mysql_num_rows($lekerdezm)>0) {
-				$vanmise=true;
-				$kovetkezomise.="<img src=img/space.gif width=5 height=5><br><a href=?templom=$tid$linkveg class=link title='$tismnev'><b>$tnev</b></a><br>";	
-				while(list($ido,$nyelv,$milyen,$megjegyzes)=mysql_fetch_row($lekerdezm)) {
-					$ido=substr($ido,0,5);
-					$kovetkezomise.="<span class=alap>$ido </span>";
-					if(!empty($megjegyzes)) {
-						$kovetkezomise.="<img src=$design_url/img/info2.gif title='$megjegyzes' width=16 height=16 align=absmiddle>";
-					}
-					if(!empty($milyen)) {
-						if(strstr($milyen,'g')) {
-							$kovetkezomise.="<img src=$design_url/img/gitar.gif width=16 height=16 title='gitáros mise' align=absmiddle>";
-						}
-						if(strstr($milyen,'d')) {
-							$kovetkezomise.="<img src=$design_url/img/diak.gif width=16 height=16 title='diák mise' align=absmiddle>";
-						}
-						if(strstr($milyen,'cs')) {
-							$kovetkezomise.="<img src=$design_url/img/csendes.gif width=16 title='csendes mise' height=16 align=absmiddle>";
-						}
-					}
-					$kovetkezomise.='<span class=alap> | </span>';
-				}
-				$kovetkezomise.='<br>';
-			}			
-		}
-		if(!$vanmise) $kovetkezomise.='<span class=alap>Adatbázisunkban mára már nincs több miseidőpont a településen.</span>';
-		$kovetkezomise.='<img src=img/space.gif width=5 height=8></td><td width="5" bgcolor="#F8F4F6"></td></tr></table>';
-	}
-	/* */
-
-
-	//Templom űrlap
-	/* torolhessuk lassan	
-	$templomurlap="\n<form method=post id=\"tkereses\">
-        <input type=hidden id=tsid name=sid value=$sid>
-        <input type=hidden id=tm_id name=m_id value=$m_id>
-        <input type=hidden name=m_op id=tm_op value=templomkeres>\n";
-	$templomurlap.="<span class=kiscim>Település: </span><input type=text name=varos id=tvaros size=20 class=keresourlap>";
-	$templomurlap.="<br/><span class=kiscim>Kulcsszó: </span><input type=text id=tkulcsszo name=kulcsszo size=20 class=keresourlap>";
 	
-	//Egyházmegye
-	$templomurlap.="<br/><span class=kiscim>Egyházmegye: </span><select id=tehm name=ehm class=keresourlap style=\"width:100%\" onChange=\"if(this.value!=0) {";
-	foreach($ehmT as $id=>$nev) {
-		$templomurlap.="document.getElementById($id).style.display='none'; ";
-	} 
-	$templomurlap.="document.getElementById(this.value).style.display='inline'; document.getElementById('valassz').style.display='none'; } else {";
-	foreach($ehmT as $id=>$nev) {
-		$templomurlap.="document.getElementById($id).style.display='none'; ";
-	} 
-	$templomurlap.="document.getElementById('valassz').style.display='inline';}\"><option value=0>mindegy</option>";	
-	foreach($ehmT as $id=>$nev) {
-		$templomurlap.="<option value=$id>$nev</option>";
-	
-		$espkerurlap.="<select id=$id name=espkerT[$id] class=keresourlap style='display: none'><option value=0>mindegy</option>";
-		if(is_array($espkerT[$id])) {	
-			foreach($espkerT[$id] as $espid=>$espnev) {
-				$espkerurlap.="<option value=$espid>$espnev</option>";
-			}
-		}
-		$espkerurlap.="</select>";
-	}
-	$templomurlap.="</select>";
-
-	//Espereskerület
-	$templomurlap.="<span class=kiscim>Espereskerület: </span><img src=img/space.gif width=10 height=5>";
-	$templomurlap.="<br/><div id='valassz' style='display: inline' class=keresourlap>Először válassz egyházmegyét.</div>";
-	$templomurlap.=$espkerurlap;
-	$templomurlap.="";
-	
-	$templomurlap.="\n<div align=right><input type=submit value=keresés class=keresourlap></div></form>";
-	/* */
 	$templomurlap = '';
 	$miseurlap = $urlap;
 	//AndroidReklám
@@ -392,7 +256,6 @@ function miserend_index() {
        $nap =  $celebration->LiturgicalWeek.". hét, ".$url->DayOfWeek;
                
        $where = " WHERE ( ev = '{$ev}' AND idoszak = '{$idoszak}' AND nap = '{$nap}' ) OR (".implode(' OR ',$readingsId)." ) LIMIT 1";       
-       //echo $where."<br>";
     
    /* */
     
@@ -518,8 +381,8 @@ function miserend_index() {
 		while($random=mysql_fetch_assoc($lekerdez)) {
             $randoms[] = $random;
         }
-        foreach($randoms as $random) {
-			$random['konyvtar'] = "$konyvtaralap/".$random['id'];
+        foreach($randoms as $k=>$random) {
+			$random['konyvtar'] = $randoms[$k]['konyvtar'] = "$konyvtaralap/".$random['id'];
             //if(is_file("$konyvtar/kicsi/$fajlnev")) {
             @$info=getimagesize($random['$konyvtar']."/kicsi/".$random['fajlnev']);
 			$w1=$info[0];
@@ -586,6 +449,7 @@ function miserend_index() {
     
 	global $twig;
 	$variables = array(
+		'scripts' => $script,
 		'formnyit' => $formnyit,
 		'formvalaszt' => $formvalaszt,
         'miseurlap'=>$miseurlap,
@@ -593,12 +457,16 @@ function miserend_index() {
         'androidreklam' => $androidreklam,
         'templomurlap' => $templomurlap,
         'kepek' => $kepek,
+        'kep' => $randoms[0],
         'uzenet' => $uzenet,
         'igehelyek' => $igehelyek,
         'elmelkedes' => $elmelkedes,
         'design_url' => $design_url,
         'alert' => LiturgicalDayAlert('html'));		
-    return $twig->render('content_fooldal.html',$variables);
+
+	$variables['template'] = 'home';
+
+	return $variables;
 }
 
 function miserend_templomkeres() {
@@ -762,8 +630,10 @@ function miserend_templomkeres() {
         'focim'=>$focim,
         'content' => $tartalom,
         'templomurlap' => $templomurlap,
-        'design_url' => $design_url);		
-    return $twig->render('content_talalatok.html',$variables);
+        'design_url' => $design_url);
+
+	$variables['template'] = 'search/resultsChurches';
+    return $variables;
 }
 
 function miserend_misekeres() {
@@ -835,8 +705,9 @@ function miserend_misekeres() {
 	}
 	if(isset($_REQUEST['tnyelv']) AND $_REQUEST['tnyelv'] != '0') {
 		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle>Amelyik templomban van '".$_REQUEST['tnyelv']."' nyelvű mise.<br/>";
-		$leptet_urlap.="<input type=hidden name=tnyelv value='".$_REQUEST['tnyelv']."'>";
 	}
+		$leptet_urlap.="<input type=hidden name=tnyelv value='".$_REQUEST['tnyelv']."'>";
+	
 	if(!empty($ehmnev)) {
 		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $ehmnev egyházmegyében,";
 		$leptet_urlap.="<input type=hidden name=ehm value='$ehm'>";
@@ -888,8 +759,10 @@ function miserend_misekeres() {
 	if(!empty($nyelv) or (!empty($zene) AND count($zene) < 3) or ( !empty($kor) AND count($kor)<4))  $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> ";
 	if(!empty($nyelv)) {
 		$tartalom.="$nyelvekT[$nyelv] nyelvű, ";
-		$leptet_urlap.="<input type=hidden name=nyelv value='$nyelv'>";
+	//		$leptet_urlap.="<input type=hidden name=nyelv value='$nyelv'>";
 	}
+	$leptet_urlap.="<input type=hidden name=nyelv value='$nyelv'>";
+
 	if(!empty($zene)) {
 		foreach($zene as $z) {
 			if(count($zene)<3) $tartalom.="$zeneT[$z], ";
@@ -1041,8 +914,10 @@ function miserend_misekeres() {
         'focim'=>$focim,
         'content' => $tartalom,
         'templomurlap' => $templomurlap,
-        'design_url' => $design_url);		
-    return $twig->render('content_talalatok.html',$variables);
+        'design_url' => $design_url);	
+    $variables['template'] = 'search/resultsChurches';
+    
+    return $variables;	
 }
 
 function miserend_view() {
@@ -1059,14 +934,7 @@ function miserend_view() {
 	$lekerdez=mysql_query($query);
 	$vane=mysql_num_rows($lekerdez);
     
-    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>';
-	$script .= '<script src="jscripts2/colorbox-master/jquery.colorbox.js"></script>';
-    $script .= '<script src="jscripts2/colorbox-master/i18n/jquery.colorbox-hu.js"></script>';
-   	$script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
     
-    $script .= '<link rel="stylesheet" href="templates/colorbox.css" />';
-    $script .= '<link rel="stylesheet" href="templates/als.css" />';
-
 	$ma=date('Y-m-d');
 	list($nev,$ismertnev,$turistautak,$varos,$cim,$megkozelites,$plebania,$pleb_url,$pleb_eml,$egyhazmegye,$leiras,$megjegyzes,$miseaktiv, $misemegj,$szomszedos1,$szomszedos2,$bucsu,$nyariido,$teliido,$frissites,$letrehozta,$lat,$lng,$checked)=mysql_fetch_row($lekerdez);
 
@@ -1167,7 +1035,7 @@ function miserend_view() {
 		$nev.=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 	}
 
-	if(!empty($ismertnev)) $ismertnev="<span class=alap><i><b>Közismert nevén:</b></i><br></span><span class=dobozfocim_fekete><b><font color=#AC007A>$ismertnev</font></b></span><br><img src=img/space.gif width=5 height=7><br>";
+	if(!empty($ismertnev)) $ismertnev= $ismertnev; //"<span class=alap><i><b>Közismert nevén:</b></i><br></span><span class=dobozfocim_fekete><b><font color=#AC007A>$ismertnev</font></b></span><br><img src=img/space.gif width=5 height=7><br>";
 	$cim="<span class=alap><i>Cím:</i> <u>$varos, $cim</u></span>";
 	
 	if($checked > 0) 
@@ -1179,27 +1047,10 @@ function miserend_view() {
 	if(!empty($pleb_url)) $kapcsolat.="<br/><div style=\"width: 230px;white-space: nowrap;overflow: hidden;o-text-overflow: ellipsis;text-overflow: ellipsis;\">Weboldal: <a href=$pleb_url target=_blank class=link title='$pleb_url'  onclick=\"ga('send','event','Outgoing Links','click','".$pleb_url."');\">".preg_replace("/http:\/\//","",$pleb_url)."</a></div>";
 	if(!empty($pleb_eml)) $kapcsolat.="<div style=\"width: 230px;white-space: nowrap;overflow: hidden;o-text-overflow: ellipsis;text-overflow: ellipsis;\">Email: <a href='mailto:$pleb_eml' class=link>$pleb_eml</a></div>";
 
-	if(!empty($megkozelites)) {
-		$megkozelit='<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr bgcolor="#EAEDF1">'; 
-		$megkozelit.='<td bgcolor="#EAEDF1" width="5"><img src="img/space.gif" width="5" height="5"></td>';
-		$megkozelit.='<td><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Megközelítés</span></td><td>';
-		$megkozelit.='<div align="right"><img src="'.$design_url.'/img/lilapontok_kek.jpg" width="43" height="6"></div></td></tr></table>';			
-		$megkozelit.='</td><td width="5"><img src="img/space.gif" width="5" height="5"></td></tr><tr bgcolor="#F8F4F6"><td width="5"></td><td class="alap">';
-		$megkozelit.=nl2br($megkozelites);
-		$megkozelit.='</td><td width="5"></td></tr></table><img src=img/space.gif width=5 height=10>';
-	}
-	$eszrevetel='<img src=img/space.gif width=5 height=10><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr bgcolor="#EAEDF1">'; 
-	$eszrevetel.='<td bgcolor="#EAEDF1" width="5"><img src="img/space.gif" width="5" height="5"></td>';
-	$eszrevetel.='<td><table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td><!--<img src="'.$design_url.'/img/negyzet_lila.gif" width="6" height="8" align="absmiddle">--><img src=img/alert.gif align=top width=16 height=15><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Segítsd munkánkat!</span></td><td>';
-	$eszrevetel.='<div align="right"><img src="'.$design_url.'/img/lilapontok_kek.jpg" width="43" height="6"></div></td></tr></table>';			
-	$eszrevetel.='</td><td width="5"><img src="img/space.gif" width="5" height="5"></td></tr><tr bgcolor="#F8F4F6"><td width="5"></td><td>';
 	$eszrevetel.="<p class=alapkizart>Ha észrevételed van a templommal vagy a miserenddel kapcsolatban, írd meg nekünk!</p>
     <div align=center><a href=\"javascript:OpenNewWindow('eszrevetel.php?sid=$sid&id=$tid&kod=templomok',450,530);\" class=link><font color=#8D317C size='+1'><b>Észrevétel beküldése</b></font></a></div>
     <div align=center><a href=\"javascript:OpenNewWindow('kepkuldes.php?sid=$sid&id=$tid&kod=templomok',450,530);\" class=link><font color=#8D317C size=''><b>Új kép beküldése</b></font></a></div>";
-	$eszrevetel.='</td><td width="5"></td></tr></table>';
 
-	//AndroidReklam
-	$androidreklam = androidreklam();
 	
 	if(!empty($szomszedos1)) {
 		/*$szomszedos1=str_replace('--','!',$szomszedos1);
@@ -1252,15 +1103,6 @@ function miserend_view() {
 	//$sz2= $sz1;
 	////////////////////////
 
-	$bucsu=nl2br($bucsu);
-
-	if(!empty($misemegj)) {
-		$variables = array(
-            'header'=>array('content'=>'Kapcsolódó információk'),
-            'content' => nl2br($misemegj),            
-            'design_url' => $design_url);		
-        $misemegjegyzes = $twig->render('doboz_lila.html',$variables);
-	}
 
 	if(!empty($megjegyzes)) {
         global $design_url;
@@ -1290,7 +1132,7 @@ function miserend_view() {
              });
         </script>';
     
-		$kepek.="\n<img src=$design_url/img/negyzet_kek.gif align=absmiddle><img src=img/space.gif width=5 height=5><span class=dobozcim_fekete>Képek a templomról</span><br>";
+		$kepek.="\n";
 
         $kepek .= '<div class="als-container" id="my-als-list">
   <span class="als-prev"><img src="img/als/thin_left_arrow_333.png" alt="prev" title="previous" /></span>
@@ -1395,23 +1237,25 @@ function miserend_view() {
             'teli' => $teli,
             'miserend' => $misek, 
             'eszrevetel' => $eszrevetel,
-            'androidreklam' => $androidreklam,
+            'androidreklam' => androidreklam(),
             'kepek' => $kepek,
             'jotudni' => $jotudni,
             'leiras' => $leiras,
             'cim' => $cim,
             'terkepk' => $terkep,
-            'megkozelit' => $megkozelit,
+            'megkozelites' => nl2br($megkozelites),
             'kapcsolat' => $kapcsolat,
             'miseaktiv' => $miseaktiv,
-            'misemegjegyzes' => $misemegjegyzes,
+            'misemegjegyzes' => nl2br($misemegj),
             'sz1' => $sz1,
             'sz2' => $sz2,
             'napok' => array('','hétfő','kedd','szerda','csütörtök','péntek','szombat','<font color=#AC282B><b>vasárnap</b></font>'),
             'design_url'=>$design_url,
             'alert' => LiturgicalDayAlert('html'));		
-
-        return $twig->render('content_templom.html',$variables);    
+        $variables['template'] = 'church';
+        $variables['scripts'] = $script;
+        return $variables;
+        
 	}
 	else {
 
@@ -1430,12 +1274,8 @@ function androidreklam() {
 	$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\"  onclick=\"ga('send','event','Advertisment','play.google.com','liladoboz-kep')\">
   <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" style=\"display:block;margin-right:auto;margin-left:auto;width:100%;max-width:172px\" /></a>";
 
-	global $design_url;
-	$variables = array(
-            'content' => $dobozszoveg,
-            'settings' => array('width=100%'),
-            'design_url' => $design_url);		
-    return $twig->render('doboz_lila.html',$variables);	
+  	return $dobozszoveg;
+	
 }
 
 function miserend_getRegi() {

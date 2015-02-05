@@ -46,6 +46,14 @@ body { margin:0px}
 .loginlink:visited { color: #000000}
 .loginlink:hover { color: #8D317C; font-weight: bold}
 
+.loginlink.elotte:before {
+    content: "";
+    display: inline-block;
+    background: url("../img/negyzet.jpg") no-repeat left;
+    width: 8px;
+    height: 7px;
+}
+
 .implink {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #BBBAB6; text-decoration: none}
 .implink:visited { color: #BBBAB6}
 .implink:hover { color: #8D317C}
@@ -78,3 +86,4 @@ body { margin:0px}
 .jobburlap {  font-family: Arial, Helvetica, sans-serif; font-size: 70%; color: #000000; background-color: #E8ECEF;}
 .loginurlap {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000000; background-color: #FFFFFF; border: #8D317C; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px}
 .keresourlap {  font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000000; background-color: #FFFFFF; border: #7F9DB9; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px}
+

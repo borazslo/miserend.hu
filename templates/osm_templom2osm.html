@@ -1,0 +1,47 @@
+{% extends "osm.html" %}
+
+{% block script %}
+<script>
+		$(document).ready( function () {
+             $("body").on('click', '.kapcsol', function() {
+		    	var r = confirm("Biztosan összekapcsolod ezt a két templomot?");
+				if (r == true) {
+				    console.log($( this ).data('osm'));
+		    		console.log($( this ).data('tid'));
+		    		var ex = $( this );
+		    		$.ajax({
+                               type:"POST",
+                               url:"ajax.php?q=OSMOsszeKapcsol",
+                               data:"oid="+$( this ).data('osm')+"&tid="+$( this ).data('tid'),
+                               success:function(response){
+                               		console.log(response);
+                		    		$( ex ).parent().parent().hide('slow');
+                                },
+                        });
+				} else {
+				    txt = "You pressed Cancel!";
+				}
+		    });
+		} );
+</script>
+{% endblock %}
+
+{% block content %}
+	<table id="table_id" class="display">
+    <thead>
+        <tr>
+			{% for key in columns %}
+    			<th>{{ key }}</th>
+    		{% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+	    {% for row in rows %}
+    		<tr>
+			{% for r in row %}
+    			<td>{{ r|raw }}</td>
+    		{% endfor %}
+    		</tr>
+    	{% endfor %}
+    </tbody>
+</table>{% endblock %}

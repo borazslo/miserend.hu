@@ -1,0 +1,30 @@
+<html>
+<head>
+	<title>miserend - OSM</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css">
+	<!-- jQuery -->
+	<script type="text/javascript" charset="utf8" src="//code.jquery.com/jquery-1.10.2.min.js"></script>  
+	<!-- DataTables -->
+	<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.js"></script>
+	<script>
+		$(document).ready( function () {
+		    $('#table_id').DataTable( {
+				  "pageLength": 200
+				} );
+		} );
+	</script>
+	{% block script %}{% endblock %}
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<div style="padding:1px;text-align:right;background-color:#D1DDE9">{{ user.html|raw }}</div>
+	<div id="menu" style="padding:1px;text-align:center;background-color:#244C8F">
+		{% for item in menu %}[<a style="color:white;text-decoration: none;weight:200" href="{{ base }}{{ item[0] }}">{{ item[1] }}</a>]{% endfor %}
+	</div>
+	<div id="content">
+		{% block content %}
+			<div style="padding:20px;text-align:center">{{ text|raw }}</div>
+		{% endblock %}
+	</div>
+</body>

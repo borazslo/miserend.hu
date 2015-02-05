@@ -4,8 +4,7 @@ if($user->loggedin) mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i
 
 if(isset($_GET['q'])) { include $_GET['q'].".php"; exit;}
 
-$vars = array();
-        
+
 /////////////////////////////////
 //Ellenőrzések, beállítások
 /////////////////////////////////
@@ -108,6 +107,7 @@ else {
     if($m_zart and $belepve and $jogosult) $mehet=true;
     elseif(!$m_zart) $mehet=true;
 
+    if($user->jogok != '') { $vars['chat'] = chat_vars(); }
 /////////////////////////////////
 //nyelv beállítása
 /////////////////////////////////
@@ -116,9 +116,17 @@ else {
 /////////////////////////////////
 //tartalmi rész összeállítása
 /////////////////////////////////
-    $script .= '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>'."\n";
-    $script .= '<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>'."\n";
-    $script .= '<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">'."\n";
+    $script .= '<script src="/bower_components/jquery/dist/jquery.min.js"></script>'."\n";
+    $script .= '<script src="/bower_components/jquery-ui/jquery-ui.js"></script>'."\n";
+    $script .= '<script src="/bower_components/jquery-ui/ui/autocomplete.js"></script>'."\n";
+    $script .= '<script src="/bower_components/jquery-colorbox/jquery.colorbox.js"></script>';
+    $script .= '<script src="/bower_components/jquery-colorbox/i18n/jquery.colorbox-hu.js"></script>';
+    $script .= '<script src="jscripts2/als/jquery.als-1.5.min.js"></script>';
+    
+    $script .= '<link rel="stylesheet" href="templates/colorbox.css" />';
+    $script .= '<link rel="stylesheet" href="templates/als.css" />';
+
+    $script .= '<link rel="stylesheet" href="/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">'."\n";
 
     $script .= '<script src="js/miserend.js"></script>';
 
@@ -149,6 +157,11 @@ else {
                 $hibauzenet_prog.='<br>HIBA a modul design fájl behívásánál!';
             }
         }
+        if(preg_match('/\/admin_/i', $modul)) {
+            $loader = new Twig_Loader_Filesystem('templates');
+            $twig = new Twig_Environment($loader); // cache?        
+        }
+
         //Mivel jogosult, behívjuk a modult
         if(!include_once($modul)) {
             $hiba=true;
