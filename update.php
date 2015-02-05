@@ -1,16 +1,30 @@
 <?php
 include 'load.php';
 
-echo 'hajrá';
-/*
+echo "hajrá<br/>\n";
+
 //$tid = rand(1,4111);
 //print_r(getMasses(rand(1,1)));
 //exit;
 //
 
-//  img/zaszloikon/hu.gif -> img/zaszloikon/h.gid
+//  img/zaszloikon/hu.gif -> img/zaszloikon/h.gif
+
+/* */
+$query = "select misek.*,templomok.nyariido,templomok.teliido FROM misek LEFT JOIN templomok ON templom = templomok.id where datumtol = '0000-00-00' OR datumig = '0000-00-00' ";
+$result = mysql_query($query);
+$c = 0;
+while(($mise = mysql_fetch_array($result,MYSQL_ASSOC))) {
+	$query = "UPDATE misek SET datumtol = '".$mise['nyariido']."', datumig = '".$mise['teliido']."' WHERE id = '".$mise['id']."' LIMIT 1";
+	echo $query."<br/>";
+	mysql_query($query);
+	$c++;
+}
+echo $c." db 0000-00-00 updated<br/>\n";
+
 
 $query = " 
+
 ALTER TABLE kepek ADD COLUMN height integer;
 ALTER TABLE kepek ADD COLUMN width integer;
 DELETE FROM kepek wHERE kat <> 'templomok';
@@ -92,21 +106,21 @@ DROP TABLE terkep_misek_next;
 DROP TABLE terkep_geocode_suggestion;
 DROP TABLE szavazasv;
 DROP TABLE szavazask;
-DROP TABLE szavazasell;
+DROP TABLE szavazasell;";
 
-UPDATE `miserend`.`fomenu` SET `leiras`='<p class=\"kiscim\">A regisztr&aacute;ci&oacute;ra &eacute;s a port&aacute;lrendszer haszn&aacute;lat&aacute;ra az al&aacute;bbi szab&aacute;lyok &eacute;rv&eacute;nyesek, k&eacute;rj&uuml;k olvasd el figyelmesen!</p>           <table width=\"100%\" cellspacing=\"1\" cellpadding=\"4\" border=\"0\">   <tbody>      <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\" style=\"background-color: #ffffff\">1.</td>            <td class=\"alap\">  <p>      A Virtu&aacute;lis Pl&eacute;b&aacute;nia Port&aacute;lcsoport, melyhez a főmen&uuml;ben tal&aacute;lhat&oacute; aloldalak (h&iacute;rporta, miserend, t&aacute;borhely, m&eacute;diat&aacute;r, pl&eacute;b&aacute;nia) tartoznak, magyar katolikus oldalak. Tartalm&aacute;t papok      &eacute;s elk&ouml;telezett h&iacute;vek friss&iacute;tik. <strong>A port&aacute;lon megjelenő anyagok tekintet&eacute;ben      a Katolikus Egyh&aacute;z hivatalos tan&iacute;t&aacute;sa a m&eacute;rvad&oacute;!</strong></p>   </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">2.</td>            <td class=\"alap\">  <p>      Felhaszn&aacute;l&oacute;ink k&ouml;z&ouml;tt term&eacute;szetesen korra, nemre, felekezetre val&oacute; tekintet      n&eacute;lk&uuml;l mindenkit szeretettel l&aacute;tunk! Azonban k&eacute;rj&uuml;k az 1. pont tudom&aacute;sulv&eacute;tel&eacute;t &eacute;s egym&aacute;s k&ouml;lcs&ouml;n&ouml;s tiszteletbentart&aacute;s&aacute;t!</p>   <p><strong>FONTOS!</strong> Oldalunkon b&aacute;rki, b&aacute;rmilyen sz&aacute;nd&eacute;kkal jelen lehet, a regisztr&aacute;ci&oacute;, illetve a k&uuml;l&ouml;nb&ouml;ző kapcsolatok sor&aacute;n szem&eacute;lyes adataid mindig kellő &oacute;vatoss&aacute;ggal kezeld! <u>Felhaszn&aacute;l&oacute;ink publikusan megadott adatainak val&oacute;s&aacute;gtartalm&aacute;&eacute;rt nem tudunk felelőss&eacute;get v&aacute;llalni!</u><br />  </p>  </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">3.</td>            <td class=\"alap\">      A port&aacute;lon lehetős&eacute;get biztos&iacute;tunk besz&eacute;lget&eacute;sekre, ismerked&eacute;sre, kapcsolattart&aacute;sra, azonban mindezt csak kultur&aacute;lt keretek k&ouml;z&ouml;tt, az 1. pont figyelembev&eacute;tel&eacute;vel. Oldalunkon, t&eacute;mak&ouml;reinkben val&oacute; provok&aacute;l&aacute;s, m&aacute;sok zaklat&aacute;sa kiz&aacute;r&aacute;ssal j&aacute;r!      </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">4.</td>            <td class=\"alap\">  <p>A regisztr&aacute;ci&oacute; sor&aacute;n k&ouml;telező megadni emailc&iacute;med, valamint egy bejelentkez&eacute;si nevet. A v&aacute;lasztott <u>bejelentkez&eacute;si n&eacute;v</u> viszont <u>mindig egy &eacute;s csak egy konkr&eacute;t szem&eacute;lyt k&eacute;pviselhet</u> (szervezetet, int&eacute;zm&eacute;nyt vagy csoportot, k&ouml;z&ouml;ss&eacute;get, csal&aacute;dot nem) &eacute;s azt <u>csak egy ember haszn&aacute;lhatja</u>.</p>   <p><strong>FONTOS!</strong> Figyelj, hogy <u>emailc&iacute;med mindig aktu&aacute;lis legyen</u>, v&aacute;ltoz&aacute;s eset&eacute;n oldalunkon is m&oacute;dos&iacute;tsd. K&eacute;retlen rekl&aacute;mleveleket nem k&uuml;ld&uuml;nk, harmadik f&eacute;lnek nem adjuk ki, de adott esetben az itt megadott c&iacute;mre k&uuml;ld&uuml;nk oldalunkkal kapcsolatos &eacute;rtes&iacute;t&eacute;st, figyelmeztet&eacute;st. Saj&aacute;t &eacute;rdeked, hogy ezt mindig időben megkaphasd.<br />  </p>  </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">5.</td>            <td class=\"alap\"><p>Regisztr&aacute;lt felhaszn&aacute;l&oacute;inknak lehetős&eacute;g&uuml;k van egym&aacute;s k&ouml;zti kapcsolatokat be&aacute;ll&iacute;tani. Ennek megfelelően a regisztr&aacute;ci&oacute; sor&aacute;n megadott adatok szűrhetőek, hogy mely k&ouml;r l&aacute;thassa. A nyilv&aacute;nosan megadott adatok mellett lehetős&eacute;g van csak ismerős&ouml;k &eacute;s bar&aacute;tok, vagy csak bar&aacute;tok r&eacute;sz&eacute;re megadni adatokat.</p><p>A kapcsolatok jel&ouml;l&eacute;se nem k&ouml;lcs&ouml;n&ouml;sen műk&ouml;dik, akit az egyik f&eacute;l bar&aacute;tj&aacute;nak jel&ouml;l, nem sz&uuml;ks&eacute;ges, hogy a m&aacute;sik f&eacute;l is elfogadja, mivel itt csup&aacute;n az adatok kezel&eacute;s&eacute;ről van sz&oacute;, kapcsolatrendszert nem &eacute;p&iacute;t&uuml;nk.<br /> </p>  </td>   </tr> <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">6.</td>            <td class=\"alap\">  <p>A Virtu&aacute;lis Pl&eacute;b&aacute;nia Port&aacute;l regisztr&aacute;lt felhaszn&aacute;l&oacute;jak&eacute;nt haszn&aacute;lhatod a Pl&eacute;b&aacute;nia &aacute;ltal ny&uacute;jtott szolg&aacute;ltat&aacute;sokat, funkci&oacute;kat, bőv&iacute;theted a Pl&eacute;b&aacute;nia adatb&aacute;zis&aacute;t, illetve felhaszn&aacute;lhatod azt munk&aacute;d, szem&eacute;lyes fejlőd&eacute;sed vagy sz&oacute;rakoz&aacute;sod &eacute;rdek&eacute;ben.</p>   <p>      A Pl&eacute;b&aacute;ni&aacute;n tal&aacute;lhat&oacute; anyagokat felhaszn&aacute;lhatod, azokra hivatkozhatsz,      azonban ez esetben k&eacute;rj&uuml;k megjel&ouml;lni a forr&aacute;st! <br />  </p>  </td>   </tr>                </tbody></table>   <br /> <br /> ' WHERE `id`='11';
+//Ez nem működik :(
+//$query = "UPDATE `miserend`.`fomenu` SET leiras = '<p class=\"kiscim\">A regisztráci&oacute;ra &eacute;s a port&aacute;lrendszer haszn&aacute;lat&aacute;ra az al&aacute;bbi szab&aacute;lyok &eacute;rv&eacute;nyesek, k&eacute;rj&uuml;k olvasd el figyelmesen!</p>           <table width=\"100%\" cellspacing=\"1\" cellpadding=\"4\" border=\"0\">   <tbody>      <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\" style=\"background-color: #ffffff\">1.</td>            <td class=\"alap\">  <p>      A Virtu&aacute;lis Pl&eacute;b&aacute;nia Port&aacute;lcsoport, melyhez a főmen&uuml;ben tal&aacute;lhat&oacute; aloldalak (h&iacute;rporta, miserend, t&aacute;borhely, m&eacute;diat&aacute;r, pl&eacute;b&aacute;nia) tartoznak, magyar katolikus oldalak. Tartalm&aacute;t papok      &eacute;s elk&ouml;telezett h&iacute;vek friss&iacute;tik. <strong>A port&aacute;lon megjelenő anyagok tekintet&eacute;ben      a Katolikus Egyh&aacute;z hivatalos tan&iacute;t&aacute;sa a m&eacute;rvad&oacute;!</strong></p>   </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">2.</td>            <td class=\"alap\">  <p>      Felhaszn&aacute;l&oacute;ink k&ouml;z&ouml;tt term&eacute;szetesen korra, nemre, felekezetre val&oacute; tekintet      n&eacute;lk&uuml;l mindenkit szeretettel l&aacute;tunk! Azonban k&eacute;rj&uuml;k az 1. pont tudom&aacute;sulv&eacute;tel&eacute;t &eacute;s egym&aacute;s k&ouml;lcs&ouml;n&ouml;s tiszteletbentart&aacute;s&aacute;t!</p>   <p><strong>FONTOS!</strong> Oldalunkon b&aacute;rki, b&aacute;rmilyen sz&aacute;nd&eacute;kkal jelen lehet, a regisztr&aacute;ci&oacute;, illetve a k&uuml;l&ouml;nb&ouml;ző kapcsolatok sor&aacute;n szem&eacute;lyes adataid mindig kellő &oacute;vatoss&aacute;ggal kezeld! <u>Felhaszn&aacute;l&oacute;ink publikusan megadott adatainak val&oacute;s&aacute;gtartalm&aacute;&eacute;rt nem tudunk felelőss&eacute;get v&aacute;llalni!</u><br />  </p>  </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">3.</td>            <td class=\"alap\">      A port&aacute;lon lehetős&eacute;get biztos&iacute;tunk besz&eacute;lget&eacute;sekre, ismerked&eacute;sre, kapcsolattart&aacute;sra, azonban mindezt csak kultur&aacute;lt keretek k&ouml;z&ouml;tt, az 1. pont figyelembev&eacute;tel&eacute;vel. Oldalunkon, t&eacute;mak&ouml;reinkben val&oacute; provok&aacute;l&aacute;s, m&aacute;sok zaklat&aacute;sa kiz&aacute;r&aacute;ssal j&aacute;r!      </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">4.</td>            <td class=\"alap\">  <p>A regisztr&aacute;ci&oacute; sor&aacute;n k&ouml;telező megadni emailc&iacute;med, valamint egy bejelentkez&eacute;si nevet. A v&aacute;lasztott <u>bejelentkez&eacute;si n&eacute;v</u> viszont <u>mindig egy &eacute;s csak egy konkr&eacute;t szem&eacute;lyt k&eacute;pviselhet</u> (szervezetet, int&eacute;zm&eacute;nyt vagy csoportot, k&ouml;z&ouml;ss&eacute;get, csal&aacute;dot nem) &eacute;s azt <u>csak egy ember haszn&aacute;lhatja</u>.</p>   <p><strong>FONTOS!</strong> Figyelj, hogy <u>emailc&iacute;med mindig aktu&aacute;lis legyen</u>, v&aacute;ltoz&aacute;s eset&eacute;n oldalunkon is m&oacute;dos&iacute;tsd. K&eacute;retlen rekl&aacute;mleveleket nem k&uuml;ld&uuml;nk, harmadik f&eacute;lnek nem adjuk ki, de adott esetben az itt megadott c&iacute;mre k&uuml;ld&uuml;nk oldalunkkal kapcsolatos &eacute;rtes&iacute;t&eacute;st, figyelmeztet&eacute;st. Saj&aacute;t &eacute;rdeked, hogy ezt mindig időben megkaphasd.<br />  </p>  </td>   </tr>       <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">5.</td>            <td class=\"alap\"><p>Regisztr&aacute;lt felhaszn&aacute;l&oacute;inknak lehetős&eacute;g&uuml;k van egym&aacute;s k&ouml;zti kapcsolatokat be&aacute;ll&iacute;tani. Ennek megfelelően a regisztr&aacute;ci&oacute; sor&aacute;n megadott adatok szűrhetőek, hogy mely k&ouml;r l&aacute;thassa. A nyilv&aacute;nosan megadott adatok mellett lehetős&eacute;g van csak ismerős&ouml;k &eacute;s bar&aacute;tok, vagy csak bar&aacute;tok r&eacute;sz&eacute;re megadni adatokat.</p><p>A kapcsolatok jel&ouml;l&eacute;se nem k&ouml;lcs&ouml;n&ouml;sen műk&ouml;dik, akit az egyik f&eacute;l bar&aacute;tj&aacute;nak jel&ouml;l, nem sz&uuml;ks&eacute;ges, hogy a m&aacute;sik f&eacute;l is elfogadja, mivel itt csup&aacute;n az adatok kezel&eacute;s&eacute;ről van sz&oacute;, kapcsolatrendszert nem &eacute;p&iacute;t&uuml;nk.<br /> </p>  </td>   </tr> <tr>        <td valign=\"top\" align=\"right\" class=\"kiscim\">6.</td>            <td class=\"alap\">  <p>A Virtu&aacute;lis Pl&eacute;b&aacute;nia Port&aacute;l regisztr&aacute;lt felhaszn&aacute;l&oacute;jak&eacute;nt haszn&aacute;lhatod a Pl&eacute;b&aacute;nia &aacute;ltal ny&uacute;jtott szolg&aacute;ltat&aacute;sokat, funkci&oacute;kat, bőv&iacute;theted a Pl&eacute;b&aacute;nia adatb&aacute;zis&aacute;t, illetve felhaszn&aacute;lhatod azt munk&aacute;d, szem&eacute;lyes fejlőd&eacute;sed vagy sz&oacute;rakoz&aacute;sod &eacute;rdek&eacute;ben.</p>   <p>      A Pl&eacute;b&aacute;ni&aacute;n tal&aacute;lhat&oacute; anyagokat felhaszn&aacute;lhatod, azokra hivatkozhatsz,      azonban ez esetben k&eacute;rj&uuml;k megjel&ouml;lni a forr&aacute;st! <br />  </p>  </td>   </tr>                </tbody></table>   <br /> <br /> ' WHERE `id`='11';";
 
-
-";
-
-
-//UPDATE misek SET torolte = datumig, datumig = datumtol, datumtol = torolte, torolte = ''  WHERE idoszamitas = 't' AND datumtol LIKE '2014-%' AND datumig LIKE '2014-%';
 
 $queries = explode(';',$query);
+$c = 0;
 foreach($queries as $query) {
-	if(trim($query) != '') if(!$lekerdez=mysql_query($query)) die( "<p>HIBA #711!<br>$query<br>".mysql_error());	
+	if(trim($query) != '') {
+		if(!$lekerdez=mysql_query($query)) die( "<p>HIBA #711!<br>$query<br>".mysql_error());	
+		else $c++;
+	}
 }
-echo 'mysql ok';
+echo $c." db mysql ok<br/>\n";
 
 
 mysql_query("SET collation_connection = 'utf8_general_ci'");
@@ -116,34 +130,96 @@ while($tables = mysql_fetch_array($result)) {
         foreach ($tables as $key => $value) {
          mysql_query("ALTER TABLE $value CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci");
    }}
-echo "The collation of your database has been successfully changed!";
+echo "The collation of your database has been successfully changed!<br/>\n";
+
+
+
+$query = "SELECT tid,nap,ido,nap2,idoszamitas,weight,tol,ig,tmp_datumtol,tmp_relation,tmp_datumig,nyelv,milyen,megjegyzes,torles FROM misek ORDER BY tid,nap,nap2,idoszamitas,ido ";
+$result = mysql_query($query);
+$misek = array();    
+while(($mise = mysql_fetch_array($result,MYSQL_ASSOC))) {
+	$tmp = $mise;
+	unset($tmp['idoszamitas']);
+	$misek[$mise['tid']][$mise['idoszamitas']][] = $tmp;
+}
+
+
+foreach($misek as $tid => $idoszamitasok) {
+	echo $tid.": ";
+	if(count($idoszamitasok) == 2 and isset($idoszamitasok['t']) AND isset($idoszamitasok['ny'])) {
+		echo ' lehetséges ';
+		echo count($idoszamitasok['t'])."-".count($idoszamitasok['ny'])." ";
+		if($idoszamitasok['t'] == $idoszamitasok['ny']) {
+			foreach ($idoszamitasok['t'] as  $mise) {
+				$t = array();
+				foreach(array('tid','nap','ido','nap2','weight','tol','ig','tmp_datumtol','tmp_relation','tmp_datumig','nyelv','milyen','megjegyzes','torles') as $w) {
+					if($mise[$w] != '')
+						$t[] = " ".$w." = '".$mise[$w]."' ";
+					else 
+						$t[] = "( ".$w." = '".$mise[$w]."' OR ".$w." IS NULL )";
+				}
+				$query = "DELETE FROM misek WHERE ".implode(" AND ",$t)." AND idoszamitas = 't' LIMIT 1";
+				//echo $query."<br/>";
+				mysql_query($query);
+
+				$query = "UPDATE  misek SET idoszamitas = 'egész évben', tol = '01-01', ig = '12-31' WHERE ".implode(" AND ",$t)." AND idoszamitas = 'ny' LIMIT 1";
+				//echo $query."<br/>";
+				mysql_query($query);
+
+			}
+			echo " YEAH ";
+		}
+	}
+	echo "<br/>";
+}
 
 
 //misek
 $idoszamitas = array('t' => 'télen', 'ny'=> 'nyáron');
-$plusznap = array('t' => '', 'ny' => ' +1');
-$minusznap = array('t' => '', 'ny' => ' -1');
+$tolnap = array('t' => '-1 day', 'ny' => '');
+$ignap = array('t' => '+1 day', 'ny' => '');
 
-$query = 'SELECT * FROM misek';
+$query = "SELECT * FROM misek WHERE idoszamitas = 't' OR idoszamitas = 'ny' ";
 $result = mysql_query($query);    
 while(($mise = mysql_fetch_array($result))) {
-	if(date('Y',strtotime($mise['tol'])) != date('Y') AND date('Y',strtotime($mise['ig'])) != date('Y') AND preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/i', $mise['ig'])) {
-		$tmp = array('t','ny');
-		if($mise['idoszamitas'] == 't') { $tol = 'ig'; $ig = 'tol'; }
-		elseif($mise['idoszamitas'] == 'ny') { $tol = 'tol'; $ig = 'ig'; }
-		$query =  "UPDATE misek SET idoszamitas = '".$idoszamitas[$mise['idoszamitas']]."', ".$tol." = 'utolsó tanítási nap".$plusznap[$mise['idoszamitas']]."', ".$ig." = 'első tanítási nap".$minusznap[$mise['idoszamitas']]."' WHERE id = ".$mise['id']." LIMIT 1";
-		echo $query."<br>";
-		mysql_query($query);
-
-	}
+	//$tmp = array('t','ny');
+	//if(date('Y',strtotime($mise['tol'])) != date('Y') AND date('Y',strtotime($mise['ig'])) != date('Y') AND preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/i', $mise['ig'])) {
+	
+	if($mise['idoszamitas'] == 't') { $tol = 'ig'; $ig = 'tol'; }
+	elseif($mise['idoszamitas'] == 'ny') { $tol = 'tol'; $ig = 'ig'; }
+	//echo $mise['tol']."::".date('Y-m-d',strtotime($mise['tol']));
+	
+	$query =  "UPDATE misek SET idoszamitas = '".$idoszamitas[$mise['idoszamitas']]."', ".$tol." = '".date('m-d',strtotime($mise['tol']." ".$tolnap[$mise['idoszamitas']]))."',".$ig." = '".date('m-d',strtotime($mise['ig']." ".$ignap[$mise['idoszamitas']]))."' WHERE id = ".$mise['id']." LIMIT 1";
+	
+	echo $query."<br>";
+	mysql_query($query);
 
 }
+/**/
+set_time_limit('300');
 
-//neighbour
-neighboursUpdate();
+$query = "SELECT count(misek.id) as misek ,SUM(if(ido = '00:00:00', 1, 0)) AS nullak, tid, misek.id,misek.megjegyzes,templomok.misemegj FROM misek LEFT JOIN templomok ON tid = templomok.id GROUP BY tid;";
+$result = mysql_query($query);    
+$c = 0;
+while(($tmp = mysql_fetch_array($result))) {
+	if($tmp['nullak'] == 1 AND $tmp['misek'] == 1) {
+		$c ++;
+		if($tmp['megjegyzes'] != '' AND $tmp['misemegj'] == '') {
+			//echo $tmp['tid'].": ".$tmp['megjegyzes']." -::-".$tmp['misemegj']."<br/>";
+			$query = "UPDATE templomok SET misemegj = '".$tmp['megjegyzes']."' WHERE id = ".$tmp['tid']." LIMIT 1";
+			//echo $query."<br/>";
+			mysql_query($query);
+		}
+		$query = "UPDATE templomok SET  miseaktiv = 0 WHERE id = ".$tmp['tid']." LIMIT 1";
+		//echo $query."<br/>";
+		mysql_query($query);
 
-//
-generateMassTmp();
+		$query = "DELETE FROM misek WHERE id = ".$tmp['id']." LIMIT 1;";
+		echo $query."<br/>";
+		mysql_query($query);
+	}
+}
+echo $c." db csak nullák eltávolítva<br/>";
 
 //kepek
 $query = 'SELECT * FROM kepek WHERE width IS NULL OR height IS NULL OR width = 0 OR height = 0 ';
@@ -171,6 +247,12 @@ while(($kep = mysql_fetch_array($result))) {
 }
 
 /**/
+
+//
+generateMassTmp();
+
+//neighbour
+neighboursUpdate();
 
 
 
