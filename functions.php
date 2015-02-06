@@ -361,7 +361,7 @@ function event2Date($event, $year = false) {
 }
 
 function events_form() {
-    $query = "SELECT * FROM events ;";
+    $query = "SELECT * FROM events WHERE year >= ".date('Y','-1 year')." ORDER BY year;";
     $result = mysql_query($query);
     $years = array(); $names = array();
     while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
@@ -369,7 +369,7 @@ function events_form() {
             $form[$name][$row['year']]['input'] = array(
                 'name' => 'events['.$name.']['.$row['year'].'][input]',
                 'value' => $row['date'],
-                'size' => '8')
+                'size' => '9')
             ;
             $form[$name][$row['year']]['id'] = array(
                 'type' => 'hidden',
@@ -379,6 +379,14 @@ function events_form() {
             $years[$row['year']] = $row['year'];
             $names[$name] = $name;
     }
+    //new line
+    //$array_shift(array_values($form))
+    $newname = array(
+        'name' => 'newname',
+        'size' => 12);
+    global $twig;
+    $names['new'] = 'new';
+
     $years[date('Y')] = date('Y');
     $years[date('Y',strtotime('+1 years'))] = date('Y',strtotime('+1 years'));
 
@@ -401,8 +409,16 @@ function events_form() {
             }
 
         }
+    //stats
+        $query = "SELECT count(*) as sum FROM misek where ig  REGEXP '^(".$name.")(( +| -)[0-9]{1,3})|)$'";
+        $result = mysql_query($query);
+        $row = mysql_fetch_array($result,MYSQL_ASSOC);
+        $stats[$name] = $row['sum'];
+    
     }
-    return array('form'=>$form,'names'=>$names,'years'=>$years);
+    
+
+    return array('form'=>$form,'names'=>$names,'years'=>$years,'stats'=>$stats);
 }
 
 function events_save($form) {
@@ -414,10 +430,12 @@ function events_save($form) {
                 mysql_query($query);
             } else {
                 if($input['input'] != '') {
-                    $query = "INSERT INTO events (name,year,date) VALUES ('".$name."','".$year."','".$input['input']."');";
-                    mysql_query($query);
-
-
+                    if($name == 'new') $name = sanitize($form['new']);
+                    if($name != 'new' OR $form['new'] != '') {
+                        $query = "INSERT INTO events (name,year,date) VALUES ('".$name."','".$year."','".$input['input']."');";
+                        mysql_query($query);
+                        //echo $query."<br/>";
+                    }
                 }
             }
         }
@@ -593,7 +611,7 @@ function formMass($pkey,$mkey,$mass = false,$group = false) {
         'ido' => array(
             'name' => $group."[".$pkey."][".$mkey."][ido]",
             'value' => $mass['ido'],
-            'size' => 1,
+            'size' => 4,
             'class'=> 'time' ),
         'nyelv' => array(
             'label' => 'nyelvek',

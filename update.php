@@ -49,6 +49,13 @@ CREATE TABLE `events` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 LOCK TABLES `events` WRITE;
 INSERT INTO `events` VALUES (1,'utolsó tanítási nap','2014','2014-06-01'),(2,'utolsó tanítási nap','2015','2015-06-07'),(3,'első tanítási nap','2014','2014-09-01'),(4,'első tanítási nap','2015','2015-09-03');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (5,'Advent I. vasárnapja','2014','2014-11-30');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (6,'Advent I. vasárnapja','2015','2015-11-29');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (7,'Advent I. vasárnapja','2016','2016-11-27');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (8,'Hamvazószerda','2015','2015-02-18');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (9,'Hamvazószerda','2016','2016-02-10');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (10,'Húsvétvasárnap','2015','2015-04-05');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (11,'Húsvétvasárnap','2016','2016-03-27');
 UNLOCK TABLES;
 ALTER TABLE misek ADD COLUMN nap2 varchar(4) AFTER ido;
 ALTER TABLE misek ADD COLUMN tmp_datumig VARCHAR(5) AFTER ig;
