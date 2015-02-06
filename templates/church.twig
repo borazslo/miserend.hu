@@ -55,7 +55,7 @@ $(document).ready(function(){
   {% if miseaktiv == 1 %}
 
   {% for key,idoszak in miserend.periods %}
-    <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="idoszak_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></div>
+    <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="idoszak_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:12px"><strong>({{ idoszak.datumtol }} - {{ idoszak.datumig }})</strong></span></div>
 
     <div id="idoszak_{{ key }}">
     {% for nap in idoszak.napok %}
@@ -95,7 +95,7 @@ $(document).ready(function(){
     {% endfor %}
 
      {% for key,idoszak in miserend.particulars %}
-    <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="particular_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:11px">({{ idoszak.datumtol }})</span></div>
+    <div style="padding-left:5px;background-color:#B51A7E;margin-top:3px"><span class="alap clickme {% if idoszak.now %}open{% else %}close{% endif %}" data-id="particular_{{ key }}" >-</span><span class="dobozcim_feher" style="margin-left:5px"> {{ idoszak.nev }} </span><span class="alap" style="font-size:12px"><strong>({{ idoszak.datumtol }})</strong></span></div>
 
     <div id="particular_{{ key }}">
     {% for nap in idoszak.napok %}

@@ -499,7 +499,8 @@ function miserend_addingtemplom() {
 			//neighboursUpdate($tid);
 			
 		} 
-		neighboursUpdate($tid);
+		if($lng != '' AND $lat != '')
+			neighboursUpdate($tid);
 			
 	
 	//fájlkezelés
@@ -832,7 +833,7 @@ function miserend_addmise($tid) {
 
 	$vars['misemegj'] =  array(
             'type' => 'textbox',
-            'name' => "misemefj",
+            'name' => "misemegj",
             'value' => $church['misemegj'],
             'label'=> 'Rendszeres rózsafűzér, szentségimádás, hittan, stb.<br/>');
 	$vars['adminmegj'] =  array(
