@@ -859,7 +859,6 @@ function searchChurchesWhere($args) {
 }
 function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
-    $attributes = unserialize(ATTRIBUTES);
 
     $return = array(
         'offset' => $offset,
@@ -883,8 +882,6 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     if($args['gorog'] == 'gorog') {
         $where[] = "( egyhazmegye=17 OR egyhazmegye=18 )";
     }
-    $where[] = "miseaktiv = 1";
-
 
     //milyen nap
     if($args['mikor'] == 'x') $args['mikor'] = $args['mikordatum']; 
@@ -920,44 +917,71 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
         $where[] = " m.ido <= '".$idok[1].":00'"; 
     }
 
-    //nyelv és egyéb tulajdonságok
-    if($args['nyelv'] != '0' AND $args['nyelv'] != '') $where[] = "( m.nyelv REGEXP '(^|,)(".$args['nyelv'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' )";
+    //LANGUAGES
+    $languages = unserialize(LANGUAGES);
+    foreach($languages as $abbrev => $attribute) if($attribute['abbrev'] != 'h') $nothu[] = $abbrev;
+    if($args['nyelv'] != '0' AND $args['nyelv'] != '') {
+        if($args['nyelv'] == 'h') {
+            $where[] = "( m.nyelv REGEXP '(^|,)(".$args['nyelv'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR 
+                templomok.orszag = 12 AND m.nyelv NOT REGEXP '(^|,)(".implode("|",$nothu).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' )";
+        } else {
+            $where[] = "( m.nyelv REGEXP '(^|,)(".$args['nyelv'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' )";
+        }
+    }
 
+    //ATTRIBUTES
+    $attributes = unserialize(ATTRIBUTES);
+
+    //age group (checkbox)
     if(isset($args['kor'])) {
+        foreach($attributes as $abbrev => $attribute) {
+            if($attribute['group'] == 'age')
+                $ages[] = $abbrev;
+        }
         $wherekor = array();
         foreach($args['kor'] as $kor) {
-            if(in_array($kor, array('csal','d','ifi'))) {
+            if(in_array($kor, $ages)) {
                  $wherekor[] = " m.milyen REGEXP '(^|,)(".$kor.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             } elseif($kor == 'na') {
-                 $wherekor[] = " m.milyen NOT REGEXP '(^|,)(csal|d|ifi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+                 $wherekor[] = " m.milyen NOT REGEXP '(^|,)(".implode('|',$ages).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             }
         }
         $where[] = " ( ".implode(' OR ',$wherekor).") ";
     }
 
+    //music group (chekbox)
     if(isset($args['zene'])) {
+        foreach($attributes as $abbrev => $attribute) {
+           if($attribute['group'] == 'music')
+                $musics[] = $abbrev;
+        }
         $wherezene = array();
         foreach($args['zene'] as $zene) {
-            if(in_array($zene, array('g','cs'))) {
+            if(in_array($zene, $musics)) {
                  $wherezene[] = " m.milyen REGEXP '(^|,)(".$zene.")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             } elseif($zene == 'na') {
-                 $wherezene[] = " m.milyen NOT REGEXP '(^|,)(g|cs)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
+                 $wherezene[] = " m.milyen NOT REGEXP '(^|,)(".implode("|",$musics).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";
             }
         }
         $where[] = " ( ".implode(' OR ',$wherezene).") ";
     }
     
+    //rite group (select)
     if($args['ritus'] != '0') {
         if($args['ritus'] == 'gor') {
-            $where[] = "( m.milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen NOT REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+            foreach($attributes as $abbrev => $attribute) if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'gor') $notgor[] = $abbrev;
+            $where[] = "( m.milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' OR 
+                        ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen NOT REGEXP '(^|,)(".implode("|",$notgor).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } elseif($args['ritus'] == 'rom') {
-            $where[] = "( (m.milyen NOT REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
-        } elseif($args['ritus'] == 'regi') {
-            $where[] = " m.milyen REGEXP '(^|,)(regi)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
-        }    
+            foreach($attributes as $abbrev => $attribute) if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'rom') $notrom[] = $abbrev;
+            $where[] = "( (m.milyen NOT REGEXP '(^|,)(".implode("|",$notgor).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR 
+                        ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+        } else {
+            $where[] = " m.milyen REGEXP '(^|,)(".$args['ritus'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
+        } 
     }
 
-    //not search for lituries that are not masses
+    //liturgy (not mass) group (checkbox/radio)
     $not = $only = array();
     foreach($attributes as $abbrev => $attribute) {
         if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == false) {

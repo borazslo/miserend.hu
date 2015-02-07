@@ -15,7 +15,11 @@ function idoszak($i) {
 function miserend_index() {
 	global $linkveg,$db_name,$m_id,$u_login,$sid,$design_url,$_GET,$u_varos,$onload,$script;
    
-       
+    
+	$attributes = unserialize(ATTRIBUTES);
+	$languages = unserialize(LANGUAGES);
+
+
 	$ma=date('Y-m-d');
 	$holnap=date('Y-m-d',(time()+86400));
 	$mikor='8:00-19:00';
@@ -109,21 +113,11 @@ function miserend_index() {
             'name' => "tnyelv",
             'id' => "tnyelv",
             'class' => 'keresourlap',
-			'options'=> array(0=>'bármilyen',
-					'h' => 'magyar',
-					'en' => 'angol',
-					'fr' => 'francia',
-					'gr' => 'görög',
-					'hr' => 'horvát',
-					'va' => 'latin',
-					'pl' => 'lengyel',
-					'de' => 'német',
-					'it' => 'olasz',
-					'ro' => 'román',
-					'es' => 'spanyol',
-					'sk' => 'szlovák',
-					'si' => 'szlovén')
+			'options'=> array(0=>'bármilyen')
 	);
+	foreach($languages as $abbrev => $language) {
+		$searchform['tnyelv']['options'][$abbrev] = $language['name'];
+	}
 
 	//Mikor
 	$mainap=date('w');
@@ -170,28 +164,24 @@ function miserend_index() {
             'value' => $mikor
     );
 
-	//Milyen
+	//languages
 	$searchform['nyelv'] = array(
             'name' => "nyelv",
             'id' => "nyelv",
             'class' => 'keresourlap',
-			'options'=> array(0=>'mindegy',
-					'h' => 'magyar',
-					'en' => 'angol',
-					'fr' => 'francia',
-					'gr' => 'görög',
-					'hr' => 'horvát',
-					'va' => 'latin',
-					'pl' => 'lengyel',
-					'de' => 'német',
-					'it' => 'olasz',
-					'ro' => 'román',
-					'es' => 'spanyol',
-					'sk' => 'szlovák',
-					'si' => 'szlovén')
+			'options'=> array(0=>'mindegy')
 	);
+	foreach($languages as $abbrev => $language) {
+		$searchform['nyelv']['options'][$abbrev] = $language['name'];
+	}
 	
-	foreach(array('cs'=>'csendes','g'=>'gitáros','na'=>'<i>meghatározatlan</i>') as $value => $label) {
+	//group music
+	$music['na'] = '<i>meghatározatlan</i>';
+	foreach($attributes as $abbrev => $attribute) {
+		if($attribute['group'] == 'music')
+			$music = array($abbrev => $attribute['name']) + $music;
+	}
+	foreach($music as $value => $label) {
 		$searchform['zene'][] = array(
 				'type' => 'checkbox',
 	            'name' => "zene[]",
@@ -202,7 +192,13 @@ function miserend_index() {
 	    );
 	}
 	
-	foreach(array('csal'=>'családi/mocorgós','d'=>'diák','ifi'=>'ifjúsági/egyetemista','na' => '<i>meghatározatlan</i>') as $value => $label) {
+	//group age
+	$age['na'] = '<i>meghatározatlan</i>';
+	foreach($attributes as $abbrev => $attribute) {
+		if($attribute['group'] == 'age')
+			$age = array($abbrev => $attribute['name']) + $age;
+	}
+	foreach($age as $value => $label) {
 		$searchform['kor'][] = array(
 				'type' => 'checkbox',
 	            'name' => "kor[]",
@@ -213,23 +209,25 @@ function miserend_index() {
 	    );
 	}
 
+	//group rite
 	$searchform['ritus'] = array(
             'name' => "ritus",
             'id' => "ritus",
             'class' => 'keresourlap',
-			'options'=> array(0=>'mindegy',
-					'rom' => 'római katolikus',
-					'gor' => 'görögkatolikus',
-					'regi' => 'régi rítusú')
+			'options'=> array(0=>'mindegy')
 	);
+	foreach($attributes as $abbrev => $attribute) {
+		if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true)
+			$searchform['ritus']['options'][$abbrev] = $attribute['name'];
+	}
 	
 	$searchform['ige'] = array(
 			'type' => 'checkbox',
-            'name' => "yes",
+            'name' => "ige",
             'id' => "ige",
             'checked' => true,
             'class' => "keresourlap",
-            'value' => "ige"
+            'value' => "yes"
     );
 	
 	$templomurlap = '';
@@ -781,7 +779,7 @@ function miserend_misekeres() {
 	}
 	if(!empty($ige)) {
 		$tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> igeliturgiák is";
-		$leptet_urlap.="<input type=hidden name=ige value='ige'>";
+		$leptet_urlap.="<input type=hidden name=ige value='yes'>";
 	}
 	
 	$tartalom.="</span><br/>".LiturgicalDayAlert('html',$mikordatum);
