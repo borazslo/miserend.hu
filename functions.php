@@ -859,6 +859,8 @@ function searchChurchesWhere($args) {
 }
 function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
 
+    $attributes = unserialize(ATTRIBUTES);
+
     $return = array(
         'offset' => $offset,
         'limit' => $limit );
@@ -955,9 +957,24 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
         }    
     }
 
-    if(!isset($args['ige']) OR $args['ige'] != 'ige') {
-        $where[] = " m.milyen NOT REGEXP '(^|,)(ige)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
+    //not search for lituries that are not masses
+    $not = $only = array();
+    foreach($attributes as $abbrev => $attribute) {
+        if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == false) {
+            if(isset($args[$abbrev]) AND ( $args[$abbrev] == 'not' OR $args[$abbrev] == '' OR $args[$abbrev] == 0) ) {
+                $not[] = $abbrev;
+            } elseif(isset($args[$abbrev]) AND $args[$abbrev] == 'only') {
+                $only[] = $abbrev;
+            } elseif(!isset($args[$abbrev]) OR $ars[$abbrev] == 'yes')  {
+                //yes
+            }
+        }
     }
+    if(count($not) > 0)
+        $where[] = " m.milyen NOT REGEXP '(^|,)(".implode('|',$not).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
+    if(count($only) > 0)
+        $where[] = " m.milyen REGEXP '(^|,)(".implode('|',$only).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
+
 
     //mehet a lekérés
     $query = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta FROM misek m "; 

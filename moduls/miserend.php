@@ -225,7 +225,7 @@ function miserend_index() {
 	
 	$searchform['ige'] = array(
 			'type' => 'checkbox',
-            'name' => "ige",
+            'name' => "yes",
             'id' => "ige",
             'checked' => true,
             'class' => "keresourlap",

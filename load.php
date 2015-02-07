@@ -117,41 +117,47 @@ $milyen = array(
         'abbrev' => 'gor',
         'name' => 'görögkatolikus liturgia',
         'file' => 'jelzes1.png',
-        'group' => 'liturgy'
+        'group' => 'liturgy',
+        'isitmass' => 'false'
         ),    
     'rom' => array(
         'abbrev' => 'rom',
         'name' => 'római katolikus szentmise',
         'file' => 'jelzes10.png',
-        'group' => 'liturgy'
+        'group' => 'liturgy',
+        'isitmass' => 'false'
         ),    
     'regi' => array(
         'abbrev' => 'regi',
         'name' => 'régi rítusú szentmise',
         'file' => 'jelzes6.png',
-        'group' => 'liturgy'
+        'group' => 'liturgy',
+        'isitmass' => 'false'
         ), 
 
     'ige' => array(
         'abbrev' => 'ige',
         'name' => 'igeliturgia',
         'file' => 'biblia.gif',
-        'group' => 'liturgy',
-        'isitmass' => 'false'        
+        'group' => 'liturgy'
         ), 
     'vecs' => array(
         'abbrev' => 'vecs',
         'name' => 'vecsernye',
         'file' => 'jelzes7.png',
-        'group' => 'liturgy',
-        'isitmass' => 'false'
+        'group' => 'liturgy'
         ), 
     'utr' => array(
         'abbrev' => 'utr',
         'name' => 'utrenye',
         'file' => 'jelzes8.png',
-        'group' => 'liturgy',
-        'isitmass' => 'false'        
+        'group' => 'liturgy'        
+        ),
+    'szent' => array(
+        'abbrev' => 'szent',
+        'name' => 'szentségimádás',
+        'file' => 'jelzes9.png',
+        'group' => 'liturgy'        
         )
 );
 foreach($milyen as $k => $v) {
