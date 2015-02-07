@@ -213,7 +213,7 @@ while(($mise = mysql_fetch_array($result))) {
 	mysql_query($query);
 
 }
-/**/
+
 set_time_limit('300');
 
 $query = "SELECT count(misek.id) as misek ,SUM(if(ido = '00:00:00', 1, 0)) AS nullak, tid, misek.id,misek.megjegyzes,templomok.misemegj FROM misek LEFT JOIN templomok ON tid = templomok.id GROUP BY tid;";
@@ -265,6 +265,26 @@ while(($kep = mysql_fetch_array($result))) {
 }
 
 /**/
+$tables = array(
+	'templomok' => array('nev','ismertnev','megjegyzes','misemegj','leiras','megkozelites'),
+	'misek' => array('megjegyzes'),
+	'kepek' => array('felirat')
+	);
+$c = 0;
+foreach ($tables as $table => $fields) {
+	foreach ($fields as $key => $field) {
+		$query = "SELECT id,".$field." from ".$table." WHERE ".$field." LIKE '%görög katolikus%' ";
+		$result = mysql_query($query);    
+		while(($row = mysql_fetch_array($result))) {
+			$text = preg_replace('/(görög) katolikus/i', '$1katolikus',$row[$field]);
+			
+			$query = "UPDATE ".$table." SET ".$field." = '".$text."' WHERE id = ".$row['id']." LIMIT 1;";
+			mysql_query($query);
+			$c++;
+		}
+	}
+}
+echo $c." db görögkatolizálás<br/>";
 
 //
 generateMassTmp();
