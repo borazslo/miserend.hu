@@ -528,45 +528,50 @@ function updateMass() {
 function decodeMassAttr($text) {
     $return  = array();
 
-    $milyen = array('d','g','cs','gor','rom','regi','ige','ifi','csal');
-    $d = array('file' => 'diak.gif','name'=>'diák mise');
-    $g = array('file' => 'gitar.gif','name'=>'gitáros mise');
-    $cs = array('file' => 'csendes.gif','name'=>'csendes mise');
-
-    $gor = array('file' => 'jelzes1.png','name'=>'görögkatolikus liturgia');
-    $rom = array('file' => 'jelzes10.png','name'=>'római katolikus szentmise');
-    $regi = array('file' => 'jelzes6.png','name'=>'régi rítusú szentmise');
-
-    $ige = array('file' => 'biblia.gif','name'=>'igeliturgia');
-
-
-    $ifi = array('file' => 'fiu.png','name'=>'ifjúsági/egyetemista');
-    $csal = array('file' => 'lany.png','name'=>'családos/mocorgós');
-
-
-    $nyelvek = array('h'=>'magyar', 'en'=>'angol', 'de'=>'német', 'it'=>'olasz', 'va'=>'latin', 'gr'=>'görög', 'sk'=>'szlovák', 'hr'=>'horvát', 'pl'=>'lengyel', 'si'=>'szlovén', 'ro'=>'román', 'fr'=>'francia', 'es'=>'spanyol','uk'=>'ukrán');
-    foreach($nyelvek as $k => $v) {
-        $$k = array('file' => 'zaszloikon/'.$k.'.gif','name'=>$v." nyelven");
-        $milyen[] = $k;
+    $milyen = array();
+    $attributes = unserialize(ATTRIBUTES);
+    foreach($attributes as $abbrev => $attribute) {
+        $milyen[] = $abbrev;
+    }
+    $languages = unserialize(LANGUAGES);
+    foreach($languages as $abbrev => $language) {
+        $attributes[$abbrev] = $language;
+        $milyen[] = $abbrev;
     }
 
     preg_match_all("/(".implode('|',$milyen).")([0-5]{1}|-1|ps|pt|)(,|$)/i", $text,$matches,PREG_SET_ORDER);
     foreach ($matches as $match) {
-        if($match[1] != 'h' OR $match[2] != 0) {
-            $tmp = $match[1]; $tmp = $$tmp;
-            $tmp['abbrev'] = $match[1];
-            if($match[2] != '0' AND $match[2] != '' ) {
-                $tmp['week'] = $match[2];
-                if($match[2] == '-1') $match[2] = 'utolsó';
-                elseif($match[2] == 'ps') $match[2] = 'páros';
-                elseif($match[2] == 'pt') $match[2] = 'páratlan';
-                else $match[2] = $match[2].".";
-                $tmp['weektext'] = $match[2]." héten";
-            }
-            $return[] = $tmp;
-        }
+        if(!isset($return[$match[1]])) 
+            $return[$match[1]] = $attributes[$match[1]];
+        $return[$match[1]]['values'][] = $match[2];
     }
-    //print_r($return);
+
+    $periods = unserialize(PERIODS);
+    foreach($return as $abbrev => $attribute) {
+        sort($attribute['values']);
+        $tmp1 = $tmp2 = '';
+
+        for($i = 0;$i<count($attribute['values']);$i++) { 
+            $tmp1 .= $periods[$attribute['values'][$i]]['abbrev'];
+            $tmp2 .= $periods[$attribute['values'][$i]]['name'];
+            if($i<count($attribute['values'])-2) {
+                $tmp1 .= ", ";
+                $tmp2 .= ", ";
+            } elseif($i<count($attribute['values'])-1) {
+                $tmp1 .= ", ";
+                $tmp2 .= " és ";                
+            }
+        }
+        if(count($attribute['values'])>0 AND $tmp2 != '') {
+            $tmp2 .= " héten";                            
+        }
+
+        if($tmp1 != '') $return[$abbrev]['name'] .= ' '.$tmp1;
+        if($tmp2 != '' AND isset($attribute['description'])) $return[$abbrev]['description'] .= ' '.$tmp2;
+        
+
+    }
+    //echo "<pre>".print_r($return,1)."</pre>";
     return $return;
 }
 

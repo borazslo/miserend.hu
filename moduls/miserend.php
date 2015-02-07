@@ -879,13 +879,13 @@ function miserend_misekeres() {
 
 				$mass['nyelv'] = decodeMassAttr($mass['nyelv']);
 				foreach($mass['nyelv'] as $milyen)
-					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['weektext'].' '.$milyen['name'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-    					<span class="" style="display:none" >'.$milyen['weektext'].' '.$milyen['name'].'</span>';
+					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['description'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+    					<span class="" style="display:none" >'.$milyen['description'].'</span>';
     					
 				$mass['milyen'] = decodeMassAttr($mass['milyen']);
 				foreach($mass['milyen'] as $milyen)
-					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['weektext'].' '.$milyen['name'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-    					<span class="" style="display:none">'.$milyen['weektext'].' '.$milyen['name'].'</span>';
+					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['description'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+    					<span class="" style="display:none">'.$milyen['description'].'</span>';
 
     			if($mass['megjegyzes'] != '')
 				$tartalom.= '<img src="'.$design_url.'img/info2.gif" class="massinfo" width=14 title="'.$milyen['megjegyzes'].'"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">

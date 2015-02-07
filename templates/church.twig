@@ -79,7 +79,7 @@ $(document).ready(function(){
               <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
           {% if nap.misek[key].attr %}
               {% for attr in nap.misek[key].attr %} 
-                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.description,design_url) }}
               {% endfor %}
           {% endif %}  
           {% if nap.misek[key].megjegyzes %}
@@ -112,7 +112,7 @@ $(document).ready(function(){
               <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
           {% if nap.misek[key].attr %}
               {% for attr in nap.misek[key].attr %} 
-                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.description,design_url) }}
               {% endfor %}
           {% endif %}  
           {% if nap.misek[key].megjegyzes %}

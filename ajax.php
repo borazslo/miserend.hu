@@ -109,8 +109,13 @@ switch ($_REQUEST['q']) {
                     'es' => 'spanyol',
                     'sk' => 'szlovák',
                     'si' => 'szlovén');
-        else 
-        $attributes = array('csal'=>'családos/mocorgós','d'=>'diák','ifi'=>'ifjúsági/egyetemista','g'=>'gitáros','cs'=>'csendes','gor'=>'görögkatolikus','rom'=>'római katolikus','regi'=>'régi rítusú','lit'=>'igeliturgia');
+        else { 
+            $attributes = array();
+            $tmp = unserialize (ATTRIBUTES);
+            foreach($tmp as $abbrev => $attribute) {
+                $attributes[$abbrev] = $attribute['name'];
+            }
+        }
         $periods = array(''=>'minden héten','1'=>'1. héten','2'=>'2. héten','3'=>'3. héten','4'=>'4. héten','5'=>'5. héten','-1'=>'utolsó héten','ps'=>'páros héten','pt'=>'páratlan héten');
         
         foreach($attributes as $key => $val) {

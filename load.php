@@ -40,6 +40,19 @@ $tiltott_IP_T=ip_ell($fooldal_id);
 //$tiltott_IP és belep_tiltott_IP true vagy false
 /**/
 
+//Twig       
+require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
+Twig_Autoloader::register();
+
+
+if(isset($_REQUEST['template'])) $_SESSION['template'] = $_REQUEST['template'];
+if(!isset($_SESSION['template'])) $_SESSION['template'] = 'templates'; 
+$template = $_SESSION['template'];
+
+$loader = new Twig_Loader_Filesystem($template);
+$twig = new Twig_Environment($loader); // cache?        
+
+
 exec('git rev-parse --verify HEAD 2> /dev/null', $output);
 $hash = $output[0];
 if($hash != '') $vars['version']['hash'] = $hash;
@@ -62,22 +75,156 @@ if(!isset($_SESSION['isAndroidOS'])) {
     }    
 }
 
-//Twig       
-require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
-Twig_Autoloader::register();
-
-
-if(isset($_REQUEST['template'])) $_SESSION['template'] = $_REQUEST['template'];
-if(!isset($_SESSION['template'])) $_SESSION['template'] = 'templates'; 
-$template = $_SESSION['template'];
-
-$loader = new Twig_Loader_Filesystem($template);
-$twig = new Twig_Environment($loader); // cache?        
 
 if (!is_dir('fajlok/igenaptar')) {
     die('Nincsen faljok/igenaptar könyvtár. Upsz.');
 }
 
+$milyen = array(
+    'csal' => array(
+        'abbrev' => 'csal',
+        'name' => 'családos/mocorgós',
+        'file' => 'lany.png',
+        'group' => 'age'
+        ),
+    'd' => array(
+        'abbrev' => 'd',
+        'name' => 'diák',
+        'file' => 'diak.gif',
+        'group' => 'age'
+        ),
+    'ifi' => array(
+        'abbrev' => 'ifi',
+        'name' => 'ifjúsági/egyetemista',
+        'file' => 'fiu.png',
+        'group' => 'age'
+        ),
 
+    'g' => array(
+        'abbrev' => 'g',
+        'name' => 'gitáros',
+        'file' => 'gitar.gif',
+        'group' => 'music'
+        ),
+    'cs' => array(
+        'abbrev' => 'cs',
+        'name' => 'csendes',
+        'file' => 'csendes.gif',
+        'group' => 'music'
+        ),
+    
+    'gor' => array(
+        'abbrev' => 'gor',
+        'name' => 'görögkatolikus liturgia',
+        'file' => 'jelzes1.png',
+        'group' => 'liturgy'
+        ),    
+    'rom' => array(
+        'abbrev' => 'rom',
+        'name' => 'római katolikus szentmise',
+        'file' => 'jelzes10.png',
+        'group' => 'liturgy'
+        ),    
+    'regi' => array(
+        'abbrev' => 'regi',
+        'name' => 'régi rítusú szentmise',
+        'file' => 'jelzes6.png',
+        'group' => 'liturgy'
+        ), 
+
+    'ige' => array(
+        'abbrev' => 'ige',
+        'name' => 'igeliturgia',
+        'file' => 'biblia.gif',
+        'group' => 'liturgy',
+        'isitmass' => 'false'        
+        ), 
+    'vecs' => array(
+        'abbrev' => 'vecs',
+        'name' => 'vecsernye',
+        'file' => 'jelzes7.png',
+        'group' => 'liturgy',
+        'isitmass' => 'false'
+        ), 
+    'utr' => array(
+        'abbrev' => 'utr',
+        'name' => 'utrenye',
+        'file' => 'jelzes8.png',
+        'group' => 'liturgy',
+        'isitmass' => 'false'        
+        )
+);
+foreach($milyen as $k => $v) {
+    if(!isset($v['description']))
+        $milyen[$k]['description'] = $v['name'];
+}
+define ("ATTRIBUTES", serialize ($milyen));
+
+$nyelv = array(
+    'h' => 'magyar',
+    'en' => 'angol',
+    'fr' => 'francia',
+    'gr' => 'görög',
+    'hr' => 'horvát',
+    'va' => 'latin',
+    'pl' => 'lengyel',
+    'de' => 'német',
+    'it' => 'olasz',
+    'ro' => 'román',
+    'es' => 'spanyol',
+    'sk' => 'szlovák',
+    'si' => 'szlovén',
+    'uk' => 'ukrán'
+    );
+foreach($nyelv as $k => $v) {
+        $nyelv[$k] = array(
+            'abbrev' => $k,
+            'name' => $v,
+            'file' => 'zaszloikon/'.$k.'.gif',
+            'description' => $v." nyelven"
+        );
+}
+define("LANGUAGES", serialize($nyelv));
+
+$periods = array(
+    0 => array(
+        'abbrev'=>0,
+        'name'=>'',
+        'description'=>'minden'
+        ),
+    1 => array(
+        'abbrev'=>1,
+        'name'=>'1.'
+        ),
+    2 => array(
+        'abbrev'=>2,
+        'name'=>'2.'
+        ),
+    3 => array(
+        'abbrev'=>3,
+        'name'=>'3.'
+        ),
+    4 => array(
+        'abbrev'=>4,
+        'name'=>'4.'
+        ),
+    5 => array(
+        'abbrev'=>5,
+        'name'=>'5.'
+        ),
+    '-1' => array(
+        'abbrev'=>'-1',
+        'name'=>'utolsó'
+        ),
+    'ps' => array(
+        'abbrev'=>'ps',
+        'name'=>'páros'
+        ),
+    'pt'=>array(
+        'abbrev'=>'pt',
+        'name'=>'páratlan'
+        )
+);
+define("PERIODS", serialize($periods));
 
 ?>
