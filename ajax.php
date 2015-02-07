@@ -96,19 +96,13 @@ switch ($_REQUEST['q']) {
 
         $results = array();
 
-        if($_REQUEST['type'] == 'language') $attributes = array('h' => 'magyar',
-                    'en' => 'angol',
-                    'fr' => 'francia',
-                    'gr' => 'görög',
-                    'hr' => 'horvát',
-                    'va' => 'latin',
-                    'pl' => 'lengyel',
-                    'de' => 'német',
-                    'it' => 'olasz',
-                    'ro' => 'román',
-                    'es' => 'spanyol',
-                    'sk' => 'szlovák',
-                    'si' => 'szlovén');
+        if($_REQUEST['type'] == 'language') {
+            $languages = array();
+            $tmp = unserialize (LANGUAGES);
+            foreach($tmp as $abbrev => $attribute) {
+                $languages[$abbrev] = $attribute['name'];
+            }
+        }
         else { 
             $attributes = array();
             $tmp = unserialize (ATTRIBUTES);
@@ -116,7 +110,13 @@ switch ($_REQUEST['q']) {
                 $attributes[$abbrev] = $attribute['name'];
             }
         }
-        $periods = array(''=>'minden héten','1'=>'1. héten','2'=>'2. héten','3'=>'3. héten','4'=>'4. héten','5'=>'5. héten','-1'=>'utolsó héten','ps'=>'páros héten','pt'=>'páratlan héten');
+
+        $periods = array();
+        $tmp = unserialize (PERIODS);
+        foreach($tmp as $abbrev => $period) {
+            if(isset($period['description'])) $periods[$abbrev] = $period['description']." héten";
+            else $periods[$abbrev] = $period['name']." héten";
+        }
         
         foreach($attributes as $key => $val) {
             if(preg_match('/^'.$text.'/i',$key) OR preg_match('/^'.$text.'/i',$val) ) {
@@ -131,9 +131,6 @@ switch ($_REQUEST['q']) {
                 }
             }
         }
-        
-        
-
         echo json_encode(array('results'=>$results));
         break;
     case 'AutocompleteEvents':
