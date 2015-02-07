@@ -802,6 +802,8 @@ function miserend_addmise($tid) {
 
 	global $script;
 	$script .= "<script type='text/javascript' src='js/miserend_addmise.js'></script>\n";
+	//Ezt csak a development szerveren kéne
+	miserend_update_addmisejs();
 
 	$vars['church'] = $church = getChurch($tid);	
 	$masses = getMasses($tid);
@@ -846,6 +848,24 @@ function miserend_addmise($tid) {
 	 
 	global $twig;
 	return $twig->render('content_admin_editschedule.html',$vars); 
+}
+
+function miserend_update_addmisejs() {
+	$file = 'js/miserend_addmise.js';
+	if(is_writable($file)) {
+	if (filemtime('load.php') > filemtime($file)) {
+		$text = file_get_contents($file);
+		$text = preg_replace_callback("/(\/\*([A-Z]{1,15})\*\/)(.*?)(\/\*\/([A-Z]{1,15})\*\/)/i",function ($match) {
+		    $attributes = unserialize(constant($match[2]));
+		    foreach($attributes as $abbrev => $attribute) {
+		        $tmp[] = $abbrev;
+		    }
+		    $return = $match[1]." var ".strtolower($match[2])." = ['".implode("','",$tmp)."']; ".$match[4];
+		    return $return;
+		},$text);
+		file_put_contents($file,$text);
+	}
+	}
 }
 
 function miserend_addingmise() {

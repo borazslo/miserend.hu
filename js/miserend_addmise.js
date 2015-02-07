@@ -298,7 +298,8 @@ var events = new Array();
                     }); 
 
                 $("#periods").on('click', '.copyperiod', function(e) {
-                        var tr = $( this ).parent().parent(); 
+                        var tr = $( this ).parent().parent().parent().parent(); 
+
                         //var html = tr[0].outerHTML + tr.next()[0].outerHTML + tr.next().next()[0].outerHTML; 
                         var html = tr[0].outerHTML;
 
@@ -768,10 +769,10 @@ var events = new Array();
 function validate_language(str) {
   if(str == '') return true;
 
-  var languages = ['h','hu','en','de','it','va','gr','sk','hr','pl','si','ro','fr','es'];
-  var periods = ['','0','1','2','3','4','5','-1','ps','pt'];
+  /*LANGUAGES*/ var languages = ['h','en','fr','gr','hr','va','pl','de','it','ro','es','sk','si','uk']; /*/LANGUAGES*/
+  /*PERIODS*/ var periods = ['0','1','2','3','4','5','-1','ps','pt']; /*/PERIODS*/
 
-  var re = "^(((" + languages.join('|') + ")(" + periods.join('|') + ")(,|))+)$" ;
+  var re = "^(((" + languages.join('|') + ")(" + periods.join('|') + "|)(,|))+)$" ;
   re = new RegExp(re,"i");
   if(regs = str.match(re)) {
        return true;
@@ -783,10 +784,10 @@ function validate_language(str) {
 function validate_attributes(str) {
   if(str == '') return true;
 
-  var attributes = ['csal','d','ifi','g','cs','gor','rom','regi','lit'];
-  var periods = ['','0','1','2','3','4','5','-1','ps','pt'];
+  /*ATTRIBUTES*/ var attributes = ['csal','d','ifi','g','cs','gor','rom','regi','ige','vecs','utr','szent']; /*/ATTRIBUTES*/
+  /*PERIODS*/ var periods = ['0','1','2','3','4','5','-1','ps','pt']; /*/PERIODS*/
 
-  var re = "^(((" + attributes.join('|') + ")(" + periods.join('|') + ")(,|))+)$" ;
+  var re = "^(((" + attributes.join('|') + ")(" + periods.join('|') + "|)(,|))+)$" ;
   re = new RegExp(re,"i");
   if(regs = str.match(re)) {
        return true;
@@ -853,18 +854,18 @@ function validate_date(str) {
     return false;
   }
 
-  var re = /^(\d{1,2}):(\d{2})$/;
+  var re = /^(\d{1,2})(:(\d{2})|)$/;
 
   if(regs = str.match(re)) {
     // 24-hour value between 0 and 23
     if(regs[1] > 23) {
-      if(regs[1] == 24 && regs[2] == '00') return true;
+      if(regs[1] == 24 && regs[3] == '00') return true;
 
       error.push("Helytelen óra formátum: " + regs[1]);
       return false;
     }
     // minute value between 0 and 59
-    if(regs[2] > 59) {
+    if(regs[3] > 59) {
       error.push("Helytelen perc formátum: " + regs[2]);
       return false;
     }

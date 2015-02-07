@@ -118,21 +118,21 @@ $milyen = array(
         'name' => 'görögkatolikus liturgia',
         'file' => 'jelzes1.png',
         'group' => 'liturgy',
-        'isitmass' => 'false'
+        'isitmass' => true
         ),    
     'rom' => array(
         'abbrev' => 'rom',
         'name' => 'római katolikus szentmise',
         'file' => 'jelzes10.png',
         'group' => 'liturgy',
-        'isitmass' => 'false'
+        'isitmass' => true
         ),    
     'regi' => array(
         'abbrev' => 'regi',
         'name' => 'régi rítusú szentmise',
         'file' => 'jelzes6.png',
         'group' => 'liturgy',
-        'isitmass' => 'false'
+        'isitmass' => true
         ), 
 
     'ige' => array(
@@ -232,5 +232,6 @@ $periods = array(
         )
 );
 define("PERIODS", serialize($periods));
+
 
 ?>
