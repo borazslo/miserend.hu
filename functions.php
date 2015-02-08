@@ -324,7 +324,8 @@ function LiturgicalDayAlert($html = false,$date = false) {
 
 function checkDateBetween($date,$start,$end) {
         global $config;
-        if($config['debug'] > 1) echo "Is ".$date." between ".$start." and ".$end."? <br/>";
+        if($config['debug'] > 1) 
+            echo "Is ".$date." between ".$start." and ".$end."? <br/>";
 
         $year = date('Y',strtotime($date));
         if(strtotime($year."-".$start) <= strtotime($year."-".$end)) {
@@ -458,7 +459,7 @@ function getChurch($tid) {
 }
 
 function getMasses($tid,$date = false) {
-    if($date == false) $date = date('Y-m-d');
+    if($date == false OR $date == '') $date = date('Y-m-d');
 
     $napok = array('x','hétfő','kedd','szerda','csütörtök','péntek','szombat','vasárnap');
     $nap2options = array(
@@ -769,7 +770,6 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
     $return['sum']=mysql_num_rows($lekerdez);
     if(!$filterdistance) $query .= " LIMIT ".($offset ).",".($limit + $offset);
-    //echo $query;
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
     while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
         if($filterdistance) { 
@@ -857,7 +857,7 @@ function searchChurchesWhere($args) {
 
     return $where;
 }
-function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
+function searchMasses($args, $offset = 0, $limit = 20) {
 
 
     $return = array(
@@ -882,7 +882,6 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     if($args['gorog'] == 'gorog') {
         $where[] = "( egyhazmegye=17 OR egyhazmegye=18 )";
     }
-
     //milyen nap
     if($args['mikor'] == 'x') $args['mikor'] = $args['mikordatum']; 
     $where[] = "( m.nap = '".date('N',strtotime($args['mikor']))."' OR m.nap = 0 )";
@@ -974,7 +973,7 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
                         ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen NOT REGEXP '(^|,)(".implode("|",$notgor).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } elseif($args['ritus'] == 'rom') {
             foreach($attributes as $abbrev => $attribute) if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'rom') $notrom[] = $abbrev;
-            $where[] = "( (m.milyen NOT REGEXP '(^|,)(".implode("|",$notgor).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR 
+            $where[] = "( (m.milyen NOT REGEXP '(^|,)(".implode("|",$notrom).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR 
                         ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } else {
             $where[] = " m.milyen REGEXP '(^|,)(".$args['ritus'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
@@ -985,67 +984,74 @@ function searchMasses($args, $offset = 0, $limit = 20, $groupby = false) {
     $not = $only = array();
     foreach($attributes as $abbrev => $attribute) {
         if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == false) {
-            if(isset($args[$abbrev]) AND ( $args[$abbrev] == 'not' OR $args[$abbrev] == '' OR $args[$abbrev] == 0) ) {
-                $not[] = $abbrev;
-            } elseif(isset($args[$abbrev]) AND $args[$abbrev] == 'only') {
-                $only[] = $abbrev;
-            } elseif(!isset($args[$abbrev]) OR $ars[$abbrev] == 'yes')  {
-                //yes
-            }
+            $not[$abbrev] = $abbrev;
         }
     }
+    if(isset($args['liturgy'])) {
+        foreach($args['liturgy'] as $liturgy) {
+            if(isset($not[$liturgy])) unset($not[$liturgy]);
+        }
+    } 
     if(count($not) > 0)
         $where[] = " m.milyen NOT REGEXP '(^|,)(".implode('|',$not).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
-    if(count($only) > 0)
-        $where[] = " m.milyen REGEXP '(^|,)(".implode('|',$only).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
+    
+    $select = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta \nFROM misek m \n"; 
+    $select .= " LEFT JOIN templomok ON m.tid = templomok.id \n";
 
+    //Tudjuk meg, hogy hány templomban van megfelelő összesen
+    $query = "SELECT count(*) as sum FROM ( \n";
+        $query .= $select;
+        if(count($where)>0) $query .= " WHERE ".implode("\n AND ",$where);
+        $query .= "\n GROUP BY tid \n";
+    $query .= ") groups ;";
+    if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
+    $row=mysql_fetch_row($lekerdez,MYSQL_ASSOC);
+    $return['sum'] = $row['sum'];
 
-    //mehet a lekérés
-    $query = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta FROM misek m "; 
-    $query .= " LEFT JOIN templomok ON m.tid = templomok.id ";
-
-    if(count($where)>0) $query .= "WHERE ".implode(' AND ',$where);
-    if($groupby != false) $query .= " GROUP BY ".$groupby;
+    //Akkor jöhet a limitált csoportos lekérdezés, mert az jó
+    $query = $select;
+    $query .= " JOIN ( ";
+        $query .= $select;
+        if(count($where)>0) $query .= " WHERE ".implode(' AND ',$where);
+        $query .= " GROUP BY tid \n";
+        $query .= " ORDER BY ido, templomok.varos, templomok.nev ";
+        $query .= " LIMIT ".($offset ).",".($limit);
+    $query .=  ") groups ON groups.tid = m.tid ";
+    if(count($where)>0) $query .= " WHERE ".implode(' AND ',$where);
     $query .= " ORDER BY ido, templomok.varos, templomok.nev ";
     if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
-    $mennyi=mysql_num_rows($lekerdez);
-    $return['sum'] = $mennyi;
-
-
-    $query .= " LIMIT ".($offset ).",".($limit);
-    //echo $query; //exit;
-    $return['results'] = false;
-    if(!$lekerdez=mysql_query($query)) echo "HIBA a templom keresőben!<br>$query<br>".mysql_error();
+    $masses = array();
+    //echo $query;
     while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {
-        $row['datumtol'] = $datumtol = event2Date($row['tol']);
-        $row['datumig'] = $datumig = event2Date($row['ig']);
-        if(checkDateBetween($date,$datumtol,$datumig)) $tmp['now'] = true;
-
-        $return['results'][] = $row; 
+        if($row['tmp_datumtol'] == $row['tmp_datumig']) $type = 'particulars';
+        else $type = 'periods';
+        $masses[$row['tid']][$type][$row['idoszamitas']][] = $row;
     }
 
-    //Ha van particular akkor periodot törli az eredmények közül.
-    $particular = false; $tmp = array();
-    if(is_array($return['results'])) foreach ($return['results'] as $key => $mass) {
-        if($mass['tmp_relation'] == '=') {
-            $tmp[] = $mass;
-            $particular = true;
+    //use particulars only, if we can    
+    foreach($masses as $tid => $church) {
+        if(array_key_exists("particulars", $church))
+            $masses[$tid] = $church['particulars'];
+        elseif(array_key_exists("periods", $church))
+            $masses[$tid] = $church['periods'];
+    }
+    // weight
+    foreach($masses as $tid => $periods) {
+        $weight = 0; $tmp = array();
+        foreach($periods as $period) {
+            $m = array_shift(array_values($period));
+            $w = $m['weight'];
+            if($w == '') $w = 0;
+            if($w >= $weight) {
+                $tmp = $period; 
+                $weight = $w;
+            }
         }
+        $return['churches'][$tid] = array_shift(array_values($tmp)); //ezt szebben is lehetne
+        $return['churches'][$tid]['masses'] = $tmp;
     }
-    if($particular == true) $return['results'] = $tmp;
-
-
-    //Ha több period is van,akkor a nagyobb súlyút engedi csak át
-    $weight = 0; $tmp = array();
-    if(is_array($return['results'])) foreach ($return['results'] as $key => $mass) {
-        if($mass['tmp_relation'] != '=' AND is_numeric($mass['weight']) ) { 
-            if($mass['weight'] > $weight) $weight = $mass['weight'];
-            $tmp[$mass['weight']][] = $mass;
-        }
-    }
-    if($weight != false) $return['results'] = $tmp[$weight];
-
-    //echo "<pre>".print_r($return,1); 
+    /* */
+    //echo "<pre>".print_r($return,1); exit;
     return $return;
 }
 

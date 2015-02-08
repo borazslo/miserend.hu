@@ -223,11 +223,11 @@ function miserend_index() {
 	
 	$searchform['ige'] = array(
 			'type' => 'checkbox',
-            'name' => "ige",
-            'id' => "ige",
+            'name' => "liturgy[]",
+            'id' => "liturgy",
             'checked' => true,
             'class' => "keresourlap",
-            'value' => "yes"
+            'value' => "ige"
     );
 	
 	$templomurlap = '';
@@ -825,7 +825,7 @@ function miserend_misekeres() {
 		$miseT[$tid][]="<img src=img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>$mido</span>$nyelvikon$megj &nbsp; ";
 	}
 	*/
-	$results = searchMasses($_POST,$min,$leptet,'tid');
+	$results = searchMasses($_POST,$min,$leptet);
 	$mennyi = $results['sum'];
 
 	$kezd=$min+1;
@@ -860,8 +860,8 @@ function miserend_misekeres() {
 		//$tartalom.="<span class=kiscim>Összesen $mennyi templomban van megfelelő mise.</span><br><br>";
 		$tartalom.="<br><span class=alap>Összesen: $mennyi templomban van megfelelő mise.<br>Listázás: $kezd - $veg</span><br><br>";
 
-
-		foreach($results['results'] as $result) {
+		//echo "<pre>".print_r($results['results'],1)."</pre>";
+		foreach($results['churches'] as $result) {
 			$tartalom .= "<img src=img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
 				<a href=?templom=".$result['tid']."$linkveg class=felsomenulink><b>".$result['nev']."</b> <font color=#8D317C>(".$result['varos'].")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">".$result['ismertnev']."</span>";
 			if(strstr($user->jogok,'miserend')) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=".$result['tid']."$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=".$result['tid']."$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
@@ -871,8 +871,8 @@ function miserend_misekeres() {
 
 			if($_REQUEST['mikor'] == 'x') $_REQUEST['mikor'] = $_REQUEST['mikordatum'];
 			//$masses = getMasses($result['tid'],$_REQUEST['mikordatum']);
-			$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_POST));
-			foreach($masses['results'] as $mass) {
+			//$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_POST));
+			foreach($result['masses'] as $mass) {
 				$tartalom .="<img src=img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>".substr($mass['ido'],0,5)."</span>";
 
 				$mass['nyelv'] = decodeMassAttr($mass['nyelv']);
