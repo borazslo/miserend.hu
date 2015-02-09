@@ -37,7 +37,7 @@ function teendok($id,$kod) {
 	
 		$kiir.="\n<table width=100% bgcolor=#F5CC4C><tr><td class=alap><big><b><a href=/?templom=$id target=_blank>$nev</a></b> $ismertnev - <u>$varos</u></big><br><i>Javítások, változások bejelentésének kezelése</i></big></td></tr></table>";
 		$kiir.="\n<table width=100% bgcolor=#ECD9A4 cellpadding=0 cellspacing=1>";
-		$query="select id,nev,login,email,megbizhato,datum,allapot,admin,admindatum,leiras,adminmegj from eszrevetelek where hol='$kod' and hol_id='$id' order by datum desc";
+		$query="select id,nev,login,email,megbizhato,datum,allapot,admin,admindatum,leiras,adminmegj from eszrevetelek where hol_id='$id' order by datum desc";
 		$lekerdez=mysql_query($query);
 		while(list($eid,$enev,$elogin,$eemail,$emegbizhato,$edatum,$eallapot,$eadmin,$eadatum,$eleiras,$eadminmegj)=mysql_fetch_row($lekerdez)) {
 			$a++;

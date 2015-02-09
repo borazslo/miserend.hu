@@ -611,8 +611,7 @@ function miserend_templomkeres() {
 			$tvaros = $templom['varos'];
 			$letrehozta = $templom['letrehozta'];
 			$tartalom.="<a href=?templom=$tid$linkveg class=felsomenulink title='$tismertnev'><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a>";
-			if(strstr($user->jogok,'miserend')) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-			elseif($letrehozta==$user->login) $tartalom.=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";			
+			if(strstr($user->jogok,'miserend') OR $letrehozta==$user->login ) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 			if($tismertnev != '') $tartalom .= "<br/><span class=\"alap\" style=\"margin-left: 20px; font-style: italic;\">".$tismertnev."</span>";
 			$tartalom.="<br><img src=img/space.gif width=4 height=5><br>";
 		}		
@@ -864,8 +863,7 @@ function miserend_misekeres() {
 		foreach($results['churches'] as $result) {
 			$tartalom .= "<img src=img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
 				<a href=?templom=".$result['tid']."$linkveg class=felsomenulink><b>".$result['nev']."</b> <font color=#8D317C>(".$result['varos'].")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">".$result['ismertnev']."</span>";
-			if(strstr($user->jogok,'miserend')) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=".$result['tid']."$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=".$result['tid']."$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-			elseif($result['letrehozta']==$user->login) $tartalom.=" <a href=?m_id=29&m_op=addtemplom&tid=".$result['tid']."$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=".$result['tid']."$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+			if(strstr($user->jogok,'miserend') OR $result['letrehozta']==$user->login) $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=".$result['tid']."$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=".$result['tid']."$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 			
 			$tartalom.=$ertek.'<br> &nbsp; &nbsp; &nbsp;';
 
@@ -1030,7 +1028,7 @@ function miserend_view() {
 	
 	}
 	elseif($u_login==$letrehozta) {
-		$nev.=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+		$nev.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 	}
 
 	if(!empty($ismertnev)) $ismertnev= $ismertnev; //"<span class=alap><i><b>Közismert nevén:</b></i><br></span><span class=dobozfocim_fekete><b><font color=#AC007A>$ismertnev</font></b></span><br><img src=img/space.gif width=5 height=7><br>";
@@ -1316,6 +1314,10 @@ function miserend_printRegi() {
 switch($m_op) {
     case 'index':
         $tartalom=miserend_index();
+        break;
+
+    case 'map':
+        $tartalom = map_view();
         break;
 
 	case 'keres':

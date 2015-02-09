@@ -124,17 +124,21 @@ function miserend_addtemplom($tid) {
   //feltöltő
 	if(empty($feltolto)) $feltolto=$u_login;
 	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Feltöltő (jogosult):</div></td><td bgcolor=#efefef>";
-	$urlap.="<select name=feltolto class=urlap><option value=''>Nincs</option>";
-	$query="select login from user where ok='i' order by login";
-	$lekerdez=mysql_db_query($db_name,$query);
-	while(list($user)=mysql_fetch_row($lekerdez)) {
-		$urlap.="<option value='$user'";
-		if($user==$feltolto) $urlap.=" selected";
-		$urlap.=">$user</option>";
+  	if(strstr($u_jogok,'miserend')) {
+		$urlap.="<select name=feltolto class=urlap><option value=''>Nincs</option>";
+		$query="select login from user where ok='i' order by login";
+		$lekerdez=mysql_db_query($db_name,$query);
+		while(list($user)=mysql_fetch_row($lekerdez)) {
+			$urlap.="<option value='$user'";
+			if($user==$feltolto) $urlap.=" selected";
+			$urlap.=">$user</option>";
+		}
+		$urlap.="</select> <input type=checkbox name=megbizhato class=urlap value=i";
+		if($megbizhato!='n') $urlap.=" checked";
+		$urlap.="><span class=alap> megbízható, nem kell külön engedélyezni</span></td></tr>";
+	} else {
+		$urlap.= "<span class='alap'>".$feltolto."</td></tr>";
 	}
-	$urlap.="</select> <input type=checkbox name=megbizhato class=urlap value=i";
-	if($megbizhato!='n') $urlap.=" checked";
-	$urlap.="><span class=alap> megbízható, nem kell külön engedélyezni</span></td></tr>";
 
   //név
 	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><input type=text name=nev value=\"$nev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('sugo.php?id=3',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
@@ -843,7 +847,15 @@ function miserend_addmise($tid) {
             'name' => "adminmegj",
             'value' => $church['adminmegj'],
             'labelback'=> ' A templom szerkesztésével kacsolatosan.');
-	  	  
+	
+	$vars['update'] =  array(
+            'type' => 'checkbox',
+            'name' => "update",
+            'value' => 'i',
+            'checked' => true,
+            'labelback' => 'Utoljára frissítve: '.date('Y.m.d.',strtotime($church['frissites']))
+            );  	  
+
 	$vars['helptext'] = '<span class="alap">Figyelem! Ha átfedés van két periódus/időszak vagy különleges miserend között, akkor a listában lejjebb lévő vagyis „nehezebb” periódus vagy különleges miserend jelenik meg a keresőben!</span>';
 	 
 	global $twig;
@@ -968,11 +980,12 @@ function miserend_addingmise() {
 	$ma=date('Y-m-d');
 	list($log)=mysql_fetch_row(mysql_query("select log from templomok where id='$tid'"));
 	$log.="\nMISE_MOD: ".$user->login." ($most - [$ip - $host])";
-	if($_REQUEST['frissit']=='i') $frissites=", frissites='$ma'";
+	if($_REQUEST['update']=='i') $frissites=", frissites='$ma'";
 	$_REQUEST['misemegj'] = preg_replace('/<br\/>/i',"\n", $_REQUEST['misemegj']);
 	$_REQUEST['adminmegj'] = preg_replace('/<br\/>/i',"\n", $_REQUEST['adminmegj']);
 	$query="update templomok set miseaktiv='".$_REQUEST['miseaktiv']."', misemegj='".$_REQUEST['misemegj']."', adminmegj='".$_REQUEST['adminmegj']."', log='$log' $frissites where id='$tid' LIMIT 1";
 	mysql_query($query);
+
 
 
 	$modosit = $_REQUEST['modosit'];
@@ -1152,27 +1165,21 @@ function miserend_ehmlista() {
 	return $kod;
 }
 
-function atir() {
-	global $db_name;
-
-	$query="select id,megjegyzes,bucsu from templomok where bucsu!=''";
-	if(!$lekerdez=mysql_db_query($db_name,$query)) echo "<br>HIBA!<br>$query<br>".mysql_error();
-	while(list($tid,$megj,$bucsu)=mysql_fetch_row($lekerdez)) {
-		$ujmegj=$bucsu."\n\n".$megj;
-		mysql_db_query($db_name,"update templomok set megjegyzes='$ujmegj' where id='$tid'");
-		echo "<br>$tid -> ok";
-	}
-	echo '<br>kész';
-}
-
 
 //Jogosultság ellenőrzése
-if(strstr($u_jogok,'miserend')) {
+$jog = false;
+if(strstr($u_jogok,'miserend')) { $jog = true; }
+if($jog == false AND isset($_REQUEST['tid']) AND is_numeric($_REQUEST['tid']) AND in_array($m_op, array('addtemplom','addmise','addingtemplom','addingmise'))) {
+	$query = "SELECT letrehozta FROM templomok WHERE id = ".$_REQUEST['tid']." LIMIT 1";
+	$result = mysql_query($query);
+	$templom = mysql_fetch_assoc($result);
+	if($user->login == $templom['letrehozta'])
+		$jog = true;
+}
+
+if($jog == true) {
 
 switch($m_op) {
-	case 'atir':
-		atir();
-		break;
 
 	case 'ehmlista':
 		$tartalom=miserend_ehmlista();
