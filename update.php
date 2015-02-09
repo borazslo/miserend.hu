@@ -56,16 +56,10 @@ INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (8,'Hamvazószerda','201
 INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (9,'Hamvazószerda','2016','2016-02-10');
 INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (10,'Húsvétvasárnap','2015','2015-04-05');
 INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (11,'Húsvétvasárnap','2016','2016-03-27');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`) VALUES (5258,7,'12:00:00','0','Iskolai időben',3,'első tanítási nap','utolsó tanítási nap','09-03','>','06-07','','','','borazslo','2015-02-05 22:44:15');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`) VALUES (5258,7,'11:00:00','0','Nagyböjtben',2,'Hamvazószerda','Húsvétvasárnap -1','02-18','<','04-05','','','','borazslo','2015-02-05 22:44:15');
-INSERT INTO `misek` (`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`) VALUES (5258,7,'09:00:00','0','Adventben',1,'Advent I. vasárnapja','12-25 -1','11-29','<','12-24','','','','borazslo','2015-02-05 22:44:15');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'17:00:00','',Nagycsütörtök,103,'Húsvétvasárnap -3','Húsvétvasárnap -3','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'18:00:00','',Nagypéntek,104,'Húsvétvasárnap -2','Húsvétvasárnap -2','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'12:00:00','',Nagyszombat,105,'Húsvétvasárnap -1','Húsvétvasárnap -1','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'11:00:00','',Húsvéthétfő,107,'Húsvétvasárnap +1','Húsvétvasárnap +1','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'11:00:00','',Karácsony,101,'12-25','12-25','12-25','=','12-25','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'12:00:00','',Karácsony (előeste),102,'12-24','12-24','12-24','=','12-24','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
-INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'09:00:00','',Húsvét,106,'Húsvétvasárnap','Húsvétvasárnap','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (12,'Tavaszi óraátállítás','2015','2015-03-29');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (13,'Tavaszi óraátállítás','2016','2016-03-27');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (14,'Őszi óraátállítás','2015','2015-10-29');
+INSERT INTO `events` (`id`,`name`,`year`,`date`) VALUES (15,'Őszi óraátállítás','2016','2016-10-30');
 
 UNLOCK TABLES;
 ALTER TABLE misek ADD COLUMN nap2 varchar(4) AFTER ido;
@@ -92,7 +86,7 @@ ALTER TABLE `terkep_geocode` ADD INDEX `lng` (`lng`);
 INSERT INTO `miserend`.`adminmenu` (`nev`, `fm`, `sorszam`, `mid`, `op`, `ok`, `jogkod`) VALUES ('kifejezések és dátumok', '9', '4', '27', 'events', 'i', 'miserend');
 
 INSERT INTO sugo VALUES (46,'<h4>Nyelvek</h4>Az szentmise nyelvének azonosítója esetleg egy periódus megjelölésével. Több érték esetén vesszővel elválasztva. Például: <i>sk-1,grps</i> = minden hónap utolsó hetében szlovák nyelvű, minden páros héten görög (egyéb esetekben magyar)<br/><br/>Lehetséges nyelvek:<ul><li>h, hu = magyar</li><li>en = angol</li><li>de = német</li><li>it = olasz</li><li>fr = francia</li><li>va = latin</li><li>gr = görög</li><li>sk = szlovák</li><li>hr = horvát</li><li>pl = lengyel</li><li>si = szlovén</li><li>további nyelvek esetén az internetes 2 betűs végződés az irányadó!</li></ul><p><i>Ha egy magyaroszági misézőhelynél nincs megadva a nyelv, azt magyarnak tekintjük.</i></p> Lehetséges periódusok:<ul><li>0 vagy nincs periódus megadva = mindig</li><li>1, 2, 3, 4, 5 = adott héten</li><li>-1 = utolsó héten</li><li>ps = páros héten</li><li>pt = páratlan héten</li></ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust.','miserend adatlap');
-INSERT INTO sugo VALUES (47,'<h4>Tulajdonságok</h4>Az szentmise tulajdonságának rövidítése esetleg egy periódus megjelölésével. Több érték esetén vesszővel elválasztva. Például: <i>ifi,ige3</i> = mindig ifjúsági/egyetemista mise, de a hónap harmadik hetében csak igeliturgia.<br/><br/>Lehetséges tulajdonságok:<ul><li> g = gitáros</li><li> cs = csendes</li><li> csal = családos/gyerek</li><li> d = diák</li><li> ifi = egyetemista/ifjúsági</li><li> ige = igeliturgia</li><li> szent = szentségimádás</li><li> utr = utrenye</li><li> vecs = vecsernye</li><li> gor = görögkatolikus (római rítusú templomban)</li><li> rom = római katolikus (görögkatolikus rítusú templomban)</li><li> regi = régi rítusú</ul><p><i>Ha nincs megadva ezzel ellenkező tulajdonság, akkor a római katolikus misézőhely eseménye 'római katolikus szentmise', míg egy görögkatolikus hely alapérelmezett eseménye 'görögkatolikus isteni liturgia'.</i></p>Lehetséges periódusok:<ul><li>0 vagy nincs periódus megadva = mindig</li><li>1, 2, 3, 4, 5 = adott héten</li><li>-1 = utolsó héten</li><li>ps = páros héten</li><li>pt = páratlan héten</li></ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust.','miserend adatlap');
+INSERT INTO sugo VALUES (47,'<h4>Tulajdonságok</h4>Az szentmise tulajdonságának rövidítése esetleg egy periódus megjelölésével. Több érték esetén vesszővel elválasztva. Például: <i>ifi,ige3</i> = mindig ifjúsági/egyetemista mise, de a hónap harmadik hetében csak igeliturgia.<br/><br/>Lehetséges tulajdonságok:<ul><li> g = gitáros</li><li> cs = csendes</li><li> csal = családos/gyerek</li><li> d = diák</li><li> ifi = egyetemista/ifjúsági</li><li> ige = igeliturgia</li><li> szent = szentségimádás</li><li> utr = utrenye</li><li> vecs = vecsernye</li><li> gor = görögkatolikus (római rítusú templomban)</li><li> rom = római katolikus (görögkatolikus rítusú templomban)</li><li> regi = régi rítusú</ul><p><i>Ha nincs megadva ezzel ellenkező tulajdonság, akkor a római katolikus misézőhely eseménye \'római katolikus szentmise\', míg egy görögkatolikus hely alapérelmezett eseménye \'görögkatolikus isteni liturgia\'.</i></p>Lehetséges periódusok:<ul><li>0 vagy nincs periódus megadva = mindig</li><li>1, 2, 3, 4, 5 = adott héten</li><li>-1 = utolsó héten</li><li>ps = páros héten</li><li>pt = páratlan héten</li></ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust.','miserend adatlap');
 INSERT INTO sugo VALUES (48,'A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.','miserend adatlap');
 INSERT INTO sugo VALUES (49,'<h4>Periódus / Különleges mierend név</h4>Minden periódusnak, más néven időszaknak, valamint minden különleges miserendnek kell legyen egy egyedi neve. Például: <i>téli miserend</i>, <i>ádventi időszak</i> vagy <i>karácsony napja</i>. Gépelés közben megjelennek a már használt nevek is. Ha egy már használt nevet választunk, akkor az időszak kezdetét és végét átmásolja onnan, így nem kell újra beállítani.','miserend adatlap');
 INSERT INTO sugo VALUES (50,'<h4>Periódus határok</h4>Minden periódusnak, más néven időszaknak, be kell állítani a kezdetét és a végét. Több féleképpen adhatjuk meg a kezdő napot és a lezáró napot.<ul><li>Megadhatjuk egy konkért dátum nélküli kifejezéssel. Például: <i>első tanítási nap</i> vagy <i>Krisztus Király vasárnapja</i>. Gépelés közben megjelennek a választható kezdeti időpontok. Ha szükség lenne olyanra, ami még nincs, akkor írj nekem: eleklaszlosj@gmail.com. Azért nagyon praktikus ilyen kifejezéssel megadni egy időszak határát, mert így nem kell minden évben átírni. A miserend.hu tudja, hogy melyik évben mikor van pl. Húsvét.</li><li>Ha minden évben ugyan azon a naptári napon van az időszak váltása, akkor megadhatunk egy dátumot is. Például: <i>12-25</i>. Ilyenkor minden évben, pont ez lesz a forduló nap.</li><li>Nagy ritkán előfordulhat, hogy egy periódus/időszak csak egy adott évben létezik és más években nincsen rá szükség. Ilyen esetben meg lehet adni teljes tádummal a határt. Például: <i>2016-03-12</i>. Fontos, hogy így az adott időszaki miserend nem fog megjelenni más évben.</li></ul>Fontos, hogy nem szabad két különböző időszaknak pontosan ugyan azokat a határokat megadni, mert akkor nincs ami megkülönböztesse azokat egymástól.','miserend adatlap');
@@ -101,6 +95,19 @@ INSERT INTO sugo VALUES (51,'<h4>Különleges miserend</h4>Mindig be kell állí
 ALTER TABLE misek ADD COLUMN weight INT AFTER idoszamitas;
 
 UPDATE misek LEFT JOIN templomok on misek.tid = templomok.id SET nyelv = NULL  WHERE ( nyelv = 'h0' OR nyelv = 'h') AND templomok.orszag = 12;
+
+LOCK TABLES `misek` WRITE;
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`) VALUES (5258,7,'12:00:00','0','Iskolai időben',3,'első tanítási nap','utolsó tanítási nap','09-03','>','06-07','','','','borazslo','2015-02-05 22:44:15');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`) VALUES (5258,7,'11:00:00','0','Nagyböjtben',2,'Hamvazószerda','Húsvétvasárnap -1','02-18','<','04-05','','','','borazslo','2015-02-05 22:44:15');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`) VALUES (5258,7,'09:00:00','0','Adventben',1,'Advent I. vasárnapja','12-25 -1','11-29','<','12-24','','','','borazslo','2015-02-05 22:44:15');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'17:00:00','','Nagycsütörtök',103,'Húsvétvasárnap -3','Húsvétvasárnap -3','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'18:00:00','','Nagypéntek',104,'Húsvétvasárnap -2','Húsvétvasárnap -2','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'12:00:00','','Nagyszombat',105,'Húsvétvasárnap -1','Húsvétvasárnap -1','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'11:00:00','','Húsvéthétfő',107,'Húsvétvasárnap +1','Húsvétvasárnap +1','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'11:00:00','','Karácsony',101,'12-25','12-25','12-25','=','12-25','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'12:00:00','','Karácsony (előeste)',102,'12-24','12-24','12-24','=','12-24','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+INSERT INTO `misek` (`tid`,`nap`,`ido`,`nap2`,`idoszamitas`,`weight`,`tol`,`ig`,`tmp_datumtol`,`tmp_relation`,`tmp_datumig`,`nyelv`,`milyen`,`megjegyzes`,`modositotta`,`moddatum`,`torles`,`torolte`) VALUES (5258,0,'09:00:00','','Húsvét',106,'Húsvétvasárnap','Húsvétvasárnap','04-05','=','04-05','','','','borazslo','2015-02-05 23:15:17','0000-00-00 00:00:00','');
+UNLOCK TABLES;
 
 DROP TABLE 0kurir;
 DROP TABLE 0log;
@@ -140,6 +147,7 @@ foreach($queries as $query) {
 }
 echo $c." db mysql ok<br/>\n";
 
+/** /
 
 mysql_query("SET collation_connection = 'utf8_general_ci'");
 mysql_query("ALTER DATABASE db CHARACTER SET utf8 COLLATE utf8_general_ci");
@@ -163,8 +171,8 @@ while(($mise = mysql_fetch_array($result,MYSQL_ASSOC))) {
 
 
 foreach($misek as $tid => $idoszamitasok) {
-	echo $tid.": ";
 	if(count($idoszamitasok) == 2 and isset($idoszamitasok['t']) AND isset($idoszamitasok['ny'])) {
+    echo $tid.": ";
 		echo ' lehetséges ';
 		echo count($idoszamitasok['t'])."-".count($idoszamitasok['ny'])." ";
 		if($idoszamitasok['t'] == $idoszamitasok['ny']) {
@@ -264,7 +272,6 @@ while(($kep = mysql_fetch_array($result))) {
 
 }
 
-/* */
 $tables = array(
 	'templomok' => array('nev','ismertnev','megjegyzes','misemegj','leiras','megkozelites'),
 	'misek' => array('megjegyzes'),
@@ -286,7 +293,6 @@ foreach ($tables as $table => $fields) {
 }
 echo $c." db görögkatolizálás<br/>";
 
-/**/
 $c = 0;
 foreach ($attributes as $abbrev => $attribute) {
 	$query = "SELECT * from misek WHERE megjegyzes REGEXP '^".$attribute['name']."$' ";
@@ -301,6 +307,18 @@ foreach ($attributes as $abbrev => $attribute) {
 	}	
 }
 echo $c." db megjegyzés tulajdonsággá alakítva<br/>";
+
+/**/
+$c = 0;
+$query = "SELECT * from misek WHERE milyen <> '' OR nyelv <> '' ";
+$result = mysql_query($query);    
+while(($row = mysql_fetch_array($result))) {
+  $query = "UPDATE misek SET milyen = '".cleanMassAttr($row['milyen'])."', nyelv = '".cleanMassAttr($row['nyelv'])."' WHERE id = ".$row['id']." LIMIT 1";
+  //echo $query."<br/>";
+  mysql_query($query);
+  $c++;
+} 
+echo $c." db milyen/nyelv optimalizálva<br/>";
 
 //
 generateMassTmp();

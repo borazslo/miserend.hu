@@ -520,12 +520,6 @@ function getMasses($tid,$date = false) {
     return $return;
 }
 
-function updateMass() {
-
-
-
-}
-
 function decodeMassAttr($text) {
     $return  = array();
 
@@ -576,6 +570,36 @@ function decodeMassAttr($text) {
     return $return;
 }
 
+function cleanMassAttr($text) {
+    $milyen = array();
+    $attributes = unserialize(ATTRIBUTES);
+    foreach($attributes as $abbrev => $attribute) {
+        $milyen[] = $abbrev;
+    }
+    $languages = unserialize(LANGUAGES);
+    foreach($languages as $abbrev => $language) {
+        $milyen[] = $abbrev;
+    }
+    foreach(unserialize(PERIODS) as $abbrev => $period)
+        $periods[] = $abbrev;
+
+    $text = trim($text," ,");
+    $attrs = explode(',',$text);
+    sort($attrs);
+    foreach($attrs as $k => $attr) {
+        preg_match('/^('.implode('|',$milyen).')('.implode('|',$periods).'|)$/',$attr,$match);
+        if(count($match)<1) {
+            //unset($attrs[$k]);
+        } elseif ($match[2] == '0') {
+            $attrs[$k] = $match[1];
+        } elseif($match[2] != '') {
+            if(in_array($match[1],$attrs))
+                unset($attrs[$k]);
+        }
+    }
+    $attrs = array_unique($attrs);
+    return implode(',',$attrs);
+}
 
 function formMass($pkey,$mkey,$mass = false,$group = false) {
     global $twig;
@@ -848,7 +872,7 @@ function searchChurchesWhere($args) {
     }
 
     if($args['gorog'] == 'gorog') {
-        $where[] = "( egyhazmegye=17 OR egyhazmegye=18 )";
+        $where[] = "egyhazmegye IN (17,18)";
 
     }
 
@@ -875,16 +899,16 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         if(isset($tmp['leptet'])) unset($tmp['leptet']);
         if(isset($tmp['min'])) unset($tmp['min']);
         $results = searchChurches($args,0,1000000);
-        if(isset($results['results'])) foreach($results['results'] as $r) $subwhere[] = " m.tid = ".$r['id']." ";
-        if(!$subwhere) $where[] = " m.tid = 'nincs templom' ";
-        else $where[] = " (".implode(' OR ', $subwhere).")";
+        $tids[] = 0;
+        if(isset($results['results'])) foreach($results['results'] as $r) $tids[] = $r['id'];
+        $where[] = " m.tid IN (".implode(",",$tids).")";
     }
     if($args['gorog'] == 'gorog') {
-        $where[] = "( egyhazmegye=17 OR egyhazmegye=18 )";
+        $where[] = "egyhazmegye IN (17,18)";
     }
     //milyen nap
     if($args['mikor'] == 'x') $args['mikor'] = $args['mikordatum']; 
-    $where[] = "( m.nap = '".date('N',strtotime($args['mikor']))."' OR m.nap = 0 )";
+    $where[] = "m.nap IN ('".date('N',strtotime($args['mikor']))."',0)";
 
 
 
@@ -895,17 +919,10 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     OR ( m.tmp_datumig = '".$day."' AND m.tmp_datumig = '".$day."' AND  m.tmp_relation = '=' ) )";
 
     //milyen héten
-    $subwhere = array();
     if ( date('W',strtotime($args['mikor'])) & 1 ) { $parossag ='pt'; } else $parossag = "ps";
-    $subwhere[] = "m.nap2='".$parossag."'";
     $hanyadikP = getWeekInMonth($args['mikor']);
     $hanyadikM = getWeekInMonth($args['mikor'],'-');
-    $subwhere[] = "m.nap2='".$hanyadikP."'";
-    $subwhere[] = "m.nap2='".$hanyadikM."'";
-    $subwhere[] = "m.nap2='0'";
-    $subwhere[] = "m.nap2 IS NULL";
-    $subwhere[] = "m.nap2 = '' ";
-    $where[] = " (".implode(' OR ', $subwhere).")";
+    $where[] = "( m.nap2 IN ('','0','".$hanyadikM."','".$hanyadikP."','".$parossag."') OR m.nap2 IS NULL)";
 
     //milyen órákban
     if($args['mikor2'] == 'de') $where[] = " m.ido < '12:00:01' AND m.ido > '00:00:01' ";
@@ -973,8 +990,8 @@ function searchMasses($args, $offset = 0, $limit = 20) {
                         ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen NOT REGEXP '(^|,)(".implode("|",$notgor).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } elseif($args['ritus'] == 'rom') {
             foreach($attributes as $abbrev => $attribute) if($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'rom') $notrom[] = $abbrev;
-            $where[] = "( (m.milyen NOT REGEXP '(^|,)(".implode("|",$notrom).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND (egyhazmegye <> 17 AND egyhazmegye <> 18 )) OR 
-                        ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
+            $where[] = "( (m.milyen NOT REGEXP '(^|,)(".implode("|",$notrom).")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' AND egyhazmegye NOT IN (17,18)) OR 
+                        ( egyhazmegye IN (17,18) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ) )";    
         } else {
             $where[] = " m.milyen REGEXP '(^|,)(".$args['ritus'].")([0]{0,1}|".$hanyadikP."|".$hanyadikM."|".$parossag.")(,|$)' ";    
         } 
@@ -1131,6 +1148,26 @@ function getRemarkMark($tid) {
         $return['mark'] = false; 
     }
 
+    return $return;
+}
+
+
+function map_view() {
+    $return = array();
+     
+    $return['template'] = 'map';
+    $return['script'][] = '
+
+        <script src="js/lib/DecimalFormat.js" language="javascript"></script>
+        <script src="http://openlayers.org/en/v3.2.0/build/ol.js" type="text/javascript"></script>
+        <script src="http://openlayers.org/api/OpenLayers.js"></script>
+        <script src="http://acuriousanimal.com/code/animatedCluster/ol/OpenLayers.js"></script>
+        <script src="js/lib/AnimatedCluster.js"></script>
+        ';
+
+
+
+    
     return $return;
 }
 

@@ -97,10 +97,10 @@ switch ($_REQUEST['q']) {
         $results = array();
 
         if($_REQUEST['type'] == 'language') {
-            $languages = array();
+            $attributes = array();
             $tmp = unserialize (LANGUAGES);
             foreach($tmp as $abbrev => $attribute) {
-                $languages[$abbrev] = $attribute['name'];
+                $attributes[$abbrev] = $attribute['name'];
             }
         }
         else { 
@@ -127,7 +127,9 @@ switch ($_REQUEST['q']) {
         foreach($attributes as $key => $val) {
             if($text == $key) {
                 foreach ($periods as $k => $v) {
-                    $results[] = array('label' => $key.$k." <i>(".$val." ".$v.")</i>",'value'=>$key.$k);
+                    if($k != '0') {
+                        $results[] = array('label' => $key.$k." <i>(".$val." ".$v.")</i>",'value'=>$key.$k);
+                    }
                 }
             }
         }

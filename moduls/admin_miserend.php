@@ -910,6 +910,10 @@ function miserend_addingmise() {
 			$mass['ig'] = sanitize($period['to']);
 			if($period['to2'] != 0) $mass['ig'] .= ' '.$period['to2'];
 
+			$mass['milyen'] = cleanMassAttr($mass['milyen']);
+			$mass['nyelv'] = cleanMassAttr($mass['nyelv']);
+
+
 			if($mass['id'] != 'new') {
 				$query = "UPDATE misek SET ";
 				$query .= "nap='".$mass['napid']."',ido='".$mass['ido'].":00',nap2='".$mass['nap2']."',idoszamitas='".$mass['idoszamitas']."',weight='".$mass['weight']."',tol='".$mass['tol']."',ig='".$mass['ig']."',nyelv='".$mass['nyelv']."',milyen='".$mass['milyen']."',megjegyzes='".$mass['megjegyzes']."',";
