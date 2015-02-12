@@ -156,89 +156,121 @@ function nyelvmeghatarozas() {
 function neighboursUpdate($tid = false,$type = false) {
     global $config;
 
+    $time_start = microtime(true);
+
     if($type == false) $type = 'mapquest';
 
     $query = 'SELECT szomszedos1, szomszedos2, templomok.id, lng, lat,  templomok.varos, templomok.nev 
             FROM templomok LEFT JOIN terkep_geocode ON id = tid 
-            WHERE templomok.ok = "i" ORDER BY frissites DESC ';
+            WHERE templomok.ok = "i" AND lat <> "" AND lng <> "" ORDER BY frissites DESC ';
     $result = mysql_query($query);
     
     while(($row = mysql_fetch_array($result))) $templomok[$row['id']] = $row;    
 
     $i = 0;
-    foreach($templomok as $templom) { if($tid == false OR $templom['id'] == $tid) { 
+    $tmp = array();
+    foreach($templomok as $templom) { 
+        if($tid == false OR $templom['id'] == $tid) { 
+            if($templom['lat'] != false AND $templom['lng'] != false) { 
 
-        set_time_limit('600');
-        $ds10 = $ds = array();
-        $c = 0;
-        $szomszedsag = array();
-        $szomszedsag10 = array();
-        foreach($templomok as $szomszed) {
-            
-            $lat1 = $templom['lat'] * M_PI / 180;
-            $lat2 = $szomszed['lat'] * M_PI / 180;
-            $long1 = $templom['lng'] * M_PI / 180;
-            $long2 = $szomszed['lng'] * M_PI / 180;
-            $R = 6371; // km
-            $d = $R * acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($long2 - $long1)) * 1000;
-            
-            if($type == 'mapquest') $maxdist = 12000;
-            else $maxdist = 10000;
+                set_time_limit('600');
+                $ds10 = $ds = array();
+                $c = 0;
+                $szomszedsag = array();
+                $szomszedsag10 = array();
+                foreach($templomok as $szomszed) {
+                    if($szomszed['lat'] != false AND $szomszed['lng'] != false AND $szomszed['id'] <> $templom['id']) { 
 
-            if($d < $maxdist AND $szomszed['id'] <> $templom['id']) {
-                if($type == 'mapquest') {
-                    $d = mapquestDistance($templom,$szomszed);
+                        $ids = array($szomszed['id'],$templom['id']);
+                        sort($ids);
+                        $key = implode('-',$ids);
+
+                        if(isset($tmp[$key])) {
+                            $d = $tmp[$key];
+                        } else {
+                            $lat1 = $templom['lat'] * M_PI / 180;
+                            $lat2 = $szomszed['lat'] * M_PI / 180;
+                            $long1 = $templom['lng'] * M_PI / 180;
+                            $long2 = $szomszed['lng'] * M_PI / 180;
+                            $R = 6371; // km
+                            $d = $R * acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($long2 - $long1)) * 1000;
+                            
+                            if($type == 'mapquest') $maxdist = 12000;
+                            else $maxdist = 10000;
+
+
+                            if($config['debug'] > 1) echo $szomszed['nev']." (".$szomszed['varos'].")<br/>";
+                            if($d < $maxdist) {
+                                if($type == 'mapquest') {
+                                    $d = mapquestDistance($templom,$szomszed);
+                                    
+                                }
+                            }
+                        }
+
+                        $tmp[$key] = $d;
+                        if($d < 10000) {
+                            $szomszedsag10[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
+                            $ds10[$d] = $d;
+                        }
+                        $szomszedsag[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);            
+                        $ds[$d] = $d;
+                    
+                        //if($c>10) break; $c++;
+                    }
                 }
-                if($d < 10000) {
-                    $szomszedsag10[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
-                    $ds10[$d] = $d;
+                array_multisort($ds10, SORT_ASC, $szomszedsag10);
+                $szomszedsag10 = array_slice($szomszedsag10, 0, 11); 
+                
+                $nyers = '';
+                if($config['debug'] > 0) echo " ".$templom['frissites']." <a href=\"http://miserend.hu/?templom=".$templom['id']."\">".$templom['nev']." (".$templom['varos'].")</a><br/>";
+                foreach($szomszedsag10 as $szomszed) {
+                    $nyers .= $szomszed['id'].",";      
+                    echo "<div style='margin-left:40px;'>".print_r($szomszed,1)."</div>";
                 }
-                }
-            if($szomszed['id'] <> $templom['id']) {
-                $szomszedsag[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);            
-                $ds[$d] = $d;
+               
+               //HA nincs 10km-ben belül senki, aki keresni kell valakit
+               if(count($szomszedsag10) == 0 ) {
+                    if($type != 'mapquest')
+                        $elso = array_shift(array_values($szomszedsag));
+                    else {
+                        array_multisort($ds, SORT_ASC, $szomszedsag);
+                        $szomszedsag = array_slice($szomszedsag, 0, 15); //feltételezzük, hogy a légvonalban legközelebbi 15 között van a valódi legközelebbi is
+                        foreach($szomszedsag as $szomszed) {
+                            $d = mapquestDistance($templom,$szomszed);
+                            $szomszedsag2[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
+                            $ds2[$d] = $d;
+                        }
+                        array_multisort($ds2, SORT_ASC, $szomszedsag2);
+                        $elso = array_shift(array_values($szomszedsag2));
+                    }
+                } else 
+                    $elso = array_shift(array_values($szomszedsag10));
+                
+                $elso = "".$elso['id']."";
+                if($nyers == '') $nyers = '';
+                if($templom['szomszedos1'] == "") {}
+                
+                    $query = "UPDATE templomok SET szomszedos1 = '".$elso."' WHERE id = ".$templom['id']." LIMIT 1";
+                    if($config['debug'] > 1) echo $query."<br/>";
+                    mysql_query($query);
+                    $query = "UPDATE templomok SET szomszedos2 = '".$nyers."' WHERE id = ".$templom['id']." LIMIT 1";
+                    if($config['debug'] > 1) echo $query."<br/>";
+                    mysql_query($query);
             }
-            //if($c>10) break; $c++;
-        }
-        array_multisort($ds10, SORT_ASC, $szomszedsag10);
-        $szomszedsag10 = array_slice($szomszedsag10, 0, 11); 
-        
-        $nyers = '';
-        if($config['debug'] > 0) echo " ".$templom['frissites']." <a href=\"http://miserend.hu/?templom=".$templom['id']."\">".$templom['nev']." (".$templom['varos'].")</a><br/>";
-        foreach($szomszedsag10 as $szomszed) {
-            $nyers .= $szomszed['id'].",";      
-            //echo "<div style='margin-left:40px;'>".print_r($szomszed,1)."</div>";
-        }
-       
-       //HA nincs 10km-ben belül senki, aki keresni kell valakit
-       if(count($szomszedsag10) == 0 ) {
-            if($type != 'mapquest')
-                $elso = array_shift(array_values($szomszedsag));
-            else {
-                array_multisort($ds, SORT_ASC, $szomszedsag);
-                $szomszedsag = array_slice($szomszedsag, 0, 15); //feltételezzük, hogy a légvonalban legközelebbi 15 között van a valódi legközelebbi is
-                foreach($szomszedsag as $szomszed) {
-                    $d = mapquestDistance($templom,$szomszed);
-                    $szomszedsag2[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
-                    $ds2[$d] = $d;
-                }
-                array_multisort($ds2, SORT_ASC, $szomszedsag2);
-                $elso = array_shift(array_values($szomszedsag2));
-            }
-        } else 
-            $elso = array_shift(array_values($szomszedsag10));
-        
-        $elso = "".$elso['id']."";
-        if($nyers == '') $nyers = '';
-        if($templom['szomszedos1'] == "") {}
-        
-            $query = "UPDATE templomok SET szomszedos1 = '".$elso."' WHERE id = ".$templom['id']." LIMIT 1";
-            if($config['debug'] > 1) echo $query."<br/>";
-            mysql_query($query);
-            $query = "UPDATE templomok SET szomszedos2 = '".$nyers."' WHERE id = ".$templom['id']." LIMIT 1";
-            if($config['debug'] > 1) echo $query."<br/>";
-            mysql_query($query);
-    } }
+        } 
+    }
+    $time_end = microtime(true);
+    $time = $time_end - $time_start;
+    if($config['debug'] > 0)  {
+        if($time < 120)
+            echo "The neighboursUpdate() finished in $time seconds\n<br/>";
+        elseif($time < 120 * 60)
+            echo "The neighboursUpdate() finished in ".($time / 60)." minutes\n<br/>";
+        elseif($time < 120 * 60 * 24)
+            echo "The neighboursUpdate() finished in ".($time / 60)." hours\n<br/>";
+    }
+
 }
 
 function mapquestDistance($from,$to) {
@@ -447,7 +479,7 @@ function events_save($form) {
 
 function getChurch($tid) {
     $return = array();
-    $query = "SELECT * FROM templomok WHERE id = $tid LIMIT 1";
+    $query = "SELECT templomok.*,terkep_geocode.* FROM templomok LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id WHERE id = $tid LIMIT 1";
     $result = mysql_query($query);
     while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
         foreach($row as $k => $v) {
@@ -1185,4 +1217,480 @@ function widget_miserend($args) {
     else return $args['callback'] . '(' . json_encode(array('html'=>$html)). ')';
 }
 
+function generateSqlite($version,$filename) {
+    $v = $version;
+    $limit = 1650000;
+
+
+
+    if(!isset($v)) {
+        die('Kérlek adj meg egy verziót, hogy biztosan kapj eredményt!');   
+    }
+    elseif($v > 4) exit;
+
+  try {
+    /**************************************
+    * Create databases and                *
+    * open connections                    *
+    **************************************/
+
+    // Create (connect to) SQLite database in file
+    $file_db = new PDO('sqlite:'.$filename);
+
+    // Set errormode to exceptions
+    $file_db->setAttribute(PDO::ATTR_ERRMODE, 
+                            PDO::ERRMODE_EXCEPTION);
+ 
+    $file_db->exec("DROP TABLE IF EXISTS templomok");
+    $file_db->exec("DROP TABLE IF EXISTS misek");
+    $file_db->exec("DROP TABLE IF EXISTS kepek");
+ 
+    /**************************************
+    * Create tables                       *
+    **************************************/
+    
+    // Create table templomok
+    $createtabletemplomok = "CREATE TABLE IF NOT EXISTS [templomok] (
+            [tid] INTEGER  NOT NULL PRIMARY KEY,
+            [nev] VARCHAR(200)  NULL,
+            [ismertnev] vaRCHAR(200)  NULL,";
+
+    if($v > 2) $createtabletemplomok .= "
+            [gorog] INTEGER NULL,";
+            
+    $createtabletemplomok .= "
+            [orszag] vARCHAR(30)  NULL,
+            [megye] vARCHAR(80)  NULL,
+            [varos] vaRCHAR(80)  NULL,
+            [cim] vARCHAR(255)  NULL,
+            [geocim] vARCHAR(255)  NULL,
+            [megkozelites] vARCHAR(255)  NULL,
+            [lng] fLOAT  NULL,
+            [lat] flOAT  NULL,";
+
+    if($v < 4) $createtabletemplomok .= "
+            [nyariido] vARCHAR(10)  NULL,
+            [teliido]vARCHAR(10)  NULL,";
+
+    $createtabletemplomok .= "
+            [kep] vARCHAR(255)  NULL
+        
+        )";
+
+    $file_db->exec($createtabletemplomok);
+ 
+    // Create table misek
+    $createtablemisek = "CREATE TABLE IF NOT EXISTS [misek] (
+            [mid] INTEGER  PRIMARY KEY NOT NULL,
+            [tid] iNTEGER  NULL,";
+
+    if($v < 4)
+        $createtablemisek .= "      [telnyar] VARCHAR(1)  NULL,";
+    
+    if($v > 3) {
+        $createtablemisek .= "      
+                [periodus] VARCHAR(4)  NULL,
+                [idoszak] VARCHAR(255)  NULL,
+                [suly] INT NULL,
+                [datumtol] INT  NULL,
+                [datumig] INT  NULL,";
+    }
+
+    $createtablemisek .= "
+            [nap] inTEGER  NULL,
+            [ido] TIME  NULL,
+            [nyelv] VARCHAR(3)  NULL,
+            [milyen] VARCHAR(10)  NULL";
+
+    if($v > 2) $createtablemisek .= "
+            , [megjegyzes] VARCHAR(255) NULL";
+    $createtablemisek .= "  )";
+    $file_db->exec($createtablemisek);
+ 
+    
+    if($v > 1) {
+    // Create table kepek
+    $file_db->exec("CREATE TABLE IF NOT EXISTS [kepek] (
+            [kid] INTEGER  PRIMARY KEY NOT NULL,
+            [tid] INTEGER  NULL,
+            [kep] vARCHAR(255)  NULL
+        )");
+    }
+    /**************************************
+    * Set initial data                    *
+    **************************************/
+ 
+    // mysql select templomok             
+    $query = "
+            SELECT t.*,orszagok.nev as orszag, megye.megyenev as megye,lat,lng, address2 as geocim FROM templomok as t 
+                    LEFT JOIN orszagok ON orszagok.id = t.orszag 
+                    LEFT JOIN megye ON megye.id = megye 
+                    LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id 
+                    WHERE t.ok = 'i' ";                 
+    if(isset($datum)) $query .= ' AND  moddatum >= "'.$datum.'" ';                                          
+    $query .= " ORDER BY t.id desc LIMIT ".$limit;
+    //echo $query."<br>";
+    $templomok = array();
+    $result = mysql_query($query);
+    while($tmp = mysql_fetch_array($result)) {
+        $templomok[] = $tmp; 
+    }
+    // mysql select kepek
+    $query = "SELECT * 
+            FROM  `kepek` 
+            ORDER BY tid, kiemelt, sorszam DESC , id ASC ";
+            //AND kiemelt =  'i'
+   $result = mysql_query($query);
+   $kiemeltkepek = array();
+   $kepek = array();
+    while($kep = mysql_fetch_array($result)) {
+        if(!isset($kiemeltkepek[$kep['id']])) { // AND $kep['kiemelt'] == 'i')
+            $kiemeltkepek[$kep['id']] = $kep;
+            /*if($kep['kiemelt'] != 'i') { 
+                echo 'jaj - <a href="http://www.miserend.hu/?templom='.$kep['kid'].'">'.$kep['kid'].'</a><br/>'; 
+                echo $c++;
+                }*/
+            }
+        $kepek[] = $kep;
+    }
+    //echo "<pre>".print_r($kepek,1);
+    
+    
+    // mysql select misek             
+    $query  = "
+            SELECT * FROM misek 
+                    WHERE torles = '0000-00-00 00:00:00' 
+                    AND tid <> 0";
+    if(isset($datum)) $query .= '  AND moddatum >= "'.$datum.'" ';                                                          
+    $query .= " LIMIT ".$limit;
+    $misek = array();
+    $result = mysql_query($query);
+    while($tmp = mysql_fetch_array($result)) {
+        $misek[] = $tmp;
+    }
+    //echo "<pre>".print_r($misek,1)."</pre>";
+ 
+    /**************************************
+    * Play with databases and tables      *
+    **************************************/
+    
+    // Loop thru all messages and execute prepared insert statement
+    $file_db->beginTransaction();
+    if(is_array($templomok))
+    foreach ($templomok as $templom) {
+      //echo"<pre>"; print_R($misek); exit;
+      set_time_limit(60);
+      // Set values to bound variables
+      $tid = $templom['id'];
+      $nev = $templom['nev'];
+      $ismertnev = $templom['ismertnev'];
+      if($v > 2) {
+        if(in_array($templom['egyhazmegye'],array(18,17))) { //Görög egyházmegyék kódja
+            $gorog = 1;
+        } else $gorog = 0;
+      
+      }
+      $orszag = $templom['orszag'];
+      $megye = $templom['megye'];
+      $varos = $templom['varos'];
+      $cim = $templom['cim'];
+      $geocim = $templom['geocim'];
+      $lng = $templom['lng'];
+      $lat = $templom['lat'];
+      if($v < 4) {
+        $nyariido = $templom['nyariido'];
+        $teliido = $templom['teliido'];
+      }
+      if(isset($kiemeltkepek[$tid])) $kep = "kepek/templomok/".$tid."/".$kiemeltkepek[$tid]['fajlnev'];
+      else { $kep = ''; }
+      
+      if(!file_exists($kep)) $kep = '';
+      else $kep = "http://miserend.hu/".$kep;
+      
+      $megkozelites = $templom['megkozelites']; 
+ 
+        foreach(array('ismertnev','cim') as $var) {
+            //if(preg_match("/'/",$$var)) echo $nev." (".$tid."): ".$$var."<br>\n";
+            $$var = preg_replace("/'/","",$$var);
+        }
+ 
+    if($v > 3) {
+      $insert = "INSERT INTO templomok (tid, nev, ismertnev, gorog, orszag, megye, varos, cim, lng, lat,megkozelites,geocim,kep) 
+                VALUES ('".$tid."','".$nev."','".$ismertnev."','".$gorog."','".$orszag."','".$megye."','".$varos."','".$cim."','".$lng."','".$lat."','".$megkozelites."','".$geocim."','".$kep."')";
+    } elseif($v > 2) {
+      $insert = "INSERT INTO templomok (tid, nev, ismertnev, gorog, orszag, megye, varos, cim, lng, lat,nyariido,teliido,megkozelites,geocim,kep) 
+                VALUES ('".$tid."','".$nev."','".$ismertnev."','".$gorog."','".$orszag."','".$megye."','".$varos."','".$cim."','".$lng."','".$lat."','".$nyariido."','".$teliido."','".$megkozelites."','".$geocim."','".$kep."')";
+    } else {
+        
+        $insert = "INSERT INTO templomok (tid, nev, ismertnev, orszag, megye, varos, cim, lng, lat,nyariido,teliido,megkozelites,geocim,kep) 
+                VALUES ('".$tid."','".$nev."','".$ismertnev."','".$orszag."','".$megye."','".$varos."','".$cim."','".$lng."','".$lat."','".$nyariido."','".$teliido."','".$megkozelites."','".$geocim."','".$kep."')";
+                
+    }
+
+      // Execute statement
+      $file_db->query($insert);
+    }
+    $file_db->commit();
+    //echo "Templomok feltöltve<br>\n";
+ 
+    
+    // Loop thru all messages and execute prepared insert statement
+    $file_db->beginTransaction();
+    if(is_array($misek))
+    foreach ($misek as $mise) {
+      set_time_limit(60);
+      // Set values to bound variables
+      $mid = $mise['id'];
+      $tid = $mise['tid'];
+
+      if($v < 4) {
+        $tmp = $mise['idoszamitas'];
+        if(preg_match('/^(t$|tél)/i',$tmp)) $telnyar = 't';
+        elseif(preg_match('/^(ny$|nyár)/i',$tmp)) $telnyar = 'ny';
+        else $telnyar = false;
+      } 
+      
+      $nap = $mise['nap'];
+      $ido = $mise['ido'];
+      $nyelv = $mise['nyelv'];
+      $milyen = $mise['milyen'];
+      $megjegyzes = $mise['megjegyzes'];
+
+      if($v > 3) { 
+        $mise['tmp_datumtol'] = preg_replace('/-/i', '', $mise['tmp_datumtol']);
+        $mise['tmp_datumig'] = preg_replace('/-/i', '', $mise['tmp_datumig']);
+
+
+        $insert = "INSERT INTO misek (mid, tid, periodus, idoszak, suly, datumtol, datumig, nap, ido, nyelv, milyen, megjegyzes) 
+            VALUES ('".$mid."','".$tid."','".$mise['nap2']."','".$mise['idoszamitas']."','".$mise['weight']."','".$mise['tmp_datumtol']."','".$mise['tmp_datumig']."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+      } elseif($v > 2) { 
+             if($telnyar != false) {
+                $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
+                    VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+             } elseif($mise['idoszamitas'] == 'egész évben') {
+                $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
+                    VALUES ('".$mid."','".$tid."','t','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+                $file_db->query($insert);
+                $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen, megjegyzes) 
+                    VALUES ('".($mid + 1000000)."','".$tid."','ny','".$nap."','".$ido."','".$nyelv."','".$milyen."','".$megjegyzes."')";
+             } else $insert = '';
+      } else {
+             if($telnyar != false) {
+                $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen) 
+                    VALUES ('".$mid."','".$tid."','".$telnyar."','".$nap."','".$ido."','".$nyelv."','".$milyen."')";
+             } elseif($mise['idoszamitas'] == 'egész évben') {
+                $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen) 
+                    VALUES ('".$mid."','".$tid."','t','".$nap."','".$ido."','".$nyelv."','".$milyen."')";
+                $file_db->query($insert);
+                $insert = "INSERT INTO misek (mid, tid, telnyar, nap, ido, nyelv, milyen) 
+                    VALUES ('".($mid + 1000000)."','".$tid."','ny','".$nap."','".$ido."','".$nyelv."','".$milyen."')";
+             } else $insert = '';
+      // Execute statement
+      }
+      if($insert !='') $file_db->query($insert);
+    }
+    $file_db->commit();
+    //echo "Misék feltöltve<br>\n";
+
+    // Loop thru all messages and execute prepared insert statement
+    if($v > 1) {
+    $file_db->beginTransaction();
+    //$c = 1565465465465;
+    if(is_array($kepek)) 
+    foreach ($kepek as $kep) {
+      set_time_limit(60);
+      // Set values to bound variables
+      $kid = $kep['id']; //Nem megy, mert nem unique.
+      $tid = $kep['tid'];
+      $url = "http://miserend.hu/kepek/templomok/".$kep['tid']."/".$kep['fajlnev'];
+      $file = "kepek/templomok/".$kep['tid']."/".$kep['fajlnev'];
+      $insert = "INSERT INTO kepek (kid, tid, kep) 
+                VALUES ('".$kid."','".$tid."','".$url."')";
+      // Execute statement
+      if(file_exists($file))
+        $file_db->query($insert);
+        //else echo $kid." - ".$tid." - /".$kep['tid']."/".$kep['fajlnev'].";<br/>";
+    } 
+    $file_db->commit();
+    //echo "Képek feltöltve<br>\n";
+    }
+ 
+    /**************************************
+    * Close db connections                *
+    **************************************/
+ 
+    // Close file db connection
+    $file_db = null;
+
+    return true;
+
+  }
+  catch(PDOException $e) {
+    // Print PDOException message
+    echo $e->getMessage();
+    return false;
+  }
+
+}
+
+
+function upload2ftp($ftp_server,$ftp_user_name,$ftp_user_pass,$destination_file,$source_file) {
+    // set up basic connection
+    $conn_id = ftp_connect($ftp_server); 
+
+    // login with username and password
+    $login_result = ftp_login($conn_id, $ftp_user_name, $ftp_user_pass); 
+
+    // check connection
+    if ((!$conn_id) || (!$login_result)) { 
+        echo "FTP connection has failed!";
+        echo "Attempted to connect to $ftp_server for user $ftp_user_name"; 
+        return false;
+        exit; 
+    } else {
+        //echo "Connected to $ftp_server, for user $ftp_user_name";
+    }
+
+    // upload the file
+    $upload = ftp_put($conn_id, $destination_file, $source_file, FTP_BINARY); 
+
+    // check upload status
+    if (!$upload) { 
+        echo "FTP upload has failed!";
+        return false;
+    } else {
+        return true;
+        //echo "Uploaded $source_file to $ftp_server as $destination_file";
+    }
+
+    // close the FTP stream 
+    ftp_close($conn_id); 
+
+}
+
+
+function updateImageSizes() {
+    global $config;
+
+    $query = 'SELECT * FROM kepek WHERE width IS NULL OR height IS NULL OR width = 0 OR height = 0 ';
+    $result = mysql_query($query);    
+    while(($kep = mysql_fetch_array($result))) {
+
+      $file = "kepek/templomok/".$kep['tid']."/".$kep['fajlnev'];
+
+      if(file_exists($file)) {
+        if(preg_match('/(jpg|jpeg)$/i',$file)) {
+              $src_img = @ImagecreateFromJpeg($file);
+              $kep['height'] = @imagesy($src_img);  # original height
+              $kep['width'] = @imagesx($src_img);  # original width
+
+              if($kep['height'] != '' AND $kep['width'] != '') {
+                  $query =  "UPDATE kepek SET height = '".$kep['height']."', width = '".$kep['width']."' WHERE id = ".$kep['id']." LIMIT 1";
+                  if($config['debug'] > 0) echo $query."<br>";
+                  mysql_query($query);
+              }
+        } else {
+          if($config['debug'] > 0) echo "A kép nem jpg: ".$file."<br>";
+        }
+      } else {
+        if($config['debug'] > 0) echo "Hiányzó kép: ".$file."<br>";
+      }
+
+    }
+}
+
+function updateGorogkatolizalas() {
+    global $config;
+    // görög katolikus -> görögkatolikus
+    $tables = array(
+        'templomok' => array('nev','ismertnev','megjegyzes','misemegj','leiras','megkozelites'),
+        'misek' => array('megjegyzes'),
+        'kepek' => array('felirat')
+        );
+    $c = 0;
+    foreach ($tables as $table => $fields) {
+        foreach ($fields as $key => $field) {
+            $query = "SELECT id,".$field." from ".$table." WHERE ".$field." LIKE '%görög katolikus%' ";
+            $result = mysql_query($query);    
+            while(($row = mysql_fetch_array($result))) {
+                $text = preg_replace('/(görög) katolikus/i', '$1katolikus',$row[$field]);                
+                $query = "UPDATE ".$table." SET ".$field." = '".$text."' WHERE id = ".$row['id']." LIMIT 1;";
+                mysql_query($query);
+                $c++;
+            }
+        }
+    }
+    if($config['debug'] > 0) echo $c." db görögkatolizálás<br/>";
+}
+
+function updateDeleteZeroMass() {
+    global $config;
+
+    // Ha csak 00:00:00-k vannak, akkor töröljük azokat is ianktiváljuk a misét
+    $query = "SELECT count(misek.id) as misek ,SUM(if(ido = '00:00:00', 1, 0)) AS nullak, tid, misek.id,misek.megjegyzes,templomok.misemegj FROM misek LEFT JOIN templomok ON tid = templomok.id GROUP BY tid;";
+    $result = mysql_query($query);    
+    $c = 0;
+    while(($tmp = mysql_fetch_array($result))) {
+        if($tmp['nullak'] == 1 AND $tmp['misek'] == 1) {
+            $c ++;
+            if($tmp['megjegyzes'] != '' AND $tmp['misemegj'] == '') {
+                //echo $tmp['tid'].": ".$tmp['megjegyzes']." -::-".$tmp['misemegj']."<br/>";
+                $query = "UPDATE templomok SET misemegj = '".$tmp['megjegyzes']."' WHERE id = ".$tmp['tid']." LIMIT 1";
+                //echo $query."<br/>";
+                mysql_query($query);
+            }
+            $query = "UPDATE templomok SET  miseaktiv = 0 WHERE id = ".$tmp['tid']." LIMIT 1";
+            //echo $query."<br/>";
+            mysql_query($query);
+
+            $query = "DELETE FROM misek WHERE id = ".$tmp['id']." LIMIT 1;";
+            if($config['debug'] > 1) echo $query."<br/>";
+            mysql_query($query);
+        }
+    }
+    if($config['debug'] > 0) echo $c." db csak nullák eltávolítva<br/>";
+}
+
+function updateCleanMassLanguages() {
+    global $config;
+    // magyarországi templomok nyelve
+    $query = " UPDATE misek LEFT JOIN templomok on misek.tid = templomok.id SET nyelv = NULL  WHERE ( nyelv = 'h0' OR nyelv = 'h') AND templomok.orszag = 12;";
+    mysql_query($query);
+    if($config['debug'] > 0) echo "Magyarországi templomokban alapértelmezetten magyarul misézünk<br/>";
+}
+
+function updateAttributesOptimalization() {
+    global $config;
+    //milyen/nyelv optimalizálás (!minden misén átmegy!)
+    $c = 0;
+    $query = "SELECT * from misek WHERE milyen <> '' OR nyelv <> '' ";
+    $result = mysql_query($query);    
+    while(($row = mysql_fetch_array($result))) {
+      $query = "UPDATE misek SET milyen = '".cleanMassAttr($row['milyen'])."', nyelv = '".cleanMassAttr($row['nyelv'])."' WHERE id = ".$row['id']." LIMIT 1";
+      //echo $query."<br/>";
+      mysql_query($query);
+      $c++;
+    } 
+    if($config['debug'] > 0) echo $c." db milyen/nyelv optimalizálva<br/>";
+
+}
+
+function updateComments2Attributes() {
+    global $config;
+    //megjegyzés -> tulajdonság
+    $c = 0;
+    foreach ($attributes as $abbrev => $attribute) {
+        $query = "SELECT * from misek WHERE megjegyzes REGEXP '^".$attribute['name']."$' ";
+        $result = mysql_query($query);    
+        while(($row = mysql_fetch_array($result))) {
+            if(!preg_match('/(^|,)'.$abbrev.'($|,)/i',$row['milyen'])) $milyen = $abbrev.",".$row['milyen'];
+            else $milyen = $abbrev.",".$row['milyen'];
+            $query = "UPDATE misek SET megjegyzes = '', milyen = '".$milyen."' WHERE id = ".$row['id']." LIMIT 1";
+            //echo $query."<br/>";
+            mysql_query($query);
+            $c++;
+        }   
+    }
+    if($config['debug'] > 0) echo $c." db megjegyzés tulajdonsággá alakítva<br/>";
+}
 ?>
