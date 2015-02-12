@@ -37,7 +37,7 @@ function feltoltes_index() {
 	return $kod;
 }
 
-
+echo $m_op;
 
 switch($m_op) {
     case 'index':
@@ -46,19 +46,23 @@ switch($m_op) {
 
 	case 'addtemplom':
 		$tid=$_GET['tid'];
+		include_once('admin_miserend.php');
         $tartalom=miserend_addtemplom($tid);
         break;
 
 	case 'addmise':
 		$tid=$_GET['tid'];
+		include_once('admin_miserend.php');
         $tartalom=miserend_addmise($tid);
         break;
 
     case 'addingtemplom':
+		include_once('admin_miserend.php');
         $tartalom=miserend_addingtemplom();
         break;
 
 	case 'addingmise':
+		include_once('admin_miserend.php');	
         $tartalom=miserend_addingmise();
         break;
 

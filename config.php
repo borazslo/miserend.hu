@@ -11,7 +11,7 @@ $config['connection'] = array(
         'prefix' => '', /* Még nem működik */
     );
 
-$config['path']['domain'] = '';
+$config['path']['domain'] = 'http://207.180.171.165/miserend.hu/';
 
 $config['mapquest'] = array(
     'appkey' => '***',

@@ -216,7 +216,10 @@ function user_mod() {
 		$kiir.="\n<a href=?m_id=$m_id&m_op=add&uid=".$user['uid']."$linkveg class=link>";
 		$kiir .= "<b>- ".$user['login']."</b> (".$user['nev'].")</a> - ";
 		$kiir .= "<span class=\"alap\"><a href=\"mailto:".$user['email']."\">".$user['email']."</a></span> - ";
-		$kiir .= "<span class=\"alap\">".$user['lastlogin']."</span> - ";
+		if(preg_match('/^(lastlogin|lastactive|regdatum)/i',$sort,$match)) 
+			$field = $match[1];
+		else $field = 'lastlogin';
+		$kiir .= "<span class=\"alap\">".$user[$field]."</span> - ";
 		$kiir .= "<a href=?m_id=$m_id&m_op=del&uid=".$user['uid']."$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
 	}
 

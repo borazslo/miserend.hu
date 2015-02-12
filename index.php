@@ -22,7 +22,7 @@ if(!empty($_GET['design'])) $design=$_GET['design'];
 $vars['design_url'] = $design_url = $config['path']['domain'];
 
 //Beállított modulok
-if($_REQUEST['templom']>0) {
+if($_REQUEST['templom']>0 AND ( !isset($_REQUEST['m_id']) OR !isset($_REQUEST['m_op'])))  {
 	$M_ID=26;
 	$M_OP='view';
 	$TID=$_REQUEST['templom'];

@@ -124,21 +124,24 @@ function miserend_addtemplom($tid) {
   //feltöltő
 	if(empty($feltolto)) $feltolto=$u_login;
 	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Feltöltő (jogosult):</div></td><td bgcolor=#efefef>";
-  	if(strstr($u_jogok,'miserend')) {
+  	global $user;
+  	if($user->checkRole('miserend')) {
 		$urlap.="<select name=feltolto class=urlap><option value=''>Nincs</option>";
 		$query="select login from user where ok='i' order by login";
-		$lekerdez=mysql_db_query($db_name,$query);
-		while(list($user)=mysql_fetch_row($lekerdez)) {
-			$urlap.="<option value='$user'";
-			if($user==$feltolto) $urlap.=" selected";
-			$urlap.=">$user</option>";
+		$lekerdez=mysql_query($query);
+		while(list($usr)=mysql_fetch_row($lekerdez)) {
+			$urlap.="<option value='$usr'";
+			if($usr==$feltolto) $urlap.=" selected";
+			$urlap.=">$usr</option>";
 		}
 		$urlap.="</select> <input type=checkbox name=megbizhato class=urlap value=i";
 		if($megbizhato!='n') $urlap.=" checked";
 		$urlap.="><span class=alap> megbízható, nem kell külön engedélyezni</span></td></tr>";
+	
 	} else {
 		$urlap.= "<span class='alap'>".$feltolto."</td></tr>";
 	}
+
 
   //név
 	$urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><input type=text name=nev value=\"$nev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('sugo.php?id=3',200,300);\"><img src=img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
@@ -382,6 +385,7 @@ function miserend_addingtemplom() {
 
 	$hiba=false;
 	$tid=$_POST['tid'];
+	$church = getChurch($tid);
   /*
 	if($tid>0) {
 		//Ha módosítás történt
@@ -503,8 +507,11 @@ function miserend_addingtemplom() {
 			//neighboursUpdate($tid);
 			
 		} 
-		if($lng != '' AND $lat != '')
-			neighboursUpdate($tid);
+		if($lng != '' AND $lat != '') {
+			if($lng != $church['lng'] OR $lat != $church['lat']) {
+				neighboursUpdate($tid);
+			}
+		}
 			
 	
 	//fájlkezelés
@@ -566,22 +573,17 @@ function miserend_addingtemplom() {
 					$kimenet="$konyvtar/$kepnevT[$id]";
 					$kimenet1="$konyvtar/kicsi/$kepnevT[$id]";
 	
-					$info=getimagesize($kimenet);
-					$w=$info[0];
-					$h=$info[1];
-
 					if ( !copy($kep, "$kimenet") )
 						print("HIBA a másolásnál ($kimenet)!<br>\n");
 					else  {
+						$info=getimagesize($kimenet);
+						$w=$info[0];
+						$h=$info[1];
 						//Bejegyzés az adatbázisba
-						$katnev="$nev ($varos)";
-						if(!mysql_db_query($db_name,"insert kepek set tid='$tid', nev='$katnev', fajlnev='$kepnevT[$id]', felirat='$kepfeliratT[$id]', width=$w, height=$h ")) echo 'HIBA!<br>'.mysql_error();
+						if(!mysql_db_query($db_name,"insert kepek set tid='$tid', fajlnev='$kepnevT[$id]', felirat='$kepfeliratT[$id]', width=$w, height=$h ")) echo 'HIBA!<br>'.mysql_error();
 					}
 					
-					unlink($kep);
-	
-					
-      
+					unlink($kep);      
 					if($w>800 or $h>600) kicsinyites($kimenet,$kimenet,800);
 			  		kicsinyites($kimenet,$kimenet1,120);
 				}

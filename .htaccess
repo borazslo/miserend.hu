@@ -12,11 +12,14 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     
-	RewriteRule ^api/v([0-9]{1,3})/miserend.sqlite3(/|)$ api.php?q=sqlite&v=$1 [NC]
-	RewriteRule ^api/v([0-9]{1,3})/miserend.sqlite3/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ api.php?q=sqlite&v=$1&datum=$2 [NC]
 
-	RewriteRule ^api/v([0-9]{1,3})/updated(/|)$ api.php?q=updated&v=$1 [NC]
-	RewriteRule ^api/v([0-9]{1,3})/updated/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ api.php?q=updated&v=$1&datum=$2 [NC]
+    RewriteRule ^map(/|)$ index.php?m_id=26&m_op=map&$1 [NC,QSA]
+
+	RewriteRule ^api/v([0-9]{1,4})/miserend.sqlite3(/|)$ /fajlok/sqlite/miserend_v$1.sqlite3 [NC]
+	RewriteRule ^api/v([0-9]{1,4})/miserend.sqlite3/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ api.php?q=sqlite&v=$1&datum=$2 [NC]
+
+	RewriteRule ^api/v([0-9]{1,4})/updated(/|)$ api.php?q=updated&v=$1 [NC]
+	RewriteRule ^api/v([0-9]{1,4})/updated/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ api.php?q=updated&v=$1&datum=$2 [NC]
 
 
 </IfModule>
