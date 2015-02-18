@@ -50,10 +50,10 @@ switch ($_REQUEST['q']) {
         else
             $comments = chat_getcomments(array('first'=>$date));
 
-        $alert = 0;
+        $alert = 0; 
         foreach($comments as $k => $i) {
             $comments[$k]['html'] =  $twig->render('chat_comment.html',array('comment'=>$i));
-            if($i['user'] != $user->login) $alert ++;
+            if($i['user'] != $user->login) { $alert++; }
         }
 
         echo json_encode(array('result'=>'loaded','comments'=>$comments,'new'=>count($comments),'alert'=>$alert));

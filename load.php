@@ -3,7 +3,7 @@ session_start();
 
 $vars = array();
 
-include_once('config.inc');
+include_once('config.php');
 include_once('functions.php');
 include_once('functions_osm.php');
 include_once('classes.php');
@@ -34,6 +34,8 @@ if(isset($_REQUEST['login'])) {
 }
 
 $user = getuser();
+if($user->loggedin) mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$user->uid." LIMIT 1;");
+
 /*
 //Letiltott IP-ről van-e szó
 $tiltott_IP_T=ip_ell($fooldal_id);
@@ -57,12 +59,13 @@ exec('git rev-parse --verify HEAD 2> /dev/null', $output);
 $hash = $output[0];
 if($hash != '') $vars['version']['hash'] = $hash;
 
-if(!isset($_SESSION['isAndroidOS'])) { 
+if(!isset($_SESSION['isAndroidOS']) AND $_SERVER['PHP_SELF'] != '/api.php') { 
     //MobileDetect
     require_once 'vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php';        
     $detect = new Mobile_Detect;
     //$isMobile = $detect->isMobile();
     //$isTablet = $detect->isTablet();
+
     if($detect->isAndroidOS() == 1 AND $_SESSION['isAndroidOS'] != 'shown') {
         $vars['title'] = 'Miserend androidra is!';
         echo $twig->render('android_advertisment.html',$vars);
@@ -74,7 +77,6 @@ if(!isset($_SESSION['isAndroidOS'])) {
         $_SESSION['isAndroidOS'] = false;
     }    
 }
-
 
 if (!is_dir('fajlok/igenaptar')) {
     die('Nincsen faljok/igenaptar könyvtár. Upsz.');

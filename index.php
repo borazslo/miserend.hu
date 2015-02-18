@@ -1,6 +1,5 @@
 <?php
 include("load.php");
-if($user->loggedin) mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$user->uid." LIMIT 1;");
 
 if(isset($_GET['q'])) { include $_GET['q'].".php"; exit;}
 

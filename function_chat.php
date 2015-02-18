@@ -55,12 +55,17 @@ function chat_vars() {
 			if($("#chat_text").text().match(/^([$]{1})/ig)) {}
 			else {
 				//$("#chat_text").prepend("<img class='lakat link' title='Válasz csak neki' src=img/lakat.gif align=absmiddle height='13' border=0 style='margin-right:3px'>" + $(this).data('to') + ": " );
-				$("#chat_text").prepend("<span class='lakat link' title='Zárt válasz csak neki'>$</span>" + $(this).data('to') + ": " );
+				var html = "<span class='lakat link' title='Zárt válasz csak neki'>$</span>" + $(this).data('to') + ":&nbsp;";
+				placeCaretAtEnd(document.getElementById("chat_text") );
 			}
  		});
 		$("body").on('click', '.response_open', function() {
 			if($("#chat_text").html().match(/^(<i>.*?<\/i>)$/ig) ) { $("#chat_text").html(''); }
-			$("#chat_text").append("<span class='lakat link' title='Nyilvános válasz neki'>@</span>" + $(this).data('to') + " " );
+			var html = "<span class='lakat link' title='Nyilvános válasz neki'>@</span>" + $(this).data('to');
+			if($("#chat_text").html() == '' ) $("#chat_text").append(html + ":&nbsp;");
+			else  $("#chat_text").append("&nbsp;" + html + "&nbsp;");
+			placeCaretAtEnd(document.getElementById("chat_text") );
+
  		});
 
 		$("body").on('click', '#chat_loadnext', function() {
@@ -80,6 +85,41 @@ function chat_vars() {
  		});
 
     });
+
+		function placeCaretAtEnd(el) {
+		    el.focus();
+		    if (typeof window.getSelection != "undefined"
+		            && typeof document.createRange != "undefined") {
+		        var range = document.createRange();
+		        range.selectNodeContents(el);
+		        range.collapse(false);
+		        var sel = window.getSelection();
+		        sel.removeAllRanges();
+		        sel.addRange(range);
+		    } else if (typeof document.body.createTextRange != "undefined") {
+		        var textRange = document.body.createTextRange();
+		        textRange.moveToElementText(el);
+		        textRange.collapse(false);
+		        textRange.select();
+		    }
+		}
+
+		var content_id = 'chat_text';  
+
+		max = 250;
+		//binding keyup/down events on the contenteditable div
+		$('#'+content_id).keyup(function(e){ check_charcount(content_id, max, e); });
+		$('#'+content_id).keydown(function(e){ check_charcount(content_id, max, e); });
+		function check_charcount(content_id, max, e)
+		{   
+		    if(e.which != 8 && $('#'+content_id).text().length > max)
+		    {
+		       // $('#'+content_id).text($('#'+content_id).text().substring(0, max));
+		    	alert('Sajnos hosszabbat nem lehet írni!');
+		      	e.preventDefault();
+		    }
+		}
+
 
 	var c = 1;
 	var lim = 10;
@@ -131,7 +171,7 @@ function chat_vars() {
 					}
 
 					if(focus == false) {
-						var unread = $("#chat_comments").data('unread') + data.new;
+						var unread = $("#chat_comments").data('unread') + data.alert;
 						$("#chat_comments").data('unread',unread);
 					
 						if (unread > 0) {
