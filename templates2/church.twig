@@ -168,16 +168,41 @@
     {% include "panel.twig" with {title:'Megközelítés','body': cim|raw ~ terkep|raw ~ '<br>' ~ megkozelites } %}
     {% include "panel.twig" with {title:'Kapcsolat - elérhetőség','body': kapcsolat,'panel':'primary' } %}
 
-
-
-     
-    {% set content = '<b><span class="alap"><i>Legközelebbi:</i></span></b><br/>' ~ sz1|raw ~ '<br/>
-    <b><span class="alap"><i>10 km-en belül:</i></span></b><br/>' ~ sz2 |raw  %}
-    {% include "panel.twig" with {title:'Szomszédos templomok','body': content } %}
-
+    {% if szomszedok[0] %}
+    <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+            <div class="panel-heading visible-lg-block visible-md-block">
+                <h4 class="panel-title">Szomszédos templomok</h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse">
+                <div class="panel-body">
+                    <b><span class="alap"><i>Legközelebbi:</i></span></b><br>
+                    <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+                      {{ _self.neighbour(szomszedok[0],varos) }}
+                    </ul>
+                    {% if szomszedok|length > 1 %}
+                      <b><span class="alap"><i>10 km-en belül:</i></span></b><br>
+                      <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+                      {% for i in 1..6 %}
+                         {% if szomszedok[i] %} {{ _self.neighbour(szomszedok[i],varos) }} {% endif %}
+                      {% endfor %}
+                      {% if szomszedok|length > 6 %}<li style="display:inline">...</li>{% endif %}
+                      </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+  {% endif %}
 
 
 {% endblock %}
+
+{% macro neighbour(array,varos) %}
+  <li>
+    <a href="?templom={{ array.tid }}" class="link" title="{{ array.ismertnev }} ({{ ( array.tavolsag / 1000 )|number_format(1, '.', '') }} km)"  onclick="ga('send','event','Inbound Links','Szomszedsag','?templom={{ array.tid }}')">{{ array.nev }}{% if varos != array.varos %} ({{ array.varos }}){% endif %}</a>
+  </li>
+{% endmacro %}
 
 {% macro info(img,text,design_url) %}
     <img src="{{ design_url }}img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">

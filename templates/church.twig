@@ -198,6 +198,7 @@ $(document).ready(function(){
       </table>
     {% if misemegjegyzes %}{% include "doboz_lila.html" with {'header':{'content':'Kapcsolódó információk'},'content': misemegjegyzes|raw, 'design_url':design_url } %}{% endif %}
 
+{% if szomszedok[0] %}
       <img src="img/space.gif" width="5" height="10"><br>
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr bgcolor="#EAEDF1"> 
@@ -221,9 +222,19 @@ $(document).ready(function(){
 		<td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
           <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
           <td bgcolor="#FFFFFF"><b><span class="alap"><i>Legközelebbi:</i></span></b><br>
-            {{ sz1|raw }}<br>
-            <b><span class="alap"><i>10 km-en belül:</i></span></b><br>
-            {{ sz2 |raw }}</td>
+            <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+              {{ _self.neighbour(szomszedok[0],varos) }}
+            </ul>
+            {% if szomszedok|length > 1 %}
+              <b><span class="alap"><i>10 km-en belül:</i></span></b><br>
+              <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+              {% for i in 1..6 %}
+                 {% if szomszedok[i] %} {{ _self.neighbour(szomszedok[i],varos) }} {% endif %}
+              {% endfor %}
+              {% if szomszedok|length > 6 %}<li style="display:inline">...</li>{% endif %}
+              </ul>
+            {% endif %}
+          </td>
           <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
           <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
         </tr>
@@ -231,7 +242,7 @@ $(document).ready(function(){
 		<td colspan="5" bgcolor="#EAEDF1" height="1"><img src=img/space.gif width="5" height="1"></td>
 		</tr>
 </table>
-	
+	{% endif %}
     </div>
   
   
@@ -278,6 +289,11 @@ $(document).ready(function(){
 </table>
 {%  endblock %}
 
+{% macro neighbour(array,varos) %}
+  <li>
+    <a href="?templom={{ array.tid }}" class="link" title="{{ array.ismertnev }} ({{ ( array.tavolsag / 1000 )|number_format(1, '.', '') }} km)"  onclick="ga('send','event','Inbound Links','Szomszedsag','?templom={{ array.tid }}')">{{ array.nev }}{% if varos != array.varos %} ({{ array.varos }}){% endif %}</a>
+  </li>
+{% endmacro %}
 
 {% macro info(img,text,design_url) %}
     <img src="{{ design_url }}img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">

@@ -502,14 +502,14 @@ function miserend_addingtemplom() {
 			$query = "INSERT INTO terkep_geocode (tid,lng,lat,checked) VALUES (".$tid.",".$lng.",".$lat.",1)";
 			mysql_query($query);
 			$query = "INSERT INTO terkep_geocode_suggestion (tid,tchecked,slng,slat,uid) VALUES (".$tid.",".$geocode['checked'].",".$lng.",".$lat.",'".$u_login."')";
-			mysql_query($query);
-			
-			//neighboursUpdate($tid);
-			
+			mysql_query($query);			
 		} 
 		if($lng != '' AND $lat != '') {
 			if($lng != $church['lng'] OR $lat != $church['lat']) {
 				neighboursUpdate($tid);
+				$query = "UPDATE distance SET toupdate = 1 WHERE tid1 = ".$tid." OR tid2 = ".$tid." ;";
+				mysql_query($query);
+				//updateDistances($tid,15);
 			}
 		}
 			

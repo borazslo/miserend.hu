@@ -1,11 +1,17 @@
 <?php
 include 'load.php';
 set_time_limit('300');
+ini_set('memory_limit', '512M');
+
 
 switch($_REQUEST['q']) {
 
+	case 'hourly':
+		updateDistances();
+		break;
+
 	case 'daily':
-		for($v=1;$v<4;$v++) {
+		for($v=1;$v<5;$v++) {
 			$file = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
 			generateSqlite($v,$file);
 			//upload2ftp('*host*','*username*','*password*','web/'.$file,$file);
@@ -24,9 +30,9 @@ switch($_REQUEST['q']) {
 		//not so fast!
 		updateAttributesOptimalization();
 
-		//veeeery sloooow
-		neighboursUpdate();
 		break;
 }
+
+
 
 ?>

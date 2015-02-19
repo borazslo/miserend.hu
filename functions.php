@@ -153,140 +153,21 @@ function nyelvmeghatarozas() {
     }
 }
 
-function neighboursUpdate($tid = false,$type = false) {
+
+function mapquestDistance($from1,$to1) {
     global $config;
 
-    $time_start = microtime(true);
+    if(is_array($from1)) $from = $from1['lat'].",".$from1['lng']; else $from = $from1;
+    if(is_array($to1)) $to = $to1['lat'].",".$to1['lng']; else $to = $to1;
 
-    if($type == false) $type = 'mapquest';
-
-    $query = 'SELECT szomszedos1, szomszedos2, templomok.id, lng, lat,  templomok.varos, templomok.nev 
-            FROM templomok LEFT JOIN terkep_geocode ON id = tid 
-            WHERE templomok.ok = "i" AND lat <> "" AND lng <> "" ORDER BY frissites DESC ';
-    $result = mysql_query($query);
-    
-    while(($row = mysql_fetch_array($result))) $templomok[$row['id']] = $row;    
-
-    $i = 0;
-    $tmp = array();
-    foreach($templomok as $templom) { 
-        if($tid == false OR $templom['id'] == $tid) { 
-            if($templom['lat'] != false AND $templom['lng'] != false) { 
-
-                set_time_limit('600');
-                $ds10 = $ds = array();
-                $c = 0;
-                $szomszedsag = array();
-                $szomszedsag10 = array();
-                foreach($templomok as $szomszed) {
-                    if($szomszed['lat'] != false AND $szomszed['lng'] != false AND $szomszed['id'] <> $templom['id']) { 
-
-                        $ids = array($szomszed['id'],$templom['id']);
-                        sort($ids);
-                        $key = implode('-',$ids);
-
-                        if(isset($tmp[$key])) {
-                            $d = $tmp[$key];
-                        } else {
-                            $lat1 = $templom['lat'] * M_PI / 180;
-                            $lat2 = $szomszed['lat'] * M_PI / 180;
-                            $long1 = $templom['lng'] * M_PI / 180;
-                            $long2 = $szomszed['lng'] * M_PI / 180;
-                            $R = 6371; // km
-                            $d = $R * acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($long2 - $long1)) * 1000;
-                            
-                            if($type == 'mapquest') $maxdist = 12000;
-                            else $maxdist = 10000;
-
-
-                            if($config['debug'] > 1) echo $szomszed['nev']." (".$szomszed['varos'].")<br/>";
-                            if($d < $maxdist) {
-                                if($type == 'mapquest') {
-                                    $d = mapquestDistance($templom,$szomszed);
-                                    
-                                }
-                            }
-                        }
-
-                        $tmp[$key] = $d;
-                        if($d < 10000) {
-                            $szomszedsag10[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
-                            $ds10[$d] = $d;
-                        }
-                        $szomszedsag[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);            
-                        $ds[$d] = $d;
-                    
-                        //if($c>10) break; $c++;
-                    }
-                }
-                array_multisort($ds10, SORT_ASC, $szomszedsag10);
-                $szomszedsag10 = array_slice($szomszedsag10, 0, 11); 
-                
-                $nyers = '';
-                if($config['debug'] > 0) echo " ".$templom['frissites']." <a href=\"http://miserend.hu/?templom=".$templom['id']."\">".$templom['nev']." (".$templom['varos'].")</a><br/>";
-                foreach($szomszedsag10 as $szomszed) {
-                    $nyers .= $szomszed['id'].",";      
-                    echo "<div style='margin-left:40px;'>".print_r($szomszed,1)."</div>";
-                }
-               
-               //HA nincs 10km-ben belül senki, aki keresni kell valakit
-               if(count($szomszedsag10) == 0 ) {
-                    if($type != 'mapquest')
-                        $elso = array_shift(array_values($szomszedsag));
-                    else {
-                        array_multisort($ds, SORT_ASC, $szomszedsag);
-                        $szomszedsag = array_slice($szomszedsag, 0, 15); //feltételezzük, hogy a légvonalban legközelebbi 15 között van a valódi legközelebbi is
-                        foreach($szomszedsag as $szomszed) {
-                            $d = mapquestDistance($templom,$szomszed);
-                            $szomszedsag2[$d] = array('id'=>$szomszed['id'],'d'=>$d,'nev'=>$szomszed['nev'],'varos'=>$szomszed['varos']);
-                            $ds2[$d] = $d;
-                        }
-                        array_multisort($ds2, SORT_ASC, $szomszedsag2);
-                        $elso = array_shift(array_values($szomszedsag2));
-                    }
-                } else 
-                    $elso = array_shift(array_values($szomszedsag10));
-                
-                $elso = "".$elso['id']."";
-                if($nyers == '') $nyers = '';
-                if($templom['szomszedos1'] == "") {}
-                
-                    $query = "UPDATE templomok SET szomszedos1 = '".$elso."' WHERE id = ".$templom['id']." LIMIT 1";
-                    if($config['debug'] > 1) echo $query."<br/>";
-                    mysql_query($query);
-                    $query = "UPDATE templomok SET szomszedos2 = '".$nyers."' WHERE id = ".$templom['id']." LIMIT 1";
-                    if($config['debug'] > 1) echo $query."<br/>";
-                    mysql_query($query);
-            }
-        } 
-    }
-    $time_end = microtime(true);
-    $time = $time_end - $time_start;
-    if($config['debug'] > 0)  {
-        if($time < 120)
-            echo "The neighboursUpdate() finished in $time seconds\n<br/>";
-        elseif($time < 120 * 60)
-            echo "The neighboursUpdate() finished in ".($time / 60)." minutes\n<br/>";
-        elseif($time < 120 * 60 * 24)
-            echo "The neighboursUpdate() finished in ".($time / 60)." hours\n<br/>";
-    }
-
-}
-
-function mapquestDistance($from,$to) {
-    global $config;
-
-    if(is_array($from)) $from = $from['lat'].",".$from['lng'];
-    if(is_array($to)) $to = $to['lat'].",".$to['lng'];
-
-    $url = "http://www.mapquestapi.com/directions/v2/route?key=".$config['mapquest']['appkey'];
+    $url = "http://open.mapquestapi.com/directions/v2/route?key=".$config['mapquest']['appkey'];
     $url .= "&from=".$from."&to=".$to."";
     $url .= "&outFormat=json&unit=k&routeType=shortest&narrativeType=none";
-    if(!is_array($form) OR !is_array($to)) $url .= "&doReverseGeocode=true";
+    if(!is_array($form1) OR !is_array($to1)) $url .= "&doReverseGeocode=true";
     else $url .= "&doReverseGeocode=false";
-
     $file = file_get_contents($url);
     $mapquest = json_decode($file,true);
+    if(isset($mapquest['route']['routeError']['errorCode']) AND $mapquest['route']['routeError']['errorCode'] > 0) return false;
     $d = $mapquest['route']['distance'] * 1000;
     //echo $d.": ".$url."<br/>";
     return $d;
@@ -377,7 +258,6 @@ function event2Date($event, $year = false) {
         if($match[5] != '') $extra = $match[5]." days";
         return date('m-d',strtotime(date('Y')."-".$match[1]."-".$match[3]." ".$extra));
     }
-
     
     $event = preg_replace('/(\+|-)1$/', '${1}1 day', $event);
     $events = array();
@@ -385,7 +265,7 @@ function event2Date($event, $year = false) {
     $result = mysql_query($query);    
     while(($row = mysql_fetch_array($result))) {
             $events['name'][] = '/^'.$row['name'].'( (\+|-)([0-9]{1,3})|)( day|)$/i';
-            $events['date'][] = $row['date'];
+            $events['date'][] = $row['date']."$1$4";
          }
     $event = preg_replace($events['name'], $events['date'], $event);
     $event = preg_replace('/^([0-9]{2})(\.|-)([0-9]{2})/i',date('Y').'$2$1$2$3',$event);
@@ -479,11 +359,28 @@ function events_save($form) {
 
 function getChurch($tid) {
     $return = array();
-    $query = "SELECT templomok.*,terkep_geocode.* FROM templomok LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id WHERE id = $tid LIMIT 1";
+    $query = "SELECT templomok.*,geo.lat,geo.lng, geo.checked, geo.address2 FROM templomok LEFT JOIN terkep_geocode as geo ON geo.tid = templomok.id WHERE id = $tid LIMIT 1";
     $result = mysql_query($query);
     while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
         foreach($row as $k => $v) {
             $return[$k] = $v;
+        }
+        $query = "SELECT d.distance tavolsag,t.nev,t.ismertnev,t.varos,t.id tid FROM distance as d
+            LEFT JOIN templomok as t ON (tid1 <> '".$tid."' AND tid1 = id ) OR (tid2 <> '".$tid."' AND tid2 = id )
+            WHERE ( tid1 = '".$tid."' OR tid2 = '".$tid."' ) AND distance <= 10000 
+            ORDER BY distance ";
+        $results2 = mysql_query($query);
+        while(($neighbour = mysql_fetch_assoc($results2))) {
+            $return['szomszedok'][] = $neighbour;
+        }
+        if(!isset($return['szomszedok'])) {
+            $query = "SELECT d.distance tavolsag,t.nev,t.ismertnev,t.varos,t.id tid FROM distance as d
+                LEFT JOIN templomok as t ON (tid1 <> '".$tid."' AND tid1 = id ) OR (tid2 <> '".$tid."' AND tid2 = id )
+                WHERE ( tid1 = '".$tid."' OR tid2 = '".$tid."' )
+                ORDER BY distance 
+                LIMIT 1";
+            $results2 = mysql_query($query);
+            $return['szomszedok'][] = mysql_fetch_assoc($results2);
         }
         unset($return['log']);
     }
@@ -499,7 +396,6 @@ function getMasses($tid,$date = false) {
         1 => '1. héten',2 => '2. héten',3 => '3. héten',4 => '4. héten',5 => '5. héten',
         '-1' => 'utolsó héten',
         'ps' => 'páros héten','pt'=>'páratlan héten');
-
    
     $return = array();
     $query = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid GROUP BY idoszamitas ORDER BY weight DESC";
@@ -1344,8 +1240,8 @@ function generateSqlite($version,$filename) {
    $kiemeltkepek = array();
    $kepek = array();
     while($kep = mysql_fetch_array($result)) {
-        if(!isset($kiemeltkepek[$kep['id']])) { // AND $kep['kiemelt'] == 'i')
-            $kiemeltkepek[$kep['id']] = $kep;
+        if(!isset($kiemeltkepek[$kep['tid']])) { // AND $kep['kiemelt'] == 'i')
+            $kiemeltkepek[$kep['tid']] = $kep;
             /*if($kep['kiemelt'] != 'i') { 
                 echo 'jaj - <a href="http://www.miserend.hu/?templom='.$kep['kid'].'">'.$kep['kid'].'</a><br/>'; 
                 echo $c++;
@@ -1353,8 +1249,7 @@ function generateSqlite($version,$filename) {
             }
         $kepek[] = $kep;
     }
-    //echo "<pre>".print_r($kepek,1);
-    
+    //echo "<pre>".print_r($kepek,1);    
     
     // mysql select misek             
     $query  = "
@@ -1403,10 +1298,9 @@ function generateSqlite($version,$filename) {
       }
       if(isset($kiemeltkepek[$tid])) $kep = "kepek/templomok/".$tid."/".$kiemeltkepek[$tid]['fajlnev'];
       else { $kep = ''; }
-      
-      if(!file_exists($kep)) $kep = '';
-      else $kep = "http://miserend.hu/".$kep;
-      
+      if(!file_exists($kep)) $kep = ''; else 
+        $kep = "http://miserend.hu/".$kep;
+
       $megkozelites = $templom['megkozelites']; 
  
         foreach(array('ismertnev','cim') as $var) {
@@ -1692,5 +1586,117 @@ function updateComments2Attributes() {
         }   
     }
     if($config['debug'] > 0) echo $c." db megjegyzés tulajdonsággá alakítva<br/>";
+}
+
+function updateDistances($tid = false,$limit = false) {
+    global $config;
+
+    if(!is_numeric($limit) or $limit == false) $limit = 120;
+
+    $query = "
+        SELECT count(*) as sum FROM templomok 
+            LEFT JOIN terkep_geocode as geo ON geo.tid = id
+        WHERE ok = 'i' 
+            AND geo.lat <> '' AND geo.lng <> ''
+    ";
+    $result = mysql_query($query);    
+    $sum = mysql_fetch_assoc($result);
+    $sum = $sum['sum'];
+
+    $query = "
+        SELECT id,geo.lat,geo.lng FROM templomok  
+            LEFT JOIN terkep_geocode as geo ON geo.tid = templomok.id 
+            WHERE geo.lat <> '' AND geo.lng <> '' 
+    ";
+    if($tid != false) $query .= "AND id = ".$tid." ";
+    $query .= "  ORDER BY moddatum DESC ";
+    if($tid != false) $query .= " LIMIT 1;";
+    $result = mysql_query($query);    
+    $c = 0;
+    while(($church = mysql_fetch_assoc($result))) {
+        set_time_limit('600');
+
+        // we'll want everything within, say, 10km distance
+        $distance = 10;
+
+        // earth's radius in km = ~6371
+        $radius = 6371;
+
+        // latitude boundaries
+        $maxlat = $church['lat'] + rad2deg($distance / $radius);
+        $minlat = $church['lat'] - rad2deg($distance / $radius);
+
+        // longitude boundaries (longitude gets smaller when latitude increases)
+        $maxlng = $church['lng'] + rad2deg($distance / $radius / cos(deg2rad($church['lat'])));
+        $minlng = $church['lng'] - rad2deg($distance / $radius / cos(deg2rad($church['lat'])));
+
+
+        $query = "
+            SELECT t.id,geo.lat,geo.lng,(ABS(geo.lat - ".$church['lat'].") + ABS(geo.lng - ".$church['lng'].")) diff,(IFNULL(d1.up,0) + IFNULL(d2.up,0)) toupdate
+            FROM templomok AS t
+                LEFT JOIN terkep_geocode as geo ON geo.tid = t.id 
+                LEFT JOIN ( SELECT tid1,distance,toupdate as up FROM distance WHERE tid2 = ".$church['id']." ) AS d1 ON d1.tid1 = t.id
+                LEFT JOIN ( SELECT tid2,distance,toupdate as up FROM distance WHERE tid1 = ".$church['id']." ) AS d2 ON d2.tid2 = t.id
+                WHERE geo.lng <> '' AND geo.lat <> ''
+                    AND t.ok = 'i'
+                    AND ( tid1 IS NULL OR d1.up IS NOT NULL ) AND ( tid2 IS NULL OR d2.up IS NOT NULL) 
+                    AND id <> ".$church['id']."
+                    AND ( 
+                        ( lat BETWEEN ".$minlat." AND ".$maxlat." AND lng BETWEEN ".$minlng." AND ".$maxlng." ) 
+                         OR d1.up IS NOT NULL  OR d2.up IS NOT NULL 
+                        ) 
+            ORDER by diff, t.id ";
+        if($tid == false ) {
+            $query .= " LIMIT 150";
+        } else 
+            $query .= " LIMIT ".$limit;
+        $result2 = mysql_query($query);  
+        while(($other = mysql_fetch_assoc($result2))) {
+                $c++;
+                if($c > $limit) return;
+                if($other['id'] < $church['id']) { $tid1 = $other['id']; $tid2 = $church['id']; }
+                else  { $tid1 = $church['id']; $tid2 = $other['id']; }
+                $d = Distance($church,$other);
+                if($d < $distance)
+                    $d = mapquestDistance($church,$other);
+                
+                if($d > 0) {
+                    if($other['toupdate'] == 0 )
+                        $query = "INSERT INTO distance (tid1,tid2,distance,updated,toupdate) VALUES (".$tid1.",".$tid2.",'".$d."','".date('Y-m-d H:i:s')."',NULL);";
+                    else 
+                        $query = "UPDATE distance SET distance = '".$d."', updated = '".date('Y-m-d H:i:s')."', toupdate = NULL WHERE tid1 = ".$tid1." AND tid2 = ".$tid2." LIMIT 1";
+                    mysql_query($query);
+                    //echo $query."<br/>";
+                } else {
+                    //return;
+                }
+        }
+    }
+}
+
+function Distance($templom,$szomszed) {
+
+    $lat1 = $templom['lat'] * M_PI / 180;
+    $lat2 = $szomszed['lat'] * M_PI / 180;
+    $long1 = $templom['lng'] * M_PI / 180;
+    $long2 = $szomszed['lng'] * M_PI / 180;
+    $R = 6371; // km
+    $d = $R * acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($long2 - $long1)) * 1000;
+    return $d;
+}
+
+function str_putcsv($input, $delimiter = ',', $enclosure = '"') {
+  // Open a memory "file" for read/write...
+  $fp = fopen('php://temp', 'r+');
+  // ... write the $input array to the "file" using fputcsv()...
+  fputcsv($fp, $input, $delimiter, $enclosure);
+  // ... rewind the "file" so we can read what we just wrote...
+  rewind($fp);
+  // ... read the entire line into a variable...
+  $data = fread($fp, 1048576); // [changed]
+  // ... close the "file"...
+  fclose($fp);
+  // ... and return the $data to the caller, with the trailing newline from fgets() removed.
+  return rtrim( $data, "\n" );
 }
 ?>
