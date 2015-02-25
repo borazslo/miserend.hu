@@ -156,18 +156,20 @@ function nyelvmeghatarozas() {
 
 function mapquestDistance($from1,$to1) {
     global $config;
-
     if(is_array($from1)) $from = $from1['lat'].",".$from1['lng']; else $from = $from1;
     if(is_array($to1)) $to = $to1['lat'].",".$to1['lng']; else $to = $to1;
 
     $url = "http://open.mapquestapi.com/directions/v2/route?key=".$config['mapquest']['appkey'];
     $url .= "&from=".$from."&to=".$to."";
     $url .= "&outFormat=json&unit=k&routeType=shortest&narrativeType=none";
-    if(!is_array($form1) OR !is_array($to1)) $url .= "&doReverseGeocode=true";
+    if(!is_array($from1) OR !is_array($to1)) $url .= "&doReverseGeocode=true";
     else $url .= "&doReverseGeocode=false";
     $file = file_get_contents($url);
     $mapquest = json_decode($file,true);
-    if(isset($mapquest['route']['routeError']['errorCode']) AND $mapquest['route']['routeError']['errorCode'] > 0) return false;
+    if(isset($mapquest['route']['routeError']['errorCode'])) {
+        if( $mapquest['info']['statuscode'] == 602) return -1;
+        elseif( $mapquest['route']['routeError']['errorCode'] > 0) return -2;
+    }
     $d = $mapquest['route']['distance'] * 1000;
     //echo $d.": ".$url."<br/>";
     return $d;
@@ -1107,7 +1109,7 @@ function widget_miserend($args) {
     else {
         $vars['design_url'] = $config['path']['domain'];
         $vars['miserend'] = getMasses($tid);
-        $html = $twig->render('widget_miserend.html', $vars);  
+        $html = $twig->render('widget_massschedule.twig', $vars);  
     };
     if(!isset($args['callback'])) return $html;
     else return $args['callback'] . '(' . json_encode(array('html'=>$html)). ')';
@@ -1630,7 +1632,6 @@ function updateDistances($tid = false,$limit = false) {
         $maxlng = $church['lng'] + rad2deg($distance / $radius / cos(deg2rad($church['lat'])));
         $minlng = $church['lng'] - rad2deg($distance / $radius / cos(deg2rad($church['lat'])));
 
-
         $query = "
             SELECT t.id,geo.lat,geo.lng,(ABS(geo.lat - ".$church['lat'].") + ABS(geo.lng - ".$church['lng'].")) diff,(IFNULL(d1.up,0) + IFNULL(d2.up,0)) toupdate
             FROM templomok AS t
@@ -1646,10 +1647,10 @@ function updateDistances($tid = false,$limit = false) {
                          OR d1.up IS NOT NULL  OR d2.up IS NOT NULL 
                         ) 
             ORDER by diff, t.id ";
-        if($tid == false ) {
-            $query .= " LIMIT 150";
-        } else 
-            $query .= " LIMIT ".$limit;
+
+        if($tid == false) $query .= ' LIMIT 15';
+        else $query .= " LIMIT ".$limit;
+        
         $result2 = mysql_query($query);  
         while(($other = mysql_fetch_assoc($result2))) {
                 $c++;
@@ -1657,20 +1658,19 @@ function updateDistances($tid = false,$limit = false) {
                 if($other['id'] < $church['id']) { $tid1 = $other['id']; $tid2 = $church['id']; }
                 else  { $tid1 = $church['id']; $tid2 = $other['id']; }
                 $d = Distance($church,$other);
-                if($d < $distance)
-                    $d = mapquestDistance($church,$other);
-                
-                if($d > 0) {
-                    if($other['toupdate'] == 0 )
-                        $query = "INSERT INTO distance (tid1,tid2,distance,updated,toupdate) VALUES (".$tid1.",".$tid2.",'".$d."','".date('Y-m-d H:i:s')."',NULL);";
-                    else 
-                        $query = "UPDATE distance SET distance = '".$d."', updated = '".date('Y-m-d H:i:s')."', toupdate = NULL WHERE tid1 = ".$tid1." AND tid2 = ".$tid2." LIMIT 1";
-                    mysql_query($query);
-                    //echo $query."<br/>";
-                } else {
-                    //return;
-                }
+                if($d < ($distance * 1000) AND $d > 0) {
+                    $dist = mapquestDistance($church,$other);
+                    if($dist == -2) return;
+                    elseif($dist > 0 ) $d = $dist;
+                }                
+                if($other['toupdate'] == 0 )
+                    $query = "INSERT INTO distance (tid1,tid2,distance,updated,toupdate) VALUES (".$tid1.",".$tid2.",'".$d."','".date('Y-m-d H:i:s')."',NULL);";
+                else 
+                    $query = "UPDATE distance SET distance = '".$d."', updated = '".date('Y-m-d H:i:s')."', toupdate = NULL WHERE tid1 = ".$tid1." AND tid2 = ".$tid2." LIMIT 1";
+                mysql_query($query);
+                //echo $query."<br/>";
         }
+        if($c == $limit) return;
     }
 }
 
@@ -1680,6 +1680,9 @@ function Distance($templom,$szomszed) {
     $lat2 = $szomszed['lat'] * M_PI / 180;
     $long1 = $templom['lng'] * M_PI / 180;
     $long2 = $szomszed['lng'] * M_PI / 180;
+
+    if($lat1 == $lat2 AND $long1 == $long2) return 0;
+
     $R = 6371; // km
     $d = $R * acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($long2 - $long1)) * 1000;
     return $d;

@@ -6,6 +6,28 @@ http://shootitlive.com/2012/07/developing-an-embeddable-javascript-widget/
 
   var base = "http://miserend.hu/";
 
+  //LOAD CSS
+  function loadjscssfile(filename, filetype){
+    if (filetype=="js"){ //if filename is a external JavaScript file
+        var fileref=document.createElement('script')
+        fileref.setAttribute("type","text/javascript")
+        fileref.setAttribute("src", filename)
+    }
+    else if (filetype=="css"){ //if filename is an external CSS file
+        var fileref=document.createElement("link")
+        fileref.setAttribute("rel", "stylesheet")
+        fileref.setAttribute("type", "text/css")
+        fileref.setAttribute("href", filename)
+    }
+    if (typeof fileref!="undefined")
+        document.getElementsByTagName("head")[0].appendChild(fileref)
+  }
+
+  loadjscssfile("http://code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css", "css") ////dynamically load and add this .css file
+
+  loadjscssfile("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css", "css") ////dynamically load and add this .css file
+  loadjscssfile("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js","js")
+
   // Localize jQuery variable
   var jQuery;
 
@@ -204,10 +226,13 @@ http://shootitlive.com/2012/07/developing-an-embeddable-javascript-widget/
       
       settings.push(info);
 
-      $( info['container'] ).attr('id','miserend-hu widget miserend');
-      
+      $( info['container'] ).addClass('miserend-hu widget miserend');
+      $( info['container'] ).attr('id','miserend-' + info['templom']);
+
+      $( info['container'] ).attr('style',info['style']);
+
       /******* Load HTML *******/
-      var jsonp_url = base + "ajax.php?q=JSONP_miserend&tid=" + info['templom'] + "&callback=?";
+      var jsonp_url = base + "ajax.php?q=JSONP_miserend&tid=" + info['templom'] + "&template=templates2&callback=?";
       $.getJSON(jsonp_url, function(data) {
         $( info['container'] ).html(data.html);
 
