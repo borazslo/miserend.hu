@@ -14,7 +14,6 @@ switch($_REQUEST['q']) {
 		for($v=1;$v<5;$v++) {
 			$file = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
 			generateSqlite($v,$file);
-			//upload2ftp('*host*','*username*','*password*','web/'.$file,$file);
 		}
 		break;
 

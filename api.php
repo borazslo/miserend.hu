@@ -60,7 +60,39 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'json') {
 	
 	}
 }
-  
+ 
+if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'csv') { 
+	if(!$_REQUEST['table']) die ('I need \'table\'!');
+	$table = sanitize($_REQUEST['table']);
+	if(!in_array($table, array('misek','templomok','kepek'))) die("Not valid table name!");
+
+	$return = array(); $header = false;
+	$query = "SELECT * FROM ".$table;
+	if($table == 'templomok') $query .= " LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id ";
+
+	$results = mysql_query($query);
+	header('Content-Type: application/csv');
+	header('Content-Disposition: attachment; filename='.$table.'.csv');
+	header('Pragma: no-cache');
+	$out = fopen('php://output', 'w');
+	while(($result = mysql_fetch_assoc($results))) {
+		if($table == 'templomok') {
+			foreach(array('log','modositotta','nyariido','teliido','regdatum','letrehozta','megbizhato') as $field)
+				unset($result[$field]);
+		}
+
+		if($header == false ) {
+			foreach($result as $k => $i)
+				$header[$k] = $k;
+			fputcsv($out, $header);
+		}
+		foreach($result as $k => $i) $result[$k] = preg_replace("/\n/i","<br/>",$i);
+		$return[$table][] = $result;
+		fputcsv($out, $result);
+	}
+	fclose($out);	
+}
+ 
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'sqlite') {
 
 	$sqllitefile = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';

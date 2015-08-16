@@ -196,7 +196,6 @@ function chat_vars() {
 	function chat_users() {
 		$.post( "ajax.php", { q: "ChatUsers" }, function( data ) {
 	  			if(data.result === "loaded") { 
-	  				console.log(data);
 	  				$("#chat_users").html(data.text);
 	  			}
 	  	},'json');

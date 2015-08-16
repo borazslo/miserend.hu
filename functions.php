@@ -1053,7 +1053,7 @@ function getRemarkMark($tid) {
     $return = array();
 
     if(is_numeric($tid)) {
-        $querye="SELECT allapot FROM eszrevetelek WHERE hol='templomok' and hol_id = $tid GROUP BY allapot LIMIT 3";
+        $querye="SELECT allapot FROM eszrevetelek WHERE (hol='templomok' OR hol = '') and hol_id = $tid GROUP BY allapot LIMIT 3";
         if(!$lekerdeze=mysql_query($querye)) echo "HIBA!<br>$querym<br>".mysql_error();
         while(list($cell)=mysql_fetch_row($lekerdeze)) {
             $allapot[$cell] = true;
@@ -1109,8 +1109,11 @@ function widget_miserend($args) {
     else {
         $vars['design_url'] = $config['path']['domain'];
         $vars['miserend'] = getMasses($tid);
+
+        if($args['misemegj'] == 'off') unset($vars['misemegj']);
         $html = $twig->render('widget_massschedule.twig', $vars);  
     };
+
     if(!isset($args['callback'])) return $html;
     else return $args['callback'] . '(' . json_encode(array('html'=>$html)). ')';
 }
