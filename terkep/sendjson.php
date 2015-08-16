@@ -1,5 +1,6 @@
 <?php
-$url = "http://terkep.miserend.hu/jelentes/v2";
+exit;
+$url = "http://miserend.hu/api/v".rand(3,3)."/report";
 
 $return = array(
 	'0' => array('tid'=>rand(1,400),'pid'=>0,'text'=>'ÉN - Hibás pozíció'),
@@ -7,9 +8,12 @@ $return = array(
 	'2' => array('tid'=>rand(801,1200),'pid'=>2,'text'=>'ÉN - Valami barátságos szöveg')
 );
 $ret = $return[rand(0,2)];
-print_R($ret);
-$content = json_encode(array('tid'=>$ret['tid'],'pid'=>$ret['pid'],'text'=>$ret['text']));
-echo $content;
+$encode = array('tid'=>$ret['tid'],'pid'=>$ret['pid'],'text'=>$ret['text']);
+if(rand(1,1) == 1) $encode['dbdate'] = time();
+
+echo $url.": "; print_R($ret); echo "<br/>";
+$content = json_encode($encode);
+//echo $content;
 
 $curl = curl_init($url);
 curl_setopt($curl, CURLOPT_HEADER, false);
@@ -25,11 +29,15 @@ $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
 if ( $status != 201 AND $status != 200 ) {
     die("Error: call to URL $url failed with status $status, response $json_response, curl_error " . curl_error($curl) . ", curl_errno " . curl_errno($curl));
-}
+} else echo "..".$status;
 
 
 curl_close($curl);
 
+echo $json_response;
 $response = json_decode($json_response, true);
+
+echo "<br><br><h3>válasz:</h3>";
+print_r($json_response);
 
 ?>

@@ -87,30 +87,103 @@ class Mail
  **/
 class Remark
 {
-	function __construct() {
+	function __construct($tid) {
+		global $user;
+		$this->name = "vendég";
+		$this->username = $user->username;
+		//email fakultatív
+		//megbízható?? reliable
+		$this->timestamp = date('Y-m-d H:i:s');
+		$this->tid = $tid;
+		$this->state = 'u';
+		$this->text = "";
+	}
 
+	function save() {
+		if(!isset($this->reliable)) $this->reliable = '?';
+		/*
+			if(!empty($email) and strlen($email)>7) $feltetelT[]="email='$email'";
+			if($login!='*vendeg*') $feltetelT[]="login='$login'";
+			if(is_array($feltetelT)) {
+				$feltetel=implode(' or ',$feltetelT);
+				$query="select megbizhato from eszrevetelek where $feltetel order by datum limit 0,1";
+				$lekerdez=mysql_query($query);
+				list($megbizhato)=mysql_fetch_row($lekerdez);
+			}
+			if(!empty($megbizhato)) $mbiz="megbizhato='$megbizhato', ";
+		*/
+		
+		$query="INSERT eszrevetelek set 
+			nev='".$this->name."', 
+			login='".$this->username."', 
+			megbizhato='".$this->reliable."', 
+			datum='".$this->timestamp."', 
+			hol_id='".$this->tid."', 
+			allapot='".$this->state."',
+			leiras='".sanitize($this->text)."'";
+		if(isset($this->email)) $query .= ", email='".$this->email;
+		mysql_query($query);
+
+		//TODO: ezt teljesen ki lehetne iktatni
+		$query="UPDATE templomok set eszrevetel='i' where id='".$this->tid."' LIMIT 1";
+		mysql_query($query);
+		
+		return true;
+	}
+
+
+	function emails() {
+
+
+		$query="select nev,ismertnev,varos,egyhazmegye, kontaktmail from templomok where id = ".$this->tid." limit 0,1";
+		$lekerdez=mysql_query($query);
+		$templom=mysql_fetch_assoc($lekerdez);
+					
+		$eszrevetel.= "<a href=\"http://miserend.hu/?templom=".$this->tid."\">".$templom['nev']." (";
+		if($templom['ismertnev'] != "" ) $eszrevetel .= $templom['ismertnev'].", ";
+		$eszrevetel .= $templom['varos'].")</a><br/>\n";
+		$eszrevetel.= "<i><a href=\"mailto:".$email."\" target=\"_blank\">".$this->name."</a> (".$this->username."):</i><br/>\n";
+		$eszrevetel.= $this->text."<br/>\n";
+		
+		$query="select email from egyhazmegye where id='".$templom['egyhazmegye']."'";
+		$lekerdez=mysql_query($query);
+		list($felelosmail)=mysql_fetch_row($lekerdez);
+
+		$this->PreparedText4Email = $eszrevetel;
+
+		//Mail küldés az egyházmegyei felelősnek
+		if(!empty($felelosmail)) { $this->SendMail('diocese',$felelosmail);}
+		
+		//Mail küldés a karbantartónak / felelősnek
+		if(!empty($templom['kontaktmail'])) { $this->SendMail('contact',$felelosmail);}
+
+		//Mail küldése a debuggernek, hogy boldog legyen
+		$this->SendMail('debug',$config['mail']['debugger']);
+		
+		return true;
 	}
 
 	function sendMail($type,$to) {
 		$mail = new Mail();
-		if(!isset($this->EmailSubject)) $mail->subject = "Miserend - észrevétel";
+		if(!isset($this->EmailSubject)) $mail->subject = "Miserend - észrevétel (".$this->tid.")";
 		else $mail->subject = $this->EmailSubject;
-
-		$mail->content .= "------------------<br/>\n";
 
 		switch ($type) {
 			case 'diocese':
 				$mail->content .= "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
+				$mail->content .= "------------------<br/>\n";
 				$mail->content .= $this->PreparedText4Email;
 			break;
 			
 			case 'contact':
 				$mail->content .= "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomod adataihoz észrevétel érkezett.<br/>\n";
+				$mail->content .= "------------------<br/>\n";
 				$mail->content .= $this->PreparedText4Email;
 			break;
 
 			case 'debug':
 				$mail->content .= "Kedves admin!\n\n<br/><br/>Az egyik templom adataihoz észrevétel érkezett.<br/>\n";
+				$mail->content .= "------------------<br/>\n";
 				$mail->content .= $this->PreparedText4Email;
 			break;
 
