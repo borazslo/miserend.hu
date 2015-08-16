@@ -94,7 +94,7 @@ function adatadd() {
 	$eszrevetel.= "<i><a href=\"mailto:".$email."\" target=\"_blank\">".$nev."</a>"; if($login != '') $eszrevetel .= ' ('.$login.') '; $eszrevetel .= ":</i><br/>\n";
 	$eszrevetel.= sanitize($leiras)."<br/>\n";
 	
-	$query="select email from egyhazmegye where id='$ehm' LIMIT 1";
+	$query="select email from egyhazmegye where id='$ehm'";
 	$lekerdez=mysql_query($query);
 	list($felelosmail)=mysql_fetch_row($lekerdez);
 

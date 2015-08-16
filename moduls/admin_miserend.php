@@ -378,7 +378,7 @@ function miserend_addtemplom($tid) {
 
 function miserend_addingtemplom() {
 	global $_POST,$_SERVER,$db_name,$_FILES,$u_login,$u_beosztas;
-	global $config;
+	global $config, $user;
 
 	$ip=$_SERVER['REMOTE_ADDR'];
     $host = gethostbyaddr($ip);
@@ -481,7 +481,10 @@ function miserend_addingtemplom() {
 			$frissites=" frissites='$ma', ";
 		}
 
-		$query="$parameter1 templomok set nev='$nev', ismertnev='$ismertnev', turistautak='$turistautak', orszag='$orszag', megye='$megye', varos='$varos', cim='$cim', megkozelites='$megkozelites', plebania='$plebania', pleb_url='$pleb_url', pleb_eml='$pleb_eml', egyhazmegye='$egyhazmegye', espereskerulet='$espereskerulet', leiras='$szoveg', megjegyzes='$megjegyzes',  miseaktiv='$miseaktiv', misemegj='$misemegj', bucsu='$bucsu', nyariido='$nyariido', teliido='$teliido', $frissites kontakt='$kontakt', kontaktmail='$kontaktmail', adminmegj='$adminmegj', letrehozta='$feltolto', megbizhato='$megbizhato', ok='$ok' $parameter2";
+		$query="$parameter1 templomok set nev='$nev', ismertnev='$ismertnev', turistautak='$turistautak', orszag='$orszag', megye='$megye', varos='$varos', cim='$cim', megkozelites='$megkozelites', plebania='$plebania', pleb_url='$pleb_url', pleb_eml='$pleb_eml', egyhazmegye='$egyhazmegye', espereskerulet='$espereskerulet', leiras='$szoveg', megjegyzes='$megjegyzes',  miseaktiv='$miseaktiv', misemegj='$misemegj', bucsu='$bucsu', nyariido='$nyariido', teliido='$teliido', $frissites kontakt='$kontakt', kontaktmail='$kontaktmail', adminmegj='$adminmegj', megbizhato='$megbizhato', ok='$ok' ";
+		if($user->checkRole('miserend')) 
+				$query .= ", letrehozta='$feltolto' ";
+		$query .= " $parameter2 ";
 		if(!mysql_db_query($db_name,$query)) echo 'HIBA!<br>'.mysql_error();
 		if($uj) $tid=mysql_insert_id();	
 		else {
@@ -506,7 +509,7 @@ function miserend_addingtemplom() {
 		} 
 		if($lng != '' AND $lat != '') {
 			if($lng != $church['lng'] OR $lat != $church['lat']) {
-				neighboursUpdate($tid);
+				//neighboursUpdate($tid);
 				$query = "UPDATE distance SET toupdate = 1 WHERE tid1 = ".$tid." OR tid2 = ".$tid." ;";
 				mysql_query($query);
 				//updateDistances($tid,15);
@@ -699,9 +702,10 @@ function miserend_modtemplom() {
 	$kiir.="</select>";
 
 	$kiir.="\n<br><span class=alap>rendezés: </span><select name=sort class=urlap> ";
-	$sortT['utolsó módosítás']='moddatum desc';
-	$sortT['település']='varos';
-	$sortT['templomnév']='nev';
+	$sortT['utolsó módosítás']='moddatum DESC';
+	$sortT['település']='t.varos';
+	$sortT['templomnév']='t.nev';
+	$sortT['utolsó észrevétel']='e.datum DESC';
 	foreach($sortT as $kulcs=>$ertek) {
 		$kiir.="<option value='$ertek'";
 		if($ertek==$sort) $kiir.=' selected';
@@ -715,9 +719,10 @@ function miserend_modtemplom() {
 		else $feltetelT[]="espereskerulet='$ehmT[1]'";
 	}
 	if(!empty($kulcsszo)) $feltetelT[]="(nev like '%$kulcsszo%' or varos like '%$kulcsszo%' or ismertnev like '%$kulcsszo%' or letrehozta like '%$kulcsszo%')";
+	$wallapot = '';
 	if(!empty($allapot)) {
-		if($allapot=='e') $feltetelT[]="eszrevetel='i'";
-		elseif($allapot=='ef') $feltetelT[]="eszrevetel='f'";
+		if($allapot=='e') $wallapot ="e1.allapot = 'u'";
+		elseif($allapot=='ef') $wallapot ="e1.allapot = 'f'";
 		else $feltetelT[]="ok='$allapot'";
 	}
 	if(is_array($feltetelT)) $feltetel=' where '.implode(' and ',$feltetelT);
@@ -729,14 +734,31 @@ function miserend_modtemplom() {
 		$vanmiseT[$templom]=true;
 	}
 
-  //Észrevételek lekérdezése
-	$querye="select distinct(hol_id) from eszrevetelek where hol='templomok'";
-	if(!$lekerdeze=mysql_db_query($db_name,$querye)) echo "HIBA!<br>$querym<br>".mysql_error();
-	while(list($templom)=mysql_fetch_row($lekerdeze)) {
-		$vaneszrevetelT[$templom]=true;
+  	if($wallapot != '') $wallapot .= " AND ";
+  	$query = "SELECT t.id,t.nev,ismertnev,varos,ok,miseaktiv
+	FROM templomok as t ";
+
+	if($sort == 'e.datum DESC' OR $wallapot != '') {
+	$query .= "
+		LEFT JOIN eszrevetelek as e ON e.id = ( 
+			SELECT id  FROM eszrevetelek as e1
+				WHERE ".$wallapot." e1.hol_id = t.id
+	 			ORDER BY CASE `allapot`
+	     				WHEN 'u' THEN 1
+	     				WHEN 'f' THEN 2
+	     				WHEN 'j' THEN 3
+	     				END, datum DESC 
+			 	LIMIT 1
+			) AND e.hol_id = t.id 
+		";
 	}
 
-	$query="select id,nev,ismertnev,varos,ok,eszrevetel,miseaktiv from templomok $feltetel order by $sort";
+	$query .= $feltetel." ";
+	if($feltetel != '' AND $wallapot != '' ) $query .= " AND "; 
+	elseif($wallapot != '')  $query .= " WHERE "; 
+	if($wallapot != '') $query .= " e.id IS NOT NULL ";
+	$query .= "ORDER BY ".$sort." ";
+
 	$lekerdez=mysql_db_query($db_name,$query);
 	$mennyi=mysql_num_rows($lekerdez);
 	if($mennyi>$leptet) {

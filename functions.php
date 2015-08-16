@@ -359,6 +359,37 @@ function events_save($form) {
     generateMassTmp();
 }
 
+function checkPrivilege($type,$privilege,$object,$user = false) {
+    if(!$user) global $user;
+
+    switch ($type) {
+        case 'church':
+
+            switch ($privilege) {
+                case 'read':
+
+                    if($object['ok'] == 'i') return true;
+                    if($object['letrehozta'] == $user->username) return true;
+                    if($user->checkRole('miserend')) return true;
+                    break;
+                
+                default:
+                    return false;
+                    break;
+            }
+
+            break;
+        
+        default:
+            return false;
+            break;
+    }
+    return false;
+}
+
+
+
+
 function getChurch($tid) {
     $return = array();
     $query = "SELECT templomok.*,geo.lat,geo.lng, geo.checked, geo.address2 FROM templomok LEFT JOIN terkep_geocode as geo ON geo.tid = templomok.id WHERE id = $tid LIMIT 1";
@@ -370,6 +401,7 @@ function getChurch($tid) {
         $query = "SELECT d.distance tavolsag,t.nev,t.ismertnev,t.varos,t.id tid FROM distance as d
             LEFT JOIN templomok as t ON (tid1 <> '".$tid."' AND tid1 = id ) OR (tid2 <> '".$tid."' AND tid2 = id )
             WHERE ( tid1 = '".$tid."' OR tid2 = '".$tid."' ) AND distance <= 10000 
+            AND t.id IS NOT NULL 
             ORDER BY distance ";
         $results2 = mysql_query($query);
         while(($neighbour = mysql_fetch_assoc($results2))) {
@@ -386,6 +418,12 @@ function getChurch($tid) {
         }
         unset($return['log']);
     }
+
+    if($return != array()) {
+        if(!checkPrivilege('church','read',$return)) return array();
+    }
+
+
     return $return;
 }
 
@@ -1053,7 +1091,7 @@ function getRemarkMark($tid) {
     $return = array();
 
     if(is_numeric($tid)) {
-        $querye="SELECT allapot FROM eszrevetelek WHERE (hol='templomok' OR hol = '') and hol_id = $tid GROUP BY allapot LIMIT 3";
+        $querye="SELECT allapot FROM eszrevetelek WHERE ( hol='templomok' OR hol = '' )  and hol_id = $tid GROUP BY allapot LIMIT 3";
         if(!$lekerdeze=mysql_query($querye)) echo "HIBA!<br>$querym<br>".mysql_error();
         while(list($cell)=mysql_fetch_row($lekerdeze)) {
             $allapot[$cell] = true;
@@ -1227,7 +1265,7 @@ function generateSqlite($version,$filename) {
                     LEFT JOIN orszagok ON orszagok.id = t.orszag 
                     LEFT JOIN megye ON megye.id = megye 
                     LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id 
-                    WHERE t.ok = 'i' ";                 
+                    WHERE t.ok = 'i'     ";                 
     if(isset($datum)) $query .= ' AND  moddatum >= "'.$datum.'" ';                                          
     $query .= " ORDER BY t.id desc LIMIT ".$limit;
     //echo $query."<br>";

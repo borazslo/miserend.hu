@@ -66,7 +66,7 @@ switch ($_REQUEST['q']) {
     case 'AutocompleteCity':
         $return[] = array('label' => $_REQUEST['text']."* <i>(Minden ".$_REQUEST['text']."-al kezdődő)</i>",'value'=>$_REQUEST['text']."*");
 
-        $query = "SELECT varos, orszag FROM templomok WHERE varos LIKE '".$_REQUEST['text']."%' ";
+        $query = "SELECT varos, orszag FROM templomok WHERE ok = 'i' AND varos LIKE '".$_REQUEST['text']."%' ";
         $query .= "GROUP BY varos ORDER BY varos LIMIT 10";
         if(!$lekerdez=mysql_query($query)) echo "HIBA a város keresőben!<br>$query<br>".mysql_error();
         while($row=mysql_fetch_row($lekerdez,MYSQL_ASSOC)) {

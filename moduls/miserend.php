@@ -936,7 +936,7 @@ function miserend_view() {
 	}
 
 	$titlekieg=" - $nev ($varos)";
-
+	if($vane != 1) $titlekieg = "404";
 
 	if(!empty($turistautak)) {
 		$terkep="<br><a href=http://turistautak.hu/poi.php?id=$turistautak target=_blank title='További infók'><img src=http://www.geocaching.hu/images/mapcache/poi_$turistautak.gif border=0 vspace=5 hspace=5></a>";
