@@ -6,12 +6,17 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
         <title>{{ pageTitle ? pageTitle : metaTitle }}</title>
 
         <meta name="description" content="{{ teaser ? teaser : 'Magyarország és a Kárpát-medence katolikus templomainak miserendjei.' }}">
         <meta name="keywords" content="katolikus, római katolikus, görögkatolikus, szentmise, miserend, liturgia, ünnep">
         <meta name="author" content="miserend.hu">
         <meta http-equiv="cleartype" content="on">
+
+        <meta name="apple-itunes-app" content="app-id=967827488">
+        <meta name="google-play-app" content="app-id=ccom.frama.miserend.hu">
 
         {% block meta %}{% endblock %}
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
@@ -42,6 +47,9 @@
                 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
                     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
             })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+
+            ga('_setCustomVar',1,'design','new',2);
 
             ga('create', 'UA-3987621-4', 'auto');
             ga('send', 'pageview');
