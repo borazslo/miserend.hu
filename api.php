@@ -42,8 +42,17 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'report') {
 	if(isset($input['timestamp'])) $remark->timestamp = $input['timestamp'];
 
 	$remark->text = "Mobilalkalmazáson keresztül érkezett információ:\n".$input['text']."\n <i>verzió:".$v.", pid:".$input['pid']."</i>";
-	if(isset($input['dbdate'])) $remark->text .= "<i>, adatbázis: ".date("Y-m-d H:i", $input['dbdate'])."</i>";
-
+	if(isset($input['dbdate'])) {
+		if(!is_numeric($input['dbdate'])) $input['dbdate'] = strtotime($input['dbdate']);
+		$remark->text .= "<i>, adatbázis: ".date("Y-m-d H:i", $input['dbdate'])."</i>";
+		$templom = getchurch($input['tid']);
+		$updated = strtotime($templom['frissites']);
+		
+		if($input['dbdate'] < $updated) {
+			//echo date('Y-m-d',$updated)."-".date('Y-m-d',$input['dbdate']);	
+			$remark->text .= "\n\n<strong>Figyelem! Elavult adatok alapján történt a bejelentés!</strong>";
+		}
+	}
 	$remark->save();
 	$remark->emails();
 	echo json_encode(array('error'=>0,'text'=>'Köszönjük. Elmentettük.'));
