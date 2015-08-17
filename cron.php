@@ -20,6 +20,7 @@ switch($_REQUEST['q']) {
 
 
 	case 'weekly':
+		assignUpdates();
 		updateImageSizes();
 		generateMassTmp();
 

@@ -62,14 +62,14 @@ function adatadd() {
 		$content = "<h4>HIBA!</h4>Nincs templomazonosító elküldve!";
 	else {
 		$tid=$_REQUEST['tid'];
-
 		$remark = new Remark($tid);
-		$remark->name = sanitize($_REQUEST['nev']);
+		$remark->name = sanitize($_REQUEST['nev']);		
 		$remark->email = sanitize($_REQUEST['email']);
+		
+		if($remark->email == '') unset($remark->email);
 		$remark->text = sanitize($_REQUEST['leiras']);
 		$remark->save();
 		$remark->emails();
-	
 		$content = "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br></br>".$remark->PreparedText4Email."<br/><input type='button' value='Ablak bezárása' onclick='self.close()'>";
 		if($config['debug']<1) $content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
 
