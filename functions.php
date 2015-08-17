@@ -21,7 +21,6 @@ function dbconnect() {
         if($config['debug'] > 0)  die("Az '".$db_name."' adatbázis nem létezik, vagy nincs megfelelő jogosultság elérni azt!\n".mysql_error()."\n$idopont");
         else die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
     }
-
 }
 
 function kicsinyites($forras,$kimenet,$max) {
@@ -153,7 +152,6 @@ function nyelvmeghatarozas() {
     }
 }
 
-
 function mapquestDistance($from1,$to1) {
     global $config;
     if(is_array($from1)) $from = $from1['lat'].",".$from1['lng']; else $from = $from1;
@@ -186,7 +184,6 @@ function mapquestGeocode($location) {
     //print_r($mapquest);
     //echo "<a href='".$mapquest['results'][0]['locations'][0]['mapUrl']."'>map</a>";
     return array_merge($mapquest['results'][0]['locations'][0]['latLng'],array('mapUrl'=>$mapquest['results'][0]['locations'][0]['mapUrl']));
-
 } 
 
 function LirugicalDay($datum = false) {
@@ -386,9 +383,6 @@ function checkPrivilege($type,$privilege,$object,$user = false) {
     }
     return false;
 }
-
-
-
 
 function getChurch($tid) {
     $return = array();
@@ -1062,7 +1056,6 @@ function sugolink($id,$height=false) {
     return $twig->render('help_link.html', $args)  ; 
 }
 
-
 function generateMassTmp($where = false) {
     global $config;
     $updates = array();
@@ -1118,7 +1111,6 @@ function getRemarkMark($tid) {
 
     return $return;
 }
-
 
 function map_view() {
     $return = array();
@@ -1467,9 +1459,7 @@ function generateSqlite($version,$filename) {
     echo $e->getMessage();
     return false;
   }
-
 }
-
 
 function upload2ftp($ftp_server,$ftp_user_name,$ftp_user_pass,$destination_file,$source_file) {
     // set up basic connection
@@ -1502,9 +1492,7 @@ function upload2ftp($ftp_server,$ftp_user_name,$ftp_user_pass,$destination_file,
 
     // close the FTP stream 
     ftp_close($conn_id); 
-
 }
-
 
 function updateImageSizes() {
     global $config;
@@ -1609,7 +1597,6 @@ function updateAttributesOptimalization() {
       $c++;
     } 
     if($config['debug'] > 0) echo $c." db milyen/nyelv optimalizálva<br/>";
-
 }
 
 function updateComments2Attributes() {
@@ -1743,4 +1730,137 @@ function str_putcsv($input, $delimiter = ',', $enclosure = '"') {
   // ... and return the $data to the caller, with the trailing newline from fgets() removed.
   return rtrim( $data, "\n" );
 }
-?>
+
+function assignUpdates() {
+    $numbers = array('nulla','egy','kettő','három','négy','öt','hat','hét','nyolc','kilenc','tiz');
+
+    $query = "
+        SELECT user.uid,login,email,becenev,nev,c FROM user 
+        LEFT JOIN (
+            SELECT count(*) as c, uid FROM updates
+            WHERE timestamp > '".date('Y-m-d',strtotime("-1 week"))."' 
+            GROUP BY uid 
+            ORDER BY timestamp DESC
+        ) u ON u.uid = user.uid 
+        WHERE volunteer = 1 AND (c < 7 OR c IS NULL)
+    ;";
+    $result = mysql_query($query); $users = array();
+    while ($user = mysql_fetch_assoc($result)) {
+        $users[$user['uid']] = $user;    
+    }
+    foreach ($users as $uid => $user) {
+        $query = "
+            SELECT t.id,t.nev,t.ismertnev,t.varos,t.nev,t.frissites,u.uid, u.timestamp 
+            FROM templomok  t
+                LEFT JOIN (
+                    SELECT * FROM updates
+                    WHERE timestamp > '".date('Y-m-d',strtotime("-2 months"))."' 
+                    ORDER BY timestamp DESC
+                ) u ON u.tid = t.id  
+            WHERE 
+                ok = 'i' 
+                AND orszag = 12
+                AND ( nev LIKE '%templom%' OR nev LIKE '%bazilika%' OR nev LIKE '%székesegyház%')
+                AND moddatum < '".date('Y-m-d',strtotime("-2 years"))."' 
+                AND u.timestamp IS NULL
+            GROUP BY t.id
+            ORDER BY frissites, t.id LIMIT 7;
+        ";
+        $result = mysql_query($query); $templomok = array();
+        while ($templom = mysql_fetch_assoc($result)) {
+            $templomok[$templom['id']] = $templom;    
+        }        
+
+        $list = "<ul>";
+        foreach ($templomok as $tid => $templom) {
+            $query = "INSERT INTO updates (uid,tid) VALUES (".$uid.",".$tid.");";
+            mysql_query($query);
+            $list .= "<li><a href='http://miserend.hu/?templom=".$templom['id']."'>".$templom['nev']."</a>";
+            if($templom['ismertnev'] != '') $list .= " (".$templom['ismertnev'].")";
+            $list .= ", ".$templom['varos'];
+            $list .= " <font size='-1'>- utolsó frissítés: ".preg_replace('/-/', '. ', $templom['frissites']).".</font>";
+            $list .="</li>";
+        }
+        $list .= "</ul>";
+
+        //változók a levélhez
+        
+        if($user['becenev']!='') $nev = $user['becenev'];
+        elseif($user['nev']!='') $nev = $user['nev'];
+        else $nev = $user['login'];
+        
+        $query = "
+            SELECT count(*),t.nev FROM eszrevetelek
+                    RIGHT JOIN templomok t ON t.id = eszrevetelek.hol_id
+                WHERE datum > '".date('Y-m-d H:i:s',strtotime("-1 week"))."' 
+                    AND ok = 'i' 
+                    AND orszag = 12
+                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+                GROUP BY hol_id
+        ;";
+        $result = mysql_query($query);
+        $M = mysql_num_rows($result);
+
+        $query = "
+            SELECT count(*),t.nev FROM eszrevetelek e
+                    RIGHT JOIN templomok t ON t.id = e.hol_id
+                WHERE datum > '".date('Y-m-d H:i:s',strtotime("-1 week"))."' 
+                    AND e.login = '".$user['login']."' OR e.email = '".$user['email']."' 
+                    AND ok = 'i' 
+                    AND orszag = 12
+                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+                GROUP BY hol_id
+        ;";
+        $result = mysql_query($query);
+        $N = mysql_num_rows($result);
+
+        $query = "
+            SELECT count(*) FROM templomok t
+                WHERE frissites > '".date('Y-m-d',strtotime("-6 months"))."' 
+                    AND ok = 'i' 
+                    AND orszag = 12
+                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+        ;";
+        $result = mysql_query($query);
+        $tmp = mysql_fetch_row($result);
+        $L = $tmp[0];
+
+        $query = "
+            SELECT count(*) FROM templomok t
+                WHERE frissites < '".date('Y-m-d',strtotime("-2 years"))."' 
+                    AND ok = 'i' 
+                    AND orszag = 12
+                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+        ;";
+        $result = mysql_query($query);
+        $tmp = mysql_fetch_row($result);
+        $O = $tmp[0];
+
+        if($O > $L ) $ol = "de még";
+        else $ol = "és már csak";
+
+        $mail = new Mail();
+
+        $mail->subject = "Miserend frissítése, ".date('W').". hét";
+        $text = "
+            <strong>Kedves $nev!</strong>\n
+            <p>A <a href='http://miserend.hu'>miserend.hu</a>-n a múlt héten $M magyarországi templomhoz kaptunk észrevételt. ";
+        if($N == 0) $text .= "Reméljük, jövő héten te is tudsz küldeni helyesbítést.";
+        elseif($N * 5 < $M) $text .= "A te $N észrevételt küldtél bel. És pont az ilyen sok kicsi ment ilyen sokra. ";
+        else $text .= "Ebből $N templomhoz te küldtél be helyesbítést. Nagyon köszönjük! ";
+        $text .= "
+            Összesen már $L templomnak vannak fél évnél frissebb adatai, $ol $O nagyon régen frissített magyarországi templom van az adatbázisunkban.</p>\n
+            <p>A következő héten a következő ".$numbers[count($templomok)]." templom miserendjének frissítésében kérjük a te segítségedet:\n
+            ".$list."
+            <p><strong>Segítségedet nagyon köszönjük!</strong></p>\n
+            <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadisnál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre.</font></p>
+        ";
+        $mail->content = $text;
+        $mail->Send($user->email);        
+    }
+    
+    
+
+
+}
+?>  

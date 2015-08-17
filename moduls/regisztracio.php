@@ -50,9 +50,9 @@ function regisztracio_add() {
 	if($u_id>0) {
 		$urlap.="\n<span class=kiscim>Bejelentkezési név: </span><br><span class=alap>(Nem módosítható!)</span><br><input type=text name=ulogin readonly value='$u_login' class=urlap size=20 maxlength=20>";
 
-		$query="select email,becenev,nev,kontakt,szuldatum,nevnap,msn,skype,nem,csaladiallapot,foglalkozas,magamrol,vallas,orszag,varos,nyilvanos from user where uid='$u_id' and ok='i'";
+		$query="select email,becenev,nev,kontakt,szuldatum,nevnap,msn,skype,nem,csaladiallapot,foglalkozas,magamrol,vallas,orszag,varos,nyilvanos, volunteer from user where uid='$u_id' and ok='i'";
 		$lekerdez=mysql_db_query($db_name,$query);
-		list($email,$becenev,$nev,$kontakt,$szuldatum,$nevnap,$msn,$skype,$nem,$csaladiallapot,$foglalkozas,$magamrol,$vallas,$orszag,$varos,$nyilvanos)=mysql_fetch_row($lekerdez);
+		list($email,$becenev,$nev,$kontakt,$szuldatum,$nevnap,$msn,$skype,$nem,$csaladiallapot,$foglalkozas,$magamrol,$vallas,$orszag,$varos,$nyilvanos,$volunteer)=mysql_fetch_row($lekerdez);
 
 		$urlap.="\n<br><br><span class=kiscim>Jelszó (jelenlegi): </span><br><span class=alap>(FONTOS! Minden módosításhoz meg kell adni!)</span><br><input type=password name=oldjelszo class=urlap size=20 maxlength=20>";
 		
@@ -121,6 +121,13 @@ function regisztracio_add() {
 		$urlap.=">$y</option>";
 	}
 	$urlap.="</select></td></tr>";
+
+//Nem
+	$urlap.="\n<tr><td valign=top bgcolor=#FFFFFF><span class=kiscim>Önkéntesség: </span><br><input type=checkbox name=volunteer class=urlap value=1";
+	if($volunteer == 1) $urlap.=" checked";
+	$urlap.="><span class=alap>Vállalom, hogy hetente hét régen frissült templom miserendjét megpróbálom megtudakolni és megosztani a többiekkel.</span>";
+
+	$urlap.="\n</td><td valign=top bgcolor=#FFFFFF><span class=alap>Nyilvános</span></td></tr>";
 
 //Lakhely
 	if(empty($orszag)) $orszag='Magyarország';
@@ -290,6 +297,8 @@ function regisztracio_adding() {
 	$msn=$_POST['msn'];
 	$csaladiallapot=$_POST['csaladiallapot'];
 	$nyilvanosT=$_POST['nyilvanosT'];
+	$volunteer=$_POST['volunteer'];
+
 	if(is_array($nyilvanosT)) {
 		foreach($nyilvanosT as $kulcs=>$ertek) {
 			$nyilvanosT2[]="$kulcs-$ertek";
@@ -317,7 +326,7 @@ function regisztracio_adding() {
 		}
 		if(!$hiba) {
 			if(!empty($ujjelszo1)) $ujjelszo=", jelszo='".base64_encode($ujjelszo1)."'";
-			$query="update user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', szuldatum='$szuldatum', nevnap='$nevnap', skype='$skype', msn='$msn', nem='$nem', csaladiallapot='$csaladiallapot', foglalkozas='$foglalkozas', magamrol='$magamrol', vallas='$vallas', orszag='$orszag', varos='$varos', nyilvanos='$nyilvanos', regip='$ip ($host)', atvett='n' $ujjelszo where uid='$u_id'";
+			$query="update user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', szuldatum='$szuldatum', nevnap='$nevnap', skype='$skype', msn='$msn', nem='$nem', csaladiallapot='$csaladiallapot', foglalkozas='$foglalkozas', magamrol='$magamrol', vallas='$vallas', orszag='$orszag', varos='$varos', nyilvanos='$nyilvanos', regip='$ip ($host)', atvett='n', volunteer='$volunteer' $ujjelszo where uid='$u_id'";
 			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 
 			//Sessionben is módosítani kell a nemet és a szülinapot
@@ -364,7 +373,7 @@ function regisztracio_adding() {
 			$jelszo1 = str_shuffle($login).$szam1;
 			$jelszo=base64_encode($jelszo1);
 
-			$query="insert user set nev='$nev', email='$email', kontakt='$kontakt', jelszo='$jelszo', ok='i', jogok='$jogok', login='$login', letrehozta='$u_login', regdatum='$most'";
+			$query="insert user set nev='$nev', email='$email', kontakt='$kontakt', jelszo='$jelszo', ok='i', jogok='$jogok', login='$login', letrehozta='$u_login', regdatum='$most', volunteer='$volunteer'";
 			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 
 			//email küldése

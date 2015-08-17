@@ -19,8 +19,8 @@ function user_add($uid) {
 	global $sessid,$m_id,$db_name,$u_id;
 
 	if($uid>0) {
-		$query="select login,jogok,ok,regdatum,lastlogin,lastactive,email,becenev,nev,kontakt,magamrol,msn,skype,vallas,orszag,varos,csaladiallapot,szuldatum,nevnap,foglalkozas from user where uid='$uid'";
-		list($ulogin,$ujogok,$ok,$regdatum,$lastlogin,$lastactive,$email,$becenev,$nev,$kontakt,$magamrol,$msn,$skype,$vallas,$orszag,$varos,$csaladiallapot,$szuldatum,$nevnap,$foglalkozas)=mysql_fetch_row(mysql_db_query($db_name,$query));
+		$query="select login,jogok,ok,regdatum,lastlogin,lastactive,email,becenev,nev,kontakt,magamrol,msn,skype,vallas,orszag,varos,csaladiallapot,szuldatum,nevnap,foglalkozas, volunteer from user where uid='$uid'";
+		list($ulogin,$ujogok,$ok,$regdatum,$lastlogin,$lastactive,$email,$becenev,$nev,$kontakt,$magamrol,$msn,$skype,$vallas,$orszag,$varos,$csaladiallapot,$szuldatum,$nevnap,$foglalkozas,$volunteer)=mysql_fetch_row(mysql_db_query($db_name,$query));
 	}
 
 	$urlap="\n<form method=post>";
@@ -45,6 +45,11 @@ function user_add($uid) {
 	$urlap.="\n<br><br><span class=kiscim>Engedélyezés/kizárás: </span><br><input type=checkbox name=ok value='i' class=urlap";
 	if($ok!='n') $urlap.=' checked';
 	$urlap.='><span class=alap> aktív</span>';
+
+//Önkéntes
+	$urlap.="\n<br><br><span class=kiscim>Önkéntes: </span><br><input type=checkbox name=volunteer value='1' class=urlap";
+	if($volunteer == 1) $urlap.=' checked';
+	$urlap.='><span class=alap> Heti hét templom frissítője.</span>';
 
 //Jogosultság	
 	$urlap.="\n<br><br><span class=kiscim>Jogosultságok: </span>";
@@ -118,6 +123,8 @@ function user_adding() {
 	if(is_array($jogokT)) $jogok=implode('-',$jogokT);
 	$kontakt=$_POST['kontakt'];
 	$most=date('Y-m-d H:i:s');
+	$volunteer=$_POST['volunteer'];
+
 
 	if(!empty($jelszo)) {
 		if($jelszo=$jelszo1) {
@@ -142,7 +149,7 @@ function user_adding() {
 	}
 
 	if(!$hiba) {
-		$query="$parameter1 user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', magamrol='$magamrol', orszag='$orszag', varos='$varos', msn='$msn', skype='$skype', foglalkozas='$foglalkozas', ok='$ok', jogok='$jogok' $parameter2";
+		$query="$parameter1 user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', magamrol='$magamrol', orszag='$orszag', varos='$varos', msn='$msn', skype='$skype', foglalkozas='$foglalkozas', ok='$ok', jogok='$jogok', volunteer='$volunteer'  $parameter2";
 		if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 		if($uj) $uid=mysql_insert_id();
 
