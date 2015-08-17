@@ -1732,6 +1732,8 @@ function str_putcsv($input, $delimiter = ',', $enclosure = '"') {
 }
 
 function assignUpdates() {
+    global $config;
+
     $numbers = array('nulla','egy','kettő','három','négy','öt','hat','hét','nyolc','kilenc','tiz');
 
     $query = "
@@ -1774,7 +1776,8 @@ function assignUpdates() {
         $list = "<ul>";
         foreach ($templomok as $tid => $templom) {
             $query = "INSERT INTO updates (uid,tid) VALUES (".$uid.",".$tid.");";
-            mysql_query($query);
+            if($config['debug'] < 1) mysql_query($query);
+            else echo $query."\n<br/>";
             $list .= "<li><a href='http://miserend.hu/?templom=".$templom['id']."'>".$templom['nev']."</a>";
             if($templom['ismertnev'] != '') $list .= " (".$templom['ismertnev'].")";
             $list .= ", ".$templom['varos'];
@@ -1845,22 +1848,72 @@ function assignUpdates() {
         $text = "
             <strong>Kedves $nev!</strong>\n
             <p>A <a href='http://miserend.hu'>miserend.hu</a>-n a múlt héten $M magyarországi templomhoz kaptunk észrevételt. ";
-        if($N == 0) $text .= "Reméljük, jövő héten te is tudsz küldeni helyesbítést.";
+        if($N == 0) $text .= "Reméljük, a héten te is tudsz küldeni helyesbítést.";
         elseif($N * 5 < $M) $text .= "A te $N észrevételt küldtél bel. És pont az ilyen sok kicsi ment ilyen sokra. ";
         else $text .= "Ebből $N templomhoz te küldtél be helyesbítést. Nagyon köszönjük! ";
         $text .= "
             Összesen már $L templomnak vannak fél évnél frissebb adatai, $ol $O nagyon régen frissített magyarországi templom van az adatbázisunkban.</p>\n
             <p>A következő héten a következő ".$numbers[count($templomok)]." templom miserendjének frissítésében kérjük a te segítségedet:\n
-            ".$list."
-            <p><strong>Segítségedet nagyon köszönjük!</strong></p>\n
-            <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadisnál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre.</font></p>
+            ".$list;
+            
+        $text .= <<<EOT
+            <p>Amire érdemes figyelni információ kereséskor:</p>
+            <ul>
+                <li>Nem csak azktuális misrendre szükséges rákérdezni, hanem minden más időszak miserendjére is. Pl. téli/nyári miserend, adventi idő, hétköznapra eső ünnepek. (Bármilyen egyéb időszak is felvihető a rendszerünkbe.)</li>
+                <li>Fontos megtudni, hogy mikor van a téli/nyári időszak határa (és minden más időszak határa). A tanévvel van összehangolva? Vagy a napfordulóval? Esetleg egy konkrét ünneppel?</li>
+                <li>A legbiztosabb információt közvetlen az atyától, sekrestyéstől vagy titkártól lehet kapni. A plébániai honlapok nagyon sokszor teljesen elavultak és amúgy is csak az aktuális misrendet tartalmazzák.</li>
+                <li>Ha a pléábniához nincs megfelelő elérhetőség, akkor az egyházmegyei honlapot ill. annak használhatatlansága esetén az egyházmegyei titkárságot érdemes megkeresni. Ha sikerül élő elérhetőséget szerezni a plébániához, akkor azt is küldjük be a miseadatokkal. (Személyes mobilszámokat csak akkor adjunk meg, ha a tulajdonos hozzájárult, hogy megjelenjen a honlapon.)</li>
+                <li>Egy-egy plébániához/paphoz általában több templom is tartozik. Ha már sikerült felvenni egy illetékessel a kapcsolatot, akkor érdemes lehet a fíliák és kapcsolódó templomok adatait is megtudni.</li>
+                <li>Ha hiába régen volt már frissítés, mégis minden adat stimmel a honlapunkon, akkor is kérünk visszajelzést, hogy tudjuk, nem kell újra ellenőrizni.</li>
+            </ul>
+
+EOT;
+        $text .= "<p><strong>Segítségedet nagyon köszönjük!</strong></p><p>&nbsp;&nbsp;A miserend.hu önkéntes csapata</p>\n
+            <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadisnál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
         ";
         $mail->content = $text;
         $mail->Send($user->email);        
     }
-    
-    
+}
 
+function updatesCampaign() {
+    global $twig, $design_url, $user;
 
+         $query = "SELECT count(*) FROM user WHERE ok = 'i'  AND volunteer = 1;";
+        $result = mysql_query($query);
+        $tmp = mysql_fetch_row($result);
+        $C = $tmp[0];
+
+        $query = "
+            SELECT count(*) FROM templomok t
+                WHERE frissites < '".date('Y-m-d',strtotime("-2 years"))."' 
+                    AND ok = 'i' 
+                    AND orszag = 12
+                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+        ;";
+        $result = mysql_query($query);
+        $tmp = mysql_fetch_row($result);
+        $O = $tmp[0];
+
+        $W = date('W',strtotime('2015-12-24')) - date('W');
+
+        $S = (int) ( $O / $W / 7 ) + 1;
+
+        if($O > $L ) $ol = "de még";
+        else $ol = "és már csak";
+
+    $dobozszoveg = "<span class='alap'>Alig $S önkéntes heti hét templom miserendjének frissítésével karácsonyra naprakésszé teheti az összes magyarországi templomot. <strong>Már $C ember segít nekünk. ";
+
+    if($user->volunteer != 1) $dobozszoveg .= "Jelentkezz te is: <a href='mailto:eleklaszlosj@gmail.com?subject=Önkéntesnek jelentkezem'>eleklaszlosj@gmail.com</a>!";
+    else $dobozszoveg .= "Köszönjük, hogy te is köztük vagy!";
+    $dobozszoveg .= "</strong></span>";
+EOD;
+    
+    $variables = array(
+            'header' => array('content'=>'Hét nap, hét frissítés'),
+            'content' => nl2br($dobozszoveg),
+            'settings' => array('width=100%','align=center','style="padding:1px"'),
+            'design_url' => $design_url);       
+    return $twig->render('doboz_lila.html',$variables); 
 }
 ?>  

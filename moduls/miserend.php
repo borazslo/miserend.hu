@@ -451,7 +451,7 @@ function miserend_index() {
     	SELECT f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
     		LEFT JOIN templomok t ON t.id = f.tid
     	WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = ".$user->uid."
-    	ORDER BY orszag, varos, nev;");
+    	ORDER BY nev;");
     while($row=mysql_fetch_row($results,MYSQL_ASSOC)) {
     	$row['li'] = "<a class='link' href='?templom=".$row['tid']."'>".$row['nev'];
     	if($row['ismertnev'] != '') $row['li'] .= " (".$row['ismertnev'].")";
@@ -475,8 +475,9 @@ function miserend_index() {
         'igehelyek' => $igehelyek,
         'elmelkedes' => $elmelkedes,
         'design_url' => $design_url,
-        'alert' => LiturgicalDayAlert('html'));		
-
+        'alert' => LiturgicalDayAlert('html'),
+        'campaign' => updatesCampaign(),	
+       );
 	$variables['template'] = 'home';
 
 	return $variables;
@@ -1176,6 +1177,7 @@ function miserend_view() {
             'szomszedok' => $szomszedok,
             'napok' => array('','hétfő','kedd','szerda','csütörtök','péntek','szombat','<font color=#AC282B><b>vasárnap</b></font>'),
             'design_url'=>$design_url,
+            'campaign' => updatesCampaign(),
             'alert' => LiturgicalDayAlert('html'));		
         $variables['template'] = 'church';
         $variables['scripts'] = $script;
@@ -1202,7 +1204,7 @@ function androidreklam() {
 		$dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\"  onclick=\"ga('send','event','Advertisment','play.google.com','liladoboz-kep')\">
   <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" style=\"display:block;margin-right:auto;margin-left:auto;width:100%;max-width:172px\" /></a>";
   	else
-    	$dobozszoveg = '<center><a href="https://geo.itunes.apple.com/us/app/miserend/id967827488?mt=8" style="display:inline-block;overflow:hidden;background:url(http://linkmaker.itunes.apple.com/images/badges/en-us/badge_appstore-lrg.svg) no-repeat;width:165px;height:40px;" onclick="ga(\'send\',\'event\',\'Advertisment\',\'itunes.apple.com\',\'liladoboz-kep\')\"></a></centerx';
+    	$dobozszoveg = '<center><a href="https://geo.itunes.apple.com/us/app/miserend/id967827488?mt=8" style="display:inline-block;overflow:hidden;background:url(http://linkmaker.itunes.apple.com/images/badges/en-us/badge_appstore-lrg.svg) no-repeat;width:165px;height:40px;" onclick="ga(\'send\',\'event\',\'Advertisment\',\'itunes.apple.com\',\'liladoboz-kep\')\"></a></center>';
 
   	return $dobozszoveg;
 	
