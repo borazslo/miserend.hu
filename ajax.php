@@ -163,6 +163,14 @@ switch ($_REQUEST['q']) {
             $return[] = $row['name'];
         }
         echo json_encode(array('events'=>$return));
+        break;
+    case 'Favorite':
+        if(!is_numeric($_REQUEST['tid'])) break;
+        if($_REQUEST['method'] == 'add') {
+            mysql_query("INSERT INTO favorites (uid,tid) VALUES (".$user->uid.",".$_REQUEST['tid'].");");
+        } else if($_REQUEST['method'] == 'del') {
+            mysql_query("DELETE FROM favorites WHERE uid = ".$user->uid." AND tid = ".$_REQUEST['tid']." LIMIT 1");
+        }
         break;    
     default:
         //code to be executed if n is different from all labels;

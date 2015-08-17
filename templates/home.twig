@@ -79,6 +79,19 @@
   
 <div style="background-color:#CCCCCC;height:3px;margin-top:10px;margin-bottom:10px;width:100%"></div>
 <div class="screenonly">{{ kepek|raw }}</div>
+
+<div style="background-color:#CCCCCC;height:3px;margin-top:10px;margin-bottom:10px;width:100%"></div>
+<img src="img/negyzet_kek.gif" align="absmiddle">
+<img src="img/space.gif" width="5" height="5">
+<span class="dobozcim_fekete">Kedvenc templomok</span>
+{% if favorites|length > 0 %}
+    <ul>
+    {% for key, item in favorites %}<li class="link">{{ item.li|raw }}</li>{% endfor %}
+    </ul>
+{% else %}
+    <p class="alap"><i>Bejelentkezett felhasználóink megjelelölhetnek templomokat kedvencként.</i></p>
+{% endif %}
+
  <!--
 <table width="100%" border="0" cellspacing="0" cellpadding="0">   
   <tr> 

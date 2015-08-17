@@ -154,3 +154,16 @@ div.rightside.footer , div.leftside.footer {
         margin-left: 0px;
     }
 }    
+
+.yellow { color: yellow; }
+.red { color: red; }
+
+.grey
+{
+    color: #989898;
+}
+
+.ui-tooltip {
+    padding: 4px !important;
+    font-size: 10pt !important;
+  }

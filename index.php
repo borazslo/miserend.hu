@@ -115,6 +115,7 @@ else {
 /////////////////////////////////
 //tartalmi rész összeállítása
 /////////////////////////////////
+    $script .= '<link href="css/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />'."\n";
     $script .= '<script src="/bower_components/jquery/dist/jquery.min.js"></script>'."\n";
     $script .= '<script src="/bower_components/jquery-ui/jquery-ui.js"></script>'."\n";
     $script .= '<script src="/bower_components/jquery-ui/ui/autocomplete.js"></script>'."\n";

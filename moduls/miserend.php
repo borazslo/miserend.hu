@@ -445,8 +445,23 @@ function miserend_index() {
     //statisztika
     $statisztika = miserend_printRegi();
     
+    //kedvencek
+    $favorites = array();
+    $results = mysql_query("
+    	SELECT f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
+    		LEFT JOIN templomok t ON t.id = f.tid
+    	WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = ".$user->uid."
+    	ORDER BY orszag, varos, nev;");
+    while($row=mysql_fetch_row($results,MYSQL_ASSOC)) {
+    	$row['li'] = "<a class='link' href='?templom=".$row['tid']."'>".$row['nev'];
+    	if($row['ismertnev'] != '') $row['li'] .= " (".$row['ismertnev'].")";
+    	$row['li'] .= "</a>, ".$row['varos'];
+    	$favorites[$row['tid']] = $row;
+    }
+    
 	global $twig;
 	$variables = array(
+		'favorites' => $favorites,
 		'scripts' => $script,
 		'formnyit' => $formnyit,
 		'formvalaszt' => $formvalaszt,
@@ -1132,9 +1147,16 @@ function miserend_view() {
        }
        else $help = '';
     
+    $result = mysql_query("SELECT id FROM favorites WHERE uid = ".$user->uid." AND tid = ".$tid." LIMIT 1");
+    if(mysql_num_rows($result) == 1 AND $user->uid > 0 ) $favorite = 1;
+    elseif($user->uid > 0) $favorite = 0;
+    else $favorite = -1;
+
 	if($vane>0) {
         $variables = array(
+        	'tid'=>$tid,
             'nev'=>$nev,'ismertnev'=>$ismertnev,
+            'favorite' => $favorite,
             'varos' => $varos,
             'frissites' => $frissites,
             'nyari' => $nyari,

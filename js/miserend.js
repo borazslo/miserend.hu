@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    $( document ).tooltip();
+
 	$(function() {
         $('#tkereses').on('submit', function(e) { //use on if jQuery 1.7+
             e.preventDefault();  //prevent form from submitting               
@@ -64,6 +66,27 @@ $(document).ready(function() {
 		console.log($( this ));
 		$( this ).next().toggle('slow');
 	});
+
+  // favorites
+  $(document).on('click','#star',function(){
+    var $this= $(this);
+
+    if($(this).hasClass('grey')) var method = 'add';
+    else var method = 'del';
+    var tid = $(this).attr("data-tid");
+
+    $.ajax({
+       type:"POST",
+       url:"ajax.php?q=Favorite",
+       data:"tid="+tid+"&method="+method,
+       success:function(response){
+          $("#star").toggleClass("grey yellow");          
+          if($("#star").hasClass('grey')) $("#star").attr('title', 'Kattintásra hozzáadás a kedvencekhez.');
+          else $("#star").attr('title', 'Kattintásra törlés a kedvencek közül.');
+      }, 
+    });
+  
+  });
 
 
 });
