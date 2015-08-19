@@ -128,6 +128,7 @@ function getuser() {
     }
 
     $return = new User($uid);
+    if($return->uid > 0) $return->loggedin = true;
     return $return;
 }
 

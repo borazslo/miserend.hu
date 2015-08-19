@@ -101,69 +101,6 @@ function user_add($uid) {
 	return $kod;
 }
 
-function user_adding() {
-	global $_POST,$_FILES,$user;
-
-	$uid=$_POST['uid'];
-	$nev=$_POST['nev'];
-	$becenev=$_POST['becenev'];
-	$email=$_POST['email'];
-	$orszag=$_POST['orszag'];
-	$varos=$_POST['varos'];
-	$magamrol=$_POST['magamrol'];
-	$foglalkozas=$_POST['foglalkozas'];
-	$skype=$_POST['skype'];
-	$msn=$_POST['msn'];
-	$login=$_POST['ulogin'];
-	$ok=$_POST['ok'];
-	if($ok!='i') $ok='n';
-	$jelszo=$_POST['ujelszo'];
-	$jelszo1=$_POST['ujelszo1'];
-	$jogokT=$_POST['jogok'];
-	if(is_array($jogokT)) $jogok=implode('-',$jogokT);
-	$kontakt=$_POST['kontakt'];
-	$most=date('Y-m-d H:i:s');
-	$volunteer=$_POST['volunteer'];
-
-
-	if(!empty($jelszo)) {
-		if($jelszo=$jelszo1) {
-			$jelszo=base64_encode($jelszo);
-			$jelszomod=", jelszo='$jelszo'";
-		}
-		else {
-			$hiba=true;
-			$hibauzenet='HIBA! A beírt két jelszó nem egyezik!';
-		}
-	}
-
-	if($uid>0) {
-		$uj=false;
-		$parameter1='update';
-		$parameter2="$jelszomod where uid='$uid'";
-	}
-	else {
-		$uj=true;
-		$parameter1='insert';
-		$parameter2="$jelszomod ,login='$login', letrehozta='".$user->login."', regdatum='$most'";
-	}
-
-	if(!$hiba) {
-		$query="$parameter1 user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', magamrol='$magamrol', orszag='$orszag', varos='$varos', msn='$msn', skype='$skype', foglalkozas='$foglalkozas', ok='$ok', jogok='$jogok', volunteer='$volunteer'  $parameter2";
-		if(!mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
-		if($uj) $uid=mysql_insert_id();
-
-		$kod=user_add($uid);
-	}
-	else {
-		$adatT[2]="<span class=alcim>Felhasználók szerkesztése</span><br><br><span class=hiba>$hibauzenet</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
-		$tipus='doboz';
-		$kod.=formazo($adatT,$tipus);	
-	}
-
-	return $kod;
-}
-
 function user_mod() {
 	global $db_name,$linkveg,$m_id,$sid,$_POST;
 
@@ -239,39 +176,22 @@ function user_mod() {
 	return $kod;
 }
 
-function user_del() {
-	global $_GET,$db_name,$linkveg,$m_id;
+function user_del($uid) {
+	global $m_id;
 
-	$uid=$_GET['uid'];
-
-	$kiir="\n<span class=kiscim>Biztosan törölni akarod a következő felhasználót?</span>";
-	
-	$query="select login,nev from user where uid='$uid'";
-	list($ulogin,$unev)=mysql_fetch_row(mysql_db_query($db_name,$query));
-
-	$kiir.="\n<br><br><span class=alap>$ulogin ($unev)</span>";
-
-	$kiir.="<br><br><a href=?m_id=$m_id&m_op=delete&uid=$uid$linkveg class=link>Igen</a> - <a href=?m_id=$m_id&m_op=mod$linkveg class=link>NEM</a>";
-
+	$user2delete = new User($uid);
+	if($user2delete->uid == 0) {
+		$kiir="\n<span class=kiscim>Nincs ilyen felhasználó!</span>";
+	} else {
+		$kiir="\n<span class=kiscim>Biztosan törölni akarod a következő felhasználót?</span>";
+		$kiir.="\n<br><br><span class=alap>".$user2delete->username." (".$user2delete->nev.")</span>";
+		$kiir.="<br><br><a href=?m_id=$m_id&m_op=delete&uid=$uid class=link>Igen</a> - <a href=?m_id=$m_id&m_op=mod class=link>NEM</a>";
+	}
 	$adatT[2]="<span class=alcim>Felhasználók szerkesztése - törlés</span><br><br>".$kiir;
 	$tipus='doboz';
 	$tartalom.=formazo($adatT,$tipus);	
 	
 	$kod=$tartalom;
-
-	return $kod;
-}
-
-function user_delete() {
-	global $_GET,$user->uid;
-
-	$uid=$_GET['uid'];
-	if($uid!=$user->uid) {
-		$query="delete from user where uid='$uid'";
-		mysql_query($query);
-	}
-
-	$kod=user_mod();
 
 	return $kod;
 }
@@ -296,15 +216,34 @@ switch($m_op) {
         break;
 
     case 'adding':
-        $tartalom=user_adding();
+    	if(!isset($vars['uid'])) $vars['uid'] = 0;
+        $mod = new User($vars['uid']);
+
+		$return = $mod->submit($_REQUEST);
+		
+		if($return == 1) $kod=user_add($mod->uid);
+		else {
+			$adatT[2]="<span class=alcim>Felhasználók szerkesztése</span><br><br><span class=hiba>".implode('<br/>',$return)."</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
+			$tipus='doboz';
+			$tartalom .= formazo($adatT,$tipus);	
+		}
+
         break;
 
     case 'del':
-        $tartalom=user_del();
+        $tartalom=user_del($_REQUEST['uid']);
         break;
 
 	case 'delete':
-        $tartalom=user_delete();
+		if(is_numeric($_REQUEST['uid']) AND $user->checkRole('user') AND $user->uid != $_REQUEST['uid']) {
+			$user2delete = new User($_REQUEST['uid']);
+			$user2delete->delete();
+		} else {
+			//TODO: elegánsabb hibakezelést!
+			die('No-no! Nem lehetséges így a törlés!');
+		}
+        
+        $tartalom = user_mod();
         break;
 }
 }

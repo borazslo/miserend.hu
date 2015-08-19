@@ -82,7 +82,7 @@ function design(&$vars) {
 	$vars['sidebar']['left']['blocks'] = array();
 
 	//BLOCK - ADMINMENU
-	if(preg_replace('/-/i','',$user->jogok) != '' ) {
+	if($user->checkRole("'any'")) {
 		$adminmenuitems = array(
 				array(
 					'title'=> 'Miserend','url'=> '?m_id=27','permission' => 'miserend','mid'=>27,
@@ -123,7 +123,7 @@ function design(&$vars) {
 	}
 
 	//BLOCK - CHAT
-	if(preg_replace('/-/i','',$user->jogok) != '' ) {
+	if($user->checkRole("'any'")) {
 		$chat = array(
 			'content' => chat_html(),
 			'bgcolor'=>'#ECE5C8',

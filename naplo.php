@@ -20,13 +20,11 @@ function teendok($id,$kod) {
 
 	$sid=$_GET['sid'];
 
-	$jogok = $user->jogok;
-
 	if($kod=='templomok') {
 		$query="select nev,ismertnev,varos,letrehozta,megbizhato from templomok where id='$id'";
 		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
 		list($nev,$ismertnev,$varos,$feltolto,$megbizhato)=mysql_fetch_row($lekerdez);
-		if(!strstr($jogok,'miserend') and !($user->login==$feltolto and $megbizhato=='i')) {
+		if(!$user->checkRole('miserend') and !($user->username==$feltolto and $megbizhato=='i')) {
 			echo $header.$kidob.$footer;
 			exit();
 		}
@@ -104,7 +102,7 @@ function teendok($id,$kod) {
 		$query="select cim,datum,feltette,megbizhato from hirek where id='$id'";
 		if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
 		list($cim,$datum,$feltolto,$megbizhato)=mysql_fetch_row($lekerdez);
-		if(!strstr($jogok,'hirek') and !($user->login==$feltolto and $megbizhato=='i')) {
+		if($user->checkRole('hirek') and !($user->login==$feltolto and $megbizhato=='i')) {
 			echo $header.$kidob.$footer;			
 			exit();
 		}
@@ -183,8 +181,6 @@ function mod() {
 	$eid=$_POST['eid'];
 	$adminmegj=$_POST['adminmegj'];
 	$megbizhato=$_POST['megbizhato'];
-
-	$jogok = $user->jogok;
 
 	$most=date('Y-m-d H:i:s');
 	$mostkiir=date('Y-m-d H:i');

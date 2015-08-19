@@ -20,7 +20,7 @@ switch ($_REQUEST['q']) {
         echo $twig->render('admin_form_particular.html', $form);  
         break;
     case 'ChatSave':
-        if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
+        if(!$user->checkRole("'any'")) { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
         $text = sanitize($_REQUEST['text']);
         if(preg_match('/^\$(\w+)/si',$text,$match)) { 
             $kinek = $match[1]; 
@@ -43,7 +43,7 @@ switch ($_REQUEST['q']) {
         //code to be executed if n=label3;
         break;
     case 'ChatLoad':
-        if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
+        if(!$user->checkRole("'any'")) { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
         $date = date('Y-m-d H:i:s',strtotime($_REQUEST['date']));
         if(!isset($_REQUEST['rev']))
             $comments = chat_getcomments(array('last'=>$date));
@@ -59,7 +59,7 @@ switch ($_REQUEST['q']) {
         echo json_encode(array('result'=>'loaded','comments'=>$comments,'new'=>count($comments),'alert'=>$alert));
         break;
     case 'ChatUsers':
-        if($user->jogok == '') { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
+        if(!$user->checkRole("'any'")) { echo json_encode(array('result'=>'error','text'=>'Hiányzó jogosultság')); break; }
         $text = chat_getusers('html');
         echo json_encode(array('result'=>'loaded','text'=>$text));
         break;
