@@ -4,7 +4,7 @@
     $tinymce_host = $_SERVER['SERVER_NAME'];
     $edit_script="\n";
 
-    $edit_script.='<script language="javascript" type="text/javascript" src="jscripts2/tiny_mce/tiny_mce.js"></script>'."\n";
+    $edit_script.='<script language="javascript" type="text/javascript" src="js/tiny_mce/tiny_mce.js"></script>'."\n";
     $edit_script.='<script language="javascript" type="text/javascript">'."\n";
     $edit_script.='   tinyMCE.init({'."\n";
     $edit_script.='	language : "hu",'."\n";

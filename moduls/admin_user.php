@@ -16,7 +16,7 @@ function user_index() {
 }
 
 function user_add($uid) {
-	global $sessid,$m_id,$db_name,$u_id;
+	global $sessid,$m_id,$db_name,$user;
 
 	if($uid>0) {
 		$query="select login,jogok,ok,regdatum,lastlogin,lastactive,email,becenev,nev,kontakt,magamrol,msn,skype,vallas,orszag,varos,csaladiallapot,szuldatum,nevnap,foglalkozas, volunteer from user where uid='$uid'";
@@ -102,7 +102,7 @@ function user_add($uid) {
 }
 
 function user_adding() {
-	global $_POST,$_FILES,$u_login,$db_name;
+	global $_POST,$_FILES,$user;
 
 	$uid=$_POST['uid'];
 	$nev=$_POST['nev'];
@@ -145,12 +145,12 @@ function user_adding() {
 	else {
 		$uj=true;
 		$parameter1='insert';
-		$parameter2="$jelszomod ,login='$login', letrehozta='$u_login', regdatum='$most'";
+		$parameter2="$jelszomod ,login='$login', letrehozta='".$user->login."', regdatum='$most'";
 	}
 
 	if(!$hiba) {
 		$query="$parameter1 user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', magamrol='$magamrol', orszag='$orszag', varos='$varos', msn='$msn', skype='$skype', foglalkozas='$foglalkozas', ok='$ok', jogok='$jogok', volunteer='$volunteer'  $parameter2";
-		if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
+		if(!mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
 		if($uj) $uid=mysql_insert_id();
 
 		$kod=user_add($uid);
@@ -263,12 +263,12 @@ function user_del() {
 }
 
 function user_delete() {
-	global $_GET,$db_name,$u_id;
+	global $_GET,$user->uid;
 
 	$uid=$_GET['uid'];
-	if($uid!=$u_id) {
+	if($uid!=$user->uid) {
 		$query="delete from user where uid='$uid'";
-		mysql_db_query($db_name,$query);
+		mysql_query($query);
 	}
 
 	$kod=user_mod();
@@ -277,7 +277,7 @@ function user_delete() {
 }
 
 
-if(strstr($u_jogok,'user')) {
+if($user->checkRole('user')) {
 	//Csak, ha van user jogosultsága!
 
 switch($m_op) {

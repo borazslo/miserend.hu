@@ -9,17 +9,17 @@ include_once('functions_osm.php');
 include_once('classes.php');
 include_once("design.php");
 
-
 if($config['debug'] > 0)  error_reporting(E_ERROR | E_WARNING | E_PARSE);
 else error_reporting(0);
 
+//TODO: megszűntetni?
+$vars['design_url'] = $design_url = $config['path']['domain'];
+
+//TODO: megszűntetni a $db_name-t. Bár akkor már PDO mindenhiva
 $db_name = $config['connection']['database'];
 dbconnect();
 
-//URL ellenőrzése, hátha másik honlapra kell átirányítani
-include_once('ell.php');
-$urlT=url_ell();
-
+//Felhasználó kezelé
 if(isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {
     unset($_SESSION['auth']);
     unset($_COOKIE['auth']);
@@ -29,23 +29,16 @@ if(isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {
 if(isset($_REQUEST['login'])) {
     if(!login($_REQUEST['login'],$_REQUEST['passw'])) {
         $loginhiba = 'Hibás név és/vagy jelszó!';
-
     }
 }
 
 $user = getuser();
 if($user->loggedin) mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$user->uid." LIMIT 1;");
 
-/*
-//Letiltott IP-ről van-e szó
-$tiltott_IP_T=ip_ell($fooldal_id);
-//$tiltott_IP és belep_tiltott_IP true vagy false
-/**/
 
-//Twig       
+//Twig and the templates
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
-
 
 if(isset($_REQUEST['template'])) $_SESSION['template'] = $_REQUEST['template'];
 if(!isset($_SESSION['template'])) $_SESSION['template'] = 'templates'; 
@@ -55,10 +48,13 @@ $loader = new Twig_Loader_Filesystem($template);
 $twig = new Twig_Environment($loader); // cache?        
 
 
+//GIT version
 exec('git rev-parse --verify HEAD 2> /dev/null', $output);
 $hash = $output[0];
 if($hash != '') $vars['version']['hash'] = $hash;
 
+
+//Custom extrapage for Android users
 if(!isset($_SESSION['isAndroidOS']) AND $_SERVER['PHP_SELF'] != '/api.php') { 
     //MobileDetect
     require_once 'vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php';        
@@ -78,10 +74,14 @@ if(!isset($_SESSION['isAndroidOS']) AND $_SERVER['PHP_SELF'] != '/api.php') {
     }    
 }
 
-if (!is_dir('fajlok/igenaptar')) {
-    die('Nincsen faljok/igenaptar könyvtár. Upsz.');
-}
 
+
+
+//
+//  Useful CONSTANTS
+//
+// ATTRIBUTES, LANGUAGES, PERIODS 
+//
 $milyen = array(
     'csal' => array(
         'abbrev' => 'csal',

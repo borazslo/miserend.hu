@@ -78,6 +78,17 @@ function login($name,$password) {
     return true;
 }
 
+function loginurlap() {
+    $bal="<span class=alcim>Felhasználói oldal</span>";
+    $bal.="<br><br><span class=alap>Ezen oldal megtekintéséhez kérlek lépj be!<br>Ha még nincs felhasználóneved, <a href=?m_id=28&fm=11 class=felsomenulink>itt</a> tudsz regisztrálni egyet. </span>";
+    
+    $adatT[2]=$bal;
+    $tipus='doboz';
+    $kod.=formazo($adatT,$tipus);   
+    
+    return $kod;
+}
+
 function getuser() {
     $salt = 'Yzsdf';
 
@@ -120,6 +131,28 @@ function getuser() {
     return $return;
 }
 
+function menuHtml($menuitems) {
+    global $user,$m_id;
+
+    $kod_tartalom = '';
+    foreach ($menuitems as $item ) {
+        if(!isset($item['permission']) OR $user->checkRole($item['permission'])) {
+            $kod_tartalom.="\n<li class='felsomenulink'><a href='".$item['url']."' class='felsomenulink'>".$item['title']."</a>";       
+            if($item['mid'] == $m_id AND isset($item['items']) AND is_array($item['items'])) {
+                foreach ($item ['items'] as $i ) {
+                    if(!isset($i['permission']) OR $user->checkRole($i['permission'])) {
+                        $kod_tartalom.="\n<br><a href='".$i['url']."' class='loginlink'>-> ".$i['title']."</a>";
+                    }
+                }
+            }
+            $kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
+        }
+    }
+    if($kod_tartalom == '') return false;
+    else return $kod_tartalom;
+
+}
+
 function cookieSave($uid,$name) {
     $salt = 'Yzsdf';
     $identifier = md5($salt . md5($uid . $salt));
@@ -135,22 +168,6 @@ function cookieSave($uid,$name) {
     mysql_query($query);
 }
 
-function nyelvmeghatarozas() {
-    global $modul_url,$linkveg;
-    //Nyelv meghatározása
-    $lang=$_POST['lang'];
-    if(!isset($lang)) $lang=$_GET['lang'];
-    if($lang=='hu') $lang='';
-        
-    if(!@include_once("$modul_url/szotar/alapszotar$lang.inc")) {
-        $hiba=true;
-        $hibauzenet_prog.='<br>Sorry, not translated this language!';
-    }
-
-    if(!empty($lang)) {
-        $linkveg.="&lang=$lang";
-    }
-}
 
 function mapquestDistance($from1,$to1) {
     global $config;
@@ -188,6 +205,12 @@ function mapquestGeocode($location) {
 
 function LirugicalDay($datum = false) {
     global $config;
+
+    //TODO: ha nincs könyvár, attól még megpróbálhatná élesben lehozni.
+    if (!is_dir('fajlok/igenaptar')) {
+        //die('Sajnos nincsen faljok/igenaptar könyvtár. Ez komoly hiba.');
+        return false;
+    }
 
     if(empty($datum)) $datum=  date('Y-m-d');
     
@@ -1872,7 +1895,7 @@ EOT;
             <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadisnál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
         ";
         $mail->content = $text;
-        $mail->Send($user->email);        
+        $mail->Send($user['email']);        
     }
 }
 
@@ -1916,4 +1939,71 @@ EOD;
             'design_url' => $design_url);       
     return $twig->render('doboz_lila.html',$variables); 
 }
+
+
+function feltoltes_block() {
+    global $user;    
+
+    $query="select id,nev,varos,eszrevetel from templomok where letrehozta='".sanitize($user->login)."' limit 0,5";
+    $lekerdez=mysql_query($query);
+    $mennyi=mysql_num_rows($lekerdez);
+    
+    if($mennyi>0) {
+        while(list($tid,$tnev,$tvaros,$teszrevetel)=mysql_fetch_row($lekerdez)) {
+            if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";       
+            elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";                     
+            else $jelzes='';
+            
+            $kod_tartalom.="\n<li class=link_kek>$jelzes<a href=?m_id=29&m_op=addtemplom&tid=$tid class=link_kek title='$tvaros'>$tnev</a></li><img src=img/space.gif width=5 height=3>";
+        }   
+
+        $kod_tartalom.="\n<li class=felsomenulink><a href=?m_id=29 class=felsomenulink>Teljes lista...</a>";
+        $kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
+    }
+
+    return $kod_tartalom;
+
+    if(!empty($kod_tartalom)) {
+        //Tartalom létrehozása
+        $kod_cim="<span class=hasabcimlink>Módosítás</span>";
+
+        $kodT[0]=$kod_cim;
+        $kodT[1]=$kod_tartalom;
+
+        return $kodT;
+    }
+}
+
+function formazo($adatT,$tipus) {
+    global $design_url,$szin,$design;
+
+    if(!isset($design)) $design='alap';
+
+    if($tipus == 'doboz') return $adatT[2];
+    
+    $cim=$adatT[0];
+    $cimlink=$adatT[1];
+    $tartalom=$adatT[2];
+    $tartalom2=$adatT[3]; //híreknél 2. hasáb
+    $tovabb=$adatT[4]; //híreknél "cikk bővebben"
+    $tovabblink=$adatT[5]; //általában a $cimlink
+        
+    $tmpl_file = $design_url.'/'.$tipus.'.htm';
+    echo $tmpl_file;
+    $thefile = implode("", file($tmpl_file));
+    $thefile = addslashes($thefile);
+    $thefile = "\$r_file=\"".$thefile."\";";
+    eval($thefile);
+    
+    return $kod = $r_file;
+}
+
+/*
+    TODO: delete alapnyelv();
+ */
+function alapnyelv($text) {
+    return $text;
+
+}
+
 ?>  

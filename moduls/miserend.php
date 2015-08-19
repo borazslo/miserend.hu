@@ -13,7 +13,7 @@ function idoszak($i) {
 }
 
 function miserend_index() {
-	global $user,$linkveg,$db_name,$m_id,$design_url,$_GET,$u_varos,$onload,$script;
+	global $user,$linkveg,$db_name,$m_id,$design_url,$_GET,$onload,$script;
    
     
 	$attributes = unserialize(ATTRIBUTES);
@@ -812,8 +812,8 @@ function miserend_misekeres() {
 		$nyelvikon='';
 		if(empty($templom[$tid])) {
 			$templomT[$tid]="<img src=img/templom1.gif align=absmiddle width=16 height=16 hspace=2><a href=?templom=$tid$linkveg class=felsomenulink><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">$tismertnev</span>";
-			if(strstr($u_jogok,'miserend')) $templomT[$tid].=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-			elseif($letrehozta==$u_login) $templomT[$tid].=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+			if(strstr($user->jogok,'miserend')) $templomT[$tid].=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+			elseif($letrehozta==$user->login) $templomT[$tid].=" <a href=?m_id=29&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 		}
 		if(!empty($mmegjegyzes)) $megj="<img src=$design_url/img/info2.gif border=0 title='$mmegjegyzes' align=absmiddle width=16 height=16>";
 		else $megj='';
@@ -955,7 +955,7 @@ function miserend_view() {
 	if($vane != 1) $titlekieg = "404";
 
 	if(!empty($turistautak)) {
-		$terkep="<br><a href=http://turistautak.hu/poi.php?id=$turistautak target=_blank title='További infók'><img src=http://www.geocaching.hu/images/mapcache/poi_$turistautak.gif border=0 vspace=5 hspace=5></a>";
+		//$terkep="<br><a href=http://turistautak.hu/poi.php?id=$turistautak target=_blank title='További infók'><img src=http://www.geocaching.hu/images/mapcache/poi_$turistautak.gif border=0 vspace=5 hspace=5></a>";
 	}
 
 	$ev=date('Y');
@@ -1000,8 +1000,14 @@ function miserend_view() {
 	if(!empty($ismertnev)) $ismertnev= $ismertnev; //"<span class=alap><i><b>Közismert nevén:</b></i><br></span><span class=dobozfocim_fekete><b><font color=#AC007A>$ismertnev</font></b></span><br><img src=img/space.gif width=5 height=7><br>";
 	$cim="<span class=alap><i>Cím:</i> <u>$varos, $cim</u></span>";
 	
-	if($checked > 0) 
-		$cim .= "<br/><span class=alap><i>Térképen:</i> <u><a href=\"http://terkep.miserend.hu/?templom=$tid\">$lat; $lng</a></u></span>";
+	if($checked > 0) {
+		$staticmap = "kepek/staticmaps/".$tid."_227x140.jpeg";
+		if(file_exists($staticmap))
+			$cim .= "<img src='kepek/staticmaps/".$tid."_227x140.jpeg'>";
+		else
+			$cim .= "<br/><span class=alap><i>Térképen:</i> <u><a href=\"http://terkep.miserend.hu/?templom=$tid\">$lat; $lng</a></u></span>";
+		
+	}
 	else
 		$cim .= "<br/><span class=alap><u><a href=\"http://terkep.miserend.hu/?templom=$tid\">Segíts megtalálni a térképen!</a></u></span>";
 	
@@ -1169,7 +1175,7 @@ function miserend_view() {
             'jotudni' => $jotudni,
             'leiras' => $leiras,
             'cim' => $cim,
-            'terkepk' => $terkep,
+            'terkep' => $terkep,
             'megkozelites' => nl2br($megkozelites),
             'kapcsolat' => $kapcsolat,
             'miseaktiv' => $miseaktiv,

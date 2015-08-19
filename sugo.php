@@ -19,10 +19,12 @@ $id=$_GET['id'];
 $idT=explode('-',$id);
 
 foreach($idT as $idk) {
-	$query="select leiras from sugo where id='$idk'";
-	$lekerdez=mysql_query($query);
-	list($leiras)=mysql_fetch_row($lekerdez);
-	$kod.="<div class='alap help'>$leiras</div>";
+	if(is_numeric($idk)) {
+		$query="select leiras from sugo where id='$idk'";
+		$lekerdez=mysql_query($query);
+		list($leiras)=mysql_fetch_row($lekerdez);
+		$kod.="<div class='alap help'>$leiras</div>";
+	}
 }
 
 $kod.="<div align=center><a href=javascript:close(); class=link><img src=img/bezar.gif border=0 aling=absmiddle> Bezár</a></div>";

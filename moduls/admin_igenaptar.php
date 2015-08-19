@@ -784,12 +784,13 @@ function modingnaptar() {
 	return $kod;
 }
 
-if(strstr($u_jogok,'igenaptar')) {
+if($user->checkRole('igenaptar')) {
 
 	switch($m_op) {
     
 	case 'index':
-        $tartalom=igenaptar_index();
+        //$tartalom=igenaptar_index();
+        $tartalom=naptar(date('m'),date('Y'));
         break;
 
     case "naptar":

@@ -1,7 +1,7 @@
 <?
 
 function naptar_jobbmenu() {
-    global $linkveg,$db_name,$elso,$m_id,$m_op,$sid,$_POST,$_GET,$bgcolor,$fooldal_id;
+    global $linkveg,$db_name,$elso,$m_id,$m_op,$sid,$_POST,$_GET,$bgcolor;
 
 	$tartalom=naptari();
 	$kodT[0]="<a href=?m_id=15$linkveg class=hasabcimlink>Eseménynaptár</a>";

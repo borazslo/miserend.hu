@@ -273,23 +273,5 @@ function chat_getusers($format = false) {
 	return $return;
 }
 
-function chat_balmenu() {
-    global $user;
-
-	$loginkiir=urlencode($u_login);
-   
-	//Tartalom létrehozása
-	$kod_cim="<span class=admincimlink>Admin üzenőfal</span>";
-
-	$kod_tartalom = chat_html();
-    if($user->jogok == '') { $kod_tartalom = 'Hiányzó jogosultság.'; }
-
-	
-	$kodT[0]=$kod_cim;
-	$kodT[1]=$kod_tartalom;
-
-    return $kodT;
-
-}
 
 ?>

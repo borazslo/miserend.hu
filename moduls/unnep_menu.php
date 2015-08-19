@@ -1,13 +1,13 @@
 <?
 
 function unnep_balmenu() {
-    global $linkveg,$lang,$db_name,$sid,$u_id,$_SERVER,$m_id,$u_jogok,$u_login,$fooldal_id,$_GET;
+    global $linkveg,$lang,$db_name,$sid,$u_id,$_SERVER,$m_id,$u_jogok,$u_login,$_GET;
 
 
 }
 
 function unnep_jobbmenu() {
-    global $linkveg,$lang,$db_name,$sid,$u_id,$_SERVER,$m_id,$u_jogok,$u_login,$fooldal_id,$design_url,$_GET;
+    global $linkveg,$lang,$db_name,$sid,$u_id,$_SERVER,$m_id,$u_jogok,$u_login,$design_url,$_GET;
 
 	
 		$kod_cim="Mindenszentek";

@@ -1,7 +1,6 @@
 <?php
 
 function miserend_index() {
-	global $linkveg,$m_id,$db_name;
 
 	$kod=miserend_adminmenu();
 
@@ -9,12 +8,12 @@ function miserend_index() {
 }
 
 function miserend_adminmenu() {
-	global $m_id,$linkveg,$u_beosztas,$db_name;
+	global $m_id;
 
 	$menu.='<span class=alcim>Templomok és miserend szerkesztése</span><br><br>';
 
-	$menu.="<a href=?m_id=$m_id&m_op=addtemplom$linkveg class=kismenulink>Új templom feltöltése</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=modtemplom$linkveg class=kismenulink>Meglévő templom módosítása, törlése, miserend hozzáadása, módosítása</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=addtemplom class=kismenulink>Új templom feltöltése</a><br>";
+	$menu.="<a href=?m_id=$m_id&m_op=modtemplom class=kismenulink>Meglévő templom módosítása, törlése, miserend hozzáadása, módosítása</a><br>";
 	$menu.="<a href=?m_id=$m_id&m_op=events class=kismenulink>Kifejezések dátummá alakítása</a><br>";
 
 
@@ -26,7 +25,7 @@ function miserend_adminmenu() {
 }
 
 function miserend_addtemplom($tid) {
-	global $sid,$linkveg,$m_id,$db_name,$onload,$u_beosztas,$u_login,$design_url;	
+	global $sid,$linkveg,$m_id,$db_name,$onload,$user,$design_url;	
 	
 	$query="select id,nev from egyhazmegye where ok='i' order by sorrend";
 	$lekerdez=mysql_db_query($db_name,$query);
@@ -122,7 +121,7 @@ function miserend_addtemplom($tid) {
   //kontakt
 	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Felelős:<br><a href=\"javascript:OpenNewWindow('sugo.php?id=2',200,300);\"><img src=img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#efefef><textarea name=kontakt class=urlap cols=50 rows=2>$kontakt</textarea><span class=alap> név és telefonszám</span><br><input type=text name=kontaktmail size=40 class=urlap value='$kontaktmail'><span class=alap> emailcím</span></td></tr>";
   //feltöltő
-	if(empty($feltolto)) $feltolto=$u_login;
+	if(empty($feltolto)) $feltolto=$user->login;
 	$urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Feltöltő (jogosult):</div></td><td bgcolor=#efefef>";
   	global $user;
   	if($user->checkRole('miserend')) {
@@ -377,7 +376,7 @@ function miserend_addtemplom($tid) {
 }
 
 function miserend_addingtemplom() {
-	global $_POST,$_SERVER,$db_name,$_FILES,$u_login,$u_beosztas;
+	global $_POST,$_SERVER,$db_name,$_FILES,$user;
 	global $config, $user;
 
 	$ip=$_SERVER['REMOTE_ADDR'];
@@ -391,7 +390,7 @@ function miserend_addingtemplom() {
 		//Ha módosítás történt
 		$lekerdez=mysql_db_query($db_name,"select megnyitva from hirek where id='$hid'");
 		list($megnyitva)=mysql_fetch_row($lekerdez);
-		if(strstr($megnyitva,$u_login)) { //és ő nyitotta meg utoljára,
+		if(strstr($megnyitva,$user->login)) { //és ő nyitotta meg utoljára,
 			mysql_db_query($db_name,"update hirek set megnyitva='' where id='$hid'"); //akkor töröljük a bejegyzést
 		}
 	}
@@ -467,8 +466,8 @@ function miserend_addingtemplom() {
 			$uj=false;
 			$parameter1='update';
 			list($log)=mysql_fetch_row(mysql_db_query($db_name,"select log from templomok where id='$tid'"));
-			$ujlog=$log."\nMod: $u_login ($most)";
-			$parameter2=", modositotta='$u_login', moddatum='$most', log='$ujlog' where id='$tid'";
+			$ujlog=$log."\nMod: ".$user->login." ($most)";
+			$parameter2=", modositotta='".$user->login."', moddatum='$most', log='$ujlog' where id='$tid'";
 
 			//Módosítjuk a hozzákapcsolódó miseidőpontoknál is az időszámítási dátumot
 			$query="update misek set datumtol='$nyariido', datmig='$teliido' where tid='$tid' and torolte=''";
@@ -477,7 +476,7 @@ function miserend_addingtemplom() {
 		else {
 			$uj=true;
 			$parameter1='insert';
-			$parameter2=", regdatum='$most', log='Add: $u_login ($most)'";
+			$parameter2=", regdatum='$most', log='Add: ".$user->login." ($most)'";
 			$frissites=" frissites='$ma', ";
 		}
 
@@ -504,7 +503,7 @@ function miserend_addingtemplom() {
 			}
 			$query = "INSERT INTO terkep_geocode (tid,lng,lat,checked) VALUES (".$tid.",".$lng.",".$lat.",1)";
 			mysql_query($query);
-			$query = "INSERT INTO terkep_geocode_suggestion (tid,tchecked,slng,slat,uid) VALUES (".$tid.",".$geocode['checked'].",".$lng.",".$lat.",'".$u_login."')";
+			$query = "INSERT INTO terkep_geocode_suggestion (tid,tchecked,slng,slat,uid) VALUES (".$tid.",".$geocode['checked'].",".$lng.",".$lat.",'".$user->login."')";
 			mysql_query($query);			
 		} 
 		if($lng != '' AND $lat != '') {
@@ -617,7 +616,7 @@ function miserend_addingtemplom() {
 }
 
 function miserend_modtemplom() {
-	global $db_name,$linkveg,$m_id,$_POST,$u_login,$sid;
+	global $db_name,$linkveg,$m_id,$_POST,$user,$sid;
 
 	$egyhazmegye=$_POST['egyhazmegye'];
 	if($egyhazmegye=='0') $egyhazmegye='mind';
@@ -650,7 +649,7 @@ function miserend_modtemplom() {
 	$query_kat="select id,nev,felelos,csakez from egyhazmegye where ok='i' order by sorrend";
 	$lekerdez_kat=mysql_db_query($db_name,$query_kat);
 	while(list($kid,$knev,$kfelelos,$kcsakez)=mysql_fetch_row($lekerdez_kat)) {
-		if($kfelelos==$u_login) {
+		if($kfelelos==$user->login) {
 			$ehmT['priv'][$kid]=$knev;
 			if($kcsakez=='i') {
 				$csakpriv='priv';
@@ -1028,7 +1027,7 @@ function miserend_addingmise() {
 
 
 function miserend_deltemplom() {
-	global $_GET,$db_name,$linkveg,$m_id,$u_login;
+	global $_GET,$db_name,$linkveg,$m_id,$user;
 
 	$tid=$_GET['tid'];
 
@@ -1056,7 +1055,7 @@ function miserend_deltemplom() {
 }
 
 function miserend_deletetemplom() {
-	global $_GET,$db_name,$u_login,$u_beosztas;
+	global $_GET,$db_name;
 
 	$tid=$_GET['tid'];
 	$query="delete from templomok where id='$tid'";
@@ -1145,12 +1144,10 @@ function miserend_deletetemplom() {
 }
 
 function miserend_ehmlista() {
-	global $_GET,$db_name,$linkveg,$m_id,$u_login;
-
 
 	$txt.="<span class=alcim>Egyházmegyei templomok listája</span><br><form method=post><input type=hidden name=m_op value=ehmlista><input type=hidden name=m_id value=$m_id><select name=ehm class=urlap>";
 	$query="select id,nev from egyhazmegye";
-	$lekerdez=mysql_db_query($db_name,$query);
+	$lekerdez=mysql_query($query);
 	while(list($id,$nev)=mysql_fetch_row($lekerdez)) {
 		$txt.="<option value=$id";
 		if($id==$ehm) $txt.=" selected";
@@ -1161,12 +1158,11 @@ function miserend_ehmlista() {
 	$ehm=$_POST['ehm'];
 	if($ehm>0) {
 
-		list($ehmnev)=mysql_fetch_row(mysql_db_query($db_name,"select nev from egyhazmegye where id='$ehm'"));
+		list($ehmnev)=mysql_fetch_row(mysql_query("select nev from egyhazmegye where id='$ehm'"));
 		$txt.="<h2>$ehmnev egyházmegye</h2>";
 
 		$query="select templomok.id,templomok.nev,templomok.varos,espereskerulet.nev from espereskerulet, templomok where espereskerulet.id=templomok.espereskerulet and templomok.egyhazmegye=$ehm order by templomok.espereskerulet, templomok.varos";
-
-		if(!$lekerdez=mysql_db_query($db_name,$query)) echo "<br>HIBA!<br>$query<br>".mysql_error();
+		if(!$lekerdez=mysql_query($query)) echo "<br>HIBA!<br>$query<br>".mysql_error();
 		while(list($tid,$tnev,$varos,$espker)=mysql_fetch_row($lekerdez)) {
 			$a++;
 			if($espker!=$espkerell) {
@@ -1178,7 +1174,6 @@ function miserend_ehmlista() {
 		}
 		$txt.="<br><br><span class=alap>Az alábbi szöveget kimásolva excelbe importálható.<br>Excelben: Adatok / Szövegből oszlopok -> táblázattá alakítható</span><br><textarea class=urlap cols=60 rows=20>$excel</textarea>";
 	}
-
 
 	$adatT[2]=$txt;
 	$tipus='doboz';
@@ -1192,7 +1187,7 @@ function miserend_ehmlista() {
 
 //Jogosultság ellenőrzése
 $jog = false;
-if(strstr($u_jogok,'miserend')) { $jog = true; }
+if($user->checkRole('miserend')) { $jog = true; }
 if($jog == false AND isset($_REQUEST['tid']) AND is_numeric($_REQUEST['tid']) AND in_array($m_op, array('addtemplom','addmise','addingtemplom','addingmise'))) {
 	$query = "SELECT letrehozta FROM templomok WHERE id = ".$_REQUEST['tid']." LIMIT 1";
 	$result = mysql_query($query);

@@ -4,16 +4,27 @@ function regisztracio_index() {
 	global $linkveg,$m_id,$_GET,$db_name;
 
 	$fm=$_GET['fm'];
-	if($fm>0) {
-		$query="select cim,leiras from fomenu where id='$fm'";
-		$lekerdez=mysql_db_query($db_name,$query);
-		list($cim,$leiras)=mysql_fetch_row($lekerdez);
-		if(!empty($cim)) $tartalom.="<span class=alcim>$cim</span>";
-		if(!empty($leiras)) $tartalom.=$leiras;
-		else $tartalom.='<br><br>';
-	}
+	if($fm == 11) {
+		$tartalom.= <<<EOD
+		<span class=alcim>Regisztráció</span>
+		<p class="alap">A <i>Miserend</i> honlap felhasználókezelése külön vált a <a href="http://plebania.net"><i>Virtuális Plébánia</i></a> portál többi oldalától. A különböző oldalakon külön kell regisztrálni. De ha 2015 előtt regisztrált akár a <i>Miserend</i>, akár a <i>Virtuális Plébánia</i> bármelyik másik aloldalára, akkor az akkor megadott név és jelszó továbbra is érvényes itt is. (Ám megváltoztatása esetén csak itt változik meg.</p>
+		<p class="alap"><strong>A regisztrációra és a honlap használatára az alábbi szabályok érvényesek, kérjük olvasd el figyelmesen!</strong></p>
+		<ol>
+			<li class="alap" style="margin: 0 0 12px 0;"><A <i>Miserend</i> a <i>Virtuális Plébánia Portálcsoport</i> tagjaként magyar katolikus oldalak. Tartalmát papok és elkötelezett hívek frissítik. <strong>A honlapon megjelenő anyagok tekintetében a Katolikus Egyház hivatalos tanítása a mérvadó!</strong></li>
+			<li class="alap" style="margin: 0 0 12px 0;">Felhasználóink között természetesen korra, nemre, felekezetre való tekintet nélkül mindenkit szeretettel látunk! Azonban kérjük az 1. pont tudomásulvételét és egymás kölcsönös tiszteletbentartását!<br/><br/>
+				<strong>FONTOS!</strong> Oldalunkon bárki, bármilyen szándékkal jelen lehet, a regisztráció, illetve a különböző kapcsolatok során személyes adataid mindig kellő óvatossággal kezeld! Felhasználóink publikusan megadott adatainak valóságtartalmáért nem tudunk felelősséget vállalni!</li>
+			<li class="alap" style="margin: 0 0 12px 0;">A regisztráció során kötelező megadni emailcímed, valamint egy bejelentkezési nevet. A választott bejelentkezési név viszont mindig egy és csak egy konkrét személyt képviselhet (szervezetet, intézményt vagy csoportot, közösséget, családot nem) és azt csak egy ember használhatja.<br/><br/>
+				<strong>FONTOS!</strong> Figyelj, hogy emailcímed mindig aktuális legyen, változás esetén oldalunkon is módosítsd. Kéretlen reklámleveleket nem küldünk, harmadik félnek nem adjuk ki, de adott esetben az itt megadott címre küldünk oldalunkkal kapcsolatos értesítést, figyelmeztetést. Saját érdeked, hogy ezt mindig időben megkaphasd.</li>
+			<li class="alap" style="margin: 0 0 12px 0;">A <i>Miserend</i> regisztrált felhasználójaként használhatod a <i>Miserend</i> által nyújtott szolgáltatásokat, funkciókat, bővítheted az adatbázist, illetve felhasználhatod azt munkád, személyes fejlődésed vagy szórakozásod érdekében.<br/><br/>
+				A <i>Miserenden</i> található információkat felhasználhatod, azokra hivatkozhatsz, azonban ez esetben kérjük megjelölni a forrást! </li>
+		</ol>
+EOD;
+		$tartalom .= "<center><span class='cim'><a href=?m_id=$m_id&m_op=add class=cim>Elolvastam, elfogadom, regisztrálok - tovább</a></span></center><br/><br/>";
 
-	$tartalom.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Elolvastam, elfogadom, regisztrálok - tovább</a><br>";
+
+	}
+	else $tartalom .= "404 - üres lap";
+
 	$adatT[2]=$tartalom;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);
@@ -22,12 +33,12 @@ function regisztracio_index() {
 }
 
 function regisztracio_atvett() {
-	global $u_login,$linkveg,$m_id,$m_op;
+	global $user,$m_id,$m_op;
 
-	$tartalom.="\n<span class=alcim>Első belépés</span><br><br><span class=alap><b>Kedves $u_login!<br>Szeretettel köszöntünk megújult portálunkon!</b><br><br>";
+	$tartalom.="\n<span class=alcim>Első belépés</span><br><br><span class=alap><b>Kedves ".$user->login."!<br>Szeretettel köszöntünk honlapunkon!</b><br><br>";
 	$tartalom.="\nA Virtuális Plébánia korábbi adatbázisából megtartottuk a felhasználóneved, emailcímed és ha beírtad, akkor a neved. Kérünk, hogy most az első belépés alkalmával nézd át új portálunk regisztrációs részét, ellenőrizd a megtartott adatokat, s ha jónak látod, megadhatsz további adatokat is, melyek megjelenését is többféleképpen beállíthatod.<br><br><b>Köszönjük, hogy időt szánsz rá!</b></span><br><br>";
 
-	$tartalom.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Tovább</a><br>";
+	$tartalom.="<a href=?m_id=$m_id&m_op=add class=kismenulink>Tovább</a><br>";
 	$adatT[2]=$tartalom;
 	$tipus='doboz';
 	$kod.=formazo($adatT,$tipus);
@@ -36,21 +47,47 @@ function regisztracio_atvett() {
 }
 
 function regisztracio_add() {
-	global $sessid,$m_id,$db_name,$u_oldal,$u_beosztas,$u_id,$u_jogT,$u_id,$u_login;
+	global $sessid,$m_id,$db_name,$user;
 
 	$optionT=array('0'=>'bárki','i'=>'ismerős','b'=>'barát','n'=>'senki');
 
-	$urlap="\n<form method=post>";
+$urlap.= <<<EOD
+<!--<script>
+ $(function() {
+    $( "#accordion" ).accordion({
+      collapsible: true
+    });
+  });
+  </script>
+  <div id="accordion" class="alapj">
+  <span class='kiscim'>Kötelező adatok:</span>
+  <div>
+    <p>
+    Mauris mauris ante, blandit et, ultrices a, suscipit eget, quam. Integer
+    ut neque. Vivamus nisi metus, molestie vel, gravida in, condimentum sit
+    amet, nunc. Nam a nibh. Donec suscipit eros. Nam mi. Proin viverra leo ut
+    odio. Curabitur malesuada. Vestibulum a velit eu ante scelerisque vulputate.
+    </p>
+  </div>
+  <h3>Önkéntesség</h3>
+  <div>
+  </div>
+  <h3>Egyéb személyes adatok</h3>
+  <div>
+  </div>
+</div>-->
+EOD;
+	$urlap.="\n<form method=post>";
 	$urlap.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=sessid value=$sessid>";
 	$urlap.="\n<input type=hidden name=m_op value=adding>";
 	$urlap.="\n<table cellpadding=8 cellspacnig=1 bgcolor=#efefef>";
 
 //Bejelentkezési név	
 	$urlap.="<tr><td valign=top bgcolor=#FFFFFF>";
-	if($u_id>0) {
-		$urlap.="\n<span class=kiscim>Bejelentkezési név: </span><br><span class=alap>(Nem módosítható!)</span><br><input type=text name=ulogin readonly value='$u_login' class=urlap size=20 maxlength=20>";
+	if($user->loggedin) {
+		$urlap.="\n<span class=kiscim>Bejelentkezési név: </span><br><span class=alap>(Nem módosítható!)</span><br><input type=text name=ulogin readonly value='".$user->login."' class=urlap size=20 maxlength=20>";
 
-		$query="select email,becenev,nev,kontakt,szuldatum,nevnap,msn,skype,nem,csaladiallapot,foglalkozas,magamrol,vallas,orszag,varos,nyilvanos, volunteer from user where uid='$u_id' and ok='i'";
+		$query="select email,becenev,nev,kontakt,szuldatum,nevnap,msn,skype,nem,csaladiallapot,foglalkozas,magamrol,vallas,orszag,varos,nyilvanos, volunteer from user where uid='".$user->uid."' and ok='i'";
 		$lekerdez=mysql_db_query($db_name,$query);
 		list($email,$becenev,$nev,$kontakt,$szuldatum,$nevnap,$msn,$skype,$nem,$csaladiallapot,$foglalkozas,$magamrol,$vallas,$orszag,$varos,$nyilvanos,$volunteer)=mysql_fetch_row($lekerdez);
 
@@ -259,7 +296,7 @@ function regisztracio_add() {
 
 	$urlap.='<br><br><input type=submit value=Mehet class=urlap></form>';
 
-	if($u_id>0) $tartalom="<span class=alcim>Adatok módosítása</span><br><br>".$urlap;
+	if($user->loggedin) $tartalom="<span class=alcim>Adatok módosítása</span><br><br>".$urlap;
 	else $tartalom="<span class=alcim>Regisztráció</span><br><br>".$urlap;
 
 	$adatT[2]=$tartalom;
@@ -270,7 +307,7 @@ function regisztracio_add() {
 }
 
 function regisztracio_adding() {
-	global $_POST,$_FILES,$_SERVER,$u_login,$db_name,$u_id,$sid;
+	global $_POST,$_FILES,$_SERVER,$db_name,$user,$sid;
 
 	$ip=$_SERVER['REMOTE_ADDR'];
     $host = gethostbyaddr($ip);
@@ -309,9 +346,9 @@ function regisztracio_adding() {
 	$most=date('Y-m-d H:i:s');
 	$hiba=false;
 
-	if($u_id>0) {
+	if($user->loggedin) {
 		//módosítás
-		$query="select jelszo from user where uid='$u_id'";
+		$query="select jelszo from user where uid='".$use->uid."'";
 		$lekerdez=mysql_db_query($db_name,$query);
 		list($jelszo)=mysql_fetch_row($lekerdez);
 
@@ -326,14 +363,10 @@ function regisztracio_adding() {
 		}
 		if(!$hiba) {
 			if(!empty($ujjelszo1)) $ujjelszo=", jelszo='".base64_encode($ujjelszo1)."'";
-			$query="update user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', szuldatum='$szuldatum', nevnap='$nevnap', skype='$skype', msn='$msn', nem='$nem', csaladiallapot='$csaladiallapot', foglalkozas='$foglalkozas', magamrol='$magamrol', vallas='$vallas', orszag='$orszag', varos='$varos', nyilvanos='$nyilvanos', regip='$ip ($host)', atvett='n', volunteer='$volunteer' $ujjelszo where uid='$u_id'";
+			$query="update user set becenev='$becenev', nev='$nev', email='$email', kontakt='$kontakt', szuldatum='$szuldatum', nevnap='$nevnap', skype='$skype', msn='$msn', nem='$nem', csaladiallapot='$csaladiallapot', foglalkozas='$foglalkozas', magamrol='$magamrol', vallas='$vallas', orszag='$orszag', varos='$varos', nyilvanos='$nyilvanos', regip='$ip ($host)', atvett='n', volunteer='$volunteer' $ujjelszo where uid='".$user->uid."'";
 			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 
-			//Sessionben is módosítani kell a nemet és a szülinapot
-			$query="update session set nem='$nem' where sessid='$sid'";
-			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
-
-			$tartalom="<span class=alcim>Adatok módosítása</span><br><br><span class=alap>Az adatok módosítása sikerrel járt.<br>FIGYELEM! Előfordulhat, hogy bizonyos változások csak a következő belépésnél lépnek érvénybe!</span>";
+			$tartalom="<span class=alcim>Adatok módosítása</span><br><br><span class=alap>Az adatok módosítása sikerrel járt.</span>";
 		}
 		else {
 			$tartalom="<span class=alcim>Adatok módosítása</span><br><br>$hibauzenet<br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
@@ -373,7 +406,7 @@ function regisztracio_adding() {
 			$jelszo1 = str_shuffle($login).$szam1;
 			$jelszo=base64_encode($jelszo1);
 
-			$query="insert user set nev='$nev', email='$email', kontakt='$kontakt', jelszo='$jelszo', ok='i', jogok='$jogok', login='$login', letrehozta='$u_login', regdatum='$most', volunteer='$volunteer'";
+			$query="insert user set nev='$nev', email='$email', kontakt='$kontakt', jelszo='$jelszo', ok='i', jogok='$jogok', login='$login', letrehozta='".$user->login."', regdatum='$most', volunteer='$volunteer'";
 			if(!mysql_db_query($db_name,$query)) echo "HIBA!<br>$query<br>".mysql_error();
 
 			//email küldése
@@ -457,7 +490,6 @@ function regisztracio_jelszokuld() {
 
 	return $kod;
 }
-
 
 switch($m_op) {
     case 'index':
