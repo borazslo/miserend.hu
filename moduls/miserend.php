@@ -933,11 +933,10 @@ function miserend_misekeres() {
 }
 
 function miserend_view() {
-	global $TID,$linkveg,$db_name,$elso,$m_id,$m_op,$_GET,$design_url,$deisgn,$onload,$script,$titlekieg, $meta;
+	global $linkveg,$db_name,$elso,$m_id,$m_op,$design_url,$deisgn,$onload,$script,$titlekieg, $meta;
     global $twig,$user;
     
-	$tid=$_GET['tid'];
-	if(!empty($TID)) $tid=$TID;
+	$tid=$_REQUEST['tid'];
 
 	$church = getChurch($tid);
 	if($church != array()) $vane = 1;

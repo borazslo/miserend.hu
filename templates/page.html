@@ -19,7 +19,8 @@
 <link rel="stylesheet" href="templates/style.css" type="text/css">
 <link rel="stylesheet" href="templates/newstyle.css" type="text/css">
 {% block extracss %}{% endblock %}
-{% if script %}{% for s in script %}{{ s|raw }}{% endfor %}{% endif %}
+{% if script %}{% for s in script %}{{ s|raw }}
+{% endfor %}{% endif %}
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" {{ body.onload|raw }}>

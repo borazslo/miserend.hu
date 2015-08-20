@@ -11,12 +11,15 @@ Előfeltétel
 -- Több helyen még kell a http://php.net/manual/en/language.basic-syntax.phptags.php
 - Composer: https://getcomposer.org/doc/00-intro.md#globally
 - sudo apt-get install php5-sqlite
+- install node.js, npm
+- npm install -g bower
+
 
 Telepítés
 - Klónozás 
 - config.inc-ben be kell állítani a mysql nevet/jelszót.
 - mysql betöltése
-- php composer.phar
+- php composer.phar install
 
 
 

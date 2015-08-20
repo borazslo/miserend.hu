@@ -2006,4 +2006,4 @@ function alapnyelv($text) {
 
 }
 
-?>  
+?>
