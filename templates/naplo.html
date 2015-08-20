@@ -1,0 +1,53 @@
+<script>
+				
+				</script>
+<table width=100% bgcolor=#F5CC4C>
+	<tr>
+		<td class=alap><big><b><a href="/?templom={{ church.id }}" target=_blank>{{ church.nev }}</a></b> {{ church.ismertnev }} - <u>{{ church.varos }}</u></big><br/>
+			<i>Javítások, változások bejelentésének kezelése</i></big>
+		</td>
+	</tr>
+</table>
+<table width=100% bgcolor=#ECD9A4 cellpadding=0 cellspacing=1>
+{% for remark in remarks %}
+    <tr>
+    	<td valign=top width=35 bgcolor={{ cycle(['#F3E9CD', '#EFEFEF'], loop.index0) }}>
+    		{% if remark.allapot == 'u' %}
+			    	<img src=img/Folderdownloads.gif border=0 title='új észrevétel'>
+			{% elseif remark.allapot == 'f' %}
+			   		<img src=img/Filesedit.gif border=0 title='folyamatban van -> {{ remak.admin }} ({{ remark.admindatum }})'>
+			{% else %}
+			   		<img src=img/Hand.gif border=0 title='Javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})'>
+			{% endif %}
+    	</td>
+    	<td valign=top width=125 bgcolor={{ cycle(['#F3E9CD', '#EFEFEF'], loop.index0) }}>
+    		<span class=alap>{{ remark.datum }}</span><br>
+    		{{ remark.urlap|raw }}
+    	</td>
+    	<td valign=top bgcolor={{ cycle(['#F3E9CD', '#EFEFEF'], loop.index0) }}>
+    		<span class=alap style="float:left;"><b>{{ remark.nev }} ({{ remark.username }})</b></span>
+    		<span data-username="{{ remark.username }}" data-email="{{ remark.email }}" data-rid="{{ remark.id }}" title="A beküldő megbízhatósága állítható egyetlen kattintással: megbízható, nem megbízható vagy nem tudjuk.">
+	    			<span class="reliable ui-icon ui-icon-alert alert {% if remark.megbizhato == 'n' %}red{% else %}lightgrey{% endif %}" style="float:left;font-size:1em;margin-left:3px"></span>
+	    			<span class="reliable ui-icon ui-icon-check check {% if remark.megbizhato == 'i' %}green{% else %}lightgrey{% endif %}" style="float:left;font-size:1em;margin-left:3px"></span>
+			</span>
+
+			{% if remark.email %} <br><a href="mailto:{{ remark.email }}" class=alap><b>{{ remark.email }}</b></a>{% endif %}
+		{% if remark.allapot != 'j' %}
+				<br><br><span class=alap>{{ remark.leiras|raw|nl2br }}</span>
+		{% else %}
+				<br><span class='alap javitva' title="Kattintásra megtekinthető az észrevétel."><font color=red>Utoljára javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})</font></span>
+				<br><span class='alap' style='display:none;'><br>{{ remark.leiras|raw|nl2br }}</span>								
+		{% endif %}
+
+
+		{% if remark.adminmegj %} 
+				<br><br><span class=alap><u>Admin megjegyzés:</u><br>
+				{{ remark.adminmegj|raw|nl2br }}</span>
+		{% endif %}
+
+
+    	</td>
+    </tr>
+{% endfor %}
+</table>
+	
