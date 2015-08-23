@@ -2008,4 +2008,4 @@ function alapnyelv($text) {
 
 }
 
-?>  
+?>

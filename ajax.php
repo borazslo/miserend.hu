@@ -171,7 +171,17 @@ switch ($_REQUEST['q']) {
         } else if($_REQUEST['method'] == 'del') {
             mysql_query("DELETE FROM favorites WHERE uid = ".$user->uid." AND tid = ".$_REQUEST['tid']." LIMIT 1");
         }
-        break;    
+        break;
+    case 'SwitchReliable':
+        if(!is_numeric($_REQUEST['rid'])) exit;
+        if(!in_array($_REQUEST['reliable'], array('i','n','?','e'))) exit;
+
+        mysql_query("UPDATE eszrevetelek SET megbizhato = '".$_REQUEST['reliable']."' WHERE id = ".$_REQUEST['rid']." LIMIT 1;");
+        /*
+        
+        */
+
+        break;  
     default:
         return json_encode($_REQUEST);
         //code to be executed if n is different from all labels;

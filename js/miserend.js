@@ -112,4 +112,55 @@ $(document).ready(function() {
   });
 
 
+   $(document).on('click','.reliable',function(){
+
+      if($(this).hasClass('check')) {
+          if($(this).hasClass('lightgrey')) {
+                var reliable = 'i';       
+          } else {
+                var reliable = '?';       
+          }
+      } else if($(this).hasClass('alert')) {
+          if($(this).hasClass('lightgrey')) {
+                var reliable = 'n';       
+          } else {
+                var reliable = '?';       
+          }
+      } 
+
+      var rid = $(this).parent().attr("data-rid");
+      var here = $(this);
+
+      $.ajax({
+             type:"POST",
+             url:"ajax.php?q=SwitchReliable",
+             data:"rid="+rid+"&reliable="+reliable,
+             success:function(response){
+                if(here.hasClass('check')) {
+                    if(here.hasClass('lightgrey')) {
+                          here.parent().find('.alert').removeClass('red');
+                          here.parent().find('.alert').addClass('lightgrey')
+                    } 
+                    here.toggleClass("lightgrey green");
+                } else if(here.hasClass('alert')) {
+                    if(here.hasClass('lightgrey')) {
+                          here.parent().find('.check').removeClass('green');
+                          here.parent().find('.check').addClass('lightgrey')
+                    } else {
+                    }
+                    here.toggleClass("lightgrey red");
+                } 
+            }, 
+        });        
+  });
+
+
+
+$( ".javitva" ).click(function( event ) {
+          event.preventDefault();
+          $( this ).nextAll(" .alap:first ").toggle()
+});
+
+
+
 });

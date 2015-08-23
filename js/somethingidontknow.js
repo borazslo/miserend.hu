@@ -1,4 +1,4 @@
-	/*
+	
 	function fokusz() {
       document.loginurlap.login.focus();
 	}
@@ -43,5 +43,3 @@
 	function linkTo_UnCryptMailto(s)	{
 		location.href=UnCryptMailto(s);
 	}
-
-	*/

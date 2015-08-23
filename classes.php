@@ -291,16 +291,32 @@ class Mail
  **/
 class Remark
 {
-	function __construct($tid) {
-		global $user;
-		$this->name = "vendég";
-		$this->username = $user->username;
-		//email fakultatív
-		//megbízható?? reliable
-		$this->timestamp = date('Y-m-d H:i:s');
-		$this->tid = $tid;
-		$this->state = 'u';
-		$this->text = "";
+	function __construct($rid = false) {
+		if(!isset($rid) OR !is_numeric($rid)) {
+			global $user;
+			$this->name = $user->nev;
+			$this->username = $user->username;
+			//email fakultatív
+			//TODO: megbízható?? reliable
+			$this->timestamp = date('Y-m-d H:i:s');
+			$this->state = 'u';
+			$this->text = "";
+		} else {
+			$query = "SELECT * FROM  eszrevetelek WHERE id = $rid LIMIT 1";
+			$result = mysql_query($query);
+            $x = mysql_fetch_assoc($result);
+            if(is_array($x)) {
+            	foreach ($x as $key => $value) {
+            		$this->$key = $value;
+            	}
+            	$this->rid = $this->id;
+            	$this->tid = $thid->hol_id;
+				$this->username = $this->login;
+            } else {
+            	// TODO: There is no remark with this rid;
+            	return false;
+            }
+		}
 	}
 
 	function save() {
