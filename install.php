@@ -12,6 +12,7 @@ if (!is_dir('kepek')) {
     if (!is_dir('kepek')) {
         mkdir('kepek'); 
         mkdir('kepek/templomok'); 
+        mkdir('fajlok/staticmaps'); 
     }
 }
 

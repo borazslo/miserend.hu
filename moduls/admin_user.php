@@ -1,20 +1,5 @@
 <?php
 
-function user_index() {
-	global $linkveg,$m_id;
-
-	$menu.="<a href=?m_id=$m_id&m_op=add$linkveg class=kismenulink>Új felhasználó - hozzáadás</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=mod$linkveg class=kismenulink>Meglévő módosítása, törlése</a><br>";
-
-	$adatT[2]="<span class=alcim>Felhasználók szerkesztése</span><br><br>".$menu;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
-	
-	$kod=$tartalom;
-
-	return $kod;
-}
-
 function user_add($uid) {
 	global $sessid,$m_id,$db_name,$user;
 
@@ -104,11 +89,11 @@ function user_add($uid) {
 function user_mod() {
 	global $db_name,$linkveg,$m_id,$sid,$_POST;
 
-	$kulcsszo=$_POST['kulcsszo'];
-	$sort=$_POST['sort'];
+	$kulcsszo=$_REQUEST['kulcsszo'];
+	$sort=$_REQUEST['sort'];
 	if(empty($sort)) $sort='nev';
-	$adminok=$_POST['adminok'];
-	$limit=$_POST['limit'];
+	$adminok=$_REQUEST['adminok'];
+	$limit=$_REQUEST['limit'];
 	if(empty($limit)) $limit=50;
 
 	$kiir.="\n<span class=kiscim>Keresés:</span><br><br>";
@@ -203,12 +188,10 @@ if($user->checkRole('user')) {
 switch($m_op) {
     case 'index':
         $tartalom=user_mod();
-        //$tartalom=user_index();
         break;
 
 	case 'add':
-		$uid=$_GET['uid'];
-        $tartalom=user_add($uid);
+        $tartalom=user_add($_GET['uid']);
         break;
 
     case 'mod':
@@ -221,11 +204,11 @@ switch($m_op) {
 
 		$return = $mod->submit($_REQUEST);
 		
-		if($return == 1) $kod=user_add($mod->uid);
+		if($return == 1) $tartalom =user_add($mod->uid);
 		else {
 			$adatT[2]="<span class=alcim>Felhasználók szerkesztése</span><br><br><span class=hiba>".implode('<br/>',$return)."</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>";
 			$tipus='doboz';
-			$tartalom .= formazo($adatT,$tipus);	
+			$tartalom = formazo($adatT,$tipus);	
 		}
 
         break;

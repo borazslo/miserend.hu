@@ -12,13 +12,26 @@ function design(&$vars) {
     if(!is_array($script)) $vars['script'][] = $script;
     else $vars['script'] = $script;
 
+    
     $vars['script'][] = '<link href="css/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />';
-    $vars['script'][] = '<script src="/bower_components/jquery/dist/jquery.min.js"></script>';
-    $vars['script'][] = '<script src="/bower_components/jquery-ui/jquery-ui.js"></script>';
+
+
+
+    //$vars['script'][] = '<script src="/bower_components/jquery/dist/jquery.js"></script>'; 
+    $vars['script'][] = '  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>';
+
+
+
+    $vars['script'][] = '<script src="/bower_components/jquery-ui/jquery-ui.js"></script>'; 
+
+
     $vars['script'][] = '<script src="/bower_components/jquery-ui/ui/autocomplete.js"></script>';
     $vars['script'][] = '<script src="/bower_components/jquery-colorbox/jquery.colorbox.js"></script>';
     $vars['script'][] = '<script src="/bower_components/jquery-colorbox/i18n/jquery.colorbox-hu.js"></script>';
     $vars['script'][] = '<script src="js/als/jquery.als-1.5.min.js"></script>';
+
+	$vars['script'][] = '<script src="js/miserend.js"></script>'; 
+
 
     
     $vars['script'][] = '<link rel="stylesheet" href="templates/colorbox.css" />';
@@ -26,7 +39,8 @@ function design(&$vars) {
 
     $vars['script'][] = '<link rel="stylesheet" href="/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">';
 
-    $vars['script'][] = '<script src="js/miserend.js"></script>';
+    
+   /*
     $vars['script'][] = '<script src="js/somethingidontknow.js"></script>';
     $vars['script'][] = '<script language="JavaScript" type="text/javascript">
         var trackOutboundLink = function(url) {
@@ -37,8 +51,7 @@ function design(&$vars) {
         });
         }
         </script>';
-
-    
+    */
     $vars['pagetitle'] = 'VPP - miserend';
     if(isset($titlekieg)) $vars['pagetitle'] = preg_replace("/^( - )/i","",$titlekieg)." | ".$vars['pagetitle'];
     	
@@ -51,7 +64,6 @@ function design(&$vars) {
 		$vars['body']['onload']="onload=\"".$vars['body']['onload'].";\"";
 	}
 
-	
 	$emaillink_lablec="<A HREF=\"javascript:linkTo_UnCryptMailto('ocknvq%3CkphqBokugtgpf0jw');\" class=emllink>info<img src=img/kukaclent.gif align=absmiddle border=0>miserend.hu</a>";
 	
 
