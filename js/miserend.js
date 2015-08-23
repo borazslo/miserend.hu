@@ -1,8 +1,9 @@
 $(document).ready(function() {
     $( document ).tooltip();
 
+ $( ".emailmenu" ).menu();
 
-  $(function() {
+	$(function() {
         $('#tkereses').on('submit', function(e) { //use on if jQuery 1.7+
             e.preventDefault();  //prevent form from submitting               
             var data = $('#tvaros').val() + '&' + $('#tkulcsszo').val() + '&' + $('#tehm').val();
@@ -150,6 +151,22 @@ $(document).ready(function() {
                     }
                     here.toggleClass("lightgrey red");
                 } 
+
+                var email = here.parent().attr('data-email');
+                if(email !== '') {
+                    $("[data-email='" + email +"']").each(function() {
+                        if(reliable == 'i') {
+                            $(this).find('.check').removeClass('lightgrey').addClass('green');
+                            $(this).find('.alert').removeClass('red').addClass('lightgrey');
+                        } else if (reliable == 'n') {
+                            $(this).find('.check').removeClass('green').addClass('lightgrey');
+                            $(this).find('.alert').removeClass('lightgrey').addClass('red');
+                        } else if (reliable == '?') {
+                            $(this).find('.check').removeClass('green').addClass('lightgrey');
+                            $(this).find('.alert').removeClass('red').addClass('lightgrey');
+                        }    
+                    });
+                }
             }, 
         });        
   });

@@ -165,3 +165,18 @@ div.rightside.footer , div.leftside.footer {
     padding: 4px !important;
     font-size: 10pt !important;
   }
+
+
+select.my_dropdown {
+    width:auto;
+}
+/*IE FIX */
+select#my_dropdown {
+    width:100%;
+}
+select:focus#my_dropdown {
+    width:auto\9;
+}
+
+
+.ui-menu-item { padding: 1em; }

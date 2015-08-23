@@ -5,7 +5,7 @@ $vars = array();
 
 include_once('config.php');
 include_once('functions.php');
-include_once('functions_osm.php');
+//include_once('functions_osm.php');
 include_once('classes.php');
 include_once("design.php");
 
@@ -35,7 +35,6 @@ if(isset($_REQUEST['login'])) {
 $user = getuser();
 if($user->loggedin) mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$user->uid." LIMIT 1;");
 
-
 //Twig and the templates
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
@@ -46,7 +45,6 @@ $template = $_SESSION['template'];
 
 $loader = new Twig_Loader_Filesystem($template);
 $twig = new Twig_Environment($loader); // cache?        
-
 
 //GIT version
 exec('git rev-parse --verify HEAD 2> /dev/null', $output);
@@ -73,7 +71,6 @@ if(!isset($_SESSION['isAndroidOS']) AND $_SERVER['PHP_SELF'] != '/api.php') {
         $_SESSION['isAndroidOS'] = false;
     }    
 }
-
 
 
 

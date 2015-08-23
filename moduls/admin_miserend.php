@@ -1250,7 +1250,10 @@ switch($m_op) {
     case 'events':
         if(isset($_REQUEST['save'])) events_save($_REQUEST);
 
-        $form=events_form();
+        if(isset($_REQUEST['order']) AND in_array($_REQUEST['order'], array('year, date','name')) )
+        $order = $_REQUEST['order'];
+
+        $form=events_form($order);
         $form['m_id'] = $m_id;
         $tartalom = $twig->render('content_admin_editevents.html',$form);
         break;    

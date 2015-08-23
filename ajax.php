@@ -176,11 +176,9 @@ switch ($_REQUEST['q']) {
         if(!is_numeric($_REQUEST['rid'])) exit;
         if(!in_array($_REQUEST['reliable'], array('i','n','?','e'))) exit;
 
-        mysql_query("UPDATE eszrevetelek SET megbizhato = '".$_REQUEST['reliable']."' WHERE id = ".$_REQUEST['rid']." LIMIT 1;");
-        /*
+        $remark = new Remark($_REQUEST['rid']);
+        $remark->changeReliability($_REQUEST['reliable']);
         
-        */
-
         break;  
     default:
         return json_encode($_REQUEST);

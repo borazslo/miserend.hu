@@ -182,6 +182,20 @@ function user_del($uid) {
 }
 
 
+function user_delete() {
+	global $user;
+
+	$uid=$_GET['uid'];
+	if($uid!=$user->uid) {
+		$query="delete from user where uid='$uid' LIMIT 1";
+		mysql_query($query);
+	}
+
+	$kod=user_mod();
+
+	return $kod;
+}
+
 if($user->checkRole('user')) {
 	//Csak, ha van user jogosultsága!
 

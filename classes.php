@@ -310,7 +310,7 @@ class Remark
             		$this->$key = $value;
             	}
             	$this->rid = $this->id;
-            	$this->tid = $thid->hol_id;
+            	$this->tid = $this->hol_id;
 				$this->username = $this->login;
             } else {
             	// TODO: There is no remark with this rid;
@@ -418,6 +418,22 @@ class Remark
 		$mail->send(); 
 
 	}
+
+	function changeReliability($reliability) {
+		if(!in_array($reliability, array('i','n','?','e'))) return false;
+		if($this->reliable == $reliability) return true;
+
+		$this->reliable = $reliability;
+		
+		//A megbízhatóságot az összes beküldésénél átállítjuk
+		// Gyakorlatilag az email az igazi azonosító.
+		// TODO: akarunk mit kezdeni az *vendeg* de email nélkül?
+		if($this->email != '')
+			mysql_query("UPDATE eszrevetelek SET megbizhato = '".$reliability."' WHERE email = '".$this->email."' ;");
+		else
+			return false;
+	}
+
 } // END class 
 
 ?>

@@ -1,5 +1,4 @@
-﻿<?
-
+<?php
 
 function design(&$vars) {
     global $design_url,$db_name,$tartalom,$m_oldalsablon,$balkeret,$jobbkeret,$onload,$sid,$linkveg,$loginhiba,$script,$meta,$titlekieg;
@@ -15,29 +14,21 @@ function design(&$vars) {
     
     $vars['script'][] = '<link href="css/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />';
 
-
-
-    //$vars['script'][] = '<script src="/bower_components/jquery/dist/jquery.js"></script>'; 
-    $vars['script'][] = '  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>';
-
-
-
-    $vars['script'][] = '<script src="/bower_components/jquery-ui/jquery-ui.js"></script>'; 
-
-
+    $vars['script'][] = '<script src="/bower_components/jquery/dist/jquery.min.js"></script>';
+    $vars['script'][] = '<script src="/bower_components/jquery-ui/jquery-ui.js"></script>';
     $vars['script'][] = '<script src="/bower_components/jquery-ui/ui/autocomplete.js"></script>';
     $vars['script'][] = '<script src="/bower_components/jquery-colorbox/jquery.colorbox.js"></script>';
     $vars['script'][] = '<script src="/bower_components/jquery-colorbox/i18n/jquery.colorbox-hu.js"></script>';
+
     $vars['script'][] = '<script src="js/als/jquery.als-1.5.min.js"></script>';
 
 	$vars['script'][] = '<script src="js/miserend.js"></script>'; 
-
 
     
     $vars['script'][] = '<link rel="stylesheet" href="templates/colorbox.css" />';
     $vars['script'][] = '<link rel="stylesheet" href="templates/als.css" />';
 
-    $vars['script'][] = '<link rel="stylesheet" href="/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">';
+    $vars['script'][] = '<link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css">';
 
     
    /*

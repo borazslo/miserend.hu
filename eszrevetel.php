@@ -33,7 +33,7 @@ function urlap() {
 		$form ="<form method=post action=?op=add><input type=hidden name=tid value='$tid'>";
 		if(!$user->loggedin) {
 			$form.="<span class=alap>Nevem: </span><input type=text size=40 name=nev class=urlap >";
-			$form.="<br><span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap >";
+			$form.="<br><span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap > * <strong>kötelező</strong>";
 			$form.="<br><br><span class=alap>Észrevételeim a templom adataihoz: </span><br>";
 		} else {
 			$form.="<input type=hidden size=40 name=nev value='".$user->nev."'>";

@@ -296,8 +296,9 @@ function event2Date($event, $year = false) {
     return $event;
 }
 
-function events_form() {
-    $query = "SELECT * FROM events WHERE year >= ".date('Y','-1 year')." ORDER BY year;";
+function events_form($order = false) {
+    if(!$order) $order = 'year, date';
+    $query = "SELECT * FROM events WHERE year >= ".date('Y','-1 year')." ORDER BY ".$order.";";
     $result = mysql_query($query);
     $years = array(); $names = array();
     while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
