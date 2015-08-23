@@ -19,7 +19,8 @@
 <link rel="stylesheet" href="templates/style.css" type="text/css">
 <link rel="stylesheet" href="templates/newstyle.css" type="text/css">
 {% block extracss %}{% endblock %}
-{% if script %}{% for s in script %}{{ s|raw }}{% endfor %}{% endif %}
+{% if script %}{% for s in script %}{{ s|raw }}
+{% endfor %}{% endif %}
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" {{ body.onload|raw }}>
@@ -85,7 +86,7 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,"script","//www.google-analytics.com/analytics.js","ga");
 
-  ga('_setCustomVar',1,'design','orig',2);
+ /* ga('_setCustomVar',1,'design','orig',2); */
 
   ga("create", "UA-3987621-4", "miserend.hu");
   ga("send", "pageview");

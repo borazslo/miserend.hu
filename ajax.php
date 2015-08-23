@@ -173,6 +173,7 @@ switch ($_REQUEST['q']) {
         }
         break;    
     default:
+        return json_encode($_REQUEST);
         //code to be executed if n is different from all labels;
 }
 

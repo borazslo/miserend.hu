@@ -412,6 +412,7 @@ function getChurch($tid) {
     $return = array();
     $query = "SELECT templomok.*,geo.lat,geo.lng, geo.checked, geo.address2 FROM templomok LEFT JOIN terkep_geocode as geo ON geo.tid = templomok.id WHERE id = $tid LIMIT 1";
     $result = mysql_query($query);
+    
     while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
         foreach($row as $k => $v) {
             $return[$k] = $v;

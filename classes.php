@@ -46,7 +46,7 @@ class User
 
 
 	function submit($vars) {
-		if(isset($vars['uid']) AND !is_numeric($vars['uid']))
+		if(isset($vars['uid']) AND !is_numeric($vars['uid']) AND $vars['uid'] != '')
 			return array("Ilyen felhasználónk biztosan nincs!");
 	
 		foreach(array('nev','becenev','email','orszag','varos','magamrol','foglalkozas','skype','msn','ok','jogok','kontakt','volunteer') as $key) {

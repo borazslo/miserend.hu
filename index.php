@@ -10,6 +10,7 @@ if($_REQUEST['templom']>0 AND ( !isset($_REQUEST['m_id']) OR !isset($_REQUEST['m
 	$m_id = 26;
 	$m_op = 'view';
 	$tid = $_REQUEST['templom'];
+    $_REQUEST['tid'] = $_REQUEST['templom'];
 } elseif(isset($_REQUEST['m_id']) AND is_numeric($_REQUEST['m_id'])) {
 	$m_id=$_REQUEST['m_id'];
 } else {
