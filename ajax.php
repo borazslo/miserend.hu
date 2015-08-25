@@ -65,6 +65,7 @@ switch ($_REQUEST['q']) {
         break;
     case 'AutocompleteCity':
         $return[] = array('label' => $_REQUEST['text']."* <i>(Minden ".$_REQUEST['text']."-al kezdődő)</i>",'value'=>$_REQUEST['text']."*");
+        $return[] = array('label' => "*".$_REQUEST['text']."* <i>(Minden ".$_REQUEST['text']."-t tartalmazó)</i>",'value'=>"*".$_REQUEST['text']."*");
 
         $query = "SELECT varos, orszag FROM templomok WHERE ok = 'i' AND varos LIKE '".$_REQUEST['text']."%' ";
         $query .= "GROUP BY varos ORDER BY varos LIMIT 10";
@@ -180,6 +181,12 @@ switch ($_REQUEST['q']) {
         $remark->changeReliability($_REQUEST['reliable']);
         
         break;  
+    case 'CheckUsername':
+        if(CheckUsername($_REQUEST['text'])) echo 1;
+        else echo 0;
+
+        break;  
+
     default:
         return json_encode($_REQUEST);
         //code to be executed if n is different from all labels;

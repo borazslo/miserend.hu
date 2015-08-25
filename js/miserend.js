@@ -29,6 +29,58 @@ $(document).ready(function() {
         });
 
 
+    $('#password2').on('input', function() { 
+        if($('#password1').val() != $(this).val() || $(this).val() == '') {
+              $('#passwordcheck').addClass("ui-icon-alert red").removeClass("ui-icon-check green");
+              $('#passwordcheck').attr("title","A két jelszó nem egyezik!");
+        } else {
+              $('#passwordcheck').addClass("ui-icon-check green").removeClass("ui-icon-alert red");
+              $('#passwordcheck').attr("title","Minden rendben!");
+        }
+    });
+    $('#password1').on('input', function() { 
+        if($('#password2').val() != $(this).val() || $(this).val() == '') {
+              $('#passwordcheck').addClass("ui-icon-alert red").removeClass("ui-icon-check green");
+              $('#passwordcheck').attr("title","A két jelszó nem egyezik!");
+        } else {
+              $('#passwordcheck').addClass("ui-icon-check green").removeClass("ui-icon-alert red");
+              $('#passwordcheck').attr("title","Minden rendben!");
+        }
+    });
+
+    $('#newuser').on('input', function() { 
+
+        $.ajax({
+            url: "ajax.php",
+            dataType: "text",
+            data: {
+              q: 'CheckUsername',
+              text: this.value
+            },
+            success: function( data ) {
+              if(data == 0) {
+                $('#usernamecheck').addClass("ui-icon-alert red").removeClass("ui-icon-check green");
+                $('#usernamecheck').attr("title","Nem megfelelő felhasználói név!");
+              } else {
+                $('#usernamecheck').addClass("ui-icon-check green").removeClass("ui-icon-alert red");
+                $('#usernamecheck').attr("title","Minden rendben!");
+              }
+              console.log(data);
+              console.log('ok');
+            },
+            error: function( data ) {
+              console.log(data);
+              console.log('1err');
+            }
+          });
+
+
+      });
+
+       
+      
+
+
    $( ".urlap" ).autocomplete({
         source: function( request, response ) {
           $.ajax({

@@ -78,15 +78,23 @@ function login($name,$password) {
     return true;
 }
 
-function loginurlap() {
-    $bal="<span class=alcim>Felhasználói oldal</span>";
-    $bal.="<br><br><span class=alap>Ezen oldal megtekintéséhez kérlek lépj be!<br>Ha még nincs felhasználóneved, <a href=?m_id=28&fm=11 class=felsomenulink>itt</a> tudsz regisztrálni egyet. </span>";
+function checkUsername($username) {
+    if($username == '') return false;
+    if($username == '*vendeg*') return false;
+    if(strlen($username) > 20) return false;
+    if(preg_match("/( |\"|'|;)/i", $username)) return false;
+
+    //TODO: én ezt feloldanám
+    if(!preg_match("/^([a-z0-9]{1,20})$/i", $username)) return false;
+
+    $checkeduser = new User($username);
+    if($checkeduser->uid > 0) return false;
     
-    $adatT[2]=$bal;
-    $tipus='doboz';
-    $kod.=formazo($adatT,$tipus);   
-    
-    return $kod;
+
+    return true;
+
+
+
 }
 
 function getuser() {
@@ -136,21 +144,31 @@ function menuHtml($menuitems) {
     global $user,$m_id;
 
     $kod_tartalom = '';
+//$item['mid'] == $m_id
+    $c = 0;
     foreach ($menuitems as $item ) {
         if(!isset($item['permission']) OR $user->checkRole($item['permission'])) {
+            $c++;
             $kod_tartalom.="\n<li class='felsomenulink'><a href='".$item['url']."' class='felsomenulink'>".$item['title']."</a>";       
-            if($item['mid'] == $m_id AND isset($item['items']) AND is_array($item['items'])) {
+            if(isset($item['items']) AND is_array($item['items'])) { 
                 foreach ($item ['items'] as $i ) {
                     if(!isset($i['permission']) OR $user->checkRole($i['permission'])) {
-                        $kod_tartalom.="\n<br><a href='".$i['url']."' class='loginlink'>-> ".$i['title']."</a>";
+                        $c++;
+                        $kod_tartalom.="\n<a href='".$i['url']."' style='display:block' class='loginlink ";
+                        if($item['mid'] != $m_id) $kod_tartalom .= " closed ";
+                        $kod_tartalom .= "' >-> ".$i['title']."</a>";
                     }
                 }
             }
             $kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
         }
     }
+
     if($kod_tartalom == '') return false;
-    else return $kod_tartalom;
+
+    if($c > 10)
+        $kod_tartalom .= "<style> .closed { display: none !important }</style>";
+    return $kod_tartalom;
 
 }
 
@@ -2001,6 +2019,31 @@ function formazo($adatT,$tipus) {
     return $kod = $r_file;
 }
 
+function addMessage($text,$severity = false) {
+    global $user;
+
+    $query = "INSERT INTO messages (sid, timestamp, severity, text) VALUES ('".session_id()."','".date('Y-m-d H:i:s')."','".$severity."','".$text."');";
+
+    if(mysql_query($query)) return true;
+    return false;
+}
+
+function getMessages() {
+    global $user;
+
+    $return = array();
+    $query = "SELECT id,timestamp,text,severity FROM messages WHERE shown = 0 AND sid = '".session_id()."' ;";
+    $results = mysql_query($query);
+    while($message = mysql_fetch_assoc($results)) {
+        $return[] = $message;
+        mysql_query("UPDATE messages SET shown = 1 WHERE id = ".$message['id']." LIMIT 1;");
+
+    }
+    if(mysql_query($query)) return $return;
+    return false;
+}
+
+
 /*
     TODO: delete alapnyelv();
  */
@@ -2008,5 +2051,7 @@ function alapnyelv($text) {
     return $text;
 
 }
+
+
 
 ?>

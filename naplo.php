@@ -112,8 +112,9 @@ function email() {
 	global $twig;
 
 	if(!is_numeric($_REQUEST['rid'])) die('Tök helytelen azonosító.');
-	$remark = new Remark($_REQUEST['rid']);
+	$remark = $vars['remark'] = new Remark($_REQUEST['rid']);
 	$vars['church'] = $textvars['church'] = getChurch($remark->tid);
+	$vars['type'] = $_REQUEST['type'];
 
 	switch($_REQUEST['type']) {
 
@@ -138,7 +139,34 @@ function email() {
 
 }
 
+function sendemail() {
+	if(isset($_REQUEST['clear'])) {
+			$remark = new Remark($_REQUEST['rid']);
+			teendok($remark->tid);
+	}
+
+	$mail = new Mail();
+	$mail->to = $_REQUEST['email'];
+	$mail->content = $_REQUEST['text'];
+	$mail->type = "feedback_thanks";
+	if(!isset($_REQUEST['subject']) OR $_REQUEST['subject'] == '') $_REQUEST['subject'] = "Miserend";
+	$mail->subject = $_REQUEST['subject'];
+	$mail->send();
+
+	$remark = new Remark($_REQUEST['rid']);
+
+    teendok($remark->tid);
+	
+
+}
+
 switch($_REQUEST['op']) {
+
+	case 'sendemail':
+
+		sendemail();
+        break;
+
 
 	case 'email':
 

@@ -160,6 +160,7 @@ div.rightside.footer , div.leftside.footer {
 .grey { color: #989898; }
 .lightgrey { color: #E0E0E0;}
 .green { color: #008000;}
+.blue { color: blue;}
 
 .ui-tooltip {
     padding: 4px !important;
@@ -180,3 +181,34 @@ select:focus#my_dropdown {
 
 
 .ui-menu-item { padding: 1em; }
+
+
+/* TAB */
+/* http://keith-wood.name/uitabs.html */
+.tabs-min { 
+    background: transparent; 
+    border: none; 
+} 
+.tabs-min .ui-widget-header { 
+    background: transparent; 
+    border: none; 
+    border-bottom: 1px solid #c0c0c0; 
+    -moz-border-radius: 0px; 
+    -webkit-border-radius: 0px; 
+    border-radius: 0px; 
+} 
+.tabs-min .ui-tabs-nav .ui-state-default { 
+    background: transparent; 
+    border: none; 
+} 
+.tabs-min .ui-tabs-nav .ui-state-active { 
+    background: transparent url(../img/uiTabsArrow.png) no-repeat bottom center; 
+    border: none; 
+} 
+.tabs-min .ui-tabs-nav .ui-state-default a { 
+    color: #c0c0c0; 
+} 
+.tabs-min .ui-tabs-nav .ui-state-active a { 
+    color: #F5CC4C; 
+}
+/*ENDTAB*/

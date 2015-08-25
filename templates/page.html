@@ -23,7 +23,8 @@
 {% endfor %}{% endif %}
 </head>
 
-<body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" {{ body.onload|raw }}>
+<body bgcolor="#FFFFFF" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
 {% block container %}
 <div id="container">
 
@@ -55,6 +56,16 @@
 {% endblock %}
         
     <div class="center">
+            {% block messages %}
+              {% if messages %}
+              <div id="messages" style="margin-bottom:6px">
+                {% for message in messages %}
+                  {% include 'message.twig' with message %}
+                {% endfor %}
+              </div>  
+              {% endif %}
+            {% endblock %}
+
             {% block content %}{{ content|raw }}{% endblock %}
     </div>
     

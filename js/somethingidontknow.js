@@ -1,8 +1,4 @@
 	
-	function fokusz() {
-      document.loginurlap.login.focus();
-	}
-  
 	function OpenPrintWindow(url, x, y) {
       var options = "toolbar=no,menubar=yes,scrollbars=yes,resizable=yes,width=" + x + ",height=" + y;
       msgWindow=window.open(url,"", options);

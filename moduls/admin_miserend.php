@@ -1144,6 +1144,7 @@ function miserend_deletetemplom() {
 }
 
 function miserend_ehmlista() {
+	global $m_id;
 
 	$txt.="<span class=alcim>Egyházmegyei templomok listája</span><br><form method=post><input type=hidden name=m_op value=ehmlista><input type=hidden name=m_id value=$m_id><select name=ehm class=urlap>";
 	$query="select id,nev from egyhazmegye";
@@ -1173,6 +1174,7 @@ function miserend_ehmlista() {
 			$excel.="\n$tid;$tnev;$varos;$espker";
 		}
 		$txt.="<br><br><span class=alap>Az alábbi szöveget kimásolva excelbe importálható.<br>Excelben: Adatok / Szövegből oszlopok -> táblázattá alakítható</span><br><textarea class=urlap cols=60 rows=20>$excel</textarea>";
+
 	}
 
 	$adatT[2]=$txt;

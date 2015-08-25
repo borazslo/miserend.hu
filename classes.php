@@ -8,6 +8,47 @@
 class User
 {
 	function __construct($uid = false) {
+		if(isset($uid) AND !is_numeric($uid) AND filter_var($uid, FILTER_VALIDATE_EMAIL)) {
+			$query = "SELECT * FROM user WHERE email = '".sanitize($uid)."' AND ok = 'i' LIMIT 1";
+			$result = mysql_query($query);
+            $x = mysql_fetch_assoc($result);
+            if(is_array($x)) {
+            	foreach ($x as $key => $value) {
+            		$this->$key = $value;
+            	}
+				$this->username = $x['login'];
+				$this->nickname = $x['becenev'];
+				$this->name = $x['nev'];
+				$this->roles = explode('-',trim($this->jogok," \t\n\r\0\x0B-"));
+				return true;
+            } else {
+            	//TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
+            	// There is no user with this uid;
+            	$uid = 0;
+            	//return false;
+            }
+		}
+		elseif(isset($uid) AND !is_numeric($uid)) {
+			$query = "SELECT * FROM user WHERE login = '".sanitize($uid)."' AND ok = 'i' LIMIT 1";
+			$result = mysql_query($query);
+            $x = mysql_fetch_assoc($result);
+            if(is_array($x)) {
+            	foreach ($x as $key => $value) {
+            		$this->$key = $value;
+            	}
+				$this->username = $x['login'];
+				$this->nickname = $x['becenev'];
+				$this->name = $x['nev'];
+				$this->roles = explode('-',trim($this->jogok," \t\n\r\0\x0B-"));
+				return true;
+            } else {
+            	//TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
+            	// There is no user with this uid;
+            	$uid = 0;
+            	//return false;
+            }
+		}
+
 		if(!isset($uid) OR !is_numeric($uid) OR $uid == 0) {
 			$this->loggedin = false;
 			$this->uid = 0;
@@ -23,7 +64,9 @@ class User
             	}
 				$this->username = $x['login'];
 				$this->nickname = $x['becenev'];
+				$this->name = $x['nev'];
 				$this->roles = explode('-',trim($this->jogok," \t\n\r\0\x0B-"));
+				return true;
             } else {
             	//TODO: kitalálni mit csináljon, hogy nincs uid-jű user. Legyen vendég?
             	// There is no user with this uid;
@@ -35,7 +78,7 @@ class User
 	function checkRole($role = false) {
 		if($role == false) return true;
 		
-		if($role == '"any"' OR $role = "'any'") {
+		if($role == '"any"' OR $role == "'any'") {
 			if(trim(preg_replace('/-/i', '', $this->jogok))  != '' ) return true;
 			else return false;
 		}
@@ -46,130 +89,144 @@ class User
 
 
 	function submit($vars) {
-		if(isset($vars['uid']) AND !is_numeric($vars['uid']) AND $vars['uid'] != '')
-			return array("Ilyen felhasználónk biztosan nincs!");
-	
-		foreach(array('nev','becenev','email','orszag','varos','magamrol','foglalkozas','skype','msn','ok','jogok','kontakt','volunteer') as $key) {
-			if(isset($vars[$key])) {
-				if(!$this->presave($key,$vars[$key])) {
-					$hiba[] = "Gond van a <i>".$key."</i> mezővel.";
+		$return = true;
+
+		if(isset($vars['uid']) AND !is_numeric($vars['uid']) AND $vars['uid'] != '') {
+			addMessage('Nincs ilyen felhasználónk!','danger');
+			return false;
+		}
+
+		$dangers = array(
+			'uid' => 'Probléma támadt az azonosítóval!',
+			'username' => 'Probléma a felhasználónévvel! (A felhasználó nevet nem lehet megváltoztatni és nem lehet olyan név, ami már használatban van.)',
+			'nickname' => 'Probléma a becenévvel!',
+			'name' => 'Probléma a névvel!',
+			'email' => 'Nem megfelelő email cím!',
+			'volunteer' => 'Hibás értéke van az önkéntességnek!',
+			'ok' => 'Csak az „i” = „igen” és a „n” = „nem” elfogadható érték az aktivitást illetően!',
+			'roles' => 'Hibás formátumú jogkörök!',
+			);
+
+		foreach(array('uid','username','nickname','name','email','volunteer','ok','roles') as $input) {
+			if(isset($vars[$input])) {
+				if(!$this->presave($input,$vars[$input])) {
+						$return = false;
+						addMessage($dangers[$input],'danger');
 				}
 			}
 		}
-		if($this->id == 0) {
-			if(!$this->presave('username',$vars['ulogin'])) {
-					$hiba[] = "Gond van a <i>username</i> mezővel.";
+
+		if(isset($vars['password1']) OR isset($vars['password2'])) {
+			if($vars['password1'] != $vars['password2'] OR $vars['password1'] == '') {
+				addMessage('A két jelszó nem egyezik meg egymással','danger');
+				$return = false;
 			}
-		}
-		//TODO: a formban ujelszo helyett valami rendes
-		if(!empty($vars['ujelszo'])) {
-			if($vars['ujelszo'] == $vars['ujelszo1']) {
-				if(!$this->presave('password',$vars['ujelszo'])) {
-					$hiba[] = "Gond van a <i>jelszó</i> mezővel.";
+			else {
+				if(!$this->presave('password',$vars['password1'])) {
+					$return = false;
+					addMessage('Sajnos nem megfelelő a jelszó!','danger');
 				}
 			}
-			else $hiba[] ='HIBA! A beírt két jelszó nem egyezik!';
+
+		} 
+
+		if($return == false) return false;
+
+		if($vars['submit'] == 'Létrehoz') {
+			$pwd = $this->generatePassword();
+			$this->presave('password',$pwd);
+
+			//email küldése
+			$email = new Mail();
+			$email->subject = 'Regisztráció - Virtuális Plébánia Portál';
+			$email->content ="Köszöntünk a Virtuális Plébánia Portál felhasználói között!<br/><br/>";
+			$email->content .="\n\nA belépéshez szükséges jelszó: $pwd<br/>";
+			$email->content .="\nA belépést követően a BEÁLLÍTÁSOK menüben kérjük megváltoztatni a jelszót.<br><br/>";
+			$email->content .="\n\nVPP \nwww.plebania.net";
+			$email->to = $this->presaved['email'];
+			if($email->send()) addMessage("Elküldtük az emailt az új regisztrációról.","success");
 		}
 		
-		if(!$this->save()) $hiba[] = "Nem sikerült elmenteni. Pedig minden rendben volt előtte.";
 
-		if($hiba) return $hiba;	
+		if(!$this->save()) {
+			addMessage("Nem sikerült elmenteni. Pedig minden rendben volt előtte.","warning");
+			return false;
+		} else
+			addMessage("A változásokat elmentettük.","success");
 
-		return 1;
+		return true;
 	}
 
 	function presave($key,$val) {
 		if(!isset($this->presaved)) $this->presaved = array();
-
 		//TODO: check duplicate for: logn + email
 
 		//TODO: van, amit ne engedjen, csak, amikor még tök új a cuccos.
 		//TODO: törölhető oszlop: ismerosok, baratok, regip, lastip, log, adminmegj,atvett
 
-		//TODO: a nickname - becenev esetén ez nem segít, bár nem sok dupla munka azért
-		if($this->$key == $val) return true;
-		
-		if($val == '' AND !in_array($key,array('username','login'))) {
-			$this->presaved[$key] = $val;
-			return true;
+		//TODO: a nickname - becenev / name - nev esetén ez nem segít, bár nem sok dupla munka azért
+		//TODO: elrontja ...
+		//if($this->$key == $val) return true;
+
+
+		//TODO: szóljon vissza a kötelező
+		if($val == '' AND in_array($key,array('username','login','email'))) {
+			return false;
 		}
-		
 
 		if($key == 'uid') {
-				return false;
+				if($this->uid != $val) 
+					return false;
 		} elseif(in_array($key,array('username','login')))  {
 				if($this->uid == 0)  {
-					if(sanitize($val) == '*vendeg*' OR sanitize($val) == '') return false;
-					else $this->presaved['login'] = sanitize($val);				
-				} else
+					if(!checkUsername($val)) return false;
+					$this->presaved['login'] =  sanitize($val);
+				} elseif($this->username != $val ) {
 					return false;
+				}
 				
 		} elseif(in_array($key,array('jelszo','password')))  {
 				$this->presaved['jelszo'] = $this->passwordEncode($val);
 
-		} elseif($key == 'jogok') {
-				if(is_array($val)) {
-					foreach ($val as $k => $i) $val[$k] = trim(sanitize($i),"-");
-					$this->presaved[$key] = implode('-',$val);
-				} else 
-					$this->presaved[$key] = trim(sanitize($val),"-");
-		} elseif($key == 'roles') {
+		} elseif($key == 'roles' OR $key == 'jogok') {
 				if(!is_array($val)) $val = array($val);
-				foreach ($val as $k => $i) $val[$k] = trim(sanitize($i),"-");
-				$this->presaved[$key] = implode('-',$val);
+				foreach ($val as $k => $i) $val['jogok'] = trim(sanitize($i),"-");
+				$val = array_filter($val);
+				$this->presaved['jogok'] = implode('-',$val);
 				
-		} elseif($key == 'nickname') {
+		} elseif($key == 'nickname' or $key == 'becenev') {
 				$this->presaved['becenev'] = sanitize($val);				
+
+		} elseif($key == 'name' or $key == 'nev') {
+				$this->presaved['nev'] = sanitize($val);				
 
 		} elseif($key == 'ok') {
 				$con = array(1=>'i',0=>'n');
-				if(in_array($val,array('i','n'))) $this->presaved[$key] = $val;
+				if($val == '') $this->presaved[$key] = 'n';
+				elseif(in_array($val,array('i','n'))) $this->presaved[$key] = $val;
 				elseif(in_array($val,array(1,0))) $this->presaved[$key] = $con[$val];
-				else return false;				
-		} elseif($key == 'nem') {
-				if(in_array($val,array('0','f','n'))) $this->presaved[$key] = $val;
-				else return false;
+				
+				else return false;	
+
 		} elseif($key == 'volunteer') {
-				if(in_array($val,array(0,1))) $this->presaved[$key] = $val;
+				if($val == '') $this->presaved[$key] = 0;
+				elseif(in_array($val,array(0,1))) $this->presaved[$key] = $val;
 				else return false;
 				
-		} elseif(in_array($key,array('letrehozta','orszag','varos'))) {
+		} elseif(in_array($key,array('letrehozta'))) {
 				//TODO: túlzás lenne megnézni, hogy valódi name-e? (bár ha törölt... user...)
 				$this->presaved[$key] = sanitize($val);
-			
 
 		} elseif(in_array($key,array('regdatum','lastlogin','lastactive'))) {
 				if(strtotime($val))
 					$this->presaved[$key] = date('Y-m-d H:i:s',strtotime($val));
 				else return false;				
-		} elseif($key == 'szuldatum') {
-				if(strtotime($val))
-					$this->presaved[$key] = date('Y-m-d',strtotime($val));
-				else return false;				
-		} elseif($key == 'nevnap') {
-				if(preg_match('/^([0-9]{1,2})( |-|\.)([0-9]{1,2})(\.|$)/i',$val,$match))
-					if(strtotime(date('Y')."-".$match[0].'-'.$match[2]))
-						$this->presaved[$key] = date('m-d',strtotime(date('Y')."-".$match[0].'-'.$match[1]));
-					else return false;
-				else return false;
-				
 
 		} elseif($key == 'email') {
 				if(!filter_var($val, FILTER_VALIDATE_EMAIL)) return false;
-				else $this->presaved[$key] = $val;
 
-			//TODO: lehetne itt még varázsolni
-		} elseif(in_array($key,array('becenev','nev','kontakt','msn','skype','foglalkozas','magamrol','vallas'))) {
-				$this->presaved[$key] = sanitize($val);				
-		} elseif($key == 'csaladiallapot') {
-				if(in_array($val,array('titok','egyedülálló','kapcsolatban','házas','elvált','özvegy','pap/szerzetes')))
-					$this->presaved[$key] = $val;
-				else return false;
-
-		} elseif($key == 'nyilvanos') {
-				//TODO: komoly fomrai követelményei vannak!!
-				$this->presaved[$key] = sanitize($val);				
-
+				//TODO: dupla email címeket kiszűrni
+				$this->presaved[$key] = $val;			
 
 		} else
 			return false;
@@ -181,17 +238,19 @@ class User
 		if(!$this->presaved) return false;
 
 		//Set Deafult
-		if(!isset($this->presaved['ok'])) $this->presaved['ok'] = $this->presave('ok','i');
-		if(!isset($this->presaved['regdatum'])) $this->presaved['regdatum'] = $this->presave('regdatum',time());
-		global $user;
-		if(!isset($this->presaved['letrehozta'])) $this->presaved['regdatum'] = $this->presave('letrehozta',$user->username);
-
+		if($this->uid < 1) {
+			if(!isset($this->presaved['ok'])) $this->presaved['ok'] = $this->presave('ok','i');
+			if(!isset($this->presaved['regdatum'])) $this->presaved['regdatum'] = $this->presave('regdatum',time());
+			global $user;
+			if(!isset($this->presaved['letrehozta'])) $this->presaved['regdatum'] = $this->presave('letrehozta',$user->username);
+		}
 
 		foreach ($this->presaved as $key => $val) {
 			$keys[] = $key;
 			$vals[] = $val;
 			$sets[] = $key.' = "'.$val.'"';
 		}
+
 		if($this->uid == 0 AND isset($this->presaved['login'])) {
 			$query = "INSERT INTO user (".implode(', ',$keys).") VALUES ('".implode("', '", $vals)."');";
 			if(!mysql_query($query)) return false;
@@ -205,7 +264,8 @@ class User
 
 		//TODO: ezt már egyszer leírtam
 		$this->username = $this->login;
-		$this->nickname = $this->nickname;
+		$this->nickname = $this->becenev;
+		$this->name = $this->nev;
 		$this->roles = explode('-',trim($this->jogok," \t\n\r\0\x0B-"));
 
 		unset($this->presaved);
@@ -229,6 +289,18 @@ class User
 			return false;
 	}
 
+	function generatePassword($length = 8) {
+	    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	    $count = mb_strlen($chars);
+
+	    for ($i = 0, $result = ''; $i < $length; $i++) {
+	        $index = rand(0, $count - 1);
+	        $result .= mb_substr($chars, $index, 1);
+	    }
+
+	    return $result;
+}
+
 	function newPassword($text) {
 		$this->presave('password',$text);
 		$this->save();
@@ -236,6 +308,112 @@ class User
 
 	function passwordEncode($text) {
 			return base64_encode($text);
+	}
+
+	function form() {
+		global $m_id, $user;
+
+		$form = array(
+        'm_id' => array(
+            'type' => 'hidden',
+            'name' => "m_id",
+            'value' => $m_id),
+        'm_op' => array(
+            'type' => 'hidden',
+            'name' => "m_op",
+            'value' => "adding"),
+
+        'username' => array(
+            'name' => "username",
+            'size' => 20,
+            'maxlength' => 20,
+            'style' => 'float:left'),
+        'nickname' => array(
+            'name' => "nickname",
+            'size' => 40,
+            'maxlength' => 100),
+        'email' => array(
+            'name' => "email",
+            'size' => 40,
+            'maxlength' => 100,
+            'class' => 'email'),
+        'password1' => array(
+            'name' => "password1",
+            'id' => "password1",
+            'type' => "password",
+            'size' => 33,
+            'maxlength' => 100),
+        'password2' => array(
+            'name' => "password2",
+            'type' => "password",
+            'id' => "password2",
+            'size' => 33,
+            'maxlength' => 100,
+            'style' => 'float:left'),
+        'name' => array(
+            'name' => "name",
+            'size' => 40,
+            'maxlength' => 100),
+        'volunteer' => array(
+            'type' => 'checkbox',
+            'name' => 'volunteer',
+            'value' => 1),
+        'submit' => array(
+        	'name' => 'submit',
+        	'type' => 'submit'
+        	)
+      );
+
+		if($this->uid > 0) {
+			$form['username']['readonly'] = true;
+			$form['username']['value'] = $this->username;
+			$form['nickname']['value'] = $this->nickname;
+			$form['email']['value'] = $this->email;
+			$form['name']['value'] = $this->nev;
+			if($this->volunteer == 1)
+				$form['volunteer']['checked'] = true;
+
+			$form['uid'] = array(
+	            'type' => 'hidden',
+	            'name' => 'uid',
+	            'value' => $this->uid);
+
+			$form['submit']['value'] = "Módosít";
+		}	
+
+		if($this->uid < 1) {
+			if(!$user->loggedin)
+				$form['terms'] = array(
+	            	'type' => 'checkbox',
+	            	'name' => 'terms',
+	            	'value' => 1);
+			$form['submit']['value'] = "Létrehoz";
+			$form['username']['id'] = 'newuser';
+		}
+
+		if($this->checkRole('user')) {
+			$form['active'] = array(
+				'type' => 'checkbox',
+				'name' => 'ok',
+				'value' => 'i');
+			if($this->ok == 'i') $form['active']['checked'] = true;
+		
+			$query="select jogkod from modulok where jogkod !=''";
+			$lekerdez=mysql_query($query);
+			while(list($jogkod)=mysql_fetch_row($lekerdez)) {
+				$form['roles'][$jogkod] = array(
+					'type' => 'checkbox',
+					'name' => 'roles[]',
+					'value' => $jogkod,
+					'labelback'=>$jogkod);
+				if($this->checkRole($jogkod)) $form['roles'][$jogkod]['checked'] = true;
+			}
+
+
+
+		}	
+
+		return $form;
 	}
 
 } // END class 
@@ -256,6 +434,7 @@ class Mail
 		$this->header  = 'MIME-Version: 1.0' . "\r\n";
 		$this->header .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
 		$this->header .= 'From: '.$config['mail']['sender'] . "\r\n";
+		$this->type = '';
 	}
 
 	function send($to = false) {
@@ -272,8 +451,10 @@ class Mail
 			if(!is_array($this->to)) $this->to = array($this->to);
 			if($this->debug == 3) { print_r($this); }
 			else {
+				$query = "INSERT INTO emails (`type`,`to`,`header`,`subject`,`body`,`timestamp`) VALUES ('".$this->type."','".implode(';',$this->to)."','".$this->header."','".$this->subject."','". mysql_real_escape_string($this->content)."','".date('Y-m-d H:i:s')."');";
 				if(!mail(implode(',',$this->to),$this->subject,$this->content,$this->header))
 					echo 'Valami hiba történt az email küldése közben. Kár';
+				else return true;
 			}
 		} else {
 			echo 'Nem tudtuk elküldeni az emailt. Kevés az adat.';
@@ -323,7 +504,7 @@ class Remark
 		if(!isset($this->reliable)) $this->reliable = '?';
 
 		if($this->username != "*vendeg*") $where = " login = '".$this->username."' ";
-		elseif(preg_match("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",$this->email)) $where = " email = '".$this->email."' ";
+		elseif(preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i",$this->email)) $where = " email = '".$this->email."' ";
 		if(isset($where)) {
 			$query="SELECT megbizhato FROM eszrevetelek where $where order by datum DESC LIMIT 1";
 			$lekerdez=mysql_query($query);

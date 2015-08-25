@@ -380,34 +380,36 @@ function miserend_index() {
             $randoms[] = $random;
         }
         foreach($randoms as $k=>$random) {
-			$random['konyvtar'] = $randoms[$k]['konyvtar'] = "$konyvtaralap/".$random['id'];
-            //if(is_file("$konyvtar/kicsi/$fajlnev")) {
-            @$info=getimagesize($random['$konyvtar']."/kicsi/".$random['fajlnev']);
-			$w1=$info[0];
-			$h1=$info[1];
-			if($h1>$w1 and $h1>90) {
-				$arany=90/$h1;
-				$ujh=90;
-				$ujw=$w1*$arany;
-			}
-			else {
-				$ujh=$h1;
-				$ujw=$w1;
-			}
-            
-           $kepek .= "<li class='als-item colorbox'><a href=\"".$random['konyvtar']."/".$random['fajlnev']."\" title=\"".$random['title']."\" class='als-color' onclick=\"ga('send','event','Inbound Links','Photos','?templom=".$random['id']."')\">
-            <img src=\"".$random['konyvtar']."/kicsi/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' ></a>
-            
-                <div tid='".$random['id']."' style='display:none;text-align:center'>
-                    <a href=\"?templom=".$random['id']."\" title=\"".$random['title']."\">
-                    <img src=\"".$random['konyvtar']."/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' align=\"center\" style=\"max-height:80%;display:block;margin-left:auto;margin-right:auto\">
-                    <div style=\"background-color:rgba(255,255,255,0.3);padding:10px;\" class=\"felsomenulink\">".$random['nev']." (".$random['varos'].")</div>
-                    </a>
-                </div>
-            
-            </li>\n";
+        	if(file_exists($random['$konyvtar']."/kicsi/".$random['fajlnev'])) {
+				$random['konyvtar'] = $randoms[$k]['konyvtar'] = "$konyvtaralap/".$random['id'];
+	            //if(is_file("$konyvtar/kicsi/$fajlnev")) {
+	            @$info=getimagesize($random['$konyvtar']."/kicsi/".$random['fajlnev']);
+				$w1=$info[0];
+				$h1=$info[1];
+				if($h1>$w1 and $h1>90) {
+					$arany=90/$h1;
+					$ujh=90;
+					$ujw=$w1*$arany;
+				}
+				else {
+					$ujh=$h1;
+					$ujw=$w1;
+				}
+	            
+	           $kepek .= "<li class='als-item colorbox'><a href=\"".$random['konyvtar']."/".$random['fajlnev']."\" title=\"".$random['title']."\" class='als-color' onclick=\"ga('send','event','Inbound Links','Photos','?templom=".$random['id']."')\">
+	            <img src=\"".$random['konyvtar']."/kicsi/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' ></a>
+	            
+	                <div tid='".$random['id']."' style='display:none;text-align:center'>
+	                    <a href=\"?templom=".$random['id']."\" title=\"".$random['title']."\">
+	                    <img src=\"".$random['konyvtar']."/".$random['fajlnev']."\" title='".$random['nev']." (".$random['varos'].")' align=\"center\" style=\"max-height:80%;display:block;margin-left:auto;margin-right:auto\">
+	                    <div style=\"background-color:rgba(255,255,255,0.3);padding:10px;\" class=\"felsomenulink\">".$random['nev']." (".$random['varos'].")</div>
+	                    </a>
+	                </div>
+	            
+	            </li>\n";
 
-        }
+        	} 
+    	}
         if($mennyi < 4) for($i=0;$i<4-$mennyi;$i++) $kepek .= "<li class='als-item'></li>";
         $kepek.='</ul>
             </div>
