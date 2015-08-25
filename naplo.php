@@ -44,8 +44,6 @@ function teendok($tid) {
 				foreach(array(
 						'u'=>'új',
 						'f'=>'folyamatban',
-						'plebaniara' => 'lezárva és a plébániára irányítva',
-						'koszon' => 'javítva és megköszönve',
 						 'j'=>'lezárva/javítva') as $i=>$ertek) {
 					if($i!=$remark->allapot) {
 						$urlap.="<option value=$i>$ertek</option>";
@@ -97,7 +95,6 @@ function mod() {
 
 	if($allapot!='0') {	
 		$query="UPDATE eszrevetelek set admin='".$user->login."', admindatum='".date('Y-m-d H:i:s.')."', allapot='".$allapot."' where id='".$id."' LIMIT 1";
-	echo $query;	
 		mysql_query($query);
 
 		if($allapot=='u') $allapot1='i';
@@ -109,23 +106,29 @@ function mod() {
 }
 
 function email() {
-	global $twig;
+	global $twig,$user;
 
+	$textvars = array();
 	if(!is_numeric($_REQUEST['rid'])) die('Tök helytelen azonosító.');
 	$remark = $vars['remark'] = new Remark($_REQUEST['rid']);
 	$vars['church'] = $textvars['church'] = getChurch($remark->tid);
 	$vars['type'] = $_REQUEST['type'];
+	$textvars['remark'] = $remark;
+	$textvars['user'] = $user;
+
 
 	switch($_REQUEST['type']) {
 
-		case 'plebaniara':
-			$content .= "szívás babám";
+		case 'koszonet':
+			$vars['text'] = $twig->render('email_feedback_koszonet.twig',$textvars);
 			break;
 
-		case 'koszonet':
-			$content .= 'köszönjük ám';
-			$textvars = array('remark'=>$remark);
-			$vars['text'] = $twig->render('email_feedback_koszonet.twig',$textvars);
+		case 'plebaniara':
+			$vars['text'] = $twig->render('email_feedback_plebaniara.twig',$textvars);
+			break;
+
+		default:
+			$vars['text'] = '';
 			break;
 
 	}
@@ -135,7 +138,6 @@ function email() {
     echo $twig->render('naplo_email.twig',$vars);
 
 	echo $header.$content.$footer;
-	echo "?";
 
 }
 
@@ -147,13 +149,15 @@ function sendemail() {
 
 	$mail = new Mail();
 	$mail->to = $_REQUEST['email'];
-	$mail->content = $_REQUEST['text'];
-	$mail->type = "feedback_thanks";
+	$mail->content = nl2br($_REQUEST['text']);
+	$mail->type = "eszrevetel_".$_REQUEST['type'];
 	if(!isset($_REQUEST['subject']) OR $_REQUEST['subject'] == '') $_REQUEST['subject'] = "Miserend";
 	$mail->subject = $_REQUEST['subject'];
-	$mail->send();
 
+	if(!$mail->send()) addMessage('Nem sikerült elküldeni az emailt. Bocsánat.','danger');
+	
 	$remark = new Remark($_REQUEST['rid']);
+	$remark->addComment("email küldve: ".$mail->type);
 
     teendok($remark->tid);
 	

@@ -452,12 +452,14 @@ class Mail
 			if($this->debug == 3) { print_r($this); }
 			else {
 				$query = "INSERT INTO emails (`type`,`to`,`header`,`subject`,`body`,`timestamp`) VALUES ('".$this->type."','".implode(';',$this->to)."','".$this->header."','".$this->subject."','". mysql_real_escape_string($this->content)."','".date('Y-m-d H:i:s')."');";
+				if(!mysql_query($query)) 
+					addMessage('Nem sikerült elmenteni az emailt.','warning');
 				if(!mail(implode(',',$this->to),$this->subject,$this->content,$this->header))
-					echo 'Valami hiba történt az email küldése közben. Kár';
+					addMessage('Valami hiba történt az email elküldése közben.','danger');
 				else return true;
 			}
 		} else {
-			echo 'Nem tudtuk elküldeni az emailt. Kevés az adat.';
+			addMessage('Nem tudtuk elküldeni az emailt. Kevés az adat.','danger');
 		}
 
 	}
@@ -521,11 +523,13 @@ class Remark
 			allapot='".$this->state."',
 			leiras='".sanitize($this->text)."'";
 		if(isset($this->email)) $query .= ", email='".$this->email."'";
-		mysql_query($query);
+		
+		if(!mysql_query($query)) return false;
 
 		//TODO: ezt teljesen ki lehetne iktatni
 		$query="UPDATE templomok set eszrevetel='i' where id='".$this->tid."' LIMIT 1";
-		mysql_query($query);
+
+		if(!mysql_query($query)) return false;
 		
 		return true;
 	}
@@ -613,6 +617,13 @@ class Remark
 			mysql_query("UPDATE eszrevetelek SET megbizhato = '".$reliability."' WHERE email = '".$this->email."' ;");
 		else
 			return false;
+	}
+
+	function addComment($text) {
+		global $user;
+		 $newline = "\n<img src='img/edit.gif' align='absmiddle' title='".$user->username." (".date('Y-m-d H:i:s').")'>".$text; 
+		 $query = 'UPDATE eszrevetelek SET adminmegj = CONCAT(IFNULL(adminmegj,""), "'.$newline.'") WHERE id = '.$this->id." LIMIT 1";
+		 if(!mysql_query($query)) addMessage("Nem sikerült a megjegyzést bővíteni.",'warning');
 	}
 
 } // END class 

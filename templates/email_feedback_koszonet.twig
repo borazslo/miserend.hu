@@ -1,3 +1,10 @@
 <strong>Kedves {{ remark.nev }}!</strong>
 
-Köszönjük, hogy észrevételt küldött be a {{ church.nev }} ({{ church.ismertnev }})
+Köszönjük, hogy észrevételt küldött be a <a href="http://miserend.hu/?templom={{ church.id }}">{{ church.nev }} {% if church.ismertnev %}({{ church.ismertnev }}){% endif %}</a> adatlapján. 
+
+Észrevételét megkaptuk és már is feldolgoztuk. Kérjük, hogy máskor is keressen meg minket, ha valami vátozást tud meg valamelyik templomunkról.
+
+<strong>Köszönettel:</strong>
+          {% if user.nev %}{{ user.nev }}{% else %}{{ user.username }}{% endif %}
+
+és a miserend.hu önkéntesei

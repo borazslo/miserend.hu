@@ -61,15 +61,17 @@ function adatadd() {
 	if(!isset($_REQUEST['tid']) OR !is_numeric($_REQUEST['tid'])) 
 		$content = "<h4>HIBA!</h4>Nincs templomazonosító elküldve!";
 	else {
-		$tid=$_REQUEST['tid'];
-		$remark = new Remark($tid);
+		$remark = new Remark();
+
+		$remark->tid=$_REQUEST['tid'];
+		$templom = getChurch($_REQUEST['tid']);
 		$remark->name = sanitize($_REQUEST['nev']);		
 		$remark->email = sanitize($_REQUEST['email']);
 		
 		if($remark->email == '') unset($remark->email);
 		$remark->text = sanitize($_REQUEST['leiras']);
-		$remark->save();
-		$remark->emails();
+		if(!$remark->save()) addMessage("Nem sikerült elmenteni az észrevételt. Sajánljuk.","danger");
+		if(!$remark->emails()) addMessage("Nem sikerült elküldeni az értesítő emaileket.","warning");
 		$content = "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br></br>".$remark->PreparedText4Email."<br/><input type='button' value='Ablak bezárása' onclick='self.close()'>";
 		if($config['debug']<1) $content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
 

@@ -52,7 +52,7 @@
 						  <ul class="emailmenu" style="width:33px;">
 						  <li style="background-color:{{ cycle(['#EFEFEF', '#F3E9CD'], loop.index0) }};padding:1"  class="alap"><span class="ui-icon ui-icon-mail-closed" style="color:#B51A7E"></span>
 						    <ul>
-						      <li><a href="mailto:{{ remark.email }}" title="{{ remark.email }}"  class="alap"><span class="ui-icon ui-icon-mail-closed" style="color:#B51A7E"></span> {{ remark.email }}</a></li>
+						      <li><a href="?op=email&rid={{ remark.rid }}"  class="alap"><span class="ui-icon ui-icon-mail-closed" style="color:#B51A7E"></span> {{ remark.email }}...</a></li>
 						      <li><a href="?op=email&rid={{ remark.rid }}&type=koszonet" class="alap"><span class="ui-icon ui-icon-heart" style="color:#ff0000"></span> Köszönet írása...</a></li>
 						      <li><a href="?op=email&rid={{ remark.rid }}&type=plebaniara" class="alap"><span class="ui-icon ui-icon-arrowreturnthick-1-w" class="grey"></span> Plébániára irányítás...</a></li>
 						    </ul>
