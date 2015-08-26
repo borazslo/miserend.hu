@@ -1,7 +1,7 @@
 <?php
 
 function design(&$vars) {
-    global $design_url,$db_name,$tartalom,$m_oldalsablon,$balkeret,$jobbkeret,$onload,$sid,$linkveg,$loginhiba,$script,$meta,$titlekieg,$m_id;
+    global $design_url,$db_name,$tartalom,$m_oldalsablon,$script,$meta,$titlekieg,$m_id;
 
     global $twig,$user;
 
@@ -10,27 +10,6 @@ function design(&$vars) {
 
     if(!is_array($script)) $vars['script'][] = $script;
     else $vars['script'] = $script;
-
-    $vars['script'][] = '<link href="css/tmp.css" rel="stylesheet">';    
-    $vars['script'][] = '<link href="css/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />';
-
-    $vars['script'][] = '<script src="bower_components/jquery/dist/jquery.min.js"></script>';
-    $vars['script'][] = '<script src="bower_components/jquery-ui/jquery-ui.js"></script>';
-    $vars['script'][] = '<script src="bower_components/jquery-ui/ui/autocomplete.js"></script>';
-    $vars['script'][] = '<script src="bower_components/jquery-colorbox/jquery.colorbox.js"></script>';
-    $vars['script'][] = '<script src="bower_components/jquery-colorbox/i18n/jquery.colorbox-hu.js"></script>';
-
-    $vars['script'][] = '<script src="js/als/jquery.als-1.5.min.js"></script>';
-
-	$vars['script'][] = '<script src="js/miserend.js"></script>'; 
-	$vars['script'][] = '<script src="js/somethingidontknow.js"></script>'; 
-
-    
-    $vars['script'][] = '<link rel="stylesheet" href="templates/colorbox.css" />';
-    $vars['script'][] = '<link rel="stylesheet" href="templates/als.css" />';
-
-
-    $vars['script'][] = '<link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css">';
 
     
    /*
@@ -51,26 +30,6 @@ function design(&$vars) {
 
 	$emaillink_lablec="<A HREF=\"javascript:linkTo_UnCryptMailto('ocknvq%3CkphqBokugtgpf0jw');\" class=emllink>info<img src=img/kukaclent.gif align=absmiddle border=0>miserend.hu</a>";
 	
-
-//Impresszum link
-	$impkiir='Impresszum';
-	$impfm='impfm';
-	$impresszumlink="<a href=?m_id=17&fm=12 class=implink>$impkiir</a>";
-    $vars['bottom']['left']['content'] = $impresszumlink."<br/>".$emaillink_lablec;
-    
-	$vars['bottom']['right']['content'] = "<a href=http://www.b-gs.hu class=implink title='BGS artPart' target=_blank>design</a><br><a href=http://www.florka.hu class=implink title='Florka Kft.' target=_blank>programozás</a>";
-
-    
-//Loginűrlap
-	if($user->loggedin) {
-        $vars['login']['loggedin'] = true;
-		//Ha bent van
-        $vars['login']['vars'] = array('linkveg' => $linkveg, 'design_url' => $design_url,'u_login'=>$user->login);
-    }
-	else {
-		//Belépés
-        $vars['login']['vars'] = array('linkveg' => $linkveg, 'design_url' => $design_url,'login'=>$_POST['login'],'loginhiba'=>$loginhiba,'sid'=>$sid);       
-	}
 
 	$vars['user'] = $user;
 	//BLOCK - BLOCKS
@@ -108,56 +67,8 @@ function design(&$vars) {
 
 		$vars['adminmenu'] = clearMenu($adminmenuitems);
 	
-	/*
-	echo"<pre>".print_r($adminmenuitems,1)."</pre>";
-
-	foreach ($adminmenuitems as $item ) {
-        if(!isset($item['permission']) OR $user->checkRole($item['permission'])) {
-            $c++;
-            $kod_tartalom.="\n<li class='felsomenulink'><a href='".$item['url']."' class='felsomenulink'>".$item['title']."</a>";       
-            if(isset($item['items']) AND is_array($item['items'])) { 
-                foreach ($item ['items'] as $i ) {
-                    if(!isset($i['permission']) OR $user->checkRole($i['permission'])) {
-                        $c++;
-                        $kod_tartalom.="\n<a href='".$i['url']."' style='display:block' class='loginlink ";
-                        if($item['mid'] != $m_id) $kod_tartalom .= " closed ";
-                        $kod_tartalom .= "' >-> ".$i['title']."</a>";
-                    }
-                }
-            }
-            $kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
-        }
-    }
-	*/
-
-
-		$adminmenu = array(
-			'content' => menuHtml($adminmenuitems), 
-			'bgcolor'=>'#ECE5C8',
-			'header'=>array(
-				'content'=>'Adminisztráció',
-				'bgcolor'=>'#F5CC4C',
-				'class' => 'dobozcim_fekete',
-			),
-			'op'=>$helyzet,
-		);
-		$vars['sidebar']['left']['blocks'][] = $adminmenu;
 	}
 
-	//BLOCK - CHAT
-	if($user->checkRole("'any'")) {
-		$chat = array(
-			'content' => chat_html(),
-			'bgcolor'=>'#ECE5C8',
-			'header'=>array(
-				'content'=>'Admin üzenőfal',
-				'bgcolor'=>'#F5CC4C',
-				'class' => 'dobozcim_fekete',
-			),
-			'op'=>$helyzet,
-		);
-		$vars['sidebar']['left']['blocks'][] = $chat;		
-    }
 
 	//BLOCK - USER'S CHURCHES
  	if($user->loggedin) {

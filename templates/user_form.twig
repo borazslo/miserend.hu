@@ -5,7 +5,7 @@
 {% block content %}
 	<span class=alcim>{{ title }}</span><br><br>
 
-	<form method=post>
+	<form method="post">
 	    {{ forms.input(form.m_op) }}
 	    {{ forms.input(form.m_id) }}
 	    {% if form.uid %}{{ forms.input(form.uid) }}{% endif %}

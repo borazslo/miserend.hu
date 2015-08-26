@@ -1,0 +1,45 @@
+{% import "forms.twig" as forms %}
+
+<table class="portlet" style="width:611px;padding:0px;background-color:white">
+
+<tr>
+	<td bgcolor=#D6F8E6>
+		<img src="img/minusz.jpg" class='close' style="vertical-align: middle;">
+		<span class=kiscim>Különleges nap:</span>
+	</td>
+	<td bgcolor=#D6F8E6>
+		{{ forms.input(nev1) }}
+		{{ forms.input(nev) }}
+		<img src="img/buttons/deleteup.gif" class='alap deleteparticular' style="vertical-align: middle;" height="18" title="A teljes különleges miserend törlése">
+		<img src="img/buttons/copyup.gif" class='alap copyparticular' style="vertical-align: middle;" height="18" title="A különleges miserend másolatának létrehozása">
+		{% include 'help_link.html' with {'id': 49, 'height': 18} %}
+		<div style="float:right" class="portlet-header ui-icon ui-icon-arrowthick-2-n-s"></div>
+		<input class="weight" name="particular[{{ pkey }}][weight]" type="hidden" value="{{ pkey + 1 }}"size="2">
+	</td>
+</tr>
+<tr>
+	<td bgcolor=#efefef>
+		<div class=kiscim align=right>ünnep/dátum/stb.:</div>
+	</td>
+	<td bgcolor=#efefef>
+		{{ forms.input(from) }} {{ forms.select(from2) }}
+		{% include 'help_link.html' with {'id': 51, 'height': 18} %}
+	</td>
+</tr>
+<tr class="particular">
+	<td colspan="2">
+		<table cellpadding=4 width=100% id="particular{{ pkey }}" >
+			{% for nap in napok %}
+				{% include "admin_form_mass_particular.html" with nap %}
+			{% endfor %}
+        	<tr class="addmass">
+        		<td colspan="2" bgcolor=#efefef>
+        			<span class="urlap addparticularmise button" particular="{{ pkey }}" last="{{ last }}">Új mise hozzáadása</span>
+
+        		</td>
+        	</tr>
+        </table>
+    </td>
+</tr>
+</table>
+

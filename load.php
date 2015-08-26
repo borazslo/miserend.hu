@@ -26,7 +26,8 @@ if(isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {
 
 if(isset($_REQUEST['login'])) {
     if(!login($_REQUEST['login'],$_REQUEST['passw'])) {
-        $loginhiba = 'Hibás név és/vagy jelszó!';
+        addMessage('Hibás név és/vagy jelszó!<br/><br/>Ha elfelejtetted a jelszavadat, <a href="?m_id=28&m_op=jelszo">kérj ITT új jelszót</a>.','danger');
+        //header("Location: ?m_id=28&m_op=jelszo");
     }
 }
 

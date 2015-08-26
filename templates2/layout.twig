@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <title>{{ pageTitle ? pageTitle : metaTitle }}</title>
+        <title>{% if pageTitle %}{{ pageTitle }}{% else %}{{ title }} | Miserend{% endif %}</title>
 
         <meta name="description" content="{{ teaser ? teaser : 'Magyarország és a Kárpát-medence katolikus templomainak miserendjei.' }}">
         <meta name="keywords" content="katolikus, római katolikus, görögkatolikus, szentmise, miserend, liturgia, ünnep">
@@ -83,7 +83,11 @@
                     {% if androidreklam %}{% include "panel.twig" with {'title':'Már mobiltelefonra is','body': androidreklam|raw,'panel':'success' } %}{% endif %}
                 </div>
                 <div class="col-md-6 col-sm-2">
-                    {% block pageHeader %}{% endblock %}
+                    {% block pageHeader %}
+                        <div class="page-header">
+                            <h2>{{ title|raw }}</h2>
+                        </div>
+                    {% endblock %}
                     {% block messages %}
                           {% if messages %}
                               <div id="messages" style="margin-bottom:6px">
@@ -102,13 +106,11 @@
         </div>
         <div class="footer">
             <p>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a konkrét     plébánián!</p>
-            <p>Technikai kérdések, ötletek, problémák: <a href='mailto:eleklaszlosj@gmail.com'>Elek László SJ</a> (<a href="http://jezsuita.hu">JTMR</a>)</p>
             <o>Fejlesztés: <a href="https://github.com/borazslo/miserend.hu">GitHub</a>
             {% if version.hash %}- <small>verzió:
                 <a href="https://github.com/borazslo/miserend.hu/commit/{{ version.hash }}">
                 {{ version.hash[0:7] }}</a></small>{% endif %}</p>
-            <p><a href='mailto:info@miserend.hu'>info at miserend.hu</a></p>
-            <p><a href="?m_id=28&fm=12">impresszum</a></p>
+            <p><a href="?m_id=17&fm=12">Impresszum</a></p>
 
         </div>
    {% endblock %}</body>

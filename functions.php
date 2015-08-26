@@ -60,8 +60,12 @@ function sanitize($text) {
     return $text;
 }
 
+function passwordEncode($text) {
+    return base64_encode($text);
+}
+
 function login($name,$password) {
-    $password=base64_encode(sanitize($password));
+    $password=passwordEncode(sanitize($password));
     $name = sanitize($name);
     $query = "SELECT uid FROM user where login='$name' and jelszo='$password' and ok!='n' LIMIT 11";
     $result = mysql_query($query);
@@ -163,37 +167,6 @@ function clearMenu($menuitems) {
 
 }
 
-function menuHtml($menuitems) {
-    global $user,$m_id;
-
-    $kod_tartalom = '';
-//$item['mid'] == $m_id
-    $c = 0;
-    foreach ($menuitems as $item ) {
-        if(!isset($item['permission']) OR $user->checkRole($item['permission'])) {
-            $c++;
-            $kod_tartalom.="\n<li class='felsomenulink'><a href='".$item['url']."' class='felsomenulink'>".$item['title']."</a>";       
-            if(isset($item['items']) AND is_array($item['items'])) { 
-                foreach ($item ['items'] as $i ) {
-                    if(!isset($i['permission']) OR $user->checkRole($i['permission'])) {
-                        $c++;
-                        $kod_tartalom.="\n<a href='".$i['url']."' style='display:block' class='loginlink ";
-                        if($item['mid'] != $m_id) $kod_tartalom .= " closed ";
-                        $kod_tartalom .= "' >-> ".$i['title']."</a>";
-                    }
-                }
-            }
-            $kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
-        }
-    }
-
-    if($kod_tartalom == '') return false;
-
-    if($c > 10)
-        $kod_tartalom .= "<style> .closed { display: none !important }</style>";
-    return $kod_tartalom;
-
-}
 
 function cookieSave($uid,$name) {
     $salt = 'Yzsdf';

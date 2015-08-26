@@ -11,6 +11,7 @@
                   </div>  
               {% endif %}
         {% endblock %}                     
-        {% block content %}{% endblock %}
+        {% block pageHeader %}{% if title %}<h3>{{ title|raw }}</h3>{% endif %}{% endblock %}
+        {% block content %}{{ content|raw }}{% endblock %}
 	</div>
 {% endblock %}

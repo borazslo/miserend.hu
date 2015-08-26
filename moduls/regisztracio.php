@@ -10,7 +10,6 @@ function user_list() {
 	$limit=$_REQUEST['limit'];
 	if(empty($limit)) $limit=50;
 
-	$kiir.="\n<span class=kiscim>Keresés:</span><br><br>";
 	$kiir.="\n<form method=post><input type=hidden name=sid value=$sid>";
 	$kiir.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=list>";
 	$kiir.="\n<input type=text name=kulcsszo value='$kulcsszo' class=urlap size=20>";
@@ -41,7 +40,7 @@ function user_list() {
 	}
 	$kiir.="\n</select><input type=submit value=Lista class=urlap></form>";
 
-	$kiir.="<span class=kiscim>Válassz az alábbi felhasználók közül:</span><br><br>";
+	$vars['form'] = $kiir;
 
 	if(!empty($kulcsszo)) {
 		$feltetelT[]="login like '%$kulcsszo%'";
@@ -53,52 +52,78 @@ function user_list() {
 	}
 	if(is_array($feltetelT)) $feltetel="where (".implode(' or ',$feltetelT).')';
 
+	$users = array();
 	$query="select * from user $feltetel order by $sort";
-	$lekerdez=mysql_db_query($db_name,$query);
+	$lekerdez=mysql_query($query);
 	while($user=mysql_fetch_assoc($lekerdez)) {
-		$kiir.="\n<a href=?m_id=$m_id&m_op=edit&uid=".$user['uid']."$linkveg class=link>";
-		$kiir .= "<b>- ".$user['login']."</b> (".$user['nev'].")</a> - ";
-		$kiir .= "<span class=\"alap\"><a href=\"mailto:".$user['email']."\">".$user['email']."</a></span> - ";
+
 		if(preg_match('/^(lastlogin|lastactive|regdatum)/i',$sort,$match)) 
-			$field = $match[1];
+			$field = preg_replace(array('/ /i','/-/i'),array('&nbsp;','&#8209;'),$match[1]);
 		else $field = 'lastlogin';
-		$kiir .= "<span class=\"alap\">".$user[$field]."</span> - ";
-		$kiir .= "<a href=?m_id=$m_id&m_op=del&uid=".$user['uid']."$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a><br>";
+
+		$user['field'] = $user[$field];
+		$users[$user['uid']] = $user;
 	}
 
-	$adatT[2]="<span class=alcim>Felhasználók szerkesztése - módosítás</span><br><br>".$kiir;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
+	$vars['field'] = $field;
+	$vars['m_id'] = $m_id;
+	$vars['users'] = $users;
+	$vars['template'] = "users_list";
 	
-	$kod=$tartalom;
 
-	return $kod;
+	return $vars;
 }
 
 
 function user_edit($uid = false) {
-	global$user;
+	global$user,$m_id;
 
-	$edituser = new User($uid);
+	$vars['template'] = 'user_form';
+	$vars['m_id'] = $m_id;
+
+	$vars['roles'] = array();
+	$query="select jogkod from modulok where jogkod !=''";
+	$lekerdez=mysql_query($query);
+	while(list($jogkod)=mysql_fetch_row($lekerdez)) {
+		$vars['roles'][$jogkod] = $jogkod;
+	}
+
+	//Ha folyamatban van a szerkesztés, akkor azokat az adatokat tesszük be
+	if(is_array($uid)) {
+		$edituser = new stdClass();
+		foreach ($uid as $key => $value) {
+			$edituser->$key = $value;
+		}
+	} else 
+		$edituser = new User($uid);
 
 	if($edituser->uid == 0 AND $user->uid == 0) {
 		$vars['title'] = "Regisztráció";
+		$vars['new'] = true;
+		$vars['helptext'] = true;
 	} elseif($edituser->uid == 0 AND $user->uid > 0 ) {
+		$vars['title'] = "Új felhasználó";
 		if(!$user->checkRole('user')) {
 			addMessage("Nincs megfelelő jogosultságod!","danger");
+			$vars['template'] = 'layout';
 			return $vars;
 		}
-		$vars['title'] = "Új felhasználó";
+		$vars['new'] = true;
 	} else {
 		$vars['title'] = "Adatok módosítása";
 		if(!$user->checkRole('user') AND $user->uid != $edituser->uid) {
 			addMessage("Nincs megfelelő jogosultságod!","danger");
+			$vars['template'] = 'layout';
 			return $vars;
 		}
+		$vars['edit'] = true;
 	}
 
-	$vars['form'] = $edituser->form();
-	$vars['template'] = 'user_form';
+	if($edituser->username == '*vendeg*') $edituser->username = false;
+	if($edituser->nickname == '*vendég*') $edituser->nickname = false;
+
+
+	$vars['edituser'] = $edituser;
 	
 	return $vars;
 }
@@ -106,17 +131,31 @@ function user_edit($uid = false) {
 
 
 function user_jelszo() {
-	global $db_name,$m_id;
+	global $m_id;
 	
-	$cim='<span class=alcim>Jelszó emlékeztető</span><br><br>';
-	$szoveg='<span class=alap>Az alábbi két adat közül legalább az egyik kitöltése alapján a rendszer megpróbál azonosítani és elküldi a megadott (regisztrált!) email címre egy ÚJ jelszót.</span><br><br>';
-	$szoveg.="\n<form method=post><input type=hidden name=m_op value=jelszokuld><input type=hidden name=m_id value=$m_id><span class=alap>Felhasználónév: </span> <input type=text name=lnev size=18 class=urlap><br><span class=alap>Emailcím: </span> <input type=text name=mail size=25 class=urlap><br><br><input type=submit value='Kérem a jelszót'></form>";
 
-	$adatT[2]=$cim.$szoveg;
-	$tipus='doboz';
-	$kod.=formazo($adatT,$tipus);
+	$szoveg = <<<EOD
+			<p>Az alábbi két adat közül legalább az egyik kitöltése alapján a rendszer megpróbál azonosítani. Ha sikerül, akkor elküld a megadott (regisztrált!) email címre egy ÚJ jelszót.</sp>
+			<form method="post">
+				<input type=hidden name=m_op value=jelszokuld>
+				<input type=hidden name=m_id value=$m_id>
+				<div class="form-group">
+					<label for="username">Felhasználónév</label>
+					<input type="text" name="lnev" class="form-control" id="username" placeholder="Felhasználónév">
+				</div>
+				<div class="form-group">
+					<label for="email">Email cím</label>
+					<input type="email" name="mail" class="form-control" id="email" placeholder="Email">
+				</div>
+				<button type="submit" class="btn btn-default">Kérem a jelszót</button>
+			</form>
+EOD;
 
-	return $kod;
+	$vars['title'] = 'Jelszó emlékeztető';
+	$vars['content'] = $szoveg;
+	$vars['template'] = 'layout';
+
+	return $vars;
 }
 
 
@@ -125,55 +164,47 @@ function user_jelszokuld() {
 	$lnev=$_POST['lnev'];
 	$mail=$_POST['mail'];
 
-	$cim='<span class=alcim>Jelszó emlékeztető</span><br><br>';
-
 	$user = new User($mail);
 	
 	if(!empty($lnev)) $userByNev = new User($lnev);
 	if(!empty($mail)) $userByMail = new User($mail);
 
 	if(!empty($lnev) AND !empty($mail) AND $userByMail->uid != $userByNev) {
-		addMessage('Ez az email cím és felhasználó név nem találkozik sehogy sem.','danger');
-		$szoveg='<span class=alap>A megadott adatok alapján nem találtunk felhasználót.</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>';
-		return false;
+		addMessage('A megadott adatok alapján nem találtunk felhasználót.','danger');		
+		return user_jelszo();	
 	} 
 
 	if($userByNev->uid > 0) $user = $userByNev;
 	elseif($userByMail > 0) $user = $userByMail;
 	else {
-		$szoveg='<span class=alap>A megadott adatok alapján nem találtunk felhasználót.</span><br><br><a href=javascript:history.go(-1); class=link>Vissza</a>';
-		return false;	
+		addMessage('A megadott adatok alapján nem találtunk felhasználót.','danger');		
+		return user_jelszo();	
 	}
 
-	$mail = new Mail();
-	$mail->subject = "Jelszó emlékeztető - Virtuális Plébánia Portál";
+	$email = new Mail();
+	$email->subject = "Jelszó emlékeztető - Virtuális Plébánia Portál";
 
 	$newpassword = $user->generatePassword();
 	$user->newPassword($newpassword);
 	
-	$mail->content="Kedves ".$user->username."!<br/><br/>";
-	$mail->content.="\n\nKérésedre küldjük a bejelentkezéshez szükséges újjelszót:";
-	$mail->content.="\n".$newpassword."<br/><br>";
-	$mail->content.="Kérjük mihamarabb változtasd meg a jelszót.<br/><br/>";
-	$mail->content.="\n\nVPP \nhttp://www.plebania.net";
+	$email->content="Kedves ".$user->username."!<br/><br/>";
+	$email->content.="\n\nKérésedre küldjük a bejelentkezéshez szükséges újjelszót:";
+	$email->content.="\n".$newpassword."<br/><br>";
+	$email->content.="Kérjük mihamarabb változtasd meg a jelszót.<br/><br/>";
+	$email->content.="\n\nVPP \nhttp://www.plebania.net";
 
-	$mail->to = $user->email;
-	$mail->send();
-			
-	$szoveg="<span class=alap>Az új jelszót elküldtük a regisztrált emailcímre. Kérjük lépjen be, és mihamarabb módosítsa.</span>";
-		
-	
+	$email->to = $user->email;
+	$email->send();
 
-	$adatT[2]=$cim.$szoveg;
-	$tipus='doboz';
-	$kod.=formazo($adatT,$tipus);
-
-
-	return $kod;
+	addMessage("Az új jelszót elküldtük a regisztrált emailcímre. Kérjük lépjen be, és mihamarabb módosítsa.",'success');
+	header('Location http://miserend.hu');
+	return true;
 }
 
 function user_del($uid) {
 	global $m_id;
+
+	$vars['title'] = 'Felhasználó törlése';
 
 	$user2delete = new User($uid);
 	if($user2delete->uid == 0) {
@@ -183,26 +214,12 @@ function user_del($uid) {
 		$kiir.="\n<br><br><span class=alap>".$user2delete->username." (".$user2delete->nev.")</span>";
 		$kiir.="<br><br><a href=?m_id=$m_id&m_op=delete&uid=$uid class=link>Igen</a> - <a href=?m_id=$m_id&m_op=mod class=link>NEM</a>";
 	}
-	$adatT[2]="<span class=alcim>Felhasználók szerkesztése - törlés</span><br><br>".$kiir;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
-	
-	$kod=$tartalom;
+	$vars['content'] = $kiir;
+	$vars['template'] = 'layout';
 
-	return $kod;
+	return $vars;
 }
 
-
-function user_delete() {
-	global $user;
-
-	$delete = new User($_GET['uid']);
-	$delete->delete();
-	
-	$kod=user_list();
-
-	return $kod;
-}
 
 switch($m_op) {
     case 'index':
@@ -214,19 +231,22 @@ switch($m_op) {
         break;
 
     case 'adding':    	
-    	$newuser = new User($_REQUEST['uid']);
+    	$newuser = new User($_REQUEST['edituser']['uid']);
 
+    	
 		if($_REQUEST['terms']!=1 AND $newuser->uid == 0 AND $user->uid == 0) {
 			addMessage("El kell fogadni a <i>Házirendet és szabályzatot</i>!",'danger');
 		} else {
-    		$newuser->submit($_REQUEST);
-    	}
+    		if($newuser->submit($_REQUEST['edituser'])) {
+    			if($user->uid < 1) header("Location: http://miserend.hu/");
+				else $tartalom = user_edit($newuser->uid);
 
-    	if($user->uid == 0) {
-    		//TODO: főoldalra irányítani
-    	} else {
-    		$tartalom = user_edit($newuser->uid);
+    		} else {
+    			$tartalom = user_edit($_REQUEST['edituser']);
+    		}
     	}
+		$tartalom = user_edit($_REQUEST['edituser']);
+
         break;
 
 	case 'jelszo':
@@ -234,7 +254,7 @@ switch($m_op) {
 		break;
 
 	case 'jelszokuld':
-		$tartalom=user_jelszokuld();
+		$tartalom = user_jelszokuld();
 		break;
 
 	case 'list':
@@ -249,12 +269,14 @@ switch($m_op) {
 		if(is_numeric($_REQUEST['uid']) AND $user->checkRole('user') AND $user->uid != $_REQUEST['uid']) {
 			$user2delete = new User($_REQUEST['uid']);
 			$user2delete->delete();
+			$tartalom = user_list();
 		} else {
 			//TODO: elegánsabb hibakezelést!
-			die('No-no! Nem lehetséges így a törlés!');
+			addMessage('Hiányzó jogosultság miatt nem lehetséges a törlése!',danger);
+			$tartalom['content'] = '';
+			$tartalom['template'] = 'layout';
 		}
-        
-        $tartalom = user_mod();
+       
     	break;
 }
 

@@ -116,8 +116,8 @@ class User
 			}
 		}
 
-		if(isset($vars['password1']) OR isset($vars['password2'])) {
-			if($vars['password1'] != $vars['password2'] OR $vars['password1'] == '') {
+		if( $vars['password1'] != '' OR $vars['password2'] != '')  {
+			if($vars['password1'] != $vars['password2'] OR $vars['password1'] == '' ) {
 				addMessage('A két jelszó nem egyezik meg egymással','danger');
 				$return = false;
 			}
@@ -132,13 +132,14 @@ class User
 
 		if($return == false) return false;
 
-		if($vars['submit'] == 'Létrehoz') {
+		if(!$vars['uid']) {	
 			$pwd = $this->generatePassword();
 			$this->presave('password',$pwd);
 
 			//email küldése
 			$email = new Mail();
 			$email->subject = 'Regisztráció - Virtuális Plébánia Portál';
+			$email->content="Kedves ".$this->username."!<br/><br/>";
 			$email->content ="Köszöntünk a Virtuális Plébánia Portál felhasználói között!<br/><br/>";
 			$email->content .="\n\nA belépéshez szükséges jelszó: $pwd<br/>";
 			$email->content .="\nA belépést követően a BEÁLLÍTÁSOK menüben kérjük megváltoztatni a jelszót.<br><br/>";
@@ -147,13 +148,15 @@ class User
 			if($email->send()) addMessage("Elküldtük az emailt az új regisztrációról.","success");
 		}
 		
-
 		if(!$this->save()) {
 			addMessage("Nem sikerült elmenteni. Pedig minden rendben volt előtte.","warning");
 			return false;
-		} else
-			addMessage("A változásokat elmentettük.","success");
-
+		} else {
+			if(!$vars['uid'])
+				addMessage("A felhasználót sikeresen létrehoztuk.","success");
+			else 
+				addMessage("A változásokat elmentettük.","success");
+		}
 		return true;
 	}
 
@@ -186,12 +189,12 @@ class User
 				}
 				
 		} elseif(in_array($key,array('jelszo','password')))  {
-				$this->presaved['jelszo'] = $this->passwordEncode($val);
+				$this->presaved['jelszo'] = passwordEncode($val);
 
 		} elseif($key == 'roles' OR $key == 'jogok') {
 				if(!is_array($val)) $val = array($val);
 				foreach ($val as $k => $i) $val['jogok'] = trim(sanitize($i),"-");
-				$val = array_filter($val);
+				$val = array_unique($val);
 				$this->presaved['jogok'] = implode('-',$val);
 				
 		} elseif($key == 'nickname' or $key == 'becenev') {
@@ -277,16 +280,19 @@ class User
 	function delete() {
 		if($this->uid == 0) return false;
 
-		$query="DELETE FROM user WHERE uid = ".$uid." LIMIT 1";
+		$query="DELETE FROM user WHERE uid = ".$this->uid." LIMIT 1";
 		if(mysql_query($query)) {
 			foreach ($this as $key => $value) unset($this->$key);
 			$this->loggedin = false;
 			$this->uid = 0;
 			$this->username = '*vendeg*';
 			$this->nickname = '*vendeg*';
+			addMessage('Sikeresen töröltük a felhasználót.','success');
 			return true;
-		} else
+		} else {
+			addMessage('Hiba lépett fel a felhasználó törlése közben','danger');
 			return false;
+		}
 	}
 
 	function generatePassword($length = 8) {
@@ -306,115 +312,6 @@ class User
 		$this->save();
 	}
 
-	function passwordEncode($text) {
-			return base64_encode($text);
-	}
-
-	function form() {
-		global $m_id, $user;
-
-		$form = array(
-        'm_id' => array(
-            'type' => 'hidden',
-            'name' => "m_id",
-            'value' => $m_id),
-        'm_op' => array(
-            'type' => 'hidden',
-            'name' => "m_op",
-            'value' => "adding"),
-
-        'username' => array(
-            'name' => "username",
-            'size' => 20,
-            'maxlength' => 20,
-            'style' => 'float:left'),
-        'nickname' => array(
-            'name' => "nickname",
-            'size' => 40,
-            'maxlength' => 100),
-        'email' => array(
-            'name' => "email",
-            'size' => 40,
-            'maxlength' => 100,
-            'class' => 'email'),
-        'password1' => array(
-            'name' => "password1",
-            'id' => "password1",
-            'type' => "password",
-            'size' => 33,
-            'maxlength' => 100),
-        'password2' => array(
-            'name' => "password2",
-            'type' => "password",
-            'id' => "password2",
-            'size' => 33,
-            'maxlength' => 100,
-            'style' => 'float:left'),
-        'name' => array(
-            'name' => "name",
-            'size' => 40,
-            'maxlength' => 100),
-        'volunteer' => array(
-            'type' => 'checkbox',
-            'name' => 'volunteer',
-            'value' => 1),
-        'submit' => array(
-        	'name' => 'submit',
-        	'type' => 'submit'
-        	)
-      );
-
-		if($this->uid > 0) {
-			$form['username']['readonly'] = true;
-			$form['username']['value'] = $this->username;
-			$form['nickname']['value'] = $this->nickname;
-			$form['email']['value'] = $this->email;
-			$form['name']['value'] = $this->nev;
-			if($this->volunteer == 1)
-				$form['volunteer']['checked'] = true;
-
-			$form['uid'] = array(
-	            'type' => 'hidden',
-	            'name' => 'uid',
-	            'value' => $this->uid);
-
-			$form['submit']['value'] = "Módosít";
-		}	
-
-		if($this->uid < 1) {
-			if(!$user->loggedin)
-				$form['terms'] = array(
-	            	'type' => 'checkbox',
-	            	'name' => 'terms',
-	            	'value' => 1);
-			$form['submit']['value'] = "Létrehoz";
-			$form['username']['id'] = 'newuser';
-		}
-
-		if($this->checkRole('user')) {
-			$form['active'] = array(
-				'type' => 'checkbox',
-				'name' => 'ok',
-				'value' => 'i');
-			if($this->ok == 'i') $form['active']['checked'] = true;
-		
-			$query="select jogkod from modulok where jogkod !=''";
-			$lekerdez=mysql_query($query);
-			while(list($jogkod)=mysql_fetch_row($lekerdez)) {
-				$form['roles'][$jogkod] = array(
-					'type' => 'checkbox',
-					'name' => 'roles[]',
-					'value' => $jogkod,
-					'labelback'=>$jogkod);
-				if($this->checkRole($jogkod)) $form['roles'][$jogkod]['checked'] = true;
-			}
-
-
-
-		}	
-
-		return $form;
-	}
 
 } // END class 
 

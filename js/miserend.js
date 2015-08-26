@@ -55,24 +55,32 @@ $(document).ready(function() {
 
     $('#password2').on('input', function() { 
         if($('#password1').val() != $(this).val() || $(this).val() == '') {
-              $('#passwordcheck').addClass("ui-icon-alert red").removeClass("ui-icon-check green");
-              $('#passwordcheck').attr("title","A két jelszó nem egyezik!");
+              $('#password2').parent().find('.form-control-feedback').addClass("glyphicon-warning-sign").removeClass("glyphicon-ok");
+              $('#password2').parent().addClass("has-error").removeClass("has-success");
+
+              //$('#passwordcheck').attr("title","A két jelszó nem egyezik!");
         } else {
-              $('#passwordcheck').addClass("ui-icon-check green").removeClass("ui-icon-alert red");
-              $('#passwordcheck').attr("title","Minden rendben!");
+              $('#password2').parent().find('.form-control-feedback').removeClass("glyphicon-warning-sign").addClass("glyphicon-ok");
+              $('#password2').parent().removeClass("has-error").addClass("has-success");
+
+              //$('#password2').parent().find('.form-control-feedback').attr("title","Minden rendben!");
         }
     });
     $('#password1').on('input', function() { 
         if($('#password2').val() != $(this).val() || $(this).val() == '') {
-              $('#passwordcheck').addClass("ui-icon-alert red").removeClass("ui-icon-check green");
-              $('#passwordcheck').attr("title","A két jelszó nem egyezik!");
+              $('#password2').parent().find('.form-control-feedback').addClass("glyphicon-warning-sign").removeClass("glyphicon-ok");
+              $('#password2').parent().addClass("has-error").removeClass("has-success");
+
+              //$('#passwordcheck').attr("title","A két jelszó nem egyezik!");
         } else {
-              $('#passwordcheck').addClass("ui-icon-check green").removeClass("ui-icon-alert red");
-              $('#passwordcheck').attr("title","Minden rendben!");
+              $('#password2').parent().find('.form-control-feedback').removeClass("glyphicon-warning-sign").addClass("glyphicon-ok");
+              $('#password2').parent().removeClass("has-error").addClass("has-success");
+
+              //$('#passwordcheck').attr("title","Minden rendben!");
         }
     });
 
-    $('#newuser').on('input', function() { 
+    $('#username').on('input', function() { 
 
         $.ajax({
             url: "ajax.php",
@@ -83,11 +91,11 @@ $(document).ready(function() {
             },
             success: function( data ) {
               if(data == 0) {
-                $('#usernamecheck').addClass("ui-icon-alert red").removeClass("ui-icon-check green");
-                $('#usernamecheck').attr("title","Nem megfelelő felhasználói név!");
+                $('#username').parent().find('.form-control-feedback').addClass("glyphicon-warning-sign").removeClass("glyphicon-ok");
+                $('#username').parent().addClass("has-error").removeClass("has-success");
               } else {
-                $('#usernamecheck').addClass("ui-icon-check green").removeClass("ui-icon-alert red");
-                $('#usernamecheck').attr("title","Minden rendben!");
+                $('#username').parent().find('.form-control-feedback').removeClass("glyphicon-warning-sign").addClass("glyphicon-ok");
+                $('#username').parent().removeClass("has-error").addClass("has-success");
               }
               console.log(data);
               console.log('ok');

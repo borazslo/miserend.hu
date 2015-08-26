@@ -32,12 +32,13 @@ if(!$hiba) {
     if(!$m_op) $m_op=$_REQUEST['m_op'];
     if(empty($m_op)) $m_op='index';
 		
+    /* *
     //TODO: a templates2 teljes készítése után törölhető, addig az admin oldalak legyenek alap design
     if(preg_match('/^admin_/i', $module['fajl'])) {
         $loader = new Twig_Loader_Filesystem('templates');
         $twig = new Twig_Environment($loader); // cache?        
     }
-
+    /* */
     if(!include_once("moduls/".$module['fajl'].".php"))
         $hiba ='HIBA! A szükséges fájl nem hívható be! ('.$module['fajl'].')';
 }

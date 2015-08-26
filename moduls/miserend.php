@@ -1099,6 +1099,7 @@ function miserend_view() {
 	}
 
     
+    /*
     //Segíts a frissítésben!
     if(strtotime($frissitve) < strtotime("-3 year")) { 
         session_start();
@@ -1154,6 +1155,7 @@ function miserend_view() {
         $eszrevetel .= '<p><a class=\'inline\' href="#inline_content">Segíts frissíteni!</a></p>';
        }
        else $help = '';
+       */
     
     $result = mysql_query("SELECT id FROM favorites WHERE uid = ".$user->uid." AND tid = ".$tid." LIMIT 1");
     if(mysql_num_rows($result) == 1 AND $user->uid > 0 ) $favorite = 1;
@@ -1185,7 +1187,8 @@ function miserend_view() {
             'napok' => array('','hétfő','kedd','szerda','csütörtök','péntek','szombat','<font color=#AC282B><b>vasárnap</b></font>'),
             'design_url'=>$design_url,
             'campaign' => updatesCampaign(),
-            'alert' => LiturgicalDayAlert('html'));		
+            'alert' => LiturgicalDayAlert('html'),
+          );		
         $variables['template'] = 'church';
         $variables['scripts'] = $script;
         return $variables;

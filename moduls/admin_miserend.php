@@ -1,28 +1,5 @@
 <?php
 
-function miserend_index() {
-
-	$kod=miserend_adminmenu();
-
-	return $kod;
-}
-
-function miserend_adminmenu() {
-	global $m_id;
-
-	$menu.='<span class=alcim>Templomok és miserend szerkesztése</span><br><br>';
-
-	$menu.="<a href=?m_id=$m_id&m_op=addtemplom class=kismenulink>Új templom feltöltése</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=modtemplom class=kismenulink>Meglévő templom módosítása, törlése, miserend hozzáadása, módosítása</a><br>";
-	$menu.="<a href=?m_id=$m_id&m_op=events class=kismenulink>Kifejezések dátummá alakítása</a><br>";
-
-
-	$adatT[2]=$menu;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
-
-	return $tartalom;
-}
 
 function miserend_addtemplom($tid) {
 	global $sid,$linkveg,$m_id,$db_name,$onload,$user,$design_url;	
@@ -366,13 +343,14 @@ function miserend_addtemplom($tid) {
 	$urlap.='</td></tr></table>';
 	$urlap.="\n</form>";
 
-	$adatT[2]='<span class=alcim>Templom feltöltése / módosítása</span><br><br>'.$urlap;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
-	
-	$kod=$tartalom;
 
-	return $kod;
+	$vars = array(
+		'title' => "Templom feltöltése / módosítása",
+		'content' => $urlap,
+		'template' => 'layout'
+	);
+
+	return $vars;
 }
 
 function miserend_addingtemplom() {
@@ -710,7 +688,9 @@ function miserend_modtemplom() {
 		if($ertek==$sort) $kiir.=' selected';
 		$kiir.=">$kulcs</option>";
 	}
-	$kiir.="\n</select><input type=submit value=Lista class=urlap></form><br>";
+	$kiir.="\n</select><input type=submit value=Lista class=urlap></form>";
+
+	$form = $kiir;
 
 	if($egyhazmegye!='mind' and isset($egyhazmegye)) {
 		$ehmT=explode('-',$egyhazmegye);
@@ -757,7 +737,7 @@ function miserend_modtemplom() {
 	elseif($wallapot != '')  $query .= " WHERE "; 
 	if($wallapot != '') $query .= " e.id IS NOT NULL ";
 	$query .= "ORDER BY ".$sort." ";
-
+	
 	$lekerdez=mysql_db_query($db_name,$query);
 	$mennyi=mysql_num_rows($lekerdez);
 	if($mennyi>$leptet) {
@@ -768,7 +748,7 @@ function miserend_modtemplom() {
 	$veg=$min+$leptet;
 	if($veg>$mennyi) $veg=$mennyi;
 	if($mennyi>0) {
-		$kiir.="<span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
+		$sum ="<span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
 		if($min>0) {
 			$lapozo.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=modtemplom><input type=hidden name=sid value=$sid><input type=hidden name=kkulcsszo value='".$_POST['kkulcsszo']."'><input type=hidden name=egyhazmegye value=$egyhazmegye><input type=hidden name=min value=$prev><input type=hidden name=sort value='$sort'>";		
 			$lapozo.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
@@ -777,31 +757,29 @@ function miserend_modtemplom() {
 			$lapozo.="\n<form method=post><input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=modtemplom><input type=hidden name=sid value=$sid><input type=hidden name=kkulcsszo value='".$_POST['kkulcsszo']."'><input type=hidden name=egyhazmegye value=$egyhazmegye><input type=hidden name=min value=$next><input type=hidden name=sort value='$sort'>";
 			$lapozo.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
 		}
-		$kiir.=$lapozo.'<br>';
 	}
-	else $kiir.="<span class=alap>Jelenleg nincs módosítható templom az adatbázisban.</span>";
-	while(list($tid,$tnev,$tismert,$tvaros,$tok,$teszrevetel,$miseaktiv)=mysql_fetch_row($lekerdez)) {
+	else $sum ="<span class=alap>Jelenleg nincs módosítható templom az adatbázisban.</span>";
+
+	$churches = array();
+	while($church = mysql_fetch_assoc($lekerdez)) {
+		//list($tid,$tnev,$tismert,$tvaros,$tok,$teszrevetel,$miseaktiv)=mysql_fetch_row($lekerdez)) {
+
+		$tid = $church['id'];
+
 		$jelzes='';
 		//Észrevétel
 		$RemarkMark = getRemarkMark($tid);
 		if($RemarkMark['mark'] != false) $jelzes.=$RemarkMark['html'];
 
-		if(!$vanmiseT[$tid] AND $miseaktiv == 1) {
+		if(!$vanmiseT[$tid] AND $church['miseaktiv'] == 1) {
 			$jelzes.="<img src=img/lampa.gif title='Nincs hozzá mise!' align=absmiddle> ";
 		}		
-		//Jelzés beállítása -> lampa = nincs kategorizalva, ora = varakozik ok=n, tilos = megjelenhet X, jegyzettömb - szerkesztés alatt (megnyitva)
-		//if(!empty($megnyitva)) $jelzes.="<img src=img/edit.gif title='Megnyitva: $megnyitva' align=absmiddle> ";
-		//if(empty($rovatkat)) $jelzes.="<img src=img/lampa.gif title='Nincs kategórizálva!' align=absmiddle> ";
-		//if(!strstr($megjelenhet,'kurir')) $jelzes.="<img src=img/tilos.gif title='Megjelenés nincs beállítva!' align=absmiddle> ";
-		//if($ok!='i') $jelzes.="<img src=img/ora.gif title='Feltöltött hír, áttekintésre vár!' align=absmiddle> ";
-		if($tok=='n') $jelzes.="<img src=img/tilos.gif title='Nem engedélyezett!' align=absmiddle> ";
-		elseif($tok=='f') $jelzes.="<img src=img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
+		if($church['ok'] =='n') $jelzes.="<img src=img/tilos.gif title='Nem engedélyezett!' align=absmiddle> ";
+		elseif($church['ok'] =='f') $jelzes.="<img src=img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
 		
-		$kiir.="\n$jelzes <a href=?m_id=$m_id&m_op=addtemplom&tid=$tid$linkveg class=felsomenulink title='$tismert'><b>- $tnev</b><font color=#8D317C> ($tvaros)</font></a> - <a href=?m_id=$m_id&m_op=addmise&tid=$tid$linkveg class=felsomenulink><img src=img/mise_edit.png title='misék' align=absmiddle border=0>szentmise</a> - <a href=?m_id=$m_id&m_op=deltemplom&tid=$tid$linkveg class=link><img src=img/del.jpg border=0 alt=Töröl align=absmiddle> töröl</a> - <a class=felsomenulink href=\"?templom=$tid\" target=\"_blank\">megnéz</a><br>";
+		$church['jelzes'] = $jelzes;
+		$churches[$church['id']] = $church;		
 	}
-
-	$kiir.='<br>';
-	$kiir.=$lapozo;
 
 	/* észrevételezett templomok esetén RSS lehetőség */
 	if($allapot == 'e') {
@@ -814,14 +792,18 @@ function miserend_modtemplom() {
 		//$kiir .= "<br/><a href=\"".$link."\" class=felsomenulink>RSS</a>";
 	}
 	
-	$adatT[2]='<span class=alcim>Templomok, miserendek módosítása</span><br><br>'.$kiir;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
+	$vars = array(
+		'form' => $form,
+		'sum' => $sum,
+		'pager' => $lapozo,
+		'churches' => $churches,
+		);
+
+	$vars['m_id'] = $m_id;
 	
-	$kod=$tartalom;
-
-
-	return $kod;
+	$vars['template'] = "churches_list";
+	
+	return $vars;
 }
 
 function miserend_addmise($tid) {
@@ -881,8 +863,12 @@ function miserend_addmise($tid) {
 
 	$vars['helptext'] = '<span class="alap">Figyelem! Ha átfedés van két periódus/időszak vagy különleges miserend között, akkor a listában lejjebb lévő vagyis „nehezebb” periódus vagy különleges miserend jelenik meg a keresőben!</span>';
 	 
-	global $twig;
-	return $twig->render('content_admin_editschedule.html',$vars); 
+
+	$vars['template'] = "admin_editschedule";
+
+			
+
+	return $vars;
 }
 
 function miserend_update_addmisejs() {
@@ -1031,7 +1017,6 @@ function miserend_deltemplom() {
 
 	$tid=$_GET['tid'];
 
-	$kiir="<span class=alcim>Templom és miserend törlése</span><br><br>";
 	$kiir.="\n<span class=kiscim>Biztosan törölni akarod a következő templomot?<br><font color=red>FIGYELEM! A kapcsolódó misék és képek is törlődnek!</font></span>";
 		
 	$query="select nev from templomok where id='$tid'";
@@ -1045,13 +1030,13 @@ function miserend_deltemplom() {
 		$kiir.="<br><br><span class=hiba>HIBA! Ilyen templom nincs!</span>";
 	}
 
-	$adatT[2]=$kiir;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
-	
-	$kod=$tartalom;
+	$vars = array(
+		'title' => "Templom és miserend törlése<",
+		'content' => $kiir,
+		'template' => 'layout'
+	);
 
-	return $kod;
+	return $vars;
 }
 
 function miserend_deletetemplom() {
@@ -1146,7 +1131,7 @@ function miserend_deletetemplom() {
 function miserend_ehmlista() {
 	global $m_id;
 
-	$txt.="<span class=alcim>Egyházmegyei templomok listája</span><br><form method=post><input type=hidden name=m_op value=ehmlista><input type=hidden name=m_id value=$m_id><select name=ehm class=urlap>";
+	$txt ="<form method=post><input type=hidden name=m_op value=ehmlista><input type=hidden name=m_id value=$m_id><select name=ehm class=urlap>";
 	$query="select id,nev from egyhazmegye";
 	$lekerdez=mysql_query($query);
 	while(list($id,$nev)=mysql_fetch_row($lekerdez)) {
@@ -1177,13 +1162,14 @@ function miserend_ehmlista() {
 
 	}
 
-	$adatT[2]=$txt;
-	$tipus='doboz';
-	$tartalom.=formazo($adatT,$tipus);	
-	
-	$kod=$tartalom;
 
-	return $kod;
+	$vars = array(
+		'title' => "Egyházmegyei templomok listája",
+		'content' => $txt,
+		'template' => 'layout'
+		);
+
+	return $vars;
 }
 
 
@@ -1257,7 +1243,8 @@ switch($m_op) {
 
         $form=events_form($order);
         $form['m_id'] = $m_id;
-        $tartalom = $twig->render('content_admin_editevents.html',$form);
+        $form['template'] = 'admin_editevents';
+        $tartalom = $form;
         break;    
 }
 }
