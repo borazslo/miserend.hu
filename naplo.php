@@ -38,8 +38,9 @@ function teendok($tid) {
     			<input type=hidden name=rid value=".$remark->id.">
     			<input type=hidden name=op value=mod>";
 
-		$urlap.="<span class=urlap>állapot: </span>
-			<select name='allapot' class='urlap my_dropdown' id='my_dropdown'>
+		$urlap.="<div class='form-group'>
+			<label for='my_dropdown'>Állapot</label>
+			<select name='allapot' class='form-control' id='my_dropdown'>
 				<option value='0'>-----</option>";
 				foreach(array(
 						'u'=>'új',
@@ -49,10 +50,15 @@ function teendok($tid) {
 						$urlap.="<option value=$i>$ertek</option>";
 					}
 				}
-		$urlap.="</select>";
+		$urlap.="</select></div>";
 		
-		if($remark->allapot!='j') $urlap.="<br><span class=urlap>megjegyzés:</span><br><textarea name=adminmegj class=urlap cols=17 rows=3></textarea>";
-		$urlap.="<input type=submit value=ok class=urlap></form>";
+		if($remark->allapot!='j') $urlap.='
+			<div class="form-group">
+				<label for="comment">Megjegyzés</label>
+				<textarea id="comment" name="adminmegj" class="form-control" rows="3" id=""></textarea>
+			</div>';
+
+		$urlap .= '<button type="submit" class="btn btn-default">Ok</button></form>';
 
 		$remarks[$id]->urlap = $urlap;
 
@@ -60,7 +66,7 @@ function teendok($tid) {
     $vars['remarks'] = $remarks;
   	
     global $twig;
-    $kiir = $twig->render('naplo.html',$vars);
+    $kiir = $twig->render('naplo.twig',$vars);
 
 
 	echo $header.$kiir.$footer;

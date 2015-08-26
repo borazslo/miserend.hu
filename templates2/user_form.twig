@@ -1,0 +1,72 @@
+{% import "forms.twig" as forms %}
+
+{% extends "layout.twig" %}
+
+{% block content %}
+	<span class=alcim>{{ title }}</span><br><br>
+
+	<form method=post>
+	    {{ forms.input(form.m_op) }}
+	    {{ forms.input(form.m_id) }}
+	    {% if form.uid %}{{ forms.input(form.uid) }}{% endif %}
+
+	    <span class="kiscim">Felhasználói név:</span> {% include 'help_link.twig' with {'id': 18} %}<br/>
+	    	{{ forms.input(form.username) }} &nbsp;<span id="usernamecheck" class="ui-icon" style="float:left;margin-left:3px"></span><br/>
+	    	{% if form.submit.value == 'Létrehoz' %}
+	    		<span class="alap">(Lehetőség szerint ékezet és speciális karakterek nélkül, maximum 20 betű. Szóköz, idézőjel és aposztróf NEM lehet benne! Ez a név azonosít, ezzel tudsz majd belépni, de alább lehetőség van külön becenév megadására is.)</span><br/>
+	    	{% endif %}<br/>
+
+		<span class="kiscim">Becenév, megszólítás:</span> {% include 'help_link.twig' with {'id': 17} %}<br/>
+	    	{{ forms.input(form.nickname) }}<br/>
+	    	{% if form.submit.value == 'Létrehoz' %}
+	    		<span class="alap">(Ide keresztnevet, vagy becenevet célszerű írni. Alapvetően ezen a néven jelensz meg oldalunkon, az azonosításhoz mellette kicsiben jelezzük a bejelentkezési neved is.)</span><br/>
+	    	{% endif %}<br/>
+
+		<span class="kiscim">Név:</span> {% include 'help_link.twig' with {'id': 20} %}<br/>
+	    	{{ forms.input(form.name) }}<br/>
+	    	{% if form.submit.value == 'Létrehoz' %}
+	    		<span class="alap">(Teljes név. Haszon pl. észrevétel vagy adatmódosítés beküldése esetén, hogy a szereksztők könnyebben azonosíthassák a beküldőt.)</span><br/>
+	    	{% endif %}<br/>
+
+		{% if form.submit.value != 'Létrehoz' %}
+		<span class="kiscim">Új jelszó:</span><br/>
+	    	<span class="alap">jelszó:</span> {{ forms.input(form.password1) }}<br/>
+	    	<span class="alap" style="float:left;width: 42px;">újra:</span> {{ forms.input(form.password2) }} &nbsp;<span id="passwordcheck" class="ui-icon" style="float:left;margin-left:3px"></span><br/>
+	    	<br/><br/>{% endif %}<br/>
+
+		<span class="kiscim">Email cím:</span> {% include 'help_link.twig' with {'id': 19} %}<br/>
+	    	{{ forms.input(form.email) }}<br/>
+	    	{% if form.submit.value == 'Létrehoz' %}
+	    		<span class="alap">(Erre a címre küldjük ki a jelszót. A regisztrációhoz szükséges egy valós emailcím! Elküldés előtt kérjük ellenőrizd!)</span><br/>
+	    	{% endif %}<br/>
+
+		<span class="kiscim">Önkéntesség:</span> {% include 'help_link.twig' with {'id': 'nn'} %}<br/>
+	    	{{ forms.input(form.volunteer) }} 
+	    	{% if form.submit.value == 'Létrehoz' %}
+	    		<span class="alap">Vállalom, hogy hetente hét régen frissült templom miserendjét megpróbálom megtudakolni és megosztani a többiekkel. (Emailben értesítünk hétről hétre a megfelelő templomokról.)</span><br/>
+	    		<span class="alap">(Ez a beállítás bármikor megváltoztatható a későbbiek során.)</span><br/>
+	    	{% else %}
+	    		<span class="alap">Heti hét templom frissítője.</span>
+    		{% endif %}<br/>
+
+	    {% if form.active %}
+    			<br/><span class="kiscim">Engedélyezés/kizárás:</span><br/>
+		    	{{ forms.input(form.active) }} <span class="alap">aktív</span><br/>
+		{% endif %}
+
+		{% if form.roles %}
+			<br/><span class="kiscim">Jogosultságok:</span><br/>
+			{% for key, item in form.roles %}
+					{{ forms.input(item) }}<br/>
+			{% endfor %}<br/>
+		{% endif %}		
+
+	    {% if form.terms %}
+	    	<span class="kiscim">Szabályzat és házirend:</span><br/>
+	    	{{ forms.input(form.terms) }} <span class="alap">Elfogadom a <i>Miserend</i> házirendjét és vállalom, hogy mindenben betartom!</span><br/>
+	    	<br/>
+	    {% endif %}
+
+	    {{ forms.input(form.submit) }} 
+	</form>
+{% endblock %}

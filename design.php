@@ -1,7 +1,7 @@
 <?php
 
 function design(&$vars) {
-    global $design_url,$db_name,$tartalom,$m_oldalsablon,$balkeret,$jobbkeret,$onload,$sid,$linkveg,$loginhiba,$script,$meta,$titlekieg;
+    global $design_url,$db_name,$tartalom,$m_oldalsablon,$balkeret,$jobbkeret,$onload,$sid,$linkveg,$loginhiba,$script,$meta,$titlekieg,$m_id;
 
     global $twig,$user;
 
@@ -72,8 +72,7 @@ function design(&$vars) {
         $vars['login']['vars'] = array('linkveg' => $linkveg, 'design_url' => $design_url,'login'=>$_POST['login'],'loginhiba'=>$loginhiba,'sid'=>$sid);       
 	}
 
-
-
+	$vars['user'] = $user;
 	//BLOCK - BLOCKS
 	$vars['sidebar']['right']['blocks'] = array();
 	$vars['sidebar']['left']['blocks'] = array();
@@ -106,6 +105,32 @@ function design(&$vars) {
 					)
 				),
 			);
+
+		$vars['adminmenu'] = clearMenu($adminmenuitems);
+	
+	/*
+	echo"<pre>".print_r($adminmenuitems,1)."</pre>";
+
+	foreach ($adminmenuitems as $item ) {
+        if(!isset($item['permission']) OR $user->checkRole($item['permission'])) {
+            $c++;
+            $kod_tartalom.="\n<li class='felsomenulink'><a href='".$item['url']."' class='felsomenulink'>".$item['title']."</a>";       
+            if(isset($item['items']) AND is_array($item['items'])) { 
+                foreach ($item ['items'] as $i ) {
+                    if(!isset($i['permission']) OR $user->checkRole($i['permission'])) {
+                        $c++;
+                        $kod_tartalom.="\n<a href='".$i['url']."' style='display:block' class='loginlink ";
+                        if($item['mid'] != $m_id) $kod_tartalom .= " closed ";
+                        $kod_tartalom .= "' >-> ".$i['title']."</a>";
+                    }
+                }
+            }
+            $kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
+        }
+    }
+	*/
+
+
 		$adminmenu = array(
 			'content' => menuHtml($adminmenuitems), 
 			'bgcolor'=>'#ECE5C8',
@@ -150,22 +175,26 @@ function design(&$vars) {
  	}
 
     if($user->checkRole('miserend'))
-    	$vars['user']['isadmin'] = true;
+    	$vars['user']->isadmin = true;
+    
     
     //Főhasáb összeállítása
 
-    $vars['messages'] = getMessages();
 
+    $vars['messages'] = getMessages();
 
     if(is_array($tartalom)) {
     	if(!isset($tartalom['template'])) {
-    		$template = "page.html";
+    			$template = "page.html";
     	} else 
     		$template = $tartalom['template'].".twig";
     	return $twig->render($template,array_merge($vars,$tartalom));
     }
     else  $vars['content'] = $tartalom;
 
+    //TODO: ez most még kell a page.html vs layout.twig miatt.
+   if(!isset($_SESSION['template']) OR $_SESSION['template'] == 'templates2' AND $m_id == 28)
+			return $twig->render('layout.twig',$vars);
 
     $sablon = "page";
     if($m_oldalsablon == 'aloldal') $sablon .= '_subadminpage';

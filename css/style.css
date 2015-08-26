@@ -33,3 +33,16 @@ span.toggle.active {
 }
 
 /*http://download.jqueryui.com/themeroller/images/ui-icons_FFFF00_256x240.png*/
+
+
+.yellow { color: yellow; }
+.red { color: #FF0000; }
+.grey { color: #989898; }
+.lightgrey { color: #E0E0E0;}
+.green { color: #008000;}
+.blue { color: blue;}
+
+
+.tooltip{
+    font-size: 14px;
+}

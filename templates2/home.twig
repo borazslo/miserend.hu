@@ -25,7 +25,7 @@
 
 {{ alert|raw }}
 
-	<div class="miseurlap" style="width:100%;float:left">
+	<div class="miseurlap">
     <form method=post name="kereses" id="kereses" class="form-group">
     {{ forms.input(searchform.m_op) }}{{ forms.input(searchform.m_id) }}
    
@@ -148,6 +148,20 @@
   </div>
   
   </form>
+</div>
+
+<div id="favorites" style="margin-top:12px">
+
+  <h3>Kedvenc templomok</h3>
+  {% if favorites|length > 0 %}
+      <ul>
+      {% for key, item in favorites %}<li class="link">{{ item.li|raw }}</li>{% endfor %}
+      </ul>
+  {% else %}
+      <p class="alap"><i>Bejelentkezett felhasználóink megjelelölhetnek templomokat kedvencként.</i></p>
+  {% endif %}
+
+
 </div>
  <!--
   

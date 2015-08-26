@@ -828,7 +828,7 @@ function miserend_addmise($tid) {
 	global $m_id;	
 
 	global $script;
-	$script .= "<script type='text/javascript' src='js/miserend_addmise.js'></script>\n";
+	//$script .= "<script type='text/javascript' src='js/miserend_addmise.js'></script>\n";
 	//Ezt csak a development szerveren kéne
 	miserend_update_addmisejs();
 

@@ -13,7 +13,7 @@ function alap_index() {
 	
 	switch ($fm) {
 		case 11:
-			$tartalom.= <<<EOD
+			$tartalomkod.= <<<EOD
 				<span class=alcim>Házirend és szabályzat</span>
 				<p class="alap">A <i>Miserend</i> honlap felhasználókezelése külön vált a <a href="http://plebania.net"><i>Virtuális Plébánia</i></a> portál többi oldalától. A különböző oldalakon külön kell regisztrálni. De ha 2015 előtt regisztrált akár a <i>Miserend</i>, akár a <i>Virtuális Plébánia</i> bármelyik másik aloldalára, akkor az akkor megadott név és jelszó továbbra is érvényes itt is. (Ám megváltoztatása esetén csak itt változik meg.</p>
 				<p class="alap"><strong>A regisztrációra és a honlap használatára az alábbi szabályok érvényesek, kérjük olvasd el figyelmesen!</strong></p>

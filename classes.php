@@ -609,13 +609,14 @@ class Remark
 		if($this->reliable == $reliability) return true;
 
 		$this->reliable = $reliability;
-		
+
 		//A megbízhatóságot az összes beküldésénél átállítjuk
 		// Gyakorlatilag az email az igazi azonosító.
 		// TODO: akarunk mit kezdeni az *vendeg* de email nélkül?
-		if($this->email != '')
-			mysql_query("UPDATE eszrevetelek SET megbizhato = '".$reliability."' WHERE email = '".$this->email."' ;");
-		else
+		if($this->email != '') {
+			$query = "UPDATE eszrevetelek SET megbizhato = '".$reliability."' WHERE email = '".$this->email."' ;";
+			mysql_query($query);
+		} else
 			return false;
 	}
 

@@ -1,7 +1,7 @@
 <div class="panel-group" id="accordion">
     <div class="panel panel-default">
 
-		<div id='chat_text' class="urlap panel-heading" style="height:50px;overflow:auto;border:1px solid">Ide, írj...</div>
+		<div id='chat_text' class="urlap panel-heading" style="height:50px;overflow:auto;border:1px solid"></div>
 		<div id='chat_submit button' class='kicsi link' style='float:right;margin-top:-0px'>[Elküldés]</div>
 		<div id='chat_users' class='panel-body kicsi'>{{ users|raw }}</div>
 		<div id='chat_comments' class="panel-body" data-last="{{ lastcomment }}" data-unread="0" style="max-height:400px;width:100%;overflow:auto;margin-top:4px;">
@@ -12,6 +12,7 @@
 
 		</div>
 		<script>{{ script|raw }}</script>
+		<script src="js/chat.js"></script>
 
 	</div>
 </div>

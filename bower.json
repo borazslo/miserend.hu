@@ -13,6 +13,7 @@
     "jquery-ui": ">=1.11",
     "bootstrap": "3.2.x",
     "requirejs": "2.1.11",
-    "jquery-colorbox" : "1.5.*"
+    "jquery-colorbox" : "1.5.*",
+    "bootstrap" : "3.3.*"
   }
 }

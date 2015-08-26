@@ -52,7 +52,7 @@ switch ($_REQUEST['q']) {
 
         $alert = 0; 
         foreach($comments as $k => $i) {
-            $comments[$k]['html'] =  $twig->render('chat_comment.html',array('comment'=>$i));
+            $comments[$k]['html'] =  $twig->render('chat/chatComment.twig',array('comment'=>$i));
             if($i['user'] != $user->login) { $alert++; }
         }
 
@@ -186,6 +186,11 @@ switch ($_REQUEST['q']) {
         else echo 0;
 
         break;  
+
+    case 'Exit':
+        quit();
+        addMessage('Sikeresen kiléptünk!','info');
+        break;
 
     default:
         return json_encode($_REQUEST);

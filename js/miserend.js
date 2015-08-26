@@ -1,9 +1,33 @@
 $(document).ready(function() {
-    $( document ).tooltip();
+
+  $(document).on('click','#quit',function(){
+    console.log('click');
+      $.ajax({
+            url: "ajax.php",
+            dataType: "text",
+            data: {
+              q: 'Exit',
+            },
+            success: function( data ) {
+              location.reload();
+            },
+            error: function( data ) {
+            }
+          });
+    return false;
+  });
+
+
+  $(document).on('click','.javitva',function(){  
+            console.log('ok');
+            //event.preventDefault();
+            $( this ).nextAll(" .alap:first ").toggle()
+  });
+
+  $('[title]').tooltip();
 
  $( ".emailmenu" ).menu();
 
-	$(function() {
         $('#tkereses').on('submit', function(e) { //use on if jQuery 1.7+
             e.preventDefault();  //prevent form from submitting               
             var data = $('#tvaros').val() + '&' + $('#tkulcsszo').val() + '&' + $('#tehm').val();
@@ -81,7 +105,7 @@ $(document).ready(function() {
       
 
 
-   $( ".urlap" ).autocomplete({
+   $("#varos").autocomplete({
         source: function( request, response ) {
           $.ajax({
             url: "ajax.php",
@@ -91,56 +115,36 @@ $(document).ready(function() {
               text: request.term
             },
             success: function( data ) {
-              console.log(data);
-              console.log('ok');
-              response( data );
-            },
-            error: function( data ) {
-              console.log(data);
-              console.log('1err');
-            }
-          });
-        },
-        minLength: 2,
-      });  
-
-      $( "#varos" ).autocomplete({
-        source: function( request, response ) {
-          $.ajax({
-            url: "ajax.php",
-            dataType: "jsonp",
-            data: {
-              q: 'AutocompleteCity',
-              text: request.term,
-            },
-            success: function( data ) {
-              //console.log(data.results)
-              if(data.results != null)
-
+              //console.log(data);
+              //console.log('ok');              
               response( 
                 $.map( data.results, function( item ) {
                 return {
                       label: item.label,
                       value: item.value
                   }
-
               }));
+            } ,
+            error: function( data ) {
+              console.log(data);
+              //console.log('1err');
             }
           });
         },
         minLength: 2,
-      }).each(function() {
-                        $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
-                            return $("<li></li>").data("item.ui-autocomplete", item).append(
-                            item.label)
-                            .appendTo(ul);
-                        };
-                    });    
+       }).each(function() {
+          $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+              return $("<li></li>").data("item.ui-autocomplete", item).append(
+              item.label)
+              .appendTo(ul);
+          };
+      });    
+
+
   });
 
-  $('.massinfo').click( function() {
-    console.log($( this ));
-    $( this ).next().toggle('slow');
+  $(document).on('click','.massinfo',function(){    
+      $( this ).next().toggle('slow');
   });
 
   // favorites
@@ -181,7 +185,7 @@ $(document).ready(function() {
           }
       } 
 
-      var rid = $(this).parent().attr("data-rid");
+      var rid = $(this).parent().parent().attr("data-rid");
       var here = $(this);
 
       $.ajax({
@@ -189,22 +193,23 @@ $(document).ready(function() {
              url:"ajax.php?q=SwitchReliable",
              data:"rid="+rid+"&reliable="+reliable,
              success:function(response){
+              console.log(response);
                 if(here.hasClass('check')) {
                     if(here.hasClass('lightgrey')) {
-                          here.parent().find('.alert').removeClass('red');
-                          here.parent().find('.alert').addClass('lightgrey')
+                          here.parent().parent().find('.alert').removeClass('red');
+                          here.parent().parent().find('.alert').addClass('lightgrey')
                     } 
                     here.toggleClass("lightgrey green");
                 } else if(here.hasClass('alert')) {
                     if(here.hasClass('lightgrey')) {
-                          here.parent().find('.check').removeClass('green');
-                          here.parent().find('.check').addClass('lightgrey')
+                          here.parent().parent().find('.check').removeClass('green');
+                          here.parent().parent().find('.check').addClass('lightgrey')
                     } else {
                     }
                     here.toggleClass("lightgrey red");
                 } 
 
-                var email = here.parent().attr('data-email');
+                var email = here.parent().parent().attr('data-email');
                 if(email !== '') {
                     $("[data-email='" + email +"']").each(function() {
                         if(reliable == 'i') {
@@ -221,15 +226,12 @@ $(document).ready(function() {
                 }
             }, 
         });        
-  });
+  
 
 
 
-$( ".javitva" ).click(function( event ) {
-          event.preventDefault();
-          $( this ).nextAll(" .alap:first ").toggle()
-});
 
+ 
 
-
+/* */
 });

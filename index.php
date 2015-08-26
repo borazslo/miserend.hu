@@ -18,7 +18,8 @@ if($_REQUEST['templom']>0 AND ( !isset($_REQUEST['m_id']) OR !isset($_REQUEST['m
            
 
 //Modul beöltése
-$lekerdez=mysql_query("select fajlnev as fajl,zart,jogkod from modulok where id='".$m_id."' and ok='i' AND fajlnev != '' LIMIT 1;");
+$query = "select fajlnev as fajl,zart,jogkod from modulok where id='".$m_id."' and ok='i' AND fajlnev != '' LIMIT 1;";
+$lekerdez=mysql_query($query);
 $module=mysql_fetch_assoc($lekerdez);
 if($module == array() OR !is_file("moduls/".$module['fajl'].".php") ) 
     $hiba='A választott modul behívása sikertelen.';
@@ -32,7 +33,7 @@ if(!$hiba) {
     if(empty($m_op)) $m_op='index';
 		
     //TODO: a templates2 teljes készítése után törölhető, addig az admin oldalak legyenek alap design
-    if(preg_match('/\/admin_/i', $module['fajl'])) {
+    if(preg_match('/^admin_/i', $module['fajl'])) {
         $loader = new Twig_Loader_Filesystem('templates');
         $twig = new Twig_Environment($loader); // cache?        
     }

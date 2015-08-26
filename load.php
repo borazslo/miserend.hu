@@ -21,9 +21,7 @@ dbconnect();
 
 //Felhasználó kezelé
 if(isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {
-    unset($_SESSION['auth']);
-    unset($_COOKIE['auth']);
-    setcookie('auth', null, time());
+    quit();
 }
 
 if(isset($_REQUEST['login'])) {
@@ -40,7 +38,7 @@ require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
 
 if(isset($_REQUEST['template'])) $_SESSION['template'] = $_REQUEST['template'];
-if(!isset($_SESSION['template'])) $_SESSION['template'] = 'templates'; 
+if(!isset($_SESSION['template'])) $_SESSION['template'] = 'templates2'; 
 $template = $_SESSION['template'];
 
 $loader = new Twig_Loader_Filesystem($template);

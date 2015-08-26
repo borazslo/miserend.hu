@@ -140,6 +140,29 @@ function getuser() {
     return $return;
 }
 
+
+function clearMenu($menuitems) {
+    global $user;
+
+    foreach ($menuitems as $key => $item ) {
+        if(isset($item['permission']) AND !$user->checkRole($item['permission'])) {
+            unset($menuitems[$key]);
+        } else {
+            if(isset($item['items']) AND is_array($item['items'])) { 
+                foreach ($item ['items'] as $k => $i ) {
+                    if(isset($i['permission']) AND !$user->checkRole($i['permission'])) {
+                        unset($menuitems[$key][$k]);
+                    } else {
+
+                    }
+                }
+            }
+        }
+    }
+    return $menuitems;
+
+}
+
 function menuHtml($menuitems) {
     global $user,$m_id;
 
@@ -2052,6 +2075,17 @@ function alapnyelv($text) {
 
 }
 
+function quit() {
+    global $user;
+
+    unset($_SESSION['auth']);
+    unset($_COOKIE['auth']);
+    setcookie('auth', null, time());
+    //session_destroy();
+    unset($user);
+    $user = new User();
+
+}
 
 
 ?>

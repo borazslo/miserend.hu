@@ -16,17 +16,23 @@
         <meta http-equiv="cleartype" content="on">
 
         <meta name="apple-itunes-app" content="app-id=967827488">
-        <meta name="google-play-app" content="app-id=ccom.frama.miserend.hu">
+        <meta name="google-play-app" content="app-id=com.frama.miserend.hu">
 
         {% block meta %}{% endblock %}
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
 
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/jquery-ui.min.css" rel="stylesheet">
-        <link href="/css/font-awesome.min.css" rel="stylesheet">
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/jquery-ui.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
 
-        <link href="/css/style.css" rel="stylesheet">
-        <link href="/css/autocomplete.css" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
+        <link href="css/autocomplete.css" rel="stylesheet">
+
+        <link href="css/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="templates/colorbox.css" />
+        <link rel="stylesheet" href="templates/als.css" />
+        <link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
+
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -35,13 +41,24 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-        <!--<script data-main="/js/requirejs_config" src="/js/lib/require.js"></script>-->
+        <!--<script data-main="/js/requirejs_config" src="/js/lib/require.js"></script>
+        {% if script %}{% for s in script %}{{ s|raw }}{% endfor %}{% endif %}-->
 
-        {% if script %}{% for s in script %}{{ s|raw }}{% endfor %}{% endif %}
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/jquery-ui/jquery-ui.js"></script>
+        <script src="bower_components/jquery-ui/ui/autocomplete.js"></script>
+        <script src="bower_components/jquery-colorbox/jquery.colorbox.js"></script>
+        <script src="bower_components/jquery-colorbox/i18n/jquery.colorbox-hu.js"></script>
+        <script src="js/als/jquery.als-1.5.min.js"></script>
+
+        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+        <script src="js/miserend.js"></script>
+        <script src="js/somethingidontknow.js"></script>
 
         {% block extraHead %}{% endblock %}
     </head>
-    <body>
+    <body>{% block body%}
         <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
                 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -62,13 +79,21 @@
                 <div class="col-md-3  col-sm-4">
                     <!--{% include 'search/quickSearchForm.twig' %}-->
                     {% block leftsidebar %}{% endblock %}
-                    {% block menu %}{% include 'menu.twig' %}{% endblock %}
                     {% if chat %}{% include 'chat/chatBox.twig' with chat %}{% endif %}
                     {% if androidreklam %}{% include "panel.twig" with {'title':'Már mobiltelefonra is','body': androidreklam|raw,'panel':'success' } %}{% endif %}
                 </div>
                 <div class="col-md-6 col-sm-2">
                     {% block pageHeader %}{% endblock %}
-                         {% block content %}{% endblock %}
+                    {% block messages %}
+                          {% if messages %}
+                              <div id="messages" style="margin-bottom:6px">
+                                {% for message in messages %}
+                                    {% include 'message.twig' with message %}
+                                {% endfor %}
+                              </div>  
+                          {% endif %}
+                    {% endblock %}                     
+                    {% block content %}{{ content|raw }}{% endblock %}
                     </div>
                 <div class="col-md-3 col-sm-2">
                          {% block rightsidebar %}{% endblock %}
@@ -86,5 +111,5 @@
             <p><a href="?m_id=28&fm=12">impresszum</a></p>
 
         </div>
-    </body>
+   {% endblock %}</body>
 </html>
