@@ -50,7 +50,8 @@ function miserend_index() {
             'name' => "varos",
             'size' => 20,
             'id'=>'varos',
-            'class' => 'keresourlap'),
+            'class' => 'keresourlap',
+            'placeholder' => 'település'),
         'hely' => array(
             'name' => "hely",
             'size' => 20,

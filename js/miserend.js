@@ -44,6 +44,7 @@ $(document).ready(function() {
 
         $('#form_church_getdetails').on('click', function(e) {               
             $('#form_church_details').toggle('slow');
+            $('.form_church_details').toggle('slow');
             $('#form_church_getdetails').toggleClass('glyphicon-minus-sign glyphicon-plus-sign');
         });
 
