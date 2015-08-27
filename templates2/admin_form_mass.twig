@@ -3,6 +3,8 @@
 <tr bgcolor="{% if nap.selected == 7 %}#E67070{% elseif nap.selected == 6 %}#F1BF8F{% else %}#efefef{% endif %}">
 	<td style="padding-right:3px;padding-left:3px" class="form-inline form-group">
 		{{ forms.input(id) }}
+    	{{ forms.select(nap2) }}
+    	{{ forms.select(nap) }}
 		{{ forms.input(ido) }}
 		<img src="img/buttons/deleteup.gif" class='alap deletemise' style="vertical-align: middle;" height="18" title="Mise törlése">
 	</td>

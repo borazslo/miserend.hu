@@ -4,7 +4,6 @@
 
     "require": {
         "twig/extensions": "1.0.*",
-        "mobiledetect/mobiledetectlib": "2.*"
     },
     "scripts": {
         "post-install-cmd": [

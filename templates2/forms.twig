@@ -4,7 +4,7 @@
     <input 
     {% if array.id %} id="{{array.id}}" {% endif %}
     {% if array.checked %} checked {% endif %}
-    class="{% if array.type != 'checkbox' %}form-control{% endif %} {{ array.class }}" type="{{ array.type|default('text') }}" style="{{ array.style }}" name="{{ array.name }}" value="{{ array.value|e }}"
+    class="input-sm {% if array.type != 'checkbox' %}form-control{% endif %} {{ array.class }}" type="{{ array.type|default('text') }}" style="{{ array.style }}" name="{{ array.name }}" value="{{ array.value|e }}"
      size="{{ array.size|default(12) }}"
     {% if array.placeholder %} placeholder="{{array.placeholder}}" {% endif %}
      />
@@ -19,7 +19,7 @@
     {% if array.id %} id="{{array.id}}" {% endif %}
     {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
     {% if array.style %} style="{{array.style}}" {% endif %}
-    class="form-control {{ array.class }}" 
+    class="input-sm form-control {{ array.class }}" 
 	>
 		{% for key, option in array.options %}
 			<option value="{{ key }}" 
@@ -36,7 +36,7 @@
 {% macro textarea(array) %}
     {% if array.label %}<span class=alap> {{array.label|raw}} </span>{% endif %}
     
-    <textarea name="{{ array.name }}" class="form-control"
+    <textarea name="{{ array.name }}" class="input-sm form-control"
     {% if array.id %} id="{{array.id}}" {% endif %}
     {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
     {% if array.style %} style="{{array.style}}" {% else %} style="width:100%" {% endif %}

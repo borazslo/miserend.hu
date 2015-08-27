@@ -7,7 +7,6 @@ include_once('config.php');
 include_once('functions.php');
 //include_once('functions_osm.php');
 include_once('classes.php');
-include_once("design.php");
 
 if($config['debug'] > 0)  error_reporting(E_ERROR | E_WARNING | E_PARSE);
 else error_reporting(0);
@@ -19,58 +18,33 @@ $vars['design_url'] = $design_url = $config['path']['domain'];
 $db_name = $config['connection']['database'];
 dbconnect();
 
-//Felhasználó kezelé
+//Felhasználó kiléptetés
 if(isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {
     quit();
 }
-
+//Felhasználó beléptetés
 if(isset($_REQUEST['login'])) {
     if(!login($_REQUEST['login'],$_REQUEST['passw'])) {
         addMessage('Hibás név és/vagy jelszó!<br/><br/>Ha elfelejtetted a jelszavadat, <a href="?m_id=28&m_op=jelszo">kérj ITT új jelszót</a>.','danger');
-        //header("Location: ?m_id=28&m_op=jelszo");
     }
 }
 
+//Felhasználó betöltése
 $user = getuser();
-if($user->loggedin) mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$user->uid." LIMIT 1;");
+//Felhasználó aktív még mindig
+if($user->loggedin) $user->active();
+
 
 //Twig and the templates
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
 
-if(isset($_REQUEST['template'])) $_SESSION['template'] = $_REQUEST['template'];
-if(!isset($_SESSION['template'])) $_SESSION['template'] = 'templates2'; 
-$template = $_SESSION['template'];
-
-$loader = new Twig_Loader_Filesystem($template);
+$loader = new Twig_Loader_Filesystem('templates2');
 $twig = new Twig_Environment($loader); // cache?        
 
 //GIT version
 exec('git rev-parse --verify HEAD 2> /dev/null', $output);
-$hash = $output[0];
-if($hash != '') $vars['version']['hash'] = $hash;
-
-
-//Custom extrapage for Android users
-if(!isset($_SESSION['isAndroidOS']) AND $_SERVER['PHP_SELF'] != '/api.php') { 
-    //MobileDetect
-    require_once 'vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php';        
-    $detect = new Mobile_Detect;
-    //$isMobile = $detect->isMobile();
-    //$isTablet = $detect->isTablet();
-
-    if($detect->isAndroidOS() == 1 AND $_SESSION['isAndroidOS'] != 'shown') {
-        $vars['title'] = 'Miserend androidra is!';
-        echo $twig->render('android_advertisment.html',$vars);
-        $_SESSION['isAndroidOS'] = 'shown';
-        exit;
-    } elseif ($detect->isAndroidOS() == 1) {
-        $_SESSION['isAndroidOS'] = 'shown';    
-    } else {
-        $_SESSION['isAndroidOS'] = false;
-    }    
-}
-
+if($output[0] != '') $vars['version']['hash'] = $output[0];
 
 
 //

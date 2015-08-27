@@ -347,7 +347,8 @@ function miserend_addtemplom($tid) {
 	$vars = array(
 		'title' => "Templom feltöltése / módosítása",
 		'content' => $urlap,
-		'template' => 'layout'
+		'template' => 'layout',
+		'comlumns2' => true,
 	);
 
 	return $vars;

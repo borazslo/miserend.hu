@@ -46,3 +46,16 @@ span.toggle.active {
 .tooltip{
     font-size: 14px;
 }
+
+#formschedule select.form-control,
+#formschedule input.form-control {
+    height: 25px !important;
+    padding: 2px 6px !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+    border-radius: 1px !important;
+}    
+
+#formschedule .alap{
+    font-size: 12px !important;
+}

@@ -305,11 +305,15 @@ class User
 	    }
 
 	    return $result;
-}
+	}
 
 	function newPassword($text) {
 		$this->presave('password',$text);
 		$this->save();
+	}
+
+	function active() {
+		mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$this->uid." LIMIT 1;");
 	}
 
 

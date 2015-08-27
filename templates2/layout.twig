@@ -18,7 +18,6 @@
         <meta name="apple-itunes-app" content="app-id=967827488">
         <meta name="google-play-app" content="app-id=com.frama.miserend.hu">
 
-        {% block meta %}{% endblock %}
         <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
 
         <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -40,9 +39,6 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
-
-        <!--<script data-main="/js/requirejs_config" src="/js/lib/require.js"></script>
-        {% if script %}{% for s in script %}{{ s|raw }}{% endfor %}{% endif %}-->
 
         <script src="bower_components/jquery/dist/jquery.min.js"></script>
         <script src="bower_components/jquery-ui/jquery-ui.js"></script>
@@ -80,9 +76,10 @@
                     <!--{% include 'search/quickSearchForm.twig' %}-->
                     {% block leftsidebar %}{% endblock %}
                     {% if chat %}{% include 'chat/chatBox.twig' with chat %}{% endif %}
+                    {% if mychurches %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
                     {% if androidreklam %}{% include "panel.twig" with {'title':'Már mobiltelefonra is','body': androidreklam|raw,'panel':'success' } %}{% endif %}
                 </div>
-                <div class="col-md-6 col-sm-2">
+                <div class="col-md-{% if columns2 %}9{% else %}6{% endif %} col-sm-2">
                     {% block pageHeader %}
                         <div class="page-header">
                             <h2>{{ title|raw }}</h2>
@@ -99,9 +96,12 @@
                     {% endblock %}                     
                     {% block content %}{{ content|raw }}{% endblock %}
                     </div>
+                {% if columns2 %}{% else %}  
                 <div class="col-md-3 col-sm-2">
+                        {% if campaign %}{% include "panel.twig" with {'title': campaign.title ,'body': campaign.content|raw,'panel':'danger' } %}{% endif %}
                          {% block rightsidebar %}{% endblock %}
                     </div>
+                {% endif %}    
             </div>
         </div>
         <div class="footer">
@@ -113,5 +113,15 @@
             <p><a href="?m_id=17&fm=12">Impresszum</a></p>
 
         </div>
-   {% endblock %}</body>
+   {% endblock %}
+    <script language="JavaScript" type="text/javascript">
+        var trackOutboundLink = function(url) {
+            ga('send', 'event', 'outbound', 'click', url, {'hitCallback':
+                function () {
+                    document.location = url;
+                }
+            });
+        }
+    </script>
+</body>
 </html>

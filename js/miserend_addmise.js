@@ -391,7 +391,7 @@ var events = new Array();
                         return false; 
                     }); 
 
-                $("body").on('change', '.urlap.nap', function(e) {
+                $("body").on('change', '#formschedule .nap', function(e) {
                     if($( this ).val() == 7) {
                         $( this ).parent().parent().css("background-color", "#E67070");
                     } else if ($( this ).val() == 6) {
@@ -682,7 +682,7 @@ var events = new Array();
 
         var vars = ["from","to"];
         for (var i = 0; i < 2; i++) {
-          var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");   
+          var input = $("[name='period[" + id + "][" + vars[i] +"]']");   
           if( input.val() != '') alert = true;
         }
 
@@ -690,7 +690,7 @@ var events = new Array();
           if ( window.confirm("Az '" + ui.item.value + "' névhez találtunk határokat: \n" + ui.item.from + " - " + ui.item.to + "\n Jó lesz?") ) {
               var vars = ["from","from2","to2","to"];
               for (var i = 0; i < 4; i++) {
-                var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
+                var input = $("[name='period[" + id + "][" + vars[i] +"]']");          
                 input.val(ui.item[vars[i]]);
               }
 
@@ -698,7 +698,7 @@ var events = new Array();
         } else {
           var vars = ["from","from2","to2","to"];
             for (var i = 0; i < 4; i++) {
-              var input = $(".urlap[name='period[" + id + "][" + vars[i] +"]']");          
+              var input = $("[name='period[" + id + "][" + vars[i] +"]']");          
               input.val(ui.item[vars[i]]);
           }
         }  
@@ -711,7 +711,7 @@ var events = new Array();
 
         var vars = ["from"];
         for (var i = 0; i < 1; i++) {
-          var input = $(".urlap[name='particular[" + id + "][" + vars[i] +"]']");   
+          var input = $("[name='particular[" + id + "][" + vars[i] +"]']");   
           if( input.val() != '') alert = true;
         }
 
@@ -719,7 +719,7 @@ var events = new Array();
           if ( window.confirm("Az '" + ui.item.value + "' névhez találtunk adatot: \n" + ui.item.from + " " + ui.item.from2 + "\n Jó lesz?") ) {
               var vars = ["from","from2"];
               for (var i = 0; i < 2; i++) {
-                var input = $(".urlap[name='particular[" + id + "][" + vars[i] +"]']");          
+                var input = $("[name='particular[" + id + "][" + vars[i] +"]']");          
                 input.val(ui.item[vars[i]]);
               }
 
@@ -727,7 +727,7 @@ var events = new Array();
         } else {
           var vars = ["from","from2"];
             for (var i = 0; i < 2; i++) {
-              var input = $(".urlap[name='particular[" + id + "][" + vars[i] +"]']");          
+              var input = $("[name='particular[" + id + "][" + vars[i] +"]']");          
               input.val(ui.item[vars[i]]);
           }
         }  

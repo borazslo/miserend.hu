@@ -17,7 +17,9 @@ if($_REQUEST['templom']>0 AND ( !isset($_REQUEST['m_id']) OR !isset($_REQUEST['m
 }
            
 
-//Modul beöltése
+/*
+    Module, azaz fő anyag betöltése
+ */
 $query = "select fajlnev as fajl,zart,jogkod from modulok where id='".$m_id."' and ok='i' AND fajlnev != '' LIMIT 1;";
 $lekerdez=mysql_query($query);
 $module=mysql_fetch_assoc($lekerdez);
@@ -31,27 +33,97 @@ if(!$user->checkRole($module['jogkod']) )
 if(!$hiba) {
     if(!$m_op) $m_op=$_REQUEST['m_op'];
     if(empty($m_op)) $m_op='index';
-		
-    /* *
-    //TODO: a templates2 teljes készítése után törölhető, addig az admin oldalak legyenek alap design
-    if(preg_match('/^admin_/i', $module['fajl'])) {
-        $loader = new Twig_Loader_Filesystem('templates');
-        $twig = new Twig_Environment($loader); // cache?        
-    }
-    /* */
+
     if(!include_once("moduls/".$module['fajl'].".php"))
         $hiba ='HIBA! A szükséges fájl nem hívható be! ('.$module['fajl'].')';
 }
+if($hiba) { echo $hiba; exit; }
 
-//TODO: ez mi ez?
-if($user->checkRole('"any"')) { $vars['chat'] = chat_vars(); }	
+if(isset($tartalom)) {
+    if(is_array($tartalom)) {
+        $vars = array_merge($vars,$tartalom);
+    } else  {
+        $vars['content'] = $tartalom;
+    }
+}
 
 
-if($hiba) {
-    //TODO: Kedvesebb hibaüzenetet adjon már, légyszi.
-    echo $hiba;
+//TODO: ezminekez
+if(!isset($vars['pageTitle'])) $vars['pageTitle'] = 'VPP - miserend';
+if(isset($titlekieg)) $vars['pagetitle'] = preg_replace("/^( - )/i","",$titlekieg)." | ".$vars['pagetitle'];
+        
+//TODO: ezmiez
+$emaillink_lablec="<A HREF=\"javascript:linkTo_UnCryptMailto('ocknvq%3CkphqBokugtgpf0jw');\" class=emllink>info<img src=img/kukaclent.gif align=absmiddle border=0>miserend.hu</a>";
+    
+
+//Admin menü összeállítása   
+if($user->checkRole("'any'")) {
+    $adminmenuitems = array(
+            array(
+                'title'=> 'Miserend','url'=> '?m_id=27','permission' => 'miserend','mid'=>27,
+                'items' => array(
+                    array('title' => 'új templom','url' => '?m_id=27&m_op=addtemplom','permission' => '' ),
+                    array('title' => 'módosítás','url' => '?m_id=27&m_op=modtemplom','permission' => '' ),              
+                    array('title' => 'egyházmegyei lista','url' => '?m_id=27&m_op=ehmlista','permission' => 'miserend' ),
+                    array('title' => 'kifejezések és dátumok','url' => '?m_id=27&m_op=events','permission' => 'miserend' ),             
+                )
+            ),
+            array(
+                'title'=> 'Igenaptár','url'=> '?m_id=31','permission' => 'igenaptar','mid'=>31,
+                'items' => array(
+                    array('title' => 'naptár beállítása','url' => '?m_id=31&m_op=naptar','permission' => 'igenaptar' ),
+                    array('title' => 'gondolatok','url' => '?m_id=31&m_op=gondolatok','permission' => 'igenaptar' ),
+                    array('title' => 'szentek','url' => '?m_id=31&m_op=szentek','permission' => 'igenaptar' ),
+                )
+            ),
+            array(
+                'title'=> 'Felhasználók','url'=> '?m_id=21','permission' => 'user','mid'=>21,
+                'items' => array(
+                    array('title' => 'új felhasználó','url' => '?m_id=28&m_op=edit','permission' => 'user' ),
+                    array('title' => 'módosítás','url' => '?m_id=28&m_op=list','permission' => 'user' ),
+                )
+            ),
+        );
+
+    $vars['adminmenu'] = clearMenu($adminmenuitems);
+}
+
+
+//Campaing betöltése
+$vars['campaign'] = updatesCampaign();
+
+
+//Saját templomok blokkjához
+if($user->loggedin AND !$user->checkRole('miserend') ) 
+    $vars['mychurches'] = feltoltes_block();
+// Chat betöltése, ha lehet
+if($user->checkRole('"any"'))
+    $vars['chat'] = chat_load();
+
+
+// Felhasználük 
+$vars['user'] = $user;
+if($user->checkRole('miserend'))
+    $vars['user']->isadmin = true;
+    
+// Üzenetek betöltése    
+$vars['messages'] = getMessages();
+
+
+//Template fájl megtalálása
+if(!isset($tartalom['template'])) {
+    $template = "layout.twig";
+} elseif(preg_match('/\.([a-zA-Z]{1,4})$/i',$vars['template'])) {
+    $template = $vars['template'];
 } else
-    print design($vars);
+    $template = $vars['template'].".twig";
+
+//És a világ kiírása
+print $twig->render($template,$vars);  
+
+
+
+
 
 
 ?>

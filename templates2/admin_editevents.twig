@@ -1,3 +1,4 @@
+{% set columns2 = true  %}
 {% extends "layout.twig" %}
 
 {% import "forms.twig" as forms %}
@@ -12,40 +13,29 @@
 	<input type=hidden name=m_id value={{ m_id }}>
 	<input type=hidden name=m_op value=events>
 
-<div style="display:table;padding:5px" class="alap">
-	<div style="display:table-row">
-		<div style="display:table-cell">
-			<strong>kifejezés</strong>
-		</div>
-		{% for year in years %}
-			<div style="display:table-cell;text-align:center">
-			<strong>{{ year }}</strong>
-			</div>
-		{% endfor %}
-		<div style="display:table-cell">
-			<strong>használtban</strong>
-		</div>
-	</div>
+	<table class="table table-hover table-condensed table-striped">
 
 	{% for key,input in form %}
-		<div style="display:table-row">
-			<div style="display:table-cell;padding:5px">
+		<tr>
+			<td style="vertical-align:middle"><strong>
 				{% if names[key] != 'new' %}{{ names[key] }}
 				{% else %} {{ forms.input( {'name':'new','size':'18'} ) }}
 				{% endif %}
-			</div>
+			</strong></td>
 			{% for year in years %}
-				<div style="display:table-cell;padding:5px">
+				<td>
 				{% if form[key][year]['id'] %}{{ forms.input( form[key][year]['id'] ) }}{% endif %}
 
 				{{ forms.input( form[key][year]['input'] ) }}
-				</div>
+				</td>
 			{% endfor %}
-			<div style="display:table-cell">
+			<td style="vertical-align:middle">
 				{% if names[key] != 'new' %}{{ stats[key] }} helyen{% endif %}
-			</div>
-		</div>
+			</td>
+		</tr>
+	
 	{% endfor %}
-</div>
+	</table>
+
 <input type="submit" name="save" value="Mentés">
 {% endblock %}

@@ -894,16 +894,16 @@ function miserend_misekeres() {
 				$mass['nyelv'] = decodeMassAttr($mass['nyelv']);
 				foreach($mass['nyelv'] as $milyen)
 					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['description'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-    					<span class="" style="display:none" >'.$milyen['description'].'</span>';
+    					<span class="massfullinfo" style="display:none" >'.$milyen['description'].'</span>';
     					
 				$mass['milyen'] = decodeMassAttr($mass['milyen']);
 				foreach($mass['milyen'] as $milyen)
 					$tartalom.= '<img src="'.$design_url.'img/'.$milyen['file'].'" class="massinfo" width=14 title="'.$milyen['description'].'"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-    					<span class="" style="display:none">'.$milyen['description'].'</span>';
+    					<span class="massfullinfo" style="display:none">'.$milyen['description'].'</span>';
 
     			if($mass['megjegyzes'] != '')
 				$tartalom.= '<img src="'.$design_url.'img/info2.gif" class="massinfo" width=14 title="'.$milyen['megjegyzes'].'"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-					<span class="" style="display:none">'.$mass['megjegyzes'].'</span>';
+					<span class="massfullinfo" style="display:none">'.$mass['megjegyzes'].'</span>';
 			
 			}
 			//$tartalom .= print_r($masses,1);
@@ -1006,7 +1006,7 @@ function miserend_view() {
 		if(file_exists($staticmap))
 			$cim .= "<img src='kepek/staticmaps/".$tid."_227x140.jpeg'>";
 		else
-			$cim .= "<br/><span class=alap><i>Térképen:</i> <u><a href=\"http://terkep.miserend.hu/?templom=$tid\">$lat; $lng</a></u></span>";
+			$cim .= "<br/><span class=alap><i>Térképen:</i> <u><a href=\"http://www.openstreetmap.org/?mlat=$lat&mlon=$lng\">$lat, $lng</a></u></span>";
 		
 	}
 	else

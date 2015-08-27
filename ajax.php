@@ -5,7 +5,7 @@ include 'load.php';
 switch ($_REQUEST['q']) {
     case 'FormMassEmpty':
     	$form = formMass($_POST['period'],$_POST['count'],false,'period');
-    	echo $twig->render('admin_form_mass.html', $form);  
+    	echo $twig->render('admin_form_mass.twig', $form);  
         break;
     case 'FormMassParticularEmpty':
         $form = formMass($_POST['particular'],$_POST['count'],false,'particular');

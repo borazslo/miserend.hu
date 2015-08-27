@@ -38,9 +38,9 @@ function teendok($tid) {
     			<input type=hidden name=rid value=".$remark->id.">
     			<input type=hidden name=op value=mod>";
 
-		$urlap.="<div class='form-group'>
+		$urlap.="<div class='form-group '>
 			<label for='my_dropdown'>Állapot</label>
-			<select name='allapot' class='form-control' id='my_dropdown'>
+			<select name='allapot' class='form-control input-sm' id='my_dropdown'>
 				<option value='0'>-----</option>";
 				foreach(array(
 						'u'=>'új',
@@ -55,10 +55,10 @@ function teendok($tid) {
 		if($remark->allapot!='j') $urlap.='
 			<div class="form-group">
 				<label for="comment">Megjegyzés</label>
-				<textarea id="comment" name="adminmegj" class="form-control" rows="3" id=""></textarea>
+				<textarea id="comment" name="adminmegj" class="form-control input-sm" rows="3" id=""></textarea>
 			</div>';
 
-		$urlap .= '<button type="submit" class="btn btn-default">Ok</button></form>';
+		$urlap .= '<button type="submit" class="btn btn-default input-sm">Ok</button></form>';
 
 		$remarks[$id]->urlap = $urlap;
 

@@ -152,7 +152,9 @@ $(document).ready(function() {
   });
 
   $(document).on('click','.massinfo',function(){    
-      $( this ).next().toggle('slow');
+      //$( this ).parent().find('.massfullinfo').toggle('slow');
+      $( this ).nextAll('.massfullinfo:first').toggle('slow');
+      
   });
 
   // favorites
