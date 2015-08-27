@@ -380,8 +380,8 @@ function miserend_index() {
             $randoms[] = $random;
         }
         foreach($randoms as $k=>$random) {
+			$random['konyvtar'] = $randoms[$k]['konyvtar'] = "$konyvtaralap/".$random['id'];
         	if(file_exists($random['$konyvtar']."/kicsi/".$random['fajlnev'])) {
-				$random['konyvtar'] = $randoms[$k]['konyvtar'] = "$konyvtaralap/".$random['id'];
 	            //if(is_file("$konyvtar/kicsi/$fajlnev")) {
 	            @$info=getimagesize($random['$konyvtar']."/kicsi/".$random['fajlnev']);
 				$w1=$info[0];
@@ -408,7 +408,9 @@ function miserend_index() {
 	            
 	            </li>\n";
 
-        	} 
+        	} else {
+
+        	}
     	}
         if($mennyi < 4) for($i=0;$i<4-$mennyi;$i++) $kepek .= "<li class='als-item'></li>";
         $kepek.='</ul>
@@ -1004,7 +1006,7 @@ function miserend_view() {
 	if($checked > 0) {
 		$staticmap = "kepek/staticmaps/".$tid."_227x140.jpeg";
 		if(file_exists($staticmap))
-			$cim .= "<img src='kepek/staticmaps/".$tid."_227x140.jpeg'>";
+			$cim .= "<a href=\"http://www.openstreetmap.org/?mlat=$lat&mlon=$lng#map=15/$lat/$lng\" target=\"_blank\"><img src='kepek/staticmaps/".$tid."_227x140.jpeg'></a>";
 		else
 			$cim .= "<br/><span class=alap><i>Térképen:</i> <u><a href=\"http://www.openstreetmap.org/?mlat=$lat&mlon=$lng\">$lat, $lng</a></u></span>";
 		

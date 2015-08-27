@@ -258,7 +258,12 @@ switch($m_op) {
 		break;
 
 	case 'list':
-		$tartalom=user_list();
+		if($user->checkRole('user'))
+			$tartalom=user_list();
+		else  {
+			addMessage('Nincs jogosultságod megnézni a felhasználók listáját.','warning');
+			$tartalom = array('title' => 'Felhasználók listája');
+		}
 		break;
 
     case 'del':

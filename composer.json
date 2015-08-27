@@ -1,9 +1,8 @@
 {
     "name": "miserend.hu/miserend-webapp",
     "description": "Miserend.hu web application",
-
     "require": {
-        "twig/extensions": "1.0.*",
+        "twig/extensions": "1.0.*"
     },
     "scripts": {
         "post-install-cmd": [

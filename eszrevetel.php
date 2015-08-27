@@ -39,7 +39,7 @@ function urlap() {
 			$form.="<input type=hidden size=40 name=nev value='".$user->nev."'>";
 			$form.="<input type=hidden size=40 name=email value='".$user->email."'>";
 		}
-		$form .= "<textarea name=leiras class=urlap cols=70 rows=20></textarea>";
+		$form .= "<textarea name=leiras class='form-control' rows=20></textarea>";
 		$form.="<br><input type=submit value=Elküld class=urlap></td></tr></table></form>";
 		}
 	$vars = array(
