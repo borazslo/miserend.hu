@@ -3,8 +3,8 @@
 function feltoltes_index() {
 	global $user;
 
-	$menu.="\n<span class=alcim>Feltöltés oldal</span><br><br>";
-	$menu.="\n<span class=alap>Köszönjük, hogy segítesz oldalunk tartalmának gazdagításában, naprakészen tartásában!</span><br>";
+	$vars['title']  ="Módosítható templomok és miserendek";
+	$menu ="\n<span class=alap>Köszönjük, hogy segítesz oldalunk tartalmának gazdagításában, naprakészen tartásában!</span><br>";
 	
 	//Kapcsolódó templomok listája
 	$querye="select distinct(hol_id),hol from eszrevetelek where hol='templomok' or hol='hirek'";
@@ -20,9 +20,9 @@ function feltoltes_index() {
 		while(list($tid,$tnev,$tvaros,$teszrevetel,$megbizhato)=mysql_fetch_row($lekerdez)) {
 			$jelzes='';
 			if($megbizhato=='i') {				
-				if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
-				elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";		
-				elseif($vaneszrevetelT['templomok'][$tid]) $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";		
+				if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
+				elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";		
+				elseif($vaneszrevetelT['templomok'][$tid]) $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?id=$tid',550,500);\"><img src=img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";		
 			}
 
 			$menu.="$jelzes<a href=?m_id=27&m_op=addtemplom&tid=$tid class=kismenulink>- $tnev<font color=#8D317C> ($tvaros)</font></a> - <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg class=kismenulink><img src=img/edit.gif title='misék' align=absmiddle border=0>szentmise</a><br>";
@@ -30,11 +30,11 @@ function feltoltes_index() {
 		$menu.="\n<br>";
 	}	
 	
-	$adatT[2]=$menu;
-	$tipus='doboz';
-	$kod.=formazo($adatT,$tipus);	
+	$vars['content'] = $menu;
+	$vars['columns2'] = true;
+	$vars['template'] = 'layout';
 
-	return $kod;
+	return $vars;
 }
 
 
@@ -43,7 +43,7 @@ switch($m_op) {
     case 'index':
         $tartalom=feltoltes_index();
         break;
-
+/*
 	case 'addtemplom':
 		$tid=$_GET['tid'];
 		include_once('admin_miserend.php');
@@ -65,7 +65,7 @@ switch($m_op) {
 		include_once('admin_miserend.php');	
         $tartalom=miserend_addingmise();
         break;
-
+*/
 }
 
 ?>

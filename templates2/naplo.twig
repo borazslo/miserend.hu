@@ -2,7 +2,7 @@
 
 {% set pageTitle = "Észrevételek | Miserend" %}
 
-{% block content %}
+{% block pageHeader %}
 <div class="jumbotron">
 	<h3>
 		<a href="/?templom={{ church.id }}" target=_blank>{{ church.nev }}</a>
@@ -10,8 +10,9 @@
 		Javítások, változások bejelentésének kezelése</small>
 	</h3>
 </div>
+{% endblock %}
 
-
+{% block content %}
 <table cellpadding=0 cellspacing=1 class="table table-striped table-hover">
 {% for remark in remarks %}
     <tr>

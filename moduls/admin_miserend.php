@@ -1181,76 +1181,83 @@ if($jog == false AND isset($_REQUEST['tid']) AND is_numeric($_REQUEST['tid']) AN
 	$query = "SELECT letrehozta FROM templomok WHERE id = ".$_REQUEST['tid']." LIMIT 1";
 	$result = mysql_query($query);
 	$templom = mysql_fetch_assoc($result);
-	if($user->login == $templom['letrehozta'])
+	if($user->login == $templom['letrehozta']) {
 		$jog = true;
+	}
 }
+
+//if($jog == true) { echo 'ok'; }
+//else exit;
 
 if($jog == true) {
 
-switch($m_op) {
+	switch($m_op) {
 
-	case 'ehmlista':
-		$tartalom=miserend_ehmlista();
-		break;
+		case 'ehmlista':
+			$tartalom=miserend_ehmlista();
+			break;
 
-    case 'index':
-        $tartalom=miserend_modtemplom();
-        //$tartalom=miserend_index();
-        break;
+	    case 'index':
+	        $tartalom=miserend_modtemplom();
+	        //$tartalom=miserend_index();
+	        break;
 
-	case 'addtemplom':
-		$tid=$_GET['tid'];
-        $tartalom=miserend_addtemplom($tid);
-        break;
+		case 'addtemplom':
+			$tid=$_GET['tid'];
+	        $tartalom=miserend_addtemplom($tid);
+	        break;
 
-	case 'addmise':
-		$tid=$_GET['tid'];
-        $tartalom=miserend_addmise($tid);
-        break;
+		case 'addmise':
+			$tid=$_GET['tid'];
+	        $tartalom=miserend_addmise($tid);
+	        break;
 
-    case 'modtemplom':
-        $tartalom=miserend_modtemplom();
-        break;
+	    case 'modtemplom':
+	        $tartalom=miserend_modtemplom();
+	        break;
 
-    case 'addingtemplom':
-        $tartalom=miserend_addingtemplom();
-        break;
+	    case 'addingtemplom':
+	        $tartalom=miserend_addingtemplom();
+	        break;
 
-	case 'addingmise':
-        $tartalom=miserend_addingmise();
-        break;
+		case 'addingmise':
+	        $tartalom=miserend_addingmise();
+	        break;
 
-    case 'deltemplom':
-        $tartalom=miserend_deltemplom();
-        break;
+	    case 'deltemplom':
+	        $tartalom=miserend_deltemplom();
+	        break;
 
-	case 'deletetemplom':
-        $tartalom=miserend_deletetemplom();
-        break;
+		case 'deletetemplom':
+	        $tartalom=miserend_deletetemplom();
+	        break;
 
-    case 'delmise':
-        $tartalom=miserend_delmise();
-        break;
+	    case 'delmise':
+	        $tartalom=miserend_delmise();
+	        break;
 
-	case 'deletemise':
-        $tartalom=miserend_deletemise();
-        break;
+		case 'deletemise':
+	        $tartalom=miserend_deletemise();
+	        break;
 
-    case 'events':
-        if(isset($_REQUEST['save'])) events_save($_REQUEST);
+	    case 'events':
+	        if(isset($_REQUEST['save'])) events_save($_REQUEST);
 
-        if(isset($_REQUEST['order']) AND in_array($_REQUEST['order'], array('year, date','name')) )
-        $order = $_REQUEST['order'];
+	        if(isset($_REQUEST['order']) AND in_array($_REQUEST['order'], array('year, date','name')) )
+	        $order = $_REQUEST['order'];
 
-        $form=events_form($order);
-        $form['m_id'] = $m_id;
-        $form['template'] = 'admin_editevents';
-        $tartalom = $form;
-        break;    
-}
+	        $form=events_form($order);
+	        $form['m_id'] = $m_id;
+	        $form['template'] = 'admin_editevents';
+	        $tartalom = $form;
+	        break;    
+	}
+
 }
 else {
-	$tartalom="\n<span class=hiba>HIBA! Nincs hozzá jogosultságod!</span>";
+	$vars['title'] = 'Hiányzó jogosultság!';
+	addMessage('Hiányzó jogosultság!','danger');
+	$tartalom = $vars;
 }
 
 ?>

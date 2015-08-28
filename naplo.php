@@ -8,17 +8,21 @@ include("load.php");
 
 
 function teendok($tid) {
-	global $user;
-	
+	global $user, $twig;
+		
 	//TODO: tisztes kidobást kérek!
 	if(!is_numeric($tid)) die($kidob);
+
 
 	$templom = getChurch($tid);
 	if(!empty($templom['ismertnev'])) $templom['ismertnev']="(".$templom['ismertnev'].")";
 	$vars['church'] = $templom;
 
-	if(!$user->checkRole('miserend') and !($user->login == $templom['feltolto'] and $templom['megbizhato']=='i')) {
-			die($kidob);
+	if(!$user->checkRole('miserend') and !($user->username == $templom['letrehozta'] and $templom['megbizhato']=='i')) {
+			addMessage("Hiányzó jogosultság. Elnézést.","danger");
+			$vars['messages'] = getMessages();
+    		echo  $twig->render('naplo.twig',$vars);
+			exit;
 	}
 	
     $remarks = array();

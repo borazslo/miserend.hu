@@ -510,15 +510,17 @@ function getMasses($tid,$date = false) {
     }
 
     //order byweight
-    function cmp($a, $b) {
-        return $a["weight"] - $b["weight"];
-    }
+    
     if(is_array($return['periods'])) usort($return['periods'], "cmp");
     if(is_array($return['particulars'])) usort($return['particulars'], "cmp");
 
 
     return $return;
 }
+
+function cmp($a, $b) {
+        return $a["weight"] - $b["weight"];
+    }
 
 function decodeMassAttr($text) {
     $return  = array();
@@ -1968,16 +1970,17 @@ function feltoltes_block() {
     $mennyi=mysql_num_rows($lekerdez);
     
     if($mennyi>0) {
+        $kod_tartalom = '<ul>';
         while(list($tid,$tnev,$tvaros,$teszrevetel)=mysql_fetch_row($lekerdez)) {
             if($teszrevetel=='i') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";       
             elseif($teszrevetel=='f') $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";                     
             else $jelzes='';
             
-            $kod_tartalom.="\n<li class=link_kek>$jelzes<a href=?m_id=29&m_op=addtemplom&tid=$tid class=link_kek title='$tvaros'>$tnev</a></li><img src=img/space.gif width=5 height=3>";
+            $kod_tartalom.="\n<li>$jelzes<a href=?m_id=27&m_op=addtemplom&tid=$tid class=link_kek title='$tvaros'>$tnev</a></li>";
         }   
 
-        $kod_tartalom.="\n<li class=felsomenulink><a href=?m_id=29 class=felsomenulink>Teljes lista...</a>";
-        $kod_tartalom.="</li><img src=img/space.gif width=5 height=3>";
+        $kod_tartalom.="\n<li><a href=?m_id=29 class=felsomenulink>Teljes lista...</a></li>";
+        $kod_tartalom .= '</ul>';
     }
 
     return $kod_tartalom;

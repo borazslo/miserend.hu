@@ -27,7 +27,8 @@ if($module == array() OR !is_file("moduls/".$module['fajl'].".php") )
     $hiba='A választott modul behívása sikertelen.';
 if($module['zart'] == 1 and !$user->loggedin)
     $hiba='A hozzáféréshez be kell jelentkezni.';
-if(!$user->checkRole($module['jogkod']) )
+// Az admin_miserend kivétel, mert ahhoz megfelelő normálék is hozzáférhetnek!
+if(!$user->checkRole($module['jogkod'] AND $m_id != 27 ) )
     $hiba='A hozzáféréshez további jogosultságokra volna szükség.';   
 
 if(!$hiba) {
