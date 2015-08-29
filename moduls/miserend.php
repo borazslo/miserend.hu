@@ -955,6 +955,8 @@ function miserend_view() {
 		//$frissites="<span class=kicsi_kek><b><u>Frissítve:</u></b><br>$frissites</span>";
 	}
 
+	$title = $nev." | Miserend";
+
 	$titlekieg=" - $nev ($varos)";
 	if($vane != 1) $titlekieg = "404";
 
@@ -985,7 +987,7 @@ function miserend_view() {
 	//Miseidőpontok
 	$misek = getMasses($tid);
 	
-	if($user->checkRole('miserend')) {
+	if($user->checkRole('miserend') OR $user->checkRole('ehm:'.$egyhazmegye) OR in_array($user->login,$responsible)) {
 		$nev.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 	
 		$query="select allapot from eszrevetelek where hol = 'templomok' AND hol_id = '".$tid."' GROUP BY allapot ORDER BY allapot limit 5;";
@@ -995,11 +997,7 @@ function miserend_view() {
 		if(in_array('u',$allapotok)) $nev.=" <a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";		
 		elseif(in_array('f',$allapotok)) $nev.=" <a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";	
 		elseif(count($allapotok)>0) $nev.=" <a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";		
-	
-	
-	}
-	elseif($user->login ==$letrehozta) {
-		$nev.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+		
 	}
 	if(!empty($ismertnev)) $ismertnev= $ismertnev; //"<span class=alap><i><b>Közismert nevén:</b></i><br></span><span class=dobozfocim_fekete><b><font color=#AC007A>$ismertnev</font></b></span><br><img src=img/space.gif width=5 height=7><br>";
 	$cim="<span class=alap><i>Cím:</i> <u>$varos, $cim</u></span>";
@@ -1168,6 +1166,7 @@ function miserend_view() {
 	if($vane>0) {
         $variables = array(
         	'tid'=>$tid,
+        	'title'=>$title,
             'nev'=>$nev,'ismertnev'=>$ismertnev,
             'favorite' => $favorite,
             'varos' => $varos,

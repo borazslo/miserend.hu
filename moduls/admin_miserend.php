@@ -1177,17 +1177,18 @@ function miserend_ehmlista() {
 //Jogosultság ellenőrzése
 $jog = false;
 if($user->checkRole('miserend')) { $jog = true; }
+
 if($jog == false AND isset($_REQUEST['tid']) AND is_numeric($_REQUEST['tid']) AND in_array($m_op, array('addtemplom','addmise','addingtemplom','addingmise'))) {
-	$query = "SELECT letrehozta FROM templomok WHERE id = ".$_REQUEST['tid']." LIMIT 1";
-	$result = mysql_query($query);
-	$templom = mysql_fetch_assoc($result);
-	if($user->login == $templom['letrehozta']) {
+	$church = getChurch($_REQUEST['tid']);
+	if ($user->checkRole('miserend') OR in_array($user->login,$church['responsible'])  OR in_array($user->login,$church['diocese']['responsible']))
 		$jog = true;
-	}
+	else 
+		$jog = false;
+} elseif(( $m_op == 'index' OR $m_op == 'modtemplom' )AND ($user->checkRole('miserend') OR count($user->responsible['diocese']) > 0  )) {
+	$jog = true;
+
 }
 
-//if($jog == true) { echo 'ok'; }
-//else exit;
 
 if($jog == true) {
 

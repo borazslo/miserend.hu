@@ -18,7 +18,7 @@ function teendok($tid) {
 	if(!empty($templom['ismertnev'])) $templom['ismertnev']="(".$templom['ismertnev'].")";
 	$vars['church'] = $templom;
 
-	if(!$user->checkRole('miserend') and !($user->username == $templom['letrehozta'] and $templom['megbizhato']=='i')) {
+	if(!$user->checkRole('miserend') and !($user->username == $templom['letrehozta'] )) {
 			addMessage("Hiányzó jogosultság. Elnézést.","danger");
 			$vars['messages'] = getMessages();
     		echo  $twig->render('naplo.twig',$vars);

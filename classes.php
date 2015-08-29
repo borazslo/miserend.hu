@@ -20,6 +20,7 @@ class User
 				$this->nickname = $x['becenev'];
 				$this->name = $x['nev'];
 				$this->roles = explode('-',trim($this->jogok," \t\n\r\0\x0B-"));
+				$this->getResponsabilities();
 				return true;
             } else {
             	//TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -40,6 +41,7 @@ class User
 				$this->nickname = $x['becenev'];
 				$this->name = $x['nev'];
 				$this->roles = explode('-',trim($this->jogok," \t\n\r\0\x0B-"));
+				$this->getResponsabilities();
 				return true;
             } else {
             	//TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -66,6 +68,7 @@ class User
 				$this->nickname = $x['becenev'];
 				$this->name = $x['nev'];
 				$this->roles = explode('-',trim($this->jogok," \t\n\r\0\x0B-"));
+				$this->getResponsabilities();
 				return true;
             } else {
             	//TODO: kitalálni mit csináljon, hogy nincs uid-jű user. Legyen vendég?
@@ -81,12 +84,35 @@ class User
 		if($role == '"any"' OR $role == "'any'") {
 			if(trim(preg_replace('/-/i', '', $this->jogok))  != '' ) return true;
 			else return false;
+		} elseif(preg_match('/^ehm:([0-9]{1,3})$/i',$role,$match) ) {
+			$query = "SELECT * FROM egyhazmegye WHERE id = ".$match[1]." AND felelos = '".$this->username."' LIMIT 1";			
+			$result = mysql_query($query);
+			if(mysql_num_rows($result) == 1) return true;
+			else return false;
+		} elseif(preg_match('/(^|-)'.$role.'(-|$)/i',$this->jogok)) {
+			return true;
 		}
-
-		if(preg_match('/(^|-)'.$role.'(-|$)/i',$this->jogok)) return true;
 		else return false;
 	}
 
+	function getResponsabilities() {
+		$this->responsible = array(
+			'diocese' => array(),
+			'church'=> array()
+		);
+		if($this->uid > 0) {
+			$query = "SELECT id FROM egyhazmegye WHERE ok = 'i' AND felelos = '".$this->username."' ";
+			$result = mysql_query($query);
+			while($ehm = mysql_fetch_assoc($result)) {
+				$this->responsible['diocese'][] = $ehm['id'];
+			}
+			$query = "SELECT id FROM templomok WHERE ok = 'i' AND letrehozta = '".$this->username."' ";
+			$result = mysql_query($query);
+			while($church = mysql_fetch_assoc($result)) {
+				$this->responsible['church'][] = $church['id'];
+			}
+		}
+	}
 
 	function submit($vars) {
 		$return = true;

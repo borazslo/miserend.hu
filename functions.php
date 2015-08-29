@@ -430,6 +430,7 @@ function getChurch($tid) {
         foreach($row as $k => $v) {
             $return[$k] = $v;
         }
+        $return['responsible'] = array($return['letrehozta']);
         $query = "SELECT d.distance tavolsag,t.nev,t.ismertnev,t.varos,t.id tid FROM distance as d
             LEFT JOIN templomok as t ON (tid1 <> '".$tid."' AND tid1 = id ) OR (tid2 <> '".$tid."' AND tid2 = id )
             WHERE ( tid1 = '".$tid."' OR tid2 = '".$tid."' ) AND distance <= 10000 
@@ -449,6 +450,11 @@ function getChurch($tid) {
             $return['szomszedok'][] = mysql_fetch_assoc($results2);
         }
         unset($return['log']);
+
+        $query = "SELECT * FROM egyhazmegye WHERE id = ".$return['egyhazmegye']." LIMIT 1;";
+        $result3 = mysql_query($query);
+        $return['diocese'] = mysql_fetch_assoc($result3);
+        $return['diocese']['responsible'][] = $return['diocese']['felelos'];
     }
 
     if($return != array()) {

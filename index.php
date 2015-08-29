@@ -57,6 +57,7 @@ if(isset($titlekieg)) $vars['pagetitle'] = preg_replace("/^( - )/i","",$titlekie
 $emaillink_lablec="<A HREF=\"javascript:linkTo_UnCryptMailto('ocknvq%3CkphqBokugtgpf0jw');\" class=emllink>info<img src=img/kukaclent.gif align=absmiddle border=0>miserend.hu</a>";
     
 
+$adminmenuitems = array();
 //Admin menü összeállítása   
 if($user->checkRole("'any'")) {
     $adminmenuitems = array(
@@ -86,9 +87,23 @@ if($user->checkRole("'any'")) {
             ),
         );
 
-    $vars['adminmenu'] = clearMenu($adminmenuitems);
+    $adminmenuitems = clearMenu($adminmenuitems);
 }
 
+
+//Egyházmegyei szerkesztők menüje
+if(count($user->responsible['diocese']) > 0  AND !$user->checkRole('miserend')) {
+    $diocesemenuitems = array(
+            array(
+                'title'=> 'Templomok','url'=> '?m_id=27','mid'=>27,
+                'items' => array(
+                    array('title' => 'módosítás','url' => '?m_id=27&m_op=modtemplom','permission' => '' ),              
+                )
+            ),
+    );
+    $adminmenuitems = array_merge($diocesemenuitems,$adminmenuitems);
+}
+$vars['adminmenu'] = $adminmenuitems;
 
 //Campaing betöltése
 $vars['campaign'] = updatesCampaign();
