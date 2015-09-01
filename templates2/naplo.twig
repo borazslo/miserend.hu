@@ -30,7 +30,7 @@
 		</td>
     	<td valign=top style="padding:3px">
     	<div>
-    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.username }})&nbsp;<br/><small>{{ remark.datum }}</small></h5></div>
+    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.username }}){% if remark.user.volunteer == 1 %}<span title="A felhasználó önkéntességet vállalt!" class="reliable ui-icon ui-icon-star yellow" style="float:right">{% endif %}&nbsp;</span><br/><small>{{ remark.datum }}</small></h5></div>
     		{% if remark.email %}
 
 				<div class="dropdown" style="float:left;margin-right:3px">
@@ -42,6 +42,7 @@
 				      <li><a href="?op=email&rid={{ remark.rid }}"  class="alap"><span class="ui-icon ui-icon-mail-closed" style="float:left;margin-right:3px;color:#B51A7E"></span> {{ remark.email }}...</a></li>
 				      <li><a href="?op=email&rid={{ remark.rid }}&type=koszonet" class="alap"><span class="ui-icon ui-icon-heart" style="float:left;margin-right:3px;color:#ff0000"></span> Köszönet írása...</a></li>
 				      <li><a href="?op=email&rid={{ remark.rid }}&type=plebaniara" class="alap"><span class="ui-icon ui-icon-arrowreturnthick-1-w" style="float:left;margin-right:3px" class="grey"></span> Plébániára irányítás...</a></li>
+				      <li><a href="?op=email&rid={{ remark.rid }}&type=android"><span class="ui-icon ui-icon-alert" style="float:left;margin-right:3px" class="lightgrey"></span> Frissítés androidon...</a></li>
 				  </ul>
 				</div>
     		{% else %}
@@ -56,9 +57,6 @@
 					</button>
 				</div>
 			{% endif %}
-
-			
-
 		</div>
 
 		{% if remark.allapot != 'j' %}

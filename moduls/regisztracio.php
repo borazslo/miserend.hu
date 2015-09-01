@@ -236,16 +236,19 @@ switch($m_op) {
     	
 		if($_REQUEST['terms']!=1 AND $newuser->uid == 0 AND $user->uid == 0) {
 			addMessage("El kell fogadni a <i>Házirendet és szabályzatot</i>!",'danger');
+			$tartalom = user_edit($_REQUEST['edituser']);
 		} else {
     		if($newuser->submit($_REQUEST['edituser'])) {
-    			if($user->uid < 1) header("Location: http://miserend.hu/");
-				else $tartalom = user_edit($newuser->uid);
+    			if($user->uid < 1) {
+    				require_once('moduls/miserend.php');
+    				$tartalom = miserend_index();
+    				//header("Location: http://miserend.hu/");
+				} else $tartalom = user_edit($newuser->uid);
 
     		} else {
     			$tartalom = user_edit($_REQUEST['edituser']);
     		}
     	}
-		$tartalom = user_edit($_REQUEST['edituser']);
 
         break;
 

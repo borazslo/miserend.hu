@@ -955,7 +955,6 @@ function miserend_view() {
 		//$frissites="<span class=kicsi_kek><b><u>Frissítve:</u></b><br>$frissites</span>";
 	}
 
-	$title = $nev." | Miserend";
 
 	$titlekieg=" - $nev ($varos)";
 	if($vane != 1) $titlekieg = "404";
@@ -990,7 +989,7 @@ function miserend_view() {
 	if($user->checkRole('miserend') OR $user->checkRole('ehm:'.$egyhazmegye) OR in_array($user->login,$responsible)) {
 		$nev.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 	
-		$query="select allapot from eszrevetelek where hol = 'templomok' AND hol_id = '".$tid."' GROUP BY allapot ORDER BY allapot limit 5;";
+		$query="select allapot from eszrevetelek where hol_id = '".$tid."' GROUP BY allapot ORDER BY allapot limit 5;";
 		$result=mysql_query($query);
 		$allapotok = array();
 		while ($row = mysql_fetch_assoc($result)) { if($row['allapot']) $allapotok[] = $row['allapot'];}
@@ -1166,7 +1165,7 @@ function miserend_view() {
 	if($vane>0) {
         $variables = array(
         	'tid'=>$tid,
-        	'title'=>$title,
+        	'title'=>$church['nev']." | Miserend",
             'nev'=>$nev,'ismertnev'=>$ismertnev,
             'favorite' => $favorite,
             'varos' => $varos,

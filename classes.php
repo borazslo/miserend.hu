@@ -246,8 +246,10 @@ class User
 				//TODO: túlzás lenne megnézni, hogy valódi name-e? (bár ha törölt... user...)
 				$this->presaved[$key] = sanitize($val);
 
-		} elseif(in_array($key,array('regdatum','lastlogin','lastactive'))) {
-				if(strtotime($val))
+		} elseif(in_array($key,array('regdatum','lastlogin','lastactive'))) {				
+				if(is_numeric($val)) {
+					$this->presaved[$key] = date('Y-m-d H:i:s',$val);
+				} elseif(strtotime($val))
 					$this->presaved[$key] = date('Y-m-d H:i:s',strtotime($val));
 				else return false;				
 
@@ -268,10 +270,10 @@ class User
 
 		//Set Deafult
 		if($this->uid < 1) {
-			if(!isset($this->presaved['ok'])) $this->presaved['ok'] = $this->presave('ok','i');
-			if(!isset($this->presaved['regdatum'])) $this->presaved['regdatum'] = $this->presave('regdatum',time());
+			if(!isset($this->presaved['ok'])) $this->presave('ok','i');
+			if(!isset($this->presaved['regdatum'])) $this->presave('regdatum',time());
 			global $user;
-			if(!isset($this->presaved['letrehozta'])) $this->presaved['regdatum'] = $this->presave('letrehozta',$user->username);
+			if(!isset($this->presaved['letrehozta'])) $this->presave('letrehozta',$user->username);
 		}
 
 		foreach ($this->presaved as $key => $val) {
@@ -422,6 +424,11 @@ class Remark
             	$this->rid = $this->id;
             	$this->tid = $this->hol_id;
 				$this->username = $this->login;
+
+				if($this->username != '') {
+						$this->user = new User($this->username);
+				}
+
             } else {
             	// TODO: There is no remark with this rid;
             	return false;

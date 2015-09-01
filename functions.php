@@ -1895,7 +1895,7 @@ function assignUpdates() {
             <strong>Kedves $nev!</strong>\n
             <p>A <a href='http://miserend.hu'>miserend.hu</a>-n a múlt héten $M magyarországi templomhoz kaptunk észrevételt. ";
         if($N == 0) $text .= "Reméljük, a héten te is tudsz küldeni helyesbítést.";
-        elseif($N * 5 < $M) $text .= "A te $N észrevételt küldtél bel. És pont az ilyen sok kicsi ment ilyen sokra. ";
+        elseif($N * 5 < $M) $text .= "Te $N észrevételt küldtél be. És pont az ilyen sok kicsi ment ilyen sokra. ";
         else $text .= "Ebből $N templomhoz te küldtél be helyesbítést. Nagyon köszönjük! ";
         $text .= "
             Összesen már $L templomnak vannak fél évnél frissebb adatai, $ol $O nagyon régen frissített magyarországi templom van az adatbázisunkban.</p>\n
@@ -1905,12 +1905,13 @@ function assignUpdates() {
         $text .= <<<EOT
             <p>Amire érdemes figyelni információ kereséskor:</p>
             <ul>
-                <li>Nem csak azktuális misrendre szükséges rákérdezni, hanem minden más időszak miserendjére is. Pl. téli/nyári miserend, adventi idő, hétköznapra eső ünnepek. (Bármilyen egyéb időszak is felvihető a rendszerünkbe.)</li>
+                <li>Nem csak azktuális miserendre szükséges rákérdezni, hanem minden más időszak miserendjére is. Pl. téli/nyári miserend, adventi idő, hétköznapra eső ünnepek. (Bármilyen egyéb időszak is felvihető a rendszerünkbe.)</li>
                 <li>Fontos megtudni, hogy mikor van a téli/nyári időszak határa (és minden más időszak határa). A tanévvel van összehangolva? Vagy a napfordulóval? Esetleg egy konkrét ünneppel?</li>
-                <li>A legbiztosabb információt közvetlen az atyától, sekrestyéstől vagy titkártól lehet kapni. A plébániai honlapok nagyon sokszor teljesen elavultak és amúgy is csak az aktuális misrendet tartalmazzák.</li>
-                <li>Ha a pléábniához nincs megfelelő elérhetőség, akkor az egyházmegyei honlapot ill. annak használhatatlansága esetén az egyházmegyei titkárságot érdemes megkeresni. Ha sikerül élő elérhetőséget szerezni a plébániához, akkor azt is küldjük be a miseadatokkal. (Személyes mobilszámokat csak akkor adjunk meg, ha a tulajdonos hozzájárult, hogy megjelenjen a honlapon.)</li>
-                <li>Egy-egy plébániához/paphoz általában több templom is tartozik. Ha már sikerült felvenni egy illetékessel a kapcsolatot, akkor érdemes lehet a fíliák és kapcsolódó templomok adatait is megtudni.</li>
+                <li>A legbiztosabb információt közvetlen az atyától, sekrestyéstől vagy titkártól lehet kapni. A plébániai honlapok nagyon sokszor teljesen elavultak és amúgy is csak az aktuális miserendet tartalmazzák.</li>
+                <li>Ha a plébániához nincs megfelelő elérhetőség, akkor az egyházmegyei honlapot ill. annak használhatatlansága esetén az egyházmegyei titkárságot érdemes megkeresni. Ha sikerül élő elérhetőséget szerezni a plébániához, akkor azt is küldjük be a miseadatokkal. (Személyes mobilszámokat csak akkor adjunk meg, ha a tulajdonos hozzájárult, hogy megjelenjen a honlapon.)</li>
+                <li>Egy-egy plébániához/paphoz általában több templom is tartozik. Ha már sikerült felvenni egy illetékessel a kapcsolatot, akkor érdemes a fíliák és kapcsolódó templomok adatait is megtudni.</li>
                 <li>Ha hiába régen volt már frissítés, mégis minden adat stimmel a honlapunkon, akkor is kérünk visszajelzést, hogy tudjuk, nem kell újra ellenőrizni.</li>
+                <li><strong>A visszajelzéseket lehetőség szerint a templom oldalán az észrevétel beküldésénkeresztül kérjük feltölteni.</strong> Segít, ha be vagy jelentkezve, így tudjuk, hogy mebízható forrásból származik az információ. </li>
             </ul>
 
 EOT;
@@ -1948,10 +1949,13 @@ function updatesCampaign() {
         if($O > $L ) $ol = "de még";
         else $ol = "és már csak";
 
-    $dobozszoveg = "<span class='alap'>Alig $S önkéntes heti hét templom miserendjének frissítésével karácsonyra naprakésszé teheti az összes magyarországi templomot. <strong>Már $C ember segít nekünk. ";
+    $dobozszoveg = "<span class='alap'>Alig $S önkéntes heti hét templom miserendjének frissítésével karácsonyra naprakésszé teheti az összes magyarországi templomot. <strong>Már $C ember segít nekünk";
 
-    if($user->volunteer != 1) $dobozszoveg .= "Jelentkezz te is: <a href='mailto:eleklaszlosj@gmail.com?subject=Önkéntesnek jelentkezem'>eleklaszlosj@gmail.com</a>!";
-    else $dobozszoveg .= "Köszönjük, hogy te is köztük vagy!";
+    if($C >= $S ) $dobozszoveg .= ", de segítő kézre még szükségünk van. ";
+    else $dobozszoveg .= " .";
+    if($user->volunteer == 1) $dobozszoveg .= "Köszönjük, hogy te is köztük vagy!";
+    else $dobozszoveg .= "Jelentkezz te is: <a href='mailto:eleklaszlosj@gmail.com?subject=Önkéntesnek jelentkezem'>eleklaszlosj@gmail.com</a>!";
+    
     $dobozszoveg .= "</strong></span>";
     
     $variables = array(
