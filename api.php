@@ -73,6 +73,92 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'updated') {
 	exit;
 } 
 
+if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'table') { 
+
+
+	if(isset($_REQUEST['table']) AND in_array($_REQUEST['table'],array('templomok'))) {
+
+		if( $v < 3 ) {
+			echo json_encode(array('error'=>'Ez a funkció csak v3-tól érhető el.'));
+			exit;
+		}
+
+		$inputJSON = file_get_contents('php://input');
+		$t = $inputJSON;
+		$input= json_decode( $inputJSON, TRUE ); //convert JSON into array
+
+		if(!isset($input['delimiter'])) $input['delimiter'] = ';';
+		if(!isset($input['format'])) $input['format'] = 'json'; //or 'text'
+		$input['table'] = $_REQUEST['table'];
+		
+		if($input['table'] == 'templomok') {
+			if(!isset($input['columns']) OR !is_array($input['columns'])) 
+				$input['columns'] = array('id','nev','url','lng','lat');
+			
+			$query = "
+				SELECT t.*,orszagok.nev as orszag, megye.megyenev as megye,lat,lng, checked FROM templomok as t 
+						LEFT JOIN orszagok ON orszagok.id = t.orszag 
+						LEFT JOIN megye ON megye.id = megye 
+						LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id 
+						WHERE t.ok = 'i' 
+						LIMIT 10000";
+		}
+		
+		$output = array();
+		$result = mysql_query($query);    
+		while($row =  mysql_fetch_assoc($result)) {
+			$tmp = array();
+			foreach ($input['columns'] as $column) {
+				// data in mysql
+				if(isset($row[$column]) AND in_array($column,array('id','nev','ismertnev','turistautak','orszag','megye','varos','cim','megkozelites','plebania','pleb_url','pleb_eml','egyhazmegye','espereskerulet','leiras','megjegyzes','miseaktiv','misemegj','bucsu','frissites','lat','lng','checked'))) {
+					 $tmp[$column] = $row[$column];
+				}
+				// simple data mapping
+				$mapping = array('name'=>'nev','alt_name'=>'ismertnev','lon'=>'lng');
+				if (array_key_exists($column, $mapping)) {
+					$tmp[$column] =  $row[$mapping[$column]];	
+				}
+				//extra mapping
+				switch ($column) {
+					case 'denomination':
+						//http://wiki.openstreetmap.org/wiki/Key:denomination#Christian_denominations
+						if(in_array($row['egyhazmegye'],array(17,18))) {
+							$tmp[$column] = 'greek_catholic';
+						} else {
+							$tmp[$column] = 'roman_catholic';
+						}
+						break;
+
+					case 'url':
+						$tmp[$column] = 'http://miserend.hu/?templom='.$row['id'];
+						break;
+					
+					default:
+						# code...
+						break;
+				}
+			}
+			$output[] = $tmp;
+		}
+		
+		if($input['format'] == 'json') {
+			//JSON output
+			echo json_encode(array('error'=>0,$input['table']=>$output));	
+		
+		} elseif ($input['format'] == 'text') {
+			//SIMPLE table output
+			//TODO: a szöveg nem tartalmazhatja az elválasztó karaktert, különben gond van.
+			foreach ($output as $key => $row) {
+				echo implode($input['delimiter'],$row)."<br/>\n";
+			}
+		}
+
+	} else {
+		echo json_encode(array('error'=>'table nélkül mit érek én?'));
+	
+	}
+}
+
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'json') { 
 	if(isset($_REQUEST['id']) AND is_numeric($_REQUEST['id'])) {
 

@@ -1,17 +1,41 @@
 <?php
-exit;
-$url = "http://miserend.hu/api/v".rand(3,3)."/report";
+/*
+	FOR DEBUG purpose only!
+ */
 
-$return = array(
-	'0' => array('tid'=>rand(1,400),'pid'=>0,'text'=>'ÉN - Hibás pozíció'),
-	'1' => array('tid'=>rand(401,800),'pid'=>1,'text'=>'ÉN - Hibás mise adatok'),
-	'2' => array('tid'=>rand(801,1200),'pid'=>2,'text'=>'ÉN - Valami barátságos szöveg')
-);
-$ret = $return[rand(0,2)];
-$encode = array('tid'=>$ret['tid'],'pid'=>$ret['pid'],'text'=>$ret['text']);
-if(rand(1,1) == 1) $encode['dbdate'] = time();
+switch ($_REQUEST['q']) {
+	case 'report':
+		$url = "http://miserend.hu/api/v".rand(3,3)."/report";
 
-echo $url.": "; print_R($ret); echo "<br/>";
+		$return = array(
+			'0' => array('tid'=>rand(1,400),'pid'=>0,'text'=>'ÉN - Hibás pozíció'),
+			'1' => array('tid'=>rand(401,800),'pid'=>1,'text'=>'ÉN - Hibás mise adatok'),
+			'2' => array('tid'=>rand(801,1200),'pid'=>2,'text'=>'ÉN - Valami barátságos szöveg')
+		);
+		$ret = $return[rand(0,2)];
+		$encode = array('tid'=>$ret['tid'],'pid'=>$ret['pid'],'text'=>$ret['text']);
+		if(rand(1,1) == 1) $encode['dbdate'] = time();
+
+		break;
+	
+	case 'templomok':
+		$url = "http://miserend.hu/api/v".rand(3,3)."/templomok";
+		$encode = array(
+			'format'=>'text',
+			'delimiter'=>'@',
+			'columns'=>array('name','alt_name','denomination','url','lon','lat')
+			);
+		break;
+
+	default:
+		# code...
+		break;
+}
+
+if(!isset($url))
+	exit;
+
+echo $url.": "; print_R($encode); echo "<br/>";
 $content = json_encode($encode);
 //echo $content;
 
