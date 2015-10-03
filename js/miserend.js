@@ -1,5 +1,23 @@
 $(document).ready(function() {
 
+  $(document).on('click','a.ajax',function(){
+    console.log('click');
+    var ezez = $(this);
+    var url = $(this).attr('href');
+      $.ajax({
+            url: url,
+            success: function( data ) {
+              console.log(data);
+              ezez.html('<span title="' + data + '" class="glyphicon glyphicon-ok green"></span>');
+            },
+            error: function( data ) {
+              ezez.html('<span class="glyphicon glyphicon-remove red"></span>');
+            }
+          });
+    return false;
+  });
+
+
   $(document).on('click','#quit',function(){
     console.log('click');
       $.ajax({

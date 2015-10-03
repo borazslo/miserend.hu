@@ -11,6 +11,7 @@ switch($_REQUEST['q']) {
 		break;
 
 	case 'daily':
+		updateOSM();
 		for($v=1;$v<5;$v++) {
 			$file = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
 			generateSqlite($v,$file);

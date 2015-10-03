@@ -2,7 +2,8 @@
 include("load.php");
 
 //TODO: ez itt nem túl barátságok dolog
-if(isset($_GET['q'])) { include $_GET['q'].".php"; exit;}
+if(isset($_GET['q'])) { include $_GET['q'].".php"; }
+else {
 
 
 //Beállított modulok
@@ -39,6 +40,8 @@ if(!$hiba) {
         $hiba ='HIBA! A szükséges fájl nem hívható be! ('.$module['fajl'].')';
 }
 if($hiba) { echo $hiba; exit; }
+
+}
 
 if(isset($tartalom)) {
     if(is_array($tartalom)) {
@@ -127,7 +130,7 @@ $vars['messages'] = getMessages();
 
 
 //Template fájl megtalálása
-if(!isset($tartalom['template'])) {
+if(!isset($vars['template'])) {
     $template = "layout.twig";
 } elseif(preg_match('/\.([a-zA-Z]{1,4})$/i',$vars['template'])) {
     $template = $vars['template'];

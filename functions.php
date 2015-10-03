@@ -423,7 +423,13 @@ function checkPrivilege($type,$privilege,$object,$user = false) {
 
 function getChurch($tid) {
     $return = array();
-    $query = "SELECT templomok.*,geo.lat,geo.lng, geo.checked, geo.address2 FROM templomok LEFT JOIN terkep_geocode as geo ON geo.tid = templomok.id WHERE id = $tid LIMIT 1";
+    $query = "
+        SELECT templomok.*,geo.lat,geo.lng, geo.checked, geo.address2, osm.id as osm_id, osm.type as osm_type, irsz
+        FROM templomok 
+            LEFT JOIN terkep_geocode as geo ON geo.tid = templomok.id 
+            LEFT JOIN osm ON osm.tid = templomok.id 
+            LEFT JOIN varosok ON varosok.nev = templomok.varos 
+        WHERE templomok.id = $tid LIMIT 1";
     $result = mysql_query($query);
     
     while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
@@ -449,6 +455,21 @@ function getChurch($tid) {
             $results2 = mysql_query($query);
             $return['szomszedok'][] = mysql_fetch_assoc($results2);
         }
+        
+        if($return['osm_id'] != '' AND $return['osm_type'] != '' ) {
+            $return['osm']['type'] = $return['osm_type'];
+            $return['osm']['id'] = $return['osm_id'];
+
+            $query2 = "SELECT * FROM osm_tags WHERE type = '".$return['osm_type']."' AND id = '".$return['osm_id']."';";
+            $results2 = mysql_query($query2);
+            while($tag = mysql_fetch_array($results2,MYSQL_ASSOC)) {
+                if(in_array($tag['name'],array('lat','lon')) ) {
+                    $return['osm'][$tag['name']] = $tag['value'];
+                } else 
+                    $return['osm']['tags'][$tag['name']] = $tag['value'];
+            }
+        }
+
         unset($return['log']);
 
         $query = "SELECT * FROM egyhazmegye WHERE id = ".$return['egyhazmegye']." LIMIT 1;";
@@ -1762,6 +1783,49 @@ function Distance($templom,$szomszed) {
     return $d;
 }
 
+function getOSMelement($type,$id) {
+   $json = file_get_contents("http://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%5Btimeout%3A5%5D%3B%0A%28%0A%20%20".$type."%28".$id."%29%3B%0A%29%3B%0Aout%20body%20qt%20center%3B");
+   $obj = json_decode($json);
+   $element = $obj->elements[0];
+   if(isset($element->center->lat)) $element->lat = $element->center->lat; 
+   if(isset($element->center->lon)) $element->lon = $element->center->lon;  
+   return json_decode(json_encode($element), true);
+}
+
+function updateOSM() {
+    $json = file_get_contents("http://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%5Btimeout%3A25%5D%3B%0A%28%0A%20%20node%5B%22url%3Amiserend%22%5D%3B%0A%20%20way%5B%22url%3Amiserend%22%5D%3B%0A%20%20relation%5B%22url%3Amiserend%22%5D%3B%0A%29%3B%0Aout%20body%20qt%20center%3B");
+    //file_put_contents("json.tmp", $json); 
+    //$json = file_get_contents("json.tmp");   
+    $obj = json_decode($json);
+    if(count((array)$obj->elements) > 0) {
+
+        mysql_query("TRUNCATE osm;");
+        mysql_query("TRUNCATE osm_tags;");
+
+        foreach ($obj->elements as $key => $item) {
+            if(count((array)$item->tags) > 0) {
+                if(preg_match("/=([0-9]{0,6})$/i",$item->tags->{'url:miserend'},$match)) {
+                    $tid = $match[1];                    
+                    mysql_query("INSERT INTO osm (tid,id,type) VALUES (".$tid.",".$item->id.",'".$item->type."');");
+                    unset($item->tags->{'url:miserend'});
+                    if(isset($item->lon)) $item->tags->lon = $item->lon;
+                    if(isset($item->lat)) $item->tags->lat = $item->lat;
+                    if(isset($item->center->lon)) $item->tags->lon = $item->center->lon;
+                    if(isset($item->center->lat)) $item->tags->lat = $item->center->lat;
+
+                    foreach ($item->tags as $name => $value) {
+                        mysql_query("INSERT INTO osm_tags (`type`,`id`,`name`,`value`) VALUES ('".$item->type."','".(int) $item->id."','".$name."','".$value."');");
+                    }
+                    //echo $c ." ".$tid.": <a href='http://openstreetmap.org/".$item->type."/".$item->id."'>".$item->type."/".$item->id."</a> tags:".count((array)$item->tags)." @".$item->lat."@".$item->lon."<br/>";
+                }
+            }
+        }
+
+    }
+
+    return true;
+}
+
 function str_putcsv($input, $delimiter = ',', $enclosure = '"') {
   // Open a memory "file" for read/write...
   $fp = fopen('php://temp', 'r+');
@@ -1952,7 +2016,7 @@ function updatesCampaign() {
     $dobozszoveg = "<span class='alap'>Alig $S önkéntes heti hét templom miserendjének frissítésével karácsonyra naprakésszé teheti az összes magyarországi templomot. <strong>Már $C ember segít nekünk";
 
     if($C >= $S ) $dobozszoveg .= ", de segítő kézre még szükségünk van. ";
-    else $dobozszoveg .= " .";
+    else $dobozszoveg .= ". ";
     if($user->volunteer == 1) $dobozszoveg .= "Köszönjük, hogy te is köztük vagy!";
     else $dobozszoveg .= "Jelentkezz te is: <a href='mailto:eleklaszlosj@gmail.com?subject=Önkéntesnek jelentkezem'>eleklaszlosj@gmail.com</a>!";
     
@@ -2118,7 +2182,8 @@ function chat_getcomments($args = array()) {
             //$row['jelzes'] .= "<a class='response_open link' title='Nyilvános válasz / említés' data-to='".$row['kinek']."'><i> ".$row['kinek']."</i></a>: ";
         }
 
-
+        $row['szoveg'] = preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1" target="_blank">$1</a>', $row['szoveg']);
+        $row['szoveg'] = preg_replace('@>(https?://miserend\.hu/)@','>', $row['szoveg']);
         $row['szoveg'] = preg_replace('/@(\w+)/i','<span class="response_open" data-to="$1" style="background-color: rgba(0,0,0,0.15);">$1</span>',$row['szoveg']);
         
         
