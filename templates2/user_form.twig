@@ -2,6 +2,47 @@
 
 {% extends "layout.twig" %}
 
+
+{% block rightsidebar %}
+	{% if not new %}
+		<div class="panel-group" id="accordion">
+		    <div class="panel panel-default">
+		        <div class="panel-heading visible-lg-block visible-md-block">
+		            <h4 class="panel-title">További információk</h4>
+		        </div>
+		        <div id="collapseOne" class="panel-collapse">
+		            <table class="table small">
+		            	<tr><td>Regisztráció:<td><td>{{ edituser.regdatum}}</td></tr>
+		            	<tr><td>Utolsó belépés:<td><td>{{ edituser.lastlogin}}</td></tr>
+		            	<tr><td>Utolsó aktivitás:<td><td>{{ edituser.lastactive }}</td></tr>
+		            </table>
+		        </div>
+		    </div>
+		</div>
+		{% if edituser.remarksCount > 0 %}
+		<div class="panel-group" id="accordion">
+		    <div class="panel panel-default">
+		        <div class="panel-heading visible-lg-block visible-md-block">
+		            <h4 class="panel-title">Észrevételei</h4>
+		        </div>
+	            <ul class="list-group">
+	                {% for key, remark in edituser.remarks %}
+	                	<li class="list-group-item">
+	                		<a href="?templom={{ remark.church.id }}">{{ remark.church.nev }}</a> ({{ remark.church.varos }})<br/>
+	                		{{ remark.datum }} {% if user.isadmin %}<a href="{{ remark.marker.url }}">{% endif %}{{ remark.marker.html|raw }}{% if user.isadmin %}</a>{% endif %}
+	            		</li>
+	                {% endfor %}
+	                {% if edituser.remarksCount - (edituser.remarks)|length  > 0 %}
+	                <li class="list-group-item">És további {{ edituser.remarksCount - (edituser.remarks)|length }} ...</li>
+	                {% endif %}
+	            </ul>            
+		    </div>
+		</div>
+		{% endif %}
+	{% endif %}
+	{{ parent() }}
+{% endblock %}
+
 {% block content %}
 	<form method="post">
 		<input type="hidden" name="m_id" value="{{ m_id }}">
@@ -50,6 +91,7 @@
 	    	<label for="volunteer">Önkéntesség</label>
 	    	<div id="volunteer" class="checkbox">
 	        	<label>
+	        		<input type="hidden" name="edituser[volunteer]" value="0">
       				<input type="checkbox" name="edituser[volunteer]" value="1" {% if edituser.volunteer %}checked{% endif %}> Vállalom heti hét templom frissítését.
     			</label>
     			{% if helptext %}<p class="help-block">Vállalom, hogy hetente hét régen frissült templom miserendjét megpróbálom megtudakolni és megosztani a többiekkel. (Emailben értesítünk hétről hétre a megfelelő templomokról.)</p>{% endif %}

@@ -5,7 +5,7 @@ function user_list() {
 
 	$kulcsszo=$_REQUEST['kulcsszo'];
 	$sort=$_REQUEST['sort'];
-	if(empty($sort)) $sort='nev';
+	if(empty($sort)) $sort='lastactive desc';
 	$adminok=$_REQUEST['adminok'];
 	$limit=$_REQUEST['limit'];
 	if(empty($limit)) $limit=50;
@@ -122,6 +122,11 @@ function user_edit($uid = false) {
 	if($edituser->username == '*vendeg*') $edituser->username = false;
 	if($edituser->nickname == '*vendég*') $edituser->nickname = false;
 
+	$edituser->getRemarks(6);
+
+	if($user->checkRole('user')) {
+		$user->isadmin = true;
+	}
 
 	$vars['edituser'] = $edituser;
 	

@@ -114,6 +114,25 @@ class User
 		}
 	}
 
+	function getRemarks($limit = false, $ago = false) {
+		if($limit == false OR !is_numeric($limit)) $limit = 5;
+		
+		if($ago != false) $datum = " AND datum > '".date('Y-m-d H:i:s',strtotime("-".$ago))."' ";
+		else $datum = '';
+
+		$query = "SELECT id FROM eszrevetelek WHERE 
+				(login = '".$this->username."' OR email = '".$this->email."') 
+				".$datum." ORDER BY datum desc";
+		$result = mysql_query($query);
+		$this->remarksCount = mysql_num_rows($result);
+		$query .= " LIMIT ".$limit.";";
+		$result = mysql_query($query);
+		while($remark = mysql_fetch_assoc($result)) {
+			$this->remarks[$remark['id']] = new Remark($remark['id']);
+		}
+		return true;
+	}
+
 	function submit($vars) {
 		$return = true;
 
@@ -428,6 +447,27 @@ class Remark
 				if($this->username != '') {
 						$this->user = new User($this->username);
 				}
+
+		    	$this->marker['url'] = "javascript:OpenScrollWindow('naplo.php?kod=templomok&id=".$this->hol_id."',550,500);";
+				if($this->allapot == 'u') { 
+			        $this->marker['text'] = "Új észrevétel!";
+			        $this->marker['html'] = "<img src=img/csomag.gif title='".$this->marker['text']."' align=absmiddle border=0> "; 
+			        $this->marker['mark'] = 'u';
+			    } elseif($this->allapot == 'f') { 
+			        $this->marker['text'] = "Észrevétel javítása folyamatban!";
+			        $this->marker['html'] = "<img src=img/csomagf.gif title='".$this->marker['text']."' align=absmiddle border=0> "; 			     
+			        $this->marker['mark'] = 'f';
+			    } elseif($this->allapot == 'j') { 
+			        $this->marker['text'] = "Észrevétel feldolgova.";
+			        $this->marker['html'] = "<img src=img/csomag1.gif title='".$this->marker['text']."' align=absmiddle border=0> "; 
+			        $this->marker['mark'] = 'j';
+			    } else {
+			        $this->marker['text'] = "Nincsenek állapota";
+			        $this->marker['html'] = "<span class='alap' title='".$this->marker['text']."'>(nincs)</span>"; 
+			        $this->marker['mark'] = false; 
+			    }
+
+				$this->church = getChurch($this->hol_id);
 
             } else {
             	// TODO: There is no remark with this rid;
