@@ -476,6 +476,8 @@ function getChurch($tid) {
         $result3 = mysql_query($query);
         $return['diocese'] = mysql_fetch_assoc($result3);
         $return['diocese']['responsible'][] = $return['diocese']['felelos'];
+
+        $return['kepek'] = getImages($tid);
     }
 
     if($return != array()) {
@@ -1561,6 +1563,61 @@ function upload2ftp($ftp_server,$ftp_user_name,$ftp_user_pass,$destination_file,
     ftp_close($conn_id); 
 }
 
+function getImages($tid) {
+    if(!is_numeric($tid)) return false;
+
+    $query="select * from kepek where tid='$tid' order by sorszam";
+    $lekerdez=mysql_query($query);
+    $mennyi=mysql_num_rows($lekerdez);
+
+    $return = array();
+
+    if($mennyi>0) {
+        $images = array();
+        while($row=mysql_fetch_assoc($lekerdez)) {
+            $images[] = $row;
+        }
+
+        $dir="kepek/templomok/";
+
+        foreach ($images as  $key => $image) {
+            $images[$key]['url'] = $dir.$tid."/".$image['fajlnev'];
+        }
+
+        //kiemelt
+        foreach($images as $image) {
+            if($image['width'] > 0 AND $image['kiemelt'] == 'i' AND ($image['height'] / $image['width']) > 1 AND !isset($kiemelt)) {
+                $kiemelt = $image;
+            }
+        }
+        if(!isset($kiemelt)) {
+            foreach($images as $image) {
+                if($image['kiemelt'] == 'i' AND !isset($kiemelt)) {
+                    $kiemelt = $image;
+                }
+            }
+        }
+        if(!isset($kiemelt)) {
+            foreach($images as $image) {
+                if(!isset($kiemelt)) {
+                    $kiemelt = $image;
+                }
+            }
+        }
+        $return[0] = $kiemelt;
+
+        foreach ($images as  $image) {
+            if($return[0] != $image)
+                $return[] = $image;
+        }        
+        return $return;
+
+    } else
+        return array();
+
+
+}
+
 function updateImageSizes() {
     global $config;
 
@@ -1771,6 +1828,9 @@ function updateDistances($tid = false,$limit = false) {
 
 function Distance($templom,$szomszed) {
 
+    if(!isset($templom['lng']) AND isset($templom['lon']))  $templom['lng'] = $templom['lon'];
+    if(!isset($szomszed['lng']) AND isset($szomszed['lon']))  $szomszed['lng'] = $szomszed['lon'];
+
     $lat1 = $templom['lat'] * M_PI / 180;
     $lat2 = $szomszed['lat'] * M_PI / 180;
     $long1 = $templom['lng'] * M_PI / 180;
@@ -1783,6 +1843,23 @@ function Distance($templom,$szomszed) {
     return $d;
 }
 
+function getOverpass($query) {
+    $obj = false;
+    $query = urlencode($query);
+    $dir = 'fajlok/tmp/';
+    if(file_exists($dir."osm_".md5($query))) {
+        $json = file_get_contents($dir."osm_".md5($query)); 
+        //echo "cache<br/>";
+    } else {        
+        $json = file_get_contents("http://overpass-api.de/api/interpreter?data=".$query);
+        //$json = file_get_contents("http://overpass.osm.rambler.ru/cgi/interpreter?data=".$query);
+        file_put_contents($dir."osm_".md5($query), $json);         
+        //echo $query."<br/>";
+    }
+    $obj = json_decode($json);
+    return $obj;
+}
+
 function getOSMelement($type,$id) {
    $json = file_get_contents("http://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%5Btimeout%3A5%5D%3B%0A%28%0A%20%20".$type."%28".$id."%29%3B%0A%29%3B%0Aout%20body%20qt%20center%3B");
    $obj = json_decode($json);
@@ -1790,6 +1867,83 @@ function getOSMelement($type,$id) {
    if(isset($element->center->lat)) $element->lat = $element->center->lat; 
    if(isset($element->center->lon)) $element->lon = $element->center->lon;  
    return json_decode(json_encode($element), true);
+}
+
+function deleteOverpass() {
+    $start = microtime();
+    //updateOSM();
+    $files = scandir('fajlok/tmp');
+    /* */
+    foreach($files as $file)
+        if(preg_match('/^osm_/i',$file))
+            unlink('fajlok/tmp/'.$file);
+    /* * /
+
+    $query = "SELECT t.id, g.* FROM templomok t 
+                LEFT JOIN osm ON osm.tid = t.id 
+                LEFT JOIN terkep_geocode as g ON g.tid = t.id 
+                WHERE osm.type IS NULL and ok = 'i' 
+                ORDER BY t.id";
+    //$query .= " LIMIT 15";
+    $result = mysql_query($query);
+
+    while ($row = mysql_fetch_assoc($result)) {
+        set_time_limit(600);
+        $around = 60;
+        $around2 = 3000;
+        $lon = $row['lng'];
+        $lat = $row['lat'];
+        $query = '[out:json][timeout:6]; ( node["amenity"="place_of_worship"](around:'.$around2.','.$lat.','.$lon.'); way["amenity"="place_of_worship"](around:'.$around2.','.$lat.','.$lon.'); rel["amenity"="place_of_worship"](around:'.$around2.','.$lat.','.$lon.'); ); out body center qt 6;';        
+        $obj = getOverpass($query);
+        if(count((array)$obj->elements) > 5) {
+            $query = '[out:json][timeout:6]; ( node["amenity"="place_of_worship"](around:'.$around.','.$lat.','.$lon.'); way["amenity"="place_of_worship"](around:'.$around.','.$lat.','.$lon.'); rel["amenity"="place_of_worship"](around:'.$around.','.$lat.','.$lon.'); ); out body center qt;';
+            getOverpass($query);
+        }
+    }
+    /* */
+    echo (  $start - microtime() )."s ";
+    return true;
+
+}
+
+function updateOverpass($limit = false) {
+    $start = microtime();
+    //updateOSM();
+    $files = scandir('fajlok/tmp');
+    /* * /
+    foreach($files as $file)
+        if(preg_match('/^osm_/i',$file))
+            unlink('fajlok/tmp/'.$file);
+    /* */
+
+    $query = "SELECT t.id, g.* FROM templomok t 
+                LEFT JOIN osm ON osm.tid = t.id 
+                LEFT JOIN terkep_geocode as g ON g.tid = t.id 
+                WHERE osm.type IS NULL and ok = 'i' 
+                ORDER BY t.id";
+     
+    $result = mysql_query($query);
+    $c = 0;
+    while ($row = mysql_fetch_assoc($result)) {
+        set_time_limit(600);
+        $around = 60;
+        $around2 = 3000;
+        $lon = $row['lng'];
+        $lat = $row['lat'];
+        $query = '[out:json][timeout:6]; ( node["amenity"="place_of_worship"](around:'.$around2.','.$lat.','.$lon.'); way["amenity"="place_of_worship"](around:'.$around2.','.$lat.','.$lon.'); rel["amenity"="place_of_worship"](around:'.$around2.','.$lat.','.$lon.'); ); out body center qt 6;';        
+        $obj = getOverpass($query);
+        if(count((array)$obj->elements) > 5) {
+            $query = '[out:json][timeout:6]; ( node["amenity"="place_of_worship"](around:'.$around.','.$lat.','.$lon.'); way["amenity"="place_of_worship"](around:'.$around.','.$lat.','.$lon.'); rel["amenity"="place_of_worship"](around:'.$around.','.$lat.','.$lon.'); ); out body center qt;';
+            getOverpass($query);
+        }
+        $c++;
+        if(is_numeric($limit) AND $limit > 0 AND $limit >= $c)
+            break;
+    }
+    /* */
+    echo (  $start - microtime() )."s ";
+    return true;
+
 }
 
 function updateOSM() {
@@ -1844,8 +1998,12 @@ function str_putcsv($input, $delimiter = ',', $enclosure = '"') {
 function assignUpdates() {
     global $config;
 
+    $limit = 7;
+
     $numbers = array('nulla','egy','kettő','három','négy','öt','hat','hét','nyolc','kilenc','tiz');
 
+
+    //users
     $query = "
         SELECT user.uid,login,email,becenev,nev,c FROM user 
         LEFT JOIN (
@@ -1854,34 +2012,103 @@ function assignUpdates() {
             GROUP BY uid 
             ORDER BY timestamp DESC
         ) u ON u.uid = user.uid 
-        WHERE volunteer = 1 AND (c < 7 OR c IS NULL)
+        WHERE volunteer = 1 AND (c < ".$limit." OR c IS NULL)
     ;";
     $result = mysql_query($query); $users = array();
     while ($user = mysql_fetch_assoc($result)) {
         $users[$user['uid']] = $user;    
     }
-    foreach ($users as $uid => $user) {
-        $query = "
-            SELECT t.id,t.nev,t.ismertnev,t.varos,t.nev,t.frissites,u.uid, u.timestamp 
-            FROM templomok  t
-                LEFT JOIN (
-                    SELECT * FROM updates
-                    WHERE timestamp > '".date('Y-m-d',strtotime("-2 months"))."' 
-                    ORDER BY timestamp DESC
-                ) u ON u.tid = t.id  
-            WHERE 
-                ok = 'i' 
+    $cUsers = mysql_num_rows($result);
+    
+    //templomok
+    $query = "
+        SELECT t.id,t.nev,t.ismertnev,t.varos,t.nev,t.frissites,u.uid, u.timestamp 
+        FROM templomok  t
+            LEFT JOIN (
+                SELECT * FROM updates
+                WHERE timestamp > '".date('Y-m-d',strtotime("-2 months"))."' 
+                ORDER BY timestamp DESC
+            ) u ON u.tid = t.id  
+            LEFT JOIN (
+                SELECT * FROM eszrevetelek
+                WHERE allapot = 'u' or allapot = 'f' 
+                GROUP BY hol_id
+                ORDER BY datum
+            ) e ON e.hol_id = t.id
+        WHERE 
+            ok = 'i' 
+            AND orszag = 12
+            AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+            AND moddatum < '".date('Y-m-d',strtotime("-2 years"))."' 
+            AND u.timestamp IS NULL
+            AND e.allapot IS NULL                
+        GROUP BY t.id
+        ORDER BY frissites, t.id ";
+    //$query .= " LIMIT ".( $limit * $cUsers );
+
+    $result = mysql_query($query); $templomok = array();
+    while ($templom = mysql_fetch_assoc($result)) {
+        $templomokFull[$templom['id']] = $templom;    
+    }
+    $cKioszthato = mysql_num_rows($result);
+    //echo "Kiosztható: ".$cKioszthato;
+
+    //echo $cUsers * $limit;
+    if( ($cUsers * $limit) > $cKioszthato) {
+        $mail = new Mail();
+        $mail->subject = "Miserend.hu - Önkéntes FIGYELMEZTETÉS!";
+        $mail->content = "Itt a vége?\n\n".$cUsers." önkéntesünk van. Nekik kéne kiosztani ".( $cUsers * $limit )." templomot, de csak ".$cKioszthato." templom van a raktáron.";
+        if($cKioszthato > 0 ) {
+            $limit = ceil($cKioszthato / $cUsers);
+            $mail->content .= "\nÚgy határoztunk hát, hogy csak ".$limit." templomot osztunk ki fejenként.";
+        }
+        $mail->Send($config['mail']['debugger']);
+    }
+
+    //változók a levélhez
+    $query = "
+        SELECT count(*),t.nev FROM eszrevetelek
+                RIGHT JOIN templomok t ON t.id = eszrevetelek.hol_id
+            WHERE datum > '".date('Y-m-d H:i:s',strtotime("-1 week"))."' 
+                AND ok = 'i' 
                 AND orszag = 12
-                AND ( nev LIKE '%templom%' OR nev LIKE '%bazilika%' OR nev LIKE '%székesegyház%')
-                AND moddatum < '".date('Y-m-d',strtotime("-2 years"))."' 
-                AND u.timestamp IS NULL
-            GROUP BY t.id
-            ORDER BY frissites, t.id LIMIT 7;
-        ";
-        $result = mysql_query($query); $templomok = array();
-        while ($templom = mysql_fetch_assoc($result)) {
-            $templomok[$templom['id']] = $templom;    
-        }        
+                AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+            GROUP BY hol_id
+    ;";
+    $result = mysql_query($query);
+    $M = mysql_num_rows($result);
+
+
+    $query = "
+        SELECT count(*) FROM templomok t
+            WHERE frissites > '".date('Y-m-d',strtotime("-6 months"))."' 
+                AND ok = 'i' 
+                AND orszag = 12
+                AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+    ;";
+    $result = mysql_query($query);
+    $tmp = mysql_fetch_row($result);
+    $L = $tmp[0];
+
+    $query = "
+        SELECT count(*) FROM templomok t
+            WHERE frissites < '".date('Y-m-d',strtotime("-2 years"))."' 
+                AND ok = 'i' 
+                AND orszag = 12
+                AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
+    ;";
+    $result = mysql_query($query);
+    $tmp = mysql_fetch_row($result);
+    $O = $tmp[0];
+
+
+
+    //minden felhasználó egyesével
+    $c = 0;
+    foreach ($users as $uid => $user) {
+
+        $templomok = array_slice($templomokFull, $c * $limit , $limit , true);
+        $c++;
 
         $list = "<ul>";
         foreach ($templomok as $tid => $templom) {
@@ -1903,18 +2130,6 @@ function assignUpdates() {
         else $nev = $user['login'];
         
         $query = "
-            SELECT count(*),t.nev FROM eszrevetelek
-                    RIGHT JOIN templomok t ON t.id = eszrevetelek.hol_id
-                WHERE datum > '".date('Y-m-d H:i:s',strtotime("-1 week"))."' 
-                    AND ok = 'i' 
-                    AND orszag = 12
-                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
-                GROUP BY hol_id
-        ;";
-        $result = mysql_query($query);
-        $M = mysql_num_rows($result);
-
-        $query = "
             SELECT count(*),t.nev FROM eszrevetelek e
                     RIGHT JOIN templomok t ON t.id = e.hol_id
                 WHERE datum > '".date('Y-m-d H:i:s',strtotime("-1 week"))."' 
@@ -1927,27 +2142,6 @@ function assignUpdates() {
         $result = mysql_query($query);
         $N = mysql_num_rows($result);
 
-        $query = "
-            SELECT count(*) FROM templomok t
-                WHERE frissites > '".date('Y-m-d',strtotime("-6 months"))."' 
-                    AND ok = 'i' 
-                    AND orszag = 12
-                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
-        ;";
-        $result = mysql_query($query);
-        $tmp = mysql_fetch_row($result);
-        $L = $tmp[0];
-
-        $query = "
-            SELECT count(*) FROM templomok t
-                WHERE frissites < '".date('Y-m-d',strtotime("-2 years"))."' 
-                    AND ok = 'i' 
-                    AND orszag = 12
-                    AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
-        ;";
-        $result = mysql_query($query);
-        $tmp = mysql_fetch_row($result);
-        $O = $tmp[0];
 
         if($O > $L ) $ol = "de még";
         else $ol = "és már csak";
@@ -1984,6 +2178,7 @@ EOT;
         ";
         $mail->content = $text;
         $mail->Send($user['email']);        
+        /* */
     }
 }
 
@@ -2028,6 +2223,10 @@ function updatesCampaign() {
             'settings' => array('width=100%','align=center','style="padding:1px"'),
             'design_url' => $design_url);       
     //return $twig->render('doboz_lila.html',$variables); 
+
+    if($C >= ( $S * 2 ) ) {
+        return false;
+    }
 
     return array(
         'title' => 'Hét nap, hét frissítése',
@@ -2212,5 +2411,10 @@ function chat_getusers($format = false) {
     return $return;
 }
 
+function printr($variable) {
+
+    echo"<pre>".print_r($variable,1)."</pre>";
+
+}
 
 ?>

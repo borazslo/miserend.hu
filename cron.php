@@ -7,10 +7,12 @@ ini_set('memory_limit', '512M');
 switch($_REQUEST['q']) {
 
 	case 'hourly':
+		updateOverpass(50);
 		updateDistances();
 		break;
 
 	case 'daily':
+		deleteOverpass();
 		updateOSM();
 		for($v=1;$v<5;$v++) {
 			$file = 'fajlok/sqlite/miserend_v'.$v.'.sqlite3';
