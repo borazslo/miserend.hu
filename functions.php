@@ -246,7 +246,6 @@ function LirugicalDay($datum = false) {
  }
 
 function LiturgicalDayAlert($html = false,$date = false) {
-    global $design_url;
 
     if($date == false) $date = date('Y-m-d'); 
     $alert = false;
@@ -256,7 +255,10 @@ function LiturgicalDayAlert($html = false,$date = false) {
             $alert = true;
         } 
     }
-
+    $text = "Ma van <strong>".$day->Celebration->LiturgicalCelebrationName."</strong>";
+    if(preg_match("/ünnep$/i",$day->Celebration->LiturgicalCelebrationType))
+        $text .= " ".$day->Celebration->LiturgicalCelebrationType."e";
+    
     if($html == false ) {
         if($alert == false) return false;
         else return true;
@@ -264,7 +266,7 @@ function LiturgicalDayAlert($html = false,$date = false) {
         if($alert == false) return '';
         else {
             global $twig;
-            return $twig->render('alert_liturgicalday.html',array('design_url'=>$design_url));
+            return $twig->render('alert_liturgicalday.html',array('text'=>$text));
         }
     }
 
@@ -2192,7 +2194,7 @@ function updatesCampaign() {
 
         $query = "
             SELECT count(*) FROM templomok t
-                WHERE frissites < '".date('Y-m-d',strtotime("-2 years"))."' 
+                WHERE frissites < '".date('Y-m-d',strtotime("2015-12-24 -2 years"))."' 
                     AND ok = 'i' 
                     AND orszag = 12
                     AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
