@@ -2010,7 +2010,7 @@ function assignUpdates() {
         SELECT user.uid,login,email,becenev,nev,c FROM user 
         LEFT JOIN (
             SELECT count(*) as c, uid FROM updates
-            WHERE timestamp > '".date('Y-m-d',strtotime("-1 week"))."' 
+            WHERE timestamp > '".date('Y-m-d',strtotime("-160 hours"))."' 
             GROUP BY uid 
             ORDER BY timestamp DESC
         ) u ON u.uid = user.uid 
@@ -2041,7 +2041,7 @@ function assignUpdates() {
             ok = 'i' 
             AND orszag = 12
             AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
-            AND moddatum < '".date('Y-m-d',strtotime("-2 years"))."' 
+            AND frissites < '".date('Y-m-d',strtotime("-2 years"))."' 
             AND u.timestamp IS NULL
             AND e.allapot IS NULL                
         GROUP BY t.id
