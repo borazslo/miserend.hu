@@ -11,13 +11,14 @@ $config['connection'] = array(
         'prefix' => '', /* Még nem működik */
     );
 
-$config['path']['domain'] = 'http://207.180.171.165/miserend.hu/';
+$config['path']['domain'] = 'http://miserend.hu/';
 
 $config['mapquest'] = array(
     'appkey' => '***',
     'useitforsearch' => false
 );
 
+$config['token']['timeout'] = "15 minutes";
 
 $config['mail'] = array(
         'sender' => 'miserend.hu <info@miserend.hu>',
@@ -26,5 +27,7 @@ $config['mail'] = array(
     );
 
 $config['debug'] = 0;
+
+date_default_timezone_set('Europe/Budapest');
 
 ?>

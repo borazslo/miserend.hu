@@ -6,17 +6,44 @@ ini_set('memory_limit', '256M');
 if(isset($_REQUEST['datum']) AND preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$_REQUEST['datum'])) $datum = $_REQUEST['datum'];
 if(isset($_REQUEST['v']) AND preg_match('/^[0-9]{1,3}$/',$_REQUEST['v'])) $v = $_REQUEST['v'];
 
-// Set default timezone
-date_default_timezone_set('UTC +1');
+if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'login') {
+	if(!isset($v) OR ( $v < 4 OR $v > 4)) { echo json_encode(array('error'=>1,'text'=>'Nem támogatott API verzió.')); exit; } 
+	
+	$input = getInputJSON();
+
+	if(!is_array($input)) { echo json_encode(array('error'=>1,'text'=>'Nem kaptunk adatot.')); exit; }
+
+	if(!$uid = login($input['username'],$input['password'])) {
+		echo json_encode(array('error'=>1,'text'=>'Hibás név és/vagy jelszó.')); exit; 
+	}
+
+	//only one API connection/user in the same time
+	mysql_query("DELETE FROM tokens WHERE type ='API' AND uid = ".$uid.";");
+
+	//generate unique token
+	$inserted = false;
+	for($i = 1;$i < 5; $i++) {
+		$token = md5(uniqid(mt_rand(), true));
+		mysql_query("INSERT INTO tokens (name,type,uid,timeout) VALUES ('".$token."','API',".$uid.",'".date('Y-m-d H:i:s',strtotime("+".$config['token']['timeout']))."');");
+		if(mysql_affected_rows() == 1) {
+			$inserted = true;
+			break;
+		}
+	}
+	if($inserted != true) {
+		echo json_encode(array('error'=>1,'text'=>'Nem sikerült egyedi tokent generálni és menteni.')); exit; 
+	}
+
+	echo json_encode(array('error'=>0,'token'=>$token)); 
+	exit; 
+	
+}
 
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'report') {
  	
 	if(!isset($v) OR $v > 4) { echo json_encode(array('error'=>1,'text'=>'Nem támogatott API verzió.')); exit; } 
 
-	$inputJSON = file_get_contents('php://input');
-	$t = $inputJSON;
-	$input= json_decode( $inputJSON, TRUE ); //convert JSON into array
-
+	$input = getInputJSON();
 
 	if(!is_array($input)) { echo json_encode(array('error'=>1,'text'=>'Nem kaptunk adatot.')); exit; }
 	if(
@@ -31,13 +58,24 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'report') {
 	if(!isset($input['email'])) $input['email'] = ""; else $input['email'] = sanitize($input['email']);
 	if(isset($input['dbdate']))  $input['dbdate'] = sanitize($input['dbdate']);
 
+	if(isset($input['token']) AND $v >= 4) {
+		if(!$token = validateToken($input['token'])) {
+			echo json_encode(array('error'=>1,'text'=>'Érvénytelen token.'));
+			exit;
+		}
+		global $user;
+		$user = new User($token['uid']);
+		$input['email'] = $user->email;
+		$input['name'] = $user->nev;
+	}
+	
+
 	$input['v'] = $v;
+		
+	$remark = new Remark();
+	$remark->tid = $input['tid'];
 	
-	$inputJSON = json_encode($input);
-	
-	$remark = new Remark($input['tid']);
-	
-	$remark->name = "Mobil felhasználó";
+	if(!isset($input['name'])) $remark->name = "Mobil felhasználó";
 	if($input['email'] != '') $remark->email = $input['email'];
 	if(isset($input['timestamp'])) $remark->timestamp = $input['timestamp'];
 
@@ -83,9 +121,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'table') {
 			exit;
 		}
 
-		$inputJSON = file_get_contents('php://input');
-		$t = $inputJSON;
-		$input= json_decode( $inputJSON, TRUE ); //convert JSON into array
+		$input = getInputJSON();
 
 		if(!isset($input['delimiter'])) $input['delimiter'] = ';';
 		if(!isset($input['format'])) $input['format'] = 'json'; //or 'text'

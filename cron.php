@@ -7,6 +7,7 @@ ini_set('memory_limit', '512M');
 switch($_REQUEST['q']) {
 
 	case 'hourly':
+		clearoutTokens();
 		updateOverpass(50);
 		updateDistances();
 		break;

@@ -83,7 +83,7 @@ function login($name,$password) {
 
     cookieSave($x['uid'],$name);
     
-    return true;
+    return $x['uid'];
 }
 
 function checkUsername($username) {
@@ -2242,6 +2242,37 @@ function updatesCampaign() {
         );
 }
 
+
+function clearoutTokens() {
+    mysql_query("DELETE FROM tokens WHERE timeout < '".date('Y-m-d H:i:s')."';");
+}
+
+function validateToken($token) {
+    $result = mysql_query("SELECT * FROM tokens WHERE name = '".sanitize($token)."' LIMIT 1");
+    $row = mysql_fetch_assoc($result);
+
+    if(!is_array($row)) {
+        return false;
+    } elseif($row['timeout'] < date('Y-m-d H:i:s')) {
+        return false;
+    } 
+    //TODO: check also: type,uid
+    return $row;
+}
+
+function getInputJSON() {
+    global $config;
+
+    $inputJSON = file_get_contents('php://input');
+    $t = $inputJSON;
+    $input= json_decode( $inputJSON, TRUE ); //convert JSON into array
+    if($config['debug'] > 0 AND is_array($input)) {
+        $input = array_replace($input,$_REQUEST);
+    }
+    elseif($config['debug'] >0 ) $input = $_REQUEST;
+
+    return $input;
+}
 
 function feltoltes_block() {
     global $user;    
