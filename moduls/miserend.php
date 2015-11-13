@@ -450,23 +450,9 @@ function miserend_index() {
     //statisztika
     $statisztika = miserend_printRegi();
     
-    //kedvencek
-    $favorites = array();
-    $results = mysql_query("
-    	SELECT f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
-    		LEFT JOIN templomok t ON t.id = f.tid
-    	WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = ".$user->uid."
-    	ORDER BY nev;");
-    while($row=mysql_fetch_row($results,MYSQL_ASSOC)) {
-    	$row['li'] = "<a class='link' href='?templom=".$row['tid']."'>".$row['nev'];
-    	if($row['ismertnev'] != '') $row['li'] .= " (".$row['ismertnev'].")";
-    	$row['li'] .= "</a>, ".$row['varos'];
-    	$favorites[$row['tid']] = $row;
-    }
-    
 	global $twig;
 	$variables = array(
-		'favorites' => $favorites,
+		'favorites' => $user->getFavorites(),
 		'scripts' => $script,
 		'formnyit' => $formnyit,
 		'formvalaszt' => $formvalaszt,
@@ -1258,6 +1244,12 @@ function miserend_printRegi() {
     
 }
 
+function miserend_list($list) {
+
+	return "?m_id=26&m_op=list&list=Balaton";
+
+}
+
 switch($m_op) {
     case 'index':
         $tartalom=miserend_index();
@@ -1279,6 +1271,9 @@ switch($m_op) {
 		$tartalom=miserend_view();
 		break;
 
+	case 'list':
+		$tartalom=miserend_list($_REQUEST['list']);
+		break;
 }
 
 ?>

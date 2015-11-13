@@ -2257,7 +2257,19 @@ function validateToken($token) {
         return false;
     } 
     //TODO: check also: type,uid
+
+    extendToken($token);
     return $row;
+}
+
+function extendToken($token) {
+    global $config;
+    $query = "UPDATE tokens SET timeout = '".date('Y-m-d H:i:s',strtotime("+".$config['token']['timeout']))."' WHERE name = '".$token."' LIMIT 1;";
+    if(mysql_query($query))
+        return true;
+    else
+        return false;
+
 }
 
 function getInputJSON() {

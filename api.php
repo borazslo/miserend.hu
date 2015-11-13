@@ -33,10 +33,83 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'login') {
 	if($inserted != true) {
 		echo json_encode(array('error'=>1,'text'=>'Nem sikerült egyedi tokent generálni és menteni.')); exit; 
 	}
+	$query = "UPDATE user SET lastlogin = '".date('Y-m-d H:i:s')."' WHERE uid = ".$uid.";";
+    mysql_query($query);
 
 	echo json_encode(array('error'=>0,'token'=>$token)); 
 	exit; 
 	
+}
+
+if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'user') {
+	if(!isset($v) OR ( $v < 4 OR $v > 4)) { echo json_encode(array('error'=>1,'text'=>'Nem támogatott API verzió.')); exit; } 
+	$input = getInputJSON();
+	if(isset($input['token'])) {
+		if(!$token = validateToken($input['token'])) {
+			echo json_encode(array('error'=>1,'text'=>'Érvénytelen token.'));
+			exit;
+		}
+		global $user;
+		$user = new User($token['uid']);
+		$user->getFavorites();
+		$data = array(
+			'username' => $user->username,
+			'nickname' => $user->nickname,
+			'name' => $user->name,
+			'email' => $user->email
+		);
+		foreach($user->favorites as $favorite)
+			$data['favorites'][] = $favorite['tid'];
+
+		echo json_encode(array('error'=>0,'user'=>$data));
+
+		exit;
+	}
+	echo json_encode(array('error'=>1,'text'=>'Hiányzó vagy hibás token.')); exit; 
+}
+
+if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'favorites') {
+	if(!isset($v) OR ( $v < 4 OR $v > 4)) { echo json_encode(array('error'=>1,'text'=>'Nem támogatott API verzió.')); exit; } 
+	$input = getInputJSON();
+	if(isset($input['token'])) {		
+		if(!$token = validateToken($input['token'])) {
+			echo json_encode(array('error'=>1,'text'=>'Érvénytelen token.'));
+			exit;
+		}
+		global $user;
+		$user = new User($token['uid']);
+		
+		foreach(array('add','remove') as $method) {
+			if(isset($input[$method])) {
+				if(!is_array($input[$method]) AND !is_numeric($input[$method])) {
+					echo json_encode(array('error'=>1,'text'=>'Hibás formátumú adat.'));
+					exit;
+				} elseif(!is_array($input[$method])) {
+					$input[$method] = array($input[$method]);
+				}
+				foreach($input[$method] as $tid) {
+					if(!is_numeric($tid)) {
+						echo json_encode(array('error'=>1,'text'=>'Hibás formátumú adat.'));
+						exit;						
+					}					
+				}
+				$function = $method."Favorites";
+				if(!$user->$function($input[$method])) {
+					echo json_encode(array('error'=>1,'text'=>'Nem sikerült a módosítás mentése.'));
+					exit;						
+				}
+			}
+		}
+
+		$favorites = array();
+		$user->getFavorites();
+		foreach($user->favorites as $favorite)
+			$favorites[] = $favorite['tid'];
+
+		echo json_encode(array('error'=>0,'favorites'=>$favorites));
+		exit;
+	}
+	echo json_encode(array('error'=>1,'text'=>'Hiányzó vagy hibás token.')); exit; 
 }
 
 if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'report') {
@@ -91,6 +164,7 @@ if(isset($_REQUEST['q']) and $_REQUEST['q'] == 'report') {
 			$remark->text .= "\n\n<strong>Figyelem! Elavult adatok alapján történt a bejelentés!</strong>";
 		}
 	}
+	if($user->uid > 0) $user->active();
 	$remark->save();
 	$remark->emails();
 	echo json_encode(array('error'=>0,'text'=>'Köszönjük. Elmentettük.'));

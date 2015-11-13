@@ -363,6 +363,57 @@ class User
 		mysql_query("UPDATE user SET lastactive = '".date('Y-m-d H:i:s')."' WHERE uid = ".$this->uid." LIMIT 1;");
 	}
 
+	function getFavorites() {
+		$favorites = array();
+	    $results = mysql_query("
+	    	SELECT f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
+	    		LEFT JOIN templomok t ON t.id = f.tid
+	    	WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = ".$this->uid."
+	    	ORDER BY nev;");
+	    while($row=mysql_fetch_row($results,MYSQL_ASSOC)) {
+	    	$row['li'] = "<a class='link' href='?templom=".$row['tid']."'>".$row['nev'];
+	    	if($row['ismertnev'] != '') $row['li'] .= " (".$row['ismertnev'].")";
+	    	$row['li'] .= "</a>, ".$row['varos'];
+	    	$favorites[$row['tid']] = $row;
+	    }
+	    $this->favorites = $favorites;
+	    return $favorites;
+	}
+
+	function addFavorites($tids) {
+		if(!is_array($tids)) $tids = array($tids);
+		foreach($tids as $tid) { 
+			if(!is_numeric($tid)) return false; 
+		}
+		foreach($tids as $key => $tid) { 
+			if( getChurch($tid) == array() ) unset($tids[$key]); 
+		}
+
+		$query = "INSERT IGNORE INTO favorites (uid,tid) VALUES ";
+		foreach($tids as $key => $tid) {
+			$query .= "(".$this->uid.",".$tid.")";
+			if($key < count($tids) -1 ) $query .= ", ";
+		}
+		$query .= ";";
+		if(mysql_query($query)) return true;
+		else return false;
+	}
+
+	function removeFavorites($tids) {
+		if(!is_array($tids)) $tids = array($tids);
+		foreach($tids as $tid) { 
+			if(!is_numeric($tid)) return false; 
+		}
+
+		$query = "DELETE FROM favorites WHERE ";
+		foreach($tids as $key => $tid) {
+			$query .= "( uid = ".$this->uid." AND tid = ".$tid.")";
+			if($key < count($tids) -1 ) $query .= " OR ";
+		}
+		$query .= ";";
+		if(mysql_query($query)) return true;
+		else return false;
+	}
 
 } // END class 
 
