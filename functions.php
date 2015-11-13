@@ -2462,6 +2462,11 @@ function chat_getusers($format = false) {
     return $return;
 }
 
+function env($name,$default=false) {
+    if(!getenv($name)) return $default;
+    else return getenv($name);
+}
+
 function printr($variable) {
 
     echo"<pre>".print_r($variable,1)."</pre>";

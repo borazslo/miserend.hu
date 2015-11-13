@@ -1,0 +1,22 @@
+language: php
+php:
+  - 5.6
+
+services:
+  - mysql
+
+before_script:
+  - mysql -e 'create database miserend character set utf8 collate utf8_unicode_ci;'
+  - npm install
+  - php composer.phar selfupdate
+  - php composer.phar install
+  - php install.php
+
+script:
+  #- phpunit --configuration phpunit.xml
+
+env:
+  global:
+  - ENV=production
+  - DB_USERNAME=root
+  - DB_PASSWORD=""

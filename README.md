@@ -1,7 +1,8 @@
 miserend.hu
 ========
 
-A miserend.hu teljes forrása honlap a /kepek és /fajlok kivételével.
+A miserend.hu teljes forrása honlap a /kepek és /fajlok kivételével. [![Build Status](https://travis-ci.org/borazslo/miserend.hu.png)](https://travis-ci.org/borazslo/miserend.hu)
+
 
 Az adatbázis struktúrát a mysql_sample.sql tartalmazza, némi minta adattal együtt.
 (A minta adatok nem koherensek, így nem sokra használhatóak önmagukban. De fejlesztőknek szívesen adunk igazibb adatbázist.)

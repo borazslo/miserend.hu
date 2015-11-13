@@ -3,11 +3,13 @@
 $config = array();
 $db = false;
 
+$config['env'] = env('ENV','testing'); /* testing, staging, production */
+
 $config['connection'] = array(
-        'host' => 'localhost',
-        'user' => '***',
-        'password' => '***',
-        'database' => 'vpa_portal',
+        'host' => env('DB_HOST','localhost'),
+        'user' => env('DB_USERNAME','miserend'),
+        'password' => env('DB_PASSWORD',''),
+        'database' => env('DB_DATABASE','miserend'),
         'prefix' => '', /* Még nem működik */
     );
 
@@ -25,9 +27,23 @@ $config['mail'] = array(
         'debug' => 0, /* 0,1,2,3 */
         'debugger' => 'eleklaszlosj@gmail.com'
     );
-
 $config['debug'] = 0;
 
 date_default_timezone_set('Europe/Budapest');
+
+
+switch ($config['env']) {
+    case 'testing':
+        $config['debug'] = 1;
+        $config['mail']['debug'] = 3;
+        $config['path']['domain'] = 'http://localhost/miserend.hu/';
+        break;
+    
+    case 'staging':
+        $config['debug'] = 1;
+        $config['mail']['debug'] = 2;
+        $config['path']['domain'] = 'http://staging.miserend.hu/';
+        break;
+}
 
 ?>
