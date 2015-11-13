@@ -234,7 +234,7 @@ class User
 				}
 				
 		} elseif(in_array($key,array('jelszo','password')))  {
-				$this->presaved['jelszo'] = passwordEncode($val);
+				$this->presaved['jelszo'] = password_hash($val,PASSWORD_BCRYPT);
 
 		} elseif($key == 'roles' OR $key == 'jogok') {
 				if(!is_array($val)) $val = array($val);

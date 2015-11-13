@@ -58,17 +58,23 @@ function sanitize($text) {
     return $text;
 }
 
-function passwordEncode($text) {
-    return base64_encode($text);
-}
-
 function login($name,$password) {
-    $password=passwordEncode(sanitize($password));
     $name = sanitize($name);
-    $query = "SELECT uid FROM user where login='$name' and jelszo='$password' and ok!='n' LIMIT 11";
+    $query = "SELECT uid,jelszo FROM user where login='$name' and ok!='n' LIMIT 11";
     $result = mysql_query($query);
     $x = mysql_fetch_assoc($result);
-    if($x == '') { 
+    
+    if($x == '') { return false; }
+
+    if(password_verify($password,$x['jelszo'])) {
+        //we are happy        
+    }
+    elseif(strlen($x['jelszo']) < 60 AND base64_decode($x['jelszo']) == $password) {
+        $jelszo = password_hash(base64_decode($x['jelszo']),PASSWORD_BCRYPT);
+        $query = "UPDATE user SET jelszo = '".$jelszo."' WHERE login='".$name."' LIMIT 1;";
+        mysql_query($query);
+    }
+    else {
         return false;
     }
 
@@ -103,7 +109,7 @@ function getuser() {
     $salt = 'Yzsdf';
 
     $uid = false;
-    
+
     if(isset($_SESSION['auth'])) {
         $tmp = explode(':',$_SESSION['auth']);
         if(count($tmp) == 3) {
@@ -2010,7 +2016,7 @@ function assignUpdates() {
         SELECT user.uid,login,email,becenev,nev,c FROM user 
         LEFT JOIN (
             SELECT count(*) as c, uid FROM updates
-            WHERE timestamp > '".date('Y-m-d',strtotime("-160 hours"))."' 
+            WHERE timestamp > '".date('Y-m-d H:i:s',strtotime("-160 hours"))."' 
             GROUP BY uid 
             ORDER BY timestamp DESC
         ) u ON u.uid = user.uid 
