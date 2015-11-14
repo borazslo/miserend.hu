@@ -1088,24 +1088,6 @@ CREATE TABLE `user` (
   `email` varchar(100) NOT NULL DEFAULT '',
   `becenev` varchar(50) NOT NULL DEFAULT '',
   `nev` varchar(100) NOT NULL DEFAULT '',
-  `kontakt` tinytext NOT NULL,
-  `szuldatum` date NOT NULL DEFAULT '0000-00-00',
-  `nevnap` varchar(5) NOT NULL DEFAULT '',
-  `msn` varchar(50) NOT NULL DEFAULT '',
-  `skype` varchar(50) NOT NULL DEFAULT '',
-  `nem` enum('0','f','n') NOT NULL DEFAULT '0',
-  `csaladiallapot` varchar(50) NOT NULL DEFAULT '',
-  `foglalkozas` varchar(100) NOT NULL DEFAULT '',
-  `magamrol` text NOT NULL,
-  `vallas` varchar(50) NOT NULL DEFAULT '',
-  `orszag` varchar(50) NOT NULL DEFAULT '',
-  `varos` varchar(50) NOT NULL DEFAULT '',
-  `nyilvanos` text NOT NULL,
-  `ismerosok` text NOT NULL,
-  `baratok` text NOT NULL,
-  `regip` varchar(50) NOT NULL DEFAULT '',
-  `lastip` varchar(50) NOT NULL DEFAULT '',
-  `log` text NOT NULL,
   `adminmegj` text NOT NULL,
   `atvett` enum('i','n') NOT NULL DEFAULT 'i',
   `volunteer` int(11) NOT NULL DEFAULT '0',
@@ -1119,8 +1101,8 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (5258,'verem','TWFjaTcdfds2TGFjaQ==','hirek-szavazas-galeria-info-hirek-user-nevnaptar-reklam-miserend-igenaptar','i','*vendeg*','2011-02-23 19:52:06','2015-03-18 22:29:29','2015-03-18 23:52:50','egyik@gmail.com','','Teljes A Nevem','','0000-00-00','00-00','','','0','titok','','','titok','Magyarország','','email-0*nev-0*nem-0*magamrol-0*orszag-0*varos-0*kontakt-0*skype-0*msn-0*foglalkozas-0*szuldatum-0*nevnap-0*csaladiallapot-0*vallas-0','','','','','','n',1);
-INSERT INTO `user` VALUES (2343,'bernadett','bWFsefef0eXZhcmVrODA=','','i','*vendeg*','2012-12-22 17:24:19','2015-02-03 11:10:39',NULL,'email@cim.com','Berni','Sörösné Bernadett','','1919-04-24','11-23','','','n','hajadon','','','római katolikus','Magyarország','Kakucs','email-0*nev-0*nem-0*magamrol-0*orszag-0*varos-0*kontakt-0*skype-0*msn-0*foglalkozas-0*szuldatum-i*nevnap-0*csaladiallapot-i*vallas-0','','','','','','n',0);
+INSERT INTO `user` VALUES (5258,'verem','TWFjaTcdfds2TGFjaQ==','hirek-szavazas-galeria-info-hirek-user-nevnaptar-reklam-miserend-igenaptar','i','*vendeg*','2011-02-23 19:52:06','2015-03-18 22:29:29','2015-03-18 23:52:50','egyik@gmail.com','','Teljes A Nevem','','n',1);
+INSERT INTO `user` VALUES (2343,'bernadett','bWFsefef0eXZhcmVrODA=','','i','*vendeg*','2012-12-22 17:24:19','2015-02-03 11:10:39',NULL,'email@cim.com','Berni','Sörösné Bernadett','','n',0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -4904,3 +4886,14 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2015-08-18 23:52:49
+
+CREATE TABLE tokens (
+id int(11) NOT NULL AUTO_INCREMENT,
+type varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+name varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+uid int(11) DEFAULT NULL,
+timeout timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (id),
+UNIQUE KEY id_UNIQUE (id),
+UNIQUE KEY name_UNIQUE (name)
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
