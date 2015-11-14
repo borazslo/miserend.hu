@@ -14,6 +14,7 @@ before_script:
   - php install.php
 
 script:
+  - phpunit tests
   #- phpunit --configuration phpunit.xml
 
 env:
