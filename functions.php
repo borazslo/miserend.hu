@@ -2243,6 +2243,10 @@ function updatesCampaign() {
 }
 
 
+function clearoutMessages() {
+    mysql_query("DELETE FROM messages WHERE timestamp < '".date('Y-m-d H:i:s',strtotime('-1 month'))."' OR shown = 1;");
+}
+
 function clearoutTokens() {
     mysql_query("DELETE FROM tokens WHERE timeout < '".date('Y-m-d H:i:s')."';");
 }

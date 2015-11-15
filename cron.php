@@ -8,6 +8,7 @@ switch($_REQUEST['q']) {
 
 	case 'hourly':
 		clearoutTokens();
+		clearoutMessages();
 		updateOverpass(50);
 		updateDistances();
 		break;

@@ -407,9 +407,8 @@ CREATE TABLE `eszrevetelek` (
 
 LOCK TABLES `eszrevetelek` WRITE;
 /*!40000 ALTER TABLE `eszrevetelek` DISABLE KEYS */;
-INSERT INTO `eszrevetelek` VALUES (103,'Ólmos Nikolett','niki','valami@valami.hu','i','2015-04-16 13:17:26','templomok',644,'j','elem','2015-04-16 20:11:10','Dicsértessék a Jézus Krisztus!\r\n\r\nÉszrevételeim vannak. Fogadjátok szeretettel.','');
+INSERT INTO `eszrevetelek` VALUES (103,'Ólmos Nikolett','niki','valami@valami.hu','i','2015-04-16 13:17:26','templomok',644,'j','elem','2015-04-16 20:11:10','Dicsértessék a Jézus Krisztus!\r\n\r\nÉszrevételeim vannak. Fogadjátok szeretettel.','','');
 INSERT INTO `eszrevetelek` VALUES (102,'Bela','*vendeg*','belea@skocia.elemer','e','2015-04-16 11:08:16','templomok',125,'j','elem','2015-04-16 13:07:35','Sziasztok!\r\n A kápolna miserendjében van egy kis eltérés. Íme: xxxx stb.','<img src=img/edit.gif align=absmiddle title=\'elem (2015-04-16 13:03)\'> miserend küldés ','');
-/*!40000 ALTER TABLE `igenaptar` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -764,92 +763,6 @@ CREATE TABLE `session` (
   KEY `sessid_2` (`sessid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `session`
---
-
-LOCK TABLES `session` WRITE;
-/*!40000 ALTER TABLE `session` DISABLE KEYS */;
-INSERT INTO `session` VALUES (5508,'bambabela','8314ce12f1c4fd618b674799797204623f4fb2b17dbe8604d1',1440556169);
-INSERT INTO `session` VALUES (5508,'','8314ce12f1c4fd618b6311d7954f1dfa660e181baa8ab6a1',1440552389);
-/*!40000 ALTER TABLE `session` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `sugo`
---
-
-DROP TABLE IF EXISTS `sugo`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `sugo` (
-  `id` int(3) NOT NULL AUTO_INCREMENT,
-  `leiras` text NOT NULL,
-  `hol` varchar(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `sugo`
---
-
-LOCK TABLES `sugo` WRITE;
-/*!40000 ALTER TABLE `sugo` DISABLE KEYS */;
-INSERT INTO `sugo` VALUES (1,'<b>Megjegyzés</b> (a szerkesztéssel kapcsolatban)\r\n<br><br>Ide akkor kell beírni, ha a feltöltésnél van valami olyan körülmény, amiről fontos, hogy minden rögzítő, aki megnyithatja az űrlapot módosításra, tudjon.\r\n<br><br>Pl. \"még ne engedélyezd, most egyeztetek a plébánossal\" vagy bármi hasonló','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (2,'<b>Felelős</b>\r\n<br><br>Annak az adatai, aki kb. negyedévente megkereshető a templom adataival kapcsolatban, tud a változásokról, naprakész információi vannak.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (3,'<b>Templom neve</b>\r\n<br><br>Ide a templom valódi nevét kell beírni, ami nem mindig azonos azzal, ahogy a helybeliek hívják!\r\n<br><br>Ha ezt nem tudjuk, akkor lehet ismert nevet vagy plébánia nevet is beírni, de ezt mindenképp jelezzük a szerkesztői megjegyzés részben, ahol egy későbbi módosítás során esetleg utánajárhatunk a valódi névnek.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (4,'<b>Közismert neve</b>\r\n<br><br>Ide azt a nevet kell megadni, akár többet is, ahogy a helybeliek ismerik a templomot.  <br>Abban az esetben, ha olyan településen van a templom, ami időközben másik településbe olvadt, de azon belül még ismerik a régi nevet, azt is ide kell rögzíteni, pl. \"izbégi templom\", ami egyébként már Szentendréhez tartozik.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (5,'<b>Templom címe</b>\r\n<br><br>Értelemszerűen a templom (és nem a plébánia!) elérhetőségeit kell megadni. A listákból a kezdőbetüket begépelve könnyen kereshető a település.\r\n<br><br>Megközelítésnek egy rövid leírást célszerű beírni (ha tudjuk), hogyan kell eljutni a templomhoz, amivel az odalátogatókat segítjük.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (6,'<b>Plébánia adatai</b>\r\n<br><br>Itt a templomhoz kapcsolódó plébánia elérhetőségét kell megadni, ha pl. valami ügyintézés (esküvő, ilyesmi) miatt szeretne valaki érdeklődni, akkor hol teheti meg.\r\n<br><br>A plébánosok és minden alkalmazott névsora nem szükséges, de ha frissíthető, akkor persze néha jó tudni, hogy ki ott a plébános.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (7,'<b>Ünnep adatok</b>\r\n<br><br>Ide alapvetően a búcsút és időpontját kell beírni (pl. a templom búcsúja augusztus 20.)\r\n<br><br>Előfordulhat több búcsú, vagy más rendszeres ünnep, esetleg ezen ünnepek nem csak a templomot, hanem környezetét is érinthetik, ilyenkor rövid leírást is be lehet írni.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (8,'<b>Nyári időszámítás</b>\r\n<br><br>Egyes templomoknál a téli és nyári miserend nem a hivatalos időszámítással függ össze, van ahol az idegenforgalmi szezonnal, vagy más megfontolás alapján döntik el. Ilyen esetben itt kell átírni a \"nyári\" időszámítás kezdő és végdátumát.\r\n<br><br>FIGYELEM! Ezt minden évben aktualizálni kell a szokásos frissítések során!','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (9,'<b>Részletes leírás, templom története</b>\r\n<br><br>Ide a templom történeti leírása, összefoglalása kerülhet, illetve minden érdekesség a templommal kapcsolatban.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (10,'<b>Megjegyzés</b>\r\n<br><br>Ide kerülhet minden olyan, ami a templommal összefügg, fontos információ, pl. búcsú időpontja, védőszent, plébániával kapcsolatos rövid (!) \"reklámok\".\r\n<br><br>Az ide írt szöveg a templom bemutatásánál jelenik meg \"jó tudni...\" című dobozban.\r\n<br><br>FONTOS! A rendszeres alkalmak infomrációi (pl. rózsafűzér, szentségimádás, hittan) NEM ide való, annak a miserend űrlap tetején van egy megjegyzés mező!','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (11,'<b>Képek</b>\r\n<br><br>Feltölthetők templomképek, egy templomhoz maximum 20 db. Fontos, hogy a fájlnevekben ne legyen ékezet vagy szóköz, valamint az azonos fájlnevű képek felülírják egymást, erre figyeljünk oda! Ilyenkor két azonos képet fogunk látni, méghozzá az utóbb feltöltöttet. Ez esetben töröljük mindkettőt és töltsük fel újra.\r\n<br><br>Lehetőség szerint CSAK jpg (esetleg gif) fájlokat töltsünk föl! A rendszer automatikusan kicsinyít, így a mérettel nem kell foglalkozni.\r\n<br><br>A feltöltött képek alatt jelölhető, hogy a kép a főoldalra (véletlenszerű válogatás) kikerüljön-e. Ha nincs kijelölve a négyzet, akkor nem teszi ki. Térképnél, kevésbé látványos templombelsőnél inkább ne jelöljük be!','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (12,'<b>Letölthető fájlok</b>\r\n<br><br>Erre valószínű nem lesz szükség, de ha a templomhoz mégis kapcsolódna valami olyan dokumentum, amit érdemes fájlként megjeleníteni róla, akkor azt itt lehet feltölteni.\r\n<br><br>A feltöltés után a kiírt listából kimásolva lehet a szöveges (tartalmi leírás) mezőbe bemásolni, elhelyezni.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (13,'<b>Szomszédos templomok</b>\r\n<br><br>Itt lehet kiválasztani, hogy adott esetben, ha itt nem talál misét, akkor hol érdemes még megnéznie, illetve kirándulás esetén mely templomok vannak még a közelben.\r\n<br><br>A CTRL billentyű nyomvatartása mellett több templom is kiválasztható, illetve a CTRL billentyűvel (és klikkelve) vonható vissza a kijelölés.\r\n<br><br>Értelemszerűen csak helyismerettel tölthető ki, két csoportra osztva, szomszédos és 10km-en belüli. Mindkét mezőbe nem kell ugyanazt a templomot felvenni! Rögzítésnél a kiválasztott templomhoz is hozzárendelődik! (hasonlóan egy kapcsolódás törlésénél is!)','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (14,'<b>Frissítés</b>\r\n<br><br>Minden templomhoz ki lesz írva, hogy mikoriak a információink, segítségképpen, hogy vajon mennyire lehet aktuális. Itt tehát akkor kell a dátumfrissítést bejelölni, ha az adatokat átnéztük és rendben találtuk. Ha csak egy helyesírási hibát javítottunk, vagy hasonló kis javítás történt, de az adatok valódiságáról nincs tudomásunk, akkor nem kell frissíteni.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (15,'<b>Megjelenhet:</b>\r\n<br><br>Itt lehet beállítani, hogy a templom valamiért (hiányos adatok, tesztelés, stb.) nem jelenhet meg, vagy új feltöltés, módosítás miatt még várakozik. \r\n<br>Ha az adatok rendben vannak, akkor itt engedélyezhetjük.','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (16,'<b>Turistautak ID</b>\r\n<br><br>A turistautak.hu oldal gazdái gyűjtik a templomok (GPS) koordinátáit. Ebből térképen pontosan meghatározható a templom elhelyezkedése. Nekünk nem kell külön felmérnünk, hanem az elérhető <a href=http://turistautak.hu/search.php?s=templom target=_blank>listából</a> elég kikeresnünk a templomot (ha megvan) és ráklikkelve a címsorban megjelenő id utáni értéket kell ide beírnunk. \r\n<br><br>Egy példa: tardosi rk. templom linkje: http://turistautak.hu/poi.php?<b>id=6515</b>\r\n<br>Az űrlapba beírandó szám tehát a 6515','miserend -> templom adatlap');
-INSERT INTO `sugo` VALUES (17,'<b>Becenév, megszólítás:</b>\r\n<br><br>Portálunkon mindenki az itt megadott (bece)nevével szerepel, hangsúlyosan ez a név látható. Így nem okoz gondot, ha egy bejelentkezési név már foglalt, lehet másikat regisztrálni, s itt meg tudjuk adni kedvenc becenevünket, ahogy szeretnénk, hogy megszólítsanak.\r\n\r\nMivel így több azonos becenevű felhasználó is lehetséges, az azonosítás miatt (amennyiben a becenévtől különböző) valamilyen formában megjelenik a bejelentkezési név is.','regisztráció');
-INSERT INTO `sugo` VALUES (18,'<b>Bejelentkezési név</b>\r\n<br><br>Ezzel a névvel tudsz belépni, ez a név azonosít, így csak olyan nevet választhatsz, amit más még nem regisztrált. Előfordulhat, hogy a beírt név már foglalt, ez esetben másikat kell választani.\r\n<br><br>Szóköz, idézőjel és aposztróf nem lehet a bejelentkezési névben, de javasoljuk, hogy ékezetek és speciális karakterek se legyenek, a későbbi belépések során ezek gondot okozhatnak.','regisztráció');
-INSERT INTO `sugo` VALUES (19,'<b>Email cím</b>\r\n<br><br>Az itt megadott emailcímre küldjük ki a belépéshez szükséges jelszót, amit a későbbiekben a beállítások menüben tudsz majd megváltoztatni.\r\n<br>Továbbá ez az emailcím szolgál a kapcsolattartásra, valamint ezzel a címeddel tudsz feliratkozni különböző hírleveleinkre.\r\n<br><br>Emailcímed nyilvánosságáról külön dönthetsz.','regisztráció');
-INSERT INTO `sugo` VALUES (20,'<b>Név:</b>\r\n<br><br>Itt megadhatod teljes neved. A mező kitöltése nem kötelező, de akár a nyilvánosságot is állíthatod, így meghatározva, hogy mely kör az, akik láthatják megadott neved, s a többiek nem.','regisztráció');
-INSERT INTO `sugo` VALUES (21,'<b>Bemutatkozás</b>\r\n<br><br>Elsősorban a fórumon, de egyéb kapcsolatoknál is segítség lehet, ha pár szót írsz magadról. Nem célszerű önéletrajzot írni, de egy rövid bemutatkozás segíthet másokat, hogy megismerjenek.\r\n<br><br>A bemutatkozás nyilvánossága állítható, így szűrhető, hogy ne lássa mindenki.','regisztráció');
-INSERT INTO `sugo` VALUES (22,'<b>Elérhetőség</b>\r\n<br><br>Itt megadhatod mások számára elérhetőségeid. Ezt a mezőt célszerű óvatosan kezelni, személyes adatokat csak megfelelő kör számára szabad engedélyezni.\r\n<br><br>Itt különös szerepe van a nyilvánosság beállításának!','regisztráció');
-INSERT INTO `sugo` VALUES (23,'<b>Foglalkozás</b>\r\n<br><br>Itt megadhatod foglalkozásod, ami adatlapodon jelenik meg, illetve adott esetben kereshető is.\r\n<br><br>A nyilvánossága ennek a mezőnek is beállítható.','regisztráció');
-INSERT INTO `sugo` VALUES (24,'<b>Születésnap</b>\r\n<br><br>A születési dátumot megadva a beállított nyilvánosság figyelembevételével a rendszer automatikusan kezeli azt.\r\n\r\n<br><br><b>Névnap</b>\r\n<br><br>A születésnaphoz hasonlóan kezelődik.','regisztráció');
-INSERT INTO `sugo` VALUES (25,'<b>Családi állapot</b>\r\n<br><br>Itt állíthatod be családi állapotod, valamint meghatározható a nyilvánossága is.','regisztráció');
-INSERT INTO `sugo` VALUES (26,'<b>Lakhely</b>\r\n<br><br>Itt beállítható az ország és a település. Amennyiben a listában nem lenne a keresett ország, úgy válaszd az \"egyéb\" megjelölést.\r\n<br><br>A településnél figyelj a pontos beírásra, mindig a települést és ne a településen belüli résznevet (pl. valamilyen telep, stb.) írd! A beírt településnevet a rendszer használhatja, szolgáltatások kapcsolódhatnak hozzá, melyeket hibás beírás esetén nem tudsz használni.\r\n<br><br>Budapest esetében a kerületeket a következő formában kell mögé írni, pl.: <u>Budapest XVI. kerület</u>','regisztráció');
-INSERT INTO `sugo` VALUES (27,'<b>Vallás</b>\r\n<br><br>Amennyiben teheted, kérlek add meg vallásod, s ha nem szeretnéd, hogy mások lássák, akkor a nyilvánosságát tiltsd le. Ezt az adatot többek között statisztikához használjuk fel, de ha a nyilvánosságát engedélyezed, akkor adatlapodon is megjelenik.','regisztráció');
-INSERT INTO `sugo` VALUES (28,'<b>Internetes elérhetőség</b>\r\n<br><br>Itt a skype és messenger azonosítók adhatóak meg, hogy adott esetben online fel lehessen venni a kapcsolatot egymással.\r\n<br><br>A programok segítségével akár élő hanggal is lehet beszélgetni az interneten, így költségkímélő megoldás a telefonhoz képest.','regisztráció');
-INSERT INTO `sugo` VALUES (29,'<b>Megjegyzés</b> (a szerkesztéssel kapcsolatban)\r\n<br><br>Ide akkor kell beírni, ha a feltöltésnél van valami olyan körülmény, amiről fontos, hogy minden rögzítő, aki megnyithatja az űrlapot módosításra, tudjon.\r\n<br><br>Pl. \"még ne engedélyezd, most egyeztetek\" vagy bármi hasonló','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (30,'<b>Felelős</b>\r\n<br><br>Annak az adatai, aki megkereshető a hírrel / eseménnyel kapcsolatban, tud a változásokról, naprakész információi vannak.\r\n<br><br>Nem jelenik meg, csak belső infó!','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (31,'<b>Dátum, idő</b>\r\n<br><br>Ettől az időponttól kezdve jelenik meg a hír vagy esemény a honlapon, illetve keresővel is csak innentől lehet rátalálni. \r\n<br>Későbbi dátumot beírva akár előre is rögzíthetőek hírek, mintha folyamatosan dolgoznánk rajta ;)\r\n<br><br>FIGYELEM! Ez a dátum a mérvadó az eseménynél is, tehát egy későbbi dátumozású esemény is CSAK ezen dátum után jelenik meg a naptárban!','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (32,'<b>Hírlevélben</b>\r\n<br><br>Remélhetőleg hamarosan lesz hírlevelünk is, ennek a mezőnek a beállítása onnantól lesz érdekes, hogy a hírből mennyi jelenjen meg a hírlevélben.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (33,'<b>Aktuális</b>\r\n<br><br>Esemény esetén itt lehet megadni az aktualitás dátumát, ez alapján kerül be a naptárba. Egyszerre több dátum is megadható, kétféle módon\r\n<br><br>\r\nHa az esemény olyan jellegű, hogy minden napjára el lehet menni, érdemes minden napját megjeleníteni a naptárban, akkor + jellel elválasztva írjunk be minden napot!. (pl. 2006-05-06+2006-05-07)\r\n<br><br>\r\nHa olyan jellegű, hogy csak az elején lehet csatlakozni, de több napos, akkor a tól-ig formában lehet megadni. (pl. 2006-05-06=>2006-05-07) Ez esetben csak az első nap kerül kiírásra a naptárban, a további napokon csak jelezve van az esemény.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (34,'<b>Esemény helyszíne</b>\r\n<br><br>Egyházmegye, espereskerület, megye, település. Ezeket a mezőket lehet kiválasztani, attól függően, hogy melyikhez kapcsolódik az esemény.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (35,'<b>Határidő</b>\r\n<br><br>Eseményeknél van jelentkezési határidő, ezt kell ide beírni, s akkor egy jelzés megjelenik a naptárban.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (36,'<b>Kategórizálás</b>\r\n<br><br>Itt lehet beállítani, hogy:\r\n<br><b>Főhír</b> = a főoldalon első hírként, vagy az eseményeknél kiemelt eseményként jelenik meg.\r\n<br><b>rk</b> = rovat kiemelt, vagyis a főoldalon a rovat kiemelt híreként jelenik meg,\r\n<br><b>ak</b> = aloldal kiemelt, vagyis valamely rovatot megnyitva, ott kiemeltként jelenik meg\r\n<br><b>n</b> = normál, vagyis sima hír, ami listázódik.\r\n<br><br>FONTOS! Sima hírként mindig be kell állítani, ha a listában látni szeretnénk, különben csak a kiemelt helyre kerül, s máshogy nem találunk rá.<br>Tehát akár az is megoldható, hogy az egyik rovatban lévő sima hír, a másik rovat kiemelt híre, de ott a listában nem jelenik meg.','');
-INSERT INTO `sugo` VALUES (37,'<b>Kérdés, tudtad-e</b>\r\n<br><br>A hírekhez, eseményekhez figyelemfelkeltésként (önreklám) feltehetünk kérdéseket, amelyek véletlenszerűen megjelennek az oldalon, rákattintva pedig bejön a hír.\r\n<br><br>Például van egy hírünk, hogy elindult a miserend oldal. A főoldalon van egy kérdés:<br><b><i>Tudtad-e, hogy <u>új országos miserend oldal indult</u></i></b>\r\n<br>Ebből az aláhúzott rész a kérdés, amit az űrlapba be kell írni. A kérdésre klikkelve pedig bejön a hírünk. (mint www.magyarkurir.hu oldalon)','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (38,'<b>Kulcsszó</b>\r\n<br><br>Lehetőség van hasonló témájú hírek összekapcsolására kulcsszóval. Ezek nem külső, látható kulcsszavak, hanem magunknak tudunk létrehozni. Ezekkel saját szempontok alapján tudjuk csoportosítani a híreket, így egy hír megtekintésekor alul listázódnak a kapcsolódó hírek is.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (39,'<b>Kapcsolódó galéria</b>\r\n<br><br>Ha lesz galéria, itt lehet majd a hírhez kapcsolni.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (40,'<b>Képek</b>\r\n<br><br>Feltölthetők képek, egy hírhez maximum 20 db. Fontos, hogy <b>a fájlnevekben ne legyen ékezet vagy szóköz</b>, valamint az <b>azonos fájlnevű képek felülírják egymást</b>, erre figyeljünk oda! Ilyenkor két azonos képet fogunk látni, méghozzá az utóbb feltöltöttet. Ez esetben töröljük mindkettőt és töltsük fel újra.\r\n<br><br>Lehetőség szerint CSAK jpg (esetleg gif) fájlokat töltsünk föl! A rendszer automatikusan kicsinyít, így a mérettel nem kell foglalkozni.\r\n<br><br>A feltöltött képek alatt jelölhető, hogy a kép a hír kiemelése esetén megjelenjen-e a főoldalon. Ha nincs kijelölve a négyzet, akkor nem teszi ki. \r\n<br><br>A feltöltött képeket az adminban listázza, ahonnan egérrel behúzható a szerkesztőablakba, s tetszés szerint alakítható (képkezelés ikon).','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (41,'<b>Kiegészítő infók</b>\r\n<br><br>Ide jön minden olyan kapcsolódó információ, ami nem egy konkrét miséhez tartozik, hanem rendszeres esemény. Pl. a minden héten valamelyik este szentségimádás, vagy minden hónap első hétfője családos hittan, vagy bármi hasonló, ami fontos lehet, de nem a templomhoz tartozik (pl. védőszent, ünnep), hanem a miserendet kiegészítő rendszeres információ.','miserend -> miseűrlap');
-INSERT INTO `sugo` VALUES (42,'<b>Rövid bevezető</b>\r\n<br><br>Ha a hír vagy az esemény kiemelt, akkor a főoldalon rövid bevezetővel együtt jelenik meg, ezt kell ide beírni. \r\n<br>FONTOS! Figyeljünk, hogy többnyire azonos hosszúságú legyen, se túl hosszú, se túl rövid!\r\n<br><br>A hír megnyitásakor ez már nem jelenik meg, tehát a bevezetőbe akár a hír közepéből is be lehet tenni, míg a teljes szöveget is tetszés szerint lehet formázni.\r\n<br><br>Program esetén a naptár napi nézetében is megjelenik, tehát érdemes kitölteni!','hírek admin -> intro');
-INSERT INTO `sugo` VALUES (43,'<b>Szervező (név)</b>\r\n<br>Programoknál, eseményeknél a szervező (szervezet) neve. (egyelőre szabadon beírva, később lehetőség lesz listából választani)\r\n<br><br>\r\nMegjelenik a naptár napi nézetében is a program mellett, segítve az eligazodást, valamint a program teljes nézeténél külön ablakba kerül a szervező további adataival együtt.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (44,'<b>Szervező kontakt</b>\r\n<br>A programmal kapcsolatos további információkhoz megadott elérhetőségek. (pl. kontakt név, telefonszám, emailcím, weboldal, stb.)\r\n<br><br>\r\nMegjelenik a program teljes nézeténél külön ablakban a szervező nevével együtt.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (45,'<b>Szervezés típusa:</b>\r\n<br><br>\r\nMeg lehet határozni, hogy milyen szervezésű programról van szó, így a napi nézetnél, vagy a program teljes nézeténél rögtön látható, hogy pl. országos vagy egyházmegyei, stb. szervezésű program.','hírek admin -> hírek űrlap');
-INSERT INTO `sugo` VALUES (46,'<h4>Nyelvek</h4>Az szentmise nyelvének azonosítója esetleg egy periódus megjelölésével. Több érték esetén vesszővel elválasztva. Például: <i>sk-1,grps</i> = minden hónap utolsó hetében szlovák nyelvű, minden páros héten görög (egyéb esetekben magyar)<br/><br/>Lehetséges nyelvek:<ul><li>h, hu = magyar</li><li>en = angol</li><li>de = német</li><li>it = olasz</li><li>fr = francia</li><li>va = latin</li><li>gr = görög</li><li>sk = szlovák</li><li>hr = horvát</li><li>pl = lengyel</li><li>si = szlovén</li><li>további nyelvek esetén az internetes 2 betűs végződés az irányadó!</li></ul><p><i>Ha egy magyaroszági misézőhelynél nincs megadva a nyelv, azt magyarnak tekintjük.</i></p> Lehetséges periódusok:<ul><li>0 vagy nincs periódus megadva = mindig</li><li>1, 2, 3, 4, 5 = adott héten</li><li>-1 = utolsó héten</li><li>ps = páros héten</li><li>pt = páratlan héten</li></ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust.','miserend adatlap');
-INSERT INTO `sugo` VALUES (47,'<h4>Tulajdonságok</h4>Az szentmise tulajdonságának rövidítése esetleg egy periódus megjelölésével. Több érték esetén vesszővel elválasztva. Például: <i>ifi,ige3</i> = mindig ifjúsági/egyetemista mise, de a hónap harmadik hetében csak igeliturgia.<br/><br/>Lehetséges tulajdonságok:<ul><li> g = gitáros</li><li> cs = csendes</li><li> csal = családos/gyerek</li><li> d = diák</li><li> ifi = egyetemista/ifjúsági</li><li> ige = igeliturgia</li><li> szent = szentségimádás</li><li> utr = utrenye</li><li> vecs = vecsernye</li><li> gor = görögkatolikus (római rítusú templomban)</li><li> rom = római katolikus (görögkatolikus rítusú templomban)</li><li> regi = régi rítusú</ul><p><i>Ha nincs megadva ezzel ellenkező tulajdonság, akkor a római katolikus misézőhely eseménye \'római katolikus szentmise\', míg egy görögkatolikus hely alapérelmezett eseménye \'görögkatolikus isteni liturgia\'.</i></p>Lehetséges periódusok:<ul><li>0 vagy nincs periódus megadva = mindig</li><li>1, 2, 3, 4, 5 = adott héten</li><li>-1 = utolsó héten</li><li>ps = páros héten</li><li>pt = páratlan héten</li></ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust.','miserend adatlap');
-INSERT INTO `sugo` VALUES (48,'A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.','miserend adatlap');
-INSERT INTO `sugo` VALUES (49,'<h4>Periódus / Különleges mierend név</h4>Minden periódusnak, más néven időszaknak, valamint minden különleges miserendnek kell legyen egy egyedi neve. Például: <i>téli miserend</i>, <i>ádventi időszak</i> vagy <i>karácsony napja</i>. Gépelés közben megjelennek a már használt nevek is. Ha egy már használt nevet választunk, akkor az időszak kezdetét és végét átmásolja onnan, így nem kell újra beállítani.','miserend adatlap');
-INSERT INTO `sugo` VALUES (50,'<h4>Periódus határok</h4>Minden periódusnak, más néven időszaknak, be kell állítani a kezdetét és a végét. Több féleképpen adhatjuk meg a kezdő napot és a lezáró napot.<ul><li>Megadhatjuk egy konkért dátum nélküli kifejezéssel. Például: <i>első tanítási nap</i> vagy <i>Krisztus Király vasárnapja</i>. Gépelés közben megjelennek a választható kezdeti időpontok. Ha szükség lenne olyanra, ami még nincs, akkor írj nekem: eleklaszlosj@gmail.com. Azért nagyon praktikus ilyen kifejezéssel megadni egy időszak határát, mert így nem kell minden évben átírni. A miserend.hu tudja, hogy melyik évben mikor van pl. Húsvét.</li><li>Ha minden évben ugyan azon a naptári napon van az időszak váltása, akkor megadhatunk egy dátumot is. Például: <i>12-25</i>. Ilyenkor minden évben, pont ez lesz a forduló nap.</li><li>Nagy ritkán előfordulhat, hogy egy periódus/időszak csak egy adott évben létezik és más években nincsen rá szükség. Ilyen esetben meg lehet adni teljes tádummal a határt. Például: <i>2016-03-12</i>. Fontos, hogy így az adott időszaki miserend nem fog megjelenni más évben.</li></ul>Fontos, hogy nem szabad két különböző időszaknak pontosan ugyan azokat a határokat megadni, mert akkor nincs ami megkülönböztesse azokat egymástól.','miserend adatlap');
-INSERT INTO `sugo` VALUES (51,'<h4>Különleges miserend</h4>Mindig be kell állítani, hogy a különleges mierend mikor van érvénybe.Több féleképpen adhatjuk meg ezt:<ul><li>Megadhatjuk egy konkért dátum nélküli kifejezéssel. Például: <i>első tanítási nap</i>, <i>Krisztus Király vasárnapja</i> vagy <i>Karácsony utáni 3. nap</i>. Gépelés közben megjelennek a választható időpont-kifejezések. Ha szükség lenne olyanra, ami még nincs, akkor írj nekem: eleklaszlosj@gmail.com. Azért nagyon praktikus ilyen kifejezéssel megadni egy különleges miserend érvényességét, mert így nem kell minden évben átírni. A miserend.hu tudja, hogy melyik évben mikor van pl. Húsvét.</li><li>Ha minden évben ugyan azon a naptári napon érvényes a miserend, akkor megadhatunk egy dátumot is. Például: <i>01-06</i>. Ilyenkor minden évben, pont ezen a napon lép életben a miserend.</li><li>Előfordulhat, hogy egy különleges miserend egy konkrét év egyetlen napján fordul elő és más évben várhatóan nem. Ilyen esetben meg lehet adni teljes tádummal a napot. Például: <i>2016-03-12</i>. Fontos, hogy így az adott miserend nem fog megjelenni más évben.</li></ul>Fontos, hogy nem szabad két különböző különleges miserendnek pontosan ugyan azt a napot megadni érvényességként, mert akkor nincs ami megkülönböztesse a két különleges miserendet egymástól.','miserend adatlap');
-/*!40000 ALTER TABLE `sugo` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `szentek`
@@ -4877,6 +4790,195 @@ INSERT INTO `varosok` VALUES (3751,7720,2,12,'Martonfa');
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+--
+-- Table structure for table `favorites`
+--
+
+DROP TABLE IF EXISTS `favorites`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `favorites` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `tid` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uid_tid_UNIQUE` (`uid`,`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `favorites`
+--
+
+LOCK TABLES `favorites` WRITE;
+/*!40000 ALTER TABLE `favorites` DISABLE KEYS */;
+/*!40000 ALTER TABLE `favorites` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `osm`
+--
+
+DROP TABLE IF EXISTS `osm`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `osm` (
+  `tid` int(11) NOT NULL,
+  `id` varchar(11) NOT NULL,
+  `type` varchar(9) NOT NULL,
+  PRIMARY KEY (`tid`),
+  UNIQUE KEY `id_UNIQUE` (`tid`,`id`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tokens`
+--
+
+DROP TABLE IF EXISTS `tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `uid` int(11) DEFAULT NULL,
+  `timeout` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `osm_tags`
+--
+
+DROP TABLE IF EXISTS `osm_tags`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `osm_tags` (
+  `type` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+  `value` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `valami` (`id`,`name`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `messages`
+--
+
+DROP TABLE IF EXISTS `messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sid` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `severity` varchar(10) COLLATE utf8_unicode_ci DEFAULT 'info',
+  `text` text COLLATE utf8_unicode_ci,
+  `shown` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=396 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `messages`
+--
+
+LOCK TABLES `messages` WRITE;
+/*!40000 ALTER TABLE `messages` DISABLE KEYS */;
+INSERT INTO `messages` VALUES (1,'644ee6db659af1f1a8031e2320cdd66e','2015-08-25 01:14:15','success','Bajvan',1);
+/*!40000 ALTER TABLE `messages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `igenaptar`
+--
+
+DROP TABLE IF EXISTS `igenaptar`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `igenaptar` (
+  `id` int(5) NOT NULL AUTO_INCREMENT,
+  `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'feher',
+  `ev` enum('0','A','B','C') NOT NULL DEFAULT '0',
+  `idoszak` char(1) NOT NULL DEFAULT '',
+  `nap` varchar(250) NOT NULL DEFAULT '',
+  `oszov_hely` varchar(50) NOT NULL DEFAULT '',
+  `oszov` text NOT NULL,
+  `ujszov_hely` varchar(50) NOT NULL DEFAULT '',
+  `ujszov` text NOT NULL,
+  `evang_hely` varchar(50) NOT NULL DEFAULT '',
+  `evang` text NOT NULL,
+  `unnep` varchar(250) NOT NULL DEFAULT '',
+  `intro` text NOT NULL,
+  `gondolat` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=821 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `igenaptar`
+--
+
+LOCK TABLES `igenaptar` WRITE;
+/*!40000 ALTER TABLE `igenaptar` DISABLE KEYS */;
+INSERT INTO `igenaptar` VALUES (2,'zold','A','e','4. vasárnap','','','','','','','','',''),(3,'zold','0','e','3. hét, szombat','','','','','','','','A hit a nem látott dolgok bizonysága és reményeink alapja. Az Újszövetség szentjei is ebben a hitben adtak példát és ez a hit kapcsol egybe minket és odafűz az Istenhez, aki bennünket gyermekeinek ismer.','<p><font size=\"1\">Zsid 11, 1-2.8-19<br />A hit szil&aacute;rd bizalom abban, amit rem&eacute;l&uuml;nk, meggyőződ&eacute;s arr&oacute;l, amit nem l&aacute;tunk.<br />Mk 4, 35-40<br />Mi&eacute;rt f&eacute;ltek, kicsinyhitűek?</font></p> <p align=\"center\"><font><img border=\"0\" src=\"http://www.plebania.net/img/kocka.gif\" /></font></p> <p><font>A hit a nem l&aacute;tott dolgok bizonys&aacute;ga &eacute;s rem&eacute;nyeink alapja. Az &Uacute;jsz&ouml;vets&eacute;g szentjei is ebben a hitben adtak p&eacute;ld&aacute;t &eacute;s ez a hit kapcsol egybe minket &eacute;s odafűz az Istenhez, aki benn&uuml;nket gyermekeinek ismer.</font></p> <p align=\"center\"><img border=\"0\" src=\"http://www.plebania.net/img/kocka.gif\" /></p> <p><font>A hit legyőzi a f&eacute;lelmet. A J&eacute;zus Krisztusba vetett hit megadja a<br />b&aacute;tors&aacute;got, hogy b&aacute;tran &eacute;s bizalommal n&eacute;zz&uuml;nk szembe &eacute;let&uuml;nk dolgaival, b&aacute;tran v&aacute;gjunk neki mindennapi feladatainknak.<br />J&eacute;zus erej&eacute;vel j&aacute;ruk utunkon, &eacute;s szombat l&eacute;v&eacute;n M&aacute;ri&aacute;hoz, &eacute;gi &eacute;desany&aacute;nkhoz is bizalommal sz&aacute;ll foh&aacute;szunk, seg&iacute;ten k&ouml;zbenj&aacute;r&aacute;s&aacute;val nek&uuml;nk, j&aacute;rja ki nek&uuml;nk a sz&uuml;ks&eacute;ges kegyelmet.</font></p> <p><font><img border=\"0\" src=\"http://www.plebania.net/img/kocka.gif\" /></font></p> <p><font><font>Zsid 11, 1-2.8-19 A hit szil&aacute;rd bizalom abban, amit rem&eacute;l&uuml;nk, meggy?z?d&eacute;s arr&oacute;l, <br />amit nem l&aacute;tunk.<br />Mk 4, 35-40 Mi&eacute;rt f&eacute;ltek, kicsinyhitűek?<br /><br />A hit a nem l&aacute;tott dolgok bizonys&aacute;ga &eacute;s rem&eacute;nyeink alapja. Az &Uacute;jsz&ouml;vets&eacute;g szentjei is ebben a hitben adtak p&eacute;ld&aacute;t &eacute;s ez a hit kapcsol egybe minket &eacute;s odafűz az Istenhez, aki benn&uuml;nket gyermekeinek ismer.<br /><br />A hit legyőzi a f&eacute;lelmet. A J&eacute;zus Krisztusba vetett hit megadja a b&aacute;tors&aacute;got, hogy b&aacute;tran &eacute;s bizalommal n&eacute;zz&uuml;nk szembe &eacute;let&uuml;nk dolgaival, b&aacute;tran v&aacute;gjunk neki mindennapi feladatainknak.<br />J&eacute;zus erej&eacute;vel j&aacute;runk utunkon, &eacute;s szombat l&eacute;v&eacute;n M&aacute;ri&aacute;hoz, &eacute;gi &eacute;desany&aacute;nkhoz is bizalommal sz&aacute;ll foh&aacute;szunk, seg&iacute;tsen k&ouml;zbenj&aacute;r&aacute;s&aacute;val nek&uuml;nk, j&aacute;rja ki nek&uuml;nk a sz&uuml;ks&eacute;ges kegyelmet.<br /><br />Fulop Akos RM</font><br /><br /></font></p>');
+/*!40000 ALTER TABLE `igenaptar` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `emails`
+--
+
+DROP TABLE IF EXISTS `emails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `emails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `to` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `header` text COLLATE utf8_unicode_ci,
+  `subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `body` text COLLATE utf8_unicode_ci NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `events`
+--
+
+DROP TABLE IF EXISTS `events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `events` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `year` varchar(4) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `name+year` (`name`,`year`)
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `events`
+--
+
+LOCK TABLES `events` WRITE;
+/*!40000 ALTER TABLE `events` DISABLE KEYS */;
+INSERT INTO `events` VALUES (1,'utolsó tanítási nap','2014','2014-06-01'),(2,'utolsó tanítási nap','2015','2015-06-16'),(3,'első tanítási nap','2014','2014-09-01'),(4,'első tanítási nap','2015','2015-09-03'),(5,'Advent I. vasárnapja','2014','2014-11-30'),(6,'Advent I. vasárnapja','2015','2015-11-29'),(7,'Advent I. vasárnapja','2016','2016-11-27'),(8,'Hamvazószerda','2015','2015-02-18'),(9,'Hamvazószerda','2016','2016-02-10'),(10,'Húsvétvasárnap','2015','2015-04-05'),(11,'Húsvétvasárnap','2016','2016-03-27'),(12,'Tavaszi óraátállítás','2015','2015-03-12'),(13,'Tavaszi óraátállítás','2016','2016-03-27'),(14,'Őszi óraátállítás','2015','2015-10-29'),(15,'Őszi óraátállítás','2016','2016-10-30'),(16,'Pünkösdvasárnap','2014','2014-06-08'),(17,'Pünkösdvasárnap','2015','2015-05-24'),(18,'Pünkösdvasárnap','2016','2016-05-15'),(19,'Pünkösdhétfő','2014','2014-06-09'),(20,'Pünkösdhétfő','2015','2015-05-25'),(21,'Pünkösdhétfő','2016','2016-05-16'),(23,'szeptember utolsó vasárnapja','2015','2015-09-27'),(24,'szeptember 1. vasárnapja','2015','2015-09-02'),(25,'Húsvéthétfő','2015','2015-04-06'),(26,'Húsvéthétfő','2016','2016-03-28'),(27,'október utolsó vasárnapja','2015','2015-10-25'),(28,'szeptember 2. vasárnapja','2015','2015-09-09'),(29,'június 2. vasárnapja','2015','2015-06-14'),(30,'Isteni Irgalmasság vasárnapja','2015','2015-04-12'),(31,'Szent Kereszt felmagasztalása követő vasárna','2015','2015-09-16'),(32,'Szent Kereszt megtalálása köv. vasárnap','2015','2015-05-05'),(34,'Szűz Mária neve követő vasárnap','2015','2015-09-13'),(35,'Nagycsütörtök','2015','2015-04-02'),(36,'Szentháromság vasárnapja','2015','2015-05-31'),(37,'Szentháromság vasárnapja','2016','2016-05-22'),(38,'Május 3. vasárnapja','2015','2015-05-17'),(39,'október első vasárnapja','2015','2015-10-04'),(40,'Úrnapja','2015','2015-06-07'),(41,'Úrnapja','2016','2016-05-29'),(42,'június utolsó vasárnapja','2015','2015-06-28'),(43,'augusztus utolsó vasárnapja','2015','2015-08-30'),(44,'május első vasárnapja','2015','2015-05-03'),(45,'június első szombatja','2015','2015-06-06'),(46,'március utolsó vasárnapja','2015','2015-03-29'),(47,'március utolsó vasárnapja','2016','2016-03-27'),(48,'Urunk mennybemenetele','2015','2015-05-14'),(49,'Urunk mennybemenetele követő vasárnap','2015','2015-05-17'),(50,'Szent Anna követő vasárnap','2015','2015-07-26'),(51,'Sárgabarack','2015','2015-03-29');
+/*!40000 ALTER TABLE `events` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -4884,16 +4986,3 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2015-08-18 23:52:49
-
-CREATE TABLE tokens (
-id int(11) NOT NULL AUTO_INCREMENT,
-type varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
-name varchar(40) COLLATE utf8_unicode_ci NOT NULL,
-uid int(11) DEFAULT NULL,
-timeout timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-PRIMARY KEY (id),
-UNIQUE KEY id_UNIQUE (id),
-UNIQUE KEY name_UNIQUE (name)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
