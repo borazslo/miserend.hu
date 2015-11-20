@@ -2182,12 +2182,79 @@ function assignUpdates() {
 
 EOT;
         $text .= "<p><strong>Segítségedet nagyon köszönjük!</strong></p><p>&nbsp;&nbsp;A miserend.hu önkéntes csapata</p>\n
-            <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadisnál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
+            <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
         ";
+        $mail->type = "heti7templom_hetiadag";
         $mail->content = $text;
         $mail->Send($user['email']);        
         /* */
     }
+}
+
+function clearoutVolunteers() {
+    $query = "
+    SELECT user.uid,
+        (IF (login.count IS NULL,0,login.count) + IF (email.count IS NULL,0,email.count)) as eszrevetelek,
+        IF (updates.count IS NULL,0,updates.count) as updates
+    FROM user 
+    LEFT JOIN (
+        SELECT count(*) as count,login 
+        FROM eszrevetelek 
+        WHERE datum > '".date('Y-m-d H:i:s',strtotime("-1 month"))."' 
+        GROUP BY login
+        ) login 
+        ON login.login = user.login
+    LEFT JOIN (
+        SELECT count(*) as count,email 
+        FROM eszrevetelek 
+        WHERE datum > '".date('Y-m-d H:i:s',strtotime("-1 month"))."'
+            AND login like '*vendeg*' GROUP BY email 
+        ) email 
+        ON email.email = user.email
+    LEFT JOIN (
+        SELECT count(*) as count,uid
+        FROM updates 
+        WHERE timestamp > '".date('Y-m-d H:i:s',strtotime("-1 month"))."'
+        GROUP BY uid
+        ) updates 
+        ON updates.uid = user.uid    
+
+    WHERE volunteer = 1;";
+
+    $limit = 10; $c = 1;
+    $result = mysql_query($query); $volunteer = array();
+    while ($volunteer = mysql_fetch_assoc($result)) {
+        if($volunteer['updates'] > 0 AND $volunteer['eszrevetelek'] == 0) {
+
+            $user = new User($volunteer['uid']);
+            if($user->nickname != '') $nev = $user->nickname;
+            elseif($user->name != '') $nev = $user->name;
+            else $nev = $user->username;
+
+
+            $mail = new Mail();
+
+            $mail->subject = "Miserend önkéntesség";
+
+            $text = <<<EOD
+            <strong>Kedves $nev!</strong>\n
+            <p>Templomaink miserendjének frissentartása elképzelhetetlen lenne önkéntesek segítsége nélkül. Sajnáljuk, hogy az elmúlt hónapban nem állt módodban teljesíteni vállalásodat. Ezért, hogy aktív önkénteseinknek biztosan jusson elég frissítendő adat, feloldunk önkéntes vállalásod alól. A továbbiakban nem küldünk neked frissítendő templomokat emailben.</p>\n
+            <p>Észrevételeidet, helyesbítéseidet továbbra is köszönettel várjuk a honlapon keresztül. Valamint, ha mégis tudod vállalni újra heti hét templom frissítését, a honlapon a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a> vállalásodat megteheted.</p>\n
+            <p><strong>Köszönjük korábbi és majdani minden helyesbítésedet!</strong></p>
+            <p>&nbsp;&nbsp;A miserend.hu önkéntes csapata</p>\n
+EOD;
+        $text .= "<p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor módosíthatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
+        ";
+        $mail->content = $text;
+        $mail->type = "heti7templom_lemondas";
+        $mail->Send($user->email);        
+        $user->presave('volunteer',0);
+        $user->save();
+        $c++;
+        if($c > $limit) return true;
+        }
+    }
+    return true;
 }
 
 function updatesCampaign() {
@@ -2250,6 +2317,7 @@ function clearoutMessages() {
 function clearoutTokens() {
     mysql_query("DELETE FROM tokens WHERE timeout < '".date('Y-m-d H:i:s')."';");
 }
+
 
 function validateToken($token) {
     $result = mysql_query("SELECT * FROM tokens WHERE name = '".sanitize($token)."' LIMIT 1");

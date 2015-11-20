@@ -14,6 +14,7 @@ switch($_REQUEST['q']) {
 		break;
 
 	case 'daily':
+		clearoutVolunteers(); 
 		deleteOverpass();
 		updateOSM();
 		for($v=1;$v<5;$v++) {
