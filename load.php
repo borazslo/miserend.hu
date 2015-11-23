@@ -8,8 +8,14 @@ include_once('config.php');
 //include_once('functions_osm.php');
 include_once('classes.php');
 
-if($config['debug'] > 0)  error_reporting(E_ERROR | E_WARNING | E_PARSE);
-else error_reporting(0);
+if($config['debug'] > 0) {
+    ini_set('display_errors', 1);
+    error_reporting(E_ERROR | E_WARNING | E_PARSE);
+} 
+else {
+    error_reporting(0);
+    ini_set('display_errors', 0);
+}
 
 //TODO: megszűntetni?
 $vars['design_url'] = $design_url = $config['path']['domain'];
