@@ -3,7 +3,7 @@
 $config = array();
 $db = false;
 
-$config['env'] = env('ENV','testing'); /* testing, staging, production */
+$config['env'] = env('MISEREND_WEBAPP_ENVIRONMENT','testing'); /* testing, staging, production */
 
 $config['connection'] = array(
         'host' => env('MYSQL_MISEREND_HOST','localhost'),
