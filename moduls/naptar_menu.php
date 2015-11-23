@@ -1,4 +1,4 @@
-<?
+<?php
 
 function naptar_jobbmenu() {
     global $linkveg,$db_name,$elso,$m_id,$m_op,$sid,$_POST,$_GET,$bgcolor;

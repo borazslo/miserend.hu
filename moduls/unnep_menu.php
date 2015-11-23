@@ -1,4 +1,4 @@
-<?
+<?php
 
 function unnep_balmenu() {
     global $linkveg,$lang,$db_name,$sid,$u_id,$_SERVER,$m_id,$u_jogok,$u_login,$_GET;

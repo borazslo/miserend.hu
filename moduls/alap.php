@@ -1,4 +1,4 @@
-<?
+<?php
 
 function alap_index($id) {
 	

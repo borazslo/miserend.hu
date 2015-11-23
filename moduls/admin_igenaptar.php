@@ -1,4 +1,4 @@
-<?
+<?php
 
 function idoszak($i) {
     switch($i) {

@@ -1,4 +1,4 @@
-<?
+<?php
 
 function alapnyelv($txt) {
    switch($txt) {
