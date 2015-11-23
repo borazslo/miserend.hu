@@ -6,10 +6,10 @@ $db = false;
 $config['env'] = env('ENV','testing'); /* testing, staging, production */
 
 $config['connection'] = array(
-        'host' => env('DB_HOST','localhost'),
-        'user' => env('DB_USERNAME','miserend'),
-        'password' => env('DB_PASSWORD',''),
-        'database' => env('DB_DATABASE','miserend'),
+        'host' => env('MYSQL_MISEREND_HOST','localhost'),
+        'user' => env('MYSQL_MISEREND_USER','miserend'),
+        'password' => env('MYSQL_MISEREND_PASSWORD','***'),
+        'database' => env('MYSQL_MISEREND_DATABASE','miserend'),
         'prefix' => '', /* Még nem működik */
     );
 
