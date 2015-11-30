@@ -1,22 +1,16 @@
 <?php
 
 function dbconnect() {
-    global $config;
-    $db_host = $config['connection']['host'];
-    $db_uname = $config['connection']['user'];
-    $db_upass = $config['connection']['password'];
-    $db_name = $config['connection']['database'];
-
-    if(!@mysql_connect($db_host, $db_uname, $db_upass)) {
-        if($config['debug'] > 0)  die("Adatbázisszerverhez nem lehet csatlakozni!\n".mysql_error()."\n$idopont");
+    global $config;    
+    if(!@mysql_connect($config['connection']['host'], $config['connection']['user'], $config['connection']['password'])) {
+        if($config['debug'] > 0)  die("Adatbázisszerverhez nem lehet csatlakozni!\n".mysql_error());
         else die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
     }
-    
     mysql_query("SET NAMES UTF8");
     //mysql_query("SET CHARACTER SET 'UTF8'");
     
-    if(!mysql_select_db($db_name)) {
-        if($config['debug'] > 0)  die("Az '".$db_name."' adatbázis nem létezik, vagy nincs megfelelő jogosultság elérni azt!\n".mysql_error()."\n$idopont");
+    if(!mysql_select_db($config['connection']['database'])) {
+        if($config['debug'] > 0)  die("Az '".$config['connection']['database']."' adatbázis nem létezik, vagy nincs megfelelő jogosultság elérni azt!\n".mysql_error());
         else die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
     }
 }
@@ -63,7 +57,6 @@ function login($name,$password) {
     $query = "SELECT uid,jelszo FROM user where login='$name' and ok!='n' LIMIT 11";
     $result = mysql_query($query);
     $x = mysql_fetch_assoc($result);
-    
     if($x == '') { return false; }
 
     if(password_verify($password,$x['jelszo'])) {
@@ -173,18 +166,20 @@ function clearMenu($menuitems) {
 
 
 function cookieSave($uid,$name) {
+    $isCLI = ( php_sapi_name() == 'cli' );
+    
     $salt = 'Yzsdf';
     $identifier = md5($salt . md5($uid . $salt));
     $token = md5(uniqid(rand(), TRUE));
     $timeout = time() + 60 * 60 * 24 * 7;
-    setcookie('auth', "$identifier:$token:".md5($timeout), $timeout);
+    if(!$isCLI)   setcookie('auth', "$identifier:$token:".md5($timeout), $timeout);
     $query = "DELETE FROM session WHERE uid = ".$uid." AND login = '$name' LIMIT 1;";
     mysql_query($query);
     $query = "INSERT INTO session (uid,login,sessid,lejarat) VALUES (".$uid.",'$name','$identifier:$token:".md5($timeout)."',$timeout);";
     mysql_query($query);
     $_SESSION['auth'] = "$identifier:$token:".md5($timeout);
     $query = "UPDATE user SET lastlogin = ".time()." LIMIT 1;";
-    mysql_query($query);
+    mysql_query($query);    
 }
 
 
@@ -2318,6 +2313,23 @@ function clearoutTokens() {
     mysql_query("DELETE FROM tokens WHERE timeout < '".date('Y-m-d H:i:s')."';");
 }
 
+function generateToken($forUserId) {
+    global $config;    
+    
+    $inserted = false;
+    for($i = 1;$i < 5; $i++) {
+            $token = md5(uniqid(mt_rand(), true));
+            mysql_query("INSERT INTO tokens (name,type,uid,timeout) VALUES ('".$token."','API',".$forUserId.",'".date('Y-m-d H:i:s',strtotime("+".$config['token']['timeout']))."');");
+            if(mysql_affected_rows() == 1) {
+                    $inserted = true;
+                    break;
+            }
+    }
+    if($inserted != true) {
+           throw new Exception("We could not generate unique token.");
+    } 
+    return $token;
+}
 
 function validateToken($token) {
     $result = mysql_query("SELECT * FROM tokens WHERE name = '".sanitize($token)."' LIMIT 1");
@@ -2348,13 +2360,16 @@ function getInputJSON() {
     global $config;
 
     $inputJSON = file_get_contents('php://input');
-    $t = $inputJSON;
     $input= json_decode( $inputJSON, TRUE ); //convert JSON into array
     if($config['debug'] > 0 AND is_array($input)) {
         $input = array_replace($input,$_REQUEST);
     }
     elseif($config['debug'] >0 ) $input = $_REQUEST;
-
+    
+    if(!is_array($input)) {
+        throw new Exception("Nem érkezett megfelelő JSON input.");
+    }
+    
     return $input;
 }
 
@@ -2534,7 +2549,62 @@ function chat_getusers($format = false) {
     return $return;
 }
 
-function env($name,$default=false) {
+function dieJsonException($message) {
+    $error = ['error' => 1,
+        'text' => $message];
+    echo(json_encode($error));
+}
+function callPageFake($uri, $post, $phpinput = array()) {
+    stream_wrapper_unregister("php");
+    stream_wrapper_register("php", "MockPhpStream");
+
+    file_put_contents('php://input', json_encode($phpinput));
+    $_REQUEST = array_merge($_REQUEST, $post);
+
+    ob_start();
+    include $uri;
+    $page = ob_get_contents();
+    ob_end_clean();
+
+    stream_wrapper_restore("php");
+
+    return $page;
+}
+
+function sendJson($url,$content) {
+    if(!preg_match('/^http:\/\//i',$url)) {
+        global $config;
+        $url = $config['path']['domain'].$url;
+    }
+   print_r($_REQUEST);
+    $contentEncoded = json_encode($content);
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER,array("Content-type: application/json"));
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $contentEncoded);
+    
+    $response = curl_exec($curl);
+    if(!$responseArray = json_decode($response, true)) {
+        $responseArray = $response;
+    } else 
+    $responseArray['status'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    
+    curl_close($curl);
+    
+    return $responseArray;
+}
+
+spl_autoload_register(function ($class) {
+    
+    $classpath = 'classes/'.str_replace('\\','/',$class).'.php';
+    if(file_exists($classpath)) {
+        require_once($classpath);
+    }
+});
+
+function env($name,$default=false) {    
     if(!getenv($name)) return $default;
     else return getenv($name);
 }

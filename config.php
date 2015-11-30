@@ -3,7 +3,7 @@
 $config = array();
 $db = false;
 
-$config['env'] = env('MISEREND_WEBAPP_ENVIRONMENT','testing'); /* testing, staging, production */
+$config['env'] = env('MISEREND_WEBAPP_ENVIRONMENT','staging'); /* testing, staging, production */
 
 $config['connection'] = array(
         'host' => env('MYSQL_MISEREND_HOST','localhost'),
@@ -37,6 +37,7 @@ switch ($config['env']) {
         $config['debug'] = 1;
         $config['mail']['debug'] = 3;
         $config['path']['domain'] = 'http://localhost/miserend.hu/';
+        $config['connection']['database'] = 'miserend_testing';
         break;
     
     case 'staging':

@@ -991,7 +991,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   `login` varchar(20) NOT NULL DEFAULT '',
-  `jelszo` varchar(50) NOT NULL DEFAULT '',
+  `jelszo` varchar(255) NOT NULL DEFAULT '',
   `jogok` varchar(200) NOT NULL DEFAULT '',
   `ok` enum('i','n','x','o') NOT NULL DEFAULT 'i',
   `letrehozta` varchar(50) NOT NULL DEFAULT '',
@@ -1014,8 +1014,8 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (5258,'verem','TWFjaTcdfds2TGFjaQ==','hirek-szavazas-galeria-info-hirek-user-nevnaptar-reklam-miserend-igenaptar','i','*vendeg*','2011-02-23 19:52:06','2015-03-18 22:29:29','2015-03-18 23:52:50','egyik@gmail.com','','Teljes A Nevem','','n',1);
-INSERT INTO `user` VALUES (2343,'bernadett','bWFsefef0eXZhcmVrODA=','','i','*vendeg*','2012-12-22 17:24:19','2015-02-03 11:10:39',NULL,'email@cim.com','Berni','Sörösné Bernadett','','n',0);
+INSERT INTO `user` VALUES (10,'vacskamati','$2y$10$EsjnJE0dHH/H4P7PjB0ks.9w9CcCqkz8SJav/1etPgLos2b/rO7j.','hirek-szavazas-galeria-info-hirek-user-nevnaptar-reklam-miserend-igenaptar','i','*vendeg*','2011-02-23 19:52:06','2015-03-18 22:29:29','2015-03-18 23:52:50','egyik@gmail.com','','Lázár Ervin','','n',1);
+INSERT INTO `user` VALUES (11,'manyok','$2y$10$bWzPPXw3uGTbxLhvnVGTOu3S74CxjwpSNba2Vin/klQys6A1ufECG','','i','*vendeg*','2012-12-22 17:24:19','2015-02-03 11:10:39',NULL,'email@cim.com','Manyók','Hétszünyükapanyányimanyók','','n',0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
