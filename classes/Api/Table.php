@@ -41,7 +41,7 @@ class Table extends Api {
     public function run() {
         parent::run();
 
-        $this->tableName = $this->request->SimpletextRequired('table');
+        $this->tableName = \Request::SimpletextRequired('table');
         if (!array_key_exists($this->tableName, $this->validColumnsTables)) {
             throw new \Exception("Table '$this->tableName' is invalid.");
         }

@@ -4,9 +4,8 @@ include_once('load.php');
 
 ini_set('memory_limit', '256M');
 
-try {
-    $request = new \getRequest();
-    $action = $request->SimpletextRequired('q');
+try {    
+    $action = \Request::SimpletextRequired('q');
 } catch (Exception $e) {
 
     dieJsonException($e->getMessage());

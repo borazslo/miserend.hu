@@ -972,7 +972,7 @@ function miserend_view() {
 	//Miseidőpontok
 	$misek = getMasses($tid);
 	
-	if($user->checkRole('miserend') OR $user->checkRole('ehm:'.$egyhazmegye) OR in_array($user->login,$responsible)) {
+	if($user->checkRole('miserend') OR $user->checkRole('ehm:'.$egyhazmegye) OR (isset($responsible) AND in_array($user->login,$responsible))) {
 		$nev.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$linkveg><img src=img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> <a href=?m_id=27&m_op=addmise&tid=$tid$linkveg><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 	
 		$query="select allapot from eszrevetelek where hol_id = '".$tid."' GROUP BY allapot ORDER BY allapot limit 5;";

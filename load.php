@@ -3,6 +3,8 @@ session_start();
 
 $vars = array();
 
+require 'vendor/autoload.php';
+
 include_once('functions.php');
 include_once('config.php');
 //include_once('functions_osm.php');

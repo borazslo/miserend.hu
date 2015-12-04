@@ -9,12 +9,11 @@ class Api {
     public $return = array();
 
     public function run() {
-        $this->request = new \getRequest();
-        $this->version = $this->request->IntegerRequired('v');
+        $this->version = \Request::IntegerRequired('v');
         $this->validateVersionMain();
 
         $defaultDate = date('Y-m-d');
-        $this->date = $this->request->DatewDefault('datum', $defaultDate);
+        $this->date = \Request::DatewDefault('datum', $defaultDate);
     }
 
     public function validateVersionMain() {

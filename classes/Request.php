@@ -1,9 +1,9 @@
 <?php
 
-class getRequest {
+class Request {
     
    function IntegerRequired($name) {
-       $value = $this->getRequired($name);         
+       $value = self::getRequired($name);         
        if(!is_numeric($value)) {
            throw new Exception("Required '$name' is not an Integer.");
        }
@@ -11,7 +11,7 @@ class getRequest {
    }
 
    function SimpletextRequired($name) {
-       $value = $this->getRequired($name);         
+       $value = self::getRequired($name);         
        if(!preg_match('/^[a-zA-Z_-]+$/i',$value)) {
            throw new Exception("Required '$name' is not a SimpleText.");
        }
@@ -19,7 +19,7 @@ class getRequest {
    }
 
    function DateRequired($name) {
-       $value = $this->getRequired($name);         
+       $value = self::getRequired($name);         
        if(strtotime($value) == false) {
            throw new Exception("Required '$name' is not a Date.");
        }
@@ -27,7 +27,7 @@ class getRequest {
    }
 
    function DatewDefault($name,$default = false) {
-       $value = $this->getwDefault($name,$default);
+       $value = self::getwDefault($name,$default);
        if(strtotime($value) == false) {
            throw new Exception("Required '$name' is not a Date.");
        }
@@ -35,7 +35,7 @@ class getRequest {
    }
 
    private function getwDefault($name,$default = false) {
-       if($value = $this->get($name)) {
+       if($value = self::get($name)) {
            return $value;
        } else {
            return $default;
@@ -43,7 +43,7 @@ class getRequest {
    }
    
    private function getRequired($name) {
-       if(!$value = $this->get($name)) {
+       if(!$value = self::get($name)) {
             throw new Exception("Required '$name' is required.");
        } else {
            return $value;

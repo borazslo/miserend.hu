@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Database\Capsule\Manager as DB;
 
 function dbconnect() {
     global $config;    
@@ -12,7 +13,22 @@ function dbconnect() {
     if(!mysql_select_db($config['connection']['database'])) {
         if($config['debug'] > 0)  die("Az '".$config['connection']['database']."' adatbázis nem létezik, vagy nincs megfelelő jogosultság elérni azt!\n".mysql_error());
         else die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
-    }
+    };
+    
+    $capsule = new DB;
+    $capsule->addConnection([
+        'driver'    => 'mysql',
+        'host'      => $config['connection']['host'],
+        'database'  => $config['connection']['database'],
+        'username'  => $config['connection']['user'],
+        'password'  => $config['connection']['password'],
+        'charset'   => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+        'prefix'    => '',
+    ]);
+    // Make this Capsule instance available globally via static methods... (optional)
+    $capsule->setAsGlobal();
+
 }
 
 function kicsinyites($forras,$kimenet,$max) {
@@ -425,70 +441,9 @@ function checkPrivilege($type,$privilege,$object,$user = false) {
 }
 
 function getChurch($tid) {
-    $return = array();
-    $query = "
-        SELECT templomok.*,geo.lat,geo.lng, geo.checked, geo.address2, osm.id as osm_id, osm.type as osm_type, irsz
-        FROM templomok 
-            LEFT JOIN terkep_geocode as geo ON geo.tid = templomok.id 
-            LEFT JOIN osm ON osm.tid = templomok.id 
-            LEFT JOIN varosok ON varosok.nev = templomok.varos 
-        WHERE templomok.id = $tid LIMIT 1";
-    $result = mysql_query($query);
-    
-    while(($row = mysql_fetch_array($result,MYSQL_ASSOC))) {
-        foreach($row as $k => $v) {
-            $return[$k] = $v;
-        }
-        $return['responsible'] = array($return['letrehozta']);
-        $query = "SELECT d.distance tavolsag,t.nev,t.ismertnev,t.varos,t.id tid FROM distance as d
-            LEFT JOIN templomok as t ON (tid1 <> '".$tid."' AND tid1 = id ) OR (tid2 <> '".$tid."' AND tid2 = id )
-            WHERE ( tid1 = '".$tid."' OR tid2 = '".$tid."' ) AND distance <= 10000 
-            AND t.id IS NOT NULL 
-            ORDER BY distance ";
-        $results2 = mysql_query($query);
-        while(($neighbour = mysql_fetch_assoc($results2))) {
-            $return['szomszedok'][] = $neighbour;
-        }
-        if(!isset($return['szomszedok'])) {
-            $query = "SELECT d.distance tavolsag,t.nev,t.ismertnev,t.varos,t.id tid FROM distance as d
-                LEFT JOIN templomok as t ON (tid1 <> '".$tid."' AND tid1 = id ) OR (tid2 <> '".$tid."' AND tid2 = id )
-                WHERE ( tid1 = '".$tid."' OR tid2 = '".$tid."' )
-                ORDER BY distance 
-                LIMIT 1";
-            $results2 = mysql_query($query);
-            $return['szomszedok'][] = mysql_fetch_assoc($results2);
-        }
-        
-        if($return['osm_id'] != '' AND $return['osm_type'] != '' ) {
-            $return['osm']['type'] = $return['osm_type'];
-            $return['osm']['id'] = $return['osm_id'];
-
-            $query2 = "SELECT * FROM osm_tags WHERE type = '".$return['osm_type']."' AND id = '".$return['osm_id']."';";
-            $results2 = mysql_query($query2);
-            while($tag = mysql_fetch_array($results2,MYSQL_ASSOC)) {
-                if(in_array($tag['name'],array('lat','lon')) ) {
-                    $return['osm'][$tag['name']] = $tag['value'];
-                } else 
-                    $return['osm']['tags'][$tag['name']] = $tag['value'];
-            }
-        }
-
-        unset($return['log']);
-
-        $query = "SELECT * FROM egyhazmegye WHERE id = ".$return['egyhazmegye']." LIMIT 1;";
-        $result3 = mysql_query($query);
-        $return['diocese'] = mysql_fetch_assoc($result3);
-        $return['diocese']['responsible'][] = $return['diocese']['felelos'];
-
-        $return['kepek'] = getImages($tid);
-    }
-
-    if($return != array()) {
-        if(!checkPrivilege('church','read',$return)) return array();
-    }
-
-
-    return $return;
+   $church = (array) new Church($tid);
+   
+    return $church;
 }
 
 function getMasses($tid,$date = false) {
@@ -2597,11 +2552,11 @@ function sendJson($url,$content) {
 }
 
 spl_autoload_register(function ($class) {
-    
-    $classpath = 'classes/'.str_replace('\\','/',$class).'.php';
-    if(file_exists($classpath)) {
+
+    $classpath = 'classes/' . str_replace('\\', '/', $class) . '.php';
+    if (file_exists($classpath)) {
         require_once($classpath);
-    }
+    }            
 });
 
 function env($name,$default=false) {    
