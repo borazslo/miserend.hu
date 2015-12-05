@@ -20,6 +20,8 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function providerTestApiLogin() {
+        global $config;
+        print_R($config);
         return array(
             array(
                 array('q' => 'login', 'v' => '5'),
