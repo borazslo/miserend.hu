@@ -72,6 +72,7 @@ function login($name,$password) {
     $name = sanitize($name);
     $query = "SELECT uid,jelszo FROM user where login='$name' and ok!='n' LIMIT 11";
     $result = mysql_query($query);
+    //echo $query."\n";
     $x = mysql_fetch_assoc($result);
     if($x == '') { return false; }
 
@@ -2517,7 +2518,11 @@ function dieJsonException($message) {
     echo(json_encode($error));
 }
 function callPageFake($uri, $post, $phpinput = array()) {
-    stream_wrapper_unregister("php");
+    if(stream_wrapper_unregister("php")) {
+        echo "stream wrapper unregistered\n";
+    } else {
+        echo "stream wrapper NOT unregistered\n";
+    }
     stream_wrapper_register("php", "MockPhpStream");
 
     file_put_contents('php://input', json_encode($phpinput));
