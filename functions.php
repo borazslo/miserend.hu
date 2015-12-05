@@ -2405,7 +2405,7 @@ function updatesCampaign() {
     if ($user->volunteer == 1)
         $dobozszoveg .= "Köszönjük, hogy te is köztük vagy!";
     else
-        $dobozszoveg .= "Jelentkezz te is: <a href='mailto:eleklaszlosj@gmail.com?subject=Önkéntesnek jelentkezem'>eleklaszlosj@gmail.com</a>!";
+        $dobozszoveg .= "<a href='mailto:eleklaszlosj@gmail.com?subject=Önkéntesnek jelentkezem'>Jelentkezz te is!</a>";
 
     $dobozszoveg .= "</strong></span>";
 
