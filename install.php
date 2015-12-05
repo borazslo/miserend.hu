@@ -11,15 +11,15 @@ $result = DB::table('information_schema.tables')
         ->where('table_type', "=", 'BASE TABLE')
         ->where('table_schema', '=', $config['connection']['database'])
         ->count();
-if (!$result) {  
+if (!$result) {
     $command = 'mysql -h "' . $config['connection']['host'] . '" -u "' . $config['connection']['user'] . '" --password="' . $config['connection']['password'] . '" "' . $config['connection']['database'] . '" < mysql_sample.sql';
-    echo $command."\n";
-    exec($command,$output,$return_var);  
+    echo $command . "\n";
+    exec($command, $output, $return_var);
     printr($output);
     printr($return_var);
 } else {
-    throw new Exception("Database '".$config['connection']['database']."' is not empty.");
-} 
+    throw new Exception("Database '" . $config['connection']['database'] . "' is not empty.");
+}
 if (!is_dir('fajlok')) {
     //exec('ln -s ../fajlok fajlok',$em);
     if (!is_dir('fajlok')) {

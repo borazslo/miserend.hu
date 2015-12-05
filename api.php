@@ -4,7 +4,7 @@ include_once('load.php');
 
 ini_set('memory_limit', '256M');
 
-try {    
+try {
     $action = \Request::SimpletextRequired('q');
 } catch (Exception $e) {
 
@@ -26,7 +26,7 @@ try {
         case 'report':
             //TODO: Api\Report();
             break;
-        
+
         case 'updated':
             $api = new Api\Updated();
             break;

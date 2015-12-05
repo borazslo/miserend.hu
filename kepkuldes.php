@@ -123,32 +123,33 @@ include("load.php");
 dbconnect();
 
 function urlap() {
-	global $db_name,$header,$footer;
+    global $db_name, $header, $footer;
 
-	$sid=$_GET['sid'];
-	$id=$_GET['id'];
-	$kod=$_GET['kod'];
+    $sid = $_GET['sid'];
+    $id = $_GET['id'];
+    $kod = $_GET['kod'];
 
-	if(!is_numeric($id)) {		
-		echo $header."<script language=Javascript>close();</script>".$footer;
-		exit();
-	}
+    if (!is_numeric($id)) {
+        echo $header . "<script language=Javascript>close();</script>" . $footer;
+        exit();
+    }
 
-    $query="select nev,ismertnev,varos,egyhazmegye from templomok where id='$id' and ok='i'";
-    if(!$lekerdez=mysql_query($query)) echo "HIBA!<br>$query<br>".mysql_error();
-    list($nev,$ismertnev,$varos,$ehm)=mysql_fetch_row($lekerdez);
+    $query = "select nev,ismertnev,varos,egyhazmegye from templomok where id='$id' and ok='i'";
+    if (!$lekerdez = mysql_query($query))
+        echo "HIBA!<br>$query<br>" . mysql_error();
+    list($nev, $ismertnev, $varos, $ehm) = mysql_fetch_row($lekerdez);
     $kiir.="<input type=hidden name=ehm value=$ehm>";
     $kiir.="\n<table width=100% bgcolor=#F5CC4C>
         <tr><td class=alap><big><b>$nev</b> $ismertnev - <u>$varos</u></big><br/>
         <i><strong>Kép feltöltése.</strong> Kérjük kellően jó minőségű és méretű jpeg képet töltsön csak fel.</i></big></td></tr></table>";
-        
+
     $kiir .= '
         <div id="upload-wrapper">
         <div align="center">
         <form action="kepkuldesprocess.php" method="post" enctype="multipart/form-data" id="MyUploadForm">
-            <input type=hidden name=kod value='.$kod.'>
-            <input type=hidden name=sid value='.$sid.'>
-            <input type=hidden name=id value='.$id.'>            
+            <input type=hidden name=kod value=' . $kod . '>
+            <input type=hidden name=sid value=' . $sid . '>
+            <input type=hidden name=id value=' . $id . '>            
             <span class=alap>Feltöltendő kép: </span><input name="FileInput" id="FileInput" type="file" class=urlap />
             <input type="submit"  id="submit-btn" value="Feltölt" /><br/>
             <span class=alap>Leírás: </span><input type=text size=40 name=description class=urlap />
@@ -160,29 +161,28 @@ function urlap() {
         </div>
     ';
 
-	echo $header.$kiir.$footer;
+    echo $header . $kiir . $footer;
 }
 
 function bezar() {
-	echo $header."<script language=Javascript>close();</script>".$footer;
+    echo $header . "<script language=Javascript>close();</script>" . $footer;
 }
 
-$op=$_POST['op'];
-if(empty($op)) $op=$_GET['op'];
+$op = $_POST['op'];
+if (empty($op))
+    $op = $_GET['op'];
 
-switch($op) {
-	default:
+switch ($op) {
+    default:
         urlap();
         break;
 
-	case 'add':
-		/*adatadd();*/
+    case 'add':
+        /* adatadd(); */
         break;
-        	
+
     case 'bezar':
         bezar();
         break;
 }
-
-
 ?>

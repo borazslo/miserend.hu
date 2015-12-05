@@ -1,10 +1,20 @@
-<?php 
+<?php
+
 $vars['pageTitle'] = "OSM Térkép";
 $vars['template'] = "layout_simpliest_map";
 
-if(isset($_REQUEST['lat']) AND is_numeric($_REQUEST['lat'])) $lat = $_REQUEST['lat']; else $lat = 47.5;
-if(isset($_REQUEST['lon']) AND is_numeric($_REQUEST['lon'])) $lon = $_REQUEST['lon']; else $lon = 19.05;
-if(isset($_REQUEST['zoom']) AND is_numeric($_REQUEST['zoom'])) $zoom = $_REQUEST['zoom']; else $zoom = 12;
+if (isset($_REQUEST['lat']) AND is_numeric($_REQUEST['lat']))
+    $lat = $_REQUEST['lat'];
+else
+    $lat = 47.5;
+if (isset($_REQUEST['lon']) AND is_numeric($_REQUEST['lon']))
+    $lon = $_REQUEST['lon'];
+else
+    $lon = 19.05;
+if (isset($_REQUEST['zoom']) AND is_numeric($_REQUEST['zoom']))
+    $zoom = $_REQUEST['zoom'];
+else
+    $zoom = 12;
 
 $vars['content'] = <<<EOD
   <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
@@ -130,11 +140,30 @@ var layerListeners = {
                       styleMap: styleMap,
                       eventListeners: layerListeners
                     });
-    
-    
-
     map.addLayer(points);
-    
+
+    var dioceses = new OpenLayers.Layer.Vector( "Egyházmegyék",
+                    { strategies: [new OpenLayers.Strategy.BBOX()],
+                      protocol: new OpenLayers.Protocol.HTTP({
+                        url: "http://overpass-api.de/api/interpreter?data=[timeout:30];(relation[boundary=religious_administration][denomination=roman_catholic][admin_level=6](bbox););(._;>;);out body;",
+                        format: new OpenLayers.Format.OSM(),
+                      }),
+                      projection: map.displayProjection,
+                      styleMap: styleMap,
+                    });
+    map.addLayer(dioceses);
+
+    var deaneries = new OpenLayers.Layer.Vector( "Espereskerületek",
+                    { strategies: [new OpenLayers.Strategy.BBOX()],
+                      protocol: new OpenLayers.Protocol.HTTP({
+                        url: "http://overpass-api.de/api/interpreter?data=[timeout:30];(relation[boundary=religious_administration][denomination=roman_catholic][admin_level=7](bbox););(._;>;);out body;",
+                        format: new OpenLayers.Format.OSM(),
+                      }),
+                      projection: map.displayProjection,
+                      styleMap: styleMap,
+                    });
+    map.addLayer(deaneries);
+
     //Set start centrepoint and zoom
     //TODO: Is it possible to just zoom to extents of defined markers instead?  
     var lonLat = new OpenLayers.LonLat( lon, lat )

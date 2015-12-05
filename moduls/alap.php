@@ -1,11 +1,11 @@
 <?php
 
 function alap_index($id) {
-	
-	switch ($id) {
-		case 11:
-			$title = "Házirend és szabályzat";
-			$content = <<<EOD
+
+    switch ($id) {
+        case 11:
+            $title = "Házirend és szabályzat";
+            $content = <<<EOD
 				<p>A <i>Miserend</i> honlap felhasználókezelése külön vált a <a href="http://plebania.net"><i>Virtuális Plébánia</i></a> portál többi oldalától. A különböző oldalakon külön kell regisztrálni. De ha 2015 előtt regisztrált akár a <i>Miserend</i>, akár a <i>Virtuális Plébánia</i> bármelyik másik aloldalára, akkor az akkor megadott név és jelszó továbbra is érvényes itt is. (Ám megváltoztatása esetén csak itt változik meg.</p>
 				<p><strong>A regisztrációra és a honlap használatára az alábbi szabályok érvényesek, kérjük olvasd el figyelmesen!</strong></p>
 				<ol>
@@ -18,11 +18,11 @@ function alap_index($id) {
 						A <i>Miserenden</i> található információkat felhasználhatod, azokra hivatkozhatsz, azonban ez esetben kérjük megjelölni a forrást! </li>
 				</ol>
 EOD;
-		break;
+            break;
 
-		case 12:
-			$title = "Impresszum";		
-			$content = <<<EOD
+        case 12:
+            $title = "Impresszum";
+            $content = <<<EOD
 				<h3>Üzemeltető</h3>
 				<p><a href="http://vpa.hu">Virtu&aacute;lis Pl&eacute;b&aacute;nia Alap&iacute;tv&aacute;ny</a></p>
 				<h3>Célunk</h3>
@@ -36,24 +36,22 @@ EOD;
         			<li>Tartalmi dolgok: <a href='mailto:info@miserend.hu'>info@miserend.hu</a></li>
 				</ul>
 EOD;
-			break;
-		
-		default:
-			$title = "404";
-			$content = "Nincs ilyen lap. Elnézést.";
-			break;
-	}	
+            break;
 
-	$vars = array(
-		'title' => $title,
-		'content' => $content,
-		'template' => 'layout'
-	);
+        default:
+            $title = "404";
+            $content = "Nincs ilyen lap. Elnézést.";
+            break;
+    }
+
+    $vars = array(
+        'title' => $title,
+        'content' => $content,
+        'template' => 'layout'
+    );
 
     return $vars;
 }
 
-
 $tartalom = alap_index($_GET['fm']);
-
 ?>
