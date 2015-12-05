@@ -27,10 +27,7 @@ after_success:
   - chmod 600 ~/.ssh/deploy.secret.key
   - ssh-add ~/.ssh/deploy.secret.key
   - echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-  - ssh miserend_hu_git@szentiras.hu "git -C /home/miserend_hu_git/github/borazslo/${TRAVIS_BRANCH}.miserend.hu chekout ${TRAVIS_BRANCH}"
-  - ssh miserend_hu_git@szentiras.hu "git -C /home/miserend_hu_git/github/borazslo/${TRAVIS_BRANCH}.miserend.hu pull origin ${TRAVIS_BRANCH}"
-  - ssh miserend_hu_git@szentiras.hu "php /home/miserend_hu_git/github/borazslo/${TRAVIS_BRANCH}.miserend.hu/composer.phar install"
-  - ssh miserend_hu_git@szentiras.hu "php /home/miserend_hu_git/github/borazslo/${TRAVIS_BRANCH}.miserend.hu/migration.php"
+  - ssh miserend_hu_git@szentiras.hu "bash -s" < update.sh
 
 env:
   global:
