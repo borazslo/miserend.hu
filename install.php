@@ -1,9 +1,12 @@
 <?php
 
-require_once('load.php');
+require 'vendor/autoload.php';
+include_once('functions.php');
+include_once('config.php');
 
 use Illuminate\Database\Capsule\Manager as DB;
 
+dbconnect();
 $result = DB::table('information_schema.tables')
         ->where('table_type', "=", 'BASE TABLE')
         ->where('table_schema', '=', $config['connection']['database'])
