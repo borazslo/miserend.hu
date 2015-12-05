@@ -12,6 +12,7 @@ before_script:
   - npm install -g bower
   - php composer.phar selfupdate
   - php composer.phar install
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
   - php install.php
 
 script:
@@ -31,4 +32,4 @@ env:
   global:
   - MISEREND_WEBAPP_ENVIRONMENT=production
   - MYSQL_MISEREND_USER=root
-  - MYSQL_MISEREND_PASSWORD=""
+  - MYSQL_MISEREND_PASSWORD=root
