@@ -16,8 +16,7 @@ before_script:
   - php install.php
 
 script:
-  - vendor/phpunit/phpunit/phpunit --version
-  - vendor/phpunit/phpunit/phpunit tests -v --debug
+  - vendor/phpunit/phpunit/phpunit tests
   #- phpunit --configuration phpunit.xml
 
 after_success:
