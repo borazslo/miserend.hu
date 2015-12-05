@@ -22,6 +22,8 @@ echo $rawresponse."\n";
     }
 
     public function providerTestApiLogin() {
+        echo phpinfo();
+        
         global $config;
         print_R($config);
         
