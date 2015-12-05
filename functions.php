@@ -2518,13 +2518,20 @@ function dieJsonException($message) {
     echo(json_encode($error));
 }
 function callPageFake($uri, $post, $phpinput = array()) {
+    
     if(stream_wrapper_unregister("php")) {
         echo "stream wrapper unregistered\n";
     } else {
         echo "stream wrapper NOT unregistered\n";
     }
-    stream_wrapper_register("php", "MockPhpStream");
+    if(stream_wrapper_register("php", "MockPhpStream")) {
+        echo "stream wrapper registered\n";
+    } else {
+        include_once("classes/MockPhpStream.php");
+        echo "stream wrapper NOT registered\n";
+    }
 
+    echo $uri."\n";
     file_put_contents('php://input', json_encode($phpinput));
     $_REQUEST = array_merge($_REQUEST, $post);
 
