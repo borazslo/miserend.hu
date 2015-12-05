@@ -38,7 +38,6 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
                 array('username' => 'vacskamati', 'password' => 'VanValami'),
                 array('error' => 0)),
                 //array('report',array(),array('error'=>0)),
-                //array('table',array(),array('error'=>0)),
                 //array('sqlite',array(),array('error'=>0)),
         );
     }
@@ -89,7 +88,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         $rawresponse = callPageFake('api.php', $request, $json);
 
         if (!$response = json_decode($rawresponse, true)) {
-            echo "ERROR: " . $response . "\n";
+            echo "ERROR: " . $rawresponse . "\n";
         }
         $this->assertArraySubset($output, $response);
     }

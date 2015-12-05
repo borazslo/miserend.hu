@@ -441,9 +441,16 @@ function checkPrivilege($type,$privilege,$object,$user = false) {
 }
 
 function getChurch($tid) {
-   $church = (array) new Church($tid);
-   
-    return $church;
+    //TODO: delete getChurch();
+    try {
+        $church = new Church($tid);
+        $church->allowOldStructure();
+        return (array) $church;        
+    } catch (Exception $e) {
+        //If there is no such church, we return an empty array();
+        //echo $e->getMessage();
+        return array();
+    }
 }
 
 function getMasses($tid,$date = false) {
