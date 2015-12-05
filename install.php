@@ -11,7 +11,13 @@ $result = DB::table('information_schema.tables')
         ->where('table_type', "=", 'BASE TABLE')
         ->where('table_schema', '=', $config['connection']['database'])
         ->count();
+echo "table: ".$result."\n";
 if (!$result) {
+    echo "mysql redump\n";
+    exec('mysql -h "' . $config['connection']['host'] . '" -u "' . $config['connection']['user'] . '" --password="' . $config['connection']['password'] . '" "' . $config['connection']['database'] . '" < mysql_sample.sql');
+    echo "finished\n";
+} else {
+    echo "it is not so easy :( \n";
     exec('mysql -h "' . $config['connection']['host'] . '" -u "' . $config['connection']['user'] . '" --password="' . $config['connection']['password'] . '" "' . $config['connection']['database'] . '" < mysql_sample.sql');
 }
 if (!is_dir('fajlok')) {
