@@ -3,6 +3,8 @@
 global $config;
 include_once('load.php');
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class ApiTest extends \PHPUnit_Framework_TestCase {
 
     /**
@@ -10,7 +12,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
      */
     public function testApiLogin($request, $json, $output) {
         $rawresponse = callPageFake('api.php', $request, $json);
-
+echo $rawresponse."\n";
         if (!$response = json_decode($rawresponse, true)) {
             echo "ERROR: " . $rawresponse . "\n";
         } elseif (isset($response['token'])) {
@@ -22,6 +24,14 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
     public function providerTestApiLogin() {
         global $config;
         print_R($config);
+        
+        
+        $result = DB::table('information_schema.tables')
+        ->where('table_type', "=", 'BASE TABLE')
+        ->where('table_schema', '=', $config['connection']['database'])
+        ->count();
+        echo "COUNT: ".$result."\n";
+        
         return array(
             array(
                 array('q' => 'login', 'v' => '5'),
