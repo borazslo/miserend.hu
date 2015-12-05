@@ -26,6 +26,17 @@ class Api {
     }
 
     public function getInputJson() {
+        try {
+            file_get_contents('php://input');
+        } catch (Exception $exc) {
+            echo $exc->getTraceAsString();
+            echo $exc->getMessage();
+        }
+
+
+
+
+
         if (!$inputJSONstring = file_get_contents('php://input')) {
             throw new \Exception("There is no JSON input.");
         }

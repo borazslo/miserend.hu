@@ -3,8 +3,6 @@
 global $config;
 include_once('load.php');
 
-use Illuminate\Database\Capsule\Manager as DB;
-
 class ApiTest extends \PHPUnit_Framework_TestCase {
 
     /**
@@ -22,18 +20,6 @@ echo $rawresponse."\n";
     }
 
     public function providerTestApiLogin() {
-        echo phpinfo();
-        
-        global $config;
-        print_R($config);
-        
-        
-        $result = DB::table('information_schema.tables')
-        ->where('table_type', "=", 'BASE TABLE')
-        ->where('table_schema', '=', $config['connection']['database'])
-        ->count();
-        echo "COUNT: ".$result."\n";
-        
         return array(
             array(
                 array('q' => 'login', 'v' => '5'),
