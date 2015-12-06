@@ -29,8 +29,6 @@ class Report extends Api {
         $this->prepareUser();
 
         $this->prepareRemark();
-        printr($this);
-        exit;
         try {
             $this->remark->save();
             $this->remark->emails();
