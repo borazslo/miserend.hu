@@ -4,6 +4,18 @@ namespace Api;
 
 class Report extends Api {
 
+    public function factoryCreate() {
+        $api = new Api();
+        $api->getInputJson();
+
+
+        if (!$api->input['token']) {
+            return new ReportByAnonym();
+        } else {
+            return new ReportByUser();
+        }
+    }
+
     public function validateInput() {
         //TODO: !isValidChurchId()?
         if (!is_numeric($this->input['tid'])) {
@@ -61,6 +73,15 @@ class Report extends Api {
             $this->input['text'] = "";
         } else {
             $this->input['text'] = sanitize($this->input['text']);
+        }
+
+        switch ($this->input['pid']) {
+            case 0:
+                $this->input['text'] .= " Helytelen pozíció.";
+                break;
+            case 1:
+                $this->input['text'] .= " Helytelen miseidőpont.";
+                break;
         }
 
         $this->remark->text = "Mobilalkalmazáson keresztül érkezett információ:\n" . $this->input['text'] . "\n <i>verzió:" . $this->version . ", pid:" . $this->input['pid'] . "</i>";

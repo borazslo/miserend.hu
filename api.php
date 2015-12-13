@@ -23,7 +23,7 @@ try {
             break;
 
         case 'report':
-            $api = Api\ReportFactory::create();
+            $api = Api\Report::factoryCreate();
             break;
 
         case 'updated':
@@ -45,6 +45,11 @@ try {
     $api->printOutput();
     
 } catch (Exception $e) {
-    $api->printException($e);
+    //Because of the Report::factoryCreate();
+    if(!isset($api)) {
+        echo json_encode(array('error'=>1,'text'=>$e->getMessage()));
+    } else {
+        $api->printException($e);
+    }
 }
 ?>

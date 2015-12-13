@@ -29,6 +29,8 @@ class Mail {
                 $this->to = array($this->to);
             if ($this->debug == 3) {
                 print_r($this);
+            } else if ($this->debug == 5) {
+                // black hole
             } else {
                 $query = "INSERT INTO emails (`type`,`to`,`header`,`subject`,`body`,`timestamp`) VALUES ('" . $this->type . "','" . implode(';', $this->to) . "','" . $this->header . "','" . $this->subject . "','" . mysql_real_escape_string($this->content) . "','" . date('Y-m-d H:i:s') . "');";
                 if (!mysql_query($query))

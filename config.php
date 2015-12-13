@@ -24,7 +24,7 @@ $config['token']['timeout'] = "15 minutes";
 
 $config['mail'] = array(
     'sender' => 'miserend.hu <info@miserend.hu>',
-    'debug' => 0, /* 0,1,2,3 */
+    'debug' => 0, /* 0,1,2,3,5 */
     'debugger' => 'eleklaszlosj@gmail.com'
 );
 $config['debug'] = 0;

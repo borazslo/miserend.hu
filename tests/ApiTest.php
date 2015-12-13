@@ -10,7 +10,6 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
      */
     public function testApiLogin($request, $json, $output) {
         $rawresponse = callPageFake('api.php', $request, $json);
-echo $rawresponse."\n";
         if (!$response = json_decode($rawresponse, true)) {
             echo "ERROR: " . $rawresponse . "\n";
         } elseif (isset($response['token'])) {
@@ -123,6 +122,53 @@ echo $rawresponse."\n";
                 array('q' => 'favorites', 'v' => '4'),
                 array('add' => array(138, 139), 'remove' => 139),
                 array('error' => 0, 'favorites' => array(138))),
+        );
+    }
+
+    /**
+     * @dataProvider providerTestApiReportByAnonym
+     */
+    public function testApiReportByAnonym($request, $json, $output) {
+        $rawresponse = callPageFake('api.php', $request, $json);
+        if (!$response = json_decode($rawresponse, true)) {
+            echo "ERROR: " . $rawresponse . "\n";
+        }
+        $this->assertArraySubset($output, $response);
+    }
+
+    public function providerTestApiReportByAnonym() {
+        global $config;
+        $config['mail']['debug'] = 5;
+
+        return array(
+            array(
+                array('q' => 'report', 'v' => '3'),
+                array(),
+                array('error' => 1)),
+            array(
+                array('q' => 'report', 'v' => '3'),
+                array('tid' => 138, 'pid' => 0),
+                array('error' => 0)),
+            array(
+                array('q' => 'report', 'v' => '3'),
+                array('tid' => 138, 'pid' => 1),
+                array('error' => 0)),
+            array(
+                array('q' => 'report', 'v' => '3'),
+                array('tid' => 138, 'pid' => 2),
+                array('error' => 1)),
+            array(
+                array('q' => 'report', 'v' => '3'),
+                array('tid' => 138, 'pid' => 2, 'text' => 'Ez egy teszt megjegyzés. Elnézést.'),
+                array('error' => 0)),
+            array(
+                array('q' => 'report', 'v' => '4'),
+                array('tid' => 138, 'pid' => 2, 'text' => 'Ez egy teszt megjegyzés. Elnézést.'),
+                array('error' => 1)),
+            array(
+                array('q' => 'report', 'v' => '4'),
+                array('tid' => 138, 'pid' => 2, 'text' => 'Ez egy teszt megjegyzés. "dbdate" is van. Elnézést.', 'dbdate' => "-2 years"),
+                array('error' => 0)),
         );
     }
 
