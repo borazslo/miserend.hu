@@ -24,6 +24,7 @@ if ($config['debug'] > 0) {
 
 //TODO: megszűntetni?
 $vars['design_url'] = $design_url = $config['path']['domain'];
+define('DOMAIN', $config['path']['domain']);
 
 //TODO: megszűntetni a $db_name-t. Bár akkor már PDO mindenhiva
 $db_name = $config['connection']['database'];
