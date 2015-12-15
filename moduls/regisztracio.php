@@ -180,7 +180,7 @@ function user_jelszokuld() {
     if (!empty($mail))
         $userByMail = new User($mail);
 
-    if (!empty($lnev) AND ! empty($mail) AND $userByMail->uid != $userByNev) {
+    if (!empty($lnev) AND ! empty($mail) AND $userByMail->uid != $userByNev->uid) {
         addMessage('A megadott adatok alapján nem találtunk felhasználót.', 'danger');
         return user_jelszo();
     }
