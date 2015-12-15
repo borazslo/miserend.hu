@@ -107,30 +107,30 @@ CREATE TABLE `egyhazmegye` (
 LOCK TABLES `egyhazmegye` WRITE;
 /*!40000 ALTER TABLE `egyhazmegye` DISABLE KEYS */;
 INSERT INTO `egyhazmegye` VALUES (1,'Debrecen-Nyíregyháza',1,'i','','','i');
-INSERT INTO `egyhazmegye` VALUES (2,'Eger',2,'i','nbalazs','einsti442@gmail.com','i');
+INSERT INTO `egyhazmegye` VALUES (2,'Eger',2,'i','nbalazs','','i');
 INSERT INTO `egyhazmegye` VALUES (3,'Esztergom-Budapest',3,'i','judy83','','i');
-INSERT INTO `egyhazmegye` VALUES (4,'Győr',4,'i','ÁgiM','magi@orsolyita.hu','n');
+INSERT INTO `egyhazmegye` VALUES (4,'Győr',4,'i','','','n');
 INSERT INTO `egyhazmegye` VALUES (6,'Kalocsa-Kecskemét',6,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (7,'Kaposvár',7,'i','bebee','dobi411@citromail.hu','i');
 INSERT INTO `egyhazmegye` VALUES (8,'Pécs',10,'i','f.orsolya','','i');
 INSERT INTO `egyhazmegye` VALUES (9,'Szeged-Csanád',11,'i','','','i');
-INSERT INTO `egyhazmegye` VALUES (10,'Székesfehérvár',12,'i','Marian','marian@szfvar.katolikus.hu','i');
+INSERT INTO `egyhazmegye` VALUES (10,'Székesfehérvár',12,'i','Marian','','i');
 INSERT INTO `egyhazmegye` VALUES (11,'Szombathely',13,'i','Istvánatya','his1969@gmail.com','n');
-INSERT INTO `egyhazmegye` VALUES (12,'Vác',14,'i','zsotom','annatom@freemail.hu','i');
+INSERT INTO `egyhazmegye` VALUES (12,'Vác',14,'i','zsotom','','i');
 INSERT INTO `egyhazmegye` VALUES (13,'Veszprém',15,'i','','','i');
-INSERT INTO `egyhazmegye` VALUES (15,'Pannonhalmi Területi Apátság',9,'i','','serviam@freemail.hu','i');
+INSERT INTO `egyhazmegye` VALUES (15,'Pannonhalmi Területi Apátság',9,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (16,'Tábori Püspökség',16,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (17,'Miskolci Apostoli Exarchátus (gk)',8,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (18,'Hajdúdorogi egyházmegye (gk)',5,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (19,'Munkácsi em. (Kárpátalja)',17,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (20,'Gyulafehérvári főem. (Erdély)',18,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (21,'Szatmári em. (Erdély)',20,'i','','','i');
-INSERT INTO `egyhazmegye` VALUES (22,'Nagyváradi egyházmegye (Erdély)',19,'i','spzoltan','sp.zoltan@yahoo.com','i');
+INSERT INTO `egyhazmegye` VALUES (22,'Nagyváradi egyházmegye (Erdély)',19,'i','spzoltan','','i');
 INSERT INTO `egyhazmegye` VALUES (23,'Temesvári em. (Erdély)',21,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (24,'Szabadkai em. (Délvidék)',23,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (25,'Nagybecskereki em. (Délvidék)',22,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (26,'Kassai em. (Felvidék)',24,'i','','','i');
-INSERT INTO `egyhazmegye` VALUES (27,'Rozsnyói em. (Felvidék)',28,'i','VoxCordis','simonjani@stonline.sk','i');
+INSERT INTO `egyhazmegye` VALUES (27,'Rozsnyói em. (Felvidék)',28,'i','VoxCordis','','i');
 INSERT INTO `egyhazmegye` VALUES (28,'Nyitrai egyházmegye (Felvidék)',25,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (29,'Nagyszombati főem.(Felvidék)',26,'i','','','i');
 INSERT INTO `egyhazmegye` VALUES (30,'Eisenstadti',30,'i','','','i');
@@ -991,7 +991,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   `login` varchar(20) NOT NULL DEFAULT '',
-  `jelszo` varchar(50) NOT NULL DEFAULT '',
+  `jelszo` varchar(255) NOT NULL DEFAULT '',
   `jogok` varchar(200) NOT NULL DEFAULT '',
   `ok` enum('i','n','x','o') NOT NULL DEFAULT 'i',
   `letrehozta` varchar(50) NOT NULL DEFAULT '',
@@ -1014,8 +1014,8 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (5258,'verem','TWFjaTcdfds2TGFjaQ==','hirek-szavazas-galeria-info-hirek-user-nevnaptar-reklam-miserend-igenaptar','i','*vendeg*','2011-02-23 19:52:06','2015-03-18 22:29:29','2015-03-18 23:52:50','egyik@gmail.com','','Teljes A Nevem','','n',1);
-INSERT INTO `user` VALUES (2343,'bernadett','bWFsefef0eXZhcmVrODA=','','i','*vendeg*','2012-12-22 17:24:19','2015-02-03 11:10:39',NULL,'email@cim.com','Berni','Sörösné Bernadett','','n',0);
+INSERT INTO `user` VALUES (10,'vacskamati','$2y$10$RmePrAkA68lNiKS9zY9yUuCdw6L7pw4ITysPe2MsBJ3QEqJKVz5V2','hirek-szavazas-galeria-info-hirek-user-nevnaptar-reklam-miserend-igenaptar','i','*vendeg*','2011-02-23 19:52:06','2015-03-18 22:29:29','2015-03-18 23:52:50','egyik@gmail.com','','Lázár Ervin','','n',1);
+INSERT INTO `user` VALUES (11,'manyok','$2y$10$bWzPPXw3uGTbxLhvnVGTOu3S74CxjwpSNba2Vin/klQys6A1ufECG','','i','*vendeg*','2012-12-22 17:24:19','2015-02-03 11:10:39',NULL,'email@cim.com','Manyók','Hétszünyükapanyányimanyók','','n',0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 

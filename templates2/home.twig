@@ -244,7 +244,7 @@
 
 {% block leftsidebar %}
     {% if kep %}
-      {% set content = '<img class="hidden-sm hidden-xs" src="' ~ kep.konyvtar ~ '/' ~  kep.fajlnev ~ '" style="width: auto !important; /*override the width below*/ width: 100%; max-width: 100%; float: left; clear: both;"><h5 class="text-center"><a href="?templom=' ~ kep.id ~'">' ~ kep.nev ~ ' (' ~ kep.varos ~')</a></h5>' %}
+      {% set content = '<img src="' ~ kep.konyvtar ~ '/' ~  kep.fajlnev ~ '" class="img-responsive"><h5 class="text-center"><a href="?templom=' ~ kep.id ~'">' ~ kep.nev ~ ' (' ~ kep.varos ~')</a></h5>' %}
       {% include "panel.twig" with {'title' : ' ' , 'body': content,'panel':'default  ' } %}
   {% endif %}
 {% endblock %}

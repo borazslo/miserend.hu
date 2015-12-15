@@ -72,14 +72,14 @@
         <div class="container">
             {% include 'navbar.twig' %}
             <div class="row">
-                <div class="col-md-3  col-sm-4">
+                <div class="col-md-3  col-sm-3">
                     <!--{% include 'search/quickSearchForm.twig' %}-->
                     {% block leftsidebar %}{% endblock %}
                     {% if chat %}{% include 'chat/chatBox.twig' with chat %}{% endif %}
                     {% if mychurches %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
                     {% if androidreklam %}{% include "panel.twig" with {'title':'Már mobiltelefonra is','body': androidreklam|raw,'panel':'success' } %}{% endif %}
                 </div>
-                <div class="col-md-{% if columns2 %}9{% else %}6{% endif %} col-sm-2">
+                <div class="col-md-{% if columns2 %}9{% else %}6{% endif %} col-sm-6">
                     {% block pageHeader %}
                         <div class="page-header">
                             <h2>{{ title|raw }}</h2>
@@ -97,7 +97,7 @@
                     {% block content %}{{ content|raw }}{% endblock %}
                     </div>
                 {% if columns2 %}{% else %}  
-                <div class="col-md-3 col-sm-2">
+                <div class="col-md-3 col-sm-3">
                         {% if campaign %}{% include "panel.twig" with {'title': campaign.title ,'body': campaign.content|raw,'panel':'danger' } %}{% endif %}
                          {% block rightsidebar %}{% endblock %}
                     </div>

@@ -1,13 +1,10 @@
 sudo: false
 language: php
 php:
-  - 5.6
+  - 5.5
 
 services:
   - mysql
-
-before_install:
-  - openssl aes-256-cbc -K $encrypted_eb8cd28bff04_key -iv $encrypted_eb8cd28bff04_iv -in deploy.secret.key.enc -out ~/.ssh/deploy.secret.key -d
 
 before_script:
   - mysql -e 'create database miserend character set utf8 collate utf8_unicode_ci;'
@@ -15,24 +12,24 @@ before_script:
   - npm install -g bower
   - php composer.phar selfupdate
   - php composer.phar install
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
   - php install.php
 
 script:
-  - phpunit tests
+  - vendor/phpunit/phpunit/phpunit tests
   #- phpunit --configuration phpunit.xml
 
 after_success:
   # Add the ssh key
+  - openssl aes-256-cbc -K $encrypted_eb8cd28bff04_key -iv $encrypted_eb8cd28bff04_iv -in deploy.secret.key.enc -out ~/.ssh/deploy.secret.key -d
   - eval "$(ssh-agent)"
   - chmod 600 ~/.ssh/deploy.secret.key
   - ssh-add ~/.ssh/deploy.secret.key
   - echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-  - git remote add deploy miserend_hu_git@szentiras.hu:/home/miserend_hu_git/github/borazslo/${TRAVIS_BRANCH}.miserend.hu
-  - git push deploy $TRAVIS_BRANCH
-  - ssh miserend_hu_git@szentiras.hu "php /home/miserend_hu_git/github/borazslo/${TRAVIS_BRANCH}.miserend.hu/update.php"
+  - ssh miserend_hu_git@szentiras.hu "bash -s ${TRAVIS_BRANCH}" < update.sh
 
 env:
   global:
-  - ENV=production
-  - DB_USERNAME=root
-  - DB_PASSWORD=""
+  - MISEREND_WEBAPP_ENVIRONMENT=production
+  - MYSQL_MISEREND_USER=root
+  - MYSQL_MISEREND_PASSWORD=root
