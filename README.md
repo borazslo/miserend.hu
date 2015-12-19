@@ -7,19 +7,19 @@ Az adatbázis struktúrát a mysql_sample.sql tartalmazza, némi minta adattal e
 (A minta adatok nem koherensek, így nem sokra használhatóak önmagukban. De fejlesztőknek szívesen adunk igazibb adatbázist.)
 
 ##Előfeltétel
-- (L)AMP szerver
+- (L)AMP szerver: `sudo apt-get install apache2 php5`
  - Több helyen még kell a http://php.net/manual/en/language.basic-syntax.phptags.php
-- [Git telepítése](http://git-scm.com/book/en/Getting-Started-Installing-Git) és [beállítása](http://git-scm.com/book/en/Getting-Started-First-Time-Git-Setup).
-- `sudo apt-get install php5-sqlite`
-- `sudo apt-get install nodejs`
+- [Git telepítése](http://git-scm.com/book/en/Getting-Started-Installing-Git) és [beállítása](http://git-scm.com/book/en/Getting-Started-First-Time-Git-Setup). `sudo apt-get install git`
+- `sudo apt-get install php5-sqlite php5-mysql composer`
+- `sudo apt-get install npm`
 - `npm install`
 - `npm install -g bower`
 
 ##Telepítés
 - `git clone https://github.com/borazslo/miserend.hu.git`
-- MySQL elérhetőség megadása a `config.inc`-ben vagy környezeti változóként (SetEnv/Export).
-- `php composer.phar selfupdate`
-- `php composer.phar install`
+- MySQL elérhetőség megadása a `config.php`-ben vagy környezeti változóként (SetEnv/Export).
+- `composer selfupdate`
+- `composer install`
 - `php install.php` (Betölti a minta adatbázist. Létrehozza a hiányzó könyvtárakat.)
 
 ## Néhány vegyes gondolat
@@ -33,7 +33,7 @@ Az adatbázis struktúrát a mysql_sample.sql tartalmazza, némi minta adattal e
     - a production branch kerül ki az élesbe
     - a production branchet normál esetben a master után pull requesttel húzzuk. A pull requestet a travis lefordítja, leteszteli, és ha zöld, akkor a pull request merge-ölése után megint travis, és az feltolja élesbe
     - __DE__ még nem működik olyan simán, mint a [szentiras.hu](https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k#n%C3%A9h%C3%A1ny-vegyes-gondolat)! (Nincs wekiszolgáló leállítás, stb.)
-      
+
 ##Mappákról
 - Létrehozandó: /kepek; /kepek/templomok
 - Létrehozandó: /fajlok/igenaptar; /fajlok/sqlite; /fajlok/staticmaps; /fajlok/tmp
