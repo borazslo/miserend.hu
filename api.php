@@ -12,6 +12,9 @@ try {
 
 try {
     switch ($action) {
+        case 'signup':
+            $api = new Api\Signup();
+            break;
         case 'login':
             $api = new Api\Login();
             break;

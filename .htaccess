@@ -29,8 +29,11 @@
 	RewriteRule ^api/v([0-9]{1,4})/updated(/|)$ api.php?q=updated&v=$1 [NC]
 	RewriteRule ^api/v([0-9]{1,4})/updated/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ api.php?q=updated&v=$1&datum=$2 [NC]
 
+    RewriteRule ^api/v([0-9]{1,4})/signup(/|)$ api.php?q=signup&v=$1 [NC,QSA]    
     RewriteRule ^api/v([0-9]{1,4})/login(/|)$ api.php?q=login&v=$1 [NC,QSA]
     RewriteRule ^api/v([0-9]{1,4})/user(/|)$ api.php?q=user&v=$1 [NC,QSA]
     RewriteRule ^api/v([0-9]{1,4})/user/favorites(/|)$ api.php?q=favorites&v=$1 [NC,QSA]
+
+    RewriteRule ^api/ https://github.com/borazslo/miserend.hu/wiki/API [NC]
 
 </IfModule>

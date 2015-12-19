@@ -95,13 +95,13 @@ function user_edit($uid = false) {
 
     //Ha folyamatban van a szerkesztés, akkor azokat az adatokat tesszük be
     if (is_array($uid)) {
-        $edituser = new stdClass();
+        $edituser = new User();
         foreach ($uid as $key => $value) {
             $edituser->$key = $value;
         }
     } else
         $edituser = new User($uid);
-
+    
     if ($edituser->uid == 0 AND $user->uid == 0) {
         $vars['title'] = "Regisztráció";
         $vars['new'] = true;
@@ -250,14 +250,17 @@ switch ($m_op) {
             addMessage("El kell fogadni a <i>Házirendet és szabályzatot</i>!", 'danger');
             $tartalom = user_edit($_REQUEST['edituser']);
         } else {
-            if ($newuser->submit($_REQUEST['edituser'])) {
+            try {
+                $newuser->submit($_REQUEST['edituser']);
                 if ($user->uid < 1) {
                     require_once('moduls/miserend.php');
                     $tartalom = miserend_index();
                     //header("Location: http://miserend.hu/");
                 } else
                     $tartalom = user_edit($newuser->uid);
-            } else {
+            } catch (Exceptions $e) {
+                printr($e);
+                
                 $tartalom = user_edit($_REQUEST['edituser']);
             }
         }

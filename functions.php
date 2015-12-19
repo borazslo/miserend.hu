@@ -2557,28 +2557,34 @@ function formazo($adatT, $tipus) {
 }
 
 function addMessage($text, $severity = false) {
-    global $user;
-
-    $query = "INSERT INTO messages (sid, timestamp, severity, text) VALUES ('" . session_id() . "','" . date('Y-m-d H:i:s') . "','" . $severity . "','" . $text . "');";
-
-    if (mysql_query($query))
-        return true;
-    return false;
+    $id = DB::table('messages')->insertGetId([
+        'sid' => session_id(),
+        'timestamp' => date('Y-m-d H:i:s'),
+        'severity' => $severity,
+        'text' => $text
+    ]);
+    return true;
 }
 
 function getMessages() {
-    global $user;
-
-    $return = array();
-    $query = "SELECT id,timestamp,text,severity FROM messages WHERE shown = 0 AND sid = '" . session_id() . "' ;";
-    $results = mysql_query($query);
-    while ($message = mysql_fetch_assoc($results)) {
-        $return[] = $message;
-        mysql_query("UPDATE messages SET shown = 1 WHERE id = " . $message['id'] . " LIMIT 1;");
+    $messages = DB::table('messages')
+            ->select('id', 'timestamp', 'text', 'severity')
+            ->where('shown', 0)
+            ->where('sid', session_id())
+            ->get();
+    if (!count($messages)) {
+        return array();
     }
-    if (mysql_query($query))
-        return $return;
-    return false;
+
+    foreach ($messages as $message) {
+        $ids[] = $message->id;
+        $return[] = (array) $message;
+    }
+    DB::table('messages')
+            ->whereIn('id', $ids)
+            ->update(['shown' => 1]);
+
+    return (array) $return;
 }
 
 /*

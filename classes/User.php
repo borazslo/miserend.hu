@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class User {
 
     function __construct($uid = false) {
@@ -273,10 +275,12 @@ class User {
             else
                 return false;
         } elseif ($key == 'email') {
-            if (!filter_var($val, FILTER_VALIDATE_EMAIL))
+            if (!filter_var($val, FILTER_VALIDATE_EMAIL)) {
                 return false;
-
-            //TODO: dupla email címeket kiszűrni
+            }
+            if ($this->isEmailInUse($val)) {
+                return false;
+            }
             $this->presaved[$key] = $val;
         } else
             return false;
@@ -432,6 +436,18 @@ class User {
         if (mysql_query($query))
             return true;
         else
+            return false;
+    }
+    
+    function isEmailInUse($val) {
+        $result = DB::table('user')
+                ->select('email')
+                ->where('email', $val)
+                ->limit(1)
+                ->get();
+        if (count($result)) {
+            return true;
+        } else
             return false;
     }
 

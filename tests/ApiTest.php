@@ -9,6 +9,38 @@ include_once('load.php');
 class ApiTest extends \PHPUnit_Framework_TestCase {
 
     /**
+     * @dataProvider providerTestApiSignup
+     */
+    public function testApiSignup($request, $json, $output) {
+        $rawresponse = callPageFake('api.php', $request, $json);
+        if (!$response = json_decode($rawresponse, true)) {
+            echo "ERROR: " . $rawresponse . "\n";
+        } 
+        $this->assertArraySubset($output, $response);
+    }
+
+    public function providerTestApiSignup() {
+        return array(
+            array(
+                array('q' => 'signup', 'v' => '3'),
+                array('username' => 'vacskamati', 'password' => 'VanValami'),
+                array('error' => 1)),
+            array(
+                array('q' => 'signup', 'v' => '4'),
+                array('username' => 'EgyHosszúÚjNév', 'email' => 'teszt@teszt.com', 'password' => 'sippala'),
+                array('error' => 1)),
+            array(
+                array('q' => 'signup', 'v' => '4'),
+                array('username' => 'EgyHosszuUjNev', 'email' => 'teszt@teszt.com', 'password' => 'sippala'),
+                array('error' => 0)),
+            array(
+                array('q' => 'signup', 'v' => '4'),
+                array('username' => 'EgyMasikHosszuUjNev', 'email' => 'teszt@teszt.com', 'password' => 'simoppo'),
+                array('error' => 1)),
+        );
+    }
+
+    /**
      * @dataProvider providerTestApiLogin     
      */
     public function testApiLogin($request, $json, $output) {
