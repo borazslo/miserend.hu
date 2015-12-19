@@ -4,7 +4,9 @@
     "require": {
         "twig/extensions": "1.0.*",
         "phpunit/phpunit": "4.8@stable",
-        "illuminate/database": "5.*"
+        "illuminate/database": "5.*",
+        "ext-sqlite3": "*",
+        "ext-mysql": "*"
     },
     "scripts": {
         "post-install-cmd": [

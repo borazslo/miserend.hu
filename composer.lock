@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "aa01224dcd755f666a2e9f97883f85fd",
-    "content-hash": "5df552530d81db2754c18aca2b206c8d",
+    "hash": "71dc9a3e96d8f84cbe95a45fa2de9b9c",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -1564,6 +1563,9 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "ext-sqlite3": "*",
+        "ext-mysql": "*"
+    },
     "platform-dev": []
 }
