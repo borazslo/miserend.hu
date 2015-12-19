@@ -1,6 +1,10 @@
 <?php
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class Remark {
+
+    public $table = 'eszrevetelek';
 
     function __construct($rid = false) {
         if (!isset($rid) OR ! is_numeric($rid)) {
@@ -13,7 +17,7 @@ class Remark {
             $this->state = 'u';
             $this->text = "";
         } else {
-            $query = "SELECT * FROM  eszrevetelek WHERE id = $rid LIMIT 1";
+            $query = "SELECT * FROM  " . $this->table . " WHERE id = $rid LIMIT 1";
             $result = mysql_query($query);
             $x = mysql_fetch_assoc($result);
             if (is_array($x)) {
@@ -25,7 +29,7 @@ class Remark {
                 $this->username = $this->login;
 
                 if ($this->username != '') {
-                    $this->user = new User($this->username);
+                    $this->user = new \User($this->username);
                 }
 
                 $this->marker['url'] = "javascript:OpenScrollWindow('naplo.php?kod=templomok&id=" . $this->hol_id . "',550,500);";
@@ -64,14 +68,14 @@ class Remark {
         elseif (preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i", $this->email))
             $where = " email = '" . $this->email . "' ";
         if (isset($where)) {
-            $query = "SELECT megbizhato FROM eszrevetelek where $where order by datum DESC LIMIT 1";
+            $query = "SELECT megbizhato FROM " . $this->table . " where $where order by datum DESC LIMIT 1";
             $lekerdez = mysql_query($query);
             list($megbizhato) = mysql_fetch_row($lekerdez);
             if (!empty($megbizhato))
                 $this->reliable = $megbizhato;
         }
 
-        $query = "INSERT eszrevetelek set 
+        $query = "INSERT " . $this->table . " set 
 			nev='" . $this->name . "', 
 			login='" . $this->username . "', 
 			megbizhato='" . $this->reliable . "', 
@@ -133,7 +137,7 @@ class Remark {
     }
 
     function sendMail($type, $to) {
-        $mail = new Mail();
+        $mail = new \Mail();
         if (!isset($this->EmailSubject))
             $mail->subject = "Miserend - észrevétel (" . $this->tid . ")";
         else
@@ -180,18 +184,38 @@ class Remark {
         // Gyakorlatilag az email az igazi azonosító.
         // TODO: akarunk mit kezdeni az *vendeg* de email nélkül?
         if ($this->email != '') {
-            $query = "UPDATE eszrevetelek SET megbizhato = '" . $reliability . "' WHERE email = '" . $this->email . "' ;";
-            mysql_query($query);
+            DB::table($this->table)
+            ->where('email', $this->email)
+            ->limit(1)
+            ->update(['megbizhato' => $reliability]);
         } else
             return false;
+    }
+
+    function changeState($state) {
+        if (
+                        DB::table($this->table)
+                        ->where('id', $this->id)
+                        ->limit(1)
+                        ->update(['allapot' => $state, 'admindatum' => date('Y-m-d H:i:s.')])
+        ) {
+            $this->allapot = $state;
+        }
     }
 
     function addComment($text) {
         global $user;
         $newline = "\n<img src='img/edit.gif' align='absmiddle' title='" . $user->username . " (" . date('Y-m-d H:i:s') . ")'>" . $text;
-        $query = 'UPDATE eszrevetelek SET adminmegj = CONCAT(IFNULL(adminmegj,""), "' . $newline . '") WHERE id = ' . $this->id . " LIMIT 1";
-        if (!mysql_query($query))
+        $adminmegj = $this->adminmegj . $newline;
+        if (
+                        DB::table($this->table)
+                        ->where('id', $this->id)
+                        ->limit(1)
+                        ->update(['adminmegj' => $adminmegj])
+        ) {
+            $this->adminmegj = $adminmegj;
             addMessage("Nem sikerült a megjegyzést bővíteni.", 'warning');
+        }
     }
 
 }

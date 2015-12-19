@@ -34,6 +34,7 @@ class Church {
         foreach ($acceptedColumns as $column) {
             $this->$column = $result[0]->$column;
         }
+        $this->getFullName();
 
         global $user;
         if (!$this->checkPrivilegeRead($user)) {
@@ -43,7 +44,6 @@ class Church {
         $this->getOSM();
         $this->getLocation();
         $this->getReligious_administration();
-        $this->getNeighbourChurches();
 
         $this->kepek = getImages($this->id);
     }
@@ -113,6 +113,8 @@ class Church {
         foreach ($this->location as $k => $v) {
             $this->$k = $v;
         }
+        if (!$this->neighbourChurches)
+            $this->getNeighbourChurches();
         foreach ($this->neigbourChurches as $neighbour) {
             $this->szomszedok[] = (array) $neighbour;
         }
@@ -122,4 +124,30 @@ class Church {
         $this->egyhazmegye = $this->religious_administration->diocese->name;
         $this->espereskerulet = $this->religious_administration->deaconry->shortname;
     }
+
+    function getFullName() {
+        $this->fullName = $this->nev;
+        if (!empty($this->ismertnev)) {
+            $this->fullName .= '(' . $this->ismertnev . ')';
+        } else {
+            $this->fullName .= '(' . $this->varos . ')';
+        }
+    }
+
+    function getRemarks() {
+        $results = DB::table('eszrevetelek')
+                ->select('id')
+                ->where('hol_id', "=", $this->id)
+                ->orderBy('datum', 'desc')
+                ->get();
+
+        $this->remarks = array();
+        foreach ($results as $result) {
+            $result = (array) $result;
+            $tmp = new \Remark($result['id']);
+            if (isset($tmp) AND $tmp->id > 0)
+                $this->remarks[$result['id']] = $tmp;
+        }
+    }
+
 }

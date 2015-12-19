@@ -1,0 +1,26 @@
+ {% extends "remark.twig" %}
+
+ {% block content %}
+<div style="width:100%-10px;background-color:#ffffff;padding:5">  
+    <form method=post action="index.php">
+        <input type=hidden name=tid value='{{ church.id }}'>
+        <input type=hidden name=q value='remarks'>
+        <input type=hidden name=op value='add'>
+        {% if not user.loggedin %}
+            <span class=alap>Nevem: </span><input type=text size=40 name=nev class=urlap ><br/>
+            <span class=alap>Email címem: </span><input type=text size=40 name=email class=urlap > * <strong>kötelező</strong><br/>
+            <br/><span class=alap>Észrevételeim a templom adataihoz: </span><br>
+        {% else %}
+            <input type=hidden size=40 name=nev value='{{ user.nev }}'>
+            <input type=hidden size=40 name=email value='{{ user.email }}'>
+        {% endif %}
+            <textarea name=leiras class='form-control' rows=20></textarea><br/>
+            <input type=submit value=Elküld class=urlap></td></tr></table></form>
+
+  {% if disclaimer %}
+    <div style="width:100%-20px;background-color:#F5CC4C;padding:5;margin-bottom:6px" class="alap">
+        {{ disclaimer|raw }}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

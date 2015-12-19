@@ -3,9 +3,22 @@
 include("load.php");
 
 //TODO: ez itt nem túl barátságok dolog
-if (isset($_GET['q'])) {
-    include $_GET['q'] . ".php";
-} else {
+$action = \Request::Simpletext('q');
+switch ($action) {
+    case 'remarks':
+        $html = new \Html\Remark();
+        $html->render();
+        $html->messages = getMessages();
+        echo $html->html;
+        exit;
+        break;
+
+    default:
+        @include $action . ".php";
+        break;
+}    
+
+if(!isset($_GET['q']))  {
 
 
 //Beállított modulok
