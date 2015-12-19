@@ -1066,7 +1066,7 @@ function miserend_view() {
         $variables = array(
             'header' => array('content' => 'Jó tudni...'),
             'content' => nl2br($megjegyzes),
-            'settings' => array('width=50%', 'align=right'),
+            'settings' => array(),
             'design_url' => $design_url);
         $jotudni = $twig->render('doboz_lila.html', $variables);
     }

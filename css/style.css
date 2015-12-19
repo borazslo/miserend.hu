@@ -59,3 +59,21 @@ span.toggle.active {
 #formschedule .alap{
     font-size: 12px !important;
 }
+
+.doboz {
+	float: right;
+	width: 50%;
+	margin: 0 0 1em 1em;
+}
+
+.doboz th {
+	background-color: #B51A7E;
+}
+
+.doboz td {
+	background-color: #F8F4F6;
+}
+
+.dobozcim_feher {
+	color: white;
+}
