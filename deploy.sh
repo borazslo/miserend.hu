@@ -9,6 +9,5 @@ if [ "$pull_request" = "false" ]; then
         ssh-add ~/.ssh/deploy.secret.key
         echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
         echo $TRAVIS_BRANCH
-        cat update.sh | miserend_hu_git@szentiras.hu
         ssh miserend_hu_git@szentiras.hu "bash -s $branch" < $build_dir/update.sh
 fi
