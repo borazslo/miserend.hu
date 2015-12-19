@@ -21,7 +21,10 @@ script:
 
 after_success:
   - chmod +x deploy.sh
-  - deploy.sh
+  - ${TRAVIS_BUILD_DIR}/deploy.sh ${TRAVIS_BRANCH} ${TRAVIS_BUILD_DIR} ${TRAVIS_PULL_REQUEST}
+  - echo "?"
+  - ./deploy.sh
+  - echo "!"
 
 env:
   global:
