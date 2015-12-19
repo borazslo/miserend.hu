@@ -26,6 +26,9 @@ class UserTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    /**
+    * @requires PHP 5.5.26
+    */
     public function testUserDelete() {
         $user = new \User('EgyHosszuUjNev');
         $success = $user->delete();
