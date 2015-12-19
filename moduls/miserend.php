@@ -1075,6 +1075,7 @@ function miserend_view() {
     $query = "select fajlnev,felirat from kepek where tid='$tid' order by sorszam";
     $lekerdez = mysql_query($query);
     $mennyi = mysql_num_rows($lekerdez);
+    $kepek = '';
     if ($mennyi > 0) {
 
         $scrollable .= '<script>
@@ -1092,7 +1093,7 @@ function miserend_view() {
              });
         </script>';
 
-        $kepek.="\n";
+        $kepek .= "\n";
 
         $kepek .= '<div class="als-container" id="my-als-list">
   <span class="als-prev"><img src="img/als/thin_left_arrow_333.png" alt="prev" title="previous" /></span>
