@@ -20,11 +20,7 @@ script:
   #- phpunit --configuration phpunit.xml
 
 after_success:
-  - chmod +x deploy.sh
-  - ${TRAVIS_BUILD_DIR}/deploy.sh ${TRAVIS_BRANCH} ${TRAVIS_BUILD_DIR} ${TRAVIS_PULL_REQUEST}
-  - echo "?"
-  - ./deploy.sh
-  - echo "!"
+  - ${TRAVIS_BUILD_DIR}/deploy.sh
 
 env:
   global:
