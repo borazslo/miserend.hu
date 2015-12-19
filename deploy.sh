@@ -5,5 +5,5 @@ if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
         chmod 600 ~/.ssh/deploy.secret.key
         ssh-add ~/.ssh/deploy.secret.key
         echo -e "Host szentiras.hu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-        ssh miserend_hu_git@szentiras.hu "bash -s ${TRAVIS_BRANCH}" < ./update.sh
+        ssh miserend_hu_git@szentiras.hu "bash -s ${TRAVIS_BRANCH}" < ${TRAVIS_BUILD_DIR}/update.sh
 fi
