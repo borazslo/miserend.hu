@@ -125,16 +125,14 @@ class Home extends Html {
             'name' => "mikor",
             'id' => "mikor",
             'class' => 'keresourlap',
-            'onChange' => "
-						if(this.value == 'x') {document.getElementById('md').style.display='inline';} 
-						else {document.getElementById('md').style.display='none';}",
+            'onChange' => "if (this.value == 'x') $('#md').show().focus(); else $('#md').hide();",
             'options' => array($vasarnap => 'vasárnap', $ma => 'ma', $holnap => 'holnap', 'x' => 'adott napon:')
         );
         $searchform['mikordatum'] = array(
             'name' => "mikordatum",
             'id' => "md",
             'style' => "display:none",
-            'class' => "keresourlap",
+            'class' => "keresourlap datepicker",
             'size' => "10",
             'value' => $ma
         );

@@ -13,6 +13,10 @@
       display: block;
   }
   </style>
+  <link href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+  <script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+  <script src="bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
+   
 {% endblock %}
 
 {% block pageHeader %}
@@ -163,82 +167,16 @@
 
 
 </div>
- <!--
-  
-<div style="background-color:#CCCCCC;height:3px;margin-top:10px;margin-bottom:10px;width:100%"></div>
-<div class="screenonly">{{ kepek|raw }}</div>
-<table width="100%" border="0" cellspacing="0" cellpadding="0">   
-  <tr> 
-    <td colspan="3"><img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class=dobozfocim_kek>Mai ünnep - üzenet</span></td>
-  </tr>
-  <tr valign="top"> 
-    <td colspan="3" height="10"> 
-      <table width="180" border="0" cellspacing="0" cellpadding="0" align="right">
-	  <tr> 
-        <td width="1" bgcolor="#EAEDF1" colspan="5"><img src=img/space.gif width=5 height=1></td>
-	  </tr>
-        <tr> 
-          <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
-          <td width="4" bgcolor="#F8F4F6"><img src=img/space.gif width=4 height=5></td>
-          <td bgcolor="#FFFFFF">
-            <table bgcolor="#F8F4F6" width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td><img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_kek">Napi 
-                  igehelyek </span></td>
-                <td> 
-                  <div align="right"><img src="{{ design_url|raw }}/img/lilapontok_lila.jpg" width="43" height="6"></div>
-                </td>
-              </tr>
-            </table>
-            </td>
-          <td width="4" bgcolor="#F8F4F6"><img src=img/space.gif width=4 height=5></td>
-          <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
-        </tr>
-		<tr> 
-          <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
-          <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
-          <td bgcolor="#FFFFFF">
-            {{ igehelyek|raw }}
-            </td>
-          <td width="4" bgcolor="#FFFFFF"><img src=img/space.gif width=4 height=5></td>
-          <td width="1" bgcolor="#EAEDF1"><img src=img/space.gif width=1 height=5></td>
-        </tr>
-        <tr> 
-          <td colspan="5" bgcolor="#EAEDF1" height="1"><img src=img/space.gif width="5" height="1"></td>
-        </tr>
-      </table>
-      {{ uzenet|raw }}</td>
-  </tr>
-  <tr> 
-    <td colspan="3" height="10"><img src="img/space.gif" width="10" height="10"></td>
-  </tr>
-  <tr> 
-    <td colspan="3"> 
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr bgcolor="#EAEDF1"> 
-          <td bgcolor="#D0D6E4" width="5"><img src="img/space.gif" width="5" height="5"></td>
-          <td bgcolor="#D0D6E4"> 
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr> 
-                <td><img src="{{ design_url|raw }}/img/negyzet_lila.gif" width="6" height="8" align="absmiddle"><img src="img/space.gif" width="5" height="5"><span class="dobozcim_fekete">Napi 
-                  elm&eacute;lked&eacute;s </span></td>
-                <td> 
-                  <div align="right"><span class="dobozfocim_fekete"><img src="{{ design_url|raw }}/img/lilacsik.jpg" width="170" height="7" align="absmiddle"></span></div>
-                </td>
-              </tr>
-            </table>
-          </td>
-          <td width="5" bgcolor="#D0D6E4"><img src="img/space.gif" width="5" height="5"></td>
-        </tr>
-        <tr bgcolor="#F8F4F6"> 
-          <td width="5" bgcolor="#F3F3F5"></td>
-          <td bgcolor="#F3F3F5">{{ elmelkedes|raw }}</td>
-          <td width="5" bgcolor="#F3F3F5"></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>-->
+
+<script>
+$('input.datepicker').datepicker({
+	format: "yyyy-mm-dd",
+	weekStart: 1,
+	language: "hu",
+	autoclose: true,
+	todayHighlight: true
+});
+</script>
 
 {%  endblock %}
 
