@@ -4,12 +4,15 @@ if(isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
     $mapping = array(11=>'termsandconditions',12=>'impressum');
     header('Location: index.php?q=static&name='.$mapping[$_GET['fm']]);
     exit;
+} else if(isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 29) {
+    header('Location: index.php?q=user/maintainedchurches');
+    exit;
 }
 
 include("load.php");
 
 //TODO: ez itt nem túl barátságok dolog
-$action = \Request::Simpletext('q');
+$action = \Request::Text('q');
 switch ($action) {
     case 'remarks':
         $html = new \Html\Remark();        
@@ -23,14 +26,17 @@ switch ($action) {
         $html = new \Html\StaticPage();        
         break;
     
+    case 'user/maintainedchurches':
+        $html = new \Html\User\MaintainedChurches();
+    
     default:
         @include $action . ".php";
         break;
 }    
 
 if  ($html) {
-    $html->render();
     $html->messages = getMessages();
+    $html->render();    
     echo $html->html;
     exit;
 }

@@ -1,0 +1,36 @@
+{% extends "layout.twig" %}
+
+{% block content %}    
+    <span class=alap>Köszönjük, hogy segítesz oldalunk tartalmának gazdagításában, naprakészen tartásában!</span><br>
+    <table class="table table-hover table-condensed table-striped">
+        <tr>
+            <th class="col-md-1"></th>
+            <th class="col-md-7">Misézőhely neve (és városa)</th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése"></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Templom szerkesztése"></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Templom lapjának megtekintése"></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom és miserendje törlése"></span></th>
+        </tr>
+        {% for church in churches %}
+            <tr>
+                <td>{{ church.jelzes.html|raw }}</td>
+                <td>
+                    <a href=?m_id={{ m_id }}&m_op=addtemplom&tid={{ church.id }} title='{{ church.ismertnev }}'><strong>{{ church.nev }}</strong> ({{ church.location.varos }})
+                    </a>
+                </td>
+                <td>
+                    <a href="?m_id={{ m_id }}&m_op=addmise&tid={{ church.id }}"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése..."></span></a>
+                </td>
+                <td>
+                    <a href="?m_id={{ m_id }}&m_op=addtemplom&tid={{ church.id }}"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="A templom adatainak szerkesztése."></a>
+                </td>
+                <td>
+                    <a href="?templom={{ church.id }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Ugrás a templom oldalára."></span></a>
+                </td>				
+                <td>
+                    <a href="?m_id={{ m_id }}&m_op=deltemplom&tid={{ church.id }}" class="red"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom törlése..."></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
