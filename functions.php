@@ -2587,14 +2587,6 @@ function getMessages() {
     return (array) $return;
 }
 
-/*
-  TODO: delete alapnyelv();
- */
-
-function alapnyelv($text) {
-    return $text;
-}
-
 function quit() {
     global $user;
 

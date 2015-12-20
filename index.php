@@ -6,17 +6,24 @@ include("load.php");
 $action = \Request::Simpletext('q');
 switch ($action) {
     case 'remarks':
-        $html = new \Html\Remark();
-        $html->render();
-        $html->messages = getMessages();
-        echo $html->html;
-        exit;
+        $html = new \Html\Remark();        
         break;
 
+    case 'help':
+        $html = new \Html\Help();        
+        break;
+   
     default:
         @include $action . ".php";
         break;
 }    
+
+if  ($html) {
+    $html->render();
+    $html->messages = getMessages();
+    echo $html->html;
+    exit;
+}
 
 if(!isset($_GET['q']))  {
 
