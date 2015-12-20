@@ -66,14 +66,16 @@ span.toggle.active {
 	margin: 0 0 1em 1em;
 }
 
-.doboz th {
-	background-color: #B51A7E;
-}
-
-.doboz td {
+.doboz > div {
+	padding: 5px;
 	background-color: #F8F4F6;
 }
 
-.dobozcim_feher {
+.doboz .header {
+	background-color: #B51A7E;
 	color: white;
+}
+
+.doboz .header img {
+	margin-right: 5px;
 }

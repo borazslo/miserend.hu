@@ -109,7 +109,7 @@ class Church extends Html {
             $variables = array(
                 'header' => array('content' => 'Jó tudni...'),
                 'content' => nl2br($megjegyzes),
-                'settings' => array(),
+                'settings' => array('class' => 'doboz'),
                 'design_url' => $config['path']['domain']);
             $jotudni = $twig->render('doboz_lila.html', $variables);
         }
