@@ -834,7 +834,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         $query .= " INNER JOIN misek ON misek.tid = templomok.id ";
         if ($args['tnyelv'] == 'h')
             $args['tnyelv'] = 'hu|h';
-        $where[] = " misek.nyelv  REGEXP '(^|,)(" . $args['tnyelv'] . ")([0-5]{0,1}|-1|ps|pt)(,|$)' ";
+        $where[] = " misek.nyelv  REGEXP '(^|,)(" . mysql_real_escape_string($args['tnyelv']) . ")([0-5]{0,1}|-1|ps|pt)(,|$)' ";
     }
     if (count($where) > 0)
         $query .= "WHERE " . implode(' AND ', $where);
@@ -843,12 +843,12 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 
     $query .= " ORDER BY nev ";
     if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
+        if ($config['debug']) echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     $return['sum'] = mysql_num_rows($lekerdez);
     if (!$filterdistance)
         $query .= " LIMIT " . ($offset ) . "," . ($limit + $offset);
     if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
+        if ($config['debug']) echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
         if ($filterdistance) {
             //acos(sin(:lat)*sin(radians(Lat)) + cos(:lat)*cos(radians(Lat))*cos(radians(Lon)-:lon)) * :R < :rad
@@ -880,12 +880,13 @@ function searchChurchesWhere($args) {
 
     if ($args['kulcsszo'] != '') {
         $subwhere = array();
-        if (preg_match('(\*|\?)', $args['kulcsszo'])) {
-            $regexp = preg_replace('/\*/i', '.*', $args['kulcsszo']);
+        $escaped = mysql_real_escape_string($args['kulcsszo']);
+        if (preg_match('(\*|\?)', $escaped)) {
+            $regexp = preg_replace('/\*/i', '.*', $escaped);
             $regexp = preg_replace('/\?/i', '.{1}', $regexp);
             $text = " REGEXP '" . $regexp . "'";
         } else {
-            $text = " LIKE '%" . $args['kulcsszo'] . "%'";
+            $text = " LIKE '%" . $escaped . "%'";
         }
         foreach (array('nev', 'ismertnev', 'varos', 'cim', 'megkozelites', 'plebania', 'templomok.megjegyzes', 'misemegj') as $column) {
             $subwhere[] = $column . $text;
@@ -897,12 +898,13 @@ function searchChurchesWhere($args) {
         if ($args['varos'] == 'Budapest')
             $args['varos'] = 'Budapest*';
 
-        if (preg_match('(\*|\?)', $args['varos'])) {
-            $regexp = preg_replace('/\*/i', '.*', $args['varos']);
+		$escaped = mysql_real_escape_string($args['varos']);
+        if (preg_match('(\*|\?)', $escaped)) {
+            $regexp = preg_replace('/\*/i', '.*', $escaped);
             $regexp = preg_replace('/\?/i', '.{1}', $regexp);
             $where[] = "varos REGEXP '^" . $regexp . "$'";
         } else {
-            $where[] = "varos='" . $args['varos'] . "'";
+            $where[] = "varos='" . $escaped . "'";
         }
     }
 
@@ -929,9 +931,9 @@ function searchChurchesWhere($args) {
     }
 
     if ($args['ehm'] != 0)
-        $where[] = "egyhazmegye='" . $args['ehm'] . "'";
+        $where[] = "egyhazmegye='" . mysql_real_escape_string($args['ehm']) . "'";
     if (isset($args['espkerT'][$args['ehm']]) AND $args['espkerT'][$args['ehm']] != 0)
-        $where[] = "espereskerulet='" . $args['espkerT'][$args['ehm']] . "'";
+        $where[] = "espereskerulet='" . mysql_real_escape_string($args['espkerT'][$args['ehm']]) . "'";
 
     return $where;
 }
@@ -1006,10 +1008,10 @@ function searchMasses($args, $offset = 0, $limit = 20) {
             $nothu[] = $abbrev;
     if ($args['nyelv'] != '0' AND $args['nyelv'] != '') {
         if ($args['nyelv'] == 'h') {
-            $where[] = "( m.nyelv REGEXP '(^|,)(" . $args['nyelv'] . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' OR 
+            $where[] = "( m.nyelv REGEXP '(^|,)(" . mysql_real_escape_string($args['nyelv']) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' OR 
                 templomok.orszag = 12 AND m.nyelv NOT REGEXP '(^|,)(" . implode("|", $nothu) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' )";
         } else {
-            $where[] = "( m.nyelv REGEXP '(^|,)(" . $args['nyelv'] . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' )";
+            $where[] = "( m.nyelv REGEXP '(^|,)(" . mysql_real_escape_string($args['nyelv']) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' )";
         }
     }
 
@@ -1025,7 +1027,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         $wherekor = array();
         foreach ($args['kor'] as $kor) {
             if (in_array($kor, $ages)) {
-                $wherekor[] = " m.milyen REGEXP '(^|,)(" . $kor . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
+                $wherekor[] = " m.milyen REGEXP '(^|,)(" . mysql_real_escape_string($kor) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
             } elseif ($kor == 'na') {
                 $wherekor[] = " m.milyen NOT REGEXP '(^|,)(" . implode('|', $ages) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
             }
@@ -1042,7 +1044,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         $wherezene = array();
         foreach ($args['zene'] as $zene) {
             if (in_array($zene, $musics)) {
-                $wherezene[] = " m.milyen REGEXP '(^|,)(" . $zene . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
+                $wherezene[] = " m.milyen REGEXP '(^|,)(" . mysql_real_escape_string($zene) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
             } elseif ($zene == 'na') {
                 $wherezene[] = " m.milyen NOT REGEXP '(^|,)(" . implode("|", $musics) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
             }
@@ -1065,7 +1067,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
             $where[] = "( (m.milyen NOT REGEXP '(^|,)(" . implode("|", $notrom) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' AND egyhazmegye NOT IN (17,18)) OR 
                         ( egyhazmegye IN (17,18) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
         } else {
-            $where[] = " m.milyen REGEXP '(^|,)(" . $args['ritus'] . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
+            $where[] = " m.milyen REGEXP '(^|,)(" . mysql_real_escape_string($args['ritus']) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
         }
     }
 
@@ -1096,7 +1098,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     $query .= "\n GROUP BY tid \n";
     $query .= ") groups ;";
     if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
+        if ($config['debug']) echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     $row = mysql_fetch_row($lekerdez, MYSQL_ASSOC);
     $return['sum'] = $row['sum'];
 
@@ -1114,7 +1116,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         $query .= " WHERE " . implode(' AND ', $where);
     $query .= " ORDER BY ido, templomok.varos, templomok.nev ";
     if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
+        if ($config['debug']) echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     $masses = array();
     //echo $query;
     while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
@@ -1184,7 +1186,7 @@ function generateMassTmp($where = false) {
     if ($where != false)
         $query .= "AND ( " . $where . " ) ";
     if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
+        if ($config['debug']) echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
         if ($row['tol'] == '')
             $row['tol'] = '01-01';
