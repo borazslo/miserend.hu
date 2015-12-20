@@ -1,19 +1,35 @@
 <?php
 //For compatibility
 if(isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
-    $mapping = array(11=>'termsandconditions',12=>'impressum');
-    header('Location: index.php?q=static&name='.$mapping[$_GET['fm']]);
-    exit;
+    $_REQUEST['q'] = "static";
+    $_REQUEST['name'] = $mapping[$_GET['fm']];
 } else if(isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 29) {
-    header('Location: index.php?q=user/maintainedchurches');
-    exit;
-}
+    $_REQUEST['q'] = 'user/maintainedchurches';    
+} else if(isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 26) {
+    if($_REQUEST['m_op'] == 'keres') {
+         if (isset($_REQUEST['misekereses'])) {
+             $_REQUEST['q'] = 'searchresultsmasses';
+         }            
+        else {
+            $_REQUEST['q'] = 'searchresultschurches';
+        }
+    } elseif($_REQUEST['m_op'] == 'view') {
+        $_REQUEST['q'] = 'church';
+    } else {
+        $_REQUEST['q'] = 'home';
+    }
+ } else if(isset($_REQUEST['templom']))  {        
+     $_REQUEST['q'] = 'church';
+     $_REQUEST['tid'] = $_REQUEST['templom'];
+} else if(!isset($_REQUEST['m_id']) AND !isset($_REQUEST['q']) AND !isset($_REQUEST['templom'])) {
+    $_REQUEST['q'] = 'home';
+}    
 
 include("load.php");
 
 //TODO: ez itt nem túl barátságok dolog
 $action = \Request::Text('q');
-switch ($action) {
+switch ($action) {        
     case 'remarks':
         $html = new \Html\Remark();        
         break;
@@ -28,6 +44,22 @@ switch ($action) {
     
     case 'user/maintainedchurches':
         $html = new \Html\User\MaintainedChurches();
+    
+    case 'home':
+        $html = new \Html\Home();        
+        break;
+
+    case 'church':
+        $html = new \Html\Church();        
+        break;
+    
+    case 'searchresultschurches':
+        $html = new \Html\SearchResultsChurches();
+        break;
+
+    case 'searchresultsmasses':
+        $html = new \Html\SearchResultsmasses();
+        break;
     
     default:
         @include $action . ".php";
@@ -58,31 +90,27 @@ if(!isset($_GET['q']))  {
 
     /*
       Module, azaz fő anyag betöltése
-     */
-    $query = "select fajlnev as fajl,zart,jogkod from modulok where id='" . $m_id . "' and ok='i' AND fajlnev != '' LIMIT 1;";
-    $lekerdez = mysql_query($query);
-    $module = mysql_fetch_assoc($lekerdez);
-    if ($module == array() OR ! is_file("moduls/" . $module['fajl'] . ".php"))
-        $hiba = 'A választott modul behívása sikertelen.';
-    if ($module['zart'] == 1 and ! $user->loggedin)
-        $hiba = 'A hozzáféréshez be kell jelentkezni.';
-// Az admin_miserend kivétel, mert ahhoz megfelelő normálék is hozzáférhetnek!
-    if (!$user->checkRole($module['jogkod'] AND $m_id != 27))
-        $hiba = 'A hozzáféréshez további jogosultságokra volna szükség.';
+     */    
+    if (!$m_op)
+        $m_op = $_REQUEST['m_op'];
+    if (empty($m_op))
+        $m_op = 'index';
 
-    if (!$hiba) {
-        if (!$m_op)
-            $m_op = $_REQUEST['m_op'];
-        if (empty($m_op))
-            $m_op = 'index';
+    switch ($m_id) {      
+        case 27:
+            if (! $user->loggedin) {
+                throw new Exception('A hozzáféréshez be kell jelentkezni.');
+            }
+            include_once("moduls/admin_miserend.php");
+            break;
+        case 28:
+            include_once("moduls/regisztracio.php");
 
-        if (!include_once("moduls/" . $module['fajl'] . ".php"))
-            $hiba = 'HIBA! A szükséges fájl nem hívható be! (' . $module['fajl'] . ')';
+            break;        
+        default:
+            break;
     }
-    if ($hiba) {
-        echo $hiba;
-        exit;
-    }
+    
 }
 
 if (isset($tartalom)) {
@@ -99,9 +127,6 @@ if (!isset($vars['pageTitle']))
     $vars['pageTitle'] = 'VPP - miserend';
 if (isset($titlekieg))
     $vars['pagetitle'] = preg_replace("/^( - )/i", "", $titlekieg) . " | " . $vars['pagetitle'];
-
-//TODO: ezmiez
-$emaillink_lablec = "<A HREF=\"javascript:linkTo_UnCryptMailto('ocknvq%3CkphqBokugtgpf0jw');\" class=emllink>info<img src=img/kukaclent.gif align=absmiddle border=0>miserend.hu</a>";
 
 
 $adminmenuitems = array();

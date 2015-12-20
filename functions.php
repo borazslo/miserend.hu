@@ -1242,25 +1242,6 @@ function getRemarkMark($tid) {
     return $return;
 }
 
-function map_view() {
-    $return = array();
-
-    $return['template'] = 'map';
-    $return['script'][] = '
-
-        <script src="js/lib/DecimalFormat.js" language="javascript"></script>
-        <script src="http://openlayers.org/en/v3.2.0/build/ol.js" type="text/javascript"></script>
-        <script src="http://openlayers.org/api/OpenLayers.js"></script>
-        <script src="http://acuriousanimal.com/code/animatedCluster/ol/OpenLayers.js"></script>
-        <script src="js/lib/AnimatedCluster.js"></script>
-        ';
-
-
-
-
-    return $return;
-}
-
 function widget_miserend($args) {
     global $twig, $config;
     $tid = $args['tid'];
@@ -2681,6 +2662,80 @@ function chat_getusers($format = false) {
         $return = $text;
     }
     return $return;
+}
+
+function androidreklam() {
+    global $twig;
+    $dobozcim = 'Már androidra is';
+    //$dobozszoveg=nl2br($misemegj);
+    $dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz-kep')\"><img src=\"http://terkep.miserend.hu/images/device-2014-03-24-230146_framed.png\" height=\"180\" style=\"float:right\"></a>Megjelent a <a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz')\">miserend androidos mobiltelefonokra</a> készült változata is. Ám még meg kell találni néhány templomnak a pontos helyét a térképen. Kérem segítsen nekünk!<br/><center><a href=\"http://terkep.miserend.hu\" onclick=\"ga('send','event','Advertisment','terkep.miserend.hu','liladoboz')\">terkep.miserend.hu</a></center>";
+
+    $s = rand(1, 8);
+
+    if ($s > 6)
+        $dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\"  onclick=\"ga('send','event','Advertisment','play.google.com','liladoboz-kep')\">
+  <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" style=\"display:block;margin-right:auto;margin-left:auto;width:100%;max-width:172px\" /></a>";
+    else
+        $dobozszoveg = '<center><a href="https://geo.itunes.apple.com/us/app/miserend/id967827488?mt=8" style="display:inline-block;overflow:hidden;background:url(http://linkmaker.itunes.apple.com/images/badges/en-us/badge_appstore-lrg.svg) no-repeat;width:165px;height:40px;" onclick="ga(\'send\',\'event\',\'Advertisment\',\'itunes.apple.com\',\'liladoboz-kep\')\"></a></center>';
+
+    return $dobozszoveg;
+}
+
+function miserend_printRegi() {
+    $templomok = miserend_getRegi();
+
+    $return = '<img src="design/miserend/img/negyzet_kek.gif" align="absmiddle" style="margin-right:5px"><span class="dobozcim_fekete">Legrégebben frissített templomaink</span><br/>';
+    $return .= "<span class=\"alap\">Segíts nekünk az adatok frissen tartásában! Hívj fel egy régen frissült templomot!</span><br/><br/>";
+    $c = 0;
+    foreach ($templomok as $templom) {
+        if (isset($templom['eszrevetel'])) {
+            $return .= "<span class=\"alap\"><i>folyamatban: " . $templom['nev'] . " (" . $templom['varos'] . ")</i></span><br/>\n";
+        } else {
+            $return .= "<span class=\"alap\">" . date('Y.m.d.', strtotime($templom['frissites'])) . "</span> <a class=\"felsomenulink\" href=\"?templom=" . $templom['id'] . "\">" . $templom['nev'] . " (" . $templom['varos'] . ")</a><br/>\n";
+        }
+        //echo print_R($templom,1)."<br>";
+
+        if ($c > 10)
+            break;
+        $c++;
+    }
+
+
+    return $return;
+}
+
+
+function miserend_getRegi() {
+    $return = array();
+    $results = mysql_query('SELECT templomok.id, templomok.varos, templomok.nev, templomok.ismertnev, frissites, egyhazmegye, egyhazmegye.nev as egyhazmegyenev FROM templomok LEFT JOIN egyhazmegye ON egyhazmegye.id = egyhazmegye WHERE templomok.ok = "i" AND templomok.nev LIKE \'%templom%\' ORDER BY frissites ASC LIMIT 100');
+    while ($templom = mysql_fetch_assoc($results)) {
+        $results2 = mysql_query("SELECT * FROM eszrevetelek WHERE hol = 'templomok' AND hol_id = " . $templom['id'] . " AND ( allapot = 'u' OR allapot = 'f' ) ORDER BY datum DESC, allapot DESC LIMIT 1 ;");
+        //while ($eszrevetel = mysql_fetch_assoc($results2)) { print_R($eszrevetel); }
+        if (mysql_num_rows($results2) > 0) {
+            $eszrevetel = mysql_fetch_assoc($results2);
+            $templom['eszrevetel'] = $eszrevetel;
+        }
+        $return[] = $templom;
+    }
+    return $return;
+}
+
+function idoszak($i) {
+    switch ($i) {
+        case 'a': $tmp = 'Ádventi idő';
+            break;
+        case 'k': $tmp = 'Karácsonyi idő';
+            break;
+        case 'n': $tmp = 'Nagyböjti idő';
+            break;
+        case 'h': $tmp = 'Húsvéti idő';
+            break;
+        case 'e': $tmp = 'Évközi idő';
+            break;
+        case 's': $tmp = 'Szent ünnepe';
+            break;
+    }
+    return $tmp;
 }
 
 function dieJsonException($message) {
