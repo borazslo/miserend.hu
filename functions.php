@@ -169,27 +169,6 @@ function getuser() {
     return $return;
 }
 
-function clearMenu($menuitems) {
-    global $user;
-
-    foreach ($menuitems as $key => $item) {
-        if (isset($item['permission']) AND ! $user->checkRole($item['permission'])) {
-            unset($menuitems[$key]);
-        } else {
-            if (isset($item['items']) AND is_array($item['items'])) {
-                foreach ($item ['items'] as $k => $i) {
-                    if (isset($i['permission']) AND ! $user->checkRole($i['permission'])) {
-                        unset($menuitems[$key][$k]);
-                    } else {
-                        
-                    }
-                }
-            }
-        }
-    }
-    return $menuitems;
-}
-
 function cookieSave($uid, $name) {
     $isCLI = ( php_sapi_name() == 'cli' );
 
@@ -2738,10 +2717,31 @@ function idoszak($i) {
     return $tmp;
 }
 
-function dieJsonException($message) {
-    $error = ['error' => 1,
-        'text' => $message];
-    echo(json_encode($error));
+function allowOldUrls() {
+    //For compatibility
+    if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
+        $_REQUEST['q'] = "staticpage";
+        $_REQUEST['name'] = $mapping[$_GET['fm']];
+    } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 29) {
+        $_REQUEST['q'] = 'user/maintainedchurches';
+    } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 26) {
+        if ($_REQUEST['m_op'] == 'keres') {
+            if (isset($_REQUEST['misekereses'])) {
+                $_REQUEST['q'] = 'searchresultsmasses';
+            } else {
+                $_REQUEST['q'] = 'searchresultschurches';
+            }
+        } elseif ($_REQUEST['m_op'] == 'view') {
+            $_REQUEST['q'] = 'church';
+        } else {
+            $_REQUEST['q'] = 'home';
+        }
+    } else if (isset($_REQUEST['templom'])) {
+        $_REQUEST['q'] = 'church';
+        $_REQUEST['tid'] = $_REQUEST['templom'];
+    } else if (!isset($_REQUEST['m_id']) AND ! isset($_REQUEST['q']) AND ! isset($_REQUEST['templom'])) {
+        $_REQUEST['q'] = 'home';
+    }
 }
 
 function callPageFake($uri, $post, $phpinput = array()) {

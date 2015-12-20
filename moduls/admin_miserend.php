@@ -1336,6 +1336,12 @@ if ($jog == true) {
             $form['template'] = 'admin_editevents';
             $tartalom = $form;
             break;
+            
+        default:
+            $tartalom = miserend_modtemplom();
+            //$tartalom=miserend_index();
+            break;
+     
     }
 }
 else {

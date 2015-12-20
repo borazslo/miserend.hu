@@ -33,7 +33,7 @@ class Table extends Api {
                 throw new \Exception("Column '$column' is invalid in '$this->tableName'.");
             }
         }
-        if (isset($this->input['format']) AND ! in_array($this->input['format'], array('json', 'text'))) {
+        if (isset($this->input['format']) AND ! in_array($this->input['format'], array('json', 'text', 'csv'))) {
             throw new \Exception("Format '" . $this->input['format'] . "' is not supported.");
         }
     }
@@ -68,19 +68,8 @@ class Table extends Api {
                 break;
         }
 
-        switch ($this->format) {
-            case 'json':
-                $this->return[$this->tableName] = $this->table;
-
-                break;
-
-            case 'text':
-                break;
-
-            default:
-                throw new \Exception("Format '" . $this->input['format'] . "' is not supported.");
-                break;
-        }
+        if ($this->format == 'text')
+            $this->format = 'csv';
 
         $this->return[$this->tableName] = $this->table;
 
@@ -142,18 +131,4 @@ class Table extends Api {
         }
         $this->table = $output;
     }
-
-    public function printOutputText() {
-        if (is_array($this->return)) {
-            //TODO: a szöveg nem tartalmazhatja az elválasztó karaktert, különben gond van.
-            $columnNames = array_keys($this->return[$this->tableName][0]);
-            echo implode($this->delimiter, $columnNames), ";\n";
-            foreach ($this->return[$this->tableName] as $row) {
-                echo implode($this->delimiter, $row), ";\n";
-            }
-        } else {
-            echo $this->return;
-        }
-    }
-
 }

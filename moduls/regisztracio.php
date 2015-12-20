@@ -301,5 +301,9 @@ switch ($m_op) {
         }
 
         break;
+        
+    default :
+        $tartalom = user_edit($user->uid);
+        break;    
 }
 ?>

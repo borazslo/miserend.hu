@@ -37,46 +37,4 @@ class Api {
             $this->validateInput();
         }
     }
-
-    public function printException($exception) {
-        $this->return = array(
-            'error' => '1',
-            'text' => $exception->getMessage()
-        );
-        $this->printOutput();
-    }
-
-    public function printOutput() {
-        switch ($this->format) {
-            case 'json':
-                $this->printOutputJson();
-                break;
-
-            case 'text':
-                $this->printOutputText();
-                break;
-
-            default:
-                $this->printOutputText();
-                break;
-        }
-    }
-
-    public function printOutputText() {
-        if (is_array($this->return)) {
-            foreach ($this->return as $key => $value) {
-                echo $key . ": \"" . $value . "\";\n";
-            }
-        } else {
-            echo $this->return;
-        }
-    }
-
-    public function printOutputJson() {
-        if (!isset($this->return['error'])) {
-            $this->return['error'] = 0;
-        }
-        echo json_encode($this->return);
-    }
-
 }

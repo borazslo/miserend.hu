@@ -18,6 +18,7 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
+                if ($this->checkRole('miserend')) { $this->isadmin = true;}
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -38,6 +39,7 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
+                if ($this->checkRole('miserend')) { $this->isadmin = true;}
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -65,6 +67,7 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
+                if ($this->checkRole('miserend')) { $this->isadmin = true;}
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, hogy nincs uid-jű user. Legyen vendég?
