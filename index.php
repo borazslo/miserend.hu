@@ -1,4 +1,10 @@
 <?php
+//For compatibility
+if(isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
+    $mapping = array(11=>'termsandconditions',12=>'impressum');
+    header('Location: index.php?q=static&name='.$mapping[$_GET['fm']]);
+    exit;
+}
 
 include("load.php");
 
@@ -12,7 +18,11 @@ switch ($action) {
     case 'help':
         $html = new \Html\Help();        
         break;
-   
+ 
+    case 'static':
+        $html = new \Html\StaticPage();        
+        break;
+    
     default:
         @include $action . ".php";
         break;
