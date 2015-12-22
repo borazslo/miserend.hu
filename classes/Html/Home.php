@@ -472,7 +472,6 @@ class Home extends Html {
             'elmelkedes' => $elmelkedes,
             'design_url' => $config['path']['domain'],
             'alert' => LiturgicalDayAlert('html'),
-            'campaign' => updatesCampaign(),
         );
         $variables['template'] = 'home.twig';
         

@@ -211,7 +211,6 @@ class Church extends Html {
                 'szomszedok' => $szomszedok,
                 'napok' => array('', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', '<font color=#AC282B><b>vasárnap</b></font>'),
                 'design_url' => $config['path']['domain'],
-                'campaign' => updatesCampaign(),
                 'alert' => LiturgicalDayAlert('html'),
                 'titlekieg' => $titlekieg,
             );
