@@ -15,7 +15,7 @@ switch ($_REQUEST['q']) {
         break;
 
     case 'daily':
-        clearoutVolunteers();
+        #clearoutVolunteers();
         deleteOverpass();
         updateOSM();
         for ($v = 1; $v < 5; $v++) {
@@ -27,7 +27,7 @@ switch ($_REQUEST['q']) {
 
 
     case 'weekly':
-        assignUpdates();
+        #assignUpdates();
         updateImageSizes();
         generateMassTmp();
 

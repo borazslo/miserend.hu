@@ -117,7 +117,7 @@ if (count($user->responsible['diocese']) > 0 AND ! $user->checkRole('miserend'))
 $vars['adminmenu'] = $adminmenuitems;
 
 //Campaing betöltése
-$vars['campaign'] = updatesCampaign();
+$vars['campaign'] = ""; //updatesCampaign();
 
 
 //Saját templomok blokkjához
