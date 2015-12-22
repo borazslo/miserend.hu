@@ -2,8 +2,24 @@
 
 class Request {
 
+    function Integer($name) {
+        $value = self::get($name);
+        if (!is_numeric($value)) {
+            throw new Exception("Required '$name' is not an Integer.");
+        }
+        return $value;
+    }
+
     function IntegerRequired($name) {
         $value = self::getRequired($name);
+        if (!is_numeric($value)) {
+            throw new Exception("Required '$name' is not an Integer.");
+        }
+        return $value;
+    }
+
+    function IntegerwDefault($name, $default = false) {
+        $value = self::getwDefault($name, $default);
         if (!is_numeric($value)) {
             throw new Exception("Required '$name' is not an Integer.");
         }
@@ -16,6 +32,12 @@ class Request {
         return $value;
     }
 
+    function TextwDefault($name, $default = false) {
+        $value = self::getwDefault($name, $default);
+        $value = sanitize($value);
+        return $value;
+    }
+
     function TextRequired($name) {
         $value = self::getRequired($name);
         $value = sanitize($value);
@@ -24,6 +46,14 @@ class Request {
 
     function Simpletext($name) {
         $value = self::get($name);
+        if ($value != '' AND ! preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
+            throw new Exception("Variable '$name' is not a SimpleText.");
+        }
+        return $value;
+    }
+
+    function SimpletextwDefault($name, $default = false) {
+        $value = self::getwDefault($name, $default);
         if ($value != '' AND ! preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
             throw new Exception("Variable '$name' is not a SimpleText.");
         }

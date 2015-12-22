@@ -1,85 +1,5 @@
 <?php
 
-function user_list() {
-    global $db_name, $linkveg, $m_id, $sid, $_POST;
-
-    $kulcsszo = $_REQUEST['kulcsszo'];
-    $sort = $_REQUEST['sort'];
-    if (empty($sort))
-        $sort = 'lastactive desc';
-    $adminok = $_REQUEST['adminok'];
-    $limit = $_REQUEST['limit'];
-    if (empty($limit))
-        $limit = 50;
-
-    $kiir.="\n<form method=post><input type=hidden name=sid value=$sid>";
-    $kiir.="\n<input type=hidden name=m_id value=$m_id><input type=hidden name=m_op value=list>";
-    $kiir.="\n<input type=text name=kulcsszo value='$kulcsszo' class=urlap size=20>";
-    $kiir.="\n<select name=adminok class=urlap><option value=0>Mindenki</option>";
-    $query = "select jogkod from modulok where jogkod!=''";
-    $lekerdez = mysql_db_query($db_name, $query);
-    while (list($jogkod) = mysql_fetch_row($lekerdez)) {
-        $kiir.="\n<option value='$jogkod'";
-        if ($adminok == $jogkod)
-            $kiir.=' selected';
-        $kiir.=">$jogkod</option>s";
-    }
-    $kiir.="\n</select>";
-
-    $kiir.="\n<br><span class=alap>rendezés: </span><select name=sort class=urlap> ";
-    $sortT['felhasználó név'] = 'login';
-    $sortT['becenév'] = 'becenev';
-    $sortT['név'] = 'nev';
-    $sortT['utolsó belépés'] = 'lastlogin desc';
-    $sortT['utolsó aktivitás'] = 'lastactive desc';
-    $sortT['regisztráció'] = 'regdatum desc';
-
-
-
-    foreach ($sortT as $kulcs => $ertek) {
-        $kiir.="<option value='$ertek'";
-        if ($ertek == $sort)
-            $kiir.=' selected';
-        $kiir.=">$kulcs</option>";
-    }
-    $kiir.="\n</select><input type=submit value=Lista class=urlap></form>";
-
-    $vars['form'] = $kiir;
-
-    if (!empty($kulcsszo)) {
-        $feltetelT[] = "login like '%$kulcsszo%'";
-        $feltetelT[] = "nev like '%$kulcsszo%'";
-        $feltetelT[] = "email like '%$kulcsszo%'";
-    }
-    if (!empty($adminok)) {
-        $feltetelT[] = "jogok like '%$adminok%'";
-    }
-    if (is_array($feltetelT))
-        $feltetel = "where (" . implode(' or ', $feltetelT) . ')';
-
-    $users = array();
-    $query = "select * from user $feltetel order by $sort";
-    $lekerdez = mysql_query($query);
-    while ($user = mysql_fetch_assoc($lekerdez)) {
-
-        if (preg_match('/^(lastlogin|lastactive|regdatum)/i', $sort, $match))
-            $field = preg_replace(array('/ /i', '/-/i'), array('&nbsp;', '&#8209;'), $match[1]);
-        else
-            $field = 'lastlogin';
-
-        $user['field'] = $user[$field];
-        $users[$user['uid']] = $user;
-    }
-
-    $vars['field'] = $field;
-    $vars['m_id'] = $m_id;
-    $vars['users'] = $users;
-    $vars['template'] = "users_list";
-
-
-    return $vars;
-}
-
 function user_edit($uid = false) {
     global$user, $m_id;
 
@@ -273,15 +193,6 @@ switch ($m_op) {
 
     case 'jelszokuld':
         $tartalom = user_jelszokuld();
-        break;
-
-    case 'list':
-        if ($user->checkRole('user'))
-            $tartalom = user_list();
-        else {
-            addMessage('Nincs jogosultságod megnézni a felhasználók listáját.', 'warning');
-            $tartalom = array('title' => 'Felhasználók listája');
-        }
         break;
 
     case 'del':

@@ -2719,7 +2719,11 @@ function idoszak($i) {
 
 function allowOldUrls() {
     //For compatibility
-    if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
+    if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 28){
+        if($_REQUEST['m_op'] == 'list') {
+            $_REQUEST['q'] = "user/list";
+        }
+    } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
         $_REQUEST['q'] = "staticpage";
         $_REQUEST['name'] = $mapping[$_GET['fm']];
     } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 29) {

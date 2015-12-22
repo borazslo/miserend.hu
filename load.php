@@ -63,7 +63,7 @@ if ($output[0] != '')
 //
 //  Useful CONSTANTS
 //
-// ATTRIBUTES, LANGUAGES, PERIODS 
+// ATTRIBUTES, LANGUAGES, PERIODS, ROLES 
 //
 $milyen = array(
     'csal' => array(
@@ -214,4 +214,7 @@ $periods = array(
     )
 );
 define("PERIODS", serialize($periods));
+
+$roles = ['miserend', 'user'];
+define("ROLES", serialize($roles));
 ?>

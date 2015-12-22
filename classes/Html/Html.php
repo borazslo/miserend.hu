@@ -44,10 +44,10 @@ class Html {
                     ['title' => 'kifejezések és dátumok', 'url' => '?m_id=27&m_op=events', 'permission' => 'miserend'],
                 ]
             ],
-            ['title' => 'Felhasználók', 'url' => '?m_id=21', 'permission' => 'user', 'mid' => 21,
+            ['title' => 'Felhasználók', 'url' => '?q=user/list', 'permission' => 'user', 'mid' => 21,
                 'items' => [
                     ['title' => 'új felhasználó', 'url' => '?m_id=28&m_op=edit', 'permission' => 'user'],
-                    ['title' => 'módosítás', 'url' => '?m_id=28&m_op=list', 'permission' => 'user'],
+                    ['title' => 'lista', 'url' => '?q=user/list', 'permission' => 'user'],
                 ]
             ],
         ];

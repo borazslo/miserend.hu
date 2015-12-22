@@ -20,6 +20,11 @@ switch ($action) {
 
     case 'user/maintainedchurches':
         $html = new \Html\User\MaintainedChurches();
+        break;
+
+    case 'user/list':
+        $html = new \Html\User\Catalogue();
+        break;
 
     case 'home':
         $html = new \Html\Home();
