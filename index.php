@@ -4,6 +4,7 @@ include("load.php");
 
 allowOldUrls();
 
+try {
 $action = \Request::Text('q');
 switch ($action) {
     case 'remarks':
@@ -25,7 +26,11 @@ switch ($action) {
     case 'user/list':
         $html = new \Html\User\Catalogue();
         break;
-
+    
+    case 'user/lostpassword':
+        $html = new \Html\User\LostPassword();
+        break;
+    
     case 'home':
         $html = new \Html\Home();
         break;
@@ -50,7 +55,14 @@ switch ($action) {
         @include $action . ".php";
         break;
 }
-
+} catch(\Exception $e) {
+    if($html) {
+        addMessage($e->getMessage(),'danger');
+    }
+    else {
+        echo $e->getMessage();
+    }
+}
 if ($html) {
     $html->render();
     echo $html->html;

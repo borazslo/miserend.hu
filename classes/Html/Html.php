@@ -7,10 +7,12 @@ class Html {
     public $template;
     public $menu = array();
     public $pageTitle = 'VPP - miserend';
+    public $templatesPath = 'templates2';
 
     function render() {
-        global $user, $twig;
+        global $user;
         $this->user = $user;
+
         $this->loadMenu();
         $this->campaign = updatesCampaign();
         if ($this->user->loggedin AND ! $this->user->checkRole('miserend')) {
@@ -19,10 +21,28 @@ class Html {
         if ($this->user->checkRole('"any"')) {
             $this->chat = chat_load();
         }
-                        
+
         $this->messages = getMessages();
-        
-        $this->html = $twig->render($this->template, (array) $this);
+
+        $this->loadTwig();
+        $this->getTemplateFile();
+        $this->html = $this->twig->render($this->template, (array) $this);
+    }
+
+    function loadTwig() {
+        require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
+        \Twig_Autoloader::register();
+        $loader = new \Twig_Loader_Filesystem($this->templatesPath);
+        $this->twig = new \Twig_Environment($loader); // cache?          
+    }
+
+    function getTemplateFile() {
+        if (!isset($this->template)) {
+            $className = get_class($this);
+            $classPath = preg_replace("/\\\/i", "/", get_class($this));
+            $classShortPath = preg_replace("/Html\//i", "", $classPath);
+            $this->template = $classShortPath . ".twig";
+        }
     }
 
     function loadMenu() {

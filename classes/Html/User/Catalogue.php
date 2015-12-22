@@ -37,8 +37,6 @@ class Catalogue extends \Html\Html {
         if($this->input['limit'] < $this->query->count()) {
             $this->more = "Van még ".($this->query->count() - $this->input['limit'])." találat.";
         }
-
-        $this->template = "User/List.twig";
     }
 
     function buildForm() {

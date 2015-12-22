@@ -21,7 +21,7 @@ function user_edit($uid = false) {
         }
     } else
         $edituser = new User($uid);
-    
+
     if ($edituser->uid == 0 AND $user->uid == 0) {
         $vars['title'] = "Regisztráció";
         $vars['new'] = true;
@@ -58,80 +58,6 @@ function user_edit($uid = false) {
     $vars['edituser'] = $edituser;
 
     return $vars;
-}
-
-function user_jelszo() {
-    global $m_id;
-
-
-    $szoveg = <<<EOD
-			<p>Az alábbi két adat közül legalább az egyik kitöltése alapján a rendszer megpróbál azonosítani. Ha sikerül, akkor elküld a megadott (regisztrált!) email címre egy ÚJ jelszót.</sp>
-			<form method="post">
-				<input type=hidden name=m_op value=jelszokuld>
-				<input type=hidden name=m_id value=$m_id>
-				<div class="form-group">
-					<label for="username">Felhasználónév</label>
-					<input type="text" name="lnev" class="form-control" id="username" placeholder="Felhasználónév">
-				</div>
-				<div class="form-group">
-					<label for="email">Email cím</label>
-					<input type="email" name="mail" class="form-control" id="email" placeholder="Email">
-				</div>
-				<button type="submit" class="btn btn-default">Kérem a jelszót</button>
-			</form>
-EOD;
-
-    $vars['title'] = 'Jelszó emlékeztető';
-    $vars['content'] = $szoveg;
-    $vars['template'] = 'layout';
-
-    return $vars;
-}
-
-function user_jelszokuld() {
-
-    $lnev = $_POST['lnev'];
-    $mail = $_POST['mail'];
-
-    $user = new User($mail);
-
-    if (!empty($lnev))
-        $userByNev = new User($lnev);
-    if (!empty($mail))
-        $userByMail = new User($mail);
-
-    if (!empty($lnev) AND ! empty($mail) AND $userByMail->uid != $userByNev->uid) {
-        addMessage('A megadott adatok alapján nem találtunk felhasználót.', 'danger');
-        return user_jelszo();
-    }
-
-    if ($userByNev->uid > 0)
-        $user = $userByNev;
-    elseif ($userByMail > 0)
-        $user = $userByMail;
-    else {
-        addMessage('A megadott adatok alapján nem találtunk felhasználót.', 'danger');
-        return user_jelszo();
-    }
-
-    $email = new Mail();
-    $email->subject = "Jelszó emlékeztető - Virtuális Plébánia Portál";
-
-    $newpassword = $user->generatePassword();
-    $user->newPassword($newpassword);
-
-    $email->content = "Kedves " . $user->username . "!<br/><br/>";
-    $email->content.="\n\nKérésedre küldjük a bejelentkezéshez szükséges újjelszót:";
-    $email->content.="\n" . $newpassword . "<br/><br>";
-    $email->content.="Kérjük mihamarabb változtasd meg a jelszót.<br/><br/>";
-    $email->content.="\n\nVPP \nhttp://www.plebania.net";
-
-    $email->to = $user->email;
-    $email->send();
-
-    addMessage("Az új jelszót elküldtük a regisztrált emailcímre. Kérjük lépjen be, és mihamarabb módosítsa.", 'success');
-    header('Location http://miserend.hu');
-    return true;
 }
 
 function user_del($uid) {
@@ -180,19 +106,11 @@ switch ($m_op) {
                     $tartalom = user_edit($newuser->uid);
             } catch (Exceptions $e) {
                 printr($e);
-                
+
                 $tartalom = user_edit($_REQUEST['edituser']);
             }
         }
 
-        break;
-
-    case 'jelszo':
-        $tartalom = user_jelszo();
-        break;
-
-    case 'jelszokuld':
-        $tartalom = user_jelszokuld();
         break;
 
     case 'del':
@@ -212,9 +130,9 @@ switch ($m_op) {
         }
 
         break;
-        
+
     default :
         $tartalom = user_edit($user->uid);
-        break;    
+        break;
 }
 ?>

@@ -7,7 +7,6 @@ class MaintainedChurches extends \Html\Html {
     public function __construct() {
         $this->setTitle("Módosítható templomok és miserendek");
         $this->title = "Módosítható templomok és miserendek";
-        $this->template = "User/MaintainedChurches.twig";
 
         global $user;
         if (!is_array($user->responsible['church'])) {

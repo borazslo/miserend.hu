@@ -2722,6 +2722,8 @@ function allowOldUrls() {
     if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 28){
         if($_REQUEST['m_op'] == 'list') {
             $_REQUEST['q'] = "user/list";
+        } elseif($_REQUEST['m_op'] == 'jelszo') {
+            $_REQUEST['q'] = 'user/lostpassword';
         }
     } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
         $_REQUEST['q'] = "staticpage";
