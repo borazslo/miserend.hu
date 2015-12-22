@@ -14,7 +14,7 @@ class Html {
         $this->user = $user;
 
         $this->loadMenu();
-        $this->campaign = updatesCampaign();
+        #$this->campaign = updatesCampaign();
         if ($this->user->loggedin AND ! $this->user->checkRole('miserend')) {
             $this->mychurches = feltoltes_block();
         }
