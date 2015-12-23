@@ -6,11 +6,11 @@ try {
     $action = \Request::Text('q');
     $path = new Path($action);
 
-    if (method_exists($path->className, 'factory')) {
-        $class = $path->className;
+    $class = $path->className;
+    if (method_exists($path->className, 'factory')) {        
         $html = $class::factory($path->arguments);
     } else {
-        $html = new $path->className($path->arguments);
+        $html = new $class($path->arguments);
     }
 } catch (\Exception $e) {
     if ($html) {

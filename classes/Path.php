@@ -16,12 +16,12 @@ class Path {
         for ($i = count($path) - 1; $i >= 0; $i--) {
 
             $file = implode("/", $path) . "/" . $path[$i];
-            if (file_exists($folder . $file . ".php")) {
+            if (file_exists_ci($folder . $file . ".php")) {
                 $this->className = '\\' . preg_replace("/\//", "\\", $file);
                 return;
             }
             $file = implode("/", $path);
-            if (file_exists($folder . $file . ".php")) {
+            if (file_exists_ci($folder . $file . ".php")) {
                 $this->className = '\\' . preg_replace("/\//", "\\", $file);
                 return;
             }

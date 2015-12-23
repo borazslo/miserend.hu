@@ -2672,7 +2672,7 @@ function sendJson($url, $content) {
 spl_autoload_register(function ($class) {
 
     $classpath = 'classes/' . str_replace('\\', '/', $class) . '.php';
-    if (file_exists($classpath)) {
+    if (file_exists_ci($classpath)) {
         require_once($classpath);
     }
 });
@@ -2682,6 +2682,16 @@ function env($name, $default = false) {
         return $default;
     else
         return getenv($name);
+}
+
+function file_exists_ci($file) {
+    if (file_exists($file))
+        return $file;
+    $lowerfile = strtolower($file);
+    foreach (glob(dirname($file) . '/*') as $file)
+        if (strtolower($file) == $lowerfile)
+            return $file;
+    return FALSE;
 }
 
 function printr($variable) {
