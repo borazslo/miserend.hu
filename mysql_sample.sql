@@ -609,48 +609,6 @@ INSERT INTO `misek` VALUES (233187,5104,7,'08:00:00','pt','télen',1,'10-30','03
 UNLOCK TABLES;
 
 --
--- Table structure for table `modulok`
---
-
-DROP TABLE IF EXISTS `modulok`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `modulok` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `nev` varchar(50) NOT NULL DEFAULT '',
-  `leiras` tinytext NOT NULL,
-  `fajlnev` varchar(50) NOT NULL DEFAULT '',
-  `sablon` varchar(20) NOT NULL DEFAULT 'alap',
-  `zart` int(1) NOT NULL DEFAULT '0',
-  `jogkod` varchar(50) NOT NULL DEFAULT '',
-  `szamlalo` int(11) NOT NULL DEFAULT '0',
-  `funkcio` enum('i','n') NOT NULL DEFAULT 'n',
-  `ok` enum('i','n') NOT NULL DEFAULT 'n',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `modulok`
---
-
-LOCK TABLES `modulok` WRITE;
-/*!40000 ALTER TABLE `modulok` DISABLE KEYS */;
-INSERT INTO `modulok` VALUES (25,'chat','','chat','aloldal',1,'',0,'n','i');
-INSERT INTO `modulok` VALUES (9,'admin','admin menü','admin','alap',1,'',0,'n','i');
-INSERT INTO `modulok` VALUES (17,'infó oldalak','','alap','alap',0,'',43094,'n','n');
-INSERT INTO `modulok` VALUES (21,'user admin','admin','admin_user','aloldal',1,'user',219,'n','i');
-INSERT INTO `modulok` VALUES (26,'miserend','','miserend','alap',0,'',0,'n','i');
-INSERT INTO `modulok` VALUES (27,'miserend admin','admin','admin_miserend','aloldal',1,'miserend',0,'n','i');
-INSERT INTO `modulok` VALUES (28,'regisztráció','','regisztracio','alap',0,'',0,'i','i');
-INSERT INTO `modulok` VALUES (29,'feltöltés','anyagok feltöltése (pl. miserend, hír) felhasználók által','feltoltes','aloldal',1,'',0,'n','i');
-INSERT INTO `modulok` VALUES (30,'igenaptár','','igenaptar','alap',0,'',0,'n','i');
-INSERT INTO `modulok` VALUES (31,'igenaptár admin','admin','admin_igenaptar','aloldal',1,'igenaptar',0,'n','i');
-INSERT INTO `modulok` VALUES (37,'Térkép','','terkep','alap',0,'',0,'i','i');
-/*!40000 ALTER TABLE `modulok` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `nevnaptar`
 --
 
@@ -4940,7 +4898,7 @@ DROP TABLE IF EXISTS `emails`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `emails` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
   `to` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `header` text COLLATE utf8_unicode_ci,
   `subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,

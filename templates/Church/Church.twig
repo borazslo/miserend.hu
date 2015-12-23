@@ -1,0 +1,198 @@
+{% extends "layout.twig" %}
+
+{% set pageTitle = title|raw %}
+{% block extraHead %}
+   <style>
+    .nap:after{
+        clear: both;
+        content: "";
+        display: block;
+    }
+  </style>
+
+  {{ scripts|raw }}
+{% endblock %}
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>
+        {% if favorite >= 0 %}
+            <span class="ui-icon ui-icon-star {% if favorite == 1 %}yellow{% elseif favorite == 0 %}grey{% endif %}" style="float:left;font-size:1em;margin-right:3px;width:36px;height:36px" id="star" title="{% if favorite %}Kattintásra törlés a kedvencek közül.{% else %}Kattintással kedvencek közé emelés.{% endif %}" data-tid="{{ tid }}"></span>
+        {% else %}
+            <span class="ui-icon ui-icon-star grey" style="float:left;font-size:1em;margin-right:3px;width:36px;height:36px" title="A kedvencek közé mentéshez be kell jelentkezni."></span>
+        {% endif %}
+        {{ nev|raw }}{% if ismertnev != ''  %}<br/><small> <span class="hidden-xs hidden-sm">({{ ismertnev|raw }})</span></small>{% endif %}</h2>
+    </div>
+{%  endblock %}
+
+     
+{% block content %}
+
+  {{ alert|raw }}
+    
+  <h5><b>Frissítve:</b> {{ frissites|raw }}</h5>
+
+  {% if miseaktiv == 1 %}
+
+  <div class="panel-group" id="periods">
+    {% for key,idoszak in miserend.periods %}
+      <div class="panel panel-default">
+          <div class="panel-heading visible-lg-block visible-md-block">
+              <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#periods" href="#collapsePeriod{{ key }}">
+                      <span class="glyphicon glyphicon-plus"></span> {{ idoszak.nev }}</a> 
+                      <span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span>
+              </h4>
+          </div>
+          <div id="collapsePeriod{{ key }}" class="panel-collapse collapse {% if idoszak.now %}in{% endif %}">
+              <div class="panel-body">
+                    {% for nap in idoszak.napok %}
+
+                      <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
+                      {% if nap.misek|length < 1 %}
+                            <div style="display: table-row;">
+
+                          <div class="alap" valign="top" style="display: table-cell;width:80px;padding-left:5px;line-height:16px">{{ nap.nev }}</div></div>
+
+                      {% endif %}
+
+                      {% for key, mise in nap.misek %}
+                      <div style="display: table-row;">
+                        <div class="alap" valign="top" style="display: table-cell;width:80px;padding-left:5px;line-height:16px">{% if key == 0 %}{{ nap.nev }}{% endif %}&nbsp;</div>
+
+                        <div style="display: table-cell;width:60px;text-align:right;line-height:16px" class="alap">{{ nap.misek[key].ido }}</div>
+
+                        <div style="display: table-cell;padding-left:8px" class="alap" style="line-height:16px">
+                          {% if nap.misek[key].nap2_raw != "0" %}
+                              <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
+                          {% if nap.misek[key].attr %}
+                              {% for attr in nap.misek[key].attr %} 
+                                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+                              {% endfor %}
+                          {% endif %}  
+                          {% if nap.misek[key].megjegyzes %}
+                              {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
+                          {% endif %}       
+                        </div>
+                      </div>
+                      {% endfor %} 
+                      </div>
+
+                    {% endfor %} 
+              </div>
+          </div>
+      </div>
+    {% endfor %}
+  </div>
+
+   <div class="panel-group" id="particulars">
+     {% for key,idoszak in miserend.particulars %}
+    <div class="panel panel-default">
+        <div class="panel-heading visible-lg-block visible-md-block">
+            <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#particulars" href="#collapseParticular{{ key }}">
+                    <span class="glyphicon glyphicon-plus"></span> {{ idoszak.nev }}</a> 
+                    <span class="alap" style="font-size:11px">({{ idoszak.datumtol }})</span>
+            </h4>
+        </div>
+        <div id="collapseParticular{{ key }}" class="panel-collapse collapse {% if idoszak.now %}in{% endif %}">
+
+    {% for nap in idoszak.napok %}
+      {% for key, mise in nap.misek %}
+
+      <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
+      {% if mise.length > 4 %} {% endif %}
+      <div style="display: table-row;">
+
+        <div style="display: table-cell;width:40px;text-align:right;line-height:16px" class="alap">{{ nap.misek[key].ido }}</div>
+
+        <div style="width:121px;display: table-cell;" class="alap" style="line-height:16px">
+          {% if nap.misek[key].nap2_raw != "0" %}
+              <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
+          {% if nap.misek[key].attr %}
+              {% for attr in nap.misek[key].attr %} 
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+              {% endfor %}
+          {% endif %}  
+          {% if nap.misek[key].megjegyzes %}
+              {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
+          {% endif %}       
+        </div>
+      </div>
+      </div>
+      {% endfor %}  
+
+    {% endfor %}   
+    </div> 
+    </div>
+    {% endfor %}
+  </div>
+    {% else %}
+    <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
+    {% endif %}
+    
+	 
+{% if misemegjegyzes %}{% include "panel.twig" with {title:'Kapcsolódó információk','body': misemegjegyzes|raw } %}{% endif %}
+
+{% if kepek %}
+  <h4>Képek a templomról</h4>
+  {{ kepek|raw }}
+  <img src="/img/space.gif" width="10" height="10">
+{% endif %}
+
+{% if (leiras or jotudni) %}{% include "panel.twig" with {title:'Bemutatkozás','body': jotudni|raw ~ leiras|raw } %}{% endif %}
+<!--<h3>Bemutatkozás</h3>{{ leiras|raw }}-->
+
+{% endblock %}
+
+{% block leftsidebar %}
+
+  {% include "panel.twig" with {title:'<span class="glyphicon glyphicon-warning-sign"></span> Segítsd munkánkat!','body': eszrevetel,'panel':'primary' } %}
+
+{% endblock %}
+
+{% block rightsidebar %}
+
+    {% include "panel.twig" with {title:'Megközelítés','body': cim|raw ~ terkep|raw ~ '<br>' ~ megkozelites } %}
+    {% include "panel.twig" with {title:'Kapcsolat - elérhetőség','body': kapcsolat,'panel':'primary' } %}
+
+    {% if szomszedok[0] %}
+    <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+            <div class="panel-heading visible-lg-block visible-md-block">
+                <h4 class="panel-title">Szomszédos templomok</h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse">
+                <div class="panel-body">
+                    <b><span class="alap"><i>Legközelebbi:</i></span></b><br>
+                    <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+                      {{ _self.neighbour(szomszedok[0],varos) }}
+                    </ul>
+                    {% if szomszedok|length > 1 %}
+                      <b><span class="alap"><i>10 km-en belül:</i></span></b><br>
+                      <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+                      {% for i in 1..6 %}
+                         {% if szomszedok[i] %} {{ _self.neighbour(szomszedok[i],varos) }} {% endif %}
+                      {% endfor %}
+                      {% if szomszedok|length > 6 %}<li style="display:inline">...</li>{% endif %}
+                      </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+  {% endif %}
+
+
+{% endblock %}
+
+{% macro neighbour(array,varos) %}
+  <li>
+    <a href="/templom/{{ array.tid }}" class="link" title="{{ array.ismertnev }} ({{ ( array.tavolsag / 1000 )|number_format(1, '.', '') }} km)"  onclick="ga('send','event','Inbound Links','Szomszedsag','?templom={{ array.tid }}')">{{ array.nev }}{% if varos != array.varos %} ({{ array.varos }}){% endif %}</a>
+  </li>
+{% endmacro %}
+
+{% macro info(img,text,design_url) %}
+    <img src="{{ design_url }}img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+    <span class="massfullinfo" style="display:none" id="2">{{ text }}</span>
+{% endmacro %}

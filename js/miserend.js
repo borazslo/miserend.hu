@@ -21,11 +21,8 @@ $(document).ready(function() {
   $(document).on('click','#quit',function(){
     console.log('click');
       $.ajax({
-            url: "ajax.php",
-            dataType: "text",
-            data: {
-              q: 'Exit',
-            },
+            url: "/ajax/logout",
+            dataType: "text",            
             success: function( data ) {
               location.reload();
             },
@@ -102,10 +99,9 @@ $(document).ready(function() {
     $('#username').on('input', function() { 
 
         $.ajax({
-            url: "ajax.php",
+            url: "/ajax/checkusername",
             dataType: "text",
             data: {
-              q: 'CheckUsername',
               text: this.value
             },
             success: function( data ) {
@@ -135,10 +131,9 @@ $(document).ready(function() {
    $("#varos").autocomplete({
         source: function( request, response ) {
           $.ajax({
-            url: "ajax.php",
+            url: "/ajax/AutocompleteCity",
             dataType: "JSON",
             data: {
-              q: 'AutocompleteCity',
               text: request.term
             },
             success: function( data ) {
@@ -186,7 +181,7 @@ $(document).ready(function() {
 
     $.ajax({
        type:"POST",
-       url:"ajax.php?q=Favorite",
+       url:"/ajax/favorite",
        data:"tid="+tid+"&method="+method,
        success:function(response){
           $("#star").toggleClass("grey yellow");          
@@ -219,7 +214,7 @@ $(document).ready(function() {
 
       $.ajax({
              type:"POST",
-             url:"ajax.php?q=SwitchReliable",
+             url:"/ajax/switchreliable",
              data:"rid="+rid+"&reliable="+reliable,
              success:function(response){
               console.log(response);

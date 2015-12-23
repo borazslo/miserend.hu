@@ -161,45 +161,8 @@ class SearchResultsMasses extends Html {
             $visszalink = "?";
         else
             $visszalink = "javascript:history.go(-1);";
-        $templomurlap = "<img src=img/space.gif width=5 height=6><br><a href=$visszalink class=link><img src=img/search.gif width=16 height=16 border=0 align=absmiddle hspace=2><b>Vissza a főoldali keresőhöz</b></a><br><img src=img/space.gif width=5 height=6>";
+        $templomurlap = "<img src=/img/space.gif width=5 height=6><br><a href=$visszalink class=link><img src=/img/search.gif width=16 height=16 border=0 align=absmiddle hspace=2><b>Vissza a főoldali keresőhöz</b></a><br><img src=/img/space.gif width=5 height=6>";
 
-        /*
-
-          if(isset($results['results'])) foreach($results['results'] as $result) {
-          $tid = $result['tid'];
-          //$tnev = $result['']; ,$tismertnev,$tvaros,$letrehozta,$mido,$mnyelv,$mmegjegyzes
-
-          $nyelvikon='';
-          if(empty($templom[$tid])) {
-          $templomT[$tid]="<img src=img/templom1.gif align=absmiddle width=16 height=16 hspace=2><a href=?templom=$tid class=felsomenulink><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">$tismertnev</span>";
-          if($user->checkRole('miserend')) $templomT[$tid].=" <a href=?m_id=27&m_op=addtemplom&tid=$tid$><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=$tid><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-          elseif($letrehozta==$user->login) $templomT[$tid].=" <a href=?m_id=29&m_op=addtemplom&tid=$tid><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=29&m_op=addmise&tid=$tid><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-          }
-          if(!empty($mmegjegyzes)) $megj="<img src=$design_url/img/info2.gif border=0 title='$mmegjegyzes' align=absmiddle width=16 height=16>";
-          else $megj='';
-
-          if(strstr($mnyelv,'de')) $nyelvikon.="<img src=img/zaszloikon/de.gif width=16 height=11 vspace=2 align=absmiddle title='német nyelvű mise'>";
-          if(strstr($mnyelv,'it')) $nyelvikon.="<img src=img/zaszloikon/it.gif width=16 height=11 vspace=2 align=absmiddle title='olasz nyelvű mise'>";
-          if(strstr($mnyelv,'en')) $nyelvikon.="<img src=img/zaszloikon/en.gif width=16 height=11 vspace=2 align=absmiddle title='angol nyelvű mise'>";
-          if(strstr($mnyelv,'hr')) $nyelvikon.="<img src=img/zaszloikon/hr.gif width=16 height=11 vspace=2 align=absmiddle title='horvát nyelvű mise'>";
-          if(strstr($mnyelv,'gr')) $nyelvikon.="<img src=img/zaszloikon/gr.gif width=16 height=11 vspace=2 align=absmiddle title='görög nyelvű mise'>";
-          if(strstr($mnyelv,'va')) $nyelvikon.="<img src=img/zaszloikon/va.gif width=16 height=11 vspace=2 align=absmiddle title='latin nyelvű mise'>";
-          if(strstr($mnyelv,'si')) $nyelvikon.="<img src=img/zaszloikon/si.gif width=16 height=11 vspace=2 align=absmiddle title='szlovén nyelvű mise'>";
-          if(strstr($mnyelv,'ro')) $nyelvikon.="<img src=img/zaszloikon/ro.gif width=16 height=11 vspace=2 align=absmiddle title='román nyelvű mise'>";
-          if(strstr($mnyelv,'sk')) $nyelvikon.="<img src=img/zaszloikon/sk.gif width=16 height=11 vspace=2 align=absmiddle title='szlovák nyelvű mise'>";
-          if(strstr($mnyelv,'pl')) $nyelvikon.="<img src=img/zaszloikon/pl.gif width=16 height=11 vspace=2 align=absmiddle title='lengyel nyelvű mise'>";
-          if(strstr($mnyelv,'fr')) $nyelvikon.="<img src=img/zaszloikon/fr.gif width=16 height=11 vspace=2 align=absmiddle title='francia nyelvű mise'>";
-
-          if($mido<$mostido and $mikordatum==$ma) $elmult=true;
-          else $elmult=false;
-          if($mido=='00:00:00') $mido='?';
-          if($mido[0]=='0') $mido=substr($mido,1,4);
-          else $mido=substr($mido,0,5);
-          if($elmult) $mido="<font color=#555555>$mido</font>";
-          else $mido="<b>$mido</b>";
-          $miseT[$tid][]="<img src=img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>$mido</span>$nyelvikon$megj &nbsp; ";
-          }
-         */
         $results = searchMasses($_POST, $min, $leptet);
         $mennyi = $results['sum'];
 
@@ -209,7 +172,7 @@ class SearchResultsMasses extends Html {
             $prev = 0;
         $veg = $mennyi;
         if ($min > 0) {
-            $leptetprev.="\n<form method=post><input type=hidden name=m_id value=26><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
+            $leptetprev.="\n<form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
             $leptetprev.=$leptet_urlap;
             $leptetprev.="<input type=hidden name=min value=$prev>";
             $leptetprev.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
@@ -220,7 +183,7 @@ class SearchResultsMasses extends Html {
             $next = $min + $leptet;
 
             if ($mennyi > $min + $leptet) {
-                $leptetnext.="\n<form method=post><input type=hidden name=m_id value=26><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
+                $leptetnext.="\n<form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
                 $leptetnext.=$leptet_urlap;
                 $leptetnext.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
             }
@@ -237,10 +200,10 @@ class SearchResultsMasses extends Html {
 
             //echo "<pre>".print_r($results['results'],1)."</pre>";
             foreach ($results['churches'] as $result) {
-                $tartalom .= "<img src=img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
-				<a href=?templom=" . $result['tid'] . " class=felsomenulink><b>" . $result['nev'] . "</b> <font color=#8D317C>(" . $result['varos'] . ")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">" . $result['ismertnev'] . "</span>";
+                $tartalom .= "<img src=/img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
+				<a href='/templom/" . $result['tid'] . "' class=felsomenulink><b>" . $result['nev'] . "</b> <font color=#8D317C>(" . $result['varos'] . ")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">" . $result['ismertnev'] . "</span>";
                 if ($user->checkRole('miserend') OR $result['letrehozta'] == $user->login)
-                    $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=" . $result['tid'] . "><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href=?m_id=27&m_op=addmise&tid=" . $result['tid'] . "><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+                    $tartalom.=" <a href='/templom/" . $result['tid'] . "/edit'><img src=/img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href='/templom/" . $result['tid'] . "/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 
                 $tartalom.=$ertek . '<br> &nbsp; &nbsp; &nbsp;';
 
@@ -249,32 +212,32 @@ class SearchResultsMasses extends Html {
                 //$masses = getMasses($result['tid'],$_REQUEST['mikordatum']);
                 //$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_POST));
                 foreach ($result['masses'] as $mass) {
-                    $tartalom .="<img src=img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>" . substr($mass['ido'], 0, 5) . "</span>";
+                    $tartalom .="<img src=/img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>" . substr($mass['ido'], 0, 5) . "</span>";
 
                     $mass['nyelv'] = decodeMassAttr($mass['nyelv']);
                     foreach ($mass['nyelv'] as $milyen)
-                        $tartalom.= '<img src="' . $design_url . 'img/' . $milyen['file'] . '" class="massinfo" width=14 title="' . $milyen['description'] . '"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+                        $tartalom.= '<img src="/img/' . $milyen['file'] . '" class="massinfo" width=14 title="' . $milyen['description'] . '"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
     					<span class="massfullinfo" style="display:none" >' . $milyen['description'] . '</span>';
 
                     $mass['milyen'] = decodeMassAttr($mass['milyen']);
                     foreach ($mass['milyen'] as $milyen)
-                        $tartalom.= '<img src="' . $design_url . 'img/' . $milyen['file'] . '" class="massinfo" width=14 title="' . $milyen['description'] . '"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+                        $tartalom.= '<img src="/img/' . $milyen['file'] . '" class="massinfo" width=14 title="' . $milyen['description'] . '"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
     					<span class="massfullinfo" style="display:none">' . $milyen['description'] . '</span>';
 
                     if ($mass['megjegyzes'] != '')
-                        $tartalom.= '<img src="' . $design_url . 'img/info2.gif" class="massinfo" width=14 title="' . $milyen['megjegyzes'] . '"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+                        $tartalom.= '<img src="/img/info2.gif" class="massinfo" width=14 title="' . $milyen['megjegyzes'] . '"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
 					<span class="massfullinfo" style="display:none">' . $mass['megjegyzes'] . '</span>';
                 }
                 //$tartalom .= print_r($masses,1);
 
-                $tartalom.="<br><img src=img/space.gif width=4 height=8><br>";
+                $tartalom.="<br><img src=/img/space.gif width=4 height=8><br>";
             }
         }
 
         //Léptetés
         if ($mennyi > $min + $leptet) {
             $next = $min + $leptet;
-            $leptetes = "<br><form method=post><input type=hidden name=m_id value=26><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
+            $leptetes = "<br><form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
             $leptetes.=$leptet_urlap;
             $leptetes.="<input type=submit value=Következő class=urlap><input type=text name=leptet value=$leptet class=urlap size=2><input type=hidden name=min value=$next></form>";
         }

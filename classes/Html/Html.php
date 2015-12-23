@@ -7,7 +7,7 @@ class Html {
     public $template;
     public $menu = array();
     public $pageTitle = 'VPP - miserend';
-    public $templatesPath = 'templates2';
+    public $templatesPath = 'templates';
 
     function render() {
         global $user;
@@ -56,18 +56,18 @@ class Html {
 
     function loadAdminMenu() {
         $adminmenuitems = [
-            ['title' => 'Miserend', 'url' => '?m_id=27', 'permission' => 'miserend', 'mid' => 27,
+            ['title' => 'Miserend', 'url' => '/termplom/list', 'permission' => 'miserend', 'mid' => 27,
                 'items' => [
-                    ['title' => 'új templom', 'url' => '?m_id=27&m_op=addtemplom', 'permission' => ''],
-                    ['title' => 'módosítás', 'url' => '?m_id=27&m_op=modtemplom', 'permission' => ''],
-                    ['title' => 'egyházmegyei lista', 'url' => '?m_id=27&m_op=ehmlista', 'permission' => 'miserend'],
-                    ['title' => 'kifejezések és dátumok', 'url' => '?m_id=27&m_op=events', 'permission' => 'miserend'],
+                    ['title' => 'új templom', 'url' => '/templom/new', 'permission' => ''],
+                    ['title' => 'lista', 'url' => '/templom/list', 'permission' => ''],
+                    ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
+                    ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
                 ]
             ],
-            ['title' => 'Felhasználók', 'url' => '?q=user/list', 'permission' => 'user', 'mid' => 21,
+            ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user',
                 'items' => [
-                    ['title' => 'új felhasználó', 'url' => '?m_id=28&m_op=edit', 'permission' => 'user'],
-                    ['title' => 'lista', 'url' => '?q=user/list', 'permission' => 'user'],
+                    ['title' => 'új felhasználó', 'url' => '/user/new', 'permission' => 'user'],
+                    ['title' => 'lista', 'url' => '/user/catalogue', 'permission' => 'user'],
                 ]
             ],
         ];

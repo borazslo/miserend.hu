@@ -335,95 +335,6 @@ function event2Date($event, $year = false) {
     return $event;
 }
 
-function events_form($order = false) {
-    if (!$order)
-        $order = 'year, date';
-    $query = "SELECT * FROM events WHERE year >= " . date('Y', '-1 year') . " ORDER BY " . $order . ";";
-    $result = mysql_query($query);
-    $years = array();
-    $names = array();
-    while (($row = mysql_fetch_array($result, MYSQL_ASSOC))) {
-        $name = $row['name'];
-        $form[$name][$row['year']]['input'] = array(
-            'name' => 'events[' . $name . '][' . $row['year'] . '][input]',
-            'value' => $row['date'],
-            'class' => 'input-sm')
-        ;
-        $form[$name][$row['year']]['id'] = array(
-            'type' => 'hidden',
-            'name' => 'events[' . $name . '][' . $row['year'] . '][id]',
-            'value' => $row['id']);
-
-        $years[$row['year']] = $row['year'];
-        $names[$name] = $name;
-    }
-    //new line
-    //$array_shift(array_values($form))
-    $newname = array(
-        'name' => 'newname',
-        'size' => 12);
-    global $twig;
-    $names['new'] = 'new';
-
-    $years[date('Y')] = date('Y');
-    $years[date('Y', strtotime('+1 years'))] = date('Y', strtotime('+1 years'));
-
-    foreach (array('tol', 'ig') as $tolig) {
-        $query = "SELECT " . $tolig . " FROM misek WHERE " . $tolig . " NOT REGEXP('^([0-9]{1,4})') GROUP BY " . $tolig . " ";
-        $result = mysql_query($query);
-        while (($row = mysql_fetch_array($result, MYSQL_ASSOC))) {
-            $name = preg_replace('/ (\+|-)([0-9]{1,3}$)/i', '', $row[$tolig]);
-            if (!isset($names[$name]))
-                $names[$name] = $name;
-        }
-    }
-    foreach ($names as $name) {
-        foreach ($years as $year) {
-            if (!isset($form[$name][$year])) {
-                $form[$name][$year] = array(
-                    'input' => array(
-                        'name' => 'events[' . $name . '][' . $year . '][input]',
-                        'size' => '8'));
-            }
-        }
-        //stats
-        $query = "SELECT count(*) as sum FROM misek where ig  REGEXP '^(" . $name . ")(( +| -)[0-9]{1,3})|)$'";
-        $result = mysql_query($query);
-        $row = mysql_fetch_array($result, MYSQL_ASSOC);
-        $stats[$name] = $row['sum'];
-    }
-
-
-    return array('form' => $form, 'names' => $names, 'years' => $years, 'stats' => $stats);
-}
-
-function events_save($form) {
-    foreach ($form['events'] as $name => $years) {
-        foreach ($years as $year => $input) {
-            if (isset($input['id'])) {
-                if ($input['input'] != '')
-                    $date = date('Y-m-d', strtotime($input['input']));
-                else
-                    $date = '';
-                $query = "UPDATE events SET `date` = '" . $date . "' WHERE id = " . $input['id'] . " LIMIT 1";
-                mysql_query($query);
-            } else {
-                if ($input['input'] != '') {
-                    if ($name == 'new')
-                        $name = sanitize($form['new']);
-                    if ($name != 'new' OR $form['new'] != '') {
-                        $query = "INSERT INTO events (name,year,date) VALUES ('" . $name . "','" . $year . "','" . $input['input'] . "');";
-                        mysql_query($query);
-                        //echo $query."<br/>";
-                    }
-                }
-            }
-        }
-    }
-
-    generateMassTmp();
-}
-
 function checkPrivilege($type, $privilege, $object, $user = false) {
     if (!$user)
         global $user;
@@ -1201,15 +1112,15 @@ function getRemarkMark($tid) {
     }
 
     if (isset($allapot['u'])) {
-        $return['html'] = "<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+        $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
         $return['text'] = "Új észrevételt írtak hozzá!";
         $return['mark'] = 'u';
     } elseif (isset($allapot['f'])) {
-        $return['html'] = "<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
+        $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
         $return['text'] = "Észrevétel javítása folyamatban!";
         $return['mark'] = 'f';
     } elseif (isset($allapot['j'])) {
-        $return['html'] = "<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag1.gif title='Észrevételek' align=absmiddle border=0></a> ";
+        $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek' align=absmiddle border=0></a> ";
         $return['text'] = "Észrevételek";
         $return['mark'] = 'j';
     } else {
@@ -1375,7 +1286,7 @@ function generateSqlite($version, $filename) {
             if (!isset($kiemeltkepek[$kep['tid']])) { // AND $kep['kiemelt'] == 'i')
                 $kiemeltkepek[$kep['tid']] = $kep;
                 /* if($kep['kiemelt'] != 'i') { 
-                  echo 'jaj - <a href="http://www.miserend.hu/?templom='.$kep['kid'].'">'.$kep['kid'].'</a><br/>';
+                  echo 'jaj - <a href="http://www.miserend.hu/templom/'.$kep['kid'].'">'.$kep['kid'].'</a><br/>';
                   echo $c++;
                   } */
             }
@@ -2179,7 +2090,7 @@ function assignUpdates() {
                 mysql_query($query);
             else
                 echo $query . "\n<br/>";
-            $list .= "<li><a href='http://miserend.hu/?templom=" . $templom['id'] . "'>" . $templom['nev'] . "</a>";
+            $list .= "<li><a href='http://miserend.hu/templom/" . $templom['id'] . "'>" . $templom['nev'] . "</a>";
             if ($templom['ismertnev'] != '')
                 $list .= " (" . $templom['ismertnev'] . ")";
             $list .= ", " . $templom['varos'];
@@ -2464,16 +2375,16 @@ function feltoltes_block() {
         $kod_tartalom = '<ul>';
         while (list($tid, $tnev, $tvaros, $teszrevetel) = mysql_fetch_row($lekerdez)) {
             if ($teszrevetel == 'i')
-                $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+                $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
             elseif ($teszrevetel == 'f')
-                $jelzes.="<a href=\"javascript:OpenScrollWindow('naplo.php?kod=templomok&id=$tid',550,500);\"><img src=img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
+                $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
             else
                 $jelzes = '';
 
-            $kod_tartalom.="\n<li>$jelzes<a href=?m_id=27&m_op=addtemplom&tid=$tid class=link_kek title='$tvaros'>$tnev</a></li>";
+            $kod_tartalom.="\n<li>$jelzes<a href='/templom/$tid/edit' class=link_kek title='$tvaros'>$tnev</a></li>";
         }
 
-        $kod_tartalom.="\n<li><a href=?m_id=29 class=felsomenulink>Teljes lista...</a></li>";
+        $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";
         $kod_tartalom .= '</ul>';
     }
 
@@ -2670,7 +2581,7 @@ function miserend_printRegi() {
         if (isset($templom['eszrevetel'])) {
             $return .= "<span class=\"alap\"><i>folyamatban: " . $templom['nev'] . " (" . $templom['varos'] . ")</i></span><br/>\n";
         } else {
-            $return .= "<span class=\"alap\">" . date('Y.m.d.', strtotime($templom['frissites'])) . "</span> <a class=\"felsomenulink\" href=\"?templom=" . $templom['id'] . "\">" . $templom['nev'] . " (" . $templom['varos'] . ")</a><br/>\n";
+            $return .= "<span class=\"alap\">" . date('Y.m.d.', strtotime($templom['frissites'])) . "</span> <a class=\"felsomenulink\" href=\"/templom/" . $templom['id'] . "\">" . $templom['nev'] . " (" . $templom['varos'] . ")</a><br/>\n";
         }
         //echo print_R($templom,1)."<br>";
 
@@ -2715,39 +2626,6 @@ function idoszak($i) {
             break;
     }
     return $tmp;
-}
-
-function allowOldUrls() {
-    //For compatibility
-    if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 28){
-        if($_REQUEST['m_op'] == 'list') {
-            $_REQUEST['q'] = "user/list";
-        } elseif($_REQUEST['m_op'] == 'jelszo') {
-            $_REQUEST['q'] = 'user/lostpassword';
-        }
-    } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 17) {
-        $_REQUEST['q'] = "staticpage";
-        $_REQUEST['name'] = $mapping[$_GET['fm']];
-    } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 29) {
-        $_REQUEST['q'] = 'user/maintainedchurches';
-    } else if (isset($_REQUEST['m_id']) AND $_REQUEST['m_id'] == 26) {
-        if ($_REQUEST['m_op'] == 'keres') {
-            if (isset($_REQUEST['misekereses'])) {
-                $_REQUEST['q'] = 'searchresultsmasses';
-            } else {
-                $_REQUEST['q'] = 'searchresultschurches';
-            }
-        } elseif ($_REQUEST['m_op'] == 'view') {
-            $_REQUEST['q'] = 'church';
-        } else {
-            $_REQUEST['q'] = 'home';
-        }
-    } else if (isset($_REQUEST['templom'])) {
-        $_REQUEST['q'] = 'church';
-        $_REQUEST['tid'] = $_REQUEST['templom'];
-    } else if (!isset($_REQUEST['m_id']) AND ! isset($_REQUEST['q']) AND ! isset($_REQUEST['templom'])) {
-        $_REQUEST['q'] = 'home';
-    }
 }
 
 function callPageFake($uri, $post, $phpinput = array()) {

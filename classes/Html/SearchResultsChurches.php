@@ -32,7 +32,7 @@ class SearchResultsChurches extends Html {
 
 
         //Templom űrlap
-        $templomurlap = "\n<div style='display: none'><form method=post><input type=hidden name=m_id value=26><input type=hidden name=m_op value=keres></div>";
+        $templomurlap = "\n<div style='display: none'><form method=post><input type=hidden name=q value=SearchResultsChurches><input type=hidden name=m_op value=keres></div>";
         $templomurlap .="<input type=hidden id=keresestipus name=keresestipus value=0>";
         //$templomurlap .= "<input type=hidden name=tavolsag id=tavolsag size=20 class=keresourlap value='".$_REQUEST['tavolsag']."'>";
         //$templomurlap .= "<input type=hidden name=hely id=tavolsag size=20 class=keresourlap value='".$_REQUEST['hely']."'>";
@@ -105,7 +105,7 @@ class SearchResultsChurches extends Html {
 
         if ($mennyi == 1) {
             //ga('send','event','Outgoing Links','click','".$pleb_url."');
-            //header ("Location: ?templom=".$talalat['id']);
+            //header ("Location: /templom/".$talalat['id']);
             echo "
         <script type='text/javascript'>
             (function(i,s,o,g,r,a,m){i[\"GoogleAnalyticsObject\"]=r;i[r]=i[r]||function(){
@@ -116,7 +116,7 @@ class SearchResultsChurches extends Html {
     ga(\"create\", \"UA-3987621-4\", \"miserend.hu\");
     ga('send','event','Search','fast','" . $varos . $kulcsszo . $ehm . "');
     
-    window.location = '?templom=" . $results['results'][0]['id'] . "';
+    window.location = '/templom/" . $results['results'][0]['id'] . "';
            
          </script>";
 
@@ -126,7 +126,7 @@ class SearchResultsChurches extends Html {
         $kezd = $min + 1;
         $veg = $mennyi;
         if ($min > 0) {
-            $leptetprev.="\n<form method=post><input type=hidden name=m_id value=26><input type=hidden name=m_op value=keres>";
+            $leptetprev.="\n<form method=post><input type=hidden name=q value=SearchResultsChurches><input type=hidden name=m_op value=keres>";
             $leptetprev.=$postdata;
             $leptetprev.="<input type=hidden name=min value=$prev>";
             $leptetprev.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
@@ -139,7 +139,7 @@ class SearchResultsChurches extends Html {
             $next = $min + $leptet;
 
             if ($mennyi > $min + $leptet) {
-                $leptetnext.="\n<form method=post><input type=hidden name=m_id value=26><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next>";
+                $leptetnext.="\n<form method=post><input type=hidden name=q value=SearchResultsChurches><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next>";
                 $leptetnext.=$postdata;
                 $leptetnext.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
             }
@@ -154,12 +154,13 @@ class SearchResultsChurches extends Html {
                 $tismertnev = $templom['ismertnev'];
                 $tvaros = $templom['varos'];
                 $letrehozta = $templom['letrehozta'];
-                $tartalom.="<a href=?templom=$tid class=felsomenulink title='$tismertnev'><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a>";
+                $tartalom.="<a href='/templom/$tid' class=felsomenulink title='$tismertnev'><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a>";
                 if ($user->checkRole('miserend') OR $letrehozta == $user->login)
-                    $tartalom.=" <a href=?m_id=27&m_op=addtemplom&tid=$tid><img src=img/edit.gif title='szerkesztés' align=absmiddle border=0></a> <a href=?m_id=27&m_op=addmise&tid=$tid><img src=img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+                    $tartalom.=" <a href='/templom/$tid/edit'><img src=/img/edit.gif title='szerkesztés' align=absmiddle border=0></a> "
+                        . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
                 if ($tismertnev != '')
                     $tartalom .= "<br/><span class=\"alap\" style=\"margin-left: 20px; font-style: italic;\">" . $tismertnev . "</span>";
-                $tartalom.="<br><img src=img/space.gif width=4 height=5><br>";
+                $tartalom.="<br><img src=/img/space.gif width=4 height=5><br>";
             }
             $tartalom.='<br>' . $leptetprev . $leptetnext;
         }

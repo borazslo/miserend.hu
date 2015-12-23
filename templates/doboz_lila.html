@@ -1,0 +1,11 @@
+<div{% for key, setting in settings %} {{ key }}="{{ setting }}"{% endfor %}>
+	{% if header %}
+	<div class="header">
+		<img src="/img/negyzet_feher.gif">
+		{{ header.content }}
+	</div>
+	{% endif %}
+	<div>
+		{{ content|raw }}
+	</div>
+</div>

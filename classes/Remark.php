@@ -32,18 +32,20 @@ class Remark {
                     $this->user = new \User($this->username);
                 }
 
-                $this->marker['url'] = "javascript:OpenScrollWindow('naplo.php?kod=templomok&id=" . $this->hol_id . "',550,500);";
+                $this->adminmegj = preg_replace('/=("|\'|)img\//i', '=$1/img/', $this->adminmegj);
+
+                $this->marker['url'] = "javascript:OpenScrollWindow('templom/" . $this->hol_id . "/eszrevetelek',550,500);";
                 if ($this->allapot == 'u') {
                     $this->marker['text'] = "Új észrevétel!";
-                    $this->marker['html'] = "<img src=img/csomag.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
+                    $this->marker['html'] = "<img src=/img/csomag.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
                     $this->marker['mark'] = 'u';
                 } elseif ($this->allapot == 'f') {
                     $this->marker['text'] = "Észrevétel javítása folyamatban!";
-                    $this->marker['html'] = "<img src=img/csomagf.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
+                    $this->marker['html'] = "<img src=/img/csomagf.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
                     $this->marker['mark'] = 'f';
                 } elseif ($this->allapot == 'j') {
                     $this->marker['text'] = "Észrevétel feldolgova.";
-                    $this->marker['html'] = "<img src=img/csomag1.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
+                    $this->marker['html'] = "<img src=/img/csomag1.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
                     $this->marker['mark'] = 'j';
                 } else {
                     $this->marker['text'] = "Nincsenek állapota";
@@ -185,9 +187,9 @@ class Remark {
         // TODO: akarunk mit kezdeni az *vendeg* de email nélkül?
         if ($this->email != '') {
             DB::table($this->table)
-            ->where('email', $this->email)
-            ->limit(1)
-            ->update(['megbizhato' => $reliability]);
+                    ->where('email', $this->email)
+                    ->limit(1)
+                    ->update(['megbizhato' => $reliability]);
         } else
             return false;
     }
@@ -207,15 +209,12 @@ class Remark {
         global $user;
         $newline = "\n<img src='img/edit.gif' align='absmiddle' title='" . $user->username . " (" . date('Y-m-d H:i:s') . ")'>" . $text;
         $adminmegj = $this->adminmegj . $newline;
-        if (
-                        DB::table($this->table)
-                        ->where('id', $this->id)
-                        ->limit(1)
-                        ->update(['adminmegj' => $adminmegj])
-        ) {
-            $this->adminmegj = $adminmegj;
-            addMessage("Nem sikerült a megjegyzést bővíteni.", 'warning');
-        }
+
+        DB::table($this->table)
+                ->where('id', $this->id)
+                ->limit(1)
+                ->update(['adminmegj' => $adminmegj]);
+        $this->adminmegj = $adminmegj;
     }
 
 }

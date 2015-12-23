@@ -150,4 +150,89 @@ class Church {
         }
     }
 
+    function delete() {
+        $tid = $this->id;
+        $query = "delete from templomok where id='$tid'";
+        mysql_query($query);
+
+        //Miséket is töröljük
+        $query = "delete from misek where templom='$tid'";
+        mysql_query($query);
+
+        //És kiszedi a törölt szomszédosokat!!!
+        $query = "select id, szomszedos1, szomszedos2 from templomok where szomszedos1 like '%-$tid-%' or szomszedos2 like '%-$tid-%'";
+        $lekerdez = mysql_query($query);
+        while (list($szid, $sz1, $sz2) = mysql_fetch_row($lekerdez)) {
+            if (strstr($sz1, $tid)) {
+                //Ha a másik templomnál szerepel a mi templomunk
+                //akkor töröljük onnan is a hozzárendelést!
+                $sz1 = str_replace('--', '!', $sz1);
+                $sz1 = str_replace('-', '', $sz1);
+                $sz1T = explode('!', $sz1);
+                foreach ($sz1T as $ertek) {
+                    if ($ertek != $tid) {
+                        $ujsz1T[] = $ertek;
+                    }
+                }
+                if (is_array($ujsz1T))
+                    $ujsz1 = '-' . implode('--', $ujsz1T) . '-';
+                else
+                    $ujsz1 = '';
+                mysql_query("update templomok set szomszedos1='$ujsz1' where id='$szid'");
+            }
+            if (strstr($sz2, $tid)) {
+                //Ha a másik templomnál szerepel a mi templomunk
+                //akkor töröljük onnan is a hozzárendelést!
+                $sz2 = str_replace('--', '!', $sz2);
+                $sz2 = str_replace('-', '', $sz2);
+                $sz2T = explode('!', $sz2);
+                foreach ($sz2T as $ertek) {
+                    if ($ertek != $tid) {
+                        $ujsz2T[] = $ertek;
+                    }
+                }
+                if (is_array($ujsz2T))
+                    $ujsz2 = '-' . implode('--', $ujsz2T) . '-';
+                else
+                    $ujsz2 = '';
+                mysql_query("update templomok set szomszedos2='$ujsz2' where id='$szid'");
+            }
+        }
+
+        //Fájlokat és képeket is törölni kell!
+        //Könyvtár tartalmát beolvassa
+        $konyvtar = "fajlok/templomok/$tid";
+        if (is_dir($konyvtar)) {
+            $handle = opendir($konyvtar);
+            while ($file = readdir($handle)) {
+                if ($file != '.' and $file != '..') {
+                    @unlink("$konyvtar/$file");
+                }
+            }
+            closedir($handle);
+        }
+
+        //Könyvtár tartalmát beolvassa
+        $konyvtar = "kepek/templomok/$tid";
+        if (is_dir($konyvtar)) {
+            $handle = opendir($konyvtar);
+            while ($file = readdir($handle)) {
+                if ($file != '.' and $file != '..' and $file != 'fokep' and $file != 'kicsi') {
+                    unlink("$konyvtar/$file");
+                }
+            }
+            closedir($handle);
+        }
+        $konyvtar = "kepek/templomok/$tid/kicsi";
+        if (is_dir($konyvtar)) {
+            $handle = opendir($konyvtar);
+            while ($file = readdir($handle)) {
+                if ($file != '.' and $file != '..') {
+                    unlink("$konyvtar/$file");
+                }
+            }
+            closedir($handle);
+        }
+    }
+
 }

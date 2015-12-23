@@ -405,7 +405,7 @@ class Home extends Html {
 	            <img src=\"" . $random['konyvtar'] . "/kicsi/" . $random['fajlnev'] . "\" title='" . $random['nev'] . " (" . $random['varos'] . ")' ></a>
 	            
 	                <div tid='" . $random['id'] . "' style='display:none;text-align:center'>
-	                    <a href=\"?templom=" . $random['id'] . "\" title=\"" . $random['title'] . "\">
+	                    <a href=\"/templom/" . $random['id'] . "\" title=\"" . $random['title'] . "\">
 	                    <img src=\"" . $random['konyvtar'] . "/" . $random['fajlnev'] . "\" title='" . $random['nev'] . " (" . $random['varos'] . ")' align=\"center\" style=\"max-height:80%;display:block;margin-left:auto;margin-right:auto\">
 	                    <div style=\"background-color:rgba(255,255,255,0.3);padding:10px;\" class=\"felsomenulink\">" . $random['nev'] . " (" . $random['varos'] . ")</div>
 	                    </a>
@@ -421,7 +421,7 @@ class Home extends Html {
                     $kepek .= "<li class='als-item'></li>";
             $kepek.='</ul>
             </div>
-            <span class="als-next"><img src="img/als/thin_right_arrow_333.png" alt="next" title="next" /></span>
+            <span class="als-next"><img src="/img/als/thin_right_arrow_333.png" alt="next" title="next" /></span>
             </div></div>';
 
             $scrollable .= '<script>

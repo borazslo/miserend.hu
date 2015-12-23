@@ -16,9 +16,6 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     
-
-    RewriteRule ^map(/|)$ index.php?m_id=26&m_op=map&$1 [NC,QSA]
-
 	RewriteRule ^api/v([0-9]{1,4})/miserend.sqlite3(/|)$ /fajlok/sqlite/miserend_v$1.sqlite3 [NC]
 	RewriteRule ^api/v([0-9]{1,4})/miserend.sqlite3/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ index.php?q=api&action=sqlite&v=$1&datum=$2 [NC]
 
@@ -35,5 +32,9 @@
     RewriteRule ^api/v([0-9]{1,4})/user/favorites(/|)$ index.php?q=api&action=favorites&v=$1 [NC,QSA]
 
     RewriteRule ^api/ https://github.com/borazslo/miserend.hu/wiki/API [NC]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([^?]*)$ /index.php?q=$1 [NC,L,QSA]
 
 </IfModule>

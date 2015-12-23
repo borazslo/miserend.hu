@@ -386,7 +386,7 @@ class User {
 	    	WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = " . $this->uid . "
 	    	ORDER BY nev;");
         while ($row = mysql_fetch_row($results, MYSQL_ASSOC)) {
-            $row['li'] = "<a class='link' href='?templom=" . $row['tid'] . "'>" . $row['nev'];
+            $row['li'] = "<a class='link' href='/templom/" . $row['tid'] . "'>" . $row['nev'];
             if ($row['ismertnev'] != '')
                 $row['li'] .= " (" . $row['ismertnev'] . ")";
             $row['li'] .= "</a>, " . $row['varos'];

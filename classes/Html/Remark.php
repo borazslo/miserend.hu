@@ -2,52 +2,40 @@
 
 namespace Html;
 
-use Illuminate\Database\Capsule\Manager as DB;
-
 class Remark extends Html {
 
     public $template;
 
-    public function __construct() {
+    public function __construct($path) {
+        $action = $path[0];
+        $this->tid = $rid = $path[1];
 
-        $action = \Request::SimpletextRequired('op');
         switch ($action) {
             case 'list':
-                $this->tid = \Request::IntegerRequired('tid');
+                if ($_REQUEST['remark'] == 'modify') {
+                    $rid = \Request::IntegerRequired('rid');
+                    $this->template = 'remark_list.twig';
+                    $remark = new \Remark($rid);
+                    $state = \Request::Simpletext('state');
+                    $remark->changeState($state);
+                    $comment = \Request::Text('adminmegj');
+                    if ($comment != '') {
+                        $remark->addComment($comment);
+                    }
+                    $this->tid = $remark->tid;
+                }
                 $church = new \Church($this->tid);
                 $this->listOfChurch($church);
                 break;
 
             case 'addform':
-                $this->tid = \Request::IntegerRequired('tid');
                 $church = new \Church($this->tid);
                 $this->newForm($church);
                 break;
 
             case 'add':
-                $this->tid = \Request::IntegerRequired('tid');
                 $church = new \Church($this->tid);
                 $this->add($church);
-                break;
-
-            case 'modify':
-                $this->template = 'remark_list.twig';
-                $rid = \Request::IntegerRequired('rid');
-                $remark = new \Remark($rid);
-                $state = \Request::Simpletext('state');
-                $remark->changeState($state);
-
-                $comment = \Request::Text('adminmegj');
-                if ($comment != '') {
-                    $remark->addComment($comment);
-                }
-                $this->tid = $remark->tid;
-
-                $church = new \Church($this->tid);
-                $this->listOfChurch($church);
-                break;
-
-            case 'add':
                 break;
         }
     }
@@ -59,8 +47,6 @@ class Remark extends Html {
         $church->getRemarks();
         $this->church = $church;
         $this->remarks = $church->remarks;
-
-        $this->template = 'remark_list.twig';
 
         global $user;
         if (!$user->checkRole('miserend') and ! ($user->username == $templom->letrehozta ) and ! $user->checkRole('ehm:' . $templom['egyhazmegye'])) {

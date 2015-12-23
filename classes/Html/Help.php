@@ -4,18 +4,16 @@ namespace Html;
 
 class Help extends Html {
 
-    public function __construct() {
+    public function __construct($path) {
         $this->setTitle('Súgó');
-
         $this->content = '';
 
-        $idT = explode('-', \Request::SimpletextRequired('id'));
+        //TODO: validate
+        $idT = explode('-', $path[0]);
         foreach ($idT as $id) {
             $help = new \Help($id);
             $this->content .= $help->html;
         }
-
-        $this->template = 'help.twig';
     }
 
 }
