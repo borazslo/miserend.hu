@@ -639,9 +639,8 @@ function miserend_templomkeres() {
         }
     }
 
-    $tartalom.="<span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
-
     if ($mennyi > 0) {
+		$tartalom.="<span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
         foreach ($results['results'] as $templom) {
             $tid = $templom['id'];
             $tnev = $templom['nev'];
@@ -658,7 +657,7 @@ function miserend_templomkeres() {
         $tartalom.='<br>' . $leptetprev . $leptetnext;
     }
     else {
-        $tartalom.='<span class=alap>A keresés nem hozott eredményt</span>';
+        $tartalom.='<span class=alap>A keresés nem hozott eredményt.</span>';
     }
 
     $focim = "Keresés a templomok között";
