@@ -2594,7 +2594,6 @@ function miserend_printRegi() {
     return $return;
 }
 
-
 function miserend_getRegi() {
     $return = array();
     $results = mysql_query('SELECT templomok.id, templomok.varos, templomok.nev, templomok.ismertnev, frissites, egyhazmegye, egyhazmegye.nev as egyhazmegyenev FROM templomok LEFT JOIN egyhazmegye ON egyhazmegye.id = egyhazmegye WHERE templomok.ok = "i" AND templomok.nev LIKE \'%templom%\' ORDER BY frissites ASC LIMIT 100');
@@ -2672,8 +2671,8 @@ function sendJson($url, $content) {
 spl_autoload_register(function ($class) {
 
     $classpath = 'classes/' . str_replace('\\', '/', $class) . '.php';
-    if (file_exists_ci($classpath)) {
-        require_once($classpath);
+    if ($file = file_exists_ci($classpath)) {
+        require_once($file);
     }
 });
 
@@ -2684,14 +2683,21 @@ function env($name, $default = false) {
         return getenv($name);
 }
 
-function file_exists_ci($file) {
-    if (file_exists($file))
-        return $file;
-    $lowerfile = strtolower($file);
-    foreach (glob(dirname($file) . '/*') as $file)
-        if (strtolower($file) == $lowerfile)
+function file_exists_ci($fileName) {
+
+    $pattern = "classes";
+    $files = array();
+    for ($i = 0; $i < 5; $i++) {
+        $pattern .= '/*';
+        $files = array_merge($files, glob($pattern));
+    }
+    $fileNameLowerCase = strtolower($fileName);
+    foreach ($files as $file) {
+        if (strtolower($file) == $fileNameLowerCase) {
             return $file;
-    return FALSE;
+        }
+    }
+    return false;
 }
 
 function printr($variable) {

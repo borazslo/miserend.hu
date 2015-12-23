@@ -473,7 +473,6 @@ class Home extends Html {
             'design_url' => $config['path']['domain'],
             'alert' => LiturgicalDayAlert('html'),
         );
-        $variables['template'] = 'home.twig';
         
         foreach($variables as $key => $var) {
             $this->$key = $var;
