@@ -180,6 +180,7 @@ $('input.datepicker').datepicker({
 
 {%  endblock %}
 
+{% set selfAdvertisement = true %}  
 {% block leftsidebar %}
     {% if kep %}
       {% set content = '<img src="' ~ kep.konyvtar ~ '/' ~  kep.fajlnev ~ '" class="img-responsive"><h5 class="text-center"><a href="/templom/' ~ kep.id ~'">' ~ kep.nev ~ ' (' ~ kep.varos ~')</a></h5>' %}

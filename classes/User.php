@@ -396,6 +396,18 @@ class User {
         $this->favorites = $favorites;
         return $favorites;
     }
+    
+    function checkFavorite($tid) {
+        if (!$this->favorites) {
+            $this->getFavorites();
+        }
+        foreach ($this->favorites as $favorite) {
+            if ($favorite['tid'] == $tid) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     function addFavorites($tids) {
         if (!is_array($tids))

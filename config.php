@@ -13,7 +13,7 @@ $config['connection'] = array(
     'prefix' => '', /* Még nem működik */
 );
 
-$config['path']['domain'] = 'http://miserend.hu/';
+$config['path']['domain'] = 'http://miserend.hu';
 
 $config['mapquest'] = array(
     'appkey' => '***',
@@ -36,14 +36,14 @@ switch ($config['env']) {
     case 'testing':
         $config['debug'] = 1;
         $config['mail']['debug'] = 3;
-        $config['path']['domain'] = 'http://localhost/miserend.hu/';
+        $config['path']['domain'] = 'http://localhost/miserend.hu';
         $config['connection']['database'] = 'miserend_testing';
         break;
 
     case 'staging':
         $config['debug'] = 1;
         $config['mail']['debug'] = 2;
-        $config['path']['domain'] = 'http://staging.miserend.hu/';
+        $config['path']['domain'] = 'http://staging.miserend.hu';
         break;
 }
 ?>

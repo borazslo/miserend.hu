@@ -225,8 +225,6 @@ class Home extends Html {
 
         $templomurlap = '';
         $miseurlap = $urlap;
-        //AndroidReklám
-        $androidreklam = androidreklam();
 
         //Napi gondolatok
         //Napi igehely
@@ -463,7 +461,6 @@ class Home extends Html {
             'formvalaszt' => $formvalaszt,
             'miseurlap' => $miseurlap,
             'searchform' => $searchform,
-            'androidreklam' => $androidreklam,
             'templomurlap' => $templomurlap,
             'kepek' => $kepek,
             'kep' => $randoms[0],

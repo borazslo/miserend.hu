@@ -1507,59 +1507,6 @@ function upload2ftp($ftp_server, $ftp_user_name, $ftp_user_pass, $destination_fi
     ftp_close($conn_id);
 }
 
-function getImages($tid) {
-    if (!is_numeric($tid))
-        return false;
-
-    $query = "select * from kepek where tid='$tid' order by sorszam";
-    $lekerdez = mysql_query($query);
-    $mennyi = mysql_num_rows($lekerdez);
-
-    $return = array();
-
-    if ($mennyi > 0) {
-        $images = array();
-        while ($row = mysql_fetch_assoc($lekerdez)) {
-            $images[] = $row;
-        }
-
-        $dir = "kepek/templomok/";
-
-        foreach ($images as $key => $image) {
-            $images[$key]['url'] = $dir . $tid . "/" . $image['fajlnev'];
-        }
-
-        //kiemelt
-        foreach ($images as $image) {
-            if ($image['width'] > 0 AND $image['kiemelt'] == 'i' AND ( $image['height'] / $image['width']) > 1 AND ! isset($kiemelt)) {
-                $kiemelt = $image;
-            }
-        }
-        if (!isset($kiemelt)) {
-            foreach ($images as $image) {
-                if ($image['kiemelt'] == 'i' AND ! isset($kiemelt)) {
-                    $kiemelt = $image;
-                }
-            }
-        }
-        if (!isset($kiemelt)) {
-            foreach ($images as $image) {
-                if (!isset($kiemelt)) {
-                    $kiemelt = $image;
-                }
-            }
-        }
-        $return[0] = $kiemelt;
-
-        foreach ($images as $image) {
-            if ($return[0] != $image)
-                $return[] = $image;
-        }
-        return $return;
-    } else
-        return array();
-}
-
 function updateImageSizes() {
     global $config;
 
@@ -2285,7 +2232,6 @@ function updatesCampaign() {
         'content' => nl2br($dobozszoveg),
         'settings' => array('width=100%', 'align=center', 'style="padding:1px"'),
         'design_url' => $design_url);
-    //return $twig->render('doboz_lila.html',$variables); 
 
     if ($C >= ( $S * 2 )) {
         return false;
@@ -2552,23 +2498,6 @@ function chat_getusers($format = false) {
         $return = $text;
     }
     return $return;
-}
-
-function androidreklam() {
-    global $twig;
-    $dobozcim = 'Már androidra is';
-    //$dobozszoveg=nl2br($misemegj);
-    $dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz-kep')\"><img src=\"http://terkep.miserend.hu/images/device-2014-03-24-230146_framed.png\" height=\"180\" style=\"float:right\"></a>Megjelent a <a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\" onclick=\"ga('send','event','Advertisment','play.store','liladoboz')\">miserend androidos mobiltelefonokra</a> készült változata is. Ám még meg kell találni néhány templomnak a pontos helyét a térképen. Kérem segítsen nekünk!<br/><center><a href=\"http://terkep.miserend.hu\" onclick=\"ga('send','event','Advertisment','terkep.miserend.hu','liladoboz')\">terkep.miserend.hu</a></center>";
-
-    $s = rand(1, 8);
-
-    if ($s > 6)
-        $dobozszoveg = "<a href=\"https://play.google.com/store/apps/details?id=com.frama.miserend.hu\"  onclick=\"ga('send','event','Advertisment','play.google.com','liladoboz-kep')\">
-  <img alt=\"Töltd le a Google Play-ről\" src=\"img/hu_generic_rgb_wo_60.png\" style=\"display:block;margin-right:auto;margin-left:auto;width:100%;max-width:172px\" /></a>";
-    else
-        $dobozszoveg = '<center><a href="https://geo.itunes.apple.com/us/app/miserend/id967827488?mt=8" style="display:inline-block;overflow:hidden;background:url(http://linkmaker.itunes.apple.com/images/badges/en-us/badge_appstore-lrg.svg) no-repeat;width:165px;height:40px;" onclick="ga(\'send\',\'event\',\'Advertisment\',\'itunes.apple.com\',\'liladoboz-kep\')\"></a></center>';
-
-    return $dobozszoveg;
 }
 
 function miserend_printRegi() {

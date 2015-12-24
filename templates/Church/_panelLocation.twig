@@ -1,0 +1,31 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Megközelítés' %}
+
+{% block body %}
+    <span class=alap>
+        <i>Cím: </i>
+        <u>{{ location.varos }}, {{ location.cim }}</u>
+    </span><br/>
+    {% if location.osm %}
+        <span class=alap>
+            <i>Térképen: </i>
+            <u><a href="http://www.openstreetmap.org/{{ location.osm }}">
+                    {{ location.lat }}, {{ location.lon }}
+            </a></u>
+        </span>
+    {% elseif location.lat %}
+        <span class=alap>
+            <i>Térképen: </i>
+            <u><a href="http://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.lon }}#map=19/{{ location.lat }}/{{ location.lon }}">
+                    {{ location.lat }}, {{ location.lon }}
+            </a></u>
+        </span>
+    {% else %}
+        <span class=alap>
+            <strong>Segíts megtalálni a térképen!</strong>
+        </span>        
+    {% endif %}
+    <br/>
+    {{ megkozelites|raw|nl2br }}     
+{% endblock %}    

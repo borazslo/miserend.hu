@@ -8,7 +8,8 @@ class Html {
     public $menu = array();
     public $pageTitle = 'VPP - miserend';
     public $templatesPath = 'templates';
-
+    public $extraMeta;
+    
     function render() {
         global $user;
         $this->user = $user;
@@ -107,6 +108,17 @@ class Html {
 
     function setTitle($title) {
         $this->pageTitle = $title . " | Miserend";
+    }
+    
+    function addExtraMeta($name,$content) {
+         $this->extraMeta .= "\n<meta name='".$name."' content='".$content."'>";
+         return true;
+    }
+
+    function array2this($array) {
+        foreach ($array as $key => $value) {
+            $this->$key = $value;
+        }
     }
 
 }

@@ -6,42 +6,51 @@
 
 
 {% block content %}
-	{{ form|raw }}<br/>
-	{{ sum|raw }}<br/>
-	{{ pager|raw }}<br/>
+    {{ form|raw }}<br/>
+    {{ sum|raw }}<br/>
+    {{ pager|raw }}<br/>
 
-	<table class="table table-hover table-condensed table-striped">
-		<tr>
-    		<th class="col-md-1"></th>
-    		<th class="col-md-7">Misézőhely neve (és városa)</th>
-    		<th class="col-md-1"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése"></span></th>
-    		<th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Templom szerkesztése"></span></th>
-    		<th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Templom lapjának megtekintése"></span></th>
-    		<th class="col-md-1"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom és miserendje törlése"></span></th>
-  		</tr>
-		{% for church in churches %}
-			<tr>
-				<td>{{ church.jelzes|raw }}</td>
-				<td>
-					<a href="/templom/{{ church.id }}/edit" title='{{ church.ismertnev }}'><strong>{{ church.nev }}</strong> ({{ church.varos }})
-					</a>
-				</td>
-				<td>
-					<a href="/templom/{{ church.id }}/editschedule"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése..."></span></a>
-				</td>
-				<td>
-					<a href="/templom/{{ church.id }}/edit"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="A templom adatainak szerkesztése."></a>
-				</td>
-				<td>
-					<a href="/templom/{{ church.id }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Ugrás a templom oldalára."></span></a>
-				</td>				
-				<td>
-					<a href="/templom/{{ church.id }}/delete" class="red"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom törlése..."></span></a>
-				</td>
-			</tr>
-		{% endfor %}
-	</table>
-	{{ pager|raw }}
+    <table class="table table-hover table-condensed table-striped">
+        <tr>
+            <th class="col-md-1"></th>
+            <th class="col-md-7">Misézőhely neve (és városa)</th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése"></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Templom szerkesztése"></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Templom lapjának megtekintése"></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom és miserendje törlése"></span></th>
+        </tr>
+        {% for church in churches %}
+            <tr>
+                <td>{{ church.jelzes|raw }}</td>
+                <td>
+                    <a href="/templom/{{ church.id }}/edit" title='{{ church.ismertnev }}'>
+                        <strong>{{ church.nev }}</strong> ({{ church.varos }})
+                    </a>
+                </td>
+                <td>
+                    <a href="/templom/{{ church.id }}/editschedule">
+                        <span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése..."></span>
+                    </a>
+                </td>
+                <td>
+                    <a href="/templom/{{ church.id }}/edit">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true" title="A templom adatainak szerkesztése.">
+                    </a>
+                </td>
+                <td>
+                    <a href="/templom/{{ church.id }}">
+                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Ugrás a templom oldalára."></span>
+                    </a>
+                </td>				
+                <td>
+                    <a href="/templom/{{ church.id }}/delete" class="red">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom törlése..."></span>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {{ pager|raw }}
 
 {% endblock %}
 

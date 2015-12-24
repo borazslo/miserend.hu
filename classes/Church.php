@@ -45,7 +45,7 @@ class Church {
         $this->getLocation();
         $this->getReligious_administration();
 
-        $this->kepek = getImages($this->id);
+        $this->getPhotos();
     }
 
     function getOSM() {
@@ -79,6 +79,11 @@ class Church {
     function getLocation() {
         $this->location = new Location();
         $this->location->getByChurchId($this->id);
+        if ($this->osm) {
+            $this->location->lat = $this->osm->lat;
+            $this->location->lon = $this->osm->lon;
+            $this->location->osm = $this->osm->type . "/" . $this->osm->id;
+        }
     }
 
     function getNeighbourChurches() {
@@ -96,6 +101,51 @@ class Church {
                 ORDER BY distance 
                 LIMIT 1", ['tid1' => $this->id, 'tid2' => $this->id, 'tid3' => $this->id, 'tid4' => $this->id]);
             $this->neigbourChurches = (array) $neighbours;
+        }
+    }
+
+    function getPhotos() {
+        $dir = "/kepek/templomok/";
+
+        $images = DB::table('kepek')
+                ->select()
+                ->where('tid', "=", $this->id)
+                ->orderBy('sorszam')
+                ->get();
+        if (count($images) < 1) return;
+
+        foreach ($images as $key => $image) {
+            $images[$key]->url = $dir . $tid . "/" . $image->fajlnev;
+        }
+
+        //kiemelt
+        foreach ($images as $image) {
+            if ($image->width > 0
+                    AND $image->kiemelt == 'i'
+                    AND ( $image->height / $image->width) > 1
+                    AND ! isset($kiemelt)) {
+                $kiemelt = $image;
+            }
+        }
+        if (!isset($kiemelt)) {
+            foreach ($images as $image) {
+                if ($image->kiemelt == 'i' AND ! isset($kiemelt)) {
+                    $kiemelt = $image;
+                }
+            }
+        }
+        if (!isset($kiemelt)) {
+            foreach ($images as $image) {
+                if (!isset($kiemelt)) {
+                    $kiemelt = $image;
+                }
+            }
+        }
+        $this->photos[0] = $kiemelt;
+
+        foreach ($images as $image) {
+            if ($this->photos[0] != $image)
+                $this->photos[] = $image;
         }
     }
 
@@ -123,6 +173,7 @@ class Church {
         $this->pleb_eml = $this->religious_administration->parish->email;
         $this->egyhazmegye = $this->religious_administration->diocese->name;
         $this->espereskerulet = $this->religious_administration->deaconry->shortname;
+        $this->kepek = $this->photos;
     }
 
     function getFullName() {

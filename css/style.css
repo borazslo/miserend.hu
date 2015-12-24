@@ -60,22 +60,8 @@ span.toggle.active {
     font-size: 12px !important;
 }
 
-.doboz {
-	float: right;
-	width: 50%;
-	margin: 0 0 1em 1em;
-}
-
-.doboz > div {
-	padding: 5px;
-	background-color: #F8F4F6;
-}
-
-.doboz .header {
-	background-color: #B51A7E;
-	color: white;
-}
-
-.doboz .header img {
-	margin-right: 5px;
+.nap:after{
+        clear: both;
+        content: "";
+        display: block;
 }
