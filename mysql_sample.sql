@@ -4781,12 +4781,16 @@ DROP TABLE IF EXISTS `osm`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `osm` (
-  `tid` int(11) NOT NULL,
-  `id` varchar(11) NOT NULL,
-  `type` varchar(9) NOT NULL,
-  PRIMARY KEY (`tid`),
-  UNIQUE KEY `id_UNIQUE` (`tid`,`id`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `osmid` varchar(11) NOT NULL,
+  `osmtype` varchar(9) NOT NULL,
+  `lon` decimal(10,8) DEFAULT NULL,
+  `lat` decimal(11,8) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`osmid`,`osmtype`)
+) ENGINE=InnoDB AUTO_INCREMENT=4075 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4810,19 +4814,23 @@ CREATE TABLE `tokens` (
 
 
 --
--- Table structure for table `osm_tags`
+-- Table structure for table `osmtags`
 --
 
-DROP TABLE IF EXISTS `osm_tags`;
+DROP TABLE IF EXISTS `osmtags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `osm_tags` (
-  `type` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
-  `id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
-  `name` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `value` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `valami` (`id`,`name`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `osmtags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `osm_id` int(11) NOT NULL,
+  `name` varchar(45) CHARACTER SET utf8 NOT NULL,
+  `value` varchar(200) CHARACTER SET utf8 DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `unique` (`osm_id`,`name`),
+  CONSTRAINT `FK_osm_id` FOREIGN KEY (`osm_id`) REFERENCES `osm` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=20816 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
