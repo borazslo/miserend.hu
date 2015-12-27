@@ -37,7 +37,7 @@ class Church {
         $this->getFullName();
 
         global $user;
-        if (!$this->checkPrivilegeRead($user)) {
+        if (!$this->checkReadAccess($user)) {
             throw new Exception("Read access denied to church tid = '$tid'");
         }
 
@@ -48,14 +48,13 @@ class Church {
         $this->getPhotos();
     }
 
-    function getOSM() {
-        try {
-            $this->osm = new OSM();
-            $this->osm->getByChurchId($this->id);
-        } catch (Exception $e) {
-            //OSM data is not obligatory
-            //echo $e->getMessage();
+    public function getOSM($tid = false) {        
+        if($tid) {
+            $this->id = $tid;
         }
+        $tag = \Eloquent\OSMTag::where("name","url:miserend")->where("value","LIKE","%?templom=".$this->id)->first();       
+        $this->osm = $tag->osm()->first();
+        return $this->osm;
     }
 
     function getReligious_administration() {
@@ -79,10 +78,10 @@ class Church {
     function getLocation() {
         $this->location = new Location();
         $this->location->getByChurchId($this->id);
-        if ($this->osm) {
+        if ($this->osm->osmid) {
             $this->location->lat = $this->osm->lat;
             $this->location->lon = $this->osm->lon;
-            $this->location->osm = $this->osm->type . "/" . $this->osm->id;
+            $this->location->osm = $this->osm->osmtype . "/" . $this->osm->osmid;
         }
     }
 
@@ -112,7 +111,8 @@ class Church {
                 ->where('tid', "=", $this->id)
                 ->orderBy('sorszam')
                 ->get();
-        if (count($images) < 1) return;
+        if (count($images) < 1)
+            return;
 
         foreach ($images as $key => $image) {
             $images[$key]->url = $dir . $tid . "/" . $image->fajlnev;
@@ -149,7 +149,7 @@ class Church {
         }
     }
 
-    function checkPrivilegeRead($user) {
+    function checkReadAccess($user) {
         if ($this->ok == 'i')
             return true;
         if ($this->letrehozta == $user->username)
@@ -157,6 +157,31 @@ class Church {
         if ($user->checkRole('miserend'))
             return true;
         return false;
+    }
+
+    function checkWriteAccess($user) {
+        if ($this->letrehozta == $user->username)
+            return true;
+        if (in_array($this->id, $user->responsible['church']))
+            return true;
+        if (in_array($this->getDioceseId(), $user->responsible['diocese']))
+            return true;
+        if ($user->checkRole('miserend'))
+            return true;
+        return false;
+    }
+
+    function getDioceseId() {
+        return $this->religious_administration->diocese->id;
+    }
+
+    function loadLog() {
+        $result = DB::table('templomok')
+                ->select('log')
+                ->where('id', "=", $this->id)
+                ->limit(1)
+                ->get();
+        $this->log = $result[0]->log;
     }
 
     function allowOldStructure() {

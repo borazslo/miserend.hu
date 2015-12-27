@@ -7,6 +7,7 @@ class Cron extends Html {
     public function __construct($path) {
         set_time_limit('300');
         ini_set('memory_limit', '512M');
+
         if ($path[0]) {
             switch ($path[0]) {
 
@@ -20,7 +21,10 @@ class Cron extends Html {
                 case 'daily':
                     #clearoutVolunteers();
                     deleteOverpass();
-                    updateOSM();
+
+                    $overpass = new \OverpassApi();
+                    $overpass->updateUrlMiserend();
+
                     for ($v = 1; $v < 5; $v++) {
                         $file = 'fajlok/sqlite/miserend_v' . $v . '.sqlite3';
                         generateSqlite($v, $file);

@@ -5,37 +5,24 @@ namespace Html\Church;
 class Edit extends \Html\Html {
 
     public function __construct($path) {
-        global$user;
+        global $user;
 
-        $this->template = 'layout.twig';
         $this->tid = $path[0];
+        $this->church = new \Church($this->tid);
+        $this->church->loadLog();
+        $this->array2this($this->church);
 
-        $jog = false;
-        if ($user->checkRole('miserend')) {
-            $jog = true;
-        }
-
-        if ($jog == false AND isset($_REQUEST['tid']) AND is_numeric($_REQUEST['tid']) AND in_array($m_op, array('addtemplom', 'addmise', 'addingtemplom', 'addingmise'))) {
-            $church = getChurch($_REQUEST['tid']);
-            if ($user->checkRole('miserend') OR in_array($user->login, $church['responsible']) OR in_array($user->login, $church['diocese']['responsible']))
-                $jog = true;
-            else
-                $jog = false;
-        } elseif (( $m_op == 'index' OR $m_op == 'modtemplom' )AND ( $user->checkRole('miserend') OR count($user->responsible['diocese']) > 0 )) {
-            $jog = true;
-        }
-
-        if ($jog == true) {
-
-            $isForm = \Request::Text('submit');
-            if ($isForm) {
-                $this->modify();
-            }
-            $this->preparePage();
-        } else {
+        if (!$this->church->checkWriteAccess($user)) {
             $this->title = 'Hiányzó jogosultság!';
             addMessage('Hiányzó jogosultság!', 'danger');
+            return;
         }
+
+        $isForm = \Request::Text('submit');
+        if ($isForm) {
+            $this->modify();
+        }
+        $this->preparePage();
     }
 
     function modify() {
@@ -305,7 +292,117 @@ class Edit extends \Html\Html {
             $espkerT[$ehm][$id] = $nev;
         }
 
-        $query = "select id,nev from orszagok where kiemelt='i'";
+        if ($tid > 0) {
+            $most = date("Y-m-d H:i:s");
+            $urlap.=include('editscript2.php'); //Csak, ha módosításról van szó
+
+            $query = "select nev,ismertnev,turistautak,orszag,megye,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,espereskerulet,leiras,megjegyzes,miseaktiv,misemegj,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,kontakt,kontaktmail,adminmegj,log,ok,letrehozta,megbizhato,eszrevetel,lat,lng from templomok LEFT JOIN terkep_geocode ON id=tid where id='$tid'";
+            if (!$lekerdez = mysql_query($query))
+                echo 'HIBA!<br>' . mysql_error();
+            list($nev, $ismertnev, $turistautak, $orszag, $megye, $varos, $cim, $megkozelites, $plebania, $pleb_url, $pleb_eml, $egyhazmegye, $espereskerulet, $szoveg, $megjegyzes, $miseaktiv, $misemegj, $szomszedos1, $szomszedos2, $bucsu, $nyariido, $teliido, $frissites, $kontakt, $kontaktmail, $adminmegj, $log, $ok, $feltolto, $megbizhato, $teszrevetel, $lat, $lng) = mysql_fetch_row($lekerdez);
+        }
+        else {
+            $datum = date('Y-m-d H:i');
+            $nyariido = '2014-03-30';
+            $teliido = '2014-10-25';
+            $urlapkieg = "\n<input type=hidden name=elsofeltoltes value=i>";
+        }
+
+        $urlap.="\n<FORM ENCTYPE='multipart/form-data' method=post>";
+        $urlap.=$urlapkieg;
+
+
+        $urlap.="\n<input type=hidden name=tid value=$tid>";
+
+        $urlap.='<table cellpadding=4>';
+
+        //Észrevétel
+        $jelzes = getRemarkMark($tid);
+        $urlap.="\n<tr><td colspan=2><span class=kiscim>Észrevétel: </span>" . $jelzes['html'] . "</td></tr>";
+
+        if ($tid > 0) {
+            //Megnéz
+            $urlap.="\n<tr><td colspan=2><span class=kiscim>Nyilvános oldal megnyitása:</span><span class=alap> (új ablakban)</span> <a href='/templom/$tid' class=link target=_blank><u>$nev</u></a></td></tr>";
+        }
+
+        //megjegyzés
+        $urlap.="\n<tr><td bgcolor=#ECE5C8><div class=kiscim align=right>Megjegyzés:<br><a href=\"javascript:OpenNewWindow('/help/1',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#ECE5C8><textarea name=adminmegj class=urlap cols=50 rows=3>$adminmegj</textarea><span class=alap> a szerkesztéssel kapcsolatosan</span></td></tr>";
+
+        //kontakt
+        $urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Felelős:<br><a href=\"javascript:OpenNewWindow('/help/2',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#efefef><textarea name=kontakt class=urlap cols=50 rows=2>$kontakt</textarea><span class=alap> név és telefonszám</span><br><input type=text name=kontaktmail size=40 class=urlap value='$kontaktmail'><span class=alap> emailcím</span></td></tr>";
+        //feltöltő
+        if (empty($feltolto))
+            $feltolto = $user->login;
+        $urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Feltöltő (jogosult):</div></td><td bgcolor=#efefef>";
+        global $user;
+        if ($user->checkRole('miserend')) {
+            $urlap.="<select name=feltolto class=urlap><option value=''>Nincs</option>";
+            $query = "select login from user where ok='i' order by login";
+            $lekerdez = mysql_query($query);
+            while (list($usr) = mysql_fetch_row($lekerdez)) {
+                $urlap.="<option value='$usr'";
+                if ($usr == $feltolto)
+                    $urlap.=" selected";
+                $urlap.=">$usr</option>";
+            }
+            $urlap.="</select> <input type=checkbox name=megbizhato class=urlap value=i";
+            if ($megbizhato != 'n')
+                $urlap.=" checked";
+            $urlap.="><span class=alap> megbízható, nem kell külön engedélyezni</span></td></tr>";
+        } else {
+            $urlap.= "<span class='alap'>" . $feltolto . "</td></tr>";
+        }
+
+
+        //név
+        $urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><input type=text name=nev value=\"$nev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('/help/3',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
+        $urlap.="\n<tr><td bgcolor=#FAE19C><div class=kiscim align=right>közismert neve:</div></td><td bgcolor=#FAE19C><input type=text name=ismertnev value=\"$ismertnev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('/help/4',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a><br><span class=alap>(Helyben elfogadott (ismert) templomnév, valamint település, vagy település résznév, amennyiben eltérő a település hivatalos nevétől, pl. <u>izbégi templom</u>)</span></td></tr>";
+
+        //cím
+        $urlap.="\n<tr><td><div class=kiscim align=right>Egyházigazgatási cím:<br><a href=\"javascript:OpenNewWindow('/help/5',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td>";
+
+        //Egyházmegye
+        $urlap.="<select name=egyhazmegye class=urlap onChange=\"if(this.value!=0) {";
+        foreach ($ehmT as $id => $nev) {
+            $urlap.="document.getElementById($id).style.display='none'; ";
+        }
+        $urlap.="document.getElementById(this.value).style.display='inline'; document.getElementById('valassz').style.display='none'; } else {";
+        foreach ($ehmT as $id => $nev) {
+            $urlap.="document.getElementById($id).style.display='none'; ";
+        }
+        $urlap.="document.getElementById('valassz').style.display='inline';}\"><option value=0>Nincs / nem tudom</option>";
+        foreach ($ehmT as $id => $nev) {
+            $urlap.="<option value=$id";
+            if ($egyhazmegye == $id)
+                $urlap.=' selected';
+            $urlap.=">$nev</option>";
+
+            if ($egyhazmegye == $id)
+                $display = 'inline';
+            else
+                $display = 'none';
+            $espkerurlap.="<div id=$id style='display: $display'><select name=espkerT[$id] class=keresourlap><option value=0>Nincs / nem tudom</option>";
+            if (is_array($espkerT[$id])) {
+                foreach ($espkerT[$id] as $espid => $espnev) {
+                    $espkerurlap.="<option value=$espid";
+                    if ($espid == $espereskerulet)
+                        $espkerurlap.=' selected';
+                    $espkerurlap.=">$espnev</option>";
+                }
+            }
+            $espkerurlap.="</select><span class=alap> (espereskerület)</span><br></div>";
+        }
+        $urlap.="</select><span class=alap> (egyházmegye)</span><br>";
+
+        //Espereskerület
+        $urlap.=$espkerurlap;
+
+        $urlap.="\n</tr></td>";
+
+        $urlap .= $this->getLocationForm();
+        
+        /////////////////////////////////
+                $query = "select id,nev from orszagok where kiemelt='i'";
         $lekerdez = mysql_query($query);
         while (list($id, $nev) = mysql_fetch_row($lekerdez)) {
             $orszagT[$id] = $nev;
@@ -349,115 +446,8 @@ class Edit extends \Html\Html {
                 $varos1T[$orszagid][$megyeid] = $v1T;
             }
         }
-
-        if ($tid > 0) {
-            $most = date("Y-m-d H:i:s");
-            $urlap.=include('editscript2.php'); //Csak, ha módosításról van szó
-
-            $query = "select nev,ismertnev,turistautak,orszag,megye,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,espereskerulet,leiras,megjegyzes,miseaktiv,misemegj,szomszedos1,szomszedos2,bucsu,nyariido,teliido,frissites,kontakt,kontaktmail,adminmegj,log,ok,letrehozta,megbizhato,eszrevetel,lat,lng from templomok LEFT JOIN terkep_geocode ON id=tid where id='$tid'";
-            if (!$lekerdez = mysql_query($query))
-                echo 'HIBA!<br>' . mysql_error();
-            list($nev, $ismertnev, $turistautak, $orszag, $megye, $varos, $cim, $megkozelites, $plebania, $pleb_url, $pleb_eml, $egyhazmegye, $espereskerulet, $szoveg, $megjegyzes, $miseaktiv, $misemegj, $szomszedos1, $szomszedos2, $bucsu, $nyariido, $teliido, $frissites, $kontakt, $kontaktmail, $adminmegj, $log, $ok, $feltolto, $megbizhato, $teszrevetel, $lat, $lng) = mysql_fetch_row($lekerdez);
-        }
-        else {
-            $datum = date('Y-m-d H:i');
-            $nyariido = '2014-03-30';
-            $teliido = '2014-10-25';
-            $urlapkieg = "\n<input type=hidden name=elsofeltoltes value=i>";
-        }
-
-        $urlap.="\n<FORM ENCTYPE='multipart/form-data' method=post>";
-        $urlap.=$urlapkieg;
-
-
-        $urlap.="\n<input type=hidden name=tid value=$tid>";
-
-        $urlap.='<table cellpadding=4>';
-
-        //Észrevétel
-        $jelzes = getRemarkMark($tid);
-        $urlap.="\n<tr><td colspan=2><span class=kiscim>Észrevétel: </span>" . $jelzes['html'] . "</td></tr>";
-
-        if ($tid > 0) {
-            //Megnéz
-            $urlap.="\n<tr><td colspan=2><span class=kiscim>Nyilvános oldal megnyitása:</span><span class=alap> (új ablakban)</span> <a href=?templom=$tid class=link target=_blank><u>$nev</u></a></td></tr>";
-        }
-
-        //megjegyzés
-        $urlap.="\n<tr><td bgcolor=#ECE5C8><div class=kiscim align=right>Megjegyzés:<br><a href=\"javascript:OpenNewWindow('/help/1',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#ECE5C8><textarea name=adminmegj class=urlap cols=50 rows=3>$adminmegj</textarea><span class=alap> a szerkesztéssel kapcsolatosan</span></td></tr>";
-
-        //kontakt
-        $urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Felelős:<br><a href=\"javascript:OpenNewWindow('/help/2',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó'></a></div></td><td bgcolor=#efefef><textarea name=kontakt class=urlap cols=50 rows=2>$kontakt</textarea><span class=alap> név és telefonszám</span><br><input type=text name=kontaktmail size=40 class=urlap value='$kontaktmail'><span class=alap> emailcím</span></td></tr>";
-        //feltöltő
-        if (empty($feltolto))
-            $feltolto = $user->login;
-        $urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Feltöltő (jogosult):</div></td><td bgcolor=#efefef>";
-        global $user;
-        if ($user->checkRole('miserend')) {
-            $urlap.="<select name=feltolto class=urlap><option value=''>Nincs</option>";
-            $query = "select login from user where ok='i' order by login";
-            $lekerdez = mysql_query($query);
-            while (list($usr) = mysql_fetch_row($lekerdez)) {
-                $urlap.="<option value='$usr'";
-                if ($usr == $feltolto)
-                    $urlap.=" selected";
-                $urlap.=">$usr</option>";
-            }
-            $urlap.="</select> <input type=checkbox name=megbizhato class=urlap value=i";
-            if ($megbizhato != 'n')
-                $urlap.=" checked";
-            $urlap.="><span class=alap> megbízható, nem kell külön engedélyezni</span></td></tr>";
-        } else {
-            $urlap.= "<span class='alap'>" . $feltolto . "</td></tr>";
-        }
-
-
-        //név
-        $urlap.="\n<tr><td bgcolor=#F5CC4C><div class=kiscim align=right>Templom neve:</div></td><td bgcolor=#F5CC4C><input type=text name=nev value=\"$nev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('/help/3',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
-        $urlap.="\n<tr><td bgcolor=#FAE19C><div class=kiscim align=right>közismert neve:</div></td><td bgcolor=#FAE19C><input type=text name=ismertnev value=\"$ismertnev\" class=urlap size=80 maxlength=150> <a href=\"javascript:OpenNewWindow('/help/4',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a><br><span class=alap>(Helyben elfogadott (ismert) templomnév, valamint település, vagy település résznév, amennyiben eltérő a település hivatalos nevétől, pl. <u>izbégi templom</u>)</span></td></tr>";
-
-        //túristautak
-        $urlap.="\n<tr><td bgcolor=#EFEFEF><div class=kiscim align=right>turistautak.hu ID:</div></td><td bgcolor=#EFEFEF><input type=text name=turistautak value=\"$turistautak\" class=urlap size=5 maxlength=10> <a href=\"javascript:OpenNewWindow('/help/16',240,320);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a><br><span class=alap>(<a href=http://turistautak.hu/search.php?s=templom target=_blank class=link><u>ebből a listából</u></a> ha bennevan)</span></td></tr>";
-
-        //cím
+        
         $urlap.="\n<tr><td><div class=kiscim align=right>Templom címe:<br><a href=\"javascript:OpenNewWindow('/help/5',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td>";
-
-        //Egyházmegye
-        $urlap.="<select name=egyhazmegye class=urlap onChange=\"if(this.value!=0) {";
-        foreach ($ehmT as $id => $nev) {
-            $urlap.="document.getElementById($id).style.display='none'; ";
-        }
-        $urlap.="document.getElementById(this.value).style.display='inline'; document.getElementById('valassz').style.display='none'; } else {";
-        foreach ($ehmT as $id => $nev) {
-            $urlap.="document.getElementById($id).style.display='none'; ";
-        }
-        $urlap.="document.getElementById('valassz').style.display='inline';}\"><option value=0>Nincs / nem tudom</option>";
-        foreach ($ehmT as $id => $nev) {
-            $urlap.="<option value=$id";
-            if ($egyhazmegye == $id)
-                $urlap.=' selected';
-            $urlap.=">$nev</option>";
-
-            if ($egyhazmegye == $id)
-                $display = 'inline';
-            else
-                $display = 'none';
-            $espkerurlap.="<div id=$id style='display: $display'><select name=espkerT[$id] class=keresourlap><option value=0>Nincs / nem tudom</option>";
-            if (is_array($espkerT[$id])) {
-                foreach ($espkerT[$id] as $espid => $espnev) {
-                    $espkerurlap.="<option value=$espid";
-                    if ($espid == $espereskerulet)
-                        $espkerurlap.=' selected';
-                    $espkerurlap.=">$espnev</option>";
-                }
-            }
-            $espkerurlap.="</select><span class=alap> (espereskerület)</span><br></div>";
-        }
-        $urlap.="</select><span class=alap> (egyházmegye)</span><br>";
-
-        //Espereskerület
-        $urlap.=$espkerurlap;
-
         //Ország
         $urlap.="<img src=/img/space.gif width=5 height=8><br>\n<select name=orszag class=urlap onChange=\"if(this.value!=0) {";
         foreach ($orszagT as $id => $nev) {
@@ -542,6 +532,8 @@ class Edit extends \Html\Html {
         $urlap.="<input type=text name=lat value=\"$lat\" class=urlap size=10 maxlength=7><span class=alap> (szélesség)</span> ";
         $urlap.="<input type=text name=lng value=\"$lng\" class=urlap size=10 maxlength=7><span class=alap> (hosszúság)</span>";
         $urlap.="</td></tr>";
+        
+        /////////////////////////////////
 
         //plébánia
         $urlap.="\n<tr><td bgcolor=#efefef><div class=kiscim align=right>Plébánia adatai:<br><a href=\"javascript:OpenNewWindow('/help/6',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a></div></td><td bgcolor=#efefef><textarea name=plebania class=urlap cols=50 rows=3>$plebania</textarea><span class=alap> cím, telefon, fax, kontakt</span>";
@@ -639,25 +631,44 @@ class Edit extends \Html\Html {
         $urlap.="><span class=alap> nem</span>";
         $urlap.=" <a href=\"javascript:OpenNewWindow('/help/15',200,300);\"><img src=/img/sugo.gif border=0 title='Súgó' align=absmiddle></a></td></tr>";
 
-        //Log
-        $urlap.="\n<tr><td valign=top><div class=kiscim align=right>Történet:</div></td><td valign=top><textarea cols=50 rows=6 disabled>Számláló: $szamlalo\n$log</textarea></td></tr>";
+        
+        
 
-        $urlap.="\n<tr><td><div align=right><input type=submit name='submit' value=Mehet class=urlap>&nbsp;</div></td><td>";
-
-        if ($tid > 0) {
-            $urlap.="<input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span>";
-            $urlap.="<br><input type=radio name=modosit value=m class=urlap><span class=alap> és tovább a miserendre</span>";
-            $urlap.="<br><input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span>";
-            $urlap.="<br><input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>";
-        } else
-            $urlap.="<input type=hidden name=modosit value=i>";
-
-        $urlap.='</td></tr></table>';
-        $urlap.="\n</form>";
-
+       
         $this->title = "Templom feltöltése / módosítása";
         $this->content = $urlap;
         $this->columns2 = true;
+        
+        #printr($this);
     }
 
+    function getLocationForm() {
+        
+        if($this->location->osm) {
+            $return = $this->getOSMLocationForm();
+        } else {
+            $return = $this->getMiserendLocationForm();
+        }
+        return $return; 
+    }
+
+    function getOSMLocationForm() {
+        return false;
+        $osmTypeId = explode('/',$this->location->osm);
+        
+        printr($this);
+        exit;
+        $osm = new \OSM();
+        $osm->getById($osmTypeId[0],$osmTypeId[1]);
+        
+        $osm->downloadEnclosingBoundaries();
+        exit;
+        printr($osm);
+        echo "ok";
+    }
+    
+    function getMiserendLocationForm() {
+
+        return $urlap;
+    }
 }

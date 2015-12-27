@@ -116,9 +116,7 @@ class Html {
     }
 
     function array2this($array) {
-        foreach ($array as $key => $value) {
-            $this->$key = $value;
-        }
+        copyArrayToObject($array,$this);
     }
 
 }

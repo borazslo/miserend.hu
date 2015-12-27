@@ -33,6 +33,7 @@ function dbconnect() {
     ]);
     // Make this Capsule instance available globally via static methods... (optional)
     $capsule->setAsGlobal();
+    $capsule->bootEloquent();
 }
 
 function kicsinyites($forras, $kimenet, $max) {
@@ -1789,7 +1790,6 @@ function getOSMelement($type, $id) {
 
 function deleteOverpass() {
     $start = microtime();
-    //updateOSM();
     $files = scandir('fajlok/tmp');
     /* */
     foreach ($files as $file)
@@ -1824,8 +1824,7 @@ function deleteOverpass() {
 }
 
 function updateOverpass($limit = false) {
-    $start = microtime();
-    //updateOSM();
+    $start = microtime();    
     $files = scandir('fajlok/tmp');
     /*     * /
       foreach($files as $file)
@@ -1859,43 +1858,6 @@ function updateOverpass($limit = false) {
     }
     /* */
     echo ( $start - microtime() ) . "s ";
-    return true;
-}
-
-function updateOSM() {
-    $json = file_get_contents("http://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%5Btimeout%3A25%5D%3B%0A%28%0A%20%20node%5B%22url%3Amiserend%22%5D%3B%0A%20%20way%5B%22url%3Amiserend%22%5D%3B%0A%20%20relation%5B%22url%3Amiserend%22%5D%3B%0A%29%3B%0Aout%20body%20qt%20center%3B");
-    //file_put_contents("json.tmp", $json); 
-    //$json = file_get_contents("json.tmp");   
-    $obj = json_decode($json);
-    if (count((array) $obj->elements) > 0) {
-
-        mysql_query("TRUNCATE osm;");
-        mysql_query("TRUNCATE osm_tags;");
-
-        foreach ($obj->elements as $key => $item) {
-            if (count((array) $item->tags) > 0) {
-                if (preg_match("/=([0-9]{0,6})$/i", $item->tags->{'url:miserend'}, $match)) {
-                    $tid = $match[1];
-                    mysql_query("INSERT INTO osm (tid,id,type) VALUES (" . $tid . "," . $item->id . ",'" . $item->type . "');");
-                    unset($item->tags->{'url:miserend'});
-                    if (isset($item->lon))
-                        $item->tags->lon = $item->lon;
-                    if (isset($item->lat))
-                        $item->tags->lat = $item->lat;
-                    if (isset($item->center->lon))
-                        $item->tags->lon = $item->center->lon;
-                    if (isset($item->center->lat))
-                        $item->tags->lat = $item->center->lat;
-
-                    foreach ($item->tags as $name => $value) {
-                        mysql_query("INSERT INTO osm_tags (`type`,`id`,`name`,`value`) VALUES ('" . $item->type . "','" . (int) $item->id . "','" . $name . "','" . $value . "');");
-                    }
-                    //echo $c ." ".$tid.": <a href='http://openstreetmap.org/".$item->type."/".$item->id."'>".$item->type."/".$item->id."</a> tags:".count((array)$item->tags)." @".$item->lat."@".$item->lon."<br/>";
-                }
-            }
-        }
-    }
-
     return true;
 }
 
@@ -2538,6 +2500,12 @@ function miserend_getRegi() {
     return $return;
 }
 
+function copyArrayToObject($array, &$object) {
+    foreach ($array as $key => $value) {
+        $object->$key = $value;
+    }
+}
+
 function idoszak($i) {
     switch ($i) {
         case 'a': $tmp = 'Ádventi idő';
@@ -2633,5 +2601,6 @@ function printr($variable) {
 
     echo"<pre>" . print_r($variable, 1) . "</pre>";
 }
+
 
 ?>

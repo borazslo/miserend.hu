@@ -1,0 +1,28 @@
+{% import "forms.twig" as forms %}
+
+{% extends "layout.twig" %}
+
+{% block content %}
+	{{ content|raw }}
+        <tr>
+            <td valign=top>
+                <div class=kiscim align=right>Történet:</div>
+            </td>
+            <td valign=top>
+                <textarea cols=50 rows=6 disabled>{{ log }}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div align=right><input type=submit name='submit' value=Mehet class=urlap>&nbsp;</div>
+            </td>
+            <td>
+                <input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span><br/>
+                <input type=radio name=modosit value=m class=urlap><span class=alap> és tovább a miserendre</span><br/>
+                <input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span><br/>
+                <input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>
+            </td>
+        </tr>
+</table>
+        </form>
+{% endblock %}

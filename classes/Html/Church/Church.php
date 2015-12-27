@@ -13,7 +13,7 @@ class Church extends \Html\Html {
         foreach ($church as $k => $i)
             $$k = $i;
 
-        $church = new \Church($tid);
+        $church = new \Church($tid);        
         $church->getNeighbourChurches();
         $this->array2this($church);
 
@@ -60,6 +60,7 @@ class Church extends \Html\Html {
                 $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
             elseif (count($allapotok) > 0)
                 $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";
+            $this->nev = $nev;
         }
 
         /*
@@ -69,7 +70,7 @@ class Church extends \Html\Html {
           else
           $cim .= "<br/>";
          */
-        
+
         $this->addExtraMeta("og:image", "/kepek/templomok/" . $tid . "/" . $this->photos[0]->fajlnev);
 
         if ($user->checkFavorite($tid)) {
@@ -83,7 +84,7 @@ class Church extends \Html\Html {
             'napok' => array('', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', '<font color=#AC282B><b>vasárnap</b></font>'),
             'alert' => LiturgicalDayAlert('html'),
         );
-        
+
         foreach ($variables as $key => $var) {
             $this->$key = $var;
         }
