@@ -190,6 +190,11 @@ function cookieSave($uid, $name) {
 
 function mapquestDistance($from1, $to1) {
     global $config;
+    
+    if(!$config['mapquest']['appkey'] or $config['mapquest']['appkey'] == '***') {
+        return false;
+    }
+    
     if (is_array($from1))
         $from = $from1['lat'] . "," . $from1['lng'];
     else
@@ -366,19 +371,6 @@ function checkPrivilege($type, $privilege, $object, $user = false) {
             break;
     }
     return false;
-}
-
-function getChurch($tid) {
-    //TODO: delete getChurch();
-    try {
-        $church = new Church($tid);
-        $church->allowOldStructure();
-        return (array) $church;
-    } catch (Exception $e) {
-        //If there is no such church, we return an empty array();
-        //echo $e->getMessage();
-        return array();
-    }
 }
 
 function getMasses($tid, $date = false) {
@@ -1104,7 +1096,7 @@ function getRemarkMark($tid) {
     $return = array();
 
     if (is_numeric($tid)) {
-        $querye = "SELECT allapot FROM eszrevetelek WHERE ( hol='templomok' OR hol = '' )  and hol_id = $tid GROUP BY allapot LIMIT 3";
+        $querye = "SELECT allapot FROM remarks WHERE church_id = $tid GROUP BY allapot LIMIT 3";
         if (!$lekerdeze = mysql_query($querye))
             echo "HIBA!<br>$querym<br>" . mysql_error();
         while (list($cell) = mysql_fetch_row($lekerdeze)) {
@@ -1136,11 +1128,10 @@ function getRemarkMark($tid) {
 function widget_miserend($args) {
     global $twig, $config;
     $tid = $args['tid'];
-    $vars = getChurch($tid);
+    $vars = \Eloquent\Church::find($tid)->toArray();
     if ($vars == array())
         $html = 'Nincs ilyen templom.';
     else {
-        $vars['design_url'] = $config['path']['domain'];
         $vars['miserend'] = getMasses($tid);
 
         if ($args['misemegj'] == 'off')
@@ -1277,15 +1268,15 @@ function generateSqlite($version, $filename) {
         }
         // mysql select kepek
         $query = "SELECT * 
-            FROM  `kepek` 
-            ORDER BY tid, kiemelt, sorszam DESC , id ASC ";
+            FROM  `photos` 
+            ORDER BY church_id, flag, order DESC , id ASC ";
         //AND kiemelt =  'i'
         $result = mysql_query($query);
         $kiemeltkepek = array();
         $kepek = array();
         while ($kep = mysql_fetch_array($result)) {
-            if (!isset($kiemeltkepek[$kep['tid']])) { // AND $kep['kiemelt'] == 'i')
-                $kiemeltkepek[$kep['tid']] = $kep;
+            if (!isset($kiemeltkepek[$kep['church_id']])) { // AND $kep['kiemelt'] == 'i')
+                $kiemeltkepek[$kep['church_id']] = $kep;
                 /* if($kep['kiemelt'] != 'i') { 
                   echo 'jaj - <a href="http://www.miserend.hu/templom/'.$kep['kid'].'">'.$kep['kid'].'</a><br/>';
                   echo $c++;
@@ -1341,7 +1332,7 @@ function generateSqlite($version, $filename) {
                     $teliido = $templom['teliido'];
                 }
                 if (isset($kiemeltkepek[$tid]))
-                    $kep = "kepek/templomok/" . $tid . "/" . $kiemeltkepek[$tid]['fajlnev'];
+                    $kep = "kepek/templomok/" . $tid . "/" . $kiemeltkepek[$tid]['filename'];
                 else {
                     $kep = '';
                 }
@@ -1446,11 +1437,11 @@ function generateSqlite($version, $filename) {
                     set_time_limit(60);
                     // Set values to bound variables
                     $kid = $kep['id']; //Nem megy, mert nem unique.
-                    $tid = $kep['tid'];
-                    $url = "http://miserend.hu/kepek/templomok/" . $kep['tid'] . "/" . $kep['fajlnev'];
-                    $file = "kepek/templomok/" . $kep['tid'] . "/" . $kep['fajlnev'];
+                    $church_id = $kep['church_id'];
+                    $url = "http://miserend.hu/kepek/templomok/" . $kep['church_id'] . "/" . $kep['filename'];
+                    $file = "kepek/templomok/" . $kep['church_id'] . "/" . $kep['filename'];
                     $insert = "INSERT INTO kepek (kid, tid, kep) 
-                VALUES ('" . $kid . "','" . $tid . "','" . $url . "')";
+                VALUES ('" . $kid . "','" . $church_id . "','" . $url . "')";
                     // Execute statement
                     if (file_exists($file))
                         $file_db->query($insert);
@@ -1511,11 +1502,11 @@ function upload2ftp($ftp_server, $ftp_user_name, $ftp_user_pass, $destination_fi
 function updateImageSizes() {
     global $config;
 
-    $query = 'SELECT * FROM kepek WHERE width IS NULL OR height IS NULL OR width = 0 OR height = 0 ';
+    $query = 'SELECT * FROM photos WHERE width IS NULL OR height IS NULL OR width = 0 OR height = 0 ';
     $result = mysql_query($query);
     while (($kep = mysql_fetch_array($result))) {
 
-        $file = "kepek/templomok/" . $kep['tid'] . "/" . $kep['fajlnev'];
+        $file = "kepek/templomok/" . $kep['church_id'] . "/" . $kep['filename'];
 
         if (file_exists($file)) {
             if (preg_match('/(jpg|jpeg)$/i', $file)) {
@@ -1524,7 +1515,7 @@ function updateImageSizes() {
                 $kep['width'] = @imagesx($src_img);  # original width
 
                 if ($kep['height'] != '' AND $kep['width'] != '') {
-                    $query = "UPDATE kepek SET height = '" . $kep['height'] . "', width = '" . $kep['width'] . "' WHERE id = " . $kep['id'] . " LIMIT 1";
+                    $query = "UPDATE photos SET height = '" . $kep['height'] . "', width = '" . $kep['width'] . "' WHERE id = " . $kep['id'] . " LIMIT 1";
                     if ($config['debug'] > 0)
                         echo $query . "<br>";
                     mysql_query($query);
@@ -1546,7 +1537,7 @@ function updateGorogkatolizalas() {
     $tables = array(
         'templomok' => array('nev', 'ismertnev', 'megjegyzes', 'misemegj', 'leiras', 'megkozelites'),
         'misek' => array('megjegyzes'),
-        'kepek' => array('felirat')
+        'photos' => array('title')
     );
     $c = 0;
     foreach ($tables as $table => $fields) {
@@ -1624,6 +1615,7 @@ function updateComments2Attributes() {
     global $config;
     //megjegyzés -> tulajdonság
     $c = 0;
+    $attributes = unserialize(ATTRIBUTES);
     foreach ($attributes as $abbrev => $attribute) {
         $query = "SELECT * from misek WHERE megjegyzes REGEXP '^" . $attribute['name'] . "$' ";
         $result = mysql_query($query);
@@ -1691,11 +1683,11 @@ function updateDistances($tid = false, $limit = false) {
             SELECT t.id,geo.lat,geo.lng,(ABS(geo.lat - " . $church['lat'] . ") + ABS(geo.lng - " . $church['lng'] . ")) diff,(IFNULL(d1.up,0) + IFNULL(d2.up,0)) toupdate
             FROM templomok AS t
                 LEFT JOIN terkep_geocode as geo ON geo.tid = t.id 
-                LEFT JOIN ( SELECT tid1,distance,toupdate as up FROM distance WHERE tid2 = " . $church['id'] . " ) AS d1 ON d1.tid1 = t.id
-                LEFT JOIN ( SELECT tid2,distance,toupdate as up FROM distance WHERE tid1 = " . $church['id'] . " ) AS d2 ON d2.tid2 = t.id
+                LEFT JOIN ( SELECT `to`,distance,toupdate as up FROM distances WHERE `to` = " . $church['id'] . " ) AS d1 ON d1.`to` = t.id
+                LEFT JOIN ( SELECT `from`,distance,toupdate as up FROM distances WHERE `from` = " . $church['id'] . " ) AS d2 ON d2.`from` = t.id
                 WHERE geo.lng <> '' AND geo.lat <> ''
                     AND t.ok = 'i'
-                    AND ( tid1 IS NULL OR d1.up IS NOT NULL ) AND ( tid2 IS NULL OR d2.up IS NOT NULL) 
+                    AND ( `from` IS NULL OR d1.up IS NOT NULL ) AND ( `to` IS NULL OR d2.up IS NOT NULL) 
                     AND id <> " . $church['id'] . "
                     AND ( 
                         ( lat BETWEEN " . $minlat . " AND " . $maxlat . " AND lng BETWEEN " . $minlng . " AND " . $maxlng . " ) 
@@ -1708,7 +1700,8 @@ function updateDistances($tid = false, $limit = false) {
         else
             $query .= " LIMIT " . $limit;
 
-        $result2 = mysql_query($query);
+        $result2 = mysql_query($query);        
+        
         while (($other = mysql_fetch_assoc($result2))) {
             $c++;
             if ($c > $limit)
@@ -1824,6 +1817,8 @@ function deleteOverpass() {
 }
 
 function updateOverpass($limit = false) {
+    /* OUT OF ORDER. IT is needed by \Html\Josm */
+    return false;
     $start = microtime();    
     $files = scandir('fajlok/tmp');
     /*     * /
@@ -1835,7 +1830,7 @@ function updateOverpass($limit = false) {
     $query = "SELECT t.id, g.* FROM templomok t 
                 LEFT JOIN osm ON osm.tid = t.id 
                 LEFT JOIN terkep_geocode as g ON g.tid = t.id 
-                WHERE osm.type IS NULL and ok = 'i' 
+                WHERE osm.osmtype IS NULL and ok = 'i' 
                 ORDER BY t.id";
 
     $result = mysql_query($query);
@@ -2458,44 +2453,6 @@ function chat_getusers($format = false) {
         if (count($return) == 0)
             $text = '<strong><i>Nincs (más) admin online.</i></strong>';
         $return = $text;
-    }
-    return $return;
-}
-
-function miserend_printRegi() {
-    $templomok = miserend_getRegi();
-
-    $return = '<img src="design/miserend/img/negyzet_kek.gif" align="absmiddle" style="margin-right:5px"><span class="dobozcim_fekete">Legrégebben frissített templomaink</span><br/>';
-    $return .= "<span class=\"alap\">Segíts nekünk az adatok frissen tartásában! Hívj fel egy régen frissült templomot!</span><br/><br/>";
-    $c = 0;
-    foreach ($templomok as $templom) {
-        if (isset($templom['eszrevetel'])) {
-            $return .= "<span class=\"alap\"><i>folyamatban: " . $templom['nev'] . " (" . $templom['varos'] . ")</i></span><br/>\n";
-        } else {
-            $return .= "<span class=\"alap\">" . date('Y.m.d.', strtotime($templom['frissites'])) . "</span> <a class=\"felsomenulink\" href=\"/templom/" . $templom['id'] . "\">" . $templom['nev'] . " (" . $templom['varos'] . ")</a><br/>\n";
-        }
-        //echo print_R($templom,1)."<br>";
-
-        if ($c > 10)
-            break;
-        $c++;
-    }
-
-
-    return $return;
-}
-
-function miserend_getRegi() {
-    $return = array();
-    $results = mysql_query('SELECT templomok.id, templomok.varos, templomok.nev, templomok.ismertnev, frissites, egyhazmegye, egyhazmegye.nev as egyhazmegyenev FROM templomok LEFT JOIN egyhazmegye ON egyhazmegye.id = egyhazmegye WHERE templomok.ok = "i" AND templomok.nev LIKE \'%templom%\' ORDER BY frissites ASC LIMIT 100');
-    while ($templom = mysql_fetch_assoc($results)) {
-        $results2 = mysql_query("SELECT * FROM eszrevetelek WHERE hol = 'templomok' AND hol_id = " . $templom['id'] . " AND ( allapot = 'u' OR allapot = 'f' ) ORDER BY datum DESC, allapot DESC LIMIT 1 ;");
-        //while ($eszrevetel = mysql_fetch_assoc($results2)) { print_R($eszrevetel); }
-        if (mysql_num_rows($results2) > 0) {
-            $eszrevetel = mysql_fetch_assoc($results2);
-            $templom['eszrevetel'] = $eszrevetel;
-        }
-        $return[] = $templom;
     }
     return $return;
 }

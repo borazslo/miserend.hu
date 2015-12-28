@@ -14,7 +14,7 @@ class Delete extends \Html\Html {
         $this->template = 'layout.twig';
         $this->input['tid'] = $path[0];
         
-        $this->church2delete = new \Church($this->input['tid']);
+        $this->church2delete = \Eloquent\Church::find($this->input['tid']);
         if ($this->church2delete->id == 0) {
             addMessage("Nincs ilyen templom!", danger);
             return;
@@ -30,6 +30,7 @@ class Delete extends \Html\Html {
     }
 
     function delete() {
+        $this->church2delete->remarks()->delete();         
         $this->church2delete->delete();
         header("Location: /templom/list");
     }

@@ -11,7 +11,7 @@
         <span class=alap>
             <i>Térképen: </i>
             <u><a href="http://www.openstreetmap.org/{{ location.osm }}">
-                    {{ location.lat }}, {{ location.lon }}
+                    {{ location.lat|number_format(6, '.') }}, {{ location.lon|number_format(6, '.') }}
             </a></u>
         </span>
     {% elseif location.lat %}

@@ -1,4 +1,4 @@
-{% extends "remark.twig" %}
+{% extends "Remark.twig" %}
 
 {% block content %}
 <table cellpadding=0 cellspacing=1 class="table table-striped table-hover">
@@ -14,7 +14,7 @@
 			{% endif %}
 		</td>
 		<td valign=top width="140" style="padding:3px">
-                    <form method=post action='/templom/{{ remark.tid }}/eszrevetelek'>
+                    <form method=post action='/templom/{{ remark.church_id }}/eszrevetelek'>
                         <input type=hidden name=rid value="{{ remark.id }}">
                         <div class='form-group '>
                             <label for='my_dropdown'>Állapot</label>
@@ -36,7 +36,7 @@
 		</td>
     	<td valign=top style="padding:3px">
     	<div>
-    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.username }}){% if remark.user.volunteer == 1 %}<span title="A felhasználó önkéntességet vállalt!" class="reliable ui-icon ui-icon-star yellow" style="float:right">{% endif %}&nbsp;</span><br/><small>{{ remark.datum }}</small></h5></div>
+    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.login }}){% if remark.user.volunteer == 1 %}<span title="A felhasználó önkéntességet vállalt!" class="reliable ui-icon ui-icon-star yellow" style="float:right">{% endif %}&nbsp;</span><br/><small>{{ remark.datum }}</small></h5></div>
     		{% if remark.email %}
 
 				<div class="dropdown" style="float:left;margin-right:3px">
@@ -45,17 +45,17 @@
 					<span class="caret"></span>
 				  </button>
 				  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-				      <li><a href="/remark/{{ remark.rid }}/feedback"  class="alap"><span class="ui-icon ui-icon-mail-closed" style="float:left;margin-right:3px;color:#B51A7E"></span> {{ remark.email }}...</a></li>
-				      <li><a href="/remark/{{ remark.rid }}/feedback?type=koszonet" class="alap"><span class="ui-icon ui-icon-heart" style="float:left;margin-right:3px;color:#ff0000"></span> Köszönet írása...</a></li>
-				      <li><a href="/remark/{{ remark.rid }}/feedback?type=plebaniara" class="alap"><span class="ui-icon ui-icon-arrowreturnthick-1-w" style="float:left;margin-right:3px" class="grey"></span> Plébániára irányítás...</a></li>
-				      <li><a href="/remark/{{ remark.rid }}/feedback?type=android"><span class="ui-icon ui-icon-alert" style="float:left;margin-right:3px" class="lightgrey"></span> Frissítés androidon...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback"  class="alap"><span class="ui-icon ui-icon-mail-closed" style="float:left;margin-right:3px;color:#B51A7E"></span> {{ remark.email }}...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=koszonet" class="alap"><span class="ui-icon ui-icon-heart" style="float:left;margin-right:3px;color:#ff0000"></span> Köszönet írása...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=plebaniara" class="alap"><span class="ui-icon ui-icon-arrowreturnthick-1-w" style="float:left;margin-right:3px" class="grey"></span> Plébániára irányítás...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=android"><span class="ui-icon ui-icon-alert" style="float:left;margin-right:3px" class="lightgrey"></span> Frissítés androidon...</a></li>
 				  </ul>
 				</div>
     		{% else %}
     			<!--<strong><span class="ui-icon ui-icon-mail-closed lightgrey" title="Nincs elérhető email cím." style="float:right;margin-left:3px;margin-right:3px"></span></strong>-->
     		{% endif %}</span>
 
-    		{% if remark.email or remark.username != "*vendeg*" %}
+    		{% if remark.email or remark.login != "*vendeg*" %}
 	    		<div data-email="{{ remark.email }}" data-rid="{{ remark.id }}" title="A beküldő megbízhatósága állítható egyetlen kattintással: megbízható, nem megbízható vagy nem tudjuk.">
 	    			<button  type="button" class="btn btn-default" style="padding:6px">
 	    				<span class="reliable ui-icon ui-icon-alert alert {% if remark.megbizhato == 'n' %}red{% else %}lightgrey{% endif %}" style="float:right"></span>

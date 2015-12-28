@@ -9,36 +9,22 @@ class Church extends \Html\Html {
 
         $tid = $path[0];
 
-        $church = getChurch($tid);
-        foreach ($church as $k => $i)
-            $$k = $i;
-
-        $church = new \Church($tid);        
-        $church->getNeighbourChurches();
-        $this->array2this($church);
+        $church = \Eloquent\Church::find($tid);
+        $church->closestNeighbour = $church->closestNeighbour()->first();
+        $church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();     
+        $church->photos = $church->photos()->get();
+        $church->osm = $church->osm();
+        $church->MgetLocation();
+        $church->MgetReligious_administration();
+        
+        if (!$church->McheckReadAccess($user)) {
+            throw new \Exception("Read access denied to church tid = '$tid'");
+        }
+        
+        copyArrayToObject($church->toArray(), $this);
 
         $this->setTitle($this->nev . " (" . $this->location->varos . ")");
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
-
-        $ma = date('Y-m-d');
-        $ev = date('Y');
-        $mostido = date('H:i:s');
-        $mainap = date('w');
-        if ($mainap == 0)
-            $mainap = 7;
-        $tolig = $nyariido . '!' . $teliido;
-        $tolig = str_replace('-', '.', $tolig);
-        $tolig = str_replace("$ev.", '', $tolig);
-        $tolig = str_replace('!', ' - ', $tolig);
-        if ($ma >= $nyariido and $ma <= $teliido) {
-            $nyari = "<div align=center><span class=alap><b><font color=#B51A7E>nyári</font></b></span><br><span class=kicsi>($tolig)</span></div>";
-            $teli = "<div align=center><span class=alap>téli</span></div>";
-            $aktiv = 'ny';
-        } else {
-            $nyari = "<div align=center><span class=alap>nyári</span><br><span class=kicsi>($tolig)</span></div>";
-            $teli = "<div align=center><span class=alap><b><font color=#B51A7E>téli</font></b></span></div>";
-            $aktiv = 't';
-        }
 
         //Miseidőpontok
         $misek = getMasses($tid);
@@ -47,7 +33,7 @@ class Church extends \Html\Html {
             $nev.=" <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
                     . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 
-            $query = "select allapot from eszrevetelek where hol_id = '" . $tid . "' GROUP BY allapot ORDER BY allapot limit 5;";
+            $query = "select allapot from remarks where church_id = '" . $tid . "' GROUP BY allapot ORDER BY allapot limit 5;";
             $result = mysql_query($query);
             $allapotok = array();
             while ($row = mysql_fetch_assoc($result)) {
@@ -60,7 +46,7 @@ class Church extends \Html\Html {
                 $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
             elseif (count($allapotok) > 0)
                 $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";
-            $this->nev = $nev;
+            $this->nev .= $nev;
         }
 
         /*
@@ -77,17 +63,8 @@ class Church extends \Html\Html {
             $this->favorite = 1;
         }
 
-        $variables = array(
-            'nyari' => $nyari,
-            'teli' => $teli,
-            'miserend' => $misek,
-            'napok' => array('', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', '<font color=#AC282B><b>vasárnap</b></font>'),
-            'alert' => LiturgicalDayAlert('html'),
-        );
-
-        foreach ($variables as $key => $var) {
-            $this->$key = $var;
-        }
+        $this->miserend = $misek;
+        $this->alert = LiturgicalDayAlert('html');
     }
 
     public function factory($path) {

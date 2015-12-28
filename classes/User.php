@@ -127,9 +127,9 @@ class User {
         else
             $datum = '';
 
-        $query = "SELECT id FROM eszrevetelek WHERE 
+        $query = "SELECT id FROM remarks WHERE 
 				(login = '" . $this->username . "' OR email = '" . $this->email . "') 
-				" . $datum . " ORDER BY datum desc";
+				" . $datum . " ORDER BY created_at desc";
         $result = mysql_query($query);
         $this->remarksCount = mysql_num_rows($result);
         $query .= " LIMIT " . $limit . ";";
@@ -416,8 +416,8 @@ class User {
             if (!is_numeric($tid))
                 return false;
         }
-        foreach ($tids as $key => $tid) {
-            if (getChurch($tid) == array())
+        foreach ($tids as $key => $tid) {                        
+            if (!\Eloquent\Church::find($tid))
                 unset($tids[$key]);
         }
 

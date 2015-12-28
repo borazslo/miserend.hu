@@ -31,6 +31,7 @@ fwrite(STDERR, $output);
 if (!is_dir('fajlok')) {
 	mkdir('fajlok');
 	mkdir('fajlok/templomok');
+        mkdir('fajlok/tmp');
     mkdir('fajlok/igenaptar');
 	mkdir('fajlok/staticmaps');
 }

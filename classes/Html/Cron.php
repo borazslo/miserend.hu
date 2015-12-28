@@ -3,6 +3,8 @@
 namespace Html;
 
 class Cron extends Html {
+    
+    public $template = 'layout_empty.twig';
 
     public function __construct($path) {
         set_time_limit('300');

@@ -358,103 +358,12 @@ class Home extends Html {
         //Programajánló
         $programajanlo = "<span class=alap>kapcsolódó programok a naptárból<br>Fejlesztés alatt...</span>";
 
-        //Képek
-        $query = "SELECT t.id, t.nev, t.ismertnev, t.varos, k.fajlnev
-    FROM kepek  k
-    JOIN templomok t ON t.id=k.tid 
-	 WHERE k.kiemelt = 'i' AND k.width < k.height AND k.height > 599 
-    GROUP BY t.id 
-    ORDER by RAND()
-    LIMIT 15";
+        $this->photo = \Eloquent\Photo::big()->vertical()->where('flag','i')->orderbyRaw('RAND()')->first();
+        $this->photo->church->MgetLocation();
+        
 
-        if (!$lekerdez = mysql_query($query))
-            echo "HIBA!<br>" . mysql_error();
-        $mennyi = mysql_num_rows($lekerdez);
-        if ($mennyi > 0) {
-            $kepek.="\n<img src=".$config['path']['domain']."/img/negyzet_kek.gif align=absmiddle><img src=img/space.gif width=5 height=5><span class=dobozcim_fekete>Képek templomainkról</span><br>";
-            $konyvtaralap = "kepek/templomok";
-
-            $kepek .= '<div style="height:180px"><div class="als-container" id="my-als-list">
-            <span class="als-prev"><img src="img/als/thin_left_arrow_333.png" alt="prev" title="previous" /></span>
-                <div class="als-viewport">
-                    <ul class="als-wrapper">';
-
-            $randoms = array();
-            while ($random = mysql_fetch_assoc($lekerdez)) {
-                $randoms[] = $random;
-            }
-            foreach ($randoms as $k => $random) {
-                $random['konyvtar'] = $randoms[$k]['konyvtar'] = "$konyvtaralap/" . $random['id'];
-                if (file_exists($random['$konyvtar'] . "/kicsi/" . $random['fajlnev'])) {
-                    //if(is_file("$konyvtar/kicsi/$fajlnev")) {
-                    @$info = getimagesize($random['$konyvtar'] . "/kicsi/" . $random['fajlnev']);
-                    $w1 = $info[0];
-                    $h1 = $info[1];
-                    if ($h1 > $w1 and $h1 > 90) {
-                        $arany = 90 / $h1;
-                        $ujh = 90;
-                        $ujw = $w1 * $arany;
-                    } else {
-                        $ujh = $h1;
-                        $ujw = $w1;
-                    }
-
-                    $kepek .= "<li class='als-item colorbox'><a href=\"" . $random['konyvtar'] . "/" . $random['fajlnev'] . "\" title=\"" . $random['title'] . "\" class='als-color' onclick=\"ga('send','event','Inbound Links','Photos','?templom=" . $random['id'] . "')\">
-	            <img src=\"" . $random['konyvtar'] . "/kicsi/" . $random['fajlnev'] . "\" title='" . $random['nev'] . " (" . $random['varos'] . ")' ></a>
-	            
-	                <div tid='" . $random['id'] . "' style='display:none;text-align:center'>
-	                    <a href=\"/templom/" . $random['id'] . "\" title=\"" . $random['title'] . "\">
-	                    <img src=\"" . $random['konyvtar'] . "/" . $random['fajlnev'] . "\" title='" . $random['nev'] . " (" . $random['varos'] . ")' align=\"center\" style=\"max-height:80%;display:block;margin-left:auto;margin-right:auto\">
-	                    <div style=\"background-color:rgba(255,255,255,0.3);padding:10px;\" class=\"felsomenulink\">" . $random['nev'] . " (" . $random['varos'] . ")</div>
-	                    </a>
-	                </div>
-	            
-	            </li>\n";
-                } else {
-                    
-                }
-            }
-            if ($mennyi < 4)
-                for ($i = 0; $i < 4 - $mennyi; $i++)
-                    $kepek .= "<li class='als-item'></li>";
-            $kepek.='</ul>
-            </div>
-            <span class="als-next"><img src="/img/als/thin_right_arrow_333.png" alt="next" title="next" /></span>
-            </div></div>';
-
-            $scrollable .= '<script>
-			$(document).ready(function(){                
-                $("#my-als-list").als(	{visible_items: ';
-            if ($mennyi < 4)
-                $scrollable .= 4;
-            else
-                $scrollable .= 4;
-            $scrollable .= ',	circular: "no"});                      
-                
-                $("li.colorbox").each(function() {
-                    $(this).colorbox({
-                        html: $(this).find("div").html(),
-                        rel: "group_random",
-                        transition:"fade",
-                        maxHeight:"98%"
-                    },
-                    function() {
-                        ga(\'send\',\'event\',\'Photos\',\'fooldal\',$(this).find("div").attr("tid"));
-                    }                        
-                   );
-                });
-                /*$(".als-color").colorbox({rel:\'als-color\', transition:"fade",maxHeight:"98%"},
-                    function() {
-                        ga(\'send\',\'event\',\'Photos\',\'fooldal\',\'' . $tid . '\')        });            
-                
-            */ });
-        </script>';
-            $kepek .= $scrollable;
-        }
-
-        //statisztika
-        $statisztika = miserend_printRegi();
-
+        
+             
         $variables = array(
             'favorites' => $user->getFavorites(),
             'formnyit' => $formnyit,
@@ -462,8 +371,6 @@ class Home extends Html {
             'miseurlap' => $miseurlap,
             'searchform' => $searchform,
             'templomurlap' => $templomurlap,
-            'kepek' => $kepek,
-            'kep' => $randoms[0],
             'uzenet' => $uzenet,
             'igehelyek' => $igehelyek,
             'elmelkedes' => $elmelkedes,

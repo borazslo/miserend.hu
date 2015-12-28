@@ -14,6 +14,9 @@ class Josm extends Html {
         $this->setTitle('JOSM összeköttetés');
         $this->template = 'layout_simpliest.twig';
 
+        addMessage('Üzemen kívül. Elnézést.','danger');
+        return;
+        
         if (isset($_REQUEST['nosuccess']))
             $nosuccess = "&nosuccess";
 
@@ -65,7 +68,9 @@ class Josm extends Html {
             addMessage('Hopsz', 'warning');
         else {
             foreach ($tmp as $t) {
-                $church = getChurch($t);
+                $church = \Eloquent\Church::find($t);
+                $church->osm();
+                $church = $church->toArray();
                 //To use uptodate OSM
                 //$church['osm'] = getOSMelement($church['osm']['type'],$church['osm']['id']);
                 $osm = (array) $church['osm'];

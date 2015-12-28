@@ -5,8 +5,8 @@
         <ul class="als-wrapper">
             {% for photo in photos %}
                 <li class='als-item'>
-                    <a href="{{ constant('DOMAIN') }}/kepek/templomok/{{ id }}/{{ photo.fajlnev }}" title="{{ photo.felirat|url_encode }}" class='als-color'>
-                        <img src="{{ constant('DOMAIN') }}/kepek/templomok/{{ id }}/kicsi/{{ photo.fajlnev }}" title="{{ photo.felirat }}" >
+                    <a href="{{ constant('DOMAIN') }}/kepek/templomok/{{ id }}/{{ photo.filename }}" title="{{ photo.title|url_encode }}" class='als-color'>
+                        <img src="{{ constant('DOMAIN') }}/kepek/templomok/{{ id }}/kicsi/{{ photo.filename }}" title="{{ photo.title }}" >
                     </a>
                 </li>
             {% endfor %}  

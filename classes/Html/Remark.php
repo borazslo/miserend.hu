@@ -13,8 +13,7 @@ class Remark extends Html {
         switch ($action) {
             case 'list':
                 if ($_REQUEST['remark'] == 'modify') {
-                    $rid = \Request::IntegerRequired('rid');
-                    $this->template = 'remark_list.twig';
+                    $rid = \Request::IntegerRequired('rid');                    
                     $remark = new \Remark($rid);
                     $state = \Request::Simpletext('state');
                     $remark->changeState($state);
@@ -22,19 +21,20 @@ class Remark extends Html {
                     if ($comment != '') {
                         $remark->addComment($comment);
                     }
-                    $this->tid = $remark->tid;
+                    $this->tid = $remark->church_id;
                 }
-                $church = new \Church($this->tid);
+                $this->template = 'remark_list.twig';
+                $church = \Eloquent\Church::find($this->tid);
                 $this->listOfChurch($church);
                 break;
 
             case 'addform':
-                $church = new \Church($this->tid);
+                $church = \Eloquent\Church::find($this->tid);
                 $this->newForm($church);
                 break;
 
             case 'add':
-                $church = new \Church($this->tid);
+                $church = \Eloquent\Church::find($this->tid);
                 $this->add($church);
                 break;
         }
@@ -44,9 +44,8 @@ class Remark extends Html {
         $this->setTitle('Észrevételek');
         $this->pageDescription = "Javítások/észrevételek kezelése";
 
-        $church->getRemarks();
-        $this->church = $church;
-        $this->remarks = $church->remarks;
+        $this->church = $church->toArray();
+        $this->remarks = $church->remarks->toArray();
 
         global $user;
         if (!$user->checkRole('miserend') and ! ($user->username == $templom->letrehozta ) and ! $user->checkRole('ehm:' . $templom['egyhazmegye'])) {
@@ -70,7 +69,7 @@ class Remark extends Html {
         $this->church = $church;
         $remark = new \Remark();
 
-        $remark->tid = $church->id;
+        $remark->church_id = $church->id;
 
         $remark->text = \Request::TextRequired('leiras');
         $remark->name = \Request::TextRequired('nev');

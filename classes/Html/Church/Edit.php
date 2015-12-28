@@ -259,16 +259,14 @@ class Edit extends \Html\Html {
             if ($modosit == 'i') {
                 return;
             } elseif ($modosit == 'm') {
-                echo "redirect?";
-                //$kod = miserend_addmise($tid);
-                return;
+                $this->redirect("/templom/".$this->church->id."/editschedule");                
+                exit;
             } elseif ($modosit == 't') {
-                header('Location: /templom/' . $tid);
-                die();
+                $this->redirect("/templom/".$this->church->id);                
+                exit;
             } else {
-                echo "redirect?";
-                // és vissza a listában!
-                return;
+                $this->redirect("/crhuch/catalogue");                
+                exit;
             }
         }
 

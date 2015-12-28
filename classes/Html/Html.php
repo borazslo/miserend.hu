@@ -118,5 +118,10 @@ class Html {
     function array2this($array) {
         copyArrayToObject($array,$this);
     }
-
+    
+    function redirect($url) {
+        # http_redirect ($url,$params,$session,$status);
+        header("Location: ".$url);
+        exit;
+    }
 }

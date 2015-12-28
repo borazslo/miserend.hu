@@ -45,39 +45,45 @@ INSERT INTO `chat` VALUES (2,'2013-01-04 11:27:41','bela','jeno','A letölthető
 UNLOCK TABLES;
 
 --
--- Table structure for table `distance`
+-- Table structure for table `distances`
 --
 
-DROP TABLE IF EXISTS `distance`;
+DROP TABLE IF EXISTS `distances`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `distance` (
-  `tid1` int(11) NOT NULL,
-  `tid2` int(11) NOT NULL,
-  `distance` float DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
+CREATE TABLE `distances` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `from` int(11) NOT NULL,
+  `to` int(11) NOT NULL,
+  `distance` float NOT NULL,
   `toupdate` int(11) DEFAULT NULL,
-  UNIQUE KEY `pair` (`tid1`,`tid2`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tid1` (`from`,`to`),
+  KEY `FK_to_idx` (`to`),
+  CONSTRAINT `FK_to` FOREIGN KEY (`to`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_from` FOREIGN KEY (`from`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=66224 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `distance`
+-- Dumping data for table `distances`
 --
 
-LOCK TABLES `distance` WRITE;
-/*!40000 ALTER TABLE `distance` DISABLE KEYS */;
-INSERT INTO `distance` VALUES (1,2,21065.3,'2015-02-18 23:54:40',1);
-INSERT INTO `distance` VALUES (1,3,100727,'2015-02-18 23:56:05',1);
-INSERT INTO `distance` VALUES (1,7,105922,'2015-02-18 23:56:04',1);
-INSERT INTO `distance` VALUES (1,14,12506.2,'2015-02-18 23:52:51',1);
-INSERT INTO `distance` VALUES (1,35,19876.7,'2015-02-18 23:54:57',1);
-INSERT INTO `distance` VALUES (1,36,19357.6,'2015-02-18 23:53:50',1);
-INSERT INTO `distance` VALUES (1,37,18533.3,'2015-02-18 23:53:50',1);
-INSERT INTO `distance` VALUES (1,38,19495.9,'2015-02-18 23:54:14',1);
-INSERT INTO `distance` VALUES (1,102,72869.3,'2015-02-18 23:56:04',NULL);
-INSERT INTO `distance` VALUES (1,114,1499.9,'2015-02-19 00:03:55',NULL);
-/*!40000 ALTER TABLE `distance` ENABLE KEYS */;
+LOCK TABLES `distances` WRITE;
+/*!40000 ALTER TABLE `distances` DISABLE KEYS */;
+INSERT INTO `distances` VALUES (1,1,2,21065.3,'2015-02-18 23:54:40',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (2,1,3,100727,'2015-02-18 23:56:05',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (3,1,7,105922,'2015-02-18 23:56:04',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (4,1,14,12506.2,'2015-02-18 23:52:51',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (5,1,35,19876.7,'2015-02-18 23:54:57',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (6,1,36,19357.6,'2015-02-18 23:53:50',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (7,1,37,18533.3,'2015-02-18 23:53:50',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (8,1,38,19495.9,'2015-02-18 23:54:14',1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (9,1,102,72869.3,'2015-02-18 23:56:04',NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (10,1,114,1499.9,'2015-02-19 00:03:55',NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+/*!40000 ALTER TABLE `distances` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -375,84 +381,90 @@ INSERT INTO `espereskerulet` VALUES (234,33,'Egyéb');
 UNLOCK TABLES;
 
 --
--- Table structure for table `eszrevetelek`
+-- Table structure for table `remarks`
 --
 
-DROP TABLE IF EXISTS `eszrevetelek`;
+DROP TABLE IF EXISTS `remarks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `eszrevetelek` (
+CREATE TABLE `remarks` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `nev` varchar(50) NOT NULL DEFAULT '',
   `login` varchar(20) NOT NULL DEFAULT '',
   `email` varchar(50) NOT NULL DEFAULT '',
   `megbizhato` enum('?','i','n','e') NOT NULL DEFAULT '?',
-  `datum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `hol` varchar(20) NOT NULL DEFAULT '',
-  `hol_id` int(5) NOT NULL DEFAULT '0',
+  `church_id` int(11) NOT NULL DEFAULT '0',
   `allapot` enum('u','f','j') NOT NULL DEFAULT 'u',
   `admin` varchar(20) NOT NULL DEFAULT '',
   `admindatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `leiras` text NOT NULL,
-  `adminmegj` text NOT NULL,
-  `log` text NOT NULL,
+  `adminmegj` text,
+  `log` text,
+  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  KEY `index2` (`hol_id`,`allapot`,`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6930 DEFAULT CHARSET=utf8;
+  KEY `index2` (`id`,`church_id`,`allapot`),
+  KEY `index1` (`id`,`church_id`),
+  KEY `FK_church_id_idx` (`church_id`),
+  CONSTRAINT `FK_church_id` FOREIGN KEY (`church_id`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=8197 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `eszrevetelek`
+-- Dumping data for table `remarks`
 --
 
-LOCK TABLES `eszrevetelek` WRITE;
-/*!40000 ALTER TABLE `eszrevetelek` DISABLE KEYS */;
-INSERT INTO `eszrevetelek` VALUES (103,'Ólmos Nikolett','niki','valami@valami.hu','i','2015-04-16 13:17:26','templomok',644,'j','elem','2015-04-16 20:11:10','Dicsértessék a Jézus Krisztus!\r\n\r\nÉszrevételeim vannak. Fogadjátok szeretettel.','','');
-INSERT INTO `eszrevetelek` VALUES (102,'Bela','*vendeg*','belea@skocia.elemer','e','2015-04-16 11:08:16','templomok',125,'j','elem','2015-04-16 13:07:35','Sziasztok!\r\n A kápolna miserendjében van egy kis eltérés. Íme: xxxx stb.','<img src=img/edit.gif align=absmiddle title=\'elem (2015-04-16 13:03)\'> miserend küldés ','');
+LOCK TABLES `remarks` WRITE;
+/*!40000 ALTER TABLE `remarks` DISABLE KEYS */;
+INSERT INTO `remarks` VALUES (103,'Ólmos Nikolett','niki','valami@valami.hu','i','2015-04-16 13:17:26',644,'j','elem','Dicsértessék a Jézus Krisztus!\r\n\r\nÉszrevételeim vannak. Fogadjátok szeretettel.','','','2015-04-16 20:11:10','0000-00-00 00:00:00');
+INSERT INTO `remarks` VALUES (102,'Bela','*vendeg*','belea@skocia.elemer','e',125,'j','elem','2015-04-16 13:07:35','Sziasztok!\r\n A kápolna miserendjében van egy kis eltérés. Íme: xxxx stb.','<img src=img/edit.gif align=absmiddle title=\'elem (2015-04-16 13:03)\'> miserend küldés ','','2015-04-16 11:08:16','0000-00-00 00:00:00');
 UNLOCK TABLES;
 
 --
--- Table structure for table `kepek`
+-- Table structure for table `photos`
 --
 
-DROP TABLE IF EXISTS `kepek`;
+DROP TABLE IF EXISTS `photos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `kepek` (
+CREATE TABLE `photos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tid` int(11) DEFAULT NULL,
-  `fajlnev` varchar(100) NOT NULL DEFAULT '',
-  `felirat` varchar(250) NOT NULL DEFAULT '',
-  `sorszam` int(2) NOT NULL DEFAULT '0',
-  `kiemelt` enum('i','n') NOT NULL DEFAULT 'i',
+  `church_id` int(11) NOT NULL,
+  `filename` varchar(100) NOT NULL DEFAULT '',
+  `title` varchar(250) NOT NULL DEFAULT '',
+  `order` int(2) NOT NULL DEFAULT '0',
+  `flag` enum('i','n') NOT NULL DEFAULT 'i',
   `height` int(11) DEFAULT NULL,
   `width` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  KEY `kiemelt` (`kiemelt`)
-) ENGINE=MyISAM AUTO_INCREMENT=21450 DEFAULT CHARSET=utf8;
+  KEY `church_id` (`church_id`),
+  CONSTRAINT `FKchurch` FOREIGN KEY (`church_id`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=23598 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `kepek`
+-- Dumping data for table `photos`
 --
 
-LOCK TABLES `kepek` WRITE;
-/*!40000 ALTER TABLE `kepek` DISABLE KEYS */;
-INSERT INTO `kepek` VALUES (23,19,'111_1143.jpg','A torony',0,'i',800,600);
-INSERT INTO `kepek` VALUES (24,20,'111_1147.jpg','',0,'i',800,600);
-INSERT INTO `kepek` VALUES (25,20,'111_1145.jpg','',0,'i',800,600);
-INSERT INTO `kepek` VALUES (22,19,'111_1129.jpg','A templom bejárata',0,'n',800,600);
-INSERT INTO `kepek` VALUES (27,23,'heviz2.jpg','Jézus Szíve Templom',0,'i',600,450);
-INSERT INTO `kepek` VALUES (26,22,'heviz.jpg','',0,'i',453,600);
-INSERT INTO `kepek` VALUES (31,28,'homokvar.jpg','homokvár',2,'i',NULL,NULL);
-INSERT INTO `kepek` VALUES (28,24,'alsopahok1.jpg','Szent Kereszt felmagasztalása templom',0,'i',333,250);
-INSERT INTO `kepek` VALUES (29,25,'gyeneshavas.jpg','',0,'i',320,400);
-INSERT INTO `kepek` VALUES (30,26,'gyenesilona.jpg','',0,'i',400,300);
-INSERT INTO `kepek` VALUES (20,17,'111_1104.jpg','A nagybácsai temlom tornya',0,'i',800,600);
-INSERT INTO `kepek` VALUES (21,17,'111_1117.jpg','A nagybácsai  templom a plébánia felől',0,'i',800,600);
-INSERT INTO `kepek` VALUES (19,17,'111_1101.jpg','Templombejárat',0,'n',800,600);
-INSERT INTO `kepek` VALUES (35,22,'heviz02.jpg','',0,'i',290,350);
-/*!40000 ALTER TABLE `kepek` ENABLE KEYS */;
+LOCK TABLES `photos` WRITE;
+/*!40000 ALTER TABLE `photos` DISABLE KEYS */;
+INSERT INTO `photos` VALUES (23,19,'111_1143.jpg','A torony',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (24,20,'111_1147.jpg','',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (25,20,'111_1145.jpg','',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (22,19,'111_1129.jpg','A templom bejárata',0,'n',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (27,23,'heviz2.jpg','Jézus Szíve Templom',0,'i',600,450,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (26,22,'heviz.jpg','',0,'i',453,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (31,28,'homokvar.jpg','homokvár',2,'i',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (28,24,'alsopahok1.jpg','Szent Kereszt felmagasztalása templom',0,'i',333,250,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (29,25,'gyeneshavas.jpg','',0,'i',320,400,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (30,26,'gyenesilona.jpg','',0,'i',400,300,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (20,17,'111_1104.jpg','A nagybácsai temlom tornya',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (21,17,'111_1117.jpg','A nagybácsai  templom a plébánia felől',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (19,17,'111_1101.jpg','Templombejárat',0,'n',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (35,22,'heviz02.jpg','',0,'i',290,350,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+/*!40000 ALTER TABLE `photos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

@@ -4,7 +4,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Remark {
 
-    public $table = 'eszrevetelek';
+    public $table = 'remarks';
 
     function __construct($rid = false) {
         if (!isset($rid) OR ! is_numeric($rid)) {
@@ -25,7 +25,7 @@ class Remark {
                     $this->$key = $value;
                 }
                 $this->rid = $this->id;
-                $this->tid = $this->hol_id;
+                $this->tid = $this->church_id;
                 $this->username = $this->login;
 
                 if ($this->username != '') {
@@ -34,7 +34,7 @@ class Remark {
 
                 $this->adminmegj = preg_replace('/=("|\'|)img\//i', '=$1/img/', $this->adminmegj);
 
-                $this->marker['url'] = "javascript:OpenScrollWindow('templom/" . $this->hol_id . "/eszrevetelek',550,500);";
+                $this->marker['url'] = "javascript:OpenScrollWindow('templom/" . $this->church_id . "/eszrevetelek',550,500);";
                 if ($this->allapot == 'u') {
                     $this->marker['text'] = "Új észrevétel!";
                     $this->marker['html'] = "<img src=/img/csomag.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
@@ -53,7 +53,7 @@ class Remark {
                     $this->marker['mark'] = false;
                 }
 
-                $this->church = getChurch($this->hol_id);
+                $this->church = \Eloquent\Church::find($this->church_id)->toArray();
             } else {
                 // TODO: There is no remark with this rid;
                 return false;
@@ -70,7 +70,7 @@ class Remark {
         elseif (preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i", $this->email))
             $where = " email = '" . $this->email . "' ";
         if (isset($where)) {
-            $query = "SELECT megbizhato FROM " . $this->table . " where $where order by datum DESC LIMIT 1";
+            $query = "SELECT megbizhato FROM " . $this->table . " where $where order by created_at DESC LIMIT 1";
             $lekerdez = mysql_query($query);
             list($megbizhato) = mysql_fetch_row($lekerdez);
             if (!empty($megbizhato))
@@ -81,13 +81,12 @@ class Remark {
 			nev='" . $this->name . "', 
 			login='" . $this->username . "', 
 			megbizhato='" . $this->reliable . "', 
-			datum='" . $this->timestamp . "', 
-			hol_id='" . $this->tid . "', 
+			created_at='" . $this->timestamp . "', 
+			church_id='" . $this->church_id . "', 
 			allapot='" . $this->state . "',
 			leiras='" . sanitize($this->text) . "'";
         if (isset($this->email))
             $query .= ", email='" . $this->email . "'";
-
         if (!mysql_query($query))
             return false;
 
@@ -102,7 +101,7 @@ class Remark {
 
     function emails() {
         global $config;
-
+        $this->tid = $this->church_id;
         $query = "select nev,ismertnev,varos,egyhazmegye, kontaktmail from templomok where id = " . $this->tid . " limit 0,1";
         $lekerdez = mysql_query($query);
         $templom = mysql_fetch_assoc($lekerdez);
@@ -207,7 +206,7 @@ class Remark {
 
     function addComment($text) {
         global $user;
-        $newline = "\n<img src='img/edit.gif' align='absmiddle' title='" . $user->username . " (" . date('Y-m-d H:i:s') . ")'>" . $text;
+        $newline = "\n<img src='/img/edit.gif' align='absmiddle' title='" . $user->username . " (" . date('Y-m-d H:i:s') . ")'>" . $text;
         $adminmegj = $this->adminmegj . $newline;
 
         DB::table($this->table)

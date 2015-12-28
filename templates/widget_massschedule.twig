@@ -37,11 +37,11 @@
                               <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
                           {% if nap.misek[key].attr %}
                               {% for attr in nap.misek[key].attr %} 
-                                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+                                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name) }}
                               {% endfor %}
                           {% endif %}  
                           {% if nap.misek[key].megjegyzes %}
-                              {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
+                              {{ _self.info('info2.gif',nap.misek[key].megjegyzes) }}
                           {% endif %}       
                         </div>
                       </div>
@@ -81,11 +81,11 @@
               <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
           {% if nap.misek[key].attr %}
               {% for attr in nap.misek[key].attr %} 
-                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name,design_url) }}
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name) }}
               {% endfor %}
           {% endif %}  
           {% if nap.misek[key].megjegyzes %}
-              {{ _self.info('info2.gif',nap.misek[key].megjegyzes,design_url) }}
+              {{ _self.info('info2.gif',nap.misek[key].megjegyzes) }}
           {% endif %}       
         </div>
       </div>
@@ -104,7 +104,7 @@
 	 
 {% if misemegj %}{% include "panel.twig" with {title:'Kapcsolódó információk','body': misemegj|raw } %}{% endif %}
 
-{% macro info(img,text,design_url) %}
-    <img src="{{ design_url }}img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+{% macro info(img,text) %}
+    <img src="{{ constant('DOMAIN') }}/img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
     <span class="massfullinfo" style="display:none" id="2">{{ text }}</span>
 {% endmacro %}

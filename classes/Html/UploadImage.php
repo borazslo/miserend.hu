@@ -116,7 +116,7 @@ class UploadImage extends Html {
                 if ($felirat == '')
                     $felirat = $katnev;
 
-                if (!mysql_query("insert kepek set tid='$tid', fajlnev='$NewFileName', felirat='$felirat', width=$w, height=$h "))
+                if (!mysql_query("insert kepek set church_id='$tid', filename='$NewFileName', title='$felirat', width=$w, height=$h "))
                     echo 'HIBA!<br>' . mysql_error();
 
                 /* email */

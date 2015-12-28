@@ -182,8 +182,8 @@ $('input.datepicker').datepicker({
 
 {% set selfAdvertisement = true %}  
 {% block leftsidebar %}
-    {% if kep %}
-      {% set content = '<img src="' ~ kep.konyvtar ~ '/' ~  kep.fajlnev ~ '" class="img-responsive"><h5 class="text-center"><a href="/templom/' ~ kep.id ~'">' ~ kep.nev ~ ' (' ~ kep.varos ~')</a></h5>' %}
+    {% if photo %}
+        {% set content = '<img src="' ~ constant('DOMAIN') ~ '/kepek/templomok/' ~ photo.church_id ~ '/' ~ photo.filename ~ '" class="img-responsive"><h5 class="text-center"><a href="/templom/' ~ photo.church_id ~'">' ~ photo.church.nev ~ ' (' ~ photo.church.location.varos ~')</a></h5>' %}
       {% include "panel.twig" with {'title' : ' ' , 'body': content,'panel':'default  ' } %}
   {% endif %}
 {% endblock %}
