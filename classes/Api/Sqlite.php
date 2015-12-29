@@ -61,6 +61,7 @@ class Sqlite extends Api {
         $this->dropAllTables();
         $this->createTables();
         $this->insertData();
+
         return true;
     }
 
@@ -80,11 +81,14 @@ class Sqlite extends Api {
     }
 
     function insertData() {
+        ini_set('memory_limit', '800M');
+        $this->sqlite->disableQueryLog();
         $this->insertDataTemplomok();
         $this->insertDataMisek();
         if ($this->version > 1) {
             $this->insertDataKepek();
         }
+        $this->sqlite->enableQueryLog();
     }
 
     function createTableTemplomok() {
