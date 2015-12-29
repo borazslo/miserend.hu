@@ -58,7 +58,8 @@ class Help {
             case 9:
                 //miserend - templom adatlap
                 $this->html = '<b>Részletes leírás, templom története</b>' .
-                        '<br><br>Ide a templom történeti leírása, összefoglalása kerülhet, illetve minden érdekesség a templommal kapcsolatban.';
+                        '<br><br>Ide a templom történeti leírása, összefoglalása kerülhet, illetve minden érdekesség a templommal kapcsolatban.<br/>'
+                    . 'Html formázás lehetséges. Sortöréseket automatikusan '.htmlentities('<br/>').'-é alakítja';
                 break;
 
             case 10:
@@ -76,14 +77,6 @@ class Help {
                         '<br><br>Lehetőség szerint CSAK jpg (esetleg gif) fájlokat töltsünk föl! A rendszer automatikusan kicsinyít, így a mérettel nem kell foglalkozni.' .
                         '<br><br>A feltöltött képek alatt jelölhető, hogy a kép a főoldalra (véletlenszerű válogatás) kikerüljön-e. Ha nincs kijelölve a négyzet, akkor nem teszi ki. Térképnél, kevésbé látványos templombelsőnél inkább ne jelöljük be!';
                 break;
-
-            case 12:
-                //miserend - templom adatlap
-                $this->html = '<b>Letölthető fájlok</b>' .
-                        '<br><br>Erre valószínű nem lesz szükség, de ha a templomhoz mégis kapcsolódna valami olyan dokumentum, amit érdemes fájlként megjeleníteni róla, akkor azt itt lehet feltölteni.' .
-                        '<br><br>A feltöltés után a kiírt listából kimásolva lehet a szöveges (tartalmi leírás) mezőbe bemásolni, elhelyezni.';
-                break;
-
 
             case 14:
                 //miserend - templom adatlap
