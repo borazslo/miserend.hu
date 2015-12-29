@@ -69,7 +69,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     public function MgetLocation() {
         $this->location = new \Location();
         $this->location->getByChurchId($this->id);
-        if (isset($this->osm)) {
+        if (!isset($this->osm)) {
+            $this->osm();
+        }
+        
+        if (isset($this->osm) AND $this->osm != '') {
             $this->location->lat = $this->osm->lat;
             $this->location->lon = $this->osm->lon;
             $this->location->osm = $this->osm->osmtype . "/" . $this->osm->osmid;

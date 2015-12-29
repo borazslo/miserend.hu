@@ -1,8 +1,8 @@
 <?php
 
-namespace Html;
+namespace Html\Api;
 
-class Api extends Html {
+class Api extends \Html\Html {
 
     public function __construct() {
         ini_set('memory_limit', '256M');
@@ -38,9 +38,6 @@ class Api extends Html {
 
                 case 'table':
                     $this->api = new \Api\Table();
-                    break;
-                case 'sqlite':
-                    $this->api = new \Api\Sqlite();
                     break;
 
                 default:

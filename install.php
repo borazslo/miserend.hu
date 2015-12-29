@@ -34,6 +34,7 @@ if (!is_dir('fajlok')) {
         mkdir('fajlok/tmp');
     mkdir('fajlok/igenaptar');
 	mkdir('fajlok/staticmaps');
+        mkdir('fajlok/sqlite');
 }
 if (!is_dir('kepek')) {
 	mkdir('kepek');

@@ -2,12 +2,17 @@
 
 {% set title = 'Megközelítés' %}
 
+{% if location.osm is not null %}
+    {% set panel = 'primary' %}
+{% endif %}    
+
 {% block body %}
     <span class=alap>
         <i>Cím: </i>
         <u>{{ location.varos }}, {{ location.cim }}</u>
     </span><br/>
-    {% if location.osm %}
+    {% if location.osm is not null %}
+        
         <span class=alap>
             <i>Térképen: </i>
             <u><a href="http://www.openstreetmap.org/{{ location.osm }}">

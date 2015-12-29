@@ -26,11 +26,14 @@ class Deaconry {
                 ->where("id", "=", $this->id)
                 ->limit(1)
                 ->get();
-        if (!count($deocanry)) {
-            throw new Exception("There is no deocanry with id = '$id'");
+        if (!count($deocanry)) {            
+            //throw new Exception("There is no deocanry with id = '$id'");
+            $this->name = "";
+            $this->shortname = "";
+        } else {
+            $this->name = $deocanry[0]->nev . " espereskerület";
+            $this->shortname = $deocanry[0]->nev;
         }
-        $this->name = $deocanry[0]->nev . " espereskerület";
-        $this->shortname = $deocanry[0]->nev;
     }
 
 }
