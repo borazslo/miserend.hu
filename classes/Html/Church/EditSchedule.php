@@ -8,32 +8,22 @@ class EditSchedule extends \Html\Html {
         global$user;
 
         $this->tid = $path[0];
-
-        $jog = false;
-        if ($user->checkRole('miserend')) {
-            $jog = true;
+       
+        $this->church = \Eloquent\Church::find($this->tid);
+        if (!$this->church) {
+            throw new \Exception('Nincs ilyen templom.');
         }
-
-        if ($jog == false AND isset($_REQUEST['tid']) AND is_numeric($_REQUEST['tid']) AND in_array($m_op, array('addtemplom', 'addmise', 'addingtemplom', 'addingmise'))) {
-            $church = getChurch($_REQUEST['tid']);
-            if ($user->checkRole('miserend') OR in_array($user->login, $church['responsible']) OR in_array($user->login, $church['diocese']['responsible']))
-                $jog = true;
-            else
-                $jog = false;
-        } elseif (( $m_op == 'index' OR $m_op == 'modtemplom' )AND ( $user->checkRole('miserend') OR count($user->responsible['diocese']) > 0 )) {
-            $jog = true;
-        }
-
-        if ($jog == true) {
-            $isForm = \Request::Text('submit');
-            if ($isForm) {
-                $this->modify();
-            }
-            $this->preparePage();
-        } else {
+        if (!$this->church->McheckWriteAccess($user)) {
             $this->title = 'Hiányzó jogosultság!';
             addMessage('Hiányzó jogosultság!', 'danger');
+            return;
         }
+        
+        $isForm = \Request::Text('submit');
+        if ($isForm) {
+            $this->modify();
+        }
+        $this->preparePage();        
     }
 
     function modify() {
@@ -132,48 +122,35 @@ class EditSchedule extends \Html\Html {
             }
         }
         generateMassTmp('tid = ' . $_REQUEST['tid']);
-
-
-        //LOG
-        $ip = $_SERVER['REMOTE_ADDR'];
-        $host = gethostbyaddr($ip);
-        $tid = $_REQUEST['tid'];
-        $ma = date('Y-m-d');
-        list($log) = mysql_fetch_row(mysql_query("select log from templomok where id='$tid'"));
-        $log.="\nMISE_MOD: " . $user->login . " ($most - [$ip - $host])";
+       
+        $this->church->log .= "\nMISE_MOD: " . $user->login . " (".date('Y-m-d H:i:s')." - [".$_SERVER['REMOTE_ADDR']." - ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."])";
         if ($_REQUEST['update'] == 'i')
-            $frissites = ", frissites='$ma'";
-        $_REQUEST['misemegj'] = preg_replace('/<br\/>/i', "\n", $_REQUEST['misemegj']);
-        $_REQUEST['adminmegj'] = preg_replace('/<br\/>/i', "\n", $_REQUEST['adminmegj']);
-        $query = "update templomok set miseaktiv='" . $_REQUEST['miseaktiv'] . "', misemegj='" . $_REQUEST['misemegj'] . "', adminmegj='" . $_REQUEST['adminmegj'] . "', log='$log' $frissites where id='$tid' LIMIT 1";
-        mysql_query($query);
-
+            $this->church->frissites = date('Y-m-d');
+        $this->church->misemegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['misemegj']);
+        $this->church->adminmegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['adminmegj']);
+        $this->church->save();
 
         $modosit = $_REQUEST['modosit'];
         if ($modosit == 'i') {
             return;
         } elseif ($modosit == 'm') {
-        //redirect to edit church
-        //$kod = miserend_addtemplom($tid);
+            $this->redirect('/templom/'.$this->tid."/edit");
         } elseif ($modosit == 't') {
-            header('Location: /templom/' . $tid);
-            die();
+            $this->redirect('/templom/' . $this->tid);
         } else {
-            //redirect to edit church
+            $this->redirect('/templom/catalogue');
         }
     }
 
-    function preparePage() {
-
+    function preparePage() {        
+        
         //Ezt csak a development szerveren kéne
         $this->update_addmisejs();
 
-        $this->church = new \Church($this->tid);
         $masses = getMasses($this->tid);
 
-        //Észrevétel
-        $jelzes = getRemarkMark($this->tid);
-        $this->jelzes = $jelzes;
+        //Észrevétel        
+        $this->jelzes = $this->church->remarksStatus;
 
         //miseaktív
         if ($this->church->miseaktiv == 1)
