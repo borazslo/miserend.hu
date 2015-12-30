@@ -1,7 +1,7 @@
 tinyMCE.init({
     language: "hu",
     mode: "exact",
-    elements: "szoveg",
+    elements: "leiras,misemegj,megjegyzes,plebania",
     theme: "advanced",
     content_css: "img/style.css",
     relative_urls: true,

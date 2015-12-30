@@ -21,7 +21,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function getNameAttribute($value) {
-        $order = ['name:hu', 'name', 'alt_name', 'alt_name:hu'];
+        $order = ['name:hu', 'name', 'alt_name:hu', 'alt_name','old_name:hu','old_name'];
         foreach ($order as $key) {
             if (array_key_exists($key, $this->tagList)) {
                 return $this->tagList[$key];
@@ -31,7 +31,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function getAdministrativeAttribute($value) {        
-        $administrationLevels = ['country','county','city'];
+        $administrationLevels = ['country','county','city','district','address'];
         foreach($administrationLevels as $level) {
             if($this->$level) {
                 $return[$level] = $this->$level;
@@ -61,6 +61,21 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
                         ->first();
     }
 
+    public function getDistrictAttribute($value) {
+        return $this->enclosing()
+                        ->whereHasTag('boundary', 'administrative')
+                        ->whereHasTag('admin_level', '9')
+                        ->first();
+    }
+
+    public function getAddressAttribute($value) {
+        $return = new \stdClass();
+        if(array_key_exists('addr:street',$this->tagList)) {
+            $return->name = $this->tagList['addr:street']." ".$this->tagList['addr:housenumber'];
+        }
+        return $return;
+    }
+    
     public function getReligiousAdministrationAttribute($value) {        
         $administrationLevels = ['diocese','deaconry','parish'];
         foreach($administrationLevels as $level) {

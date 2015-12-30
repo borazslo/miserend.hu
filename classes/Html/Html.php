@@ -9,7 +9,7 @@ class Html {
     public $pageTitle = 'VPP - miserend';
     public $templatesPath = 'templates';
     public $extraMeta;
-    
+
     function render() {
         global $user;
         $this->user = $user;
@@ -78,9 +78,9 @@ class Html {
 
     function loadResponsibleMenu() {
         $diocesemenuitems = [
-            ['title' => 'Templomok', 'url' => '?m_id=27', 'mid' => 27,
+            ['title' => 'Templomok', 'url' => '/user/maintainedchurches',
                 'items' => [
-                    ['title' => 'módosítás', 'url' => '?m_id=27&m_op=modtemplom', 'permission' => ''],
+                    ['title' => 'módosítás', 'url' => '/user/maintainedchurches'],
                 ]
             ],
         ];
@@ -109,19 +109,20 @@ class Html {
     function setTitle($title) {
         $this->pageTitle = $title . " | Miserend";
     }
-    
-    function addExtraMeta($name,$content) {
-         $this->extraMeta .= "\n<meta name='".$name."' content='".$content."'>";
-         return true;
+
+    function addExtraMeta($name, $content) {
+        $this->extraMeta .= "\n<meta name='" . $name . "' content='" . $content . "'>";
+        return true;
     }
 
     function array2this($array) {
-        copyArrayToObject($array,$this);
+        copyArrayToObject($array, $this);
     }
-    
+
     function redirect($url) {
         # http_redirect ($url,$params,$session,$status);
-        header("Location: ".$url);
+        header("Location: " . $url);
         exit;
     }
+
 }

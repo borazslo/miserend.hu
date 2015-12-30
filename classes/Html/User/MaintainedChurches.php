@@ -13,11 +13,10 @@ class MaintainedChurches extends \Html\Html {
             addMessage("Nincs olyan templom, amit módosíthatnál.", 'info');
             return false;
         }
+
         foreach ($user->responsible['church'] as $tid) {
             try {
-                $this->churches[$tid] = new \Church($tid);
-                //TODO: objectify
-                $this->churches[$tid]->jelzes = getRemarkMark($tid);
+                $this->churches[$tid] = \Eloquent\Church::find($tid);
             } catch (\Exception $e) {
                 addMessage($e->getMessage(), "info");
             }

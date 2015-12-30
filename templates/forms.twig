@@ -17,6 +17,8 @@
 	
     <select name="{{ array.name }}"
     {% if array.id %} id="{{array.id}}" {% endif %}
+    {% if array.data %} data="{{array.data}}" {% endif %}
+    {% if array.disabled %} disabled="{{array.disabled}}" {% endif %}
     {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
     {% if array.style %} style="{{array.style}}" {% endif %}
     class="input-sm form-control {{ array.class }}" 

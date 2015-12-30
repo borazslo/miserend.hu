@@ -12,16 +12,13 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function photos() {
-        return $this->hasMany('\Eloquent\Photo')
-                        ->orderBy('flag')
-                        ->orderByRaw("CASE WHEN height/width > 1 THEN 1 ELSE 0 END desc")
-                        ->orderBy("id");
+        return $this->hasMany('\Eloquent\Photo')->ordered();
     }
-    
+
     public function osms() {
         return $this->belongsToMany('\Eloquent\OSM', 'lookup_church_osm', 'church_id', 'osm_id');
     }
-    
+
     public function getOsmAttribute() {
         if ($this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
             $overpass = new \OverpassApi();
@@ -61,6 +58,32 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->lng;
     }
 
+    function getRemarksStatusAttribute($value) {
+        $remark = $this->remarks()
+                        ->select('allapot')
+                        ->groupBy('allapot')
+                        ->orderByRaw("FIND_IN_SET(allapot, 'u,f,j')")->first();
+
+        if (!$remark) {
+            $return['html'] = "<span class='alap'>(nincs)</span>";
+            $return['text'] = "Nincsenek észrevételek";
+            $return['mark'] = false;
+        } else if ($remark->allapot == 'u') {
+            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+            $return['text'] = "Új észrevételt írtak hozzá!";
+            $return['mark'] = 'u';
+        } else if ($remark->allapot == 'f') {
+            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
+            $return['text'] = "Észrevétel javítása folyamatban!";
+            $return['mark'] = 'f';
+        } else if ($remark->allapot == 'j') {
+            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek' align=absmiddle border=0></a> ";
+            $return['text'] = "Észrevételek";
+            $return['mark'] = 'j';
+        }
+        return $return;
+    }
+
     public function delete() {
         $this->neighbours()->delete();
         Distance::where('to', $this->id)->delete();
@@ -69,14 +92,14 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         parent::delete();
     }
 
-    public function MgetLocation() {        
+    public function MgetLocation() {
         $this->location = new \Location();
         $this->location->getByChurchId($this->id);
         $this->osm->religiousAdministration;
         $this->location->country = $this->osm->country;
         $this->location->county = $this->osm->county;
         $this->location->city = $this->osm->city;
-        
+
         if (isset($this->osm) AND $this->osm != '') {
             $this->location->lat = $this->osm->lat;
             $this->location->lon = $this->osm->lon;

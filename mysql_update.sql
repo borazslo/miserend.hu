@@ -145,3 +145,10 @@ CREATE TABLE `lookup_osm_enclosed` (
 ALTER TABLE `lookup_osm_enclosed` 
 ADD UNIQUE INDEX `unique` (`enclosing_id` ASC, `osm_id` ASC);
 
+/* Dec 20, 2015
+*/
+ALTER TABLE `templomok` 
+ADD COLUMN `created_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00' AFTER `eszrevetel`,
+ADD COLUMN `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00' AFTER `created_at`;
+ALTER TABLE `photos` 
+CHANGE COLUMN `order` `weight` INT(2) NOT NULL DEFAULT '0' ;

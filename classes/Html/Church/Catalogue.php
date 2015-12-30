@@ -12,7 +12,7 @@ class Catalogue extends \Html\Html {
         if (!$user->checkRole('miserend')) {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');
         }
-        
+
         $egyhazmegye = $_POST['egyhazmegye'];
         if ($egyhazmegye == '0')
             $egyhazmegye = 'mind';
@@ -211,11 +211,8 @@ class Catalogue extends \Html\Html {
 
             $tid = $church['id'];
 
-            $jelzes = '';
-            //Észrevétel
-            $RemarkMark = getRemarkMark($tid);
-            if ($RemarkMark['mark'] != false)
-                $jelzes.=$RemarkMark['html'];
+            $ch = \Eloquent\Church::find($tid);
+            $jelzes = $ch->remarksStatus['html'];
 
             if (!$vanmiseT[$tid] AND $church['miseaktiv'] == 1) {
                 $jelzes.="<img src=/img/lampa.gif title='Nincs hozzá mise!' align=absmiddle> ";
@@ -253,7 +250,6 @@ class Catalogue extends \Html\Html {
         $this->sum = $sum;
         $this->pager = $lapozo;
         $this->churches = $churches;
-        
     }
 
 }

@@ -13,9 +13,9 @@
         </tr>
         {% for church in churches %}
             <tr>
-                <td>{{ church.jelzes.html|raw }}</td>
+                <td>{{ church.remarksStatus.html|raw }}</td>
                 <td>
-                    <a href="/templom/{{ church.id }}/edit" title='{{ church.ismertnev }}'><strong>{{ church.nev }}</strong> ({{ church.location.varos }})
+                    <a href="/templom/{{ church.id }}/edit" title='{{ church.ismertnev }}'><strong>{{ church.nev }}</strong> ({{ church.varos }})
                     </a>
                 </td>
                 <td>

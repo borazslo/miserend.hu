@@ -4,6 +4,10 @@
 
 {% set panel = 'success' %}
 
+{% if church %}
+    {% set osm = church.osm %}
+{% endif %}
+
 {% block body %}
     <style>
 		.fixed_headers {
@@ -36,8 +40,7 @@
             {{ osm.osmtype }}:{{ osm.osmid }}
         </a>
     </strong>
-    <table class="fixed_headers">        
-        
+    <table class="fixed_headers">                    
     {% for key, tag in osm.tagList %}
         <tr>
             <td>{{ key }}:</td>

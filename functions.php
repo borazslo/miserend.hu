@@ -1093,39 +1093,6 @@ function generateMassTmp($where = false) {
     }
 }
 
-function getRemarkMark($tid) {
-    $return = array();
-
-    if (is_numeric($tid)) {
-        $querye = "SELECT allapot FROM remarks WHERE church_id = $tid GROUP BY allapot LIMIT 3";
-        if (!$lekerdeze = mysql_query($querye))
-            echo "HIBA!<br>$querym<br>" . mysql_error();
-        while (list($cell) = mysql_fetch_row($lekerdeze)) {
-            $allapot[$cell] = true;
-        }
-    }
-
-    if (isset($allapot['u'])) {
-        $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
-        $return['text'] = "Új észrevételt írtak hozzá!";
-        $return['mark'] = 'u';
-    } elseif (isset($allapot['f'])) {
-        $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
-        $return['text'] = "Észrevétel javítása folyamatban!";
-        $return['mark'] = 'f';
-    } elseif (isset($allapot['j'])) {
-        $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek' align=absmiddle border=0></a> ";
-        $return['text'] = "Észrevételek";
-        $return['mark'] = 'j';
-    } else {
-        $return['html'] = "<span class='alap'>(nincs)</span>";
-        $return['text'] = "Nincsenek észrevételek";
-        $return['mark'] = false;
-    }
-
-    return $return;
-}
-
 function widget_miserend($args) {
     global $twig, $config;
     $tid = $args['tid'];
@@ -2144,6 +2111,11 @@ function copyArrayToObject($array, &$object) {
     foreach ($array as $key => $value) {
         $object->$key = $value;
     }
+}
+
+function br2nl ( $string )
+{
+    return preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, $string);
 }
 
 function idoszak($i) {

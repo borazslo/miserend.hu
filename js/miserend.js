@@ -1,5 +1,32 @@
 $(document).ready(function() {
 
+    $('#selectEgyhazmegye').on('change', function() {
+        $('.selectEspereskeruletDiocese').hide();
+        $('.selectEspereskeruletDiocese').attr('disabled','disabled');
+        $('#selectEspereskeruletDiocese' + this.value ).show();
+        $('#selectEspereskeruletDiocese' + this.value ).removeAttr('disabled')
+    });
+
+    $('#selectOrszag').on('change', function() {
+        $('.selectMegyeCountry').hide();
+        $('.selectMegyeCountry').attr('disabled','disabled');
+        $('#selectMegyeCountry' + this.value ).show();
+        $('#selectMegyeCountry' + this.value ).removeAttr('disabled')
+        
+        $('.selectVarosCounty').hide();
+        $('.selectVarosCounty').attr('disabled','disabled');
+        $('#selectVarosCounty' + $(this).val() + "-" + $('#selectMegyeCountry' + this.value ).val() ).show();
+        $('#selectVarosCounty' + $(this).val() + "-" + $('#selectMegyeCountry' + this.value ).val() ).removeAttr('disabled')
+    });
+
+    $('.selectMegyeCountry').on('change', function() {
+        $('.selectVarosCounty').hide();
+        $('.selectVarosCounty').attr('disabled','disabled');
+        
+        $('#selectVarosCounty' + $(this).attr('data') + "-" + $(this).val() ).show();
+        $('#selectVarosCounty' + $(this).attr('data') + "-" + $(this).val() ).removeAttr('disabled');
+    });
+
   $(document).on('click','a.ajax',function(){
     console.log('click');
     var ezez = $(this);
@@ -251,11 +278,5 @@ $(document).ready(function() {
             }, 
         });        
   
-
-
-
-
- 
-
 /* */
 });
