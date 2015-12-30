@@ -10,19 +10,31 @@ class Church extends \Html\Html {
         $tid = $path[0];
 
         $church = \Eloquent\Church::find($tid);
+
         $church->closestNeighbour = $church->closestNeighbour()->first();
-        $church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();     
+        $church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();
         $church->photos = $church->photos()->get();
-        $church->osm = $church->osm();
-        $church->MgetLocation();
+
         $church->MgetReligious_administration();
-        
+
+        if ($church->osm AND $church->osm->enclosing->toArray() == array()) {
+            $overpass = new \OverpassApi();
+            $overpass->updateEnclosing($church->osm);
+            $church->load(osms);
+            $church->osm = $church->osms()->first();
+        }
+
+        $church->MgetLocation();
+           
+
         if (!$church->McheckReadAccess($user)) {
             throw new \Exception("Read access denied to church tid = '$tid'");
         }
-        
+
         copyArrayToObject($church->toArray(), $this);
 
+        $this->osm = $church->osm;
+        
         $this->setTitle($this->nev . " (" . $this->location->varos . ")");
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
 

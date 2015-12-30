@@ -8,23 +8,24 @@
 
 {% block body %}
     <span class=alap>
-        <i>Cím: </i>
-        <u>{{ location.varos }}, {{ location.cim }}</u>
+        {% for key,administraion in osm.administrative %}
+            > {{ _self.osmlink(administraion) }}<br/>
+        {% endfor %}        
+        > {{ location.varos }}, {{ location.cim }}
     </span><br/>
     {% if location.osm is not null %}
-        
-        <span class=alap>
+        <span class=alap>            
             <i>Térképen: </i>
             <u><a href="http://www.openstreetmap.org/{{ location.osm }}">
                     {{ location.lat|number_format(6, '.') }}, {{ location.lon|number_format(6, '.') }}
-            </a></u>
+            </a></u>                
         </span>
     {% elseif location.lat %}
         <span class=alap>
             <i>Térképen: </i>
             <u><a href="http://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.lon }}#map=19/{{ location.lat }}/{{ location.lon }}">
                     {{ location.lat }}, {{ location.lon }}
-            </a></u>
+                </a></u>
         </span>
     {% else %}
         <span class=alap>
@@ -34,3 +35,7 @@
     <br/>
     {{ megkozelites|raw|nl2br }}     
 {% endblock %}    
+
+{% macro osmlink(osm,title = false) %}
+    <a href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>
+{% endmacro %}

@@ -1401,10 +1401,13 @@ function updateDistances($tid = false, $limit = false) {
                 elseif ($dist > 0)
                     $d = $dist;
             }
-            if ($other['toupdate'] == 0)
+            if ($other['toupdate'] == 0) {
                 $query = "INSERT INTO distance (tid1,tid2,distance,updated,toupdate) VALUES (" . $tid1 . "," . $tid2 . ",'" . $d . "','" . date('Y-m-d H:i:s') . "',NULL);";
-            else
+                $query = "INSERT INTO distance (tid1,tid2,distance,updated,toupdate) VALUES (" . $tid2 . "," . $tid1 . ",'" . $d . "','" . date('Y-m-d H:i:s') . "',NULL);";                
+            } else {
                 $query = "UPDATE distance SET distance = '" . $d . "', updated = '" . date('Y-m-d H:i:s') . "', toupdate = NULL WHERE tid1 = " . $tid1 . " AND tid2 = " . $tid2 . " LIMIT 1";
+                $query = "UPDATE distance SET distance = '" . $d . "', updated = '" . date('Y-m-d H:i:s') . "', toupdate = NULL WHERE tid1 = " . $tid2 . " AND tid2 = " . $tid1 . " LIMIT 1";                
+            }
             mysql_query($query);
             //echo $query."<br/>";
         }

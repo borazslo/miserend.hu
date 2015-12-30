@@ -5,7 +5,7 @@ namespace Eloquent;
 class Church extends \Illuminate\Database\Eloquent\Model {
 
     protected $table = 'templomok';
-    protected $appends = array('fullName', 'responsible', 'lon');
+    protected $appends = array('fullName', 'responsible', 'lon', 'osm');
 
     public function getResponsibleAttribute($value) {
         return array($this->letrehozta);
@@ -17,15 +17,18 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                         ->orderByRaw("CASE WHEN height/width > 1 THEN 1 ELSE 0 END desc")
                         ->orderBy("id");
     }
-
-    public function osm() {
-        $tag = \Eloquent\OSMTag::where("name", "url:miserend")->where("value", "LIKE", "%?templom=" . $this->id)->first();
-        if ($tag) {
-            $this->osm = $tag->osm()->first();
-            return $this->osm;
-        } else {
-            return false;
+    
+    public function osms() {
+        return $this->belongsToMany('\Eloquent\OSM', 'lookup_church_osm', 'church_id', 'osm_id');
+    }
+    
+    public function getOsmAttribute() {
+        if ($this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
+            $overpass = new \OverpassApi();
+            $overpass->updateEnclosing($this->osms->first());
+            $this->load(osms);
         }
+        return $this->osms->first();
     }
 
     public function remarks() {
@@ -60,18 +63,19 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     public function delete() {
         $this->neighbours()->delete();
-        Distance::where('to',$this->id)->delete();
+        Distance::where('to', $this->id)->delete();
         $this->remarks()->delete();
         $this->photos()->delete();
         parent::delete();
     }
 
-    public function MgetLocation() {
+    public function MgetLocation() {        
         $this->location = new \Location();
         $this->location->getByChurchId($this->id);
-        if (!isset($this->osm)) {
-            $this->osm();
-        }
+        $this->osm->religiousAdministration;
+        $this->location->country = $this->osm->country;
+        $this->location->county = $this->osm->county;
+        $this->location->city = $this->osm->city;
         
         if (isset($this->osm) AND $this->osm != '') {
             $this->location->lat = $this->osm->lat;

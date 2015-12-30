@@ -4957,6 +4957,47 @@ INSERT INTO `events` VALUES (1,'utolsó tanítási nap','2014','2014-06-01'),(2,
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+CREATE TABLE `lookup_church_osm` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `church_id` INT(11) NOT NULL,
+  `osm_id` INT(11) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`));
+ALTER TABLE `lookup_church_osm` 
+ADD INDEX `FK_church_id_idx` (`church_id` ASC),
+ADD INDEX `FK_osm_id_idx` (`osm_id` ASC);
+ALTER TABLE `lookup_church_osm` 
+ADD CONSTRAINT `FK_lookup_church_osm_osm_id`
+  FOREIGN KEY (`osm_id`)
+  REFERENCES `osm` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE NO ACTION;
+ALTER TABLE `lookup_church_osm` 
+ADD UNIQUE INDEX `unique` (`church_id` ASC, `osm_id` ASC);
+
+CREATE TABLE `lookup_osm_enclosed` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `osm_id` INT(11) NOT NULL,
+  `enclosing_id` INT(11) NOT NULL,
+  `created_at` VARCHAR(45) NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  INDEX `FK_osm_id_idx` (`osm_id` ASC),
+  INDEX `FK_osm_enclosing_id_idx` (`enclosing_id` ASC),
+  CONSTRAINT `FK_lookup_osm_enclosed_osm`
+    FOREIGN KEY (`osm_id`)
+    REFERENCES `osm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FK_lookup_osm_enclosed_enclosing`
+    FOREIGN KEY (`enclosing_id`)
+    REFERENCES `osm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);
+ALTER TABLE `lookup_osm_enclosed` 
+ADD UNIQUE INDEX `unique` (`enclosing_id` ASC, `osm_id` ASC);
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

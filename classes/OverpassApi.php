@@ -83,7 +83,7 @@ class OverpassApi {
                 . "node" . $this->queryFilter . "(pivot.a);out tags;"
                 . "way" . $this->queryFilter . "(pivot.a);out tags;"
                 . "relation" . $this->queryFilter . "(pivot.a);"
-                . "out tagsb;";
+                . "out tags;";
         $this->buildQuery();
     }
 
@@ -112,6 +112,34 @@ class OverpassApi {
     function updateUrlMiserend() {
         $this->downloadUrlMiserend();
         $this->saveElement();
+        $this->saveChurchOsmRelation();
+        printr($this);
+    }
+
+    function updateEnclosing(\Eloquent\OSM $osm) {
+        $this->downloadEnclosingBoundaries($osm->lat, $osm->lon);
+        $this->saveElement();
+        $this->saveOsmEnclosingRelation($osm);
+    }
+
+    function saveChurchOsmRelation() {
+        $osmElements = \Eloquent\Osm::whereHas('tags', function ($query) {
+                    $query->where('name', 'url:miserend');
+                });
+        foreach ($osmElements->get() as $element) {
+            $urlMiserend = $element->tags->where('name', 'url:miserend')->first()->value;
+            preg_match('/=([0-9]{1,5})$/i', $urlMiserend, $match);
+            $element->churches()->detach([$match[1]]);
+            $element->churches()->attach([$match[1]]);
+        }
+    }
+
+    function saveOsmEnclosingRelation(\Eloquent\OSM $osm) {
+        foreach ($this->jsonData->elements as $element) {
+            $osmElement = \Eloquent\OSM::where('osmid', $element->id)->where('osmtype', $element->type)->first();
+            $sync[] = $osmElement->id;
+        }
+        $osm->enclosing()->sync($sync);
     }
 
     function saveElement() {
@@ -133,7 +161,7 @@ class OverpassApi {
 
             $newOSM->tags()->delete();
             foreach ($element->tags as $name => $value) {
-                $tag = \Eloquent\OSMTag::firstOrNew(['name' => $name, 'value' => $value]);
+                $tag = \Eloquent\OSMTag::firstOrNew(['osm_id' => $newOSM->id, 'name' => $name, 'value' => $value]);
                 $newOSM->tags()->save($tag);
             }
         }

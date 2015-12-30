@@ -40,7 +40,7 @@
         {% include "Church/_Schedule.twig" %}
     {% else %}
         <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
-    {% endif %}
+        {% endif %}
 
     {% if misemegj %}
         {% include "panel.twig" with {title:'Kapcsolódó információk','body': misemegj|raw|nl2br } %}    
@@ -57,12 +57,15 @@
 
 {% set selfAdvertisement = true %}
 {% block leftsidebar %}
-    {% include "Church/_panelAskingRemark.twig" %}
+    {% include "Church/_panelAskingRemark.twig" %}    
 {% endblock %}
 
 {% block rightsidebar %}
     {% include "Church/_panelLocation.twig" %}
     {% include 'Church/_panelContact.twig' %}
+    {% if osm and user.isadmin %}
+        {% include 'Church/_panelOSM.twig' %}
+    {% endif %}
     {% if megjegyzes %}
         {% include "panel.twig" with {title:'Jó tudni','body': megjegyzes } %}
     {% endif %}
