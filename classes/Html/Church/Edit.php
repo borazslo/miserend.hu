@@ -185,7 +185,7 @@ class Edit extends \Html\Html {
                 'options' => $options,
                 'selected' => $this->church->varos
             );
-            if ($selectibleCounty->id == $this->church->megye) {
+            if ($selectibleCounty->id == $this->church->megye AND $this->church->orszag == $selectibleCounty->orszag) {
                 $this->form['cities'][$selectibleCounty->orszag . "-" . $selectibleCounty->id]['style'] = 'display: inline';
             } else {
                 $this->form['cities'][$selectibleCounty->orszag . "-" . $selectibleCounty->id]['style'] = 'display: none';

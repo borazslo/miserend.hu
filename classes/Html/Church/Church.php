@@ -25,7 +25,7 @@ class Church extends \Html\Html {
         }
 
         $church->MgetLocation();
-           
+
 
         if (!$church->McheckReadAccess($user)) {
             throw new \Exception("Read access denied to church tid = '$tid'");
@@ -34,7 +34,7 @@ class Church extends \Html\Html {
         copyArrayToObject($church->toArray(), $this);
 
         $this->osm = $church->osm;
-        
+
         $this->setTitle($this->nev . " (" . $this->location->varos . ")");
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
 

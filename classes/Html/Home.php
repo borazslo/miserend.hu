@@ -34,6 +34,7 @@ class Home extends Html {
                 'value' => "keres"),
             'kulcsszo' => array(
                 'name' => "kulcsszo",
+                'id' => 'keyword',
                 'size' => 20,
                 'class' => 'keresourlap',
                 'placeholder' => 'kulcsszó'),
@@ -352,18 +353,10 @@ class Home extends Html {
         ///////////////////////////////////////////////////////////////////
         $igehelyek = $oszov_biblia . $ujszov_biblia . $evang_biblia;
 
-        //Lit. naptár
-        $naptar = "<span class=alap>naptár</span>";
 
-        //Programajánló
-        $programajanlo = "<span class=alap>kapcsolódó programok a naptárból<br>Fejlesztés alatt...</span>";
-
-        $this->photo = \Eloquent\Photo::big()->vertical()->where('flag','i')->orderbyRaw('RAND()')->first();
+        $this->photo = \Eloquent\Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();
         $this->photo->church->MgetLocation();
-        
 
-        
-             
         $variables = array(
             'favorites' => $user->getFavorites(),
             'formnyit' => $formnyit,
@@ -377,8 +370,8 @@ class Home extends Html {
             'design_url' => $config['path']['domain'],
             'alert' => LiturgicalDayAlert('html'),
         );
-        
-        foreach($variables as $key => $var) {
+
+        foreach ($variables as $key => $var) {
             $this->$key = $var;
         }
     }

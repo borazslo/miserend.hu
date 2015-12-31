@@ -113,7 +113,6 @@ class OverpassApi {
         $this->downloadUrlMiserend();
         $this->saveElement();
         $this->saveChurchOsmRelation();
-        printr($this);
     }
 
     function updateEnclosing(\Eloquent\OSM $osm) {
@@ -158,11 +157,15 @@ class OverpassApi {
             $newOSM->lat = $element->lat;
             $newOSM->lon = $element->lon;
             $newOSM->save();
-
-            $newOSM->tags()->delete();
+  
+            $now = time();
             foreach ($element->tags as $name => $value) {
                 $tag = \Eloquent\OSMTag::firstOrNew(['osm_id' => $newOSM->id, 'name' => $name, 'value' => $value]);
-                $newOSM->tags()->save($tag);
+                $newOSM->tags()->save($tag);                
+            }
+            $tags = \Eloquent\OSMTag::where('osm_id',$newOSM->id)->where('updated_at',"<", $now)->get();
+            foreach($tags as $tag) {
+                $tag->delete();
             }
         }
     }

@@ -18,6 +18,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     public function osms() {
         return $this->belongsToMany('\Eloquent\OSM', 'lookup_church_osm', 'church_id', 'osm_id');
     }
+    
+    public function keywordshortcuts() {
+        return $this->hasMany('\Eloquent\KeywordShortcut');
+    }
 
     public function getOsmAttribute() {
         if ($this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
@@ -93,6 +97,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function MgetLocation() {
+        return;
         $this->location = new \Location();
         $this->location->getByChurchId($this->id);
         $this->osm->religiousAdministration;
@@ -152,6 +157,32 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     function MgetDioceseId() {
         return $this->religious_administration->diocese->id;
+    }
+
+    function scopeWhereShortcutLike($query, $keyword, $type) {        
+        return $query->whereHas('keywordshortcuts', function ($query) use ($keyword, $type) {                
+                    $query->where('type', $type)->where('value', 'like', $keyword);                
+        });                
+    }
+
+    public function scopeWhereHasTag($query, $name, $value) {
+        if (is_array($name)) {
+            $nameOperator = $name[0];
+            $nameValue = $name[1];
+        } else {
+            $nameValue = $name;
+            $nameOperator = '=';
+        }
+        if (is_array($value)) {
+            $valueOperator = $value[0];
+            $valueValue = $value[1];
+        } else {
+            $valueValue = $value;
+            $valueOperator = '=';
+        }
+        return $query->whereHas('tags', function ($query) use ( $nameOperator, $nameValue, $valueOperator, $valueValue ) {
+                    $query->where('name', $nameOperator, $nameValue)->where('value', $valueOperator, $valueValue);
+                });
     }
 
 }

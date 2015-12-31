@@ -4844,6 +4844,9 @@ CREATE TABLE `osmtags` (
   `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `unique` (`osm_id`,`name`),
+  KEY `index_name` (`name`),
+  KEY `index_value` (`value`),
+  KEY `index_name_value` (`name`,`value`),
   CONSTRAINT `FK_osm_id` FOREIGN KEY (`osm_id`) REFERENCES `osm` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=20816 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -5003,6 +5006,21 @@ CREATE TABLE `lookup_osm_enclosed` (
 ALTER TABLE `lookup_osm_enclosed` 
 ADD UNIQUE INDEX `unique` (`enclosing_id` ASC, `osm_id` ASC);
 
+DROP TABLE IF EXISTS `keyword_shortcuts`;
+CREATE TABLE `keyword_shortcuts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `church_id` int(11) NOT NULL,
+  `osmtag_id` int(11) NOT NULL,
+  `type` varchar(30) NOT NULL,
+  `value` varchar(200) NOT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  KEY `index_value` (`value`),
+  KEY `FK_keyword_shortchuts_osmtag_idx` (`osmtag_id`),
+  KEY `church_type_value` (`church_id`,`type`,`value`),
+  KEY `type_value` (`type`,`value`)
+) ENGINE=InnoDB AUTO_INCREMENT=6774 DEFAULT CHARSET=utf8;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

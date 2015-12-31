@@ -152,3 +152,25 @@ ADD COLUMN `created_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00' AFTER `eszr
 ADD COLUMN `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00' AFTER `created_at`;
 ALTER TABLE `photos` 
 CHANGE COLUMN `order` `weight` INT(2) NOT NULL DEFAULT '0' ;
+ALTER TABLE `osmtags` 
+ADD INDEX `index_name` (`name` ASC),
+ADD INDEX `index_value` (`value` ASC),
+ADD INDEX `index_name_value` (`name` ASC, `value` ASC);
+
+CREATE TABLE `keyword_shortcuts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `church_id` int(11) NOT NULL,
+  `osmtag_id` int(11) NOT NULL,
+  `type` varchar(30) NOT NULL,
+  `value` varchar(200) NOT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  KEY `index_value` (`value`),
+  KEY `FK_keyword_shortchuts_church_idx` (`church_id`),
+  KEY `FK_keyword_shortchuts_osmtag_idx` (`osmtag_id`)  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ALTER TABLE `keyword_shortcuts` 
+ADD INDEX `church_type_value` (`church_id` ASC, `type` ASC, `value` ASC);
+ALTER TABLE `keyword_shortcuts` 
+ADD INDEX `type_value` (`type` ASC, `value` ASC);

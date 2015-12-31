@@ -28,6 +28,7 @@ class Html {
         $this->loadTwig();
         $this->getTemplateFile();
         $this->html = $this->twig->render($this->template, (array) $this);
+        $this->injectTime(microtime()-$startTime);
     }
 
     function loadTwig() {
@@ -113,6 +114,13 @@ class Html {
     function addExtraMeta($name, $content) {
         $this->extraMeta .= "\n<meta name='" . $name . "' content='" . $content . "'>";
         return true;
+    }
+
+    function injectTime($time) {
+        global $config;       
+        if ($config['debug'] > 0) {
+            $this->html = str_replace('<!--xxx-->', ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"] ) . " ms", $this->html);
+        }
     }
 
     function array2this($array) {

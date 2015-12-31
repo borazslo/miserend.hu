@@ -10,5 +10,14 @@ class OSMTag extends \Illuminate\Database\Eloquent\Model {
     public function osm() {
         return $this->belongsTo('\Eloquent\OSM', 'osm_id', 'id');
     }
+    
+    public function shortcut() {
+        return $this->belongsTo('\Eloquent\KeywordShortcut', 'id', 'osmtag_id');
+    }
+    
+    public function delete() {
+        $this->shortcut()->delete();      
+        parent::delete();
+    }
 
 }

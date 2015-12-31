@@ -5,7 +5,19 @@ namespace Html;
 class SearchResultsChurches extends Html {
 
     public function __construct() {
-        global $user, $config;       
+        global $user, $config;
+
+        $this->input = $_REQUEST;
+
+        $search = \Eloquent\Church::where('ok', 'i');
+        if ($this->input['kulcsszo']) {
+            $keyword = preg_replace("/\*/","%",$this->input['kulcsszo']);
+            $search->whereShortcutLike($keyword, 'name');
+        }
+        if ($this->input['varos']) {
+            $keyword = preg_replace("/\*/","%",$this->input['varos']);
+            $search->whereShortcutLike($keyword, 'administrative');
+        }
 
         $query = "select id,nev from egyhazmegye where ok='i' order by sorrend";
         $lekerdez = mysql_query($query);
@@ -38,7 +50,7 @@ class SearchResultsChurches extends Html {
         //$templomurlap .= "<input type=hidden name=hely id=tavolsag size=20 class=keresourlap value='".$_REQUEST['hely']."'>";
         $templomurlap.="\n<img src=img/space.gif width=5 height=10><br><span class=kiscim>Település: </span><input type=text name=varos id=varos size=20 class=keresourlap value='$varos'><br><img src=img/space.gif width=5 height=8>";
 
-        $templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text name=kulcsszo size=20 class=keresourlap value='$kulcsszo'><br><img src=img/space.gif width=5 height=8>";
+        $templomurlap.="<br><span class=kiscim>Kulcsszó: </span><input type=text name=kulcsszo id='keyword' size=20 class=keresourlap value='$kulcsszo'><br><img src=img/space.gif width=5 height=8>";
 
         //Egyházmegye
         $templomurlap.="<br><span class=kiscim>Egyházmegye: </span><br><img src=img/space.gif width=5 height=5><br><img src=img/space.gif width=10 height=5><select name=ehm class=keresourlap onChange=\"if(this.value!=0) {";
@@ -157,7 +169,7 @@ class SearchResultsChurches extends Html {
                 $tartalom.="<a href='/templom/$tid' class=felsomenulink title='$tismertnev'><b>$tnev</b> <font color=#8D317C>($tvaros)</font></a>";
                 if ($user->checkRole('miserend') OR $letrehozta == $user->login)
                     $tartalom.=" <a href='/templom/$tid/edit'><img src=/img/edit.gif title='szerkesztés' align=absmiddle border=0></a> "
-                        . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+                            . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
                 if ($tismertnev != '')
                     $tartalom .= "<br/><span class=\"alap\" style=\"margin-left: 20px; font-style: italic;\">" . $tismertnev . "</span>";
                 $tartalom.="<br><img src=/img/space.gif width=4 height=5><br>";
