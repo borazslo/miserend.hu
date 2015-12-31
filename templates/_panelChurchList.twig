@@ -1,0 +1,16 @@
+{% for church in churches %}
+<div class="row">
+    <div class="col-md-3" style="padding:10px">
+        {% if church.photos[0] %}
+            <a href="/templom/{{ church.id }}">
+                <img src="{{ constant('DOMAIN') }}{{ church.photos[0].smallUrl }}"/>
+            </a>
+        {% endif %}
+    </div>
+    <div class="col-md-9">
+        <h5><a href="/templom/{{ church.id }}">{{ church.osm.name }}</a></h5>
+        <a href="http://www.openstreetmap.org/{{ church.osm.osmtype }}/{{ church.osm.osmid }}">{{ church.osm.lat }}, {{ church.osm.lon }}</a>
+    </div>
+</div>
+{% endfor %}
+

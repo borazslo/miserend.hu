@@ -39,5 +39,5 @@
 {% endblock %}    
 
 {% macro osmlink(osm,title = false) %}
-    <a href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>
+    <a href="/collection/{{ osm.osmtype }}:{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>
 {% endmacro %}

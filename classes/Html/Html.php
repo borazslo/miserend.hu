@@ -109,6 +109,7 @@ class Html {
 
     function setTitle($title) {
         $this->pageTitle = $title . " | Miserend";
+        $this->title = $title;
     }
 
     function addExtraMeta($name, $content) {
