@@ -11,6 +11,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return array($this->letrehozta);
     }
 
+    public function getWriteAccessAttribute($value) {
+        global $user;
+        return $this->McheckWriteAccess($user);
+    }
+
     public function photos() {
         return $this->hasMany('\Eloquent\Photo')->ordered();
     }
@@ -18,7 +23,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     public function osms() {
         return $this->belongsToMany('\Eloquent\OSM', 'lookup_church_osm', 'church_id', 'osm_id');
     }
-    
+
     public function keywordshortcuts() {
         return $this->hasMany('\Eloquent\KeywordShortcut');
     }
@@ -144,14 +149,17 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     function McheckWriteAccess($user) {
+        if ($user->checkRole('miserend'))
+            return true;
         if ($this->letrehozta == $user->username)
             return true;
+        if (!is_array($user->responsible))
+            return false;
         if (in_array($this->id, $user->responsible['church']))
             return true;
         if (in_array($this->MgetDioceseId(), $user->responsible['diocese']))
             return true;
-        if ($user->checkRole('miserend'))
-            return true;
+
         return false;
     }
 
@@ -159,10 +167,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->religious_administration->diocese->id;
     }
 
-    function scopeWhereShortcutLike($query, $keyword, $type) {        
-        return $query->whereHas('keywordshortcuts', function ($query) use ($keyword, $type) {                
-                    $query->where('type', $type)->where('value', 'like', $keyword);                
-        });                
+    function scopeWhereShortcutLike($query, $keyword, $type) {
+        return $query->whereHas('keywordshortcuts', function ($query) use ($keyword, $type) {
+                    $query->where('type', $type)->where('value', 'like', $keyword);
+                });
     }
 
     public function scopeWhereHasTag($query, $name, $value) {

@@ -195,45 +195,10 @@ class Edit extends \Html\Html {
     }
 
     function addFormReligiousAdministration() {
-        $options = [0 => 'Válassz/Nem tudom'];
-        $dioceses = \Illuminate\Database\Capsule\Manager::table('egyhazmegye')
-                        ->select('id', 'nev')
-                        ->orderBy('sorrend')->get();
-        foreach ($dioceses as $selectibleDiocese) {
-            $options[$selectibleDiocese->id] = $selectibleDiocese->nev;
-        }
-        $this->form['diocese'] = array(
-            'type' => 'select',
-            'name' => 'church[egyhazmegye]',
-            'id' => 'selectEgyhazmegye',
-            'options' => $options,
-            'selected' => $this->church->egyhazmegye
-        );
-
-        foreach ($dioceses as $selectibleDiocese) {
-            $options = [0 => 'Válassz/Nem tudom'];
-            $deaneries = \Illuminate\Database\Capsule\Manager::table('espereskerulet')
-                            ->select('id', 'nev')
-                            ->where('ehm', $selectibleDiocese->id)
-                            ->orderBy('nev')->get();
-            foreach ($deaneries as $selectibleDeanery) {
-                $options[$selectibleDeanery->id] = $selectibleDeanery->nev . " espereskerület";
-            }
-            $this->form['deaneries'][$selectibleDiocese->id] = array(
-                'type' => 'select',
-                'name' => 'church[espereskerulet]',
-                'id' => 'selectEspereskeruletDiocese' . $selectibleDiocese->id,
-                'class' => 'selectEspereskeruletDiocese',
-                'options' => $options,
-                'selected' => $this->church->espereskerulet
-            );
-            if ($selectibleDiocese->id == $this->church->egyhazmegye) {
-                $this->form['deaneries'][$selectibleDiocese->id]['style'] = 'display: inline';
-            } else {
-                $this->form['deaneries'][$selectibleDiocese->id]['style'] = 'display: none';
-                $this->form['deaneries'][$selectibleDiocese->id]['disabled'] = 'disabled';
-            }
-        }
+        $selected = ['diocese' => $this->church->egyhazmegye, 'deanery' => $this->church->espereskerulet ];
+        $selectReligiousAdministration = \Form::selectReligiousAdministration($selected);
+        $this->form['dioceses'] = $selectReligiousAdministration['dioceses'];        
+        $this->form['deaneries'] = $selectReligiousAdministration['deaneries'];
     }
 
     function addFormResponsible() {

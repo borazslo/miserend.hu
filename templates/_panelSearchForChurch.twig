@@ -1,0 +1,36 @@
+{% extends 'panel.twig' %}
+{% import "forms.twig" as forms %}
+{% set title = 'Új keresés' %}
+{% set panel = 'primary' %}
+
+{% block body %}
+    <form method=get>
+        <input type=hidden name=q value=SearchResultsChurches>
+        <input type=hidden id=keresestipus name=keresestipus value=0>
+        <style>
+            #panel-search-form > .row{
+                margin-bottom:10px;
+            }
+        </style>
+        <div id="panel-search-form" style="padding-right:10px;padding-left:10px">
+            <div class="row">
+                <span class="kiscim"><strong>Kulcsszó: </strong></span>
+                <input type=text name=kulcsszo id='keyword' size=20 class="keresourlap form-control" value="{{ form.kulcsszo.value }}">                
+            </div>
+            <div class="row">
+                <span class="kiscim"><strong>Település: </strong></span>
+                <input type=text name=varos id=varos size=20 class="keresourlap form-control" value="{{ form.varos.value }}">
+            </div>
+            <div class="row">
+                <span class="kiscim"><strong>Egyházmegye és espereskerület: </strong></span>
+                {{ forms.select(form.diocese) }}
+                {% for deanery in form.deaneries %}
+                    {{ forms.select(deanery) }}
+                {% endfor %}
+            </div>
+            <div class="row">
+                <input type=submit value="keresés" class="keresourlap form-control">
+            </div>
+        </div>
+    </form>
+{% endblock %}

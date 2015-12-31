@@ -739,7 +739,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     $return['sum'] = mysql_num_rows($lekerdez);
     if (!$filterdistance)
-        $query .= " LIMIT " . ($offset ) . "," . ($limit + $offset);
+        $query .= " LIMIT " . ($offset ) . "," . ($limit);
     if (!$lekerdez = mysql_query($query))
         echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
