@@ -10,6 +10,11 @@ class Html {
     public $templatesPath = 'templates';
     public $extraMeta;
 
+    function __construct() {
+        $this->input = $_REQUEST;
+        $this->initPagination();
+    }
+
     function render() {
         global $user;
         $this->user = $user;
@@ -28,7 +33,7 @@ class Html {
         $this->loadTwig();
         $this->getTemplateFile();
         $this->html = $this->twig->render($this->template, (array) $this);
-        $this->injectTime(microtime()-$startTime);
+        $this->injectTime(microtime() - $startTime);
     }
 
     function loadTwig() {
@@ -118,9 +123,9 @@ class Html {
     }
 
     function injectTime($time) {
-        global $config;       
+        global $config;
         if ($config['debug'] > 0) {
-            $this->html = str_replace('<!--xxx-->', ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"] ) . " ms", $this->html);
+            $this->html = str_replace('<!--xxx-->', ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"] ) . " s", $this->html);
         }
     }
 
@@ -132,6 +137,16 @@ class Html {
         # http_redirect ($url,$params,$session,$status);
         header("Location: " . $url);
         exit;
+    }
+
+    function initPagination() {
+        $this->pagination = new \Pagination();
+        if ($this->input['page']) {
+            $this->pagination->active = $this->input['page'];
+        }
+        if ($this->input['take']) {
+            $this->pagination->take = $this->input['take'];
+        }
     }
 
 }
