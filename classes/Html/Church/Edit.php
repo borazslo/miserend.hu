@@ -209,13 +209,13 @@ class Edit extends \Html\Html {
                         ->orderByRaw("CASE WHEN lastlogin > '" . date('Y-m-d H:i:s', strtotime('-2 month')) . "'     THEN 1 ELSE 0 END desc")
                         ->orderBy('login')->get();
         foreach ($users as $selectibleUser) {
-            $options[$selectibleUser->uid] = $selectibleUser->login;
+            $options[$selectibleUser->login] = $selectibleUser->login;
         }
         $this->form['responsible'] = array(
             'type' => 'select',
             'name' => 'church[letrehozta]',
             'options' => $options,
-            'default' => $this->church->feltolto
+            'selected' => $this->church->letrehozta
         );
     }
 

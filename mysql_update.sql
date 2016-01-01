@@ -190,20 +190,20 @@ CREATE TABLE `crons` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
-ALTER TABLE `miserend`.`distances` 
+ALTER TABLE `distances` 
 DROP FOREIGN KEY `FK_from`,
 DROP FOREIGN KEY `FK_to`;
-ALTER TABLE `miserend`.`distances` 
+ALTER TABLE `distances` 
 CHANGE COLUMN `from` `church_from` INT(11) NOT NULL ,
 CHANGE COLUMN `to` `church_to` INT(11) NOT NULL ;
-ALTER TABLE `miserend`.`distances` 
+ALTER TABLE `distances` 
 ADD CONSTRAINT `FK_from`
   FOREIGN KEY (`church_from`)
-  REFERENCES `miserend`.`templomok` (`id`)
+  REFERENCES `templomok` (`id`)
   ON DELETE CASCADE
   ON UPDATE NO ACTION,
 ADD CONSTRAINT `FK_to`
   FOREIGN KEY (`church_to`)
-  REFERENCES `miserend`.`templomok` (`id`)
+  REFERENCES `templomok` (`id`)
   ON DELETE CASCADE
   ON UPDATE NO ACTION;
