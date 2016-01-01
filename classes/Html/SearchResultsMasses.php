@@ -251,7 +251,7 @@ class SearchResultsMasses extends Html {
             'content' => $tartalom,
             'templomurlap' => $templomurlap,
             'design_url' => $design_url);
-        $variables['template'] = 'search/resultsChurches.twig';
+        $variables['template'] = 'search/resultsMasses.twig';
 
         foreach ($variables as $key => $var) {
             $this->$key = $var;

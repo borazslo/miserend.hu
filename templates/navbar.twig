@@ -10,7 +10,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ constant('DOMAIN') }}">Miserend.hu</a>
+            <a class="navbar-brand" href="/">Miserend.hu</a>
         </div>
 
         <div class="collapse navbar-collapse" id="navbar">
@@ -19,11 +19,11 @@
                     {% for items in menu %}
                         <li class="dropdown">
                             <a href="{{ items.url }}" class="dropdown-toggle" data-toggle="dropdown">{{ items.title }}<span class="caret"></span></a>
-                            {% if items.items %}
+                                {% if items.items %}
                                 <ul class="dropdown-menu">
                                     {% for item in items.items %}
                                         <li><a href="{{ item.url }}">{{ item.title }}</a></li>
-                                    {% endfor %}
+                                        {% endfor %}
                                 </ul>
                             {% endif %}
                         </li>                        

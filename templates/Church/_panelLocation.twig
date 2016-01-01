@@ -8,12 +8,12 @@
 
 {% block body %}
     <span class=alap>
-        {% if osm.administrative %}
+        {% if osm.administrative and user.loggedin %}
             {% for key,administraion in osm.administrative %}
                 > {{ _self.osmlink(administraion) }} <br/>
             {% endfor %}
         {% endif %}        
-        {{ church.varos }}, {{ church.cim }}
+        {{ location.varos }}, {{ location.cim }}
     </span><br/>
     {% if osm is not null %}
         <span class=alap>            

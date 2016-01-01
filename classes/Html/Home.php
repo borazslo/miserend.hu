@@ -24,14 +24,6 @@ class Home extends Html {
 
         //MISEREND űRLAP	
         $searchform = array(
-            'm_id' => array(
-                'type' => 'hidden',
-                'name' => "m_id",
-                'value' => 26),
-            'm_op' => array(
-                'type' => 'hidden',
-                'name' => "m_op",
-                'value' => "keres"),
             'kulcsszo' => array(
                 'name' => "kulcsszo",
                 'id' => 'keyword',

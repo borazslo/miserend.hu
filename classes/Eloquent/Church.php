@@ -102,7 +102,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function MgetLocation() {
-        return;
+        #return;
         $this->location = new \Location();
         $this->location->getByChurchId($this->id);
         $this->osm->religiousAdministration;

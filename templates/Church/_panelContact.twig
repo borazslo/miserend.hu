@@ -14,11 +14,6 @@
         {% if religious_administration.parish.url %}
             Honlap: <a href='{{ religious_administration.parish.url }}' class=link>{{ religious_administration.parish.url }}</a>
         {% endif %}        
-        {% if osm is not null %}
-            {% for key,administraion in osm.religiousAdministration %}
-                <br/>> {{ _self.osmlink(administraion) }}
-            {% endfor %}
-        {% endif %}
     </div>    
 {% endblock %}
 

@@ -723,7 +723,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 
     $query = "SELECT templomok.id,nev,ismertnev,varos,letrehozta,lat,lng FROM templomok ";
     $query .= "LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id ";
-    if ($args['tnyelv'] != '0') {
+    if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
         $query .= " INNER JOIN misek ON misek.tid = templomok.id ";
         if ($args['tnyelv'] == 'h')
             $args['tnyelv'] = 'hu|h';
@@ -731,7 +731,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     }
     if (count($where) > 0)
         $query .= "WHERE " . implode(' AND ', $where);
-    if ($args['tnyelv'] != '0')
+    if (isset($args['tnyelv']) AND $args['tnyelv'] != '0')
         $query .= " GROUP BY templomok.id ";
 
     $query .= " ORDER BY nev ";
@@ -823,9 +823,9 @@ function searchChurchesWhere($args) {
 
     if ($args['ehm'] != 0)
         $where[] = "egyhazmegye='" . $args['ehm'] . "'";
-    if (isset($args['espkerT'][$args['ehm']]) AND $args['espkerT'][$args['ehm']] != 0)
-        $where[] = "espereskerulet='" . $args['espkerT'][$args['ehm']] . "'";
-
+    
+    if (isset($args['espker']) AND $args['espker'] != 0)
+        $where[] = "espereskerulet='" . $args['espker'] . "'";
     return $where;
 }
 

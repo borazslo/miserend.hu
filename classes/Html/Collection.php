@@ -6,7 +6,7 @@ class Collection extends Html {
 
     public function __construct() {
         parent::__construct();
-                
+
         preg_match('/(node|way|relation):([0-9]{1,8})$/i', $this->input['q'], $match);
         $osm = \Eloquent\OSM::whereOSMId($match[1], $match[2])->first();
         $this->setTitle($osm->name);
@@ -33,9 +33,7 @@ class Collection extends Html {
             $church->photos;
         }
 
-        $this->pagination->set($churches->count());        
+        $this->pagination->set($churches->count());
     }
-
-    
 
 }
