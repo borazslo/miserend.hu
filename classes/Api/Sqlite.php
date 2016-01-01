@@ -302,5 +302,12 @@ class Sqlite extends Api {
         fclose($fp);
         return true;
     }
+    
+    function cron() {
+        for($i=2;$i<=5;$i++) {
+            $_REQUEST['v'] = $i;
+            $this->run();
+        }
+    }
 
 }

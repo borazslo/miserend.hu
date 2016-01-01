@@ -174,3 +174,36 @@ ALTER TABLE `keyword_shortcuts`
 ADD INDEX `church_type_value` (`church_id` ASC, `type` ASC, `value` ASC);
 ALTER TABLE `keyword_shortcuts` 
 ADD INDEX `type_value` (`type` ASC, `value` ASC);
+
+/* Dec 31, 2015 
+*/
+CREATE TABLE `crons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `class` varchar(45) DEFAULT NULL,
+  `function` varchar(45) DEFAULT NULL,
+  `frequency` varchar(45) NOT NULL,
+  `deadline_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `attempts` int(2) DEFAULT '0',
+  `lastsuccess_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_At` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `miserend`.`distances` 
+DROP FOREIGN KEY `FK_from`,
+DROP FOREIGN KEY `FK_to`;
+ALTER TABLE `miserend`.`distances` 
+CHANGE COLUMN `from` `church_from` INT(11) NOT NULL ,
+CHANGE COLUMN `to` `church_to` INT(11) NOT NULL ;
+ALTER TABLE `miserend`.`distances` 
+ADD CONSTRAINT `FK_from`
+  FOREIGN KEY (`church_from`)
+  REFERENCES `miserend`.`templomok` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `FK_to`
+  FOREIGN KEY (`church_to`)
+  REFERENCES `miserend`.`templomok` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE NO ACTION;

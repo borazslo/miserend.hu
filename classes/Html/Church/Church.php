@@ -18,7 +18,7 @@ class Church extends \Html\Html {
         $church->MgetReligious_administration();
 
         if ($church->osm AND $church->osm->enclosing->toArray() == array()) {
-            $overpass = new \OverpassApi();
+            $overpass = new \ExternalApi\OverpassApi();
             $overpass->updateEnclosing($church->osm);
             $church->load(osms);
             $church->osm = $church->osms()->first();

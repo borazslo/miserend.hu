@@ -30,7 +30,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     public function getOsmAttribute() {
         if ($this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
-            $overpass = new \OverpassApi();
+            $overpass = new \ExternalApi\OverpassApi();
             $overpass->updateEnclosing($this->osms->first());
             $this->load(osms);
         }
@@ -42,7 +42,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function neighbours() {
-        return $this->hasMany('\Eloquent\Distance', 'from', 'id')->orderBy('distance', 'ASC');
+        return $this->hasMany('\Eloquent\Distance', 'church_from', 'id')->orderBy('distance', 'ASC');
     }
 
     public function closestNeighbour() {
@@ -95,7 +95,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     public function delete() {
         $this->neighbours()->delete();
-        Distance::where('to', $this->id)->delete();
+        Distance::where('church_to', $this->id)->delete();
+        Distance::where('church_from', $this->id)->delete();
         $this->remarks()->delete();
         $this->photos()->delete();
         parent::delete();
@@ -165,6 +166,13 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     function MgetDioceseId() {
         return $this->religious_administration->diocese->id;
+    }
+
+    function scopeInBBox($query, $bbox) {
+        return $query->whereHas('osms', function($query) use ($bbox) {
+                    $query->whereBetween('lat', [$bbox['latMin'], $bbox['latMax']])
+                            ->whereBetween('lon', [$bbox['lonMin'], $bbox['lonMax']]);
+                });
     }
 
     function scopeWhereShortcutLike($query, $keyword, $type) {

@@ -53,17 +53,17 @@ DROP TABLE IF EXISTS `distances`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `distances` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `from` int(11) NOT NULL,
-  `to` int(11) NOT NULL,
+  `church_from` int(11) NOT NULL,
+  `church_to` int(11) NOT NULL,
   `distance` float NOT NULL,
   `toupdate` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `tid1` (`from`,`to`),
-  KEY `FK_to_idx` (`to`),
-  CONSTRAINT `FK_to` FOREIGN KEY (`to`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `FK_from` FOREIGN KEY (`from`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+  UNIQUE KEY `tid1` (`church_from`,`church_to`),
+  KEY `FK_to_idx` (`church_to`),
+  CONSTRAINT `FK_from` FOREIGN KEY (`church_from`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_to` FOREIGN KEY (`church_to`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=66224 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -5021,6 +5021,20 @@ CREATE TABLE `keyword_shortcuts` (
   KEY `church_type_value` (`church_id`,`type`,`value`),
   KEY `type_value` (`type`,`value`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6774 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `crons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `class` varchar(45) DEFAULT NULL,
+  `function` varchar(45) DEFAULT NULL,
+  `frequency` varchar(45) NOT NULL,
+  `deadline_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `attempts` int(2) DEFAULT '0',
+  `lastsuccess_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_At` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

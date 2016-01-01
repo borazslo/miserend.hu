@@ -162,4 +162,17 @@ class Html {
         }
     }
 
+    public function printExceptionVerbose($e) {
+        echo $e->getMessage();
+        echo "<pre>";
+        foreach ($e->getTrace() as $trace) {
+            if ($trace['class'])
+                echo $trace['class'] . "::" . $trace['function'] . "()";
+            if ($trace['file'])
+                echo $trace['file'] . ":" . $trace['line'] . " -> " . $trace['function'] . "()";
+            echo "\n";
+        }
+        echo "</pre>";
+    }
+
 }

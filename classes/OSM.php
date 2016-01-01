@@ -10,10 +10,10 @@ class OSM  {
 
   
     function downloadEnclosingBoundaries() {
-        $overpass = new \OverpassApi();
+        $overpass = new \ExternalApi\OverpassApi();
         $overpass->downloadEnclosingBoundaries($this->lat, $this->lon);
         if (!$overpass->jsonData->elements) {
-            throw new Exception("Missing Json Elements from OverpassApi Query");
+            throw new Exception("Missing Json Elements from \ExternalApi\OverpassApi Query");
         }
         foreach ($overpass->jsonData->elements as $element) {
             if (isset($element->center->lat)) {

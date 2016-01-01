@@ -3,6 +3,16 @@
 include("load.php");
 
 try {
+    if (php_sapi_name() == "cli") {
+        foreach ($argv as $arg) {
+            $e = explode("=", $arg);
+            if (count($e) == 2)
+                $_REQUEST[$e[0]] = $e[1];
+            else
+                $_REQUEST[$e[0]] = 0;
+        }
+    }
+
     $action = \Request::Text('q');
     $path = new Path($action);
 
@@ -20,7 +30,7 @@ try {
     if ($html) {
         addMessage($e->getMessage(), 'danger');
     } else {
-        echo $e->getMessage();        
+        \Html\Html::printExceptionVerbose($e);        
     }
 }
 if ($html) {
