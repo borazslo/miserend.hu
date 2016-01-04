@@ -90,7 +90,7 @@ class Remark extends Html {
 
         $this->pageDescription = "Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban.";
 
-        $this->template = 'remark.twig';
+        $this->template = 'Remark.twig';
     }
 
 }
