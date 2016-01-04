@@ -16,7 +16,7 @@ $config['connection'] = array(
 $config['path']['domain'] = 'http://miserend.hu';
 
 $config['mapquest'] = array(
-    'appkey' => '***',
+    'appkey' => env('MAPQUEST_CONSUMERKEY','***'),
     'useitforsearch' => false
 );
 
