@@ -56,12 +56,15 @@ EOF
 )
     echo "${VHOSTT}" > /etc/environment
 
+    sudo apt-get update
+    sudo apt-get -y install phpunit
     #sudo apt-get -y install php5-sqlite php5-mysql curl npm git
       
     # setup hosts file
     VHOST=$(cat <<EOF
     <VirtualHost *:80>
         DocumentRoot "/vagrant"
+        php_admin_value sendmail_path "/usr/bin/env catchmail -f some@from.address --smtp-ip 0.0.0.0"
         <Directory "/vagrant/">
             SetEnv MISEREND_WEBAPP_ENVIRONMENT staging
             SetEnv MYSQL_MISEREND_USER root
@@ -74,19 +77,25 @@ EOF
 EOF
 )
     echo "${VHOST}" > /etc/apache2/sites-available/000-default.conf
+    ${VHOSTT}
 
     sudo a2enmod rewrite
     service apache2 restart
 
+    source /etc/profile
     cd /vagrant
     npm install
  
-    php composer.phar selfupdate
-    php composer.phar install
+    sudo composer self-update
+    composer install
     echo "create database if not exists miserend character set utf8 collate utf8_unicode_ci;" | mysql -u root --password="root"
-
-    php install.php
+    echo "create database if not exists miserend_testing character set utf8 collate utf8_unicode_ci;" | mysql -u root --password="root"
     
-    #mailcatcher --http-ip=0.0.0.0
+    php install.php
+    export MYSQL_MISEREND_DATABASE=miserend_staging
+    php install.php
+    export MYSQL_MISEREND_DATABASE=miserend
+    
+    /home/vagrant/.rbenv/shims/mailcatcher --http-ip=0.0.0.0
    SHELL
 end

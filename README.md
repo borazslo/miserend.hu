@@ -3,28 +3,23 @@ miserend.hu
 
 A miserend.hu teljes forrása a /kepek és /fajlok kivételével. [![Build Status](https://travis-ci.org/borazslo/miserend.hu.png)](https://travis-ci.org/borazslo/miserend.hu)
 
-Az adatbázis struktúrát a mysql_sample.sql tartalmazza, némi minta adattal együtt.
-(A minta adatok nem koherensek, így nem sokra használhatóak önmagukban. De fejlesztőknek szívesen adunk igazibb adatbázist.)
-
-##Előfeltétel
-- (L)AMP szerver: `sudo apt-get install apache2 php5`
- - Több helyen még kell a http://php.net/manual/en/language.basic-syntax.phptags.php
-- [Git telepítése](http://git-scm.com/book/en/Getting-Started-Installing-Git) és [beállítása](http://git-scm.com/book/en/Getting-Started-First-Time-Git-Setup). `sudo apt-get install git`
-- `sudo apt-get install php5-sqlite php5-mysql composer`
-- `sudo apt-get install npm`
-- `npm install`
-- `npm install -g bower`
-
 ##Telepítés
-- `git clone https://github.com/borazslo/miserend.hu.git`
-- MySQL elérhetőség megadása a `config.php`-ben vagy környezeti változóként (SetEnv/Export).
-- `composer selfupdate`
-- `composer install`
-- `php install.php` (Betölti a minta adatbázist. Létrehozza a hiányzó könyvtárakat.)
+A legegyszerűbb egy megfelelően konfigurált virtuális gépet telepíteni, így nem kell bajlódni LAMP/WAMP szerverekkel:
+- [VirtualBox](http://www.virtualbox.org/), [Vagrant](https://www.vagrantup.com/) és [GitHub Desktop](https://desktop.github.com/) telepítése.
+- A GitHub Desktopban ennek a forrásnak a [klónozása](https://help.github.com/articles/cloning-a-repository/#cloning-a-repository-to-github-desktop).
+- Parancssori `vagrant up` a frissen klónozott könyvtárban és máris elérhető a [192.168.33.10](http://192.168.33.10)
+
+##További segítség
+- A virtuális gép a http://192.168.33.10/ címen érhető el. 
+- SSH, mySQL, Mailcatcher, stb. eléréséhez valamint a virtuális gép irányításához lásd: [box.scotch.io](https://box.scotch.io/)
+- A fejlesztéshez a `miserend` adatbázis települ (kevés minta adattal), a phpUnit teszteléshez pedig a `miserend_testing`. (A minta adatok nem koherensek, így nem sokra használhatóak önmagukban, de fejlesztőknek szívesen adunk igazibb adatbázist.)
+- [NetBeans](https://netbeans.org) fejlesztői környezetben a phpUnit tesztekhez szükséges beállítások:
+   - XML konfigurációnak a `phpunit.xml`-t kell megadni.
+   - Egyéni scriptnek pedig a `phpunitOnVagrant.sh` fájlt. 
 
 ## Néhány vegyes gondolat
 - continuous deployment van, azaz:
-    - push után a travis-mc.org/borazslo/miserend.hu
+    - push után a http://travis-mc.org/borazslo/miserend.hu
         - letölti a függőségeket
         - létrehozza az adatbázist és feltölti a minta adatokkal
         - lefuttatja a teszteket
@@ -37,4 +32,3 @@ Az adatbázis struktúrát a mysql_sample.sql tartalmazza, némi minta adattal e
 ##Mappákról
 - Létrehozandó: /kepek; /kepek/templomok
 - Létrehozandó: /fajlok/igenaptar; /fajlok/sqlite; /fajlok/staticmaps; /fajlok/tmp
-- Törölhető a /terkep mappa. Az egykori terkep.miserend.hu teljes, de nem működő anyaga.
