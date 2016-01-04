@@ -160,16 +160,16 @@ class Catalogue extends \Html\Html {
 
         if ($sort == 'e.datum DESC' OR $wallapot != '') {
             $query .= "
-		LEFT JOIN eszrevetelek as e ON e.id = ( 
-			SELECT id  FROM eszrevetelek as e1
-				WHERE " . $wallapot . " e1.hol_id = t.id
+		LEFT JOIN remarks as e ON e.id = ( 
+			SELECT id  FROM remarks as e1
+				WHERE " . $wallapot . " e1.church_id = t.id
 	 			ORDER BY CASE `allapot`
 	     				WHEN 'u' THEN 1
 	     				WHEN 'f' THEN 2
 	     				WHEN 'j' THEN 3
-	     				END, datum DESC 
+	     				END, created_at DESC 
 			 	LIMIT 1
-			) AND e.hol_id = t.id 
+			) AND e.church_id = t.id 
 		";
         }
 
