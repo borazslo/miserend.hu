@@ -1,0 +1,22 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Kapcsolat - elérhetőség' %}
+{% set panel = 'primary' %}
+
+{% block body %}
+    <div style="width: 230px;white-space: nowrap;overflow: hidden;o-text-overflow: ellipsis;text-overflow: ellipsis;">        
+        {% if religious_administration.parish.description %}
+            {{ religious_administration.parish.description|raw|nl2br }}<br/>
+        {% endif %}
+        {% if religious_administration.parish.email %}
+            Email: <a href='mailto:{{ religious_administration.parish.email }}' class=link>{{ religious_administration.parish.email }}</a><br/>
+        {% endif %}
+        {% if religious_administration.parish.url %}
+            Honlap: <a href='{{ religious_administration.parish.url }}' class=link>{{ religious_administration.parish.url }}</a>
+        {% endif %}        
+    </div>    
+{% endblock %}
+
+{% macro osmlink(osm,title = false) %}
+    <a href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>
+{% endmacro %}

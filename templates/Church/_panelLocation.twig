@@ -1,0 +1,43 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Megközelítés' %}
+
+{% if location.osm is not null %}
+    {% set panel = 'primary' %}
+{% endif %}    
+
+{% block body %}
+    <span class=alap>
+        {% if osm.administrative and user.loggedin %}
+            {% for key,administraion in osm.administrative %}
+                > {{ _self.osmlink(administraion) }} <br/>
+            {% endfor %}
+        {% endif %}        
+        {{ location.varos }}, {{ location.cim }}
+    </span><br/>
+    {% if osm is not null %}
+        <span class=alap>            
+            <i>Térképen: </i>
+            <u><a href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}">
+                    {{ osm.lat|number_format(6, '.') }}, {{ osm.lon|number_format(6, '.') }}
+            </a></u>                
+        </span>
+    {% elseif location.lat %}
+        <span class=alap>
+            <i>Térképen: </i>
+            <u><a href="http://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.lon }}#map=19/{{ location.lat }}/{{ location.lon }}">
+                    {{ location.lat }}, {{ location.lon }}
+                </a></u>
+        </span>
+    {% else %}
+        <span class=alap>
+            <strong>Segíts megtalálni a térképen!</strong>
+        </span>        
+    {% endif %}
+    <br/>
+    {{ megkozelites|raw|nl2br }}     
+{% endblock %}    
+
+{% macro osmlink(osm,title = false) %}
+    <a href="/collection/{{ osm.osmtype }}:{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>
+{% endmacro %}

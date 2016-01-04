@@ -11,9 +11,9 @@
   "dependencies": {
     "jquery": ">=2",
     "jquery-ui": ">=1.11",
-    "bootstrap": "3.2.x",
     "requirejs": "2.1.11",
-    "jquery-colorbox" : "1.5.*",
-    "bootstrap" : "3.3.*"
+    "jquery-colorbox": "1.5.*",
+    "bootstrap": "3.3.*",
+    "bootstrap-datepicker": ">=1.5"
   }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class User {
 
     function __construct($uid = false) {
@@ -16,6 +18,7 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
+                if ($this->checkRole('miserend')) { $this->isadmin = true;}
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -36,6 +39,7 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
+                if ($this->checkRole('miserend')) { $this->isadmin = true;}
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -63,6 +67,7 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
+                if ($this->checkRole('miserend')) { $this->isadmin = true;}
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, hogy nincs uid-jű user. Legyen vendég?
@@ -122,9 +127,9 @@ class User {
         else
             $datum = '';
 
-        $query = "SELECT id FROM eszrevetelek WHERE 
+        $query = "SELECT id FROM remarks WHERE 
 				(login = '" . $this->username . "' OR email = '" . $this->email . "') 
-				" . $datum . " ORDER BY datum desc";
+				" . $datum . " ORDER BY created_at desc";
         $result = mysql_query($query);
         $this->remarksCount = mysql_num_rows($result);
         $query .= " LIMIT " . $limit . ";";
@@ -273,10 +278,12 @@ class User {
             else
                 return false;
         } elseif ($key == 'email') {
-            if (!filter_var($val, FILTER_VALIDATE_EMAIL))
+            if (!filter_var($val, FILTER_VALIDATE_EMAIL)) {
                 return false;
-
-            //TODO: dupla email címeket kiszűrni
+            }
+            if ($this->isEmailInUse($val)) {
+                return false;
+            }
             $this->presaved[$key] = $val;
         } else
             return false;
@@ -379,7 +386,7 @@ class User {
 	    	WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = " . $this->uid . "
 	    	ORDER BY nev;");
         while ($row = mysql_fetch_row($results, MYSQL_ASSOC)) {
-            $row['li'] = "<a class='link' href='?templom=" . $row['tid'] . "'>" . $row['nev'];
+            $row['li'] = "<a class='link' href='/templom/" . $row['tid'] . "'>" . $row['nev'];
             if ($row['ismertnev'] != '')
                 $row['li'] .= " (" . $row['ismertnev'] . ")";
             $row['li'] .= "</a>, " . $row['varos'];
@@ -389,6 +396,18 @@ class User {
         $this->favorites = $favorites;
         return $favorites;
     }
+    
+    function checkFavorite($tid) {
+        if (!$this->favorites) {
+            $this->getFavorites();
+        }
+        foreach ($this->favorites as $favorite) {
+            if ($favorite['tid'] == $tid) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     function addFavorites($tids) {
         if (!is_array($tids))
@@ -397,8 +416,8 @@ class User {
             if (!is_numeric($tid))
                 return false;
         }
-        foreach ($tids as $key => $tid) {
-            if (getChurch($tid) == array())
+        foreach ($tids as $key => $tid) {                        
+            if (!\Eloquent\Church::find($tid))
                 unset($tids[$key]);
         }
 
@@ -432,6 +451,18 @@ class User {
         if (mysql_query($query))
             return true;
         else
+            return false;
+    }
+    
+    function isEmailInUse($val) {
+        $result = DB::table('user')
+                ->select('email')
+                ->where('email', $val)
+                ->limit(1)
+                ->get();
+        if (count($result)) {
+            return true;
+        } else
             return false;
     }
 

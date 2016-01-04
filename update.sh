@@ -5,4 +5,3 @@ git checkout $branch
 git reset HEAD --hard
 git pull origin $branch
 php composer.phar install
-php migration.php

@@ -91,7 +91,7 @@ class Report extends Api {
             }
             $this->remark->text .= "<i>, adatbázis: " . date("Y-m-d H:i", $this->input['dbdate']) . "</i>";
 
-            $church = new \Church($this->remark->tid);
+            $church = \Eloquent\Church::find($this->remark->tid)->toArray();
             $updated = strtotime($church->frissites);
             if ($this->input['dbdate'] < $updated) {
                 $this->remark->text .= "\n\n<strong>Figyelem! Elavult adatok alapján történt a bejelentés!</strong>";

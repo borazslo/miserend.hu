@@ -1,5 +1,32 @@
 $(document).ready(function() {
 
+    $('#selectEgyhazmegye').on('change', function() {
+        $('.selectEspereskeruletDiocese').hide();
+        $('.selectEspereskeruletDiocese').attr('disabled','disabled');
+        $('#selectEspereskeruletDiocese' + this.value ).show();
+        $('#selectEspereskeruletDiocese' + this.value ).removeAttr('disabled')
+    });
+
+    $('#selectOrszag').on('change', function() {
+        $('.selectMegyeCountry').hide();
+        $('.selectMegyeCountry').attr('disabled','disabled');
+        $('#selectMegyeCountry' + this.value ).show();
+        $('#selectMegyeCountry' + this.value ).removeAttr('disabled')
+        
+        $('.selectVarosCounty').hide();
+        $('.selectVarosCounty').attr('disabled','disabled');
+        $('#selectVarosCounty' + $(this).val() + "-" + $('#selectMegyeCountry' + this.value ).val() ).show();
+        $('#selectVarosCounty' + $(this).val() + "-" + $('#selectMegyeCountry' + this.value ).val() ).removeAttr('disabled')
+    });
+
+    $('.selectMegyeCountry').on('change', function() {
+        $('.selectVarosCounty').hide();
+        $('.selectVarosCounty').attr('disabled','disabled');
+        
+        $('#selectVarosCounty' + $(this).attr('data') + "-" + $(this).val() ).show();
+        $('#selectVarosCounty' + $(this).attr('data') + "-" + $(this).val() ).removeAttr('disabled');
+    });
+
   $(document).on('click','a.ajax',function(){
     console.log('click');
     var ezez = $(this);
@@ -21,11 +48,8 @@ $(document).ready(function() {
   $(document).on('click','#quit',function(){
     console.log('click');
       $.ajax({
-            url: "ajax.php",
-            dataType: "text",
-            data: {
-              q: 'Exit',
-            },
+            url: "/ajax/logout",
+            dataType: "text",            
             success: function( data ) {
               location.reload();
             },
@@ -102,10 +126,9 @@ $(document).ready(function() {
     $('#username').on('input', function() { 
 
         $.ajax({
-            url: "ajax.php",
+            url: "/ajax/checkusername",
             dataType: "text",
             data: {
-              q: 'CheckUsername',
               text: this.value
             },
             success: function( data ) {
@@ -129,16 +152,47 @@ $(document).ready(function() {
       });
 
        
-      
+   $("#keyword").autocomplete({
+        source: function( request, response ) {
+          $.ajax({
+            url: "/ajax/AutocompleteKeyword",
+            dataType: "JSON",
+            data: {
+              text: request.term
+            },
+            success: function( data ) {
+              //console.log(data);
+              //console.log('ok');              
+              response( 
+                $.map( data.results, function( item ) {
+                return {
+                      label: item.label,
+                      value: item.value
+                  }
+              }));
+            } ,
+            error: function( data ) {
+              console.log(data);
+              //console.log('1err');
+            }
+          });
+        },
+        minLength: 2,
+       }).each(function() {
+          $(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+              return $("<li></li>").data("item.ui-autocomplete", item).append(
+              item.label)
+              .appendTo(ul);
+          };
+      });    
 
 
    $("#varos").autocomplete({
         source: function( request, response ) {
           $.ajax({
-            url: "ajax.php",
+            url: "/ajax/AutocompleteCity",
             dataType: "JSON",
             data: {
-              q: 'AutocompleteCity',
               text: request.term
             },
             success: function( data ) {
@@ -186,7 +240,7 @@ $(document).ready(function() {
 
     $.ajax({
        type:"POST",
-       url:"ajax.php?q=Favorite",
+       url:"/ajax/favorite",
        data:"tid="+tid+"&method="+method,
        success:function(response){
           $("#star").toggleClass("grey yellow");          
@@ -219,7 +273,7 @@ $(document).ready(function() {
 
       $.ajax({
              type:"POST",
-             url:"ajax.php?q=SwitchReliable",
+             url:"/ajax/switchreliable",
              data:"rid="+rid+"&reliable="+reliable,
              success:function(response){
               console.log(response);
@@ -256,11 +310,5 @@ $(document).ready(function() {
             }, 
         });        
   
-
-
-
-
- 
-
 /* */
 });

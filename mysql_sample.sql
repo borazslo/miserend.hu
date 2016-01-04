@@ -45,39 +45,45 @@ INSERT INTO `chat` VALUES (2,'2013-01-04 11:27:41','bela','jeno','A letölthető
 UNLOCK TABLES;
 
 --
--- Table structure for table `distance`
+-- Table structure for table `distances`
 --
 
-DROP TABLE IF EXISTS `distance`;
+DROP TABLE IF EXISTS `distances`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `distance` (
-  `tid1` int(11) NOT NULL,
-  `tid2` int(11) NOT NULL,
-  `distance` float DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
+CREATE TABLE `distances` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `church_from` int(11) NOT NULL,
+  `church_to` int(11) NOT NULL,
+  `distance` float NOT NULL,
   `toupdate` int(11) DEFAULT NULL,
-  UNIQUE KEY `pair` (`tid1`,`tid2`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tid1` (`church_from`,`church_to`),
+  KEY `FK_to_idx` (`church_to`),
+  CONSTRAINT `FK_from` FOREIGN KEY (`church_from`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_to` FOREIGN KEY (`church_to`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=66224 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `distance`
+-- Dumping data for table `distances`
 --
 
-LOCK TABLES `distance` WRITE;
-/*!40000 ALTER TABLE `distance` DISABLE KEYS */;
-INSERT INTO `distance` VALUES (1,2,21065.3,'2015-02-18 23:54:40',1);
-INSERT INTO `distance` VALUES (1,3,100727,'2015-02-18 23:56:05',1);
-INSERT INTO `distance` VALUES (1,7,105922,'2015-02-18 23:56:04',1);
-INSERT INTO `distance` VALUES (1,14,12506.2,'2015-02-18 23:52:51',1);
-INSERT INTO `distance` VALUES (1,35,19876.7,'2015-02-18 23:54:57',1);
-INSERT INTO `distance` VALUES (1,36,19357.6,'2015-02-18 23:53:50',1);
-INSERT INTO `distance` VALUES (1,37,18533.3,'2015-02-18 23:53:50',1);
-INSERT INTO `distance` VALUES (1,38,19495.9,'2015-02-18 23:54:14',1);
-INSERT INTO `distance` VALUES (1,102,72869.3,'2015-02-18 23:56:04',NULL);
-INSERT INTO `distance` VALUES (1,114,1499.9,'2015-02-19 00:03:55',NULL);
-/*!40000 ALTER TABLE `distance` ENABLE KEYS */;
+LOCK TABLES `distances` WRITE;
+/*!40000 ALTER TABLE `distances` DISABLE KEYS */;
+INSERT INTO `distances` VALUES (1,1,2,21065.3,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (2,1,3,100727,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (3,1,7,105922,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (4,1,14,12506.2,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (5,1,35,19876.7,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (6,1,36,19357.6,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (7,1,37,18533.3,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (8,1,38,19495.9,1,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (9,1,102,72869.3,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `distances` VALUES (10,1,114,1499.9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+/*!40000 ALTER TABLE `distances` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -375,84 +381,90 @@ INSERT INTO `espereskerulet` VALUES (234,33,'Egyéb');
 UNLOCK TABLES;
 
 --
--- Table structure for table `eszrevetelek`
+-- Table structure for table `remarks`
 --
 
-DROP TABLE IF EXISTS `eszrevetelek`;
+DROP TABLE IF EXISTS `remarks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `eszrevetelek` (
+CREATE TABLE `remarks` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `nev` varchar(50) NOT NULL DEFAULT '',
   `login` varchar(20) NOT NULL DEFAULT '',
   `email` varchar(50) NOT NULL DEFAULT '',
   `megbizhato` enum('?','i','n','e') NOT NULL DEFAULT '?',
-  `datum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `hol` varchar(20) NOT NULL DEFAULT '',
-  `hol_id` int(5) NOT NULL DEFAULT '0',
+  `church_id` int(11) NOT NULL DEFAULT '0',
   `allapot` enum('u','f','j') NOT NULL DEFAULT 'u',
   `admin` varchar(20) NOT NULL DEFAULT '',
   `admindatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `leiras` text NOT NULL,
-  `adminmegj` text NOT NULL,
-  `log` text NOT NULL,
+  `adminmegj` text,
+  `log` text,
+  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  KEY `index2` (`hol_id`,`allapot`,`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6930 DEFAULT CHARSET=utf8;
+  KEY `index2` (`id`,`church_id`,`allapot`),
+  KEY `index1` (`id`,`church_id`),
+  KEY `FK_church_id_idx` (`church_id`),
+  CONSTRAINT `FK_church_id` FOREIGN KEY (`church_id`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=8197 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `eszrevetelek`
+-- Dumping data for table `remarks`
 --
 
-LOCK TABLES `eszrevetelek` WRITE;
-/*!40000 ALTER TABLE `eszrevetelek` DISABLE KEYS */;
-INSERT INTO `eszrevetelek` VALUES (103,'Ólmos Nikolett','niki','valami@valami.hu','i','2015-04-16 13:17:26','templomok',644,'j','elem','2015-04-16 20:11:10','Dicsértessék a Jézus Krisztus!\r\n\r\nÉszrevételeim vannak. Fogadjátok szeretettel.','','');
-INSERT INTO `eszrevetelek` VALUES (102,'Bela','*vendeg*','belea@skocia.elemer','e','2015-04-16 11:08:16','templomok',125,'j','elem','2015-04-16 13:07:35','Sziasztok!\r\n A kápolna miserendjében van egy kis eltérés. Íme: xxxx stb.','<img src=img/edit.gif align=absmiddle title=\'elem (2015-04-16 13:03)\'> miserend küldés ','');
+LOCK TABLES `remarks` WRITE;
+/*!40000 ALTER TABLE `remarks` DISABLE KEYS */;
+INSERT INTO `remarks` VALUES (103,'Ólmos Nikolett','niki','valami@valami.hu','i','2015-04-16 13:17:26',644,'j','elem','Dicsértessék a Jézus Krisztus!\r\n\r\nÉszrevételeim vannak. Fogadjátok szeretettel.','','','2015-04-16 20:11:10','0000-00-00 00:00:00');
+INSERT INTO `remarks` VALUES (102,'Bela','*vendeg*','belea@skocia.elemer','e',125,'j','elem','2015-04-16 13:07:35','Sziasztok!\r\n A kápolna miserendjében van egy kis eltérés. Íme: xxxx stb.','<img src=img/edit.gif align=absmiddle title=\'elem (2015-04-16 13:03)\'> miserend küldés ','','2015-04-16 11:08:16','0000-00-00 00:00:00');
 UNLOCK TABLES;
 
 --
--- Table structure for table `kepek`
+-- Table structure for table `photos`
 --
 
-DROP TABLE IF EXISTS `kepek`;
+DROP TABLE IF EXISTS `photos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `kepek` (
+CREATE TABLE `photos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tid` int(11) DEFAULT NULL,
-  `fajlnev` varchar(100) NOT NULL DEFAULT '',
-  `felirat` varchar(250) NOT NULL DEFAULT '',
-  `sorszam` int(2) NOT NULL DEFAULT '0',
-  `kiemelt` enum('i','n') NOT NULL DEFAULT 'i',
+  `church_id` int(11) NOT NULL,
+  `filename` varchar(100) NOT NULL DEFAULT '',
+  `title` varchar(250) NOT NULL DEFAULT '',
+  `weight` int(2) NOT NULL DEFAULT '0',
+  `flag` enum('i','n') NOT NULL DEFAULT 'i',
   `height` int(11) DEFAULT NULL,
   `width` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  KEY `kiemelt` (`kiemelt`)
-) ENGINE=MyISAM AUTO_INCREMENT=21450 DEFAULT CHARSET=utf8;
+  KEY `church_id` (`church_id`),
+  CONSTRAINT `FKchurch` FOREIGN KEY (`church_id`) REFERENCES `templomok` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=23598 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `kepek`
+-- Dumping data for table `photos`
 --
 
-LOCK TABLES `kepek` WRITE;
-/*!40000 ALTER TABLE `kepek` DISABLE KEYS */;
-INSERT INTO `kepek` VALUES (23,19,'111_1143.jpg','A torony',0,'i',800,600);
-INSERT INTO `kepek` VALUES (24,20,'111_1147.jpg','',0,'i',800,600);
-INSERT INTO `kepek` VALUES (25,20,'111_1145.jpg','',0,'i',800,600);
-INSERT INTO `kepek` VALUES (22,19,'111_1129.jpg','A templom bejárata',0,'n',800,600);
-INSERT INTO `kepek` VALUES (27,23,'heviz2.jpg','Jézus Szíve Templom',0,'i',600,450);
-INSERT INTO `kepek` VALUES (26,22,'heviz.jpg','',0,'i',453,600);
-INSERT INTO `kepek` VALUES (31,28,'homokvar.jpg','homokvár',2,'i',NULL,NULL);
-INSERT INTO `kepek` VALUES (28,24,'alsopahok1.jpg','Szent Kereszt felmagasztalása templom',0,'i',333,250);
-INSERT INTO `kepek` VALUES (29,25,'gyeneshavas.jpg','',0,'i',320,400);
-INSERT INTO `kepek` VALUES (30,26,'gyenesilona.jpg','',0,'i',400,300);
-INSERT INTO `kepek` VALUES (20,17,'111_1104.jpg','A nagybácsai temlom tornya',0,'i',800,600);
-INSERT INTO `kepek` VALUES (21,17,'111_1117.jpg','A nagybácsai  templom a plébánia felől',0,'i',800,600);
-INSERT INTO `kepek` VALUES (19,17,'111_1101.jpg','Templombejárat',0,'n',800,600);
-INSERT INTO `kepek` VALUES (35,22,'heviz02.jpg','',0,'i',290,350);
-/*!40000 ALTER TABLE `kepek` ENABLE KEYS */;
+LOCK TABLES `photos` WRITE;
+/*!40000 ALTER TABLE `photos` DISABLE KEYS */;
+INSERT INTO `photos` VALUES (23,19,'111_1143.jpg','A torony',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (24,20,'111_1147.jpg','',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (25,20,'111_1145.jpg','',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (22,19,'111_1129.jpg','A templom bejárata',0,'n',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (27,23,'heviz2.jpg','Jézus Szíve Templom',0,'i',600,450,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (26,22,'heviz.jpg','',0,'i',453,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (31,28,'homokvar.jpg','homokvár',2,'i',NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (28,24,'alsopahok1.jpg','Szent Kereszt felmagasztalása templom',0,'i',333,250,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (29,25,'gyeneshavas.jpg','',0,'i',320,400,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (30,26,'gyenesilona.jpg','',0,'i',400,300,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (20,17,'111_1104.jpg','A nagybácsai temlom tornya',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (21,17,'111_1117.jpg','A nagybácsai  templom a plébánia felől',0,'i',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (19,17,'111_1101.jpg','Templombejárat',0,'n',800,600,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `photos` VALUES (35,22,'heviz02.jpg','',0,'i',290,350,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+/*!40000 ALTER TABLE `photos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -606,48 +618,6 @@ INSERT INTO `misek` VALUES (233185,5258,0,'09:00:00','','Húsvét',106,'Húsvét
 INSERT INTO `misek` VALUES (233186,5104,6,'16:00:00','ps','télen',1,'10-30','03-25','10-30','>','03-25','','','','borazslo','2015-02-08 20:28:20','0000-00-00 00:00:00','');
 INSERT INTO `misek` VALUES (233187,5104,7,'08:00:00','pt','télen',1,'10-30','03-25','10-30','>','03-25','','','','borazslo','2015-02-08 20:28:20','0000-00-00 00:00:00','');
 /*!40000 ALTER TABLE `misek` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `modulok`
---
-
-DROP TABLE IF EXISTS `modulok`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `modulok` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `nev` varchar(50) NOT NULL DEFAULT '',
-  `leiras` tinytext NOT NULL,
-  `fajlnev` varchar(50) NOT NULL DEFAULT '',
-  `sablon` varchar(20) NOT NULL DEFAULT 'alap',
-  `zart` int(1) NOT NULL DEFAULT '0',
-  `jogkod` varchar(50) NOT NULL DEFAULT '',
-  `szamlalo` int(11) NOT NULL DEFAULT '0',
-  `funkcio` enum('i','n') NOT NULL DEFAULT 'n',
-  `ok` enum('i','n') NOT NULL DEFAULT 'n',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `modulok`
---
-
-LOCK TABLES `modulok` WRITE;
-/*!40000 ALTER TABLE `modulok` DISABLE KEYS */;
-INSERT INTO `modulok` VALUES (25,'chat','','chat','aloldal',1,'',0,'n','i');
-INSERT INTO `modulok` VALUES (9,'admin','admin menü','admin','alap',1,'',0,'n','i');
-INSERT INTO `modulok` VALUES (17,'infó oldalak','','alap','alap',0,'',43094,'n','n');
-INSERT INTO `modulok` VALUES (21,'user admin','admin','admin_user','aloldal',1,'user',219,'n','i');
-INSERT INTO `modulok` VALUES (26,'miserend','','miserend','alap',0,'',0,'n','i');
-INSERT INTO `modulok` VALUES (27,'miserend admin','admin','admin_miserend','aloldal',1,'miserend',0,'n','i');
-INSERT INTO `modulok` VALUES (28,'regisztráció','','regisztracio','alap',0,'',0,'i','i');
-INSERT INTO `modulok` VALUES (29,'feltöltés','anyagok feltöltése (pl. miserend, hír) felhasználók által','feltoltes','aloldal',1,'',0,'n','i');
-INSERT INTO `modulok` VALUES (30,'igenaptár','','igenaptar','alap',0,'',0,'n','i');
-INSERT INTO `modulok` VALUES (31,'igenaptár admin','admin','admin_igenaptar','aloldal',1,'igenaptar',0,'n','i');
-INSERT INTO `modulok` VALUES (37,'Térkép','','terkep','alap',0,'',0,'i','i');
-/*!40000 ALTER TABLE `modulok` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -805,7 +775,7 @@ DROP TABLE IF EXISTS `templomok`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `templomok` (
-  `id` int(5) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nev` varchar(150) NOT NULL DEFAULT '',
   `ismertnev` varchar(150) NOT NULL DEFAULT '',
   `turistautak` int(5) NOT NULL DEFAULT '0',
@@ -840,13 +810,16 @@ CREATE TABLE `templomok` (
   `log` text NOT NULL,
   `ok` enum('i','n','f') NOT NULL DEFAULT 'i',
   `eszrevetel` enum('i','n','f') NOT NULL DEFAULT 'n',
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
   KEY `turistautak` (`turistautak`),
   KEY `id` (`id`),
   KEY `varos` (`varos`),
   KEY `ismertnev` (`ismertnev`),
   KEY `egyhazmegye` (`egyhazmegye`),
   KEY `espereskerulet` (`espereskerulet`)
-) ENGINE=MyISAM AUTO_INCREMENT=5259 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5259 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -855,8 +828,8 @@ CREATE TABLE `templomok` (
 
 LOCK TABLES `templomok` WRITE;
 /*!40000 ALTER TABLE `templomok` DISABLE KEYS */;
-INSERT INTO `templomok` VALUES (138,'Szent Anna templom','Szabadhegyi templom',0,12,8,'Győr','','Megközelíthető a Belvárosból a 19-es, 5-ös és 7-es helyi járattal.','<b>Plébánia:</b>\r\n9028 Győr, József Attila u. 46. \r\nTelefon: (xx) xxx-xxx','http://www.ember.emecclesia.hu','vanittvalaki@dehogy.hu',4,3,'<p><span class=\"alap\">Szabadhegy ősi település. 1200 körül m&aacute;r okiratok eml&iacute;tik Szabadi, illetve Szőllős néven. A h&iacute;vek kis sz&aacute;ma miatt azonban ön&aacute;ll&oacute; pléb&aacute;nia alak&iacute;t&aacute;s&aacute;t csak 1750 körül lehetett komolyan tervbe venni. 1743 &oacute;ta m&aacute;r rendszeresen j&aacute;rtak ki vas&aacute;rnapi istentiszteletre a székesegyh&aacute;zi k&aacute;pl&aacute;nok. 1787-ben megkezdték az egyh&aacute;zi anyakönyvezést a kij&aacute;r&oacute; belv&aacute;rosi k&aacute;pl&aacute;nok.<br />1789-ben egy &aacute;ldozatos szabadhegyi polg&aacute;r, Farkas M&aacute;rton végrendeletében minden vagyon&aacute;t a szabadhegyi pléb&aacute;nia alap&iacute;t&aacute;s&aacute;ra hagyta. Az 1994-ben elbontott pléb&aacute;nia az ő saj&aacute;t h&aacute;za volt. Az akkori templom - val&oacute;sz&iacute;nűleg csak kis k&aacute;poln&aacute;cska - m&aacute;r összeoml&oacute;ban volt. 1800 t&aacute;j&aacute;n épült a m&aacute;sodik szabadhegyi templom a mostani pléb&aacute;nia udvar&aacute;n. Fafedeles templom volt, torony csak később épült hozz&aacute;, amikor a szabadhegyiek saj&aacute;t erejükből 2 harangot szereztek bele.<br />A megnövekedett léleksz&aacute;mnak egyre szűkebb templom m&aacute;r düledezőben volt, amikor Kosty&aacute;n Mih&aacute;ly pléb&aacute;nos a jelenlegi templom ép&iacute;tését megkezdte. Az ép&iacute;tésnél a v&aacute;ros is sokat seg&iacute;tett, de a fő terhet a szabadhegyi h&iacute;vek v&aacute;llalt&aacute;k.<br />A mai templomot 1903. j&uacute;nius 7-én szentelték fel, Szent Anna tiszteletére.<br />A két vil&aacute;gh&aacute;bor&uacute; között Szabadhegy teljesen összeépült Győrrel. A pléb&aacute;nia területe jelenleg a p&aacute;pai vas&uacute;tvonalt&oacute;l délre eső v&aacute;rosrész, Kismegyer kivételével.<br />A II. vil&aacute;gh&aacute;bor&uacute;ban a templom sokat szenvedett, a tornyot is tal&aacute;lat érte. A h&aacute;bor&uacute;s k&aacute;rokat Haller J&aacute;nos pléb&aacute;nos gondoss&aacute;ga &aacute;ll&iacute;totta helyre. A templom k&iacute;vülről és belülről is meg&uacute;jult. A templom belsejét Samodai J&oacute;zsef festőművész 5 fresk&oacute;ja d&iacute;sz&iacute;ti. A templom belső fel&uacute;j&iacute;t&aacute;sa 2002-ben készült el, j&oacute; lelkű adakoz&oacute;k és t&aacute;mogat&oacute;k j&oacute;volt&aacute;b&oacute;l.<br />A templom jubileum&aacute;ra, 2003. j&uacute;nius&aacute;ra a templom szentélye is meg&uacute;jult: az &uacute;j liturgikus térbe &uacute;j szembemiséző olt&aacute;r készült, korszerűs&iacute;tették a templom vil&aacute;g&iacute;t&aacute;s&aacute;t és elkészültek a templom sz&iacute;nes üvegablakai is.</span>&nbsp;</p>','Templom védőszentje: Szent Anna\r\nBúcsúnapja Szent Anna ünnepe (július 26.), július utolsó vasárnapja',1,'Elsőpénteken és a nagyböjt péntekjein a szentmise 18,00-kor van.\r\nAdvent hétköznapjain a szentmise reggel 6,00-kor van.\r\n<b>Imaórák</b>\r\nMinden hónap első vasárnapján 17,00-től 18,00-ig rózsafüzéres imaóra.\r\nMinden hónap második csütörtökén egésznapos szentségimádás:\r\nreggel 8,00-kor szentmise és szentségkitétel,\r\nnapközben egyéni szentségimádás,\r\n17,00-től 18,00-ig közös imaóra, a végén szentségeltétel, szentmise.\r\n\r\nGyóntatás\r\nMinden nap a szentmisék előtti félórában.\r\n\r\nÉvi szentségimádási nap: január 10.\r\nFebruártól decemberi minden hónap 2. csütörtökön egésznapos szentségimádást tartunk.\r\nNagyböjtben minden pénteken este 17.30-kor keresztút.\r\nMájusban és októberben minden este 17.30-kor litánia és rózsafüzér.\r\nAdventben hétfőtől péntekig a szentmise reggel 6.00-kor, hajnali mise.\r\nMinden hónap 1. és 3. hétfőjén, este 19.00-kor hitünk kérdéseiről beszélgetünk a plébánián.','307','307,385,945,5035,382,136,134,139,117,3755,135,','','2014-07-01','2014-08-31','2010-06-17','Piroska Sándor','vala@masik.hu','','modly','n','2006-02-17 14:10:03','verem','2010-06-17 11:25:14','Add: verem (2006-02-17 14:10:03)\nMod: verem (2006-02-17 14:10:16)','i','n');
-INSERT INTO `templomok` VALUES (139,'Loyolai Szent Ignác-templom','Bencés templom',0,12,8,'Győr','','','<b>Plébánia:</b><br>9022 Győr\r\nSzéchenyi tér 9. \r\nTelefon: (xx) xx-xxx \r\n','','',15,146,'<p class=\"p-kopf alap\">A bencések kora barokk temploma 1634-1641 között épült Baccio de Bianco tervei <span class=\"alap\">szerint. Főhajóját 1783-ban az érett barokk stílusában alakították át, ezt a stílust képviseli a teljes berendezés és a falképek is. </span></p> <p class=\"alap\">A város neves temploma, a Szent Ignác-templom a bencés (eredetileg jezsuita) rendház és a gimnázium közé ékelődve kéttornyú barokk homlokzatát mutatja a Széchenyi téren álló szemlélőnek. A templomban az oldalkápolnákat és a főhajót szemlélve a barokk változását, gazdagságát kísérhetjük nyomon a XVII. századi egyszerűbbtől a XVIII. századi érett, burjánzó barokkig. A hat oldalkápolna mindegyikét egy-egy szent tiszteletére ajánlották. Szép stukkókeretben szerényebb képek díszítik az oltárok fölötti falakat. </p>  <p>A monumentális főoltárt mesterek sora készítette, közülük kiemelkedik a Szent Ignác megdicsőülése oltárképet festő Paul Troger. Ő készítette a boltozat mennyezetképeit 1744-1747 között, amelyek Szent Ignác mennybevitelét és az angyali üdvözletet ábrázolják. A boltsüveg ívrészein a négy evangélista és a négy próféta képét láthatjuk. Közülük az egyiknek (Szent Lukács) az arca a festő arcát mintázza. A falak szépségével harmonizál a templom egész berendezése: a freskókkal egy időben készült szószék, a jezsuita fráterek készítette padok sora, a gazdag figurális díszekkel ékes szentélyajtó, az orgona és az áttört karzatrács. </p>','',1,'<b>Időszaki miserendi változások</b>\r\nIskolai szünnapokon és szünidőben 5,45 helyett 6,45-kor kezdődnek hétköznap reggel a szentmisék.\r\nÁprilistól októberig a szombat esti szentmisék 19,00-kor kezdődnek.\r\n\r\nHétköznap 5:45 (6:45) Laudes és szentmise\r\nVasárnap 7:30-tól Laudes, 18:30-ól vesperás\r\nA szerzetesközösség reggeli és esti imája nyitott a híveknek.\r\n\r\nNagycsütörtök: 18.00 Az utolsó vacsora ünneplése, 22 óráig szentségimádás\r\nNagypéntek: 15. 00 keresztút a templomban, 18.00 Jézus halálának ünneplése\r\nNagyszombat: 21.30 Húsvét vigíliája\r\nHúsvét vasárnap: 8.00 és 9.30 és 19.00 Szentmisék\r\nHúsvét hétfő: 8.00 és 9.30 kor szentmisék\r\n','117','117,116,135,3755,388,118,386,387,136,5242,382,','','2014-06-16','2014-08-31','2014-07-03','','','','muki','i','2006-02-17 14:12:51','ember','2014-03-25 19:27:34','Add: de sok log van itten','i','n');
+INSERT INTO `templomok` VALUES (138,'Szent Anna templom','Szabadhegyi templom',0,12,8,'Győr','','Megközelíthető a Belvárosból a 19-es, 5-ös és 7-es helyi járattal.','<b>Plébánia:</b>\r\n9028 Győr, József Attila u. 46. \r\nTelefon: (xx) xxx-xxx','http://www.ember.emecclesia.hu','vanittvalaki@dehogy.hu',4,3,'<p><span class=\"alap\">Szabadhegy ősi település. 1200 körül m&aacute;r okiratok eml&iacute;tik Szabadi, illetve Szőllős néven. A h&iacute;vek kis sz&aacute;ma miatt azonban ön&aacute;ll&oacute; pléb&aacute;nia alak&iacute;t&aacute;s&aacute;t csak 1750 körül lehetett komolyan tervbe venni. 1743 &oacute;ta m&aacute;r rendszeresen j&aacute;rtak ki vas&aacute;rnapi istentiszteletre a székesegyh&aacute;zi k&aacute;pl&aacute;nok. 1787-ben megkezdték az egyh&aacute;zi anyakönyvezést a kij&aacute;r&oacute; belv&aacute;rosi k&aacute;pl&aacute;nok.<br />1789-ben egy &aacute;ldozatos szabadhegyi polg&aacute;r, Farkas M&aacute;rton végrendeletében minden vagyon&aacute;t a szabadhegyi pléb&aacute;nia alap&iacute;t&aacute;s&aacute;ra hagyta. Az 1994-ben elbontott pléb&aacute;nia az ő saj&aacute;t h&aacute;za volt. Az akkori templom - val&oacute;sz&iacute;nűleg csak kis k&aacute;poln&aacute;cska - m&aacute;r összeoml&oacute;ban volt. 1800 t&aacute;j&aacute;n épült a m&aacute;sodik szabadhegyi templom a mostani pléb&aacute;nia udvar&aacute;n. Fafedeles templom volt, torony csak később épült hozz&aacute;, amikor a szabadhegyiek saj&aacute;t erejükből 2 harangot szereztek bele.<br />A megnövekedett léleksz&aacute;mnak egyre szűkebb templom m&aacute;r düledezőben volt, amikor Kosty&aacute;n Mih&aacute;ly pléb&aacute;nos a jelenlegi templom ép&iacute;tését megkezdte. Az ép&iacute;tésnél a v&aacute;ros is sokat seg&iacute;tett, de a fő terhet a szabadhegyi h&iacute;vek v&aacute;llalt&aacute;k.<br />A mai templomot 1903. j&uacute;nius 7-én szentelték fel, Szent Anna tiszteletére.<br />A két vil&aacute;gh&aacute;bor&uacute; között Szabadhegy teljesen összeépült Győrrel. A pléb&aacute;nia területe jelenleg a p&aacute;pai vas&uacute;tvonalt&oacute;l délre eső v&aacute;rosrész, Kismegyer kivételével.<br />A II. vil&aacute;gh&aacute;bor&uacute;ban a templom sokat szenvedett, a tornyot is tal&aacute;lat érte. A h&aacute;bor&uacute;s k&aacute;rokat Haller J&aacute;nos pléb&aacute;nos gondoss&aacute;ga &aacute;ll&iacute;totta helyre. A templom k&iacute;vülről és belülről is meg&uacute;jult. A templom belsejét Samodai J&oacute;zsef festőművész 5 fresk&oacute;ja d&iacute;sz&iacute;ti. A templom belső fel&uacute;j&iacute;t&aacute;sa 2002-ben készült el, j&oacute; lelkű adakoz&oacute;k és t&aacute;mogat&oacute;k j&oacute;volt&aacute;b&oacute;l.<br />A templom jubileum&aacute;ra, 2003. j&uacute;nius&aacute;ra a templom szentélye is meg&uacute;jult: az &uacute;j liturgikus térbe &uacute;j szembemiséző olt&aacute;r készült, korszerűs&iacute;tették a templom vil&aacute;g&iacute;t&aacute;s&aacute;t és elkészültek a templom sz&iacute;nes üvegablakai is.</span>&nbsp;</p>','Templom védőszentje: Szent Anna\r\nBúcsúnapja Szent Anna ünnepe (július 26.), július utolsó vasárnapja',1,'Elsőpénteken és a nagyböjt péntekjein a szentmise 18,00-kor van.\r\nAdvent hétköznapjain a szentmise reggel 6,00-kor van.\r\n<b>Imaórák</b>\r\nMinden hónap első vasárnapján 17,00-től 18,00-ig rózsafüzéres imaóra.\r\nMinden hónap második csütörtökén egésznapos szentségimádás:\r\nreggel 8,00-kor szentmise és szentségkitétel,\r\nnapközben egyéni szentségimádás,\r\n17,00-től 18,00-ig közös imaóra, a végén szentségeltétel, szentmise.\r\n\r\nGyóntatás\r\nMinden nap a szentmisék előtti félórában.\r\n\r\nÉvi szentségimádási nap: január 10.\r\nFebruártól decemberi minden hónap 2. csütörtökön egésznapos szentségimádást tartunk.\r\nNagyböjtben minden pénteken este 17.30-kor keresztút.\r\nMájusban és októberben minden este 17.30-kor litánia és rózsafüzér.\r\nAdventben hétfőtől péntekig a szentmise reggel 6.00-kor, hajnali mise.\r\nMinden hónap 1. és 3. hétfőjén, este 19.00-kor hitünk kérdéseiről beszélgetünk a plébánián.','307','307,385,945,5035,382,136,134,139,117,3755,135,','','2014-07-01','2014-08-31','2010-06-17','Piroska Sándor','vala@masik.hu','','modly','n','2006-02-17 14:10:03','verem','2010-06-17 11:25:14','Add: verem (2006-02-17 14:10:03)\nMod: verem (2006-02-17 14:10:16)','i','n','0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `templomok` VALUES (139,'Loyolai Szent Ignác-templom','Bencés templom',0,12,8,'Győr','','','<b>Plébánia:</b><br>9022 Győr\r\nSzéchenyi tér 9. \r\nTelefon: (xx) xx-xxx \r\n','','',15,146,'<p class=\"p-kopf alap\">A bencések kora barokk temploma 1634-1641 között épült Baccio de Bianco tervei <span class=\"alap\">szerint. Főhajóját 1783-ban az érett barokk stílusában alakították át, ezt a stílust képviseli a teljes berendezés és a falképek is. </span></p> <p class=\"alap\">A város neves temploma, a Szent Ignác-templom a bencés (eredetileg jezsuita) rendház és a gimnázium közé ékelődve kéttornyú barokk homlokzatát mutatja a Széchenyi téren álló szemlélőnek. A templomban az oldalkápolnákat és a főhajót szemlélve a barokk változását, gazdagságát kísérhetjük nyomon a XVII. századi egyszerűbbtől a XVIII. századi érett, burjánzó barokkig. A hat oldalkápolna mindegyikét egy-egy szent tiszteletére ajánlották. Szép stukkókeretben szerényebb képek díszítik az oltárok fölötti falakat. </p>  <p>A monumentális főoltárt mesterek sora készítette, közülük kiemelkedik a Szent Ignác megdicsőülése oltárképet festő Paul Troger. Ő készítette a boltozat mennyezetképeit 1744-1747 között, amelyek Szent Ignác mennybevitelét és az angyali üdvözletet ábrázolják. A boltsüveg ívrészein a négy evangélista és a négy próféta képét láthatjuk. Közülük az egyiknek (Szent Lukács) az arca a festő arcát mintázza. A falak szépségével harmonizál a templom egész berendezése: a freskókkal egy időben készült szószék, a jezsuita fráterek készítette padok sora, a gazdag figurális díszekkel ékes szentélyajtó, az orgona és az áttört karzatrács. </p>','',1,'<b>Időszaki miserendi változások</b>\r\nIskolai szünnapokon és szünidőben 5,45 helyett 6,45-kor kezdődnek hétköznap reggel a szentmisék.\r\nÁprilistól októberig a szombat esti szentmisék 19,00-kor kezdődnek.\r\n\r\nHétköznap 5:45 (6:45) Laudes és szentmise\r\nVasárnap 7:30-tól Laudes, 18:30-ól vesperás\r\nA szerzetesközösség reggeli és esti imája nyitott a híveknek.\r\n\r\nNagycsütörtök: 18.00 Az utolsó vacsora ünneplése, 22 óráig szentségimádás\r\nNagypéntek: 15. 00 keresztút a templomban, 18.00 Jézus halálának ünneplése\r\nNagyszombat: 21.30 Húsvét vigíliája\r\nHúsvét vasárnap: 8.00 és 9.30 és 19.00 Szentmisék\r\nHúsvét hétfő: 8.00 és 9.30 kor szentmisék\r\n','117','117,116,135,3755,388,118,386,387,136,5242,382,','','2014-06-16','2014-08-31','2014-07-03','','','','muki','i','2006-02-17 14:12:51','ember','2014-03-25 19:27:34','Add: de sok log van itten','i','n','0000-00-00 00:00:00','0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `templomok` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -4823,12 +4796,16 @@ DROP TABLE IF EXISTS `osm`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `osm` (
-  `tid` int(11) NOT NULL,
-  `id` varchar(11) NOT NULL,
-  `type` varchar(9) NOT NULL,
-  PRIMARY KEY (`tid`),
-  UNIQUE KEY `id_UNIQUE` (`tid`,`id`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `osmid` varchar(11) NOT NULL,
+  `osmtype` varchar(9) NOT NULL,
+  `lon` decimal(10,8) DEFAULT NULL,
+  `lat` decimal(11,8) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`osmid`,`osmtype`)
+) ENGINE=InnoDB AUTO_INCREMENT=4075 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4852,19 +4829,26 @@ CREATE TABLE `tokens` (
 
 
 --
--- Table structure for table `osm_tags`
+-- Table structure for table `osmtags`
 --
 
-DROP TABLE IF EXISTS `osm_tags`;
+DROP TABLE IF EXISTS `osmtags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `osm_tags` (
-  `type` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
-  `id` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
-  `name` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `value` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
-  UNIQUE KEY `valami` (`id`,`name`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `osmtags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `osm_id` int(11) NOT NULL,
+  `name` varchar(45) CHARACTER SET utf8 NOT NULL,
+  `value` varchar(200) CHARACTER SET utf8 DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `unique` (`osm_id`,`name`),
+  KEY `index_name` (`name`),
+  KEY `index_value` (`value`),
+  KEY `index_name_value` (`name`,`value`),
+  CONSTRAINT `FK_osm_id` FOREIGN KEY (`osm_id`) REFERENCES `osm` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=20816 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4940,7 +4924,7 @@ DROP TABLE IF EXISTS `emails`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `emails` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
   `to` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `header` text COLLATE utf8_unicode_ci,
   `subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -4978,6 +4962,78 @@ INSERT INTO `events` VALUES (1,'utolsó tanítási nap','2014','2014-06-01'),(2,
 /*!40000 ALTER TABLE `events` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+DROP TABLE IF EXISTS `lookup_church_osm`;
+CREATE TABLE `lookup_church_osm` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `church_id` INT(11) NOT NULL,
+  `osm_id` INT(11) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`));
+ALTER TABLE `lookup_church_osm` 
+ADD INDEX `FK_church_id_idx` (`church_id` ASC),
+ADD INDEX `FK_osm_id_idx` (`osm_id` ASC);
+ALTER TABLE `lookup_church_osm` 
+ADD CONSTRAINT `FK_lookup_church_osm_osm_id`
+  FOREIGN KEY (`osm_id`)
+  REFERENCES `osm` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE NO ACTION;
+ALTER TABLE `lookup_church_osm` 
+ADD UNIQUE INDEX `unique` (`church_id` ASC, `osm_id` ASC);
+
+DROP TABLE IF EXISTS `lookup_osm_enclosed`;
+CREATE TABLE `lookup_osm_enclosed` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `osm_id` INT(11) NOT NULL,
+  `enclosing_id` INT(11) NOT NULL,
+  `created_at` VARCHAR(45) NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  INDEX `FK_osm_id_idx` (`osm_id` ASC),
+  INDEX `FK_osm_enclosing_id_idx` (`enclosing_id` ASC),
+  CONSTRAINT `FK_lookup_osm_enclosed_osm`
+    FOREIGN KEY (`osm_id`)
+    REFERENCES `osm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FK_lookup_osm_enclosed_enclosing`
+    FOREIGN KEY (`enclosing_id`)
+    REFERENCES `osm` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);
+ALTER TABLE `lookup_osm_enclosed` 
+ADD UNIQUE INDEX `unique` (`enclosing_id` ASC, `osm_id` ASC);
+
+DROP TABLE IF EXISTS `keyword_shortcuts`;
+CREATE TABLE `keyword_shortcuts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `church_id` int(11) NOT NULL,
+  `osmtag_id` int(11) NOT NULL,
+  `type` varchar(30) NOT NULL,
+  `value` varchar(200) NOT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  KEY `index_value` (`value`),
+  KEY `FK_keyword_shortchuts_osmtag_idx` (`osmtag_id`),
+  KEY `church_type_value` (`church_id`,`type`,`value`),
+  KEY `type_value` (`type`,`value`)
+) ENGINE=InnoDB AUTO_INCREMENT=6774 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `crons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `class` varchar(45) DEFAULT NULL,
+  `function` varchar(45) DEFAULT NULL,
+  `frequency` varchar(45) NOT NULL,
+  `deadline_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `attempts` int(2) DEFAULT '0',
+  `lastsuccess_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_At` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

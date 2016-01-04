@@ -1,0 +1,16 @@
+<div class="panel-group hidden-xs" id="accordion">
+    <div class="panel panel-{{ panel ? panel : 'default' }}">
+        {% if title %}
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    {% block title %}{{ title|raw }}{% endblock %}
+                </h4>
+            </div>
+        {% endif %}
+        <div id="collapseOne" class="panel-collapse">
+            <div class="panel-body">
+                {% block body %}{{ body|raw }}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>

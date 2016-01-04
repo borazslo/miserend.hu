@@ -1,0 +1,31 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Szomszédos templomok' %}
+
+{% block body %}
+    <b><span class="alap"><i>Legközelebbi:</i></span></b><br>
+    <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+        {{ _self.neighbour(closestNeighbour,varos) }}
+    </ul>
+    {% if neighbourWithinDistance|length > 1 %}
+        <b><span class="alap"><i>10 km-en belül:</i></span></b><br>
+        <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+            {% for i in 1..6 %}
+                {% if neighbourWithinDistance[i] %} {{ _self.neighbour(neighbourWithinDistance[i],varos) }} {% endif %}
+            {% endfor %}
+            {% if neighbourWithinDistance|length > 6 %}<li style="display:inline">...</li>{% endif %}
+        </ul>
+    {% endif %}    
+{% endblock %}    
+
+{% macro neighbour(array,varos) %}
+    <li>
+        <a 
+            href="/templom/{{ array.to.id }}" 
+            class="link" 
+            title="{{ array.to.ismertnev }} ({{ ( array.distance / 1000 )|number_format(1, '.', '') }} km)"  
+            onclick="ga('send', 'event', 'Inbound Links', 'Szomszedsag', '?templom={{ array.to.id }}')">
+            {{ array.to.nev }}{% if varos != array.to.varos %} ({{ array.to.varos }}){% endif %}
+        </a>
+    </li>
+{% endmacro %}

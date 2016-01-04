@@ -188,7 +188,7 @@ var events = new Array();
                         
                          $.ajax({
                                type:"POST",
-                               url:"ajax.php?q=FormMassEmpty",
+                               url:"/ajax/formmassempty",
                                data:"period="+period+"&count="+c,
                                success:function(response){
                                     $('#period'+ period +' tr.addmass').before(response);
@@ -211,7 +211,7 @@ var events = new Array();
                         
                          $.ajax({
                                type:"POST",
-                               url:"ajax.php?q=FormMassParticularEmpty",
+                               url:"/ajax/formmassparticularempty",
                                data:"particular="+particular+"&count="+c,
                                success:function(response){
                                     $('#particular'+ particular +' tr.addmass').before(response);
@@ -230,7 +230,7 @@ var events = new Array();
                         
                         $.ajax({
                                type:"POST",
-                               url:"ajax.php?q=FormPeriodEmpty",
+                               url:"/ajax/formperiodempty",
                                data:"period="+c,
                                success:function(response){
                                     $('.addperiod').before(response);
@@ -251,7 +251,7 @@ var events = new Array();
                         
                         $.ajax({
                                type:"POST",
-                               url:"ajax.php?q=FormParticularEmpty",
+                               url:"/ajax/formparticularempty",
                                data:"particular="+c,
                                success:function(response){
                                     $('.addparticular').before(response);
@@ -414,10 +414,9 @@ var events = new Array();
                   var autcoEvents = {
                       source: function( request, response ) {
                         $.ajax({
-                          url: "ajax.php",
+                          url: "/ajax/autocompleteevents",
                           dataType: "json",
                           data: {
-                            q: 'AutocompleteEvents',
                             text: request.term,
                           },
                           success: function( data ) {
@@ -452,10 +451,9 @@ var events = new Array();
                $( "input.name.period" ).autocomplete({
                       source: function( request, response ) {
                         $.ajax({
-                          url: "ajax.php",
+                          url: "/ajax/autocompletename",
                           dataType: "json",
                           data: {
-                            q: 'AutocompleteName',
                             text: request.term,
                             type: 'period',
                           },
@@ -492,10 +490,9 @@ var events = new Array();
                   $( "input.name.particular" ).autocomplete({
                       source: function( request, response ) {
                         $.ajax({
-                          url: "ajax.php",
+                          url: "/ajax/autocompletename",
                           dataType: "json",
                           data: {
-                            q: 'AutocompleteName',
                             text: request.term,
                             type: 'particular',
                           },
@@ -544,10 +541,9 @@ var events = new Array();
                       }).autocomplete({
                       source: function( request, response ) {
                         $.ajax({
-                          url: "ajax.php",
+                          url: "/ajax/autocompleteattributes",
                           dataType: "json",
                           data: {
-                            q: 'AutocompleteAttributes',
                             text: extractLast( request.term ) 
                           },
                           success: function( data ) {
@@ -615,10 +611,9 @@ var events = new Array();
                       }).autocomplete({
                       source: function( request, response ) {
                         $.ajax({
-                          url: "ajax.php",
+                          url: "/ajax/autocompleteattributes",
                           dataType: "json",
                           data: {
-                            q: 'AutocompleteAttributes',
                             text: extractLast( request.term ),
                             type: 'language'
                           },
@@ -740,7 +735,7 @@ var events = new Array();
   $.ajax({
       type:"POST",
       dataType: "json",
-       url:"ajax.php?q=EventsList",
+       url:"/ajax/eventslist",
        success:function(response){
           $.each(response.events,function(key,value){
               events.push(value);
@@ -756,7 +751,7 @@ var events = new Array();
     var html = '';
      $.ajax({
        type:"POST",
-       url:"ajax.php?q=FormMassEmpty",
+       url:"/ajax/formmassempty",
        data:"period="+period+"&count="+c,
        success:function(response){
             html = response;

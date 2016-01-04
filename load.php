@@ -26,8 +26,6 @@ if ($config['debug'] > 0) {
 $vars['design_url'] = $design_url = $config['path']['domain'];
 define('DOMAIN', $config['path']['domain']);
 
-//TODO: megszűntetni a $db_name-t. Bár akkor már PDO mindenhiva
-$db_name = $config['connection']['database'];
 dbconnect();
 
 //Felhasználó kiléptetés
@@ -37,7 +35,7 @@ if (isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {
 //Felhasználó beléptetés
 if (isset($_REQUEST['login'])) {
     if (!login($_REQUEST['login'], $_REQUEST['passw'])) {
-        addMessage('Hibás név és/vagy jelszó!<br/><br/>Ha elfelejtetted a jelszavadat, <a href="?m_id=28&m_op=jelszo">kérj ITT új jelszót</a>.', 'danger');
+        addMessage('Hibás név és/vagy jelszó!<br/><br/>Ha elfelejtetted a jelszavadat, <a href="/user/lostpassword">kérj ITT új jelszót</a>.', 'danger');
     }
 }
 
@@ -48,12 +46,12 @@ if ($user->loggedin)
     $user->active();
 
 
-//Twig and the templates
+//TODO: delete this (see: \Html\Html::loadTwig());
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
+$loader = new Twig_Loader_Filesystem('templates');
+$twig = new Twig_Environment($loader); // cache?      
 
-$loader = new Twig_Loader_Filesystem('templates2');
-$twig = new Twig_Environment($loader); // cache?        
 //GIT version
 exec('git rev-parse --verify HEAD 2> /dev/null', $output);
 if ($output[0] != '')
@@ -63,7 +61,7 @@ if ($output[0] != '')
 //
 //  Useful CONSTANTS
 //
-// ATTRIBUTES, LANGUAGES, PERIODS 
+// ATTRIBUTES, LANGUAGES, PERIODS, ROLES 
 //
 $milyen = array(
     'csal' => array(
@@ -214,4 +212,7 @@ $periods = array(
     )
 );
 define("PERIODS", serialize($periods));
+
+$roles = ['miserend', 'user'];
+define("ROLES", serialize($roles));
 ?>

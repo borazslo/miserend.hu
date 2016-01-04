@@ -232,7 +232,7 @@ http://shootitlive.com/2012/07/developing-an-embeddable-javascript-widget/
       $( info['container'] ).attr('style',info['style']);
 
       /******* Load HTML *******/
-      var jsonp_url = base + "ajax.php?q=JSONP_miserend&tid=" + info['templom'] + "&template=templates2";
+      var jsonp_url = base + "ajax/JSONP_miserend?tid=" + info['templom'] + "&template=templates";
       if(info['misemegj']) jsonp_url += "&misemegj=" + info['misemegj'];
       jsonp_url += "&callback=?";
 
