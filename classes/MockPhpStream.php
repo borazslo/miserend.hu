@@ -20,7 +20,7 @@ class MockPhpStream {
     }
 
     protected function buffer_filename() {
-        return sys_get_temp_dir() . '\php_input.txt';
+        return sys_get_temp_dir() . '/php_input.txt';
     }
 
     function stream_open($path, $mode, $options, &$opened_path) {

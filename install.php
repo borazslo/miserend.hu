@@ -5,7 +5,9 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 require 'vendor/autoload.php';
 include_once('functions.php');
-include_once('config.php');
+
+$env = env('MISEREND_WEBAPP_ENVIRONMENT', 'staging'); /* testing, staging, production, vagrant */
+configurationSetEnvironment('testing');
 
 dbconnect();
 $result = DB::table('information_schema.tables')
