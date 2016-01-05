@@ -49,13 +49,11 @@ $user = getuser();
 if ($user->loggedin)
     $user->active();
 
-
 //TODO: delete this (see: \Html\Html::loadTwig());
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
-$loader = new Twig_Loader_Filesystem('templates');
+$loader = new Twig_Loader_Filesystem(dirname(__FILE__) . '/templates');
 $twig = new Twig_Environment($loader); // cache?      
-
 //GIT version
 exec('git rev-parse --verify HEAD 2> /dev/null', $output);
 if ($output[0] != '')

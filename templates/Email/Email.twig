@@ -2,33 +2,8 @@
 
 {% block content %}
     {% if mail %}
-    <script>
-        $(function () {
-            $("#tabs-min").tabs();
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            var html = $("#codehere").val();
-            html = html.replace(/(?:\r\n|\r|\n)/g, '<br />');
-            $("#preview").html(html);
-
-            $("#codehere").keyup(function () {
-                var html = $(this).val();
-                html = html.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                $("#preview").html(html);
-            })
-        })
-    </script>
-
-    <form method=post>
-        <article id="tabs-min" class="tabs-min tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
-            <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-                <li><a href="#tabs-1" class="alap ui-state-default ui-corner-top ui-tabs-selected">Szerkesztés</a></li>
-                <li><a href="#tabs-2" class="alap ui-state-default ui-corner-top">Előnézet</a></li>
-
-            </ul>
-            <div id="tabs-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide alap">                
+        <form method=post>
+            <div class="ui-widget-content ui-corner-all">                
                 {% if mail.to %}
                     <input type=hidden name=email value="{{ mail.to }}">
                 {% else %}
@@ -41,16 +16,14 @@
                 {% endif %}
             {% block extraInput %}{% endblock %}
             <input type=hidden name=type value="{{ mail.type }}">
-            <textarea name="text" id="codehere" class="form-control" rows="20" style="width:100%;margin-bottom:6px">{{ mail.content }}</textarea>
-        </div>
-        <div id="tabs-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide">
-            <div id="preview" class="alap" style="height:326px;overflow:auto;border: 1px solid grey;margin: -6px;padding: 2px;"></div>
+            <textarea name="text" id="codehere" class="form-control tinymce" rows="20" style="width:100%;margin-bottom:6px">{{ mail.content|nl2br }}</textarea>
         </div>
 
-    </article>
-    <br/>&nbsp;
-    <input type="submit" name="send" class="btn btn-default" value="Küldés">&nbsp;
-    <input type="submit" name="clear" class="btn btn-default" value="Mégsem" onclick="history.go(-1);">
-</form>
-            {% endif %}
+        <br/>&nbsp;
+        <input type="submit" name="send" class="btn btn-default" value="Küldés">&nbsp;
+        <input type="submit" name="clear" class="btn btn-default" value="Mégsem" onclick="history.go(-1);">
+    </form>
+    <script language="javascript" type="text/javascript" src="/vendor/tinymce/tinymce/tinymce.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/js/tiny_mce_init.js"></script>
+{% endif %}
 {% endblock %}

@@ -163,7 +163,7 @@ class Sqlite extends Api {
     }
 
     function insertDataTemplomok() {
-        set_time_limit(300);
+        set_time_limit(600);
         $churches = \Eloquent\Church::where('ok', 'i')->orderBy('id')->get();
         if (!$churches) {
             throw new Exception("There are no valid churches.");
