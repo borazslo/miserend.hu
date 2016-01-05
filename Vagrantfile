@@ -9,7 +9,18 @@ Vagrant.configure(2) do |config|
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
   # config.vm.box_check_update = false
+
+   config.vm.provider "virtualbox" do |v|
+        v.gui = false
+        v.name = "miserend"
+        v.memory = 1024
+        v.cpus = 1
+        v.customize ["modifyvm", :id, "--ioapic", "off"]        
+        v.customize ["modifyvm", :id, "--nestedpaging", "off"]
+    end
  
+   
+
   #config.vm.network "forwarded_port", guest: 80, host: 8080  
    config.vm.network "private_network", ip: "192.168.33.10"
    config.ssh.forward_agent = true
@@ -36,7 +47,7 @@ EOF
     VHOST=$(cat <<EOF
     <VirtualHost *:80>
         DocumentRoot "/vagrant"
-        php_admin_value sendmail_path "/usr/bin/env catchmail -f test@miserend.hu --smtp-ip 0.0.0.0"
+        php_admin_value sendmail_path "catchmail -f test@miserend.hu --smtp-ip 0.0.0.0"
         <Directory "/vagrant/">
             SetEnv MISEREND_WEBAPP_ENVIRONMENT staging
             SetEnv MYSQL_MISEREND_USER root
