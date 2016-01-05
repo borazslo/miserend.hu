@@ -63,13 +63,13 @@
 {% block rightsidebar %}
     {% include "Church/_panelLocation.twig" %}
     {% include 'Church/_panelContact.twig' %}
-    {% if osm and user.isadmin %}
-        {% include 'Church/_panelOSM.twig' %}
-    {% endif %}
     {% if megjegyzes %}
         {% include "panel.twig" with {title:'Jó tudni','body': megjegyzes } %}
     {% endif %}
     {% if closestNeighbour %}
         {% include 'Church/_panelNeighbours.twig' %}
     {% endif %}    
+    {% if osm and user.isadmin %}
+        {% include 'Church/_panelOSM.twig' %}
+    {% endif %}
 {% endblock %}

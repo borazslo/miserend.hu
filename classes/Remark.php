@@ -34,7 +34,7 @@ class Remark {
 
                 $this->adminmegj = preg_replace('/=("|\'|)img\//i', '=$1/img/', $this->adminmegj);
 
-                $this->marker['url'] = "javascript:OpenScrollWindow('templom/" . $this->church_id . "/eszrevetelek',550,500);";
+                $this->marker['url'] = "javascript:OpenScrollWindow('/templom/" . $this->church_id . "/eszrevetelek',550,500);";
                 if ($this->allapot == 'u') {
                     $this->marker['text'] = "Új észrevétel!";
                     $this->marker['html'] = "<img src=/img/csomag.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
