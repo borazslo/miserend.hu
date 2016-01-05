@@ -6,7 +6,8 @@
         "phpunit/phpunit": "4.8@stable",
         "illuminate/database": "5.*",
         "ext-sqlite3": "*",
-        "ext-mysql": "*"
+        "ext-mysql": "*",
+        "tinymce/tinymce": ">= 4"
     },
     "scripts": {
         "post-install-cmd": [

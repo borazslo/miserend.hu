@@ -13,7 +13,8 @@ class Edit extends \Html\Html {
         if (!$this->church) {
             throw new \Exception('Nincs ilyen templom.');
         }
-
+        $this->setTitle($this->church->nev);
+        
         if (!$this->church->McheckWriteAccess($user)) {
             $this->title = 'Hiányzó jogosultság!';
             addMessage('Hiányzó jogosultság!', 'danger');

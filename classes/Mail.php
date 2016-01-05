@@ -35,8 +35,11 @@ class Mail {
                 $query = "INSERT INTO emails (`type`,`to`,`header`,`subject`,`body`,`timestamp`) VALUES ('" . $this->type . "','" . implode(';', $this->to) . "','" . $this->header . "','" . $this->subject . "','" . mysql_real_escape_string($this->content) . "','" . date('Y-m-d H:i:s') . "');";
                 if (!mysql_query($query))
                     addMessage('Nem sikerült elmenteni az emailt.', 'warning');
-                if (!mail(implode(',', $this->to), $this->subject, $this->content, $this->header))
+                if (!mail(implode(',', $this->to), $this->subject, $this->content, $this->header)) {
+                    printr($this);
+                    mail(implode(',', $this->to), $this->subject, $this->content, $this->header);
                     addMessage('Valami hiba történt az email elküldése közben.', 'danger');
+                }    
                 else
                     return true;
             }

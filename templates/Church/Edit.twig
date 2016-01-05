@@ -32,14 +32,14 @@
             <tr>
                 <td bgcolor=#ECE5C8 class=kiscim align=right>Megjegyzés:</td>
                 <td bgcolor=#ECE5C8>
-                    <textarea name=church[adminmegj] class="urlap form-control" cols=50 placeholder="Adminisztrátori megjegyzés" rows=2>{{ church.adminmegj }}</textarea>                    
+                    <textarea name=church[adminmegj] class="urlap form-control tinymce" cols=50 placeholder="Adminisztrátori megjegyzés" rows=2>{{ church.adminmegj|nl2br }}</textarea>                    
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 1} %}</td>
             </tr>
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Felelős:</td>
                 <td bgcolor=#efefef>
-                    <textarea name=church[kontakt] class="urlap form-control" cols=50 rows=2 placeholder="Felelős neve és telefonszáma, ha elérhető">{{ church.kontakt }}</textarea>                    
+                    <textarea name=church[kontakt] class="urlap form-control tinymce" cols=50 rows=2 placeholder="Felelős neve és telefonszáma, ha elérhető">{{ church.kontakt|nl2br }}</textarea>                    
                     <input type=text name=church[kontaktmail] size=40 class="urlap form-control" value='{{ church.kontaktmail }}'  placeholder="Felelős email címe">                    
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 2} %}</td>
@@ -88,7 +88,7 @@
             <tr>
                 <td class=kiscim align="right" >A templom megközelítése:</td>                
                 <td>
-                    <textarea name=church[megkozelites] cols=50 rows=2 class="form-control"  placeholder="A megközelítés leírása, ha kifejzetten nehézkes.">{{ church.megkozelites }}</textarea>
+                    <textarea name=church[megkozelites] cols=50 rows=2 class="form-control tinymce"  placeholder="A megközelítés leírása, ha kifejzetten nehézkes.">{{ church.megkozelites|nl2br }}</textarea>
                 </td>
                 <td></td>
             </tr>
@@ -111,7 +111,7 @@
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Plébánia adatai:</td>
                 <td bgcolor=#efefef>
-                    <textarea name=church[plebania] id="plebania" class="urlap form-control" cols=50 rows=4  placeholder="A plébánia neve, címe, telefonja, egyéb elérhetősége. Ill. hivatali idők.">{{ church.plebania }}</textarea>
+                    <textarea name=church[plebania] id="plebania" class="urlap form-control tinymce" cols=50 rows=4  placeholder="A plébánia neve, címe, telefonja, egyéb elérhetősége. Ill. hivatali idők.">{{ church.plebania|nl2br }}</textarea>
                     <input type=text class="urlap form-control" name=church[pleb_eml] value='{{ church.pleb_email }}' size=40 class=urlap maxlength=100  placeholder="Email cím">
                     <input type=text class="urlap form-control" name=church[pleb_url] value='{{ church.pleb_url }}' size=40 class=urlap maxlength=100  placeholder="http://plébnia_honlapja.hu">
                 </td>
@@ -120,7 +120,7 @@
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Megjegyzés:</td>
                 <td bgcolor=#ffffff>
-                    <textarea name=church[megjegyzes] id=megjegyzes class="urlap form-control" cols=50 rows=3>{{ church.megjegyzes }}</textarea>                
+                    <textarea name=church[megjegyzes] id=megjegyzes class="urlap form-control tinymce" cols=50 rows=3>{{ church.megjegyzes|nl2br }}</textarea>                
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 10} %}</td>
             </tr>
@@ -141,14 +141,14 @@
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Mise megjegyzés:</td>
                 <td bgcolor=#ffffff>
-                    <textarea name=church[misemegj] id=misemegj class="form-control" cols=50 rows=5>{{ church.misemegj|nl2br }}</textarea>
+                    <textarea name=church[misemegj] id=misemegj class="form-control tinymce" cols=50 rows=5>{{ church.misemegj|nl2br }}</textarea>
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 41} %}</td>
             </tr>
             <tr>
                 <td valign=top class=kiscim align=right>Részletes leírás, templom története:</td>
                 <td valign=top>                
-                    <textarea name=church[leiras] id="leiras" class="form-control szoveg" cols=90 rows=10>{{ church.leiras|nl2br }}</textarea>
+                    <textarea name=church[leiras] id="leiras" class="form-control szoveg tinymce" cols=90 rows=10>{{ church.leiras|nl2br }}</textarea>
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 9} %}</td>
             </tr>
@@ -195,8 +195,8 @@
                 <td></td>
             </tr>
         </table>
-    </form>
-    <script language="javascript" type="text/javascript" src="/js/tiny_mce/tiny_mce.js"></script>
+    </form>                
+    <script language="javascript" type="text/javascript" src="/vendor/tinymce/tinymce/tinymce.min.js"></script>
     <script language="javascript" type="text/javascript" src="/js/tiny_mce_init.js"></script>
 {% endblock %}
 

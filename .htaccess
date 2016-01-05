@@ -15,7 +15,9 @@
     # Handle Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    
+
+    RewriteRule ^(vendor|kepek|fajlok|node_modules|bower_components|img)/ - [L]
+       
     RewriteRule ^api/v([0-9]{1,4})/miserend.sqlite3(/|)$ /fajlok/sqlite/miserend_v$1.sqlite3 [NC]	
     RewriteRule ^api/v([0-9]{1,4})/sqlite(/|)$ index.php?q=api/sqlite&v=$1 [NC,QSA]
 
