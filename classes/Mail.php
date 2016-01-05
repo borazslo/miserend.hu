@@ -39,8 +39,7 @@ class Mail {
                     printr($this);
                     mail(implode(',', $this->to), $this->subject, $this->content, $this->header);
                     addMessage('Valami hiba történt az email elküldése közben.', 'danger');
-                }    
-                else
+                } else
                     return true;
             }
         } else {
