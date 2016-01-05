@@ -54,7 +54,7 @@ $environment['staging'] = [
 ];
 
 $environment['vagrant'] = [
-    'debug' => 1,
+    'debug' => 0,
     'mail' => [
         'debug' => 0
     ],
