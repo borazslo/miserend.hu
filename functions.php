@@ -1925,10 +1925,10 @@ function sendJson($url, $content) {
     return $responseArray;
 }
 
-spl_autoload_register(function ($class) {
-    $classpath = dirname(__FILE__) . '/classes/' . str_replace('\\', '/', $class) . '.php';
-    if (file_exists($classpath)) {
-        require_once($classpath);
+spl_autoload_register(function ($class) {    
+    $classpath = dirname(__FILE__) . '/classes/' . str_replace('\\', '/', $class) . '.php';   
+    if ($file = file_exists_ci($classpath)) {
+        require_once($file);
     }
 });
 
@@ -1939,9 +1939,11 @@ function env($name, $default = false) {
         return getenv($name);
 }
 
-function file_exists_ci($fileName) {
-
-    $pattern = "classes";
+function file_exists_ci($fileName) {    
+    if(file_exists($fileName)) {
+        return $fileName;
+    }
+    $pattern = dirname(__FILE__)."/classes";
     $files = array();
     for ($i = 0; $i < 5; $i++) {
         $pattern .= '/*';
