@@ -13,6 +13,8 @@ A legegyszerűbb egy megfelelően konfigurált virtuális gépet telepíteni, í
 - A virtuális gép a http://192.168.33.10/ címen érhető el. 
 - SSH, mySQL, Mailcatcher, stb. eléréséhez valamint a virtuális gép irányításához lásd: [box.scotch.io](https://box.scotch.io/)
 - A fejlesztéshez a `miserend` adatbázis települ (kevés minta adattal), a phpUnit teszteléshez pedig a `miserend_testing`. (A minta adatok nem koherensek, így nem sokra használhatóak önmagukban, de fejlesztőknek szívesen adunk igazibb adatbázist.)
+- Ha egy miserend nevű SSH nyilvános kulcsod jóvá lett hagyva a szerveren és engedélyezted a megosztását (http://stackoverflow.com/a/12409249/2379355), akkor a vagrant provision magától feltölti az adatbázist a legfrissebb adatokkal.
+- A [MailCatcher](http://mailcatcher.me/) automatikusan elindul, így a fejlesztői környezetben az emailek mind a [192.168.33.10:1080](http://192.168.33.10:1080) oldalra futnak be.
 - [NetBeans](https://netbeans.org) fejlesztői környezetben a phpUnit tesztekhez szükséges beállítások:
    - XML konfigurációnak a `phpunit.xml`-t kell megadni.
    - Egyéni scriptnek pedig a `phpunitOnVagrant.sh` fájlt. 
