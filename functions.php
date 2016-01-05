@@ -31,7 +31,7 @@ function dbconnect() {
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
         'prefix' => '',
-    ],'default');
+            ], 'default');
     // Make this Capsule instance available globally via static methods... (optional)
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
@@ -221,14 +221,14 @@ function LirugicalDay($datum = false) {
     } else {
         $source = "http://breviar.sk/cgi-bin/l.cgi?qt=pxml&d=" . substr($datum, 8, 2) . "&m=" . substr($datum, 5, 2) . "&r=" . substr($datum, 0, 4) . "&j=hu";
 
-        $ch=curl_init();
-        $timeout=1;
+        $ch = curl_init();
+        $timeout = 1;
         curl_setopt($ch, CURLOPT_URL, $source);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-        $xmlstr=curl_exec($ch);
+        $xmlstr = curl_exec($ch);
         curl_close($ch);
-        if($xmlstr) {
+        if ($xmlstr) {
             @file_put_contents($file, $xmlstr);
         }
     }
@@ -788,7 +788,7 @@ function searchChurchesWhere($args) {
 
     if ($args['ehm'] != 0)
         $where[] = "egyhazmegye='" . $args['ehm'] . "'";
-    
+
     if (isset($args['espker']) AND $args['espker'] != 0)
         $where[] = "espereskerulet='" . $args['espker'] . "'";
     return $where;
@@ -1862,8 +1862,7 @@ function copyArrayToObject($array, &$object) {
     }
 }
 
-function br2nl ( $string )
-{
+function br2nl($string) {
     return preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, $string);
 }
 
@@ -1926,9 +1925,8 @@ function sendJson($url, $content) {
     return $responseArray;
 }
 
-spl_autoload_register(function ($class) {
-
-    $classpath = 'classes/' . str_replace('\\', '/', $class) . '.php';
+spl_autoload_register(function ($class) {    
+    $classpath = dirname(__FILE__) . '/classes/' . str_replace('\\', '/', $class) . '.php';   
     if ($file = file_exists_ci($classpath)) {
         require_once($file);
     }
@@ -1941,9 +1939,11 @@ function env($name, $default = false) {
         return getenv($name);
 }
 
-function file_exists_ci($fileName) {
-
-    $pattern = "classes";
+function file_exists_ci($fileName) {    
+    if(file_exists($fileName)) {
+        return $fileName;
+    }
+    $pattern = dirname(__FILE__)."/classes";
     $files = array();
     for ($i = 0; $i < 5; $i++) {
         $pattern .= '/*';
@@ -1963,5 +1963,27 @@ function printr($variable) {
     echo"<pre>" . print_r($variable, 1) . "</pre>";
 }
 
+function configurationSetEnvironment($env) {
+    global $config;
+    include('config.php');
+    if (!array_key_exists($env, $environment)) {
+        $env = 'default';
+    }
+    $config = $environment['default'];
+    $config['env'] = $env;
+    if ($env != 'default') {
+        overrideArray($config, $environment[$env]);
+    }
+    putenv('MISEREND_WEBAPP_ENVIRONMENT=' . $env);
+    dbconnect();
+}
 
-?>
+function overrideArray(&$orig, $new) {
+    foreach ($new as $k => $n) {
+        if (!is_array($n)) {
+            $orig[$k] = $n;
+        } else {
+            overrideArray($orig[$k], $n);
+        }
+    }
+}

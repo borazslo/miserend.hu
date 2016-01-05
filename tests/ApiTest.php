@@ -2,10 +2,8 @@
 
 global $config;
 include_once('load.php');
+configurationSetEnvironment('testing');
 
-/**
- * @requires PHP 5.5.26
- */
 class ApiTest extends \PHPUnit_Framework_TestCase {
 
     /**

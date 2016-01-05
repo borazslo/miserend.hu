@@ -1,49 +1,66 @@
 <?php
 
-$config = array();
-$db = false;
+$environment['default'] = [
+    'connection' => [
+        'host' => env('MYSQL_MISEREND_HOST', 'localhost'),
+        'user' => env('MYSQL_MISEREND_USER', 'miserend'),
+        'password' => env('MYSQL_MISEREND_PASSWORD', '***'),
+        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
+    ],
+    'path' => [
+        'domain' => 'http://miserend.hu'
+    ],
+    'mapquest' => [
+        'appkey' => env('MAPQUEST_CONSUMERKEY', '***'),
+        'useitforsearch' => false
+    ],
+    'token' => [
+        'timeout' => "15 minutes"
+    ],
+    'mail' => [
+        'sender' => 'miserend.hu <info@miserend.hu>',
+        'debug' => 0, /* 0,1,2,3,5 */
+        'debugger' => 'eleklaszlosj@gmail.com'
+    ],
+    'debug' => 0
+];
 
-$config['env'] = env('MISEREND_WEBAPP_ENVIRONMENT', 'staging'); /* testing, staging, production */
+$environment['testing'] = [
+    'debug' => 1,
+    'mail' => [
+        'debug' => 5
+    ],
+    'path' => [
+        'domain' => 'http://localhost/miserend.hu'
+    ],
+    'connection' => [
+        'database' => 'miserend_testing',
+        'user' => 'root',
+        'password' => 'root'
+    ]
+];
 
-$config['connection'] = array(
-    'host' => env('MYSQL_MISEREND_HOST', 'localhost'),
-    'user' => env('MYSQL_MISEREND_USER', 'miserend'),
-    'password' => env('MYSQL_MISEREND_PASSWORD', '***'),
-    'database' => env('MYSQL_MISEREND_DATABASE', 'miserend'),
-    'prefix' => '', /* Még nem működik */
-);
+$environment['staging'] = [
+    'debug' => 1,
+    'mail' => [
+        'debug' => 2
+    ],
+    'path' => [
+        'domain' => 'http://staging.miserend.hu'
+    ],
+    'connection' => [
+        'database' => 'miserend_staging'
+    ]
+];
 
-$config['path']['domain'] = 'http://miserend.hu';
-
-$config['mapquest'] = array(
-    'appkey' => env('MAPQUEST_CONSUMERKEY','***'),
-    'useitforsearch' => false
-);
-
-$config['token']['timeout'] = "15 minutes";
-
-$config['mail'] = array(
-    'sender' => 'miserend.hu <info@miserend.hu>',
-    'debug' => 0, /* 0,1,2,3,5 */
-    'debugger' => 'eleklaszlosj@gmail.com'
-);
-$config['debug'] = 0;
-
-date_default_timezone_set('Europe/Budapest');
-
-
-switch ($config['env']) {
-    case 'testing':
-        $config['debug'] = 1;
-        $config['mail']['debug'] = 3;
-        $config['path']['domain'] = 'http://localhost/miserend.hu';
-        $config['connection']['database'] = 'miserend_testing';
-        break;
-
-    case 'staging':
-        $config['debug'] = 1;
-        $config['mail']['debug'] = 2;
-        $config['path']['domain'] = 'http://staging.miserend.hu';
-        break;
-}
-?>
+$environment['vagrant'] = [
+    'debug' => 0,
+    'mail' => [
+        'debug' => 0
+    ],
+    'connection' => [
+        'database' => 'miserend',
+        'user' => 'root',
+        'password' => 'root'
+    ]
+];

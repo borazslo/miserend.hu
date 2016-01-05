@@ -32,16 +32,13 @@ Vagrant.configure(2) do |config|
 
      # setup hosts file
     VHOSTT=$(cat <<EOF
-export MISEREND_WEBAPP_ENVIRONMENT=staging
-export MYSQL_MISEREND_USER=root
-export MYSQL_MISEREND_PASSWORD=root
-export MYSQL_MISEREND_DATABASE=miserend
+export MISEREND_WEBAPP_ENVIRONMENT=vagrant
 EOF
 )
     echo "${VHOSTT}" > /etc/environment
 
-    sudo apt-get update
-    sudo apt-get -y install phpunit mc
+    #sudo apt-get update
+    sudo apt-get -y install mc
       
     # setup hosts file
     VHOST=$(cat <<EOF
@@ -49,10 +46,7 @@ EOF
         DocumentRoot "/vagrant"
         php_admin_value sendmail_path "catchmail -f test@miserend.hu --smtp-ip 0.0.0.0"
         <Directory "/vagrant/">
-            SetEnv MISEREND_WEBAPP_ENVIRONMENT staging
-            SetEnv MYSQL_MISEREND_USER root
-            SetEnv MYSQL_MISEREND_PASSWORD root
-            SetEnv MYSQL_MISEREND_DATABASE miserend
+            SetEnv MISEREND_WEBAPP_ENVIRONMENT vagrant
             AllowOverride All
             Require all granted
         </Directory>

@@ -9,7 +9,7 @@ class Path {
     }
 
     public function prepare() {
-        $folder = "classes/";
+        $folder = dirname(__FILE__)."/";
         $this->arguments = array();
         $path = explode('/', $this->url);
         array_unshift($path, "html");

@@ -9,10 +9,15 @@ if (!@include __DIR__ . '/vendor/autoload.php') {
         wget http://getcomposer.org/composer.phar
         php composer.phar install');
 }
+date_default_timezone_set('Europe/Budapest');
+
+$config = array();
+$db = false;
 
 include_once('functions.php');
-include_once('config.php');
-//include_once('functions_osm.php');
+
+$env = env('MISEREND_WEBAPP_ENVIRONMENT', 'staging'); /* testing, staging, production, vagrant */
+configurationSetEnvironment($env);
 
 if ($config['debug'] > 0) {
     ini_set('display_errors', 1);
@@ -26,7 +31,6 @@ if ($config['debug'] > 0) {
 $vars['design_url'] = $design_url = $config['path']['domain'];
 define('DOMAIN', $config['path']['domain']);
 
-dbconnect();
 
 //Felhasználó kiléptetés
 if (isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {

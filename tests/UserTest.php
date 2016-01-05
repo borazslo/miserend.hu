@@ -7,9 +7,9 @@ class UserTest extends \PHPUnit_Framework_TestCase {
      */
     public function testUserUser($input, $output) {
         $user = new User($input);
-        if ($output == array())
+        if ($output == array()) {
             $this->assertEquals($output, (array) $user);
-        else
+        } else
             $this->assertArraySubset($output, (array) $user);
     }
 
@@ -26,9 +26,6 @@ class UserTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    /**
-    * @requires PHP 5.5.26
-    */
     public function testUserDelete() {
         $user = new \User('EgyHosszuUjNev');
         $success = $user->delete();
@@ -36,5 +33,3 @@ class UserTest extends \PHPUnit_Framework_TestCase {
     }
 
 }
-
-?>
