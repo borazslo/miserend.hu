@@ -23,7 +23,7 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
                             $query->where('attempts', '<', 10)
                             ->orWhere('updated_at', '<', date('Y-m-d H:i:s', strtotime('-12 hour')));
                         })
-                        ->orderBy('attempts', 'ASC')->orderBy('deadline_at', 'DESC');
+                        ->orderBy('attempts', 'ASC')->orderBy('deadline_at', 'ASC');
     }
 
     public function initialize() {
@@ -38,7 +38,6 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             ['\Distance', 'updateSome', '15 min']
         ];
         foreach ($jobsToSave as $jobToSave) {
-            echo $jobToSave[0];
             $job = \Eloquent\Cron::firstOrCreate(['class' => $jobToSave[0], 'function' => $jobToSave[1]]);
             $job->frequency = $jobToSave[2];
             $job->save();

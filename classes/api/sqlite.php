@@ -166,14 +166,17 @@ class Sqlite extends Api {
     }
 
     function insertDataTemplomok() {
-        set_time_limit(1200);
+        set_time_limit(15000);
         $churches = \Eloquent\Church::where('ok', 'i')->orderBy('id')->get();
         if (!$churches) {
             throw new Exception("There are no valid churches.");
         }
-
+        $sum = count($churches);
+        $c = 1;
+        echo "\n";
         foreach ($churches as $church) {
-            echo $church->id." ".$church->nev."...\n";
+            $line = (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $c++ . "/" . $sum . " -- " . $church->id . " " . $church->nev;            
+            echo "\r".str_pad($line,  120);
             $church->MgetLocation();
 
             $insert = [
@@ -207,7 +210,7 @@ class Sqlite extends Api {
                 $insert['teliido'] = $church->teliido;
             }
 
-            if ($church->photos[0]) {
+            if (isset($church->photos[0])) {
                 $insert['kep'] = DOMAIN . "/kepek/templomok/" . $church->id . "/" . $church->photos[0]->filename;
             } else {
                 $insert['kep'] = '';
@@ -218,14 +221,14 @@ class Sqlite extends Api {
     }
 
     function insertDataMisek() {
-        set_time_limit(1200);
+        set_time_limit(5200);
         $masses = DB::table('misek')->where('torles', '0000-00-00 00:00:00')->where('tid', '<>', 0)->orderBy('tid')->orderBy('id')->get();
         if (!$masses) {
             throw new Exception("There are no valid masses.");
         }
 
         foreach ($masses as $mass) {
-            echo $mass->id." (in ".$mass->tid.") ...\n";
+            echo $mass->id . " (in " . $mass->tid . ") ...\n";
             $insert = [
                 'mid' => $mass->id,
                 'tid' => $mass->tid,
@@ -309,10 +312,22 @@ class Sqlite extends Api {
     }
 
     function cron() {
+        echo "Cron job Sqlite is beginning right now...\n";
         for ($i = 2; $i <= 4; $i++) {
             $_REQUEST['v'] = $i;
             $this->run();
         }
+    }
+
+    function bufferout($newline, $fullLength = false) {
+        if(!$fullLength) $fullLength = 120;
+        $length = strlen(rtrim($newline));
+
+        $whitespaceLength = $fullLength - $length;
+        if ($whitespaceLength > 0) {
+            $return = str_repeat(" ", $whitespaceLength);
+        }
+        echo $newline . $return . "\r";
     }
 
 }
