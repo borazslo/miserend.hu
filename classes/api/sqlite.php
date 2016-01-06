@@ -59,6 +59,7 @@ class Sqlite extends Api {
         $this->setSqliteConnection();
 
         $this->dropAllTables();
+        echo "Create Tables ... \n";
         $this->createTables();
         $this->insertData();
 
@@ -83,7 +84,9 @@ class Sqlite extends Api {
     function insertData() {
         ini_set('memory_limit', '800M');
         $this->sqlite->disableQueryLog();
+        echo "insertDataTemplomok ... \n";
         $this->insertDataTemplomok();
+        echo "insertDataMisek ... \n";
         $this->insertDataMisek();
         if ($this->version > 1) {
             $this->insertDataKepek();
@@ -163,13 +166,14 @@ class Sqlite extends Api {
     }
 
     function insertDataTemplomok() {
-        set_time_limit(600);
+        set_time_limit(1200);
         $churches = \Eloquent\Church::where('ok', 'i')->orderBy('id')->get();
         if (!$churches) {
             throw new Exception("There are no valid churches.");
         }
 
         foreach ($churches as $church) {
+            echo $church->id." ".$church->nev."...\n";
             $church->MgetLocation();
 
             $insert = [
@@ -214,13 +218,14 @@ class Sqlite extends Api {
     }
 
     function insertDataMisek() {
-        set_time_limit(600);
-        $masses = DB::table('misek')->where('torles', '0000-00-00 00:00:00')->where('tid', '<>', 0)->get();
+        set_time_limit(1200);
+        $masses = DB::table('misek')->where('torles', '0000-00-00 00:00:00')->where('tid', '<>', 0)->orderBy('tid')->orderBy('id')->get();
         if (!$masses) {
             throw new Exception("There are no valid masses.");
         }
 
         foreach ($masses as $mass) {
+            echo $mass->id." (in ".$mass->tid.") ...\n";
             $insert = [
                 'mid' => $mass->id,
                 'tid' => $mass->tid,
@@ -258,7 +263,7 @@ class Sqlite extends Api {
                 }
             }
 
-            if ($insert) {
+            if (isset($insert)) {
                 $inserts[] = $insert;
             }
         }
@@ -304,7 +309,7 @@ class Sqlite extends Api {
     }
 
     function cron() {
-        for ($i = 2; $i <= 5; $i++) {
+        for ($i = 2; $i <= 4; $i++) {
             $_REQUEST['v'] = $i;
             $this->run();
         }

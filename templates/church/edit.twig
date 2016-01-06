@@ -155,7 +155,7 @@
             <tr>
                 <td bgcolor=#efefef valign=top class=kiscim align=right>Képek:</td>
                 <td bgcolor=#efefef >
-                    {% include '_PhotosEdit.twig' with {'photos' : church.photos } %}
+                    {% include '_photosedit.twig' with {'photos' : church.photos } %}
                 </td>
             </tr>
             <tr>
@@ -202,6 +202,6 @@
 
 {% block leftsidebar %}    
     {% if church.osm and user.isadmin %}
-        {% include 'Church/_panelOSM.twig' %}
+        {% include 'church/_panelosm.twig' %}
     {% endif %}    
 {% endblock %}

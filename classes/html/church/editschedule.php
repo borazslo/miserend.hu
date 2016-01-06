@@ -8,7 +8,7 @@ class EditSchedule extends \Html\Html {
         global$user;
 
         $this->tid = $path[0];
-       
+
         $this->church = \Eloquent\Church::find($this->tid);
         if (!$this->church) {
             throw new \Exception('Nincs ilyen templom.');
@@ -18,12 +18,12 @@ class EditSchedule extends \Html\Html {
             addMessage('Hiányzó jogosultság!', 'danger');
             return;
         }
-        
+
         $isForm = \Request::Text('submit');
         if ($isForm) {
             $this->modify();
         }
-        $this->preparePage();        
+        $this->preparePage();
     }
 
     function modify() {
@@ -122,8 +122,8 @@ class EditSchedule extends \Html\Html {
             }
         }
         generateMassTmp('tid = ' . $_REQUEST['tid']);
-       
-        $this->church->log .= "\nMISE_MOD: " . $user->login . " (".date('Y-m-d H:i:s')." - [".$_SERVER['REMOTE_ADDR']." - ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."])";
+
+        $this->church->log .= "\nMISE_MOD: " . $user->login . " (" . date('Y-m-d H:i:s') . " - [" . $_SERVER['REMOTE_ADDR'] . " - " . gethostbyaddr($_SERVER['REMOTE_ADDR']) . "])";
         if ($_REQUEST['update'] == 'i')
             $this->church->frissites = date('Y-m-d');
         $this->church->misemegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['misemegj']);
@@ -134,7 +134,7 @@ class EditSchedule extends \Html\Html {
         if ($modosit == 'i') {
             return;
         } elseif ($modosit == 'm') {
-            $this->redirect('/templom/'.$this->tid."/edit");
+            $this->redirect('/templom/' . $this->tid . "/edit");
         } elseif ($modosit == 't') {
             $this->redirect('/templom/' . $this->tid);
         } else {
@@ -142,8 +142,8 @@ class EditSchedule extends \Html\Html {
         }
     }
 
-    function preparePage() {        
-        
+    function preparePage() {
+
         //Ezt csak a development szerveren kéne
         $this->update_addmisejs();
 
@@ -164,6 +164,8 @@ class EditSchedule extends \Html\Html {
             foreach ($masses['periods'] as $pkey => $period) {
                 $this->periods[] = formPeriod($pkey, $period, 'period');
             }
+        if (!isset($pkey))
+            $pkey = 0;
         $this->lastperiod = $pkey;
 
         $this->lastparticular = 0;

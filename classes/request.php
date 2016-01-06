@@ -2,7 +2,7 @@
 
 class Request {
 
-    function Integer($name) {
+    static function Integer($name) {
         $value = self::get($name);
         if (!is_numeric($value)) {
             throw new Exception("Required '$name' is not an Integer.");
@@ -10,7 +10,7 @@ class Request {
         return $value;
     }
 
-    function IntegerRequired($name) {
+    static function IntegerRequired($name) {
         $value = self::getRequired($name);
         if (!is_numeric($value)) {
             throw new Exception("Required '$name' is not an Integer.");
@@ -18,7 +18,7 @@ class Request {
         return $value;
     }
 
-    function IntegerwDefault($name, $default = false) {
+    static function IntegerwDefault($name, $default = false) {
         $value = self::getwDefault($name, $default);
         if (!is_numeric($value)) {
             throw new Exception("Required '$name' is not an Integer.");
@@ -26,25 +26,25 @@ class Request {
         return $value;
     }
 
-    function Text($name) {
+    static function Text($name) {
         $value = self::get($name);
         $value = sanitize($value);
         return $value;
     }
 
-    function TextwDefault($name, $default = false) {
+    static function TextwDefault($name, $default = false) {
         $value = self::getwDefault($name, $default);
         $value = sanitize($value);
         return $value;
     }
 
-    function TextRequired($name) {
+    static function TextRequired($name) {
         $value = self::getRequired($name);
         $value = sanitize($value);
         return $value;
     }
 
-    function Simpletext($name) {
+    static function Simpletext($name) {
         $value = self::get($name);
         if ($value != '' AND ! preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
             throw new Exception("Variable '$name' is not a SimpleText.");
@@ -52,7 +52,7 @@ class Request {
         return $value;
     }
 
-    function SimpletextwDefault($name, $default = false) {
+    static function SimpletextwDefault($name, $default = false) {
         $value = self::getwDefault($name, $default);
         if ($value != '' AND ! preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
             throw new Exception("Variable '$name' is not a SimpleText.");
@@ -60,7 +60,7 @@ class Request {
         return $value;
     }
 
-    function SimpletextRequired($name) {
+    static function SimpletextRequired($name) {
         $value = self::getRequired($name);
         if (!preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
             throw new Exception("Required '$name' is not a SimpleText.");
@@ -68,7 +68,7 @@ class Request {
         return $value;
     }
 
-    function DateRequired($name) {
+    static function DateRequired($name) {
         $value = self::getRequired($name);
         if (strtotime($value) == false) {
             throw new Exception("Required '$name' is not a Date.");
@@ -76,7 +76,7 @@ class Request {
         return date('Y-m-d', strtotime($value));
     }
 
-    function DatewDefault($name, $default = false) {
+    static function DatewDefault($name, $default = false) {
         $value = self::getwDefault($name, $default);
         if (strtotime($value) == false) {
             throw new Exception("Required '$name' is not a Date.");
@@ -84,7 +84,7 @@ class Request {
         return date('Y-m-d', strtotime($value));
     }
 
-    private function getwDefault($name, $default = false) {
+    static function getwDefault($name, $default = false) {
         if ($value = self::get($name)) {
             return $value;
         } else {
@@ -92,7 +92,7 @@ class Request {
         }
     }
 
-    private function getRequired($name) {
+    static function getRequired($name) {
         if (!$value = self::get($name)) {
             throw new Exception("Required '$name' is required.");
         } else {
@@ -100,7 +100,7 @@ class Request {
         }
     }
 
-    private function get($name) {
+    static function get($name) {
         if (isset($_REQUEST[$name])) {
             return $_REQUEST[$name];
         } else {

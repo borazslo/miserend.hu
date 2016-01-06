@@ -3,6 +3,12 @@
 class Form {
 
     public function selectReligiousAdministration($selected = false) {
+        $return = $this->religiousAdministrationSelection($selected);
+        $this->form['dioceses'] = $return['dioceses'];
+        $this->form['deaneries'] = $return['deaneries'];
+    }
+
+    static function religiousAdministrationSelection($selected = false) {
         if (!$selected) {
             $selected = ['diocese' => false, 'deanery' => false];
         }
@@ -46,13 +52,7 @@ class Form {
                 $selectDeanery[$selectibleDiocese->id]['disabled'] = 'disabled';
             }
         }
-
-        if (get_class($this) != 'Form') {
-            return ['dioceses' => $selectDiocese, 'deaneries' => $selectDeanery];
-        } else {
-            $this->form['dioceses'] = $selectDiocese;
-            $this->form['deaneries'] = $selectDeanery;
-        }
+        return ['dioceses' => $selectDiocese, 'deaneries' => $selectDeanery];
     }
 
 }

@@ -24,7 +24,7 @@ class Catalogue extends \Html\Html {
         $results = $this->query->get();
 
         foreach ($results as $result) {
-            if (preg_match('/^(lastlogin|lastactive|regdatum)/i', $sort, $match))
+            if (preg_match('/^(lastlogin|lastactive|regdatum)/i', $this->input['sort'], $match))
                 $field = preg_replace(array('/ /i', '/-/i'), array('&nbsp;', '&#8209;'), $match[1]);
             else
                 $field = 'lastlogin';

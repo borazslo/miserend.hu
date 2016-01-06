@@ -7,6 +7,8 @@ class Pagination {
     public $maxOptionsToShown = 10;
 
     function set($countResults, $url = false) {
+        $this->skip = $this->take * $this->active;
+
         $this->resultsCount = $countResults;
         $this->count = ceil($countResults / $this->take);
 
@@ -43,7 +45,7 @@ class Pagination {
         return $this->qe(['page' => $page, 'take' => $this->take], $url);
     }
 
-    public function qe(array $new_params, $url = false, $overwrite = true) {
+    static function qe(array $new_params, $url = false, $overwrite = true) {
         if ($url == false) {
             $url = $_SERVER['REQUEST_URI'];
         }

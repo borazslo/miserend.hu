@@ -28,12 +28,11 @@ class Collection extends Html {
                     $query->where('enclosing_id', $osm->id);
                 });
 
+        $this->pagination->set($churches->count());
         $this->churches = $churches->skip($this->pagination->skip)->take($this->pagination->take)->get();
         foreach ($this->churches as &$church) {
             $church->photos;
         }
-
-        $this->pagination->set($churches->count());
     }
 
 }

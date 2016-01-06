@@ -8,8 +8,6 @@ class SearchResultsMasses extends Html {
 
         global $user, $config;
 
-        $design_url = $config['path']['domain'];
-
         $mikor = $_POST['mikor'];
         $mikordatum = $_POST['mikordatum'];
         if ($mikor != 'x')
@@ -57,40 +55,40 @@ class SearchResultsMasses extends Html {
 
         $tartalom.="\n<span class=kiscim>Keresési paraméterek:</span><br><span class=alap>";
         if (isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {
-            $tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> Kulcsszó: " . $_REQUEST['kulcsszo'] . "<br/>";
+            $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> Kulcsszó: " . $_REQUEST['kulcsszo'] . "<br/>";
             $leptet_urlap.="<input type=hidden name=kulcsszo value='" . $_REQUEST['kulcsszo'] . "'>";
         }
         if (isset($_REQUEST['hely']) AND $_REQUEST['hely'] != '') {
             $_REQUEST['hely_geocode'] = mapquestGeocode($_REQUEST['hely']);
-            $tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> " . $_REQUEST['hely'] . " + " . $_REQUEST['tavolsag'] . " km<br/><img src='" . $_REQUEST['hely_geocode']['mapUrl'] . "'><br/>";
+            $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> " . $_REQUEST['hely'] . " + " . $_REQUEST['tavolsag'] . " km<br/><img src='" . $_REQUEST['hely_geocode']['mapUrl'] . "'><br/>";
             $leptet_urlap.="<input type=hidden name=hely value='" . $_REQUEST['hely'] . "'>";
             $leptet_urlap.="<input type=hidden name=tavolsag value='" . $_REQUEST['tavolsag'] . "'>";
         }
         if (!empty($varos)) {
             $varos = ucfirst($varos);
-            $tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> $varos településen<br/>";
+            $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> $varos településen<br/>";
             $leptet_urlap.="<input type=hidden name=varos value='$varos'>";
         }
         if (isset($_REQUEST['gorog']) AND $_REQUEST['gorog'] == 'gorog') {
-            $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.";
             $leptet_urlap.="<input type=hidden name=gorog value='gorog'>";
         }
         if (isset($_REQUEST['tnyelv']) AND $_REQUEST['tnyelv'] != '0') {
-            $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle>Amelyik templomban van '" . $_REQUEST['tnyelv'] . "' nyelvű mise.<br/>";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle>Amelyik templomban van '" . $_REQUEST['tnyelv'] . "' nyelvű mise.<br/>";
         }
         $leptet_urlap.="<input type=hidden name=tnyelv value='" . $_REQUEST['tnyelv'] . "'>";
 
         if (!empty($ehmnev)) {
-            $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $ehmnev egyházmegyében,";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> $ehmnev egyházmegyében,";
             $leptet_urlap.="<input type=hidden name=ehm value='$ehm'>";
         }
         if (!empty($espkernev)) {
-            $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $espkernev espereskerületben,";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> $espkernev espereskerületben,";
             $leptet_urlap.="<input type=hidden name=espkerT[$ehm] value='$espkerT[$ehm]'>";
         }
         if (!empty($ehmnev))
             $tartalom .= '<br/>';
-        $tartalom.="<img src=$design_url/img/negyzet_lila.gif align=absmidle> ";
+        $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> ";
         if ($mikordatum == $ma) {
             $tartalom.='ma';
             $leptet_urlap.="<input type=hidden name=mikor value='$ma'>";
@@ -125,7 +123,7 @@ class SearchResultsMasses extends Html {
             $leptet_urlap.="<input type=hidden name=mikor2 value='0'>";
         }
         if (!empty($nyelv) or ( !empty($zene) AND count($zene) < 3) or ( !empty($kor) AND count($kor) < 4))
-            $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> ";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> ";
         if (!empty($nyelv)) {
             $tartalom.="$nyelvekT[$nyelv] nyelvű, ";
             //		$leptet_urlap.="<input type=hidden name=nyelv value='$nyelv'>";
@@ -147,11 +145,11 @@ class SearchResultsMasses extends Html {
             }
         }
         if (!empty($ritus)) {
-            $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> $ritusT[$ritus]";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> $ritusT[$ritus]";
             $leptet_urlap.="<input type=hidden name=ritus value='$ritus'>";
         }
         if (!empty($ige)) {
-            $tartalom.="<br><img src=$design_url/img/negyzet_lila.gif align=absmidle> igeliturgiák is";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> igeliturgiák is";
             $leptet_urlap.="<input type=hidden name=ige value='yes'>";
         }
 
@@ -243,19 +241,11 @@ class SearchResultsMasses extends Html {
         }
         $tartalom.=$leptetprev . $leptetnext;
 
+        $this->setTitle("Szentmise kereső");
 
-        $focim = "Szentmise kereső";
-        global $twig;
-        $variables = array(
-            'focim' => $focim,
-            'content' => $tartalom,
-            'templomurlap' => $templomurlap,
-            'design_url' => $design_url);
-        $variables['template'] = 'search/resultsMasses.twig';
-
-        foreach ($variables as $key => $var) {
-            $this->$key = $var;
-        }
+        $this->content = $tartalom;
+        $this->templomurlap = $templomurlap;
+        $this->template = 'search/resultsmasses.twig';
     }
 
 }

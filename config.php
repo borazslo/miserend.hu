@@ -22,7 +22,8 @@ $environment['default'] = [
         'debug' => 0, /* 0,1,2,3,5 */
         'debugger' => 'eleklaszlosj@gmail.com'
     ],
-    'debug' => 0
+    'debug' => 0,
+    'error_reporting' => false
 ];
 
 $environment['testing'] = [
@@ -50,11 +51,12 @@ $environment['staging'] = [
     ],
     'connection' => [
         'database' => 'miserend_staging'
-    ]
+    ],
+    'error_reporting' => E_ERROR | E_WARNING | E_PARSE
 ];
 
 $environment['vagrant'] = [
-    'debug' => 0,
+    'debug' => 1,
     'mail' => [
         'debug' => 0
     ],
@@ -62,5 +64,6 @@ $environment['vagrant'] = [
         'database' => 'miserend',
         'user' => 'root',
         'password' => 'root'
-    ]
+    ],
+    'error_reporting' => E_ALL
 ];

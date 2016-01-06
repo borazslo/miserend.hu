@@ -4,7 +4,7 @@ namespace Html\User;
 
 class User extends \Html\Html {
 
-    public function factory($path) {
+    static function factory($path) {
         if (is_numeric($path[0])) {
             $_REQUEST['uid'] = $path[0];
             $className = "\Html\\User\\" . $path[1];

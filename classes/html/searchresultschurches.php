@@ -28,7 +28,7 @@ class SearchResultsChurches extends Html {
         //Data For _panelSearchForChurch.twig
         $this->form['varos']['value'] = $_REQUEST['varos'];
         $this->form['kulcsszo']['value'] = $_REQUEST['kulcsszo'];
-        $selectReligiousAdministration = \Form::selectReligiousAdministration(['diocese' => $_REQUEST['ehm'], 'deanery' => $_REQUEST['espker']]);
+        $selectReligiousAdministration = \Form::religiousAdministrationSelection(['diocese' => $_REQUEST['ehm'], 'deanery' => $_REQUEST['espker']]);
         $this->form['diocese'] = $selectReligiousAdministration['dioceses'];
         $this->form['diocese']['name'] = 'ehm';
         $this->form['deaneries'] = $selectReligiousAdministration['deaneries'];
@@ -41,6 +41,9 @@ class SearchResultsChurches extends Html {
         $limit = $this->pagination->take;
         $results = searchChurches($_REQUEST, $offset, $limit);
         $resultsCount = $results['sum'];
+
+        if (!isset($_REQUEST['gorog']))
+            $_REQUEST['gorog'] = false;
 
         //Data For Pagination
         $params = ['varos' => $_REQUEST['varos'], 'tavolsag' => $_REQUEST['tavolsag'],

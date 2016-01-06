@@ -13,7 +13,7 @@ class Delete extends \Html\Html {
         $this->title = 'Templom és miserendje törlése';
         $this->template = 'layout.twig';
         $this->input['tid'] = $path[0];
-        
+
         $this->church2delete = \Eloquent\Church::find($this->input['tid']);
         if ($this->church2delete->id == 0) {
             addMessage("Nincs ilyen templom!", danger);
@@ -30,7 +30,7 @@ class Delete extends \Html\Html {
     }
 
     function delete() {
-        $this->church2delete->remarks()->delete();         
+        $this->church2delete->remarks()->delete();
         $this->church2delete->delete();
         header("Location: /templom/list");
     }
@@ -40,7 +40,7 @@ class Delete extends \Html\Html {
 
         $tid = $this->input['tid'];
 
-        $kiir.="\n<span class=kiscim>Biztosan törölni akarod a következő templomot?<br><font color=red>FIGYELEM! A kapcsolódó misék és képek is törlődnek!</font></span>";
+        $kiir = "\n<span class=kiscim>Biztosan törölni akarod a következő templomot?<br><font color=red>FIGYELEM! A kapcsolódó misék és képek is törlődnek!</font></span>";
 
         $query = "select nev from templomok where id='$tid'";
         list($cim) = mysql_fetch_row(mysql_query($query));
@@ -53,7 +53,6 @@ class Delete extends \Html\Html {
         }
 
         $this->content = $kiir;
-
     }
 
 }

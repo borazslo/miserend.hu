@@ -5,7 +5,7 @@ namespace ExternalApi;
 class ExternalApi {
 
     public $cache = "1 week"; //false or any time in strtotime() format
-    public $cacheDir = 'fajlok/tmp/';
+    public $cacheDir = PATH . 'fajlok/tmp/';
     public $queryTimeout = 30;
     public $query;
     public $name = 'external';
@@ -15,7 +15,7 @@ class ExternalApi {
     }
 
     function runQuery() {
-        if (!$this->rawQuery) {
+        if (!isset($this->rawQuery)) {
             $this->buildQuery();
         }
 
@@ -24,7 +24,7 @@ class ExternalApi {
             $this->tryToLoadFromCache();
         }
 
-        if (!$this->rawData) {
+        if (!isset($this->rawData)) {
             $this->downloadData();
         }
 

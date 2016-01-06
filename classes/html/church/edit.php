@@ -14,7 +14,7 @@ class Edit extends \Html\Html {
             throw new \Exception('Nincs ilyen templom.');
         }
         $this->setTitle($this->church->nev);
-        
+
         if (!$this->church->McheckWriteAccess($user)) {
             $this->title = 'Hiányzó jogosultság!';
             addMessage('Hiányzó jogosultság!', 'danger');
@@ -63,7 +63,7 @@ class Edit extends \Html\Html {
                         $origPhoto->order = 0;
                     $origPhoto->title = $modPhoto['title'];
                     $origPhoto->save();
-                    if ($modPhoto['delete']) {
+                    if (isset($modPhoto['delete'])) {
                         $origPhoto->delete();
                     }
                 }
@@ -196,9 +196,9 @@ class Edit extends \Html\Html {
     }
 
     function addFormReligiousAdministration() {
-        $selected = ['diocese' => $this->church->egyhazmegye, 'deanery' => $this->church->espereskerulet ];
-        $selectReligiousAdministration = \Form::selectReligiousAdministration($selected);
-        $this->form['dioceses'] = $selectReligiousAdministration['dioceses'];        
+        $selected = ['diocese' => $this->church->egyhazmegye, 'deanery' => $this->church->espereskerulet];
+        $selectReligiousAdministration = \Form::religiousAdministrationSelection($selected);
+        $this->form['dioceses'] = $selectReligiousAdministration['dioceses'];
         $this->form['deaneries'] = $selectReligiousAdministration['deaneries'];
     }
 

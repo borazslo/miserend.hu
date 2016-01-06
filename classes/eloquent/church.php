@@ -32,7 +32,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         if ($this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
             $overpass = new \ExternalApi\OverpassApi();
             $overpass->updateEnclosing($this->osms->first());
-            $this->load(osms);
+            $this->load('osms');
         }
         return $this->osms->first();
     }

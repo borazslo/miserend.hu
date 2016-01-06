@@ -6,7 +6,7 @@ class UploadImage extends Html {
 
     public function __construct($path) {
         $this->tid = $path[0];
-        if ($_REQUEST['upload']) {
+        if (isset($_REQUEST['upload'])) {
             $this->ajax();
             exit;
         } else {
@@ -25,7 +25,7 @@ class UploadImage extends Html {
         if (!$lekerdez = mysql_query($query))
             echo "HIBA!<br>$query<br>" . mysql_error();
         list($nev, $ismertnev, $varos, $ehm) = mysql_fetch_row($lekerdez);
-        $kiir.="<input type=hidden name=ehm value=$ehm>";
+        $kiir = "<input type=hidden name=ehm value=$ehm>";
         $kiir.="\n<table width=100% bgcolor=#F5CC4C>
         <tr><td class=alap><big><b>$nev</b> $ismertnev - <u>$varos</u></big><br/>
         <i><strong>Kép feltöltése.</strong> Kérjük kellően jó minőségű és méretű jpeg képet töltsön csak fel.</i></big></td></tr></table>";

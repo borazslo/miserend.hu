@@ -14,8 +14,11 @@ class EventsCatalogue extends Html {
         if (isset($_REQUEST['save']))
             $this->save($_REQUEST);
 
-        if (isset($_REQUEST['order']) AND in_array($_REQUEST['order'], array('year, date', 'name')))
+        if (isset($_REQUEST['order']) AND in_array($_REQUEST['order'], array('year, date', 'name'))) {
             $order = $_REQUEST['order'];
+        } else {
+            $order = false;
+        }
 
         $return = $this->form($order);
         foreach ($return as $key => $value) {
@@ -26,7 +29,7 @@ class EventsCatalogue extends Html {
     function form($order = false) {
         if (!$order)
             $order = 'year, date';
-        $query = "SELECT * FROM events WHERE year >= " . date('Y', '-1 year') . " ORDER BY " . $order . ";";
+        $query = "SELECT * FROM events WHERE year >= " . date('Y', strtotime('-1 year')) . " ORDER BY " . $order . ";";
         $result = mysql_query($query);
         $years = array();
         $names = array();

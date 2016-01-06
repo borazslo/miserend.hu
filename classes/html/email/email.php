@@ -12,7 +12,7 @@ class Email extends \Html\Html {
         }
 
         $this->mail = new \Mail();
-        if ($_REQUEST['send']) {
+        if (isset($_REQUEST['send'])) {
             $this->send();
             $this->template = 'layout_simpliest.twig';
             $this->content = "Köszönjük, elküldtük.";

@@ -12,8 +12,8 @@ class Remark extends Html {
 
         switch ($action) {
             case 'list':
-                if ($_REQUEST['remark'] == 'modify') {
-                    $rid = \Request::IntegerRequired('rid');                    
+                if (isset($_REQUEST['remark']) AND $_REQUEST['remark'] == 'modify') {
+                    $rid = \Request::IntegerRequired('rid');
                     $remark = new \Remark($rid);
                     $state = \Request::Simpletext('state');
                     $remark->changeState($state);

@@ -2,6 +2,8 @@
 
 session_start();
 
+define('PATH', dirname(__FILE__) . "/");
+
 $vars = array();
 
 if (!@include __DIR__ . '/vendor/autoload.php') {
@@ -19,16 +21,7 @@ include_once('functions.php');
 $env = env('MISEREND_WEBAPP_ENVIRONMENT', 'staging'); /* testing, staging, production, vagrant */
 configurationSetEnvironment($env);
 
-if ($config['debug'] > 0) {
-    ini_set('display_errors', 1);
-    error_reporting(E_ERROR | E_WARNING | E_PARSE);
-} else {
-    error_reporting(0);
-    ini_set('display_errors', 0);
-}
-
-//TODO: megszűntetni?
-$vars['design_url'] = $design_url = $config['path']['domain'];
+error_reporting($config['error_reporting'] ? $config['error_reporting'] : 0);
 define('DOMAIN', $config['path']['domain']);
 
 
@@ -52,11 +45,11 @@ if ($user->loggedin)
 //TODO: delete this (see: \Html\Html::loadTwig());
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
-$loader = new Twig_Loader_Filesystem(dirname(__FILE__) . '/templates');
+$loader = new Twig_Loader_Filesystem(PATH . 'templates');
 $twig = new Twig_Environment($loader); // cache?      
 //GIT version
 exec('git rev-parse --verify HEAD 2> /dev/null', $output);
-if ($output[0] != '')
+if (isset($output[0]) AND $output[0] != '')
     $vars['version']['hash'] = $output[0];
 
 

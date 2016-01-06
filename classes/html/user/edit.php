@@ -18,13 +18,12 @@ class Edit extends \Html\Html {
 
     function modify() {
         global $user;
-        
+
         $newuser = new \User($_REQUEST['edituser']['uid']);
 
-        if ($_REQUEST['terms'] != 1 AND $newuser->uid == 0 AND $user->uid == 0) {
-            addMessage("El kell fogadni a <i>Házirendet és szabályzatot</i>!", 'danger');            
-            return false;            
-            
+        if ((!isset($_REQUEST['terms']) OR $_REQUEST['terms'] != 1 ) AND $newuser->uid == 0 AND $user->uid == 0) {
+            addMessage("El kell fogadni a <i>Házirendet és szabályzatot</i>!", 'danger');
+            return false;
         } else {
             try {
                 $newuser->submit($_REQUEST['edituser']);
@@ -32,14 +31,14 @@ class Edit extends \Html\Html {
                     global $config;
                     //require_once('moduls/miserend.php');
                     //$tartalom = miserend_index();
-                    header("Location: ".$config['path']['domain']);
+                    header("Location: " . $config['path']['domain']);
                 } else {
-                    $_REQUEST['uid'] = $newuser->uid;
+                    $this->uid = $newuser->uid;
                     return true;
                 }
             } catch (\Exceptions $e) {
                 addMessage($e->getMessage());
-                return false;                
+                return false;
             }
         }
     }

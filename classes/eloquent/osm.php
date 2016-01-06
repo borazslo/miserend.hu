@@ -31,12 +31,12 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function getAdministrativeAttribute($value) {
-        for($i=1;$i<10;$i++) {
-             $osm = $this->_getAdministrative($i);
-             if($osm->name) {
+        for ($i = 1; $i < 10; $i++) {
+            $osm = $this->_getAdministrative($i);
+            if ($osm AND $osm->name) {
                 $return[$i] = $osm;
-             }             
-        }                
+            }
+        }
         return $return;
     }
 
@@ -57,6 +57,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
 
     public function getReligiousAdministrationAttribute($value) {
         $administrationLevels = ['diocese', 'deaconry', 'parish'];
+        $return = false;
         foreach ($administrationLevels as $level) {
             if ($this->$level) {
                 $return[$level] = $this->$level;
@@ -108,7 +109,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     }
 
     //Returns OSM elements that encloses this element. This element enclosed by the returning ones.
-    public function enclosing() { 
+    public function enclosing() {
         return $this->belongsToMany('\Eloquent\OSM', 'lookup_osm_enclosed', 'osm_id', 'enclosing_id');
     }
 
@@ -116,9 +117,10 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     public function enclosed() {
         return $this->belongsToMany('\Eloquent\OSM', 'lookup_osm_enclosed', 'enclosing_id', 'osm_id');
     }
-    
+
     public function delete() {
-        $this->tags()->delete();      
+        $this->tags()->delete();
         parent::delete();
     }
+
 }

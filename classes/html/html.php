@@ -32,22 +32,22 @@ class Html {
 
         $this->loadTwig();
         $this->getTemplateFile();
-        $this->html = $this->twig->render($this->template, (array) $this);
-        $this->injectTime(microtime() - $startTime);
+        $this->html = $this->twig->render(strtolower($this->template), (array) $this);
+        $this->injectTime();
     }
 
     function loadTwig() {
-        require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
-        \Twig_Autoloader::register();
-        $loader = new \Twig_Loader_Filesystem($this->templatesPath);
-        $this->twig = new \Twig_Environment($loader); // cache?          
+        #require_once PATH.'vendor/twig/twig/lib/Twig/Autoloader.php';        
+        #\Twig_Autoloader::register();        
+        $loader = new \Twig_Loader_Filesystem(PATH . $this->templatesPath);
+        $this->twig = new \Twig_Environment($loader); // cache?                  
     }
 
     function getTemplateFile() {
         if (!isset($this->template)) {
             $className = get_class($this);
             $classPath = preg_replace("/\\\/i", "/", get_class($this));
-            $classShortPath = preg_replace("/Html\//i", "", $classPath);
+            $classShortPath = preg_replace("/html\//i", "", $classPath);
             $this->template = $classShortPath . ".twig";
         }
     }
@@ -56,7 +56,7 @@ class Html {
         if ($this->user->checkRole("'any'")) {
             $this->loadAdminMenu();
         }
-        if (count($user->responsible['diocese']) > 0 AND ! $user->checkRole('miserend')) {
+        if (isset($this->user->responsible['diocese']) AND count($this->user->responsible['diocese']) > 0 AND ! $this->user->checkRole('miserend')) {
             $this->loadResponsibleMenu();
         }
     }
@@ -122,7 +122,7 @@ class Html {
         return true;
     }
 
-    function injectTime($time) {
+    function injectTime() {
         global $config;
         if ($config['debug'] > 0) {
             $this->html = str_replace('<!--xxx-->', ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"] ) . " s", $this->html);
@@ -154,15 +154,15 @@ class Html {
 
     function initPagination() {
         $this->pagination = new \Pagination();
-        if ($this->input['page']) {
+        if (isset($this->input['page'])) {
             $this->pagination->active = $this->input['page'];
         }
-        if ($this->input['take']) {
+        if (isset($this->input['take'])) {
             $this->pagination->take = $this->input['take'];
         }
     }
 
-    public function printExceptionVerbose($e) {
+    static function printExceptionVerbose($e) {
         echo $e->getMessage();
         echo "<pre>";
         foreach ($e->getTrace() as $trace) {

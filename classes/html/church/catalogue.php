@@ -13,26 +13,23 @@ class Catalogue extends \Html\Html {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');
         }
 
-        $egyhazmegye = $_POST['egyhazmegye'];
+        $egyhazmegye = (isset($_REQUEST['egyhazmegye']) ? $_REQUEST['egyhazmegye'] : false);
+
         if ($egyhazmegye == '0')
             $egyhazmegye = 'mind';
-        $kulcsszo = $_POST['kkulcsszo'];
-        $allapot = $_REQUEST['allapot'];
+        $kulcsszo = (isset($_REQUEST['kkulcsszo']) ? $_REQUEST['kkulcsszo'] : false);
+        $allapot = (isset($_REQUEST['allapot']) ? $_REQUEST['allapot'] : false);
 
-        $sort = $_POST['sort'];
-        if (empty($sort))
+        $sort = (isset($_REQUEST['sort']) ? $_REQUEST['sort'] : false);
+        if (!$sort)
             $sort = 'moddatum desc';
 
-        $min = $_POST['min'];
-        if (!isset($min))
-            $min = $_GET['min'];
-        if ($min < 0 or ! isset($min))
+        $min = (isset($_REQUEST['min']) ? $_REQUEST['min'] : false);
+        if (!is_numeric($min) or $min < 0 or ! $min)
             $min = 0;
 
-        $leptet = $_POST['leptet'];
-        if (!isset($leptet))
-            $leptet = $_GET['leptet'];
-        if (!isset($leptet))
+        $leptet = (isset($_REQUEST['leptet']) ? $_REQUEST['leptet'] : false);
+        if (!$leptet)
             $leptet = 50;
 
         $next = $min + $leptet;
@@ -44,7 +41,7 @@ class Catalogue extends \Html\Html {
             $espkerT[$eshm][$esid] = $esnev;
         }
 
-        $kiir.="<span class=kiscim>A lista szűkíthető egyházmegyék, kulcsszó és állapot alapján:</span><br>";
+        $kiir = "<span class=kiscim>A lista szűkíthető egyházmegyék, kulcsszó és állapot alapján:</span><br>";
         $csakpriv = 'mind';
         $ehmmindkiir = '<option value=mind>Mind</option>';
         $query_kat = "select id,nev,felelos,csakez from egyhazmegye where ok='i' order by sorrend";
@@ -74,7 +71,7 @@ class Catalogue extends \Html\Html {
                 $kiir.=" selected";
             $kiir.=">";
             $kiir.="$knev</option>";
-            if (is_array($espkerT[$kid])) {
+            if (isset($espkerT[$kid]) AND is_array($espkerT[$kid])) {
                 foreach ($espkerT[$kid] as $esid => $esnev) {
                     $kiir.="<option value=$kid-$esid";
                     if ($egyhazmegye == "$kid-$esid")
@@ -142,7 +139,7 @@ class Catalogue extends \Html\Html {
             else
                 $feltetelT[] = "ok='$allapot'";
         }
-        if (is_array($feltetelT))
+        if (isset($feltetelT) AND is_array($feltetelT))
             $feltetel = ' where ' . implode(' and ', $feltetelT);
 
         //Misék lekérdezése
@@ -172,9 +169,9 @@ class Catalogue extends \Html\Html {
 			) AND e.church_id = t.id 
 		";
         }
-
-        $query .= $feltetel . " ";
-        if ($feltetel != '' AND $wallapot != '')
+        if (isset($feltetel))
+            $query .= $feltetel . " ";
+        if (isset($feltetel) AND $feltetel != '' AND $wallapot != '')
             $query .= " AND ";
         elseif ($wallapot != '')
             $query .= " WHERE ";
@@ -193,13 +190,14 @@ class Catalogue extends \Html\Html {
         if ($veg > $mennyi)
             $veg = $mennyi;
         if ($mennyi > 0) {
+            $lapozo = '';
             $sum = "<span class=alap>Összesen: $mennyi találat<br>Listázás: $kezd - $veg</span><br><br>";
             if ($min > 0) {
-                $lapozo.="\n<form method=post><input type=hidden name=kkulcsszo value='" . $_POST['kkulcsszo'] . "'><input type=hidden name=egyhazmegye value=$egyhazmegye><input type=hidden name=min value=$prev><input type=hidden name=sort value='$sort'>";
+                $lapozo.="\n<form method=post><input type=hidden name=kkulcsszo value='" . $kulcsszo . "'><input type=hidden name=egyhazmegye value=$egyhazmegye><input type=hidden name=min value=$prev><input type=hidden name=sort value='$sort'>";
                 $lapozo.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
             }
             if ($mennyi > $min + $leptet) {
-                $lapozo.="\n<form method=post><input type=hidden name=kkulcsszo value='" . $_POST['kkulcsszo'] . "'><input type=hidden name=egyhazmegye value=$egyhazmegye><input type=hidden name=min value=$next><input type=hidden name=sort value='$sort'>";
+                $lapozo.="\n<form method=post><input type=hidden name=kkulcsszo value='" . $kulcsszo . "'><input type=hidden name=egyhazmegye value=$egyhazmegye><input type=hidden name=min value=$next><input type=hidden name=sort value='$sort'>";
                 $lapozo.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
             }
         } else
@@ -214,7 +212,7 @@ class Catalogue extends \Html\Html {
             $ch = \Eloquent\Church::find($tid);
             $jelzes = $ch->remarksStatus['html'];
 
-            if (!$vanmiseT[$tid] AND $church['miseaktiv'] == 1) {
+            if (!isset($vanmiseT[$tid]) AND $church['miseaktiv'] == 1) {
                 $jelzes.="<img src=/img/lampa.gif title='Nincs hozzá mise!' align=absmiddle> ";
             }
             if ($church['ok'] == 'n')

@@ -42,7 +42,7 @@ class Church extends \Html\Html {
         $misek = getMasses($tid);
 
         if ($user->checkRole('miserend') OR $user->checkRole('ehm:' . $egyhazmegye) OR ( isset($responsible) AND in_array($user->login, $responsible))) {
-            $nev.=" <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
+            $nev = " <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
                     . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 
             $query = "select allapot from remarks where church_id = '" . $tid . "' GROUP BY allapot ORDER BY allapot limit 5;";
@@ -79,7 +79,7 @@ class Church extends \Html\Html {
         $this->alert = LiturgicalDayAlert('html');
     }
 
-    public function factory($path) {
+    static function factory($path) {
         if (isset($path[1])) {
             $urlmapping = ['new' => 'edit'];
             if (array_key_exists($path[1], $urlmapping)) {

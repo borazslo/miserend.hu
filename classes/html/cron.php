@@ -11,7 +11,7 @@ class Cron extends Html {
         ini_set('memory_limit', '512M');
 
         $job = \Eloquent\Cron::nextJobs()->first();
-        
+
         if (!$job) {
             echo "Nincs futtatandó feladat.";
             return;
@@ -20,20 +20,16 @@ class Cron extends Html {
         $job->attempts++;
         $job->save();
         try {
-            echo $job->class . "->" . $job->function . "() futtatása ...\n";
+            echo "<strong>" . $job->class . "->" . $job->function . "() futtatása ....</strong>\n";
             $this->runJob($job);
         } catch (\Exception $exception) {
             $this->error = true;
-            if (php_sapi_name() == "cli") {
-                echo $job->class . "->" . $job->function . "() futtatása sikertelen.\n";
-            } else {
-                $this->printExceptionVerbose($exception);
-            }
+            echo "<strong>" . $job->class . "->" . $job->function . "() futtatása sikertelen.</strong>\n";
+            $this->printExceptionVerbose($exception);
         }
 
-        if (!$this->error) {
+        if (!isset($this->error)) {
             $job->success();
-            echo $job->class . "->" . $job->function . "() sikeresen lefuttatva.\n";
         }
     }
 
@@ -54,7 +50,7 @@ class Cron extends Html {
         updateDeleteZeroMass();
         updateComments2Attributes();
         //not so fast!
-        updateAttributesOptimalization();         
+        updateAttributesOptimalization();
     }
 
     function runJob($job) {

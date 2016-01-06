@@ -18,7 +18,9 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
-                if ($this->checkRole('miserend')) { $this->isadmin = true;}
+                if ($this->checkRole('miserend')) {
+                    $this->isadmin = true;
+                }
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -39,7 +41,9 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
-                if ($this->checkRole('miserend')) { $this->isadmin = true;}
+                if ($this->checkRole('miserend')) {
+                    $this->isadmin = true;
+                }
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
@@ -67,7 +71,9 @@ class User {
                 $this->name = $x['nev'];
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 $this->getResponsabilities();
-                if ($this->checkRole('miserend')) { $this->isadmin = true;}
+                if ($this->checkRole('miserend')) {
+                    $this->isadmin = true;
+                }
                 return true;
             } else {
                 //TODO: kitalálni mit csináljon, hogy nincs uid-jű user. Legyen vendég?
@@ -82,6 +88,9 @@ class User {
             return true;
 
         if ($role == '"any"' OR $role == "'any'") {
+            if (!isset($this->jogok)) {
+                return false;
+            }
             if (trim(preg_replace('/-/i', '', $this->jogok)) != '')
                 return true;
             else
@@ -281,7 +290,7 @@ class User {
             if (!filter_var($val, FILTER_VALIDATE_EMAIL)) {
                 return false;
             }
-            if ($this->isEmailInUse($val)) {
+            if ($this->isEmailInUse($val) AND $val != $this->email) {
                 return false;
             }
             $this->presaved[$key] = $val;
@@ -396,9 +405,9 @@ class User {
         $this->favorites = $favorites;
         return $favorites;
     }
-    
+
     function checkFavorite($tid) {
-        if (!$this->favorites) {
+        if (!isset($this->favorites)) {
             $this->getFavorites();
         }
         foreach ($this->favorites as $favorite) {
@@ -416,7 +425,7 @@ class User {
             if (!is_numeric($tid))
                 return false;
         }
-        foreach ($tids as $key => $tid) {                        
+        foreach ($tids as $key => $tid) {
             if (!\Eloquent\Church::find($tid))
                 unset($tids[$key]);
         }
@@ -453,7 +462,7 @@ class User {
         else
             return false;
     }
-    
+
     function isEmailInUse($val) {
         $result = DB::table('user')
                 ->select('email')

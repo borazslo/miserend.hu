@@ -2,13 +2,12 @@
 
 use Illuminate\Database\Capsule\Manager as DB;
 
-class OSM  {
+class OSM {
 
     public $type;
     public $id;
     public $table = 'osm';
 
-  
     function downloadEnclosingBoundaries() {
         $overpass = new \ExternalApi\OverpassApi();
         $overpass->downloadEnclosingBoundaries($this->lat, $this->lon);
@@ -22,15 +21,14 @@ class OSM  {
             if (isset($element->center->lon)) {
                 $element->lon = $element->center->lon;
             }
-                      
+
             $newOSM = new \Eloquent\OSM();
             printr($newOSM);
-            copyArrayToObject($element, $newOSM);                        
+            copyArrayToObject($element, $newOSM);
             $newOSM->save();
             printr($newOSM);
             exit;
         }
     }
 
-   
 }

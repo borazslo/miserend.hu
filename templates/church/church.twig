@@ -37,7 +37,7 @@
     <h5><b>Frissítve:</b> {{ updated }}</h5>
 
     {% if miseaktiv == 1 %}
-        {% include "Church/_Schedule.twig" %}
+        {% include "church/_schedule.twig" %}
     {% else %}
         <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
         {% endif %}
@@ -47,7 +47,7 @@
     {% endif %}
 
     {% if photos|length > 0 %}
-        {% include "Church/_PhotoSlide.twig" %}
+        {% include "church/_photoslide.twig" %}
     {% endif %}
 
     {% if leiras %}
@@ -57,19 +57,19 @@
 
 {% set selfAdvertisement = true %}
 {% block leftsidebar %}
-    {% include "Church/_panelAskingRemark.twig" %}    
+    {% include "church/_panelaskingremark.twig" %}    
 {% endblock %}
 
 {% block rightsidebar %}
-    {% include "Church/_panelLocation.twig" %}
-    {% include 'Church/_panelContact.twig' %}
+    {% include "church/_panellocation.twig" %}
+    {% include 'church/_panelcontact.twig' %}
     {% if megjegyzes %}
         {% include "panel.twig" with {title:'Jó tudni','body': megjegyzes } %}
     {% endif %}
     {% if closestNeighbour %}
-        {% include 'Church/_panelNeighbours.twig' %}
+        {% include 'church/_panelneighbours.twig' %}
     {% endif %}    
     {% if osm and user.isadmin %}
-        {% include 'Church/_panelOSM.twig' %}
+        {% include 'church/_panelosm.twig' %}
     {% endif %}
 {% endblock %}

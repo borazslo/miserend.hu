@@ -17,14 +17,14 @@ class DioceseCatalogue extends Html {
         $lekerdez = mysql_query($query);
         while (list($id, $nev) = mysql_fetch_row($lekerdez)) {
             $txt.="<option value=$id";
-            if ($id == $ehm)
+            if ($id == $_REQUEST['ehm'])
                 $txt.=" selected";
             $txt.=">$nev</option>";
         }
         $txt.="</select><input type=submit value=Mutat class=urlap></form>";
 
-        $ehm = $_POST['ehm'];
-        if ($ehm > 0) {
+        $ehm = $_REQUEST['ehm'];
+        if (is_numeric($ehm) AND $ehm > 0) {
 
             list($ehmnev) = mysql_fetch_row(mysql_query("select nev from egyhazmegye where id='$ehm'"));
             $txt.="<h2>$ehmnev egyházmegye</h2>";
@@ -32,9 +32,11 @@ class DioceseCatalogue extends Html {
             $query = "select templomok.id,templomok.nev,templomok.varos,espereskerulet.nev from espereskerulet, templomok where espereskerulet.id=templomok.espereskerulet and templomok.egyhazmegye=$ehm order by templomok.espereskerulet, templomok.varos";
             if (!$lekerdez = mysql_query($query))
                 echo "<br>HIBA!<br>$query<br>" . mysql_error();
+            $a = 0;
+            $excel = '';
             while (list($tid, $tnev, $varos, $espker) = mysql_fetch_row($lekerdez)) {
                 $a++;
-                if ($espker != $espkerell) {
+                if (!isset($espkerell) OR $espker != $espkerell) {
                     $txt.= "<br><h3>$espker espereskerület</h3>";
                     $espkerell = $espker;
                 }

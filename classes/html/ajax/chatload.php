@@ -19,7 +19,7 @@ class ChatLoad extends Ajax {
         $alert = 0;
         foreach ($comments as $k => $i) {
             global $twig;
-            $comments[$k]['html'] = $twig->render('chat/chatComment.twig', array('comment' => $i));
+            $comments[$k]['html'] = $twig->render('chat/chatcomment.twig', array('comment' => $i));
             if ($i['user'] != $user->login) {
                 $alert++;
             }

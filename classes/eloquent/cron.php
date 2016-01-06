@@ -28,7 +28,7 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
 
     public function initialize() {
         $jobsToSave = [
-            ['\Eloquent\Cron', 'initialize', '1 min'],
+            ['\Eloquent\Cron', 'initialize', '1 week'],
             ['\Html\Cron', 'oldHourly', '1 hour'],
             ['\Html\Cron', 'oldWeekly', '1 week'],
             ['\Api\Sqlite', 'cron', '1 day'],
@@ -39,7 +39,7 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
         ];
         foreach ($jobsToSave as $jobToSave) {
             echo $jobToSave[0];
-            $job = \Eloquent\Cron::firstOrCreate(['class'=>$jobToSave[0],'function'=>$jobToSave[1]]);
+            $job = \Eloquent\Cron::firstOrCreate(['class' => $jobToSave[0], 'function' => $jobToSave[1]]);
             $job->frequency = $jobToSave[2];
             $job->save();
         }
