@@ -23,7 +23,7 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
                             $query->where('attempts', '<', 10)
                             ->orWhere('updated_at', '<', date('Y-m-d H:i:s', strtotime('-12 hour')));
                         })
-                        ->orderBy('attempts', 'ASC')->orderBy('deadline_at', 'DESC');
+                        ->orderBy('attempts', 'ASC')->orderBy('deadline_at', 'ASC');
     }
 
     public function initialize() {

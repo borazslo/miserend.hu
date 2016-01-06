@@ -166,16 +166,17 @@ class Sqlite extends Api {
     }
 
     function insertDataTemplomok() {
-        set_time_limit(4500);
+        set_time_limit(15000);
         $churches = \Eloquent\Church::where('ok', 'i')->orderBy('id')->get();
         if (!$churches) {
             throw new Exception("There are no valid churches.");
         }
         $sum = count($churches);
         $c = 1;
+        echo "\n";
         foreach ($churches as $church) {
             $line = (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $c++ . "/" . $sum . " -- " . $church->id . " " . $church->nev;            
-            echo str_pad($line,  120)."\r";
+            echo "\r".str_pad($line,  120);
             $church->MgetLocation();
 
             $insert = [
@@ -220,7 +221,7 @@ class Sqlite extends Api {
     }
 
     function insertDataMisek() {
-        set_time_limit(1200);
+        set_time_limit(5200);
         $masses = DB::table('misek')->where('torles', '0000-00-00 00:00:00')->where('tid', '<>', 0)->orderBy('tid')->orderBy('id')->get();
         if (!$masses) {
             throw new Exception("There are no valid masses.");
