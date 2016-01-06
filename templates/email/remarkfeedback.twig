@@ -1,0 +1,15 @@
+{% extends "email/email.twig" %}
+
+{% block pageHeader %}
+    <div class="jumbotron">
+        <h3>
+            <a href="/templom/{{ church.id }}" target=_blank>{{ church.nev }}</a>
+            <small><strong>{% if church.ismertnev %}{{ church.ismertnev }} - {% endif %}{{ church.varos }}</strong><br/>
+                Javítások, változások bejelentésének kezelése</small>
+        </h3>
+    </div>
+{% endblock %}
+
+{% block extraInput %}
+    <input type=hidden name=rid value="{{ remark.id }}">
+{% endblock %}

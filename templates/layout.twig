@@ -75,11 +75,11 @@
                 {% include 'navbar.twig' %}
                 <div class="row">
                     <div class="col-md-3  col-sm-3">
-                        <!--{% include 'search/quickSearchForm.twig' %}-->
+                        <!--{% include 'search/quicksearchform.twig' %}-->
                         {% block leftsidebar %}{% endblock %}
-                        {% if chat %}{% include 'chat/chatBox.twig' with chat %}{% endif %}
+                        {% if chat %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
                         {% if mychurches %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
-                        {% if selfAdvertisement %}{% include "_panelSelfAdvertisement.twig"  %}{% endif %}
+                        {% if selfAdvertisement %}{% include "_panelselfadvertisement.twig"  %}{% endif %}
                     </div>
                     <div class="col-md-{% if columns2 %}9{% else %}6{% endif %} col-sm-6">
                         {% block pageHeader %}

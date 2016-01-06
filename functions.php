@@ -297,8 +297,11 @@ function event2Date($event, $year = false) {
     if (preg_match('/^([0-9]{4})(\.|-)([0-9]{2})(\.|-)([0-9]{2})(\.|)/i', $event, $match))
         return $match[3] . "-" . $match[5];
     if (preg_match('/^([0-9]{2})(\.|-)([0-9]{2})(\.|)(( \-| \+)[0-9]{1,3}|$)/i', $event, $match)) {
-        if ($match[5] != '')
+        if ($match[5] != '') {
             $extra = $match[5] . " days";
+        } else {
+            $extra = false;
+        }
         return date('m-d', strtotime(date('Y') . "-" . $match[1] . "-" . $match[3] . " " . $extra));
     }
 
@@ -407,10 +410,11 @@ function getMasses($tid, $date = false) {
 
     //order byweight
 
-    if (is_array($return['periods']))
+    if (isset($return['periods']) AND is_array($return['periods']))
         usort($return['periods'], "cmp");
-    if (is_array($return['particulars']))
+    if (isset($return['particulars']) AND is_array($return['particulars'])) {
         usort($return['particulars'], "cmp");
+    }
 
 
     return $return;
@@ -447,8 +451,10 @@ function decodeMassAttr($text) {
         $tmp1 = $tmp2 = '';
 
         for ($i = 0; $i < count($attribute['values']); $i++) {
-            $tmp1 .= $periods[$attribute['values'][$i]]['abbrev'];
-            $tmp2 .= $periods[$attribute['values'][$i]]['name'];
+            if ($attribute['values'][$i]) {
+                $tmp1 .= $periods[$attribute['values'][$i]]['abbrev'];
+                $tmp2 .= $periods[$attribute['values'][$i]]['name'];
+            }
             if ($i < count($attribute['values']) - 2) {
                 $tmp1 .= ", ";
                 $tmp2 .= ", ";
@@ -703,12 +709,12 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     if (!$lekerdez = mysql_query($query))
         echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     $return['sum'] = mysql_num_rows($lekerdez);
-    if (!$filterdistance)
+    if (!isset($filterdistance))
         $query .= " LIMIT " . ($offset ) . "," . ($limit);
     if (!$lekerdez = mysql_query($query))
         echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
     while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
-        if ($filterdistance) {
+        if (isset($filterdistance)) {
             //acos(sin(:lat)*sin(radians(Lat)) + cos(:lat)*cos(radians(Lat))*cos(radians(Lon)-:lon)) * :R < :rad
             $d = acos(sin(deg2rad($lat)) * sin(deg2rad($row['lat'])) + cos(deg2rad($lat)) * cos(deg2rad($row['lat'])) * cos(deg2rad($row['lng']) - deg2rad($lon))) * $R;
             if ($d <= $rad) {
@@ -725,7 +731,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         }
     }
 
-    if ($filterdistance) {
+    if (isset($filterdistance)) {
         $return['sum'] = count($return['results']);
         if ($return['sum'] > 0)
             $return['results'] = array_slice($return['results'], $offset, $limit + $offset);
@@ -782,7 +788,7 @@ function searchChurchesWhere($args) {
         $where[] = "( lat BETWEEN " . $minLat . " AND " . $maxLat . " AND lng BETWEEN " . $minLon . " AND " . $maxLon . ")";
     }
 
-    if ($args['gorog'] == 'gorog') {
+    if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {
         $where[] = "egyhazmegye IN (17,18)";
     }
 
@@ -1061,7 +1067,7 @@ function generateMassTmp($where = false) {
 
     foreach ($updates as $update) {
         $query = "UPDATE misek SET tmp_datumtol = '" . $update['tmp_datumtol'] . "',tmp_datumig = '" . $update['tmp_datumig'] . "',tmp_relation = '" . $update['tmp_relation'] . "' WHERE id = " . $update['id'] . " LIMIT 1";
-        if ($global['config'] > 1)
+        if ($config['debug'] > 1)
             echo $query . "<br/>";
         mysql_query($query);
     }
@@ -1543,7 +1549,7 @@ EOD;
 }
 
 function updatesCampaign() {
-    global $twig, $design_url, $user;
+    global $twig, $user;
 
     $query = "SELECT count(*) FROM user WHERE ok = 'i'  AND volunteer = 1;";
     $result = mysql_query($query);
@@ -1587,7 +1593,7 @@ function updatesCampaign() {
         'header' => array('content' => 'Hét nap, hét frissítés'),
         'content' => nl2br($dobozszoveg),
         'settings' => array('width=100%', 'align=center', 'style="padding:1px"'),
-        'design_url' => $design_url);
+    );
 
     if ($C >= ( $S * 2 )) {
         return false;
@@ -1701,32 +1707,6 @@ function feltoltes_block() {
 
         return $kodT;
     }
-}
-
-function formazo($adatT, $tipus) {
-    global $design_url, $szin, $design;
-
-    if (!isset($design))
-        $design = 'alap';
-
-    if ($tipus == 'doboz')
-        return $adatT[2];
-
-    $cim = $adatT[0];
-    $cimlink = $adatT[1];
-    $tartalom = $adatT[2];
-    $tartalom2 = $adatT[3]; //híreknél 2. hasáb
-    $tovabb = $adatT[4]; //híreknél "cikk bővebben"
-    $tovabblink = $adatT[5]; //általában a $cimlink
-
-    $tmpl_file = $design_url . '/' . $tipus . '.htm';
-    echo $tmpl_file;
-    $thefile = implode("", file($tmpl_file));
-    $thefile = addslashes($thefile);
-    $thefile = "\$r_file=\"" . $thefile . "\";";
-    eval($thefile);
-
-    return $kod = $r_file;
 }
 
 function addMessage($text, $severity = false) {
@@ -1925,8 +1905,8 @@ function sendJson($url, $content) {
     return $responseArray;
 }
 
-spl_autoload_register(function ($class) {    
-    $classpath = dirname(__FILE__) . '/classes/' . str_replace('\\', '/', $class) . '.php';   
+spl_autoload_register(function ($class) {
+    $classpath = PATH . '/classes/' . str_replace('\\', '/', strtolower($class)) . '.php';
     if ($file = file_exists_ci($classpath)) {
         require_once($file);
     }
@@ -1939,11 +1919,11 @@ function env($name, $default = false) {
         return getenv($name);
 }
 
-function file_exists_ci($fileName) {    
-    if(file_exists($fileName)) {
+function file_exists_ci($fileName) {
+    if (file_exists($fileName)) {
         return $fileName;
     }
-    $pattern = dirname(__FILE__)."/classes";
+    $pattern = dirname(__FILE__) . "/classes";
     $files = array();
     for ($i = 0; $i < 5; $i++) {
         $pattern .= '/*';
