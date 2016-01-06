@@ -38,7 +38,6 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             ['\Distance', 'updateSome', '15 min']
         ];
         foreach ($jobsToSave as $jobToSave) {
-            echo $jobToSave[0];
             $job = \Eloquent\Cron::firstOrCreate(['class' => $jobToSave[0], 'function' => $jobToSave[1]]);
             $job->frequency = $jobToSave[2];
             $job->save();

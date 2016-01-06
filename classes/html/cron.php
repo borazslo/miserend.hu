@@ -19,8 +19,7 @@ class Cron extends Html {
 
         $job->attempts++;
         $job->save();
-        try {
-            echo "<strong>" . $job->class . "->" . $job->function . "() futtatása ....</strong>\n";
+        try {            
             $this->runJob($job);
         } catch (\Exception $exception) {
             $this->error = true;
