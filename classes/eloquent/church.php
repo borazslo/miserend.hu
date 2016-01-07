@@ -2,10 +2,12 @@
 
 namespace Eloquent;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class Church extends \Illuminate\Database\Eloquent\Model {
 
     protected $table = 'templomok';
-    protected $appends = array('fullName', 'responsible', 'lon', 'osm');
+    protected $appends = array('fullName', 'responsible');
 
     public function getResponsibleAttribute($value) {
         return array($this->letrehozta);
@@ -63,10 +65,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $return;
     }
 
-    function getLonAttribute($value) {
-        return $this->lng;
-    }
-
     function getRemarksStatusAttribute($value) {
         $remark = $this->remarks()
                         ->select('allapot')
@@ -102,23 +100,32 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         parent::delete();
     }
 
-    public function MgetLocation() {
-        #return;
-        $this->location = new \Location();
-        $this->location->getByChurchId($this->id);
-        $this->osm->religiousAdministration;
-        $this->location->country = $this->osm->country;
-        $this->location->county = $this->osm->county;
-        $this->location->city = $this->osm->city;
+    function getLocationAttribute($value) {
+        $location = new \stdClass();
 
-        if (isset($this->osm) AND $this->osm != '') {
-            $this->location->lat = $this->osm->lat;
-            $this->location->lon = $this->osm->lon;
-            $this->location->osm = $this->osm->osmtype . "/" . $this->osm->osmid;
-        } else {
-            $this->location->lon = $this->location->lng;
-            unset($this->location->lng);
+        $location->lat = $this->lat;
+        $location->lon = $this->lon;
+        $location->country = DB::table('orszagok')->where('id', $this->orszag)->pluck('nev')[0];
+        if ($this->megye > 0) {
+            $location->county = DB::table('megye')->where('id', $this->megye)->pluck('megyenev')[0];
         }
+        $location->city = $this->varos;
+        $location->address = $this->cim;
+        $location->access = $this->megkozelites;
+
+        if ($this->cim == '') {
+            $location->address = $this->geoaddress;
+        }
+        /*
+          if($this->osm) {
+          #printr($this->osm->toArray());
+          $location->lat = $this->osm->lat;
+          $location->lon = $this->osm->lon;
+          $location->osm = $this->osm->osmtype . "/" . $this->osm->osmid;
+          }
+         * 
+         */
+        return $location;
     }
 
     public function MgetReligious_administration() {

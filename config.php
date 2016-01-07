@@ -38,7 +38,8 @@ $environment['testing'] = [
         'database' => 'miserend_testing',
         'user' => 'root',
         'password' => 'root'
-    ]
+    ],
+    'error_reporting' => E_ERROR | E_WARNING | E_PARSE
 ];
 
 $environment['staging'] = [

@@ -11,19 +11,19 @@ class DioceseCatalogue extends Html {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');
         }
 
+        $ehm = !empty($_REQUEST['ehm']) ? $_REQUEST['ehm'] : 'false';
         $txt = "<form method=post>"
                 . "<select name=ehm class=urlap>";
         $query = "select id,nev from egyhazmegye";
         $lekerdez = mysql_query($query);
         while (list($id, $nev) = mysql_fetch_row($lekerdez)) {
             $txt.="<option value=$id";
-            if ($id == $_REQUEST['ehm'])
+            if ($id == $ehm)
                 $txt.=" selected";
             $txt.=">$nev</option>";
         }
         $txt.="</select><input type=submit value=Mutat class=urlap></form>";
 
-        $ehm = $_REQUEST['ehm'];
         if (is_numeric($ehm) AND $ehm > 0) {
 
             list($ehmnev) = mysql_fetch_row(mysql_query("select nev from egyhazmegye where id='$ehm'"));

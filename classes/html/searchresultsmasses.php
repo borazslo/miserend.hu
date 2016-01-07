@@ -8,28 +8,27 @@ class SearchResultsMasses extends Html {
 
         global $user, $config;
 
-        $mikor = $_POST['mikor'];
-        $mikordatum = $_POST['mikordatum'];
+        $mikor = $_REQUEST['mikor'];
+        $mikordatum = $_REQUEST['mikordatum'];
         if ($mikor != 'x')
             $mikordatum = $mikor;
 
+        $mikor2 = $_REQUEST['mikor2'];
+        $mikorido = $_REQUEST['mikorido'];
+        $varos = $_REQUEST['varos'];
+        $ehm = $_REQUEST['ehm'];
+        $espkerT = $_REQUEST['espkerT'];
+        $nyelv = $_REQUEST['nyelv'];
+        $zene = $_REQUEST['zene'];
+        $kor = $_REQUEST['kor'];
+        $ritus = $_REQUEST['ritus'];
+        $ige = $_REQUEST['ige'];
 
-        $mikor2 = $_POST['mikor2'];
-        $mikorido = $_POST['mikorido'];
-        $varos = $_POST['varos'];
-        $ehm = $_POST['ehm'];
-        $espkerT = $_POST['espkerT'];
-        $nyelv = $_POST['nyelv'];
-        $zene = $_POST['zene'];
-        $kor = $_POST['kor'];
-        $ritus = $_POST['ritus'];
-        $ige = $_POST['ige'];
 
-
-        $min = $_POST['min'];
+        $min = $_REQUEST['min'];
         if (!isset($min))
             $min = 0;
-        $leptet = $_POST['leptet'];
+        $leptet = $_REQUEST['leptet'];
         if (!isset($leptet))
             $leptet = 25;
 
@@ -64,6 +63,7 @@ class SearchResultsMasses extends Html {
             $leptet_urlap.="<input type=hidden name=hely value='" . $_REQUEST['hely'] . "'>";
             $leptet_urlap.="<input type=hidden name=tavolsag value='" . $_REQUEST['tavolsag'] . "'>";
         }
+
         if (!empty($varos)) {
             $varos = ucfirst($varos);
             $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> $varos településen<br/>";
@@ -155,13 +155,13 @@ class SearchResultsMasses extends Html {
 
         $tartalom.="</span><br/>" . LiturgicalDayAlert('html', $mikordatum);
 
-        if (!empty($_POST['leptet']))
+        if (!empty($_REQUEST['leptet']))
             $visszalink = "?";
         else
             $visszalink = "javascript:history.go(-1);";
         $templomurlap = "<img src=/img/space.gif width=5 height=6><br><a href=$visszalink class=link><img src=/img/search.gif width=16 height=16 border=0 align=absmiddle hspace=2><b>Vissza a főoldali keresőhöz</b></a><br><img src=/img/space.gif width=5 height=6>";
 
-        $results = searchMasses($_POST, $min, $leptet);
+        $results = searchMasses($_REQUEST, $min, $leptet);
         $mennyi = $results['sum'];
 
         $kezd = $min + 1;
@@ -208,7 +208,7 @@ class SearchResultsMasses extends Html {
                 if ($_REQUEST['mikor'] == 'x')
                     $_REQUEST['mikor'] = $_REQUEST['mikordatum'];
                 //$masses = getMasses($result['tid'],$_REQUEST['mikordatum']);
-                //$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_POST));
+                //$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_REQUEST));
                 foreach ($result['masses'] as $mass) {
                     $tartalom .="<img src=/img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>" . substr($mass['ido'], 0, 5) . "</span>";
 

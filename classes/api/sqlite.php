@@ -59,10 +59,10 @@ class Sqlite extends Api {
         $this->setSqliteConnection();
 
         $this->dropAllTables();
-        echo "Create Tables ... \n";
+        echo "\nCreate Tables ...";
         $this->createTables();
         $this->insertData();
-
+        echo "\n";
         return true;
     }
 
@@ -84,9 +84,9 @@ class Sqlite extends Api {
     function insertData() {
         ini_set('memory_limit', '800M');
         $this->sqlite->disableQueryLog();
-        echo "insertDataTemplomok ... \n";
+        echo "\ninsertDataTemplomok ... \n";
         $this->insertDataTemplomok();
-        echo "insertDataMisek ... \n";
+        echo "\ninsertDataMisek ... \n";
         $this->insertDataMisek();
         if ($this->version > 1) {
             $this->insertDataKepek();
@@ -173,11 +173,10 @@ class Sqlite extends Api {
         }
         $sum = count($churches);
         $c = 1;
-        echo "\n";
         foreach ($churches as $church) {
-            $line = (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $c++ . "/" . $sum . " -- " . $church->id . " " . $church->nev;            
-            echo "\r".str_pad($line,  120);
-            $church->MgetLocation();
+            $line = "v" . $this->version . " " . (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $c++ . "/" . $sum . " -- " . $church->id . " " . $church->nev;
+            echo "\r" . str_pad($line, 120);
+            $church->location;
 
             $insert = [
                 'tid' => $church->id,
@@ -186,20 +185,21 @@ class Sqlite extends Api {
             ];
 
             //Location
-            $country = DB::table('orszagok')->where('id', $church->location->orszag)->first();
-            $insert['orszag'] = $country->nev;
-            $county = DB::table('megye')->where('id', $church->location->megye)->first();
-            $insert['megye'] = $county->megyenev;
-            $insert['varos'] = $church->location->varos;
-            $insert['cim'] = $church->location->cim;
-            $insert['geocim'] = $church->location->address2;
+            $insert['orszag'] = $church->location->country;
+            if (isset($church->location->county)) {
+                $insert['megye'] = $church->location->county;
+            } else {
+                $insert['megye'] = "";
+            }
+            $insert['varos'] = $church->location->city;
+            $insert['cim'] = $church->cim;
+            $insert['geocim'] = $church->geoaddress;
             $insert['lng'] = $church->location->lon;
             $insert['lat'] = $church->location->lat;
-            $insert['megkozelites'] = $church->location->megkozelites;
+            $insert['megkozelites'] = $church->location->access;
 
             if ($this->version > 2) {
-                $church->MgetReligious_administration();
-                if (in_array($church->religious_administration->diocese->id, array(18, 17))) { //Görög egyházmegyék kódja
+                if (in_array($church->egyhazmegye, array(18, 17))) { //Görög egyházmegyék kódja
                     $insert['gorog'] = 1;
                 } else
                     $insert['gorog'] = 0;
@@ -227,8 +227,11 @@ class Sqlite extends Api {
             throw new Exception("There are no valid masses.");
         }
 
+        $c = 1;
+        $sum = count($masses);
         foreach ($masses as $mass) {
-            echo $mass->id . " (in " . $mass->tid . ") ...\n";
+            $line = "v" . $this->version . " " . (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $c++ . "/" . $sum . " -- " . $mass->id . " (in " . $mass->tid . ")";
+            echo "\r" . str_pad($line, 120);
             $insert = [
                 'mid' => $mass->id,
                 'tid' => $mass->tid,
@@ -312,7 +315,7 @@ class Sqlite extends Api {
     }
 
     function cron() {
-        echo "Cron job Sqlite is beginning right now...\n";
+        echo "Cron job Sqlite is beginning right now...";
         for ($i = 2; $i <= 4; $i++) {
             $_REQUEST['v'] = $i;
             $this->run();
@@ -320,7 +323,8 @@ class Sqlite extends Api {
     }
 
     function bufferout($newline, $fullLength = false) {
-        if(!$fullLength) $fullLength = 120;
+        if (!$fullLength)
+            $fullLength = 120;
         $length = strlen(rtrim($newline));
 
         $whitespaceLength = $fullLength - $length;

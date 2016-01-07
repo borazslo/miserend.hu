@@ -36,7 +36,8 @@ class Edit extends \Html\Html {
         $allowedFields = ['adminmegj', 'kontakt', 'kontaktmail', 'nev',
             'ismertnev', 'orszag', 'megye', 'varos', 'cim', 'megkozelites',
             'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml', 'pleb_url',
-            'megjegyzes', 'miseaktiv', 'misemegj', 'leiras', 'ok', 'frissites'];
+            'megjegyzes', 'miseaktiv', 'misemegj', 'leiras', 'ok', 'frissites',
+            'lat','lon'];
 
         global $user;
         if ($user->checkRole('miserend')) {

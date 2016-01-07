@@ -17,6 +17,7 @@ class Church extends \Html\Html {
 
         $church->MgetReligious_administration();
 
+
         if ($church->osm AND $church->osm->enclosing->toArray() == array()) {
             $overpass = new \ExternalApi\OverpassApi();
             $overpass->updateEnclosing($church->osm);
@@ -24,18 +25,15 @@ class Church extends \Html\Html {
             $church->osm = $church->osms()->first();
         }
 
-        $church->MgetLocation();
-
-
         if (!$church->McheckReadAccess($user)) {
             throw new \Exception("Read access denied to church tid = '$tid'");
         }
-
         copyArrayToObject($church->toArray(), $this);
+        $this->location = $church->location;
 
         $this->osm = $church->osm;
 
-        $this->setTitle($this->nev . " (" . $this->location->varos . ")");
+        $this->setTitle($this->nev . " (" . $this->location->city . ")");
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
 
         //Miseidőpontok
@@ -68,8 +66,10 @@ class Church extends \Html\Html {
           else
           $cim .= "<br/>";
          */
-
-        $this->addExtraMeta("og:image", "/kepek/templomok/" . $tid . "/" . $this->photos[0]->fajlnev);
+        $this->photos;
+        if (isset($this->photos[0])) {
+            $this->addExtraMeta("og:image", "/kepek/templomok/" . $tid . "/" . $this->photos[0]->fajlnev);
+        }
 
         if ($user->checkFavorite($tid)) {
             $this->favorite = 1;

@@ -81,9 +81,23 @@
                     {% for city in form.cities %}
                         {{ forms.select(city) }}
                     {% endfor %}
-                    <input type=text name=church[cim] placeholder='Cím' value="{{ church.cim }}" class=form-control  placeholder="Utca házszám">                    
+                    <input type=text name=church[cim] value="{{ church.cim }}" class=form-control  placeholder="Utca házszám">                                                    
                 </td>
                 <td></td>
+            </tr>
+            <tr>
+                <td class=kiscim align=right>Koordináták:</td>
+                <td>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type=text name=church[lat] value="{{ church.lat }}" class=form-control  placeholder="szélességi fok">                    
+                        </div>
+                        <div class="col-md-6">
+                            <input type=text name=church[lon] value="{{ church.lon }}" class=form-control  placeholder="hosszúsági fok">                    
+                        </div>
+                    </div>
+                </td>
+                <td><td>
             </tr>
             <tr>
                 <td class=kiscim align="right" >A templom megközelítése:</td>                
