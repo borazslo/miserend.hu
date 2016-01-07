@@ -73,7 +73,6 @@ class Sqlite extends Api {
         $this->createTables();
         $this->insertData();
         echo "\n";
-        echo $this->sqliteFile;
         $this->sqlite->commit();
         DB::disconnect('sqlite_v' . $this->version);
         return true;
@@ -334,18 +333,6 @@ class Sqlite extends Api {
             $_REQUEST['v'] = $i;
             $this->run();
         }
-    }
-
-    function bufferout($newline, $fullLength = false) {
-        if (!$fullLength)
-            $fullLength = 120;
-        $length = strlen(rtrim($newline));
-
-        $whitespaceLength = $fullLength - $length;
-        if ($whitespaceLength > 0) {
-            $return = str_repeat(" ", $whitespaceLength);
-        }
-        echo $newline . $return . "\r";
     }
 
 }
