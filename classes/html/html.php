@@ -65,7 +65,6 @@ class Html {
         $adminmenuitems = [
             ['title' => 'Miserend', 'url' => '/termplom/list', 'permission' => 'miserend', 'mid' => 27,
                 'items' => [
-                    ['title' => 'új templom', 'url' => '/templom/new', 'permission' => ''],
                     ['title' => 'lista', 'url' => '/templom/list', 'permission' => ''],
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
@@ -73,7 +72,6 @@ class Html {
             ],
             ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user',
                 'items' => [
-                    ['title' => 'új felhasználó', 'url' => '/user/new', 'permission' => 'user'],
                     ['title' => 'lista', 'url' => '/user/catalogue', 'permission' => 'user'],
                 ]
             ],

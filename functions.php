@@ -249,25 +249,24 @@ function LiturgicalDayAlert($html = false, $date = false) {
     $day = LirugicalDay($date);
     if ($day != false AND isset($day->Celebration)) {
         if ($day->Celebration->LiturgicalCelebrationLevel <= 4 AND date('N', strtotime($date)) != 7) {
-            $alert = true;
+
+            $text = "Ma van <strong>" . $day->Celebration->LiturgicalCelebrationName . "</strong>";
+            if (preg_match("/ünnep$/i", $day->Celebration->LiturgicalCelebrationType))
+                $text .= " " . $day->Celebration->LiturgicalCelebrationType . "e";
+
+            if ($html == false) {
+                return true;
+            } else {
+                global $twig;
+                return $twig->render('alert_liturgicalday.html', array('text' => $text));
+            }
         }
     }
-    $text = "Ma van <strong>" . $day->Celebration->LiturgicalCelebrationName . "</strong>";
-    if (preg_match("/ünnep$/i", $day->Celebration->LiturgicalCelebrationType))
-        $text .= " " . $day->Celebration->LiturgicalCelebrationType . "e";
 
     if ($html == false) {
-        if ($alert == false)
-            return false;
-        else
-            return true;
+        return false;
     } else {
-        if ($alert == false)
-            return '';
-        else {
-            global $twig;
-            return $twig->render('alert_liturgicalday.html', array('text' => $text));
-        }
+        return '';
     }
 }
 
@@ -692,8 +691,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     $where = searchChurchesWhere($args);
 
 
-    $query = "SELECT templomok.id,nev,ismertnev,varos,letrehozta,lat,lng FROM templomok ";
-    $query .= "LEFT JOIN terkep_geocode ON terkep_geocode.tid = templomok.id ";
+    $query = "SELECT templomok.id,nev,ismertnev,varos,letrehozta,lat,lon FROM templomok ";    
     if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
         $query .= " INNER JOIN misek ON misek.tid = templomok.id ";
         if ($args['tnyelv'] == 'h')
@@ -716,10 +714,10 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
         if (isset($filterdistance)) {
             //acos(sin(:lat)*sin(radians(Lat)) + cos(:lat)*cos(radians(Lat))*cos(radians(Lon)-:lon)) * :R < :rad
-            $d = acos(sin(deg2rad($lat)) * sin(deg2rad($row['lat'])) + cos(deg2rad($lat)) * cos(deg2rad($row['lat'])) * cos(deg2rad($row['lng']) - deg2rad($lon))) * $R;
+            $d = acos(sin(deg2rad($lat)) * sin(deg2rad($row['lat'])) + cos(deg2rad($lat)) * cos(deg2rad($row['lat'])) * cos(deg2rad($row['lon']) - deg2rad($lon))) * $R;
             if ($d <= $rad) {
                 if ($config['mapquest']['useitforsearch'] == true) {
-                    $d = mapquestDistance(array('lat' => $lat, 'lng' => $lng), array('lat' => $row['lat'], 'lng' => $row['lng']));
+                    $d = mapquestDistance(array('lat' => $lat, 'lng' => $lon), array('lat' => $row['lat'], 'lng' => $row['lon']));
                     if ($d <= $rad)
                         $return['results'][] = $row;
                 } else {
@@ -785,7 +783,7 @@ function searchChurchesWhere($args) {
         $maxLon = $lon + rad2deg($rad / $R / cos(deg2rad($lat)));
         $minLon = $lon - rad2deg($rad / $R / cos(deg2rad($lat)));
 
-        $where[] = "( lat BETWEEN " . $minLat . " AND " . $maxLat . " AND lng BETWEEN " . $minLon . " AND " . $maxLon . ")";
+        $where[] = "( lat BETWEEN " . $minLat . " AND " . $maxLat . " AND lon BETWEEN " . $minLon . " AND " . $maxLon . ")";
     }
 
     if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {

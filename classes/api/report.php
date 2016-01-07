@@ -4,7 +4,7 @@ namespace Api;
 
 class Report extends Api {
 
-    public function factoryCreate() {
+    static function factoryCreate() {
         $api = new Api();
         $api->getInputJson();
 

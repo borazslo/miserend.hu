@@ -63,7 +63,7 @@ class SearchResultsMasses extends Html {
             $leptet_urlap.="<input type=hidden name=hely value='" . $_REQUEST['hely'] . "'>";
             $leptet_urlap.="<input type=hidden name=tavolsag value='" . $_REQUEST['tavolsag'] . "'>";
         }
-        
+
         if (!empty($varos)) {
             $varos = ucfirst($varos);
             $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> $varos településen<br/>";

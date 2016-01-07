@@ -215,7 +215,7 @@ class Home extends Html {
         );
 
         $this->photo = \Eloquent\Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();
-        $this->photo->church->MgetLocation();
+        $this->photo->church->location;
 
         $this->favorites = $user->getFavorites();
         $this->searchform = $searchform;

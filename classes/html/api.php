@@ -1,8 +1,8 @@
 <?php
 
-namespace Html\Api;
+namespace Html;
 
-class Api extends \Html\Html {
+class Api extends Html {
 
     public function __construct() {
         ini_set('memory_limit', '256M');
@@ -15,6 +15,10 @@ class Api extends \Html\Html {
 
         try {
             switch ($action) {
+                case 'sqlite':
+                    $this->redirect(DOMAIN . '/fajlok/sqlite/miserend_v' . $_REQUEST['v'] . '.sqlite3');
+                    exit;
+                    break;
                 case 'signup':
                     $this->api = new \Api\Signup();
                     break;
@@ -62,12 +66,11 @@ class Api extends \Html\Html {
 
         if (!$this->api->format)
             $this->api->format = 'text';
-        $renderfunction = 'render' . $this->api->format;
-        $this->$renderfunction();
+        $renderfunction = 'render' . ucfirst($this->api->format);
         if (method_exists($this->api, $renderfunction)) {
-            $this->api->$renderfunction;
+            $this->api->$renderfunction();
         } else {
-            $this->$renderfunction;
+            $this->$renderfunction();
         }
     }
 

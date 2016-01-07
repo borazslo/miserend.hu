@@ -14,8 +14,8 @@ class Table extends Api {
             'id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim',
             'megkozelites', 'plebania', 'pleb_url', 'pleb_eml', 'egyhazmegye',
             'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj',
-            'bucsu', 'frissites', 'lat', 'lng', 'checked', 'name', 'alt_name',
-            'denomination', 'url', 'lon'),
+            'bucsu', 'frissites', 'lat', 'lon', 'geochecked', 'name', 'alt_name',
+            'denomination', 'url'),
     );
 
     public function validateVersion() {
@@ -85,10 +85,9 @@ class Table extends Api {
     }
 
     function prepareTemplomokQuery() {
-        $this->query = "SELECT t.*,orszagok.nev as orszag, megye.megyenev as megye,lat,lng, checked FROM templomok as t 
+        $this->query = "SELECT t.*,orszagok.nev as orszag, megye.megyenev as megye,lat,lon, geochecked FROM templomok as t 
                     LEFT JOIN orszagok ON orszagok.id = t.orszag 
-                    LEFT JOIN megye ON megye.id = megye 
-                    LEFT JOIN terkep_geocode ON terkep_geocode.tid = t.id 
+                    LEFT JOIN megye ON megye.id = megye  
                     WHERE t.ok = 'i' 
                     LIMIT 10000";
     }
@@ -99,11 +98,11 @@ class Table extends Api {
             $tmp = array();
             foreach ($this->columns as $column) {
                 // data in mysql
-                if (isset($row[$column]) AND in_array($column, array('id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim', 'megkozelites', 'plebania', 'pleb_url', 'pleb_eml', 'egyhazmegye', 'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj', 'bucsu', 'frissites', 'lat', 'lng', 'checked'))) {
+                if (isset($row[$column]) AND in_array($column, array('id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim', 'megkozelites', 'plebania', 'pleb_url', 'pleb_eml', 'egyhazmegye', 'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj', 'bucsu', 'frissites', 'lat', 'lon', 'geochecked'))) {
                     $tmp[$column] = $row[$column];
                 }
                 // simple data mapping
-                $mapping = array('name' => 'nev', 'alt_name' => 'ismertnev', 'lon' => 'lng');
+                $mapping = array('name' => 'nev', 'alt_name' => 'ismertnev');
                 if (array_key_exists($column, $mapping)) {
                     $tmp[$column] = $row[$mapping[$column]];
                 }
@@ -119,7 +118,7 @@ class Table extends Api {
                         break;
 
                     case 'url':
-                        $tmp[$column] = 'http://miserend.hu/?templom=' . $row['id'];
+                        $tmp[$column] = DOMAIN . '/templom/' . $row['id'];
                         break;
 
                     default:
@@ -131,4 +130,5 @@ class Table extends Api {
         }
         $this->table = $output;
     }
+
 }

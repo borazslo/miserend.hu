@@ -40,6 +40,8 @@ try {
 }
 if (isset($html)) {
     $html->render();
-    echo $html->html;
+    if (trim($html->html) != '') {
+        echo $html->html;
+    }
 }
 ?>

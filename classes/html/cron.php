@@ -12,10 +12,7 @@ class Cron extends Html {
 
         $job = \Eloquent\Cron::nextJobs()->first();
 
-        if (!$job) {
-            echo "Nincs futtatandó feladat.";
-            return;
-        }
+        if (!$job) return;
 
         $job->attempts++;
         $job->save();
