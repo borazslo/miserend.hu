@@ -30,10 +30,7 @@ $environment['testing'] = [
     'debug' => 1,
     'mail' => [
         'debug' => 5
-    ],
-    'path' => [
-        'domain' => 'http://localhost/miserend.hu'
-    ],
+    ],   
     'connection' => [
         'database' => 'miserend_testing',
         'user' => 'root',

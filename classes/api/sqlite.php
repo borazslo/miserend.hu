@@ -7,43 +7,49 @@ use Illuminate\Database\Capsule\Manager as DB;
 class Sqlite extends Api {
 
     public $format = false;
-    public $sqliteFile;
+    public $sqliteFileName;
+    public $folder = 'fajlok/sqlite/';
     public $sqlite;
 
     public function run() {
-        global $config;
         parent::run();
 
-        $this->sqliteFile = 'fajlok/sqlite/miserend_v' . $this->version . '.sqlite3';
-        if (file_exists($this->sqliteFile) && strtotime("-20 hours") < filemtime($this->sqliteFile) AND $config['debug'] == 0) {
-            return true;
-        } else if ($this->generateSqlite()) {
+        $this->sqliteFileName = 'miserend_v' . $this->version . '.sqlite3';
+
+        if ($this->generateSqlite()) {
             //Sajnos ez itten nem működik... Nem lesz szépen letölthető.  Headerrel sem
-            //$data = readfile($sqllitefile); exit($data);            
+            //$data = readfile($sqllitefile); exit($data);
             return true;
         } else {
             throw new \Exception("Could not make the requested sqlite3 file.");
         }
     }
 
-    function setSqliteConnection() {
-        $file = __DIR__ . '/../../' . $this->sqliteFile;
-        if (!file_exists($file)) {
-            $this->createEmptySqliteFile($file);
+    function connectToSqlite($name, $file = false) {
+        try {
+            $this->sqlite = DB::connection($name);
+        } catch (\InvalidArgumentException $e) {
+            if ($file == false) {
+                throw new \Exception("Sqlite connection '$name' does not exists and there is no file for it to open.");
+            }
+            if (!file_exists($file)) {
+                $this->createEmptySqliteFile($file);
+            }
+            global $capsule;
+            $capsule->addConnection([
+                'driver' => 'sqlite',
+                'database' => $file,
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci'
+                    ], $name);
+            $this->sqlite = DB::connection($name);
         }
-
-        global $capsule;
-        $capsule->addConnection([
-            'driver' => 'sqlite',
-            'database' => $file,
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci'
-                ], 'sqlite');
-        $this->sqlite = DB::connection('sqlite');
     }
 
     function getDatabaseToArray() {
-        $this->setSqliteConnection();
+        if (!isset($this->sqlite)) {
+            throw nex \Exception('There is no Sqlite connectionto make it an array.');
+        }
         $array = [];
         $tables = $this->sqlite->table('sqlite_master')->select('name')->get();
         foreach ($tables as $table) {
@@ -56,13 +62,19 @@ class Sqlite extends Api {
     }
 
     function generateSqlite() {
-        $this->setSqliteConnection();
+        echo "Sqlite is beginning right now...";
+        $this->sqliteFile = PATH . $this->folder . $this->sqliteFileName;
+
+        $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFile);
+        $this->sqlite->beginTransaction();
 
         $this->dropAllTables();
         echo "\nCreate Tables ...";
         $this->createTables();
         $this->insertData();
         echo "\n";
+        $this->sqlite->commit();
+        DB::disconnect('sqlite_v' . $this->version);
         return true;
     }
 
@@ -83,6 +95,7 @@ class Sqlite extends Api {
 
     function insertData() {
         ini_set('memory_limit', '800M');
+        DB::disableQueryLog();
         $this->sqlite->disableQueryLog();
         echo "\ninsertDataTemplomok ... \n";
         $this->insertDataTemplomok();
@@ -92,6 +105,7 @@ class Sqlite extends Api {
             $this->insertDataKepek();
         }
         $this->sqlite->enableQueryLog();
+        DB::enableQueryLog();
     }
 
     function createTableTemplomok() {
@@ -166,7 +180,7 @@ class Sqlite extends Api {
     }
 
     function insertDataTemplomok() {
-        set_time_limit(15000);
+        set_time_limit(120);
         $churches = \Eloquent\Church::where('ok', 'i')->orderBy('id')->get();
         if (!$churches) {
             throw new Exception("There are no valid churches.");
@@ -206,8 +220,8 @@ class Sqlite extends Api {
             }
 
             if ($this->version < 4) {
-                $insert['nyariido'] = $church->nyariido;
-                $insert['teliido'] = $church->teliido;
+                $insert['nyariido'] = date('Y-') . date('m-d', strtotime($church->nyariido));
+                $insert['teliido'] = date('Y-') . date('m-d', strtotime($church->teliido));
             }
 
             if (isset($church->photos[0])) {
@@ -221,7 +235,7 @@ class Sqlite extends Api {
     }
 
     function insertDataMisek() {
-        set_time_limit(5200);
+        set_time_limit(60);
         $masses = DB::table('misek')->where('torles', '0000-00-00 00:00:00')->where('tid', '<>', 0)->orderBy('tid')->orderBy('id')->get();
         if (!$masses) {
             throw new Exception("There are no valid masses.");
@@ -315,23 +329,10 @@ class Sqlite extends Api {
     }
 
     function cron() {
-        echo "Cron job Sqlite is beginning right now...";
         for ($i = 2; $i <= 4; $i++) {
             $_REQUEST['v'] = $i;
             $this->run();
         }
-    }
-
-    function bufferout($newline, $fullLength = false) {
-        if (!$fullLength)
-            $fullLength = 120;
-        $length = strlen(rtrim($newline));
-
-        $whitespaceLength = $fullLength - $length;
-        if ($whitespaceLength > 0) {
-            $return = str_repeat(" ", $whitespaceLength);
-        }
-        echo $newline . $return . "\r";
     }
 
 }

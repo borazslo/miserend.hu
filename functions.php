@@ -691,7 +691,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     $where = searchChurchesWhere($args);
 
 
-    $query = "SELECT templomok.id,nev,ismertnev,varos,letrehozta,lat,lon FROM templomok ";    
+    $query = "SELECT templomok.id,nev,ismertnev,varos,letrehozta,lat,lon FROM templomok ";
     if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
         $query .= " INNER JOIN misek ON misek.tid = templomok.id ";
         if ($args['tnyelv'] == 'h')

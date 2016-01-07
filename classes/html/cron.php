@@ -12,11 +12,12 @@ class Cron extends Html {
 
         $job = \Eloquent\Cron::nextJobs()->first();
 
-        if (!$job) return;
+        if (!$job)
+            return;
 
         $job->attempts++;
         $job->save();
-        try {            
+        try {
             $this->runJob($job);
         } catch (\Exception $exception) {
             $this->error = true;

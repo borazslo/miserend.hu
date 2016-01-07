@@ -37,4 +37,5 @@ class Api {
             $this->validateInput();
         }
     }
+
 }
