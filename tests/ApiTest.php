@@ -13,13 +13,16 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         $_REQUEST['v'] = $version;
         $sqliteApi = new \Api\Sqlite();
         $sqliteApi->run();
+        $resultFile = $sqliteApi->sqliteFile;
         $result = $sqliteApi->getDatabaseToArray();
+        unset($sqliteApi);
 
-        $expectedFile = 'tests/sqlite/miserend_v' . $version . '.sqlite3';
-        $sqliteApi->sqliteFile = $expectedFile;
+        $sqliteApi = new \Api\Sqlite();
+        $sqliteApi->connectToSqlite('test_sqlite_v' . $version, PATH . 'tests/sqlite/miserend_v' . $version . '.sqlite3');
         $expected = $sqliteApi->getDatabaseToArray();
+        unset($sqliteApi);
 
-        $this->assertFileExists($sqliteApi->sqliteFile);
+        $this->assertFileExists($resultFile);
         $this->assertEquals($expected, $result);
     }
 

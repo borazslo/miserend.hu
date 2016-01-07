@@ -9,7 +9,6 @@ class Sqlite extends Api {
     public $format = false;
     public $sqliteFileName;
     public $folder = 'fajlok/sqlite/';
-    public $tempFolder = 'fajlok/tmp';
     public $sqlite;
 
     public function run() {
@@ -26,24 +25,31 @@ class Sqlite extends Api {
         }
     }
 
-    function setSqliteConnection() {
-        $file = $this->sqliteFile;
-        if (!file_exists($file)) {
-            $this->createEmptySqliteFile($file);
+    function connectToSqlite($name, $file = false) {
+        try {
+            $this->sqlite = DB::connection($name);
+        } catch (\InvalidArgumentException $e) {
+            if ($file == false) {
+                throw new \Exception("Sqlite connection '$name' does not exists and there is no file for it to open.");
+            }
+            if (!file_exists($file)) {
+                $this->createEmptySqliteFile($file);
+            }
+            global $capsule;
+            $capsule->addConnection([
+                'driver' => 'sqlite',
+                'database' => $file,
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci'
+                    ], $name);
+            $this->sqlite = DB::connection($name);
         }
-
-        global $capsule;
-        $capsule->addConnection([
-            'driver' => 'sqlite',
-            'database' => $file,
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci'
-                ], 'sqlite');
-        $this->sqlite = DB::connection('sqlite');
     }
 
     function getDatabaseToArray() {
-        $this->setSqliteConnection();
+        if (!isset($this->sqlite)) {
+            throw nex \Exception('There is no Sqlite connectionto make it an array.');
+        }
         $array = [];
         $tables = $this->sqlite->table('sqlite_master')->select('name')->get();
         foreach ($tables as $table) {
@@ -57,19 +63,19 @@ class Sqlite extends Api {
 
     function generateSqlite() {
         echo "Sqlite is beginning right now...";
-        $this->sqliteFile = PATH . $this->tempFolder . $this->sqliteFileName;
+        $this->sqliteFile = PATH . $this->folder . $this->sqliteFileName;
 
-        $this->setSqliteConnection();
+        $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFile);
+        $this->sqlite->beginTransaction();
 
         $this->dropAllTables();
         echo "\nCreate Tables ...";
         $this->createTables();
         $this->insertData();
         echo "\n";
-
-        DB::disconnect('sqlite');
-        rename(PATH . $this->tempFolder . $this->sqliteFileName, PATH . $this->folder . $this->sqliteFileName);
-        $this->sqliteFile = PATH . $this->folder . $this->sqliteFileName;
+        echo $this->sqliteFile;
+        $this->sqlite->commit();
+        DB::disconnect('sqlite_v' . $this->version);
         return true;
     }
 
@@ -90,6 +96,7 @@ class Sqlite extends Api {
 
     function insertData() {
         ini_set('memory_limit', '800M');
+        DB::disableQueryLog();
         $this->sqlite->disableQueryLog();
         echo "\ninsertDataTemplomok ... \n";
         $this->insertDataTemplomok();
@@ -99,6 +106,7 @@ class Sqlite extends Api {
             $this->insertDataKepek();
         }
         $this->sqlite->enableQueryLog();
+        DB::enableQueryLog();
     }
 
     function createTableTemplomok() {
@@ -213,8 +221,8 @@ class Sqlite extends Api {
             }
 
             if ($this->version < 4) {
-                $insert['nyariido'] = $church->nyariido;
-                $insert['teliido'] = $church->teliido;
+                $insert['nyariido'] = date('Y-') . date('m-d', strtotime($church->nyariido));
+                $insert['teliido'] = date('Y-') . date('m-d', strtotime($church->teliido));
             }
 
             if (isset($church->photos[0])) {
@@ -321,24 +329,11 @@ class Sqlite extends Api {
         return true;
     }
 
-    function cron_v1() {
-        $_REQUEST['v'] = 1;
-        $this->run();
-    }
-
-    function cron_v2() {
-        $_REQUEST['v'] = 2;
-        $this->run();
-    }
-
-    function cron_v3() {
-        $_REQUEST['v'] = 3;
-        $this->run();
-    }
-
-    function cron_v4() {
-        $_REQUEST['v'] = 4;
-        $this->run();
+    function cron() {
+        for ($i = 2; $i <= 4; $i++) {
+            $_REQUEST['v'] = $i;
+            $this->run();
+        }
     }
 
     function bufferout($newline, $fullLength = false) {
