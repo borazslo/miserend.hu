@@ -1,14 +1,47 @@
 {% set columns2 = true  %}
 {% extends  "layout.twig" %}
+{% import "forms.twig" as forms %}
 
 {% set pageTitle = "Templomok | Miserend" %}
 {% set title = "Misézőhelyek szerkesztése" %}
 
 
 {% block content %}
-    {{ form|raw }}<br/>
-    {{ sum|raw }}<br/>
-    {{ pager|raw }}<br/>
+
+    <form method=get>
+        <div class="row">
+            <div class="col-md-4"><label>Kulcsszó</label></div>
+            <div class="col-md-8">
+                <input type=text name=church[keyword] value='{{ form.keyword }}' class=form-control size=20>
+            </div>
+            <div class="col-md-4"><label>Egyházmegye és espereskerület</label></div>
+            <div class="col-md-8">
+                {{ forms.select(form.dioceses) }}
+                {% for deanery in form.deaneries %}
+                    {{ forms.select(deanery) }}
+                {% endfor %}
+            </div>
+            <div class="col-md-4"><label>Szűrés</label></div>
+            <div class="col-md-8">
+                {{ forms.select(form.status) }}
+            </div>
+            <div class="col-md-4"><label>Sorrend</label></div>
+            <div class="col-md-8">
+                {{ forms.select(form.orderBy) }}
+            </div>
+            <button type="submit" class="btn btn-default">Lista</button>
+    </form>
+</div>
+{% if churches|length > 0 %}
+    <div class="row" style="margin-bottom:12px">
+        Összesen: {{ pagination.resultsCount }} találat<br/>
+        Listázás: {{ (pagination.active * pagination.take) + 1 }} - 
+        {% if pagination.resultsCount < ( pagination.active + 1 ) * pagination.take %}
+            {{ pagination.resultsCount }}
+        {% else %}
+            {{ ( pagination.active + 1 ) * pagination.take }} 
+        {% endif %}
+    </div>
 
     <table class="table table-hover table-condensed table-striped">
         <tr>
@@ -50,8 +83,10 @@
             </tr>
         {% endfor %}
     </table>
-    {{ pager|raw }}
-
+    {% include '_pagination.twig' %}
+{% else %}
+    <strong>Nem találtunk megfelelő templomot.</strong>
+{% endif %}
 {% endblock %}
 
 

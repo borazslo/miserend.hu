@@ -178,6 +178,7 @@
                     <div class="controls form-inline">                         
                         <input type=checkbox name="church[frissites]" value="{{ date('now')|date("Y-m-d") }}" class="urlap form-control">
                         <label class=alap> Frissítsük a dátumot</label>
+                        (Legutóbbi frissítés: {{ church.frissites }})
                     </div>
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 15} %}</td>

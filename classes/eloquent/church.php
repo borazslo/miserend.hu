@@ -31,7 +31,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function getOsmAttribute() {
-        if ($this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
+        if ($this->osms->first() AND $this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
             $overpass = new \ExternalApi\OverpassApi();
             $overpass->updateEnclosing($this->osms->first());
             $this->load('osms');
@@ -72,20 +72,20 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                         ->orderByRaw("FIND_IN_SET(allapot, 'u,f,j')")->first();
 
         if (!$remark) {
-            $return['html'] = "<span class='alap'>(nincs)</span>";
             $return['text'] = "Nincsenek észrevételek";
+            $return['html'] = "<i class='fa fa-gift fa-lg' style='color:#D3D3D3'  title='" . $return['text'] . "'></i>";
             $return['mark'] = false;
         } else if ($remark->allapot == 'u') {
-            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
             $return['text'] = "Új észrevételt írtak hozzá!";
+            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='" . $return['text'] . "' align=absmiddle border=0></a> ";
             $return['mark'] = 'u';
         } else if ($remark->allapot == 'f') {
-            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
             $return['text'] = "Észrevétel javítása folyamatban!";
+            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='" . $return['text'] . "' align=absmiddle border=0></a> ";
             $return['mark'] = 'f';
         } else if ($remark->allapot == 'j') {
-            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek' align=absmiddle border=0></a> ";
             $return['text'] = "Észrevételek";
+            $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='" . $return['text'] . "' align=absmiddle border=0></a> ";
             $return['mark'] = 'j';
         }
         return $return;

@@ -7,7 +7,7 @@ class Pagination {
     public $maxOptionsToShown = 10;
 
     function set($countResults, $url = false) {
-        $this->skip = $this->take * $this->active;
+        $this->skip = (int) ( $this->take * $this->active );
 
         $this->resultsCount = $countResults;
         $this->count = ceil($countResults / $this->take);

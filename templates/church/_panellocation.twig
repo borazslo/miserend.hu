@@ -18,14 +18,14 @@
     {% if osm is not null %}
         <span class=alap>            
             <i>Térképen: </i>
-            <u><a href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}">
+            <u><a target="_blank" href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}">
                     {{ osm.lat|number_format(6, '.') }}, {{ osm.lon|number_format(6, '.') }}
             </a></u>                
         </span>
     {% elseif location.lat %}
         <span class=alap>
             <i>Térképen: </i>
-            <u><a href="http://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.lon }}#map=19/{{ location.lat }}/{{ location.lon }}">
+            <u><a target="_blank" href="http://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.lon }}#map=19/{{ location.lat }}/{{ location.lon }}">
                     {{ location.lat }}, {{ location.lon }}
                 </a></u>
         </span>

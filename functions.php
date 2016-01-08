@@ -1910,12 +1910,13 @@ spl_autoload_register(function ($class) {
     }
 });
 
+if(!function_exists("env")) {
 function env($name, $default = false) {
     if (!getenv($name))
         return $default;
     else
         return getenv($name);
-}
+}}
 
 function file_exists_ci($fileName) {
     if (file_exists($fileName)) {
