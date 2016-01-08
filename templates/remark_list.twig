@@ -36,7 +36,7 @@
 		</td>
     	<td valign=top style="padding:3px">
     	<div>
-    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.login }}){% if remark.user.volunteer == 1 %}<span title="A felhasználó önkéntességet vállalt!" class="reliable ui-icon ui-icon-star yellow" style="float:right">{% endif %}&nbsp;</span><br/><small>{{ remark.datum }}</small></h5></div>
+    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.login }}){% if remark.user.volunteer == 1 %}<span title="A felhasználó önkéntességet vállalt!" class="reliable ui-icon ui-icon-star yellow" style="float:right">{% endif %}&nbsp;</span><br/><small>{{ remark.created_at }}</small></h5></div>
     		{% if remark.email %}
 
 				<div class="dropdown" style="float:left;margin-right:3px">

@@ -21,7 +21,7 @@
                 <span class="kiscim"><strong>Település: </strong></span>
                 <input type=text name=varos id=varos size=20 class="keresourlap form-control" value="{{ form.varos.value }}">
             </div>
-            <div class="row">
+            <div class="row">                                
                 <span class="kiscim"><strong>Egyházmegye és espereskerület: </strong></span>
                 {{ forms.select(form.diocese) }}
                 {% for deanery in form.deaneries %}
