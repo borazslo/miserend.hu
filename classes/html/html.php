@@ -68,6 +68,7 @@ class Html {
                     ['title' => 'lista', 'url' => '/templom/list', 'permission' => ''],
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
+                    ['title' => 'statisztika', 'url' => '/stat', 'permission' => 'miserend'],
                 ]
             ],
             ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user',
