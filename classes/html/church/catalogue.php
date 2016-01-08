@@ -33,9 +33,9 @@ class Catalogue extends \Html\Html {
             'church[status]' => $this->filterStatus,
             'church[orderBy]' => $this->orderBy
         ];
-        foreach ($params as &$param) {
-            if (!$param)
-                unset($param);
+        foreach ($params as $key => &$param) {
+            if ($param == '' or $param == 0)
+                unset($params[$key]);
         }
 
         $this->loadForm();
