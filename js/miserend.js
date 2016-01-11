@@ -45,19 +45,15 @@ $(document).ready(function() {
   });
 
 
-  $(document).on('click','#quit',function(){
-    console.log('click');
-      $.ajax({
-            url: "/ajax/logout",
-            dataType: "text",            
-            success: function( data ) {
-              location.reload();
-            },
-            error: function( data ) {
-            }
-          });
-    return false;
-  });
+    $(document).on('click', '#quit', function () {
+        console.log('click');
+        var form = $('<form  method="post">' +
+                '<input type="hidden" name="logout" value="true" />' +
+                '</form>');
+        $('body').append(form);
+        form.submit();
+        return false;
+    });
 
 
   $(document).on('click','.javitva',function(){  

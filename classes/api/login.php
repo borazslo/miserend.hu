@@ -19,11 +19,11 @@ class Login extends Api {
     public function run() {
         parent::run();
         $this->getInputJson();
-        $userId = login($this->input['username'], $this->input['password']);
+        $userId = \User::login($this->input['username'], $this->input['password']);
         if (!$userId) {
             throw new \Exception("Invalid username or password.");
         }
-        $token = generateToken($userId);
+        $token = generateToken($userId, 'API');
 
         $this->return['token'] = $token;
     }

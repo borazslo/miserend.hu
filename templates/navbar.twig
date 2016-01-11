@@ -32,10 +32,10 @@
                 <li><a href="http://plebania.net" target="_blank">Virtuális Plébánia</a></li>                
             </ul>
             {% if user.loggedin %}
-                <form class="navbar-form navbar-right" role="search"  method="post">
+                <div class="navbar-form navbar-right" role="search">
                     <a class="button btn btn-default" href="/user/edit">{{ user.username }}</a>
-                    <a class="button btn btn-default" href="?kilep=true" id="quit">Kilépés</a>
-                </form>
+                    <a class="button btn btn-default" href="/?logout=true" id="quit">Kilépés</a>
+                </div>
             {% else %}
                 <form class="navbar-form navbar-right" role="search"  method="post">
                     <div class="form-group">
