@@ -38,34 +38,6 @@ function dbconnect() {
     DB::statement("SET time_zone='+05:00';");
 }
 
-function kicsinyites($forras, $kimenet, $max) {
-
-    if (!isset($max))
-        $max = 120;# maximum size of 1 side of the picture.
-
-    $src_img = ImagecreateFromJpeg($forras);
-
-    $oh = imagesy($src_img);  # original height
-    $ow = imagesx($src_img);  # original width
-
-    $new_h = $oh;
-    $new_w = $ow;
-
-    if ($oh > $max || $ow > $max) {
-        $r = $oh / $ow;
-        $new_h = ($oh > $ow) ? $max : $max * $r;
-        $new_w = $new_h / $r;
-    }
-
-    // note TrueColor does 256 and not.. 8
-    $dst_img = ImageCreateTrueColor($new_w, $new_h);
-    /* imageantialias($dst_img, true); */
-
-    /* ImageCopyResized($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img)); */
-    ImageCopyResampled($dst_img, $src_img, 0, 0, 0, 0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img));
-    ImageJpeg($dst_img, "$kimenet");
-}
-
 function sanitize($text) {
     if (is_array($text))
         foreach ($text as $k => $i)
@@ -1531,13 +1503,6 @@ function updatesCampaign() {
     );
 }
 
-function clearoutMessages() {
-    mysql_query("DELETE FROM messages WHERE timestamp < '" . date('Y-m-d H:i:s', strtotime('-1 month')) . "' OR shown = 1;");
-}
-
-function clearoutTokens() {
-    mysql_query("DELETE FROM tokens WHERE timeout < '" . date('Y-m-d H:i:s') . "';");
-}
 
 function generateToken($forUserId, $type, $timeout = false) {
     if ($timeout == false) {
@@ -1567,10 +1532,10 @@ function validateToken($token) {
     $row = mysql_fetch_assoc($result);
 
     if (!is_array($row)) {
-        throw new \Exception("Invalid token");
+        #throw new \Exception("Invalid token");
         return false;
     } elseif ($row['timeout'] < date('Y-m-d H:i:s')) {
-        throw new \Exception("Outdated token");
+        #throw new \Exception("Outdated token");
         return false;
     }
     //TODO: check also: type,uid

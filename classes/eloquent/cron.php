@@ -29,7 +29,7 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
     public function initialize() {
         $jobsToSave = [
             ['\Eloquent\Cron', 'initialize', '1 week'],
-            ['\Html\Cron', 'oldHourly', '1 hour'],
+            ['\Eloquent\Cron', 'hourly', '1 hour'],
             ['\Html\Cron', 'oldWeekly', '1 week'],
             ['\Api\Sqlite', 'cron', '1 day'],
             ['\ExternalApi\OverpassApi', 'updateUrlMiserend', '1 day'],
@@ -42,6 +42,24 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             $job->frequency = $jobToSave[2];
             $job->save();
         }
+    }
+
+    function hourly() {
+        $this->clearoutMessages();
+        $this->clearoutTokens();
+    }
+
+    private function clearoutMessages() {
+        DB::table('messages')
+                ->where('timestamp', '<', date('Y-m-d H:i:s', strtotime('-1 month')))
+                ->orWhere('shown', 1)
+                ->delete();
+    }
+
+    private function clearoutTokens() {
+        DB::table('tokens')
+                ->where('timeout', '<', date('Y-m-d H:i:s'))
+                ->delete();
     }
 
 }

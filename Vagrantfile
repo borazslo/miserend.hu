@@ -44,7 +44,7 @@ EOF
     VHOST=$(cat <<EOF
     <VirtualHost *:80>
         DocumentRoot "/vagrant"
-        php_admin_value sendmail_path "catchmail -f test@miserend.hu --smtp-ip 0.0.0.0"
+        php_admin_value sendmail_path "/home/vagrant/.rbenv/shims/catchmail -f test@miserend.hu --smtp-ip 0.0.0.0"
         <Directory "/vagrant/">
             SetEnv MISEREND_WEBAPP_ENVIRONMENT vagrant
             AllowOverride All
