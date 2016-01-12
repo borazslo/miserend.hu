@@ -5,8 +5,7 @@ namespace Eloquent;
 class Photo extends \Illuminate\Database\Eloquent\Model {
 
     protected $urlToPhotos = '/kepek/templomok';
-    protected $pathToPhotos = PATH . 'kepek/templomok';
-    protected $appends = array('url', 'smallUrl');
+    protected $appends = array('pathToPhoto', 'url', 'smallUrl');
 
     public function church() {
         return $this->belongsTo('\Eloquent\Church');
@@ -33,6 +32,10 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
 
     public function getUrlAttribute($value) {
         return $this->urlToPhotos . "/" . $this->church_id . "/" . $this->filename;
+    }
+
+    public function getPathToPhotosAttribute($value) {
+        return PATH . 'kepek/templomok';
     }
 
     public function getSmallUrlAttribute($value) {
@@ -71,7 +74,6 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         }
         $konyvtar = $this->pathToPhotos . "/" . $this->church_id;
         if (!is_dir("$konyvtar")) {
-            echo PATH . $konyvtar;
             if (!mkdir("$konyvtar", 0775)) {
                 throw new \Exception("Could not create the folder.");
             }
