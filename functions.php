@@ -1592,19 +1592,9 @@ function feltoltes_block() {
 
         $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";
         $kod_tartalom .= '</ul>';
+        return $kod_tartalom;
     }
-
-    return $kod_tartalom;
-
-    if (!empty($kod_tartalom)) {
-        //Tartalom létrehozása
-        $kod_cim = "<span class=hasabcimlink>Módosítás</span>";
-
-        $kodT[0] = $kod_cim;
-        $kodT[1] = $kod_tartalom;
-
-        return $kodT;
-    }
+    return;
 }
 
 function addMessage($text, $severity = false) {

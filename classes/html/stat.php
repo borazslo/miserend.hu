@@ -10,7 +10,12 @@ class Stat extends Html {
         parent::__construct();
         $this->setTitle('Statisztika');
         
-        
+        global $user;
+        if(!$user->loggedin) {
+            addMessage("Hozzáférés megtagadva!","danger");
+            $this->redirect('/');
+        }
+                
         $groups = \Eloquent\Church::where('ok','i')
                 ->select(DB::raw('DATE_FORMAT(frissites,\'%Y\') as month'),DB::raw('COUNT(*) as count'))
                 ->groupBy('month')->orderBy('month')->get();
