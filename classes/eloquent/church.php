@@ -182,6 +182,28 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 });
     }
 
+    function scopeChurchesAndMore($query) {
+        return $query->where('nev', 'NOT LIKE', '%kápolna%');
+    }
+
+    function scopeSelectUpdatedMonth($query) {
+        return $query->addSelect(DB::raw('DATE_FORMAT(frissites,\'%Y-%m\') as updated_month'), DB::raw('COUNT(*) as count_updated_month'));
+    }
+
+    function scopeSelectUpdatedYear($query) {
+        return $query->addSelect(DB::raw('DATE_FORMAT(frissites,\'%Y\') as updated_year'), DB::raw('COUNT(*) as count_updated_year'));
+    }
+
+    function scopeCountByUpdatedMonth($query) {
+        return $query->selectUpdatedMonth()
+                        ->groupBy('updated_month')->orderBy('updated_month');
+    }
+
+    function scopeCountByUpdatedYear($query) {
+        return $query->selectUpdatedYear()
+                        ->groupBy('updated_year')->orderBy('updated_year');
+    }
+
     function scopeWhereShortcutLike($query, $keyword, $type) {
         return $query->whereHas('keywordshortcuts', function ($query) use ($keyword, $type) {
                     $query->where('type', $type)->where('value', 'like', $keyword);

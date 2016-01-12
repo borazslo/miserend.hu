@@ -9,76 +9,73 @@ class Stat extends Html {
     public function __construct() {
         parent::__construct();
         $this->setTitle('Statisztika');
-        
+
         global $user;
-        if(!$user->loggedin) {
-            addMessage("Hozzáférés megtagadva!","danger");
+        if (!$user->loggedin) {
+            addMessage("Hozzáférés megtagadva!", "danger");
             $this->redirect('/');
         }
-                
-        $groups = \Eloquent\Church::where('ok','i')
-                ->select(DB::raw('DATE_FORMAT(frissites,\'%Y\') as month'),DB::raw('COUNT(*) as count'))
-                ->groupBy('month')->orderBy('month')->get();
+
+        $groups = \Eloquent\Church::where('ok', 'i')
+                ->countByUpdatedYear()
+                ->get();
         $s1 = [];
-        foreach($groups as $group) {
-            if($group->month > 0)
-                $s1[] = [ $group->month , $group->count ];
+
+        foreach ($groups as $group) {
+            if ($group->updated_year > 0)
+                $s1[] = [ $group->updated_year, $group->count_updated_year];
         }
         $this->s1 = $this->array2jslist($s1);
-        
-        $groups = \Eloquent\Remark::select(DB::raw('DATE_FORMAT(created_at,\'%Y\') as month'),DB::raw('COUNT(*) as count'))
-                ->groupBy('month')->orderBy('month')->get();
+
+        $groups = \Eloquent\Remark::countByCreatedYear()->get();
         $s2 = [];
-        foreach($groups as $group) {
-            if($group->month > 0)
-                $s2[] = [ $group->month , $group->count ];
+        foreach ($groups as $group) {
+            if ($group->created_year > 0)
+                $s2[] = [ $group->created_year, $group->count_created_year];
         }
         $this->s2 = $this->array2jslist($s2);
-        
-                $groups = \Eloquent\Church::where('ok','i')
-                ->select(DB::raw('DATE_FORMAT(frissites,\'%m\') as month'),DB::raw('COUNT(*) as count'))
-                        ->where('frissites','>',date('Y-m-d',strtotime('-1 year')))
-                ->groupBy('month')->orderBy('month')->get();
+
+        $groups = \Eloquent\Church::where('ok', 'i')
+                ->countByUpdatedMonth()
+                ->where('frissites', '>', date('Y-m-d', strtotime('-1 year')))
+                ->get();
         $s1 = [];
-        foreach($groups as $group) {
-            if($group->month > 0)
-                $s1[] = [ $group->month , $group->count ];
+        $c = 0;
+        foreach ($groups as $group) {
+            if ($group->updated_month > 0)
+                $s1[] = [ $c++, $group->count_updated_month];
         }
         $this->s3 = $this->array2jslist($s1);
-        
-        $groups = \Eloquent\Remark::select(DB::raw('DATE_FORMAT(created_at,\'%m\') as month'),DB::raw('COUNT(*) as count'))
-                ->where('created_at','>',date('Y-m-d',strtotime('-1 year')))
-                ->groupBy('month')->orderBy('month')->get();
+
+        $groups = \Eloquent\Remark::countByCreatedMonth()
+                ->where('created_at', '>', date('Y-m-d', strtotime('-1 year')))
+                ->get();
         $s2 = [];
-        foreach($groups as $group) {
-            if($group->month > 0)
-                $s2[] = [ $group->month , $group->count ];
+        $c = 0;
+        foreach ($groups as $group) {
+            if ($group->created_month > 0)
+                $s2[] = [ $c++, $group->count_created_month];
         }
         $this->s4 = $this->array2jslist($s2);
-        
-        
     }
-    
-    
-    
-    
-    
-    
+
     function array2jslist($array) {
         $r = "";
-        if(is_array($array)) {
+        if (is_array($array)) {
             $r .= '[';
-            foreach($array as $key => $value ) {
+            foreach ($array as $key => $value) {
                 $r .= $this->array2jslist($value);
-                if($key < count($array) - 1) $r .= ',';
+                if ($key < count($array) - 1)
+                    $r .= ',';
             }
             $r .= ']';
         } else {
-            if(is_numeric($array))
+            if (is_numeric($array))
                 $r .= $array;
-            else 
-                $r .= "'".$array."'";
+            else
+                $r .= "'" . $array . "'";
         }
         return $r;
     }
+
 }
