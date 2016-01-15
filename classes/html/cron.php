@@ -30,11 +30,6 @@ class Cron extends Html {
         }
     }
 
-    function oldHourly() {
-        clearoutTokens();
-        clearoutMessages();
-    }
-
     function oldWeekly() {
         #clearoutVolunteers();
         #assignUpdates();

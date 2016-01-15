@@ -25,22 +25,18 @@ error_reporting($config['error_reporting'] ? $config['error_reporting'] : 0);
 define('DOMAIN', $config['path']['domain']);
 
 
-//Felhasználó kiléptetés
-if (isset($_REQUEST['login']) OR isset($_REQUEST['kilep'])) {
-    quit();
-}
-//Felhasználó beléptetés
+//Felhasználó
 if (isset($_REQUEST['login'])) {
-    if (!login($_REQUEST['login'], $_REQUEST['passw'])) {
+    try {
+        \User::login($_REQUEST['login'], $_REQUEST['passw']);
+    } catch (\Exception $ex) {
         addMessage('Hibás név és/vagy jelszó!<br/><br/>Ha elfelejtetted a jelszavadat, <a href="/user/lostpassword">kérj ITT új jelszót</a>.', 'danger');
     }
 }
-
-//Felhasználó betöltése
-$user = getuser();
-//Felhasználó aktív még mindig
-if ($user->loggedin)
-    $user->active();
+$user = \User::load();
+if (isset($_REQUEST['logout'])) {
+    $user->logout();
+}
 
 //TODO: delete this (see: \Html\Html::loadTwig());
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';

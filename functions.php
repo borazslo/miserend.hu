@@ -38,34 +38,6 @@ function dbconnect() {
     DB::statement("SET time_zone='+05:00';");
 }
 
-function kicsinyites($forras, $kimenet, $max) {
-
-    if (!isset($max))
-        $max = 120;# maximum size of 1 side of the picture.
-
-    $src_img = ImagecreateFromJpeg($forras);
-
-    $oh = imagesy($src_img);  # original height
-    $ow = imagesx($src_img);  # original width
-
-    $new_h = $oh;
-    $new_w = $ow;
-
-    if ($oh > $max || $ow > $max) {
-        $r = $oh / $ow;
-        $new_h = ($oh > $ow) ? $max : $max * $r;
-        $new_w = $new_h / $r;
-    }
-
-    // note TrueColor does 256 and not.. 8
-    $dst_img = ImageCreateTrueColor($new_w, $new_h);
-    /* imageantialias($dst_img, true); */
-
-    /* ImageCopyResized($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img)); */
-    ImageCopyResampled($dst_img, $src_img, 0, 0, 0, 0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img));
-    ImageJpeg($dst_img, "$kimenet");
-}
-
 function sanitize($text) {
     if (is_array($text))
         foreach ($text as $k => $i)
@@ -76,34 +48,6 @@ function sanitize($text) {
         $text = trim($text);
     }
     return $text;
-}
-
-function login($name, $password) {
-    $name = sanitize($name);
-    $query = "SELECT uid,jelszo FROM user where login='$name' and ok!='n' LIMIT 11";
-    $result = mysql_query($query);
-    //echo $query."\n";
-    $x = mysql_fetch_assoc($result);
-    if ($x == '') {
-        return false;
-    }
-
-    if (password_verify($password, $x['jelszo'])) {
-        //we are happy        
-    } elseif (strlen($x['jelszo']) < 60 AND base64_decode($x['jelszo']) == $password) {
-        $jelszo = password_hash(base64_decode($x['jelszo']), PASSWORD_BCRYPT);
-        $query = "UPDATE user SET jelszo = '" . $jelszo . "' WHERE login='" . $name . "' LIMIT 1;";
-        mysql_query($query);
-    } else {
-        return false;
-    }
-
-    $query = "UPDATE user SET lastlogin = '" . date('Y-m-d H:i:s') . "' WHERE uid = " . $x['uid'] . ";";
-    mysql_query($query);
-
-    cookieSave($x['uid'], $name);
-
-    return $x['uid'];
 }
 
 function checkUsername($username) {
@@ -126,50 +70,6 @@ function checkUsername($username) {
 
 
     return true;
-}
-
-function getuser() {
-    $salt = 'Yzsdf';
-
-    $uid = false;
-
-    if (isset($_SESSION['auth'])) {
-        $tmp = explode(':', $_SESSION['auth']);
-        if (count($tmp) == 3) {
-            $query = "SELECT uid,login,lejarat FROM session WHERE sessid = '" . $_SESSION['auth'] . "' LIMIT 1 ";
-            $result = mysql_query($query);
-            $x = mysql_fetch_assoc($result);
-            if (is_array($x)) {
-                if ($tmp[0] == md5($salt . md5($x['uid'] . $salt))) {
-                    if ($tmp[2] == md5($x['lejarat'])) {
-                        $uid = $x['uid'];
-                        //cookieSave($x['uid'],$x['name']);
-                    }
-                }
-            }
-        }
-    }
-    if ($uid == false AND isset($_COOKIE['auth'])) {
-        $tmp = explode(':', $_COOKIE['auth']);
-        if (count($tmp) == 3) {
-            $query = "SELECT uid,login,lejarat FROM session WHERE sessid = '" . $_COOKIE['auth'] . "' LIMIT 1 ";
-            $result = mysql_query($query);
-            $x = mysql_fetch_assoc($result);
-            if (is_array($x)) {
-                if ($tmp[0] == md5($salt . md5($x['uid'] . $salt))) {
-                    if ($tmp[2] == md5($x['lejarat'])) {
-                        $uid = $x['uid'];
-                        cookieSave($x['uid'], $x['name']);
-                    }
-                }
-            }
-        }
-    }
-
-    $return = new User($uid);
-    if ($return->uid > 0)
-        $return->loggedin = true;
-    return $return;
 }
 
 function cookieSave($uid, $name) {
@@ -1603,21 +1503,19 @@ function updatesCampaign() {
     );
 }
 
-function clearoutMessages() {
-    mysql_query("DELETE FROM messages WHERE timestamp < '" . date('Y-m-d H:i:s', strtotime('-1 month')) . "' OR shown = 1;");
-}
 
-function clearoutTokens() {
-    mysql_query("DELETE FROM tokens WHERE timeout < '" . date('Y-m-d H:i:s') . "';");
-}
-
-function generateToken($forUserId) {
-    global $config;
+function generateToken($forUserId, $type, $timeout = false) {
+    if ($timeout == false) {
+        global $config;
+        $timeout = date('Y-m-d H:i:s', strtotime("+" . $config['token']['timeout']));
+    } else {
+        $timeout = date('Y-m-d H:i:s', strtotime($timeout));
+    }
 
     $inserted = false;
     for ($i = 1; $i < 5; $i++) {
         $token = md5(uniqid(mt_rand(), true));
-        mysql_query("INSERT INTO tokens (name,type,uid,timeout) VALUES ('" . $token . "','API'," . $forUserId . ",'" . date('Y-m-d H:i:s', strtotime("+" . $config['token']['timeout'])) . "');");
+        mysql_query("INSERT INTO tokens (name,type,uid,timeout) VALUES ('" . $token . "','" . $type . "'," . $forUserId . ",'" . $timeout . "');");
         if (mysql_affected_rows() == 1) {
             $inserted = true;
             break;
@@ -1634,8 +1532,10 @@ function validateToken($token) {
     $row = mysql_fetch_assoc($result);
 
     if (!is_array($row)) {
+        #throw new \Exception("Invalid token");
         return false;
     } elseif ($row['timeout'] < date('Y-m-d H:i:s')) {
+        #throw new \Exception("Outdated token");
         return false;
     }
     //TODO: check also: type,uid
@@ -1692,19 +1592,9 @@ function feltoltes_block() {
 
         $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";
         $kod_tartalom .= '</ul>';
+        return $kod_tartalom;
     }
-
-    return $kod_tartalom;
-
-    if (!empty($kod_tartalom)) {
-        //Tartalom létrehozása
-        $kod_cim = "<span class=hasabcimlink>Módosítás</span>";
-
-        $kodT[0] = $kod_cim;
-        $kodT[1] = $kod_tartalom;
-
-        return $kodT;
-    }
+    return;
 }
 
 function addMessage($text, $severity = false) {
@@ -1736,17 +1626,6 @@ function getMessages() {
             ->update(['shown' => 1]);
 
     return (array) $return;
-}
-
-function quit() {
-    global $user;
-
-    unset($_SESSION['auth']);
-    unset($_COOKIE['auth']);
-    setcookie('auth', null, time());
-    //session_destroy();
-    unset($user);
-    $user = new User();
 }
 
 function chat_load() {
@@ -1910,13 +1789,16 @@ spl_autoload_register(function ($class) {
     }
 });
 
-if(!function_exists("env")) {
-function env($name, $default = false) {
-    if (!getenv($name))
-        return $default;
-    else
-        return getenv($name);
-}}
+if (!function_exists("env")) {
+
+    function env($name, $default = false) {
+        if (!getenv($name))
+            return $default;
+        else
+            return getenv($name);
+    }
+
+}
 
 function file_exists_ci($fileName) {
     if (file_exists($fileName)) {

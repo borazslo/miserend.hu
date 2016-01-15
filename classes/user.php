@@ -58,6 +58,7 @@ class User {
             $this->uid = 0;
             $this->username = '*vendeg*';
             $this->nickname = '*vendég*';
+            $this->responsible = false;
         } else {
             $query = "SELECT * FROM user WHERE uid = $uid AND ok = 'i' LIMIT 1";
             $result = mysql_query($query);
@@ -96,13 +97,12 @@ class User {
             else
                 return false;
         } elseif (preg_match('/^ehm:([0-9]{1,3})$/i', $role, $match)) {
-            $query = "SELECT * FROM egyhazmegye WHERE id = " . $match[1] . " AND felelos = '" . $this->username . "' LIMIT 1";
-            $result = mysql_query($query);
-            if (mysql_num_rows($result) == 1)
+            $isResponsible = DB::table('egyhazmegye')->where('id', $match[1])->where('felelos', $this->username)->first();
+            if ($isResponsible)
                 return true;
             else
                 return false;
-        } elseif (preg_match('/(^|-)' . $role . '(-|$)/i', $this->jogok)) {
+        } elseif (isset($this->jogok) AND preg_match('/(^|-)' . $role . '(-|$)/i', $this->jogok)) {
             return true;
         } else
             return false;
@@ -350,20 +350,10 @@ class User {
         if ($this->uid == 0)
             return false;
 
-        $query = "DELETE FROM user WHERE uid = " . $this->uid . " LIMIT 1";
-        if (mysql_query($query)) {
-            foreach ($this as $key => $value)
-                unset($this->$key);
-            $this->loggedin = false;
-            $this->uid = 0;
-            $this->username = '*vendeg*';
-            $this->nickname = '*vendeg*';
-            addMessage('Sikeresen töröltük a felhasználót.', 'success');
-            return true;
-        } else {
-            addMessage('Hiba lépett fel a felhasználó törlése közben', 'danger');
-            return false;
-        }
+        DB::table('user')->where('uid', $this->uid)->delete();
+        $this->selfEmpty();
+        addMessage('Sikeresen töröltük a felhasználót.', 'success');
+        return true;
     }
 
     function generatePassword($length = 8) {
@@ -384,7 +374,7 @@ class User {
     }
 
     function active() {
-        mysql_query("UPDATE user SET lastactive = '" . date('Y-m-d H:i:s') . "' WHERE uid = " . $this->uid . " LIMIT 1;");
+        DB::table('user')->where('uid', $this->uid)->update(['lastactive' => date('Y-m-d H:i:s')]);
     }
 
     function getFavorites() {
@@ -473,6 +463,76 @@ class User {
             return true;
         } else
             return false;
+    }
+
+    static function emptyUser() {
+        return new \User();
+    }
+
+    static function load() {
+        if (isset($_SESSION['token'])) {
+            if (!$token = validateToken($_SESSION['token'])) {
+                setcookie('token', 'null', time());
+                return \User::emptyUser();
+            }
+            $user = new \User($token['uid']);
+        } elseif (isset($_COOKIE['token'])) {
+            if (!$token = validateToken($_COOKIE['token'])) {
+                setcookie('token', 'null', time());
+                return \User::emptyUser();
+            }
+            $timeout = '+1 month';
+            $newToken = generateToken($token['uid'], 'web', $timeout);
+            setcookie('token', $newToken, strtotime($timeout));
+            $_SESSION['token'] = $_COOKIE['token'] = $newToken;
+            $user = new \User($token['uid']);
+        } else {
+            setcookie('token', 'macska', time() + 10000);
+            return \User::emptyUser();
+        }
+        $user->loggedin = true;
+        $user->active();
+        return $user;
+    }
+
+    static function login($name, $password) {
+        $name = sanitize($name);
+        $userRow = DB::table('user')->where('login', $name)->where('ok', '!=', 'n')->first();
+        if (!$userRow) {
+            throw new \Exception("There is no such user.");
+        }
+        if (!password_verify($password, $userRow->jelszo)) {
+            throw new \Exception("Invalid password.");
+        }
+
+        $timeout = '+1 month';
+        $token = generateToken($userRow->uid, 'web', $timeout);
+
+        setcookie('token', $token, strtotime($timeout));
+        $_COOKIE['token'] = $token;
+        $_SESSION['token'] = $token;
+
+        DB::table('user')->where('uid', $userRow->uid)->update(['lastlogin' => date('Y-m-d H:i:s')]);
+        return $userRow->uid;
+    }
+
+    function logout() {
+        unset($_SESSION['token']);
+        unset($_COOKIE['token']);
+        setcookie('token', 'null', time());
+
+        $this->selfEmpty();
+        session_destroy();
+        session_unset();
+    }
+
+    function selfEmpty() {
+        foreach ($this as $key => $value)
+            unset($this->$key);
+        $this->loggedin = false;
+        $this->uid = 0;
+        $this->username = '*vendeg*';
+        $this->nickname = '*vendeg*';
     }
 
 }

@@ -38,8 +38,8 @@ class Church extends \Html\Html {
 
         //Miseidőpontok
         $misek = getMasses($tid);
-
-        if ($user->checkRole('miserend') OR $user->checkRole('ehm:' . $egyhazmegye) OR ( isset($responsible) AND in_array($user->login, $responsible))) {
+        
+        if ($user->checkRole('miserend') OR $user->checkRole('ehm:' . $this->religious_administration->diocese->id) OR ( isset($responsible) AND in_array($user->login, $responsible))) {
             $nev = " <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
                     . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
 
@@ -66,6 +66,7 @@ class Church extends \Html\Html {
           else
           $cim .= "<br/>";
          */
+        
         $this->photos;
         if (isset($this->photos[0])) {
             $this->addExtraMeta("og:image", "/kepek/templomok/" . $tid . "/" . $this->photos[0]->fajlnev);
