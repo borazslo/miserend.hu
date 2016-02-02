@@ -95,7 +95,7 @@ class Catalogue extends \Html\Html {
             $query->where(function ($q) use ($input) {
                 $q->where('login', 'like', "%" . $input['kulcsszo'] . "%")
                         ->orWhere('nev', 'like', "%" . $input['kulcsszo'] . "%")
-                        ->orWhere('email', 'like', "%" . $input['$kulcsszo'] . "%");
+                        ->orWhere('email', 'like', "%" . $input['kulcsszo'] . "%");
             });
         }
         $query->orderByRaw($this->input['sort']);
