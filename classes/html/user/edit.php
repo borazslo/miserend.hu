@@ -99,6 +99,8 @@ class Edit extends \Html\Html {
         foreach ($vars as $key => $value) {
             $this->$key = $value;
         }
+        
+        $this->edituser->processResponsabilities();        
     }
 
 }

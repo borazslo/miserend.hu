@@ -39,6 +39,25 @@
 		    </div>
 		</div>
 		{% endif %}
+                {% if edituser.responsible.church|length > 0 %}
+		<div class="panel-group" id="accordion">
+		    <div class="panel panel-default">
+		        <div class="panel-heading visible-lg-block visible-md-block">
+		            <h4 class="panel-title">Felelősségi körei</h4>
+		        </div>
+	            <ul class="list-group">
+	                {% for key, church in edituser.responsible.church %}
+	                	<li class="list-group-item">
+	                		<a href="/templom/{{ church.id }}">{{ church.nev }}</a> ({{ church.varos }})	                		
+	            		</li>
+	                {% endfor %}
+	                {% if edituser.remarksCount - (edituser.remarks)|length  > 0 %}
+	                <li class="list-group-item">És további {{ edituser.remarksCount - (edituser.remarks)|length }} ...</li>
+	                {% endif %}
+	            </ul>            
+		    </div>
+		</div>
+		{% endif %}
 	{% endif %}
 	{{ parent() }}
 {% endblock %}

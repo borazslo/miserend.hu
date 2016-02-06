@@ -2,6 +2,8 @@
 
 namespace Eloquent;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class Cron extends \Illuminate\Database\Eloquent\Model {
 
     protected $fillable = array('class', 'function');

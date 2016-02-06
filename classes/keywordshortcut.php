@@ -5,6 +5,8 @@ use Illuminate\Database\Capsule\Manager as DB;
 class KeywordShortcut {
 
     function updateAll() {
+        return true;
+        //TODO:  Maximum execution time of 300 seconds exceeded in [...]/classes/keywordshortcut.php on line 34
         $this->updateNameShortcuts();
         $this->updateAdministrativeShortcuts();
         $this->updateReligiousAdministrationShortcuts();

@@ -127,6 +127,18 @@ class User {
         }
     }
 
+    function processResponsabilities() {
+        if(!isset($this->responsible)) {
+            $this->getResponsabilities();
+        }
+        
+        $tmp = array();
+        foreach($this->responsible['church'] as $church) {
+            $tmp[$church] = \Eloquent\Church::find($church);
+        }
+        $this->responsible['church'] = $tmp;
+    }
+    
     function getRemarks($limit = false, $ago = false) {
         if ($limit == false OR ! is_numeric($limit))
             $limit = 5;
