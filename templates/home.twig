@@ -6,17 +6,17 @@
 
 
 {% block extraHead %}
-  <style>
-  .block:after{
-      clear: both;
-      content: "";
-      display: block;
-  }
-  </style>
-  <link href="/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet">
-  <script src="/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-  <script src="/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
-   
+    <style>
+        .block:after{
+            clear: both;
+            content: "";
+            display: block;
+        }
+    </style>
+    <link href="/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+    <script src="/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
+
 {% endblock %}
 
 {% block pageHeader %}
@@ -27,155 +27,153 @@
 
 {% block content %}
 
-{{ alert|raw }}
+    {{ alert|raw }}
 
-	<div class="miseurlap">
-    <form method=get action="index.php" name="kereses" id="kereses" class="form-group">
-   
-    <div id="form_church"  style="margin-top:12px;">
-      <div class="form-group row">
-        <label class="col-sm-4 control-label">Templom</label>
-        <div class="col-sm-6">{{ forms.input(searchform.kulcsszo) }}</div>
-        <div class="cols-sm-2" style="text-align:right"><span class="btn glyphicon glyphicon-plus-sign" id="form_church_getdetails"></span></div>
-      </div>
-      <div class="form-group row">
-        <label class="col-sm-4 control-label" ><span class="form_church_details" style="display:none">település</span></label>
-        <div class="col-sm-8">{{ forms.input(searchform.varos) }} </div>
-      </div>
-    </div>
+    <div class="miseurlap">
+        <form method=get action="index.php" name="kereses" id="kereses" class="form-group">
 
-    <div id="form_church_details"  style="display:none">
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >adott helyszín körül:</label>
-          <div class="col-sm-8">
-            <div class="form-inline">
-                <div class="form-group">
-                    {{ forms.input(searchform.hely) }}
+            <div id="form_church"  style="margin-top:12px;">
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label">Templom</label>
+                    <div class="col-sm-6">{{ forms.input(searchform.kulcsszo) }}</div>
+                    <div class="cols-sm-2" style="text-align:right"><span class="btn glyphicon glyphicon-plus-sign" id="form_church_getdetails"></span></div>
                 </div>
-                <div class="form-group">
-                    <div class="input-group">
-                        <div class="input-group-addon">+</div>
-                        {{ forms.input(searchform.tavolsag) }}
-                        <div class="input-group-addon">km</div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" ><span class="form_church_details" style="display:none">település</span></label>
+                    <div class="col-sm-8">{{ forms.input(searchform.varos) }} </div>
+                </div>
+            </div>
+
+            <div id="form_church_details"  style="display:none">
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >adott helyszín körül:</label>
+                    <div class="col-sm-8">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                {{ forms.input(searchform.hely) }}
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">+</div>
+                                    {{ forms.input(searchform.tavolsag) }}
+                                    <div class="input-group-addon">km</div>
+                                </div>
+                            </div>
+                        </div>    
                     </div>
                 </div>
-            </div>    
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >egyházmegye</label>
-          <div class="col-sm-8">{{ forms.select(searchform.ehm) }} </div>
-        </div>
-        <div class="form-group row" id="espkerlabel" style="display:none" >
-          <label class="col-sm-4 control-label" >esperes kerület</label>
-          <div class="col-sm-8">{% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}</div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >csak görögkatolikus</label>
-          <div class="col-sm-8">{{ forms.input(searchform.gorog) }} </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >ahol van adott nyelvű mise is</label>
-          <div class="col-sm-8">{{ forms.select(searchform.tnyelv) }} </div>
-        </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >egyházmegye</label>
+                    <div class="col-sm-8">{{ forms.select(searchform.ehm) }} </div>
+                </div>
+                <div class="form-group row" id="espkerlabel" style="display:none" >
+                    <label class="col-sm-4 control-label" >esperes kerület</label>
+                    <div class="col-sm-8">{% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}</div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >csak görögkatolikus</label>
+                    <div class="col-sm-8">{{ forms.input(searchform.gorog) }} </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >ahol van adott nyelvű mise is</label>
+                    <div class="col-sm-8">{{ forms.select(searchform.tnyelv) }} </div>
+                </div>
+            </div>
+
+            <div id="form_mass" style="margin-top:12px;">
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label">Mise</label>
+                    <div class="col-sm-6">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                {{ forms.select(searchform.mikor) }}
+                            </div>
+                            <div class="form-group">
+                                {{ forms.input(searchform.mikordatum) }}
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="cols-sm-2" style="text-align:right"><span class="btn glyphicon glyphicon-plus-sign" id="form_mass_getdetails"></span></div>      
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label"></label>
+                    <div class="col-sm-8">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                {{ forms.select(searchform.mikor2) }}
+                            </div>
+                            <div class="form-group">
+                                {{ forms.input(searchform.mikorido) }}
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+
+            <div id="form_mass_details" style="display:none">
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >nyelv</label>
+                    <div class="col-sm-8">{{ forms.select(searchform.nyelv) }} </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >zene</label>
+                    <div class="col-sm-8">
+                        <div class="checkbox">
+                            {% for key, item in searchform.zene %}
+                                <label>{{ forms.input(item) }}</label><br/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >korosztály</label>
+                    <div class="col-sm-8">
+                        <div class="checkbox">
+                            {% for key, item in searchform.kor %}
+                                <label>{{ forms.input(item) }}</label><br/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >rítus</label>
+                    <div class="col-sm-8">{{ forms.select(searchform.ritus) }} </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 control-label" >igeliturgiák is</label>
+                    <div class="col-sm-8">{{ forms.input(searchform.ige) }} </div>
+                </div>
+            </div>
+
+            <div align=center class="form-group" style="margin-top:12px">
+                <button type=submit name="q" value="SearchResultsMasses"  class="btn btn-primary">Mise keresése</button>
+                <button type=submit name="q" value="SearchResultsChurches"  class="btn btn-primary">Templom keresése</button>
+            </div>
+
+        </form>
     </div>
 
-    <div id="form_mass" style="margin-top:12px;">
-      <div class="form-group row">
-        <label class="col-sm-4 control-label">Mise</label>
-        <div class="col-sm-6">
-              <div class="form-inline">
-                  <div class="form-group">
-                      {{ forms.select(searchform.mikor) }}
-                  </div>
-                  <div class="form-group">
-                      {{ forms.input(searchform.mikordatum) }}
-                  </div>
-              </div> 
-        </div>
-        <div class="cols-sm-2" style="text-align:right"><span class="btn glyphicon glyphicon-plus-sign" id="form_mass_getdetails"></span></div>      
-      </div>
-      <div class="form-group row">
-        <label class="col-sm-4 control-label"></label>
-        <div class="col-sm-8">
-              <div class="form-inline">
-                  <div class="form-group">
-                      {{ forms.select(searchform.mikor2) }}
-                  </div>
-                  <div class="form-group">
-                      {{ forms.input(searchform.mikorido) }}
-                  </div>
-              </div> 
-        </div>
-      </div>
+    <div id="favorites" style="margin-top:12px">
+        <h3>Kedvenc templomok</h3>
+        {% if user.uid < 1 %}
+            <p class="alap"><i>Bejelentkezett felhasználóink megjelelölhetnek templomokat kedvencként.</i></p>
+        {% endif %}
+        {% if favorites|length > 0 %}
+            <ul>
+                {% for key, item in favorites %}<li class="link">{{ item.li|raw }}</li>{% endfor %}
+            </ul>
+        {% endif %}
     </div>
-      
-      <div id="form_mass_details" style="display:none">
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >nyelv</label>
-          <div class="col-sm-8">{{ forms.select(searchform.nyelv) }} </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >zene</label>
-          <div class="col-sm-8">
-            <div class="checkbox">
-            {% for key, item in searchform.zene %}
-              <label>{{ forms.input(item) }}</label><br/>
-            {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >korosztály</label>
-          <div class="col-sm-8">
-            <div class="checkbox">
-            {% for key, item in searchform.kor %}
-              <label>{{ forms.input(item) }}</label><br/>
-            {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >rítus</label>
-          <div class="col-sm-8">{{ forms.select(searchform.ritus) }} </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-4 control-label" >igeliturgiák is</label>
-          <div class="col-sm-8">{{ forms.input(searchform.ige) }} </div>
-        </div>
-      </div>
 
-  <div align=center class="form-group" style="margin-top:12px">
-    <button type=submit name="q" value="SearchResultsMasses"  class="btn btn-primary">Mise keresése</button>
-    <button type=submit name="q" value="SearchResultsChurches"  class="btn btn-primary">Templom keresése</button>
-  </div>
-  
-  </form>
-</div>
-
-<div id="favorites" style="margin-top:12px">
-
-  <h3>Kedvenc templomok</h3>
-  {% if favorites|length > 0 %}
-      <ul>
-      {% for key, item in favorites %}<li class="link">{{ item.li|raw }}</li>{% endfor %}
-      </ul>
-  {% else %}
-      <p class="alap"><i>Bejelentkezett felhasználóink megjelelölhetnek templomokat kedvencként.</i></p>
-  {% endif %}
-
-
-</div>
-
-<script>
-$('input.datepicker').datepicker({
-	format: "yyyy-mm-dd",
-	weekStart: 1,
-	language: "hu",
-	autoclose: true,
-	todayHighlight: true
-});
-</script>
+    <script>
+        $('input.datepicker').datepicker({
+            format: "yyyy-mm-dd",
+            weekStart: 1,
+            language: "hu",
+            autoclose: true,
+            todayHighlight: true
+        });
+    </script>
 
 {%  endblock %}
 
@@ -183,6 +181,6 @@ $('input.datepicker').datepicker({
 {% block leftsidebar %}
     {% if photo %}
         {% set content = '<img src="' ~ constant('DOMAIN') ~ '/kepek/templomok/' ~ photo.church_id ~ '/' ~ photo.filename ~ '" class="img-responsive"><h5 class="text-center"><a href="/templom/' ~ photo.church_id ~'">' ~ photo.church.nev ~ ' (' ~ photo.church.location.city ~')</a></h5>' %}
-      {% include "panel.twig" with {'title' : ' ' , 'body': content,'panel':'default  ' } %}
-  {% endif %}
+        {% include "panel.twig" with {'title' : ' ' , 'body': content,'panel':'default  ' } %}
+    {% endif %}
 {% endblock %}

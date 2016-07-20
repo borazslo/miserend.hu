@@ -128,17 +128,17 @@ class User {
     }
 
     function processResponsabilities() {
-        if(!isset($this->responsible)) {
+        if (!isset($this->responsible)) {
             $this->getResponsabilities();
         }
-        
+
         $tmp = array();
-        foreach($this->responsible['church'] as $church) {
+        foreach ($this->responsible['church'] as $church) {
             $tmp[$church] = \Eloquent\Church::find($church);
         }
         $this->responsible['church'] = $tmp;
     }
-    
+
     function getRemarks($limit = false, $ago = false) {
         if ($limit == false OR ! is_numeric($limit))
             $limit = 5;
@@ -391,11 +391,22 @@ class User {
 
     function getFavorites() {
         $favorites = array();
-        $results = mysql_query("
-	    	SELECT f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
-	    		LEFT JOIN templomok t ON t.id = f.tid
-	    	WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = " . $this->uid . "
-	    	ORDER BY nev;");
+
+        if ($this->uid == 0) {
+            $results = mysql_query("
+                    SELECT count(f.tid) as sum, f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
+                            LEFT JOIN templomok t ON t.id = f.tid
+                    WHERE t.ok = 'i' AND f.tid IS NOT NULL
+                    GROUP BY f.tid
+                    ORDER BY sum DESC, nev
+                    LIMIT 10;");
+        } else {
+            $results = mysql_query("
+                    SELECT f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
+                            LEFT JOIN templomok t ON t.id = f.tid
+                    WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = " . $this->uid . "
+                    ORDER BY nev;");
+        }
         while ($row = mysql_fetch_row($results, MYSQL_ASSOC)) {
             $row['li'] = "<a class='link' href='/templom/" . $row['tid'] . "'>" . $row['nev'];
             if ($row['ismertnev'] != '')
@@ -403,7 +414,8 @@ class User {
             $row['li'] .= "</a>, " . $row['varos'];
             $favorites[$row['tid']] = $row;
         }
-        sort($favorites);
+        if ($this->uid > 0)
+            sort($favorites);
         $this->favorites = $favorites;
         return $favorites;
     }
