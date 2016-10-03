@@ -13,7 +13,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         $_REQUEST['v'] = $version;
         $sqliteApi = new \Api\Sqlite();
         $sqliteApi->run();
-        $resultFile = $sqliteApi->sqliteFile;
+        $resultFilePath = $sqliteApi->sqliteFilePath;
         $result = $sqliteApi->getDatabaseToArray();
         unset($sqliteApi);
 
@@ -22,7 +22,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
         $expected = $sqliteApi->getDatabaseToArray();
         unset($sqliteApi);
 
-        $this->assertFileExists($resultFile);
+        $this->assertFileExists($resultFilePath);
         $this->assertEquals($expected, $result);
     }
 

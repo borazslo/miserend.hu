@@ -1,5 +1,5 @@
 {% for photo in photos %}
-    <div class="row">
+    <div class="row" id="photo-{{ photo.id }}">
         <div class="col-sm-2">
             <img src="{{ constant('DOMAIN')}}{{ photo.smallUrl }}">
         </div>

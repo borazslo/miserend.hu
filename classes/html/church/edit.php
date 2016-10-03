@@ -71,7 +71,9 @@ class Edit extends \Html\Html {
             }
         }
 
-        $this->church->log .= "\nMod: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
+        $now = date('Y-m-d H:i:s');
+        $this->church->moddatum = $now;
+        $this->church->log .= "\nMod: " . $user->login . " (" . $now . ")";
         $this->church->save();
 
         switch ($this->input['modosit']) {

@@ -119,8 +119,7 @@ function LirugicalDay($datum = false) {
     if (file_exists($file) AND $config['debug'] == 0) {
         $xmlstr = file_get_contents($file);
     } else {
-        $source = "http://breviar.sk/cgi-bin/l.cgi?qt=pxml&d=" . substr($datum, 8, 2) . "&m=" . substr($datum, 5, 2) . "&r=" . substr($datum, 0, 4) . "&j=hu";
-
+        $source = "http://breviar.kbs.sk/cgi-bin/l.cgi?qt=pxml&d=" . substr($datum, 8, 2) . "&m=" . substr($datum, 5, 2) . "&r=" . substr($datum, 0, 4) . "&j=hu";
         $ch = curl_init();
         $timeout = 1;
         curl_setopt($ch, CURLOPT_URL, $source);
@@ -134,9 +133,14 @@ function LirugicalDay($datum = false) {
     }
 
     if ($xmlstr != '') {
-
-        $xmlcont = new SimpleXMLElement($xmlstr);
-        return $xmlcont->CalendarDay;
+        $xmlcont = @simplexml_load_string($xmlstr);
+        if($xmlcont != '') {
+            $xmlcont = new SimpleXMLElement($xmlstr);
+            return $xmlcont->CalendarDay;    
+        } else {
+            return false;
+        }
+        
     } else
         return false;
 }

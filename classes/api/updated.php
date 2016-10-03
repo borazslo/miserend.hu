@@ -14,6 +14,14 @@ class Updated extends Api {
 
     public function run() {
         parent::run();
+
+        $sqlite = new \Api\Sqlite();
+        $sqlite->version = $this->version;        
+        if(!$sqlite->checkSqliteFile()) {
+            $this->return = "0";
+            return;
+        }
+
         $query = "SELECT id, moddatum FROM templomok WHERE  moddatum >= '" . $this->date . "' ";
         $result = mysql_query($query);
         if (mysql_num_rows($result) > 0)

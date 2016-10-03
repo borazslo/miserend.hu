@@ -14,7 +14,7 @@ class Sqlite extends Api {
     public function run() {
         parent::run();
 
-        $this->sqliteFileName = 'miserend_v' . $this->version . '.sqlite3';
+        $this->setFilePath();
 
         if ($this->generateSqlite()) {
             //Sajnos ez itten nem működik... Nem lesz szépen letölthető.  Headerrel sem
@@ -23,6 +23,17 @@ class Sqlite extends Api {
         } else {
             throw new \Exception("Could not make the requested sqlite3 file.");
         }
+    }
+
+    function setFileName() {
+        $this->sqliteFileName = 'miserend_v' . $this->version . '.sqlite3';
+    }
+
+    function setFilePath() {
+        if(!isset($this->sqliteFileName)) {
+            $this->setFileName();
+        }
+        $this->sqliteFilePath = PATH . $this->folder . $this->sqliteFileName;
     }
 
     function connectToSqlite($name, $file = false) {
@@ -48,7 +59,7 @@ class Sqlite extends Api {
 
     function getDatabaseToArray() {
         if (!isset($this->sqlite)) {
-            throw nex \Exception('There is no Sqlite connectionto make it an array.');
+            throw nex \Exception('There is no Sqlite connection to make it an array.');
         }
         $array = [];
         $tables = $this->sqlite->table('sqlite_master')->select('name')->get();
@@ -63,9 +74,11 @@ class Sqlite extends Api {
 
     function generateSqlite() {
         echo "Sqlite is beginning right now...";
-        $this->sqliteFile = PATH . $this->folder . $this->sqliteFileName;
-
-        $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFile);
+        if(!isset($this->sqliteFilePath)) {
+            $this->setFilePath();
+        }
+    
+        $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFilePath);
         $this->sqlite->beginTransaction();
 
         $this->dropAllTables();
@@ -325,6 +338,30 @@ class Sqlite extends Api {
         $fp = fopen($file, 'w');
         fwrite($fp, $emptySqliteFile);
         fclose($fp);
+        return true;
+    }
+
+    function checkSqliteFile() {
+        if(!isset($this->sqliteFilePath)) {
+            $this->setFilePath();
+        }
+        if(!file_exists($this->sqliteFilePath)) {
+            return false;
+        }
+        $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFilePath);
+        try{
+            $this->sqlite->table('sqlite_master')->select('name')->get();
+        } catch (\Illuminate\Database\QueryException $e) {            
+            global $config;
+            $mailHeader = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=UTF-8' . "\r\n";
+            $mailHeader .= 'From: ' . $config['mail']['sender'] . "\r\n";
+            $mailTo = $config['mail']['debugger'];
+            $mailSubject = "[miserend.hu] API error";
+            $mailContent = $this->sqliteFilePath." is not a valid sqlite file.";
+            mail($mailTo, $mailSubject, $mailContent, $mailHeader);
+
+            return false;
+        }
         return true;
     }
 

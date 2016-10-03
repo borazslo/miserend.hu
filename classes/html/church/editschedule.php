@@ -129,6 +129,7 @@ class EditSchedule extends \Html\Html {
         $this->church->misemegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['misemegj']);
         $this->church->adminmegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['adminmegj']);
         $this->church->miseaktiv = $_REQUEST['miseaktiv'];
+        $this->church->moddatum =  date('Y-m-d H:i:s');
         $this->church->save();
 
         $modosit = $_REQUEST['modosit'];
