@@ -5,83 +5,49 @@ use Illuminate\Database\Capsule\Manager as DB;
 class User {
 
     function __construct($uid = false) {
-        if (isset($uid) AND ! is_numeric($uid) AND filter_var($uid, FILTER_VALIDATE_EMAIL)) {
-            $query = "SELECT * FROM user WHERE email = '" . sanitize($uid) . "' AND ok = 'i' LIMIT 1";
-            $result = mysql_query($query);
-            $x = mysql_fetch_assoc($result);
-            if (is_array($x)) {
-                foreach ($x as $key => $value) {
-                    $this->$key = $value;
-                }
-                $this->username = $x['login'];
-                $this->nickname = $x['becenev'];
-                $this->name = $x['nev'];
-                $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
-                $this->getResponsabilities();
-                if ($this->checkRole('miserend')) {
-                    $this->isadmin = true;
-                }
-                return true;
+        if (isset($uid)) {
+            $user = DB::table('user')
+                    ->select('*')
+                    ->where('ok', 'i');
+            
+            if(!is_numeric($uid) AND filter_var($uid, FILTER_VALIDATE_EMAIL) ) {
+                $user = $user->where('email', $uid);
+            } elseif (!is_numeric($uid)) {
+                $user = $user->where('nev', $uid);
             } else {
-                //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
-                // There is no user with this uid;
-                $uid = 0;
-                //return false;
+                $user = $user->where('uid', $uid);
             }
-        } elseif (isset($uid) AND ! is_numeric($uid)) {
-            $query = "SELECT * FROM user WHERE login = '" . sanitize($uid) . "' AND ok = 'i' LIMIT 1";
-            $result = mysql_query($query);
-            $x = mysql_fetch_assoc($result);
-            if (is_array($x)) {
-                foreach ($x as $key => $value) {
-                    $this->$key = $value;
-                }
-                $this->username = $x['login'];
-                $this->nickname = $x['becenev'];
-                $this->name = $x['nev'];
-                $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
-                $this->getResponsabilities();
-                if ($this->checkRole('miserend')) {
-                    $this->isadmin = true;
-                }
-                return true;
-            } else {
-                //TODO: kitalálni mit csináljon, ha  nincs uid-jű user. Legyen vendég?
-                // There is no user with this uid;
-                $uid = 0;
-                //return false;
-            }
-        }
+            $user = $user->first();
 
+            if($user) {
+                foreach ($user as $key => $value) {
+                    $this->$key = $value;
+                }
+                $this->username = $user->login;
+                $this->nickname = $user->becenev;
+                $this->name = $user->nev;
+                $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
+                $this->getResponsabilities();
+                if ($this->checkRole('miserend')) {
+                    $this->isadmin = true;
+                }
+                return true;   
+
+            } else {
+                 //TODO: kitalálni mit csináljon, ha  nincs megfelelő azobosítójú user. Legyen vendég?
+                // There is no user with this uid;
+                $uid = 0;
+                //return false;
+            }        
+        }
+        //Lássuk a vendégeket
         if (!isset($uid) OR ! is_numeric($uid) OR $uid == 0) {
             $this->loggedin = false;
             $this->uid = 0;
             $this->username = '*vendeg*';
             $this->nickname = '*vendég*';
             $this->responsible = false;
-        } else {
-            $query = "SELECT * FROM user WHERE uid = $uid AND ok = 'i' LIMIT 1";
-            $result = mysql_query($query);
-            $x = mysql_fetch_assoc($result);
-            if (is_array($x)) {
-                foreach ($x as $key => $value) {
-                    $this->$key = $value;
-                }
-                $this->username = $x['login'];
-                $this->nickname = $x['becenev'];
-                $this->name = $x['nev'];
-                $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
-                $this->getResponsabilities();
-                if ($this->checkRole('miserend')) {
-                    $this->isadmin = true;
-                }
-                return true;
-            } else {
-                //TODO: kitalálni mit csináljon, hogy nincs uid-jű user. Legyen vendég?
-                // There is no user with this uid;
-                return false;
-            }
-        }
+        } 
     }
 
     function checkRole($role = false) {
@@ -114,16 +80,22 @@ class User {
             'church' => array()
         );
         if ($this->uid > 0) {
-            $query = "SELECT id FROM egyhazmegye WHERE ok = 'i' AND felelos = '" . $this->username . "' ";
-            $result = mysql_query($query);
-            while ($ehm = mysql_fetch_assoc($result)) {
-                $this->responsible['diocese'][] = $ehm['id'];
+            $results = DB::table('egyhazmegye')
+                    ->select('id')
+                    ->where('ok', 'i')
+                    ->where('felelos', $this->username)
+                    ->get();
+            foreach ($results as $result) {
+                $this->responsible['diocese'][] = $result->id;
             }
-            $query = "SELECT id FROM templomok WHERE ok = 'i' AND letrehozta = '" . $this->username . "' ";
-            $result = mysql_query($query);
-            while ($church = mysql_fetch_assoc($result)) {
-                $this->responsible['church'][] = $church['id'];
-            }
+            $results = DB::table('templomok')
+                    ->select('id')
+                    ->where('ok', 'i')
+                    ->where('letrehozta', $this->username)
+                    ->get();
+            foreach ($results as $result) {
+                $this->responsible['church'][] = $result->id;
+            }            
         }
     }
 
@@ -392,31 +364,19 @@ class User {
     function getFavorites() {
         $favorites = array();
 
-        if ($this->uid == 0) {
-            $results = mysql_query("
-                    SELECT count(f.tid) as sum, f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
-                            LEFT JOIN templomok t ON t.id = f.tid
-                    WHERE t.ok = 'i' AND f.tid IS NOT NULL
-                    GROUP BY f.tid
-                    ORDER BY sum DESC, nev
-                    LIMIT 10;");
-        } else {
-            $results = mysql_query("
-                    SELECT f.tid,t.nev,t.ismertnev,t.varos FROM favorites f
-                            LEFT JOIN templomok t ON t.id = f.tid
-                    WHERE t.ok = 'i' AND f.tid IS NOT NULL AND f.uid = " . $this->uid . "
-                    ORDER BY nev;");
+        if ($this->uid > 0) {
+            $favorites = \Eloquent\Favorite::where('uid',$this->uid)->get()->sortBy(function($favorite){
+                        return $favorite->church->nev;
+                });
         }
-        while ($row = mysql_fetch_row($results, MYSQL_ASSOC)) {
-            $row['li'] = "<a class='link' href='/templom/" . $row['tid'] . "'>" . $row['nev'];
-            if ($row['ismertnev'] != '')
-                $row['li'] .= " (" . $row['ismertnev'] . ")";
-            $row['li'] .= "</a>, " . $row['varos'];
-            $favorites[$row['tid']] = $row;
+        else {
+            $favorites = \Eloquent\Favorite::groupBy('tid')->select('tid', DB::raw('count(*) as total'))->orderBy('total','DESC')->limit(10)->get();
+        }        
+
+        foreach ($favorites as $favorite) {
+            $this->favorites[$favorite->tid] = $favorite; 
         }
-        if ($this->uid > 0)
-            sort($favorites);
-        $this->favorites = $favorites;
+
         return $favorites;
     }
 
@@ -442,18 +402,13 @@ class User {
         foreach ($tids as $key => $tid) {
             if (!\Eloquent\Church::find($tid))
                 unset($tids[$key]);
+            else {
+                $favorite = new Favorite;
+                $favorite->uid = $this->uid;
+                $favorite->tid = $tid;
+                $favorite->save();
+                }
         }
-
-        $query = "INSERT IGNORE INTO favorites (uid,tid) VALUES ";
-        $values = array();
-        foreach ($tids as $key => $tid) {
-            $values[] = "(" . $this->uid . "," . $tid . ")";
-        }
-        $query .= implode(', ', $values) . ";";
-        if (mysql_query($query))
-            return true;
-        else
-            return false;
     }
 
     function removeFavorites($tids) {
@@ -531,7 +486,6 @@ class User {
 
         $timeout = '+1 month';
         $token = generateToken($userRow->uid, 'web', $timeout);
-
         setcookie('token', $token, strtotime($timeout));
         $_COOKIE['token'] = $token;
         $_SESSION['token'] = $token;

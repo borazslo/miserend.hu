@@ -1,8 +1,14 @@
 <?php
 
+
 namespace Html;
+//use Illuminate\Database\DatabaseManager as DB;
+//use \Illuminate\Support\Facades\DB as DB;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class Home extends Html {
+
+
 
     public function __construct() {
         global $user, $config;
@@ -14,12 +20,15 @@ class Home extends Html {
         $holnap = date('Y-m-d', (time() + 86400));
         $mikor = '8:00-19:00';
 
-        $query = "select id,ehm,nev from espereskerulet";
-        $lekerdez = mysql_query($query);
-        while (list($id, $ehm, $nev) = mysql_fetch_row($lekerdez)) {
-            $espkerT[$ehm][$id] = $nev;
+        
+        $espkers = DB::table('espereskerulet')
+                    ->select('id','ehm','nev')
+                    ->get();
+            
+        foreach ($espkers as $espker) {
+            $espkerT[$espker->ehm][$espker->id] = $espker->nev;# code...
         }
-
+    
         //MISEREND űRLAP	
         $searchform = array(
             'kulcsszo' => array(
@@ -66,12 +75,16 @@ class Home extends Html {
 							document.getElementById('espkerlabel').style.display='none';
 						}");
         $searchform['ehm']['options'][0] = 'mindegy';
-        $query = "select id,nev from egyhazmegye where ok='i' order by sorrend";
-        $lekerdez = mysql_query($query);
-        while (list($id, $nev) = mysql_fetch_row($lekerdez)) {
-            $searchform['ehm']['options'][$id] = $nev;
-        }
-
+        
+        $egyhmegyes = DB::table('egyhazmegye')
+                    ->select('id','nev')
+                    ->where('ok','i')
+                    ->orderBy('sorrend')
+                    ->get();
+                    foreach ($egyhmegyes as $egyhmegye) {
+                        $searchform['ehm']['options'][$egyhmegye->id] = $egyhmegye->nev;
+                    }
+        
         foreach ($espkerT as $ehm => $espker) {
             $searchform['espker'][$ehm] = array(
                 'name' => "espker",
@@ -215,7 +228,8 @@ class Home extends Html {
         );
 
         $this->photo = \Eloquent\Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();
-        $this->photo->church->location;
+        if($this->photo->church) //TODO: Van, hogy a random képhez nem is tartozik templom. Valami régi hiba miatt.
+            $this->photo->church->location;
 
         $this->favorites = $user->getFavorites();
         $this->searchform = $searchform;
