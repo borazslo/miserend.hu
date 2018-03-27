@@ -4,12 +4,14 @@ namespace Api;
 
 class Report extends Api {
 
+    public $requiredFields = array('tid','pid');
+
     static function factoryCreate() {
         $api = new Api();
         $api->getInputJson();
 
 
-        if (!$api->input['token']) {
+        if (!isset($api->input['token'])) {
             return new ReportByAnonym();
         } else {
             return new ReportByUser();
@@ -54,7 +56,8 @@ class Report extends Api {
         $this->remark = new \Remark();
         $this->remark->tid = $this->input['tid'];
         $this->remark->name = $this->user->name;
-        $this->remark->email = $this->user->email;
+        if(isset($this->user->email))
+            $this->remark->email = $this->user->email;
         if (isset($this->input['timestamp'])) {
             $this->remark->timestamp = $this->input['timestamp'];
         }

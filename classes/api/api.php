@@ -29,12 +29,24 @@ class Api {
         if (!$inputJSONstring = file_get_contents('php://input')) {
             throw new \Exception("There is no JSON input.");
         }
-        if (!$inputJSONarray = json_decode($inputJSONstring, TRUE)) {
+        if (!$inputJSONarray = json_decode($inputJSONstring, TRUE)) {  
             throw new \Exception("Invalid JSON input.");
         }
         $this->input = $inputJSONarray;
+
+        if(isset($this->requiredFields)) {
+            $this->requiredInput($this->requiredFields);
+        }
         if (method_exists($this, 'validateInput')) {
             $this->validateInput();
+        }
+    }
+    
+    public function requiredInput($fields) {
+        foreach($fields as $field) {
+            if(! isset($this->input[$field])) {
+                throw new \Exception("Field '".$field."' is required in JSON.");
+            }
         }
     }
 

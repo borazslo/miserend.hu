@@ -14,6 +14,10 @@ class Api extends Html {
         }
 
         try {
+
+            if(!isset($action)) {
+                $this->redirect('https://github.com/borazslo/miserend.hu/wiki/API');
+            }
             switch ($action) {
                 case 'sqlite':
                     $this->redirect(DOMAIN . '/fajlok/sqlite/miserend_v' . $_REQUEST['v'] . '.sqlite3');
