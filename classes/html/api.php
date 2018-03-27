@@ -48,6 +48,10 @@ class Api extends Html {
                     $this->api = new \Api\Table();
                     break;
 
+                case 'upload':
+                    $this->api = new \Api\Upload();
+                    break;
+
                 default:
                     throw new \Exception("API action '$action' is not supported.");
             }
