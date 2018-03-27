@@ -9,7 +9,7 @@ class Remark {
     function __construct($rid = false) {
         if (!isset($rid) OR ! is_numeric($rid)) {
             global $user;
-            $this->name = $user->nev;
+            $this->name = $user->nickname;
             $this->username = $user->username;
             //email fakultatív
             //TODO: megbízható?? reliable
@@ -34,7 +34,7 @@ class Remark {
 
                 $this->adminmegj = preg_replace('/=("|\'|)img\//i', '=$1/img/', $this->adminmegj);
 
-                $this->marker['url'] = "javascript:OpenScrollWindow('/templom/" . $this->church_id . "/eszrevetelek',550,500);";
+                $this->marker['url'] = "javascript:OpenScrollWindow('/templom/" . $this->tid . "/eszrevetelek',550,500);";
                 if ($this->allapot == 'u') {
                     $this->marker['text'] = "Új észrevétel!";
                     $this->marker['html'] = "<img src=/img/csomag.gif title='" . $this->marker['text'] . "' align=absmiddle border=0> ";
@@ -53,7 +53,7 @@ class Remark {
                     $this->marker['mark'] = false;
                 }
 
-                $this->church = \Eloquent\Church::find($this->church_id)->toArray();
+                $this->church = \Eloquent\Church::find($this->tid)->toArray();
             } else {
                 // TODO: There is no remark with this rid;
                 return false;
@@ -62,12 +62,15 @@ class Remark {
     }
 
     function save() {
+        if(isset($this->tid)) $this->church_id = $this->tid;
+        else $this->tid = $this->church_id;
+        
         if (!isset($this->reliable))
             $this->reliable = '?';
 
         if ($this->username != "*vendeg*")
             $where = " login = '" . $this->username . "' ";
-        elseif (preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i", $this->email))
+        elseif (isset($this->email) AND preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i", $this->email))
             $where = " email = '" . $this->email . "' ";
         if (isset($where)) {
             $query = "SELECT megbizhato FROM " . $this->table . " where $where order by created_at DESC LIMIT 1";
@@ -82,7 +85,7 @@ class Remark {
 			login='" . $this->username . "', 
 			megbizhato='" . $this->reliable . "', 
 			created_at='" . $this->timestamp . "', 
-			church_id='" . $this->church_id . "', 
+			church_id='" . $this->tid . "', 
 			allapot='" . $this->state . "',
 			leiras='" . sanitize($this->text) . "'";
         if (isset($this->email))
@@ -101,10 +104,13 @@ class Remark {
 
     function emails() {
         global $config;
-        $this->tid = $this->church_id;
+        if(isset($this->tid)) $this->church_id = $this->tid;
+        else $this->tid = $this->church_id;
+
         $query = "select nev,ismertnev,varos,egyhazmegye, kontaktmail from templomok where id = " . $this->tid . " limit 0,1";
         $lekerdez = mysql_query($query);
         $templom = mysql_fetch_assoc($lekerdez);
+        $eszrevetel = '';
         $eszrevetel.= "<a href=\"http://miserend.hu/?templom=" . $this->tid . "\">" . $templom['nev'] . " (";
         if ($templom['ismertnev'] != "")
             $eszrevetel .= $templom['ismertnev'] . ", ";
@@ -138,12 +144,16 @@ class Remark {
     }
 
     function sendMail($type, $to) {
+        if(isset($this->tid)) $this->church_id = $this->tid;
+        else $this->tid = $this->church_id;
+        
         $mail = new \Mail();
         if (!isset($this->EmailSubject))
             $mail->subject = "Miserend - észrevétel (" . $this->tid . ")";
         else
             $mail->subject = $this->EmailSubject;
 
+        $mail->content = '';
         switch ($type) {
             case 'diocese':
                 $mail->content .= "<strong>Kedves egyházmegyei felelős!</strong>\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";

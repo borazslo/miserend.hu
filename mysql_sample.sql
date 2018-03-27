@@ -4749,6 +4749,8 @@ CREATE TABLE `favorites` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `tid` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uid_tid_UNIQUE` (`uid`,`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -4796,6 +4798,8 @@ CREATE TABLE `tokens` (
   `name` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `uid` int(11) DEFAULT NULL,
   `timeout` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)

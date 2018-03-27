@@ -4,6 +4,8 @@
 Vagrant.configure(2) do |config|
 
   config.vm.box = "scotch/box"
+  # Miserend.hu server still uses PHP 5.6.24 so we need an old schotch/box:
+  config.vm.box_version = "2.5"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs

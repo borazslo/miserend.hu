@@ -11,6 +11,10 @@ class Church extends \Html\Html {
 
         $church = \Eloquent\Church::find($tid);
 
+        if(!$church) {
+            throw new \Exception("Church with tid = '$tid' does not exist.");
+        }
+
         $church->closestNeighbour = $church->closestNeighbour()->first();
         $church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();
         $church->photos = $church->photos()->get();

@@ -69,7 +69,8 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         if ($inputFile["size"] > 5242880) {
             throw new \Exception("File size is too big!");
         }
-        if (!in_array($inputFile['type'], ['image/jpeg'])) {
+        if (!in_array($inputFile['type'], [ 'image/jpg', 'image/jpeg', 'image/gif', 'image/png' ])) {
+            printr($inputFile);
             throw new \Exception("Unsopported file type.");
         }
         $konyvtar = $this->pathToPhotos . "/" . $this->church_id;
@@ -81,14 +82,23 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
                 throw new \Exception("Could not create the folder.");
             }
         }
-
+        if (!is_writable($konyvtar)) {
+            throw new \Exception("Upload directory is not writable.");            
+        }
         $File_Name = strtolower($inputFile['name']);
         $File_Ext = substr($File_Name, strrpos($File_Name, '.')); //get file extention
         $Random_Number = rand(0, 9999999999); //Random number to be added to name.
         $this->filename = $Random_Number . $File_Ext; //new file name
-
-        if (!move_uploaded_file($inputFile['tmp_name'], $konyvtar . "/" . $this->filename)) {
-            throw new \Exception("Could not move the file to its new place.");
+                
+        //Changed move_uploaded_file() to rename() because of tha API/upload
+        if (!rename($inputFile['tmp_name'], $konyvtar . "/" . $this->filename)) {
+            $exception = "Could not move the file to its new place.";
+            if(!file_exists($inputFile['tmp_name'])) 
+                $exception .= " Because ".$inputFile['tmp_name']." does not exists";
+            if(file_exists($konyvtar."/".$this->filename))
+                    $exception .= " Because ".$konyvtar."/".$this->filename." already exists.";
+            printr($inputFile);
+            throw new \Exception($exception);
         }
 
         $kimenet = $konyvtar . "/" . $this->filename;

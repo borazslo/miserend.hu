@@ -20,6 +20,7 @@ function dbconnect() {
         else
             die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
     };
+    
     global $capsule;
     $capsule = new DB;
     $capsule->addConnection([
@@ -1507,7 +1508,6 @@ function updatesCampaign() {
     );
 }
 
-
 function generateToken($forUserId, $type, $timeout = false) {
     if ($timeout == false) {
         global $config;
@@ -1517,44 +1517,53 @@ function generateToken($forUserId, $type, $timeout = false) {
     }
 
     $inserted = false;
-    for ($i = 1; $i < 5; $i++) {
-        $token = md5(uniqid(mt_rand(), true));
-        mysql_query("INSERT INTO tokens (name,type,uid,timeout) VALUES ('" . $token . "','" . $type . "'," . $forUserId . ",'" . $timeout . "');");
-        if (mysql_affected_rows() == 1) {
-            $inserted = true;
-            break;
-        }
+    #for ($i = 1; $i < 5; $i++) {
+
+    try{ 
+        $token = new Eloquent\Token;
+
+        $token->name = md5(uniqid(mt_rand(), true));
+        $token->type = $type;
+        $token->uid = $forUserId;
+        $token->timeout = $timeout;
+
+        $token->save();
     }
-    if ($inserted != true) {
-        throw new Exception("We could not generate unique token.");
+    catch(\Exception $e){
+       throw new \Exception("Token cannot saved. Sorry");
+       echo $e->getMessage();   // insert query
     }
-    return $token;
+    return $token->name;
 }
 
 function validateToken($token) {
-    $result = mysql_query("SELECT * FROM tokens WHERE name = '" . sanitize($token) . "' LIMIT 1");
-    $row = mysql_fetch_assoc($result);
-
-    if (!is_array($row)) {
+     $token = Eloquent\Token::where('name', $token)->first();
+    
+    if (!$token) {        
         #throw new \Exception("Invalid token");
         return false;
-    } elseif ($row['timeout'] < date('Y-m-d H:i:s')) {
+    } elseif ($token->timeout < date('Y-m-d H:i:s')) {
         #throw new \Exception("Outdated token");
         return false;
     }
     //TODO: check also: type,uid
 
     extendToken($token);
-    return $row;
+    return $token;
 }
 
 function extendToken($token) {
     global $config;
-    $query = "UPDATE tokens SET timeout = '" . date('Y-m-d H:i:s', strtotime("+" . $config['token']['timeout'])) . "' WHERE name = '" . $token . "' LIMIT 1;";
-    if (mysql_query($query))
-        return true;
-    else
-        return false;
+    try {
+        $token->timeout = date('Y-m-d H:i:s', strtotime("+" . $config['token']['timeout']));
+        $token->save();
+        }
+    catch(\Exception $e){
+       throw new \Exception("Token cannot be extended.");
+       echo $e->getMessage();   // insert query
+    }
+    return true;
+
 }
 
 function getInputJSON() {
@@ -1577,28 +1586,28 @@ function getInputJSON() {
 function feltoltes_block() {
     global $user;
 
-    $query = "select id,nev,varos,eszrevetel from templomok where letrehozta='" . sanitize($user->login) . "' limit 0,5";
-    $lekerdez = mysql_query($query);
-    $mennyi = mysql_num_rows($lekerdez);
+    $churches = \Eloquent\Church::where('letrehozta',$user->login)->limit(5)->get();
 
-    if ($mennyi > 0) {
-        $kod_tartalom = '<ul>';
-        while (list($tid, $tnev, $tvaros, $teszrevetel) = mysql_fetch_row($lekerdez)) {
-            if ($teszrevetel == 'i')
-                $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
-            elseif ($teszrevetel == 'f')
-                $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
-            else
-                $jelzes = '';
+    if(count($churches) == 0) return;
 
-            $kod_tartalom.="\n<li>$jelzes<a href='/templom/$tid/edit' class=link_kek title='$tvaros'>$tnev</a></li>";
-        }
+    
+    $kod_tartalom = '<ul>';
+    foreach( $churches as $church) { 
+        if ($church->eszrevetel == 'i')
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->tid."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+        elseif ($church->eszrevetel == 'f')
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->tid."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
+        else
+            $jelzes = '';
 
-        $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";
-        $kod_tartalom .= '</ul>';
-        return $kod_tartalom;
+        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->tid."/edit' class=link_kek title='".$church->varos."'>".$church->nev."</a></li>";
     }
-    return;
+
+    $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";
+    $kod_tartalom .= '</ul>';
+
+    return $kod_tartalom;
+    
 }
 
 function addMessage($text, $severity = false) {
@@ -1648,15 +1657,25 @@ function chat_getcomments($args = array()) {
 
     $loginkiir1 = urlencode($user->login);
 
-    $query = "select id,datum,user,kinek,szoveg from chat where (kinek='' or kinek='" . $user->login . "' or user='" . $user->login . "') ";
+    $comments = DB::table('chat')->where(function($query)
+            {
+                global $user;
+                $query->orWhere('kinek', '')
+                      ->orWhere('kinek', $user->login)
+                      ->orWhere('user', $user->login);
+            })
+            ->orderBy('datum','DESC')
+            ->limit($limit);
     if (isset($args['last']))
-        $query .= " AND datum > '" . $args['last'] . "' ";
+        $comments = $comments->where('datum','>',$args['last']);
     if (isset($args['first']))
-        $query .= " AND datum < '" . $args['first'] . "' ";
+        $comments = $comments->where('datum','<',$args['first']);
+    
+    $comments = $comments->get();
+    $comments = collect($comments)->map(function($x){ return (array) $x; })->toArray();
+    
+    foreach($comments as $row) {
 
-    $query .= " order by datum desc limit 0," . $limit;
-    $lekerdez = mysql_query($query);
-    while ($row = mysql_fetch_array($lekerdez, MYSQL_ASSOC)) {
         $row['datum_raw'] = $row['datum'];
         if (date('Y', strtotime($row['datum'])) < date('Y'))
             $row['datum'] = date('Y.m.d.', strtotime($row['datum']));
@@ -1698,14 +1717,18 @@ function chat_getcomments($args = array()) {
 function chat_getusers($format = false) {
     global $user;
     $return = array();
-    $query = "select login from user where jogok!='' and lastactive >= '" . date('Y-m-d H:i:s', strtotime("-5 minutes")) . "' and login <> '" . $user->login . "' order by lastactive desc";
-    if (!$lekerdez = mysql_query($query))
-        $online.="HIBA<br>$query<br>" . mysql_error();
-    if (mysql_num_rows($lekerdez) > 0) {
-        while (list($loginnev) = mysql_fetch_row($lekerdez)) {
-            $return[] = $loginnev;
-        }
-    }
+    
+    $onlineUsers = DB::table('user')
+        ->select('login')
+        ->where('jogok','!=','')
+        ->where('lastactive','>=',date('Y-m-d H:i:s', strtotime("-5 minutes")))
+        ->where('login','<>',$user->login)
+        ->orderBy('lastactive','DESC')
+        ->get();
+
+    foreach($onlineUsers as $onlineUser)
+            $return[] = $onlineUser->login;
+    
     if ($format == 'html') {
         foreach ($return as $k => $i)
             $return[$k] = '<span class="response_closed" data-to="' . $i . '" style="background-color: rgba(0,0,0,0.15);">' . $i . '</span>';

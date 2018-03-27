@@ -69,6 +69,7 @@ class Html {
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
                     ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
+                    ['title' => 'API tesztelés', 'url' => '/apitest', 'permission' => 'miserend'],
                 ]
             ],
             ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user',
