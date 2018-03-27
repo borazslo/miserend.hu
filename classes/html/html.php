@@ -16,7 +16,10 @@ class Html {
     }
 
     function render() {
-        global $user;
+        global $user, $config;
+
+        $this->environment = $config['env'];
+        $this->githash = $this->getGitHash();
         $this->user = $user;
 
         $this->loadMenu();
@@ -162,6 +165,14 @@ class Html {
         }
     }
 
+    function getGitHash() {
+        //GIT version
+        exec('git rev-parse --verify HEAD 2> /dev/null', $output);
+        if (isset($output[0]) AND $output[0] != '')
+            return $output[0];
+        return false;
+    }
+    
     static function printExceptionVerbose($e) {
         echo $e->getMessage();
         echo "<pre>";

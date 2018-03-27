@@ -1,8 +1,9 @@
 <?php
 
-session_start();
-
-define('PATH', dirname(__FILE__) . "/");
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+    define('PATH', dirname(__FILE__) . "/");
+}
 
 $vars = array();
 
@@ -43,11 +44,6 @@ require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
 $loader = new Twig_Loader_Filesystem(PATH . 'templates');
 $twig = new Twig_Environment($loader); // cache?      
-//GIT version
-exec('git rev-parse --verify HEAD 2> /dev/null', $output);
-if (isset($output[0]) AND $output[0] != '')
-    $vars['version']['hash'] = $output[0];
-
 
 //
 //  Useful CONSTANTS

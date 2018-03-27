@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
 <html lang="hu">
-    <head>
-        {% if app.environment != 'production' %}<meta name="robots" content="noindex,nofollow">{% endif %}
+    <head>        
+        {% if environment != 'production' %}<meta name="robots" content="noindex,nofollow">{% endif %}
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -109,9 +109,9 @@
             <div class="footer">
                 <p>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a konkrét plébánián!</p>
                 <o>Fejlesztés: <a href="https://github.com/borazslo/miserend.hu">GitHub</a>
-                {% if version.hash %}- <small>verzió:
-                    <a href="https://github.com/borazslo/miserend.hu/commit/{{ version.hash }}">
-                    {{ version.hash[0:7] }}</a></small>{% endif %}</p>
+                {% if githash %}- <small>verzió:
+                    <a href="https://github.com/borazslo/miserend.hu/commit/{{ githash }}">
+                    {{ githash[0:7] }}</a></small>{% endif %}</p>
                 <p><a href="/impresszum">Impresszum</a></p>
                 <!--xxx-->
             </div>
