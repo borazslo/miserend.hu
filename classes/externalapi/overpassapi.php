@@ -68,9 +68,11 @@ class OverpassApi extends \ExternalApi\ExternalApi {
                 });
         foreach ($osmElements->get() as $element) {
             $urlMiserend = $element->tags->where('name', 'url:miserend')->first()->value;
-            preg_match('/=([0-9]{1,5})$/i', $urlMiserend, $match);
-            $element->churches()->detach([$match[1]]);
-            $element->churches()->attach([$match[1]]);
+            preg_match('/miserend\.hu\/\?{0,1}templom(\/|=)([0-9]{1,5})/i', $urlMiserend, $match);
+            if(isset($match[2])) {
+                $element->churches()->detach([$match[2]]);
+                $element->churches()->attach([$match[2]]);
+            }
         }
     }
 

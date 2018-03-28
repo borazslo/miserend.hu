@@ -73,6 +73,7 @@ class Html {
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
                     ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
                     ['title' => 'API tesztelés', 'url' => '/apitest', 'permission' => 'miserend'],
+                    ['title' => 'OSM kapcsolat', 'url' => '/josm', 'permission' => 'miserend'],
                 ]
             ],
             ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user',

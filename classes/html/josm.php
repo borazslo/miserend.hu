@@ -2,19 +2,41 @@
 
 namespace Html;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class Josm extends Html {
 
     public function __construct($path) {
 
         if (isset($_REQUEST['update'])) {
-            updateOverpass();
-            return;
+            set_time_limit('300');
+            $job = \Eloquent\Cron::where('class','\ExternalApi\OverpassApi')->where('function','updateUrlMiserend')->first();
+            $job->run();                       
         }
 
         $this->setTitle('JOSM összeköttetés');
-        $this->template = 'layout_simpliest.twig';
-
-        addMessage('Üzemen kívül. Elnézést.','danger');
+        $this->template = 'josm.twig';        
+        
+        $this->cron = \Eloquent\Cron::where('class','\ExternalApi\OverpassApi')
+                ->where('function','updateUrlMiserend')->first();
+              
+        $this->osmWithoutChurch = \Eloquent\Osm::has('churches',0)
+                ->whereHas('tags', function ($query) {
+                    $query->where('name', 'url:miserend');
+                })->get();      
+        foreach($this->osmWithoutChurch as $key => $item) {   
+             foreach($item->tags as $tag)
+                  $tag->name;                         
+        }
+         
+                
+        $this->churchWithoutOSM = \Eloquent\Church::has('osms',0)
+                ->where('ok','i')
+                ->orderBy('orszag')->orderBy('megye')->orderBy('varos')->orderBy('nev')
+                ->get();      
+        
+        
+        
         return;
         
         if (isset($_REQUEST['nosuccess']))
