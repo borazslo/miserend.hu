@@ -19,13 +19,13 @@ class Catalogue extends \Html\Html {
         if (!$user->checkRole('miserend')) {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');
         }
-
+               
         $this->filterKeyword = (isset($this->input['church']['keyword']) ? $this->input['church']['keyword'] : false);
         $this->filterDiocese = (isset($this->input['church']['egyhazmegye']) ? $this->input['church']['egyhazmegye'] : false);
         $this->filterDeanery = ((isset($this->input['church']['espereskerulet']) AND $this->input['church']['espereskerulet'] != 0 ) ? $this->input['church']['espereskerulet'] : false);
         $this->filterStatus = (isset($this->input['church']['status']) ? $this->input['church']['status'] : false);
-        $this->orderBy = (isset($this->input['church']['orderBy']) ? $this->input['church']['orderBy'] : 'moddatum desc');
-
+        $this->orderBy = (isset($this->input['church']['orderBy']) ? $this->input['church']['orderBy'] : 'moddatum DESC');
+        
         $params = [
             'church[keyword]' => $this->filterKeyword,
             'church[egyhazmegye]' => $this->filterDiocese,
