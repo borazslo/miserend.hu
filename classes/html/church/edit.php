@@ -16,8 +16,9 @@ class Edit extends \Html\Html {
         $this->setTitle($this->church->nev);
 
         if (!$this->church->McheckWriteAccess($user)) {
-            $this->title = 'Hiányzó jogosultság!';
+            $this->title = 'Templom szerkesztése!';
             addMessage('Hiányzó jogosultság!', 'danger');
+            throw new \Exception('Hiányzó jogosultság!');
             return;
         }
 

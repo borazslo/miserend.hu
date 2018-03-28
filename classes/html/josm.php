@@ -10,6 +10,10 @@ class Josm extends Html {
 
         if (isset($_REQUEST['update'])) {
             set_time_limit('300');
+            $cache = new \ExternalApi\OverpassApi();
+            $cache->cache = '1 sec';
+            $cache->clearOldCache();
+
             $job = \Eloquent\Cron::where('class','\ExternalApi\OverpassApi')->where('function','updateUrlMiserend')->first();
             $job->run();                       
         }

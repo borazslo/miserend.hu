@@ -14,7 +14,6 @@
             <th>url:miserend</th>                
             <th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" style=""></span></th>
             <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" style=""></span></th>
-            <th class="col-md-1"><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style=""></span></th>                
         </tr>
         {% for osm in osmWithoutChurch %}
             <tr>
@@ -50,8 +49,8 @@
     		<th>Ország</th>
                 <th>Város</th>
                 <th>Misézőhely neve </th>
-    		<th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" style=""></span></th>
-                <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" style=""></span></th>
+    		<th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" style=""></span></th>
+                <th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" style=""></span></th>                
   		<th class="col-md-1"><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style=""></span></th>                
                 </tr>
          {% for church in churchWithoutOSM %}
@@ -59,8 +58,8 @@
                  <td>{{ church.orszag }}</td>
                  <td>{{ church.varos }}</td>
                  <td>{{ church.nev }} {% if church.ismertnev %}({{ church.ismertnev}}){% endif %}</td>
-                 <td><a href="/templom/{{ church.id }}/edit"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Templom szerkesztése..."></span></a></td>
                  <td><a href="/templom/{{ church.id }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Templom megtekintése..."></span></a></td>                 
+                 <td><a href="https://www.openstreetmap.org/edit?editor=id#map=19/{{ church.lat }}/{{ church.lon }}"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="OSM szerkesztése..."></span></a></td>                 
                  <td><a href='http://www.openstreetmap.org/?mlat={{ church.lat }}&mlon={{ church.lon }}#map=18/{{ church.lat }}/{{ church.lon }}' target='_blank'><span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" title="OSM térkép megjelenítése..."></span></a></td>
              </tr>
         {% endfor %}
