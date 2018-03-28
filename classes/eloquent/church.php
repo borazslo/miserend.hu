@@ -95,7 +95,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function delete() {
-        $this->neighbours()->delete();
+        #$this->neighbours()->delete();
         Distance::where('church_to', $this->id)->delete();
         Distance::where('church_from', $this->id)->delete();
         $this->remarks()->delete();
@@ -108,7 +108,9 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
         $location->lat = $this->lat;
         $location->lon = $this->lon;
-        $location->country = DB::table('orszagok')->where('id', $this->orszag)->pluck('nev')[0];
+        if ($this->orszag > 0) {
+            $location->country = DB::table('orszagok')->where('id', $this->orszag)->pluck('nev')[0];
+        }
         if ($this->megye > 0) {
             $location->county = DB::table('megye')->where('id', $this->megye)->pluck('megyenev')[0];
         }
