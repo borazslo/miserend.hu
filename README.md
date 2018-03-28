@@ -3,13 +3,13 @@ miserend.hu
 
 A miserend.hu teljes forrása a /kepek és /fajlok kivételével. [![Build Status](https://travis-ci.org/borazslo/miserend.hu.png)](https://travis-ci.org/borazslo/miserend.hu)
 
-##Telepítés
+## Telepítés
 A legegyszerűbb egy megfelelően konfigurált virtuális gépet telepíteni, így nem kell bajlódni LAMP/WAMP szerverekkel:
 - [VirtualBox](http://www.virtualbox.org/), [Vagrant](https://www.vagrantup.com/) és [GitHub Desktop](https://desktop.github.com/) telepítése.
 - A GitHub Desktopban ennek a forrásnak a [klónozása](https://help.github.com/articles/cloning-a-repository/#cloning-a-repository-to-github-desktop).
 - Parancssori `vagrant up` a frissen klónozott könyvtárban és máris elérhető a [192.168.33.10](http://192.168.33.10)
 
-##További segítség
+## További segítség
 - A virtuális gép a http://192.168.33.10/ címen érhető el. 
 - SSH, mySQL, Mailcatcher, stb. eléréséhez valamint a virtuális gép irányításához lásd: [box.scotch.io](https://box.scotch.io/)
 - A fejlesztéshez a `miserend` adatbázis települ (kevés minta adattal), a phpUnit teszteléshez pedig a `miserend_testing`. (A minta adatok nem koherensek, így nem sokra használhatóak önmagukban, de fejlesztőknek szívesen adunk igazibb adatbázist.)
@@ -31,6 +31,6 @@ A legegyszerűbb egy megfelelően konfigurált virtuális gépet telepíteni, í
     - a production branchet normál esetben a master után pull requesttel húzzuk. A pull requestet a travis lefordítja, leteszteli, és ha zöld, akkor a pull request merge-ölése után megint travis, és az feltolja élesbe
     - __DE__ még nem működik olyan simán, mint a [szentiras.hu](https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k#n%C3%A9h%C3%A1ny-vegyes-gondolat)! (Nincs wekiszolgáló leállítás, stb.)
 
-##Mappákról
+## Mappákról
 - Létrehozandó: /kepek; /kepek/templomok
 - Létrehozandó: /fajlok/igenaptar; /fajlok/sqlite; /fajlok/staticmaps; /fajlok/tmp
