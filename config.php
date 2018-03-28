@@ -65,3 +65,5 @@ $environment['vagrant'] = [
     ],
     'error_reporting' => E_ALL
 ];
+
+$environment['production'] = [];

@@ -44,7 +44,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function neighbours() {
-        return $this->hasMany('\Eloquent\Distance', 'church_from', 'id')->orderBy('distance', 'ASC');
+        return $this->hasMany('\Eloquent\Distance', 'church_from', 'id')
+                ->join('templomok', 'templomok.id', '=', 'church_to')
+                ->where('templomok.ok', 'i')
+                ->orderBy('distance', 'ASC');
     }
 
     public function closestNeighbour() {

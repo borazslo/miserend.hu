@@ -1,0 +1,72 @@
+{% extends "layout_simpliest.twig" %}
+
+                 
+{% block content %}{{ content|raw }}
+<div>Ekkor futott utoljára a <a href="?update">{{ cron.class }}::{{ cron.function }}</a>: {{ cron.lastsuccess_at }}.</div>
+
+<div >
+    <h2>OSM adatok</h2>
+    <p>Sajnos {{ osmWithoutChurch|length}} olyan OSM elem van, amikben bár szerepel az <i>url:miserend</i> kulcs, mégsincsenek összekapcsolódva a templomainkkal.</p>
+    <table class="table table-hover table-condensed table-striped">
+        <tr>
+            <th>type/id</th>
+            <th>name</th>
+            <th>url:miserend</th>                
+            <th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" style=""></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" style=""></span></th>
+            <th class="col-md-1"><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style=""></span></th>                
+        </tr>
+        {% for osm in osmWithoutChurch %}
+            <tr>
+                <td><a href='http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}' target='_blank'>{{ osm.osmtype }}/{{ osm.osmid }}</a></td> 
+                <td>
+                    {% for tag in osm.tags %}
+                        {% if tag.name == 'name' %}
+                            {{ tag.value }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for tag in osm.tags %}
+                        {% if tag.name == 'url:miserend' %}
+                            <a href="{{ tag.value }}">{{ tag.value }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td><a href="https://www.openstreetmap.org/edit?editor=id&{{ osm.osmtype }}={{ osm.osmid }}#map=19/{{ osm.lat }}/{{ osm.lon }}"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="OSM szerkesztése..."></span></a></td>
+                 <td><a href="https://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}#map=19/{{ osm.lat }}/{{ osm.lon }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="OSM megtekintése..."></span></a></td>                 
+                <td></td>
+                <td></td>
+            </tr>            
+        {% endfor %}        
+    </table>
+</div>
+
+<div >
+    <h2>Templomok OSM adatok nélkül</h2>
+    <p>Sajnos {{ churchWithoutOSM|length}} olyan használatban lévő miséző hely van, ami nincs meg az OSM térképadatbázisában megjelölve.</p>
+    	<table class="table table-hover table-condensed table-striped">
+		<tr>
+    		<th>Ország</th>
+                <th>Város</th>
+                <th>Misézőhely neve </th>
+    		<th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" style=""></span></th>
+                <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" style=""></span></th>
+  		<th class="col-md-1"><span class="glyphicon glyphicon-map-marker" aria-hidden="true" style=""></span></th>                
+                </tr>
+         {% for church in churchWithoutOSM %}
+             <tr>
+                 <td>{{ church.orszag }}</td>
+                 <td>{{ church.varos }}</td>
+                 <td>{{ church.nev }} {% if church.ismertnev %}({{ church.ismertnev}}){% endif %}</td>
+                 <td><a href="/templom/{{ church.id }}/edit"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Templom szerkesztése..."></span></a></td>
+                 <td><a href="/templom/{{ church.id }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Templom megtekintése..."></span></a></td>                 
+                 <td><a href='http://www.openstreetmap.org/?mlat={{ church.lat }}&mlon={{ church.lon }}#map=18/{{ church.lat }}/{{ church.lon }}' target='_blank'><span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" title="OSM térkép megjelenítése..."></span></a></td>
+             </tr>
+        {% endfor %}
+    </table>
+</div>
+        
+
+
+{% endblock %}

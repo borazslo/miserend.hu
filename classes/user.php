@@ -403,7 +403,7 @@ class User {
             if (!\Eloquent\Church::find($tid))
                 unset($tids[$key]);
             else {
-                $favorite = new Favorite;
+                $favorite = new Eloquent\Favorite;
                 $favorite->uid = $this->uid;
                 $favorite->tid = $tid;
                 $favorite->save();

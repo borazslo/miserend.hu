@@ -63,5 +63,21 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
                 ->where('timeout', '<', date('Y-m-d H:i:s'))
                 ->delete();
     }
+    
+    function run() {
+        $className = $this->class;
+        $functionName = $this->function;
+        if (class_exists($className)) {
+            $object = new $className();
+        } else {
+            throw new \Exception("Class '$className' does not exists.");
+        }
+        if (method_exists($object, $functionName)) {
+            $object->$functionName();
+        } else {
+            throw new \Exception("Function " . $className . "->" . $functionName . "() does not exists.");
+        }
+        $this->success();
+    }
 
 }
