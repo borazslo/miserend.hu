@@ -15,6 +15,11 @@ class Church extends \Html\Html {
             throw new \Exception("Church with tid = '$tid' does not exist.");
         }
 
+        if($church->ok == 'n') {
+            addMessage('Ez a templom le van tiltva! Csak adminisztrátorok számára látható ez az oldal.', 'warning');
+        } elseif($church->ok == 'f') {
+            addMessage('Ez a templom áttekintésre vár. Csak adminisztrátorok számára látható ez az oldal.', 'warning');
+        }
         $church->closestNeighbour = $church->closestNeighbour()->first();
         $church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();
         $church->photos = $church->photos()->get();
