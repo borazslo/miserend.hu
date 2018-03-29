@@ -30,6 +30,32 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany('\Eloquent\KeywordShortcut');
     }
 
+    public function getJelzesAttribute() {
+            $jelzes = $this->remarksStatus['html'];
+
+            if ($this->miseaktiv == 1) {
+                $countMasses = DB::table('misek')->where('tid', $this->id)->where('torles', '0000-00-00 00:00:00')->count();
+                if ($countMasses < 1) {
+                    $jelzes.=' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
+                }
+            }
+
+            if ($this->ok == 'n')
+                $jelzes.=" <i class='fa fa-ban fa-lg' title='Nem engedélyezett!' style='color:red'></i> ";
+            elseif ($this->ok == 'f')
+                $jelzes.=" <img src=/img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
+
+            if($this->ok == 'i' AND $this->miseaktiv == 1) {
+                $updatedTime = strtotime($this->frissites);
+                if($updatedTime < strtotime("-10 years")) {
+                    $jelzes.=" <i class='fa fa-exclamation-triangle fa-lg' title='Több mint 10 éves adatok!' style='color:red'></i> ";
+                } elseif ($updatedTime < strtotime("-5 year")) {
+                    $jelzes.=" <i class='fa fa-exclamation fa-lg' title='Több mint öt éves adatok!' style='color:red'></i> ";
+                } 
+            }
+            return $jelzes;
+    }
+    
     public function getOsmAttribute() {
         if ($this->osms->first() AND $this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
             $overpass = new \ExternalApi\OverpassApi();
@@ -69,6 +95,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     function getRemarksStatusAttribute($value) {
+        $return = false;
         $remark = $this->remarks()
                         ->select('allapot')
                         ->groupBy('allapot')
