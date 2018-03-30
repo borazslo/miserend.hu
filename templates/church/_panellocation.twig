@@ -8,18 +8,16 @@
 
 {% block body %}
     <span class=alap>
-        {% if osm.administrative and user.loggedin %}
-            {% for key,administraion in osm.administrative %}
-                > {{ _self.osmlink(administraion) }} <br/>
-            {% endfor %}
-        {% endif %}        
-        {{ location.city }}, {{ location.address }}
+        {% if location.country and location.country.name != 'Magyarország' %}{{ location.country.name }} <br/>{% endif %}
+        {% if location.county and location.county.name != location.country.name  %} {{ location.county.name }}<br/>{% endif %}
+        {% if location.city %}{{ location.city.name }}{% endif %}{% if location.district %}, {{ location.district.name }}{% endif %}<br/>
+        {{ location.address }}
     </span><br/>
-    {% if osm is not null %}
+    {% if location.osm is not null %}
         <span class=alap>            
             <i>Térképen: </i>
-            <u><a target="_blank" href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}">
-                    {{ osm.lat|number_format(6, '.') }}, {{ osm.lon|number_format(6, '.') }}
+            <u><a target="_blank" href="{{ location.osm.url }}">
+                    {{ location.lat|number_format(6, '.') }}, {{ location.lon|number_format(6, '.') }}
             </a></u>                
         </span>
     {% elseif location.lat %}
@@ -39,5 +37,7 @@
 {% endblock %}    
 
 {% macro osmlink(osm,title = false) %}
-    <a href="/collection/{{ osm.osmtype }}:{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>
+    <!--<a href="/collection/{{ osm.osmtype }}:{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>-->
+    <a href="{{ osm.url }}" title="{{ title }}" target="_blank">{{ osm.name }}</a>
 {% endmacro %}
+

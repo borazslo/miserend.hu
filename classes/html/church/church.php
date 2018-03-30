@@ -14,35 +14,40 @@ class Church extends \Html\Html {
         if(!$church) {
             throw new \Exception("Church with tid = '$tid' does not exist.");
         }
+        if (!$church->McheckReadAccess($user)) {
+            throw new \Exception("Read access denied to church tid = '$tid'");
+        }
 
         if($church->ok == 'n') {
             addMessage('Ez a templom le van tiltva! Csak adminisztrátorok számára látható ez az oldal.', 'warning');
         } elseif($church->ok == 'f') {
             addMessage('Ez a templom áttekintésre vár. Csak adminisztrátorok számára látható ez az oldal.', 'warning');
         }
-        $church->closestNeighbour = $church->closestNeighbour()->first();
-        $church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();
+
         $church->photos = $church->photos()->get();
+        
+        /*
+         * 
+         */
+        if( $church->lat != '' AND !isset($church->location->city)) {
+            $church->MdownloadOSMBoundaries();
+        }
 
         $church->MgetReligious_administration();
 
-
-        if ($church->osm AND $church->osm->enclosing->toArray() == array()) {
-            $overpass = new \ExternalApi\OverpassApi();
-            $overpass->updateEnclosing($church->osm);
-            $church->load(osms);
-            $church->osm = $church->osms()->first();
-        }
-
-        if (!$church->McheckReadAccess($user)) {
-            throw new \Exception("Read access denied to church tid = '$tid'");
-        }
+        
         copyArrayToObject($church->toArray(), $this);
         $this->location = $church->location;
+        
 
-        $this->osm = $church->osm;
+        #$church->closestNeighbour = $church->closestNeighbour()->first();
+        #$church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();
 
-        $this->setTitle($this->nev . " (" . $this->location->city . ")");
+        if(isset($this->location->city))
+            $this->setTitle($this->nev . " (" . $this->location->city['name'] . ")");
+        else 
+            $this->setTitle($this->nev);
+        
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
 
         //Miseidőpontok
@@ -75,7 +80,7 @@ class Church extends \Html\Html {
           else
           $cim .= "<br/>";
          */
-        
+                
         $this->photos;
         if (isset($this->photos[0])) {
             $this->addExtraMeta("og:image", "/kepek/templomok/" . $tid . "/" . $this->photos[0]->fajlnev);
