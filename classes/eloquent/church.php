@@ -13,10 +13,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany('\Eloquent\Photo')->ordered();
     }
 
-    public function osms() {
-        return $this->belongsToMany('\Eloquent\OSM', 'lookup_church_osm', 'church_id', 'osm_id');
-    }
-
     public function keywordshortcuts() {
         return $this->hasMany('\Eloquent\KeywordShortcut');
     }
@@ -43,6 +39,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     
     /* 
      * scopes
+     *  boundaries() 
      *  inBBox()
      *  churchesAndMore
      *  countByUpdatedMonth
@@ -50,7 +47,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      *  selectUpdatedMonth- ?
      *  selectUpdatedYear
      *  whereShortcutLike($keyword, $type)
-     *  whereHasTag($name,$value)
 
      */
     function scopeBoundaries($query) {
@@ -92,40 +88,22 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                     $query->where('type', $type)->where('value', 'like', $keyword);
                 });
     }
-
-    public function scopeWhereHasTag($query, $name, $value) {
-        if (is_array($name)) {
-            $nameOperator = $name[0];
-            $nameValue = $name[1];
-        } else {
-            $nameValue = $name;
-            $nameOperator = '=';
-        }
-        if (is_array($value)) {
-            $valueOperator = $value[0];
-            $valueValue = $value[1];
-        } else {
-            $valueValue = $value;
-            $valueOperator = '=';
-        }
-        return $query->whereHas('tags', function ($query) use ( $nameOperator, $nameValue, $valueOperator, $valueValue ) {
-                    $query->where('name', $nameOperator, $nameValue)->where('value', $valueOperator, $valueValue);
-                });
-    }
-
-    
     
     /*
      * getSomethingAttribute -> $this->something;
      * 
+     * denomination
      * responsible
      * writeAccess
      * jelzes
-     * osm
      * fullName
      * remarksSatus
      * location
      */
+    public function getDenominationAttribute($value) {
+        return  in_array($this->egyhazmegye,[34,17,18]) ? 'greek_catholic' : 'roman_catholic';
+    }
+    
     public function getResponsibleAttribute($value) {
         return array($this->letrehozta);
     }
@@ -165,17 +143,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             return $jelzes;
     }
     
-    public function getOsmAttribute() {
-       /*
-        if ($this->osms->first() AND $this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
-            $overpass = new \ExternalApi\OverpassApi();
-            $overpass->updateEnclosing($this->osms->first());
-            $this->load('osms');
-        }
-        */
-        return $this->osms->first();
-    }
-
     function getFullNameAttribute($value) {
         $return = $this->nev;
         if (!empty($this->ismertnev)) {
@@ -212,20 +179,37 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         }
         return $return;
     }
-
     
     function getLocationAttribute($value) {
         $location = new \stdClass();
 
         $location->lat = $this->lat;
         $location->lon = $this->lon;
-        if($this->osmtype AND $this->osmid)
+        if($this->osmtype AND $this->osmid) {
             $location->osm = array(
                 'type' => $this->osmtype, 
                 'id'=>$this->osmid,
                 'url' => 'https://www.openstreetmap.org/'.$this->osmtype.'/'.$this->osmid
                  );
+        } else {
+            $location->access = $this->megkozelites;
+            $location->address = $this->cim;
+        }
 
+        /* Address addr:steet, addr:housenumber */
+        $tags = collect(\Eloquent\OSMTag::where('osmtype',$this->osmtype)
+                ->where('osmid',$this->osmid)
+                ->whereIn('name',['addr:street','addr:housenumber'])
+                ->orderBy('name','DESC')
+                ->get())->keyBy('name');
+        if(count($tags) > 0) {
+            $location->address = '';
+            foreach($tags as $tag) {
+                $location->address .= $tag->value." ";
+            }
+        }
+        
+        /* Adminisrative Boundaries(Country,County, City, District) */
         $boundaries = $this->boundaries()
                 ->where('boundary','administrative')
                 ->whereIn('admin_level',[2,6,8,9,10])
@@ -236,15 +220,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         if(array_key_exists(1, $boundaries)) $location->county = $boundaries[1];
         if(array_key_exists(2, $boundaries)) $location->city = $boundaries[2];   
         if(array_key_exists(3, $boundaries)) $location->district = $boundaries[3];        
-        $location->address = $this->cim;
-        $location->access = $this->megkozelites;
-
+                
         return $location;
     }
-/*
-    function getBoundariesAttribute() {
-        return $this->boundaries()->get();
-    }
+
     /*
      * What does 'M' mean?
      */
@@ -295,19 +274,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->religious_administration->diocese->id;
     }
 
-    /*
-     * Update Church's lat & lon based on OSM data from the DB
-     */
-    function McoordinatesFromOSM() {
-        if(!isset($this->osm) OR $this->lat <= 0) return;
-        $dis = abs($this->osm->lat - $this->lat) + abs($this->osm->lon - $this->lon);
-        if($dis > 0) {
-            $this->lat = $this->osm->lat;
-            $this->lon = $this->osm->lon;
-            $this->save();
-        }        
-    }
-    
     public function boundaries()
     {
         return $this->belongsToMany('Eloquent\Boundary', 'lookup_boundary_church')
@@ -318,11 +284,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         $overpass = new \ExternalApi\OverpassApi();
         $overpass->downloadEnclosingBoundaries($this->lat, $this->lon);
         
-        /*
-         * Ezzel nem élünk, de az adatbázisban jól mutathat az adatbázisban
-         * az osm és osmtags táblák, a lookup nélkül.
-         */        
-        #$overpass->saveElement(); 
+        /* Elementjük az osmtags táblába az összes adatot. */
+        $overpass->saveElement(); 
+
+        //Detach all boundaries but those manually added (without OSM integration);                    
         $this->boundaries()->where('osmid','>','0')->detach();
         foreach($overpass->jsonData->elements as $element) {
             $boundary = \Eloquent\Boundary::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id]);
@@ -336,7 +301,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             }
             $changed ? $boundary->save() : false;
 
-            //Detach all boundaries but those manually added (without OSM integration);            
             $this->boundaries()->attach($boundary->id);               
         }
         $this->boundaries()->touch();
@@ -352,9 +316,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      */
     function MmigrateBoundaries() {
         global $_egyhazmegyek, $_espereskeruletek, $_orszagok, $_megyek, $_varosok;
-        
-        $this->denomination =  in_array($this->egyhazmegye,[34,17,18]) ? 'greek_catholic' : 'roman_catholic';
-                                   
+                                           
         /* egyházmegye */
         $tmp = $this->boundaries()
                 ->where('boundary','religious_administration')

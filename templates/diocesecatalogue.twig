@@ -27,10 +27,10 @@
                 <th class="col-md-1"></th>
                 <th class="col-md-2">Város</th>
                 <th class="col-md-5">Misézőhely neve</th>
-                <th class="col-md-1"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése"></span></th>
-                <th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Templom szerkesztése"></span></th>
-                <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Templom lapjának megtekintése"></span></th>
-                <th class="col-md-1"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom és miserendje törlése"></span></th>
+                <th class="col-md-1"><i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése"></span></th>
+                <th class="col-md-1"><i class="{{ ICONS_CHURCH_EDIT }}" aria-hidden="true" title="Templom szerkesztése"></i></th>
+                <th class="col-md-1"><i class="{{ ICONS_CHURCH_SEE }}" aria-hidden="true" title="Templom lapjának megtekintése"></i></th>
+                <th class="col-md-1"><i class="{{ ICONS_DELETE }}" aria-hidden="true" title="Templom és miserendje törlése"></i></th>
             </tr>
             {% for church in churches %}
                 <tr>
@@ -45,22 +45,22 @@
                     </td>
                     <td>
                         <a href="/templom/{{ church.id }}/editschedule">
-                            <span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése..."></span>
+                            <i class="{{ ICONS_MASSSCHEDULE }}" aria-hidden="true" title="Miserend szerkesztése..."></i>
                         </a>
                     </td>
                     <td>
                         <a href="/templom/{{ church.id }}/edit">
-                            <span class="glyphicon glyphicon-edit" aria-hidden="true" title="A templom adatainak szerkesztése.">
+                            <i class="{{ ICONS_CHURCH_EDIT }}" aria-hidden="true" title="A templom adatainak szerkesztése."></i>
                         </a>
                     </td>
                     <td>
                         <a href="/templom/{{ church.id }}">
-                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Ugrás a templom oldalára."></span>
+                            <i class="{{ ICONS_CHURCH_SEE }}" aria-hidden="true" title="Ugrás a templom oldalára."></i>
                         </a>
                     </td>				
                     <td>
                         <a href="/templom/{{ church.id }}/delete" class="red">
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom törlése..."></span>
+                            <i class="{{ ICONS_DELETE }}" aria-hidden="true" title="Templom törlése..."></i>
                         </a>
                     </td>
                 </tr>
