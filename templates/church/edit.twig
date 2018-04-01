@@ -76,8 +76,10 @@
                         <div class="small" style="margin-top:10px">Ez a templom sikeresen össze van kötve az Open Street Map térkép adatbázissal.<br/> 
                             A templom térkép-adatainak szerkesztése az OSM-ben lehetséges az előbbi <a href="https://www.openstreetmap.org/edit?editor=id&{{ church.location.osm.type }}={{ church.location.osm.id }}#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..." "></i></a> ikonra kattintva.<br/>
                             Összekötés szétkapcsolása: <ol>
-                                <li>Az OSM szerkesztőben az 'url:miserend' címkre törlése.</li>
-                                <li>A miserend.hu-n a megfelelő ellenőrző feladatok futtatása. (Jelenleg részlegesen működik csak.)</li>
+                                <li>Az OSM szerkesztőben az 'url:miserend' címke törlése.</li>
+                                <li>A mySQL adatbázisból kézzel ki kell törölni az adott templom OSM beállításait: <i>UPDATE `templomok` SET `osmid`= NULL, `osmtype`= NULL WHERE `id`='{{ church.id }}';</i></li>
+                        
+
                         </div>
                     </td>
                 <tr>   
@@ -111,7 +113,7 @@
                                         <li>url:miserend = http://miserend.hu/templom/{{ church.id }}</li>
                                     </ul>
                                 </ol>
-                                <li>A miserend.hu-n a naponta automatikusan lefutó ellenőrző mechanizmus után automatikusan felismeri a kapcsolatot.</li>
+                                <li>A miserend.hu-n a naponta automatikusan lefutó ellenőrző mechanizmus után automatikusan felismeri a kapcsolatot. Ezt le lehet futtatni <a href="/josm?update">itt is.</a></li>
                         </div>
                     </td>
                     <td></td>

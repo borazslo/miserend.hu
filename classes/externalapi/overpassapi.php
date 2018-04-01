@@ -50,7 +50,19 @@ class OverpassApi extends \ExternalApi\ExternalApi {
         $this->run();
     }
 
+    
+    /* Innen már nem csak OverpassApi */
+    function deleteUrlMiserend() {
+         $tes = \Eloquent\Osm::all()->filter(function($model){
+            return ($model->tags()->where('name','url:miserend')->first()) ? true : false;                    
+        });
+        foreach($tes as $t) {
+            $t->delete();
+        }
+    }
+    
     function updateUrlMiserend() {
+        $this->deleteUrlMiserend();
         $this->downloadUrlMiserend();
         $this->saveElement();
         $this->saveChurchOsmRelation();
@@ -88,6 +100,8 @@ class OverpassApi extends \ExternalApi\ExternalApi {
         if (!$this->jsonData->elements) {
             throw new Exception("Missing Json Elements from OverpassApi Query");
         }
+        $now = time();
+        
         foreach ($this->jsonData->elements as $element) {
             if (isset($element->center->lat)) {
                 $element->lat = $element->center->lat;
@@ -95,22 +109,25 @@ class OverpassApi extends \ExternalApi\ExternalApi {
             if (isset($element->center->lon)) {
                 $element->lon = $element->center->lon;
             }
-
-            $newOSM = \Eloquent\OSM::firstOrNew(array('osmid' => $element->id, 'osmtype' => $element->type));
-            $newOSM->lat = $element->lat;
-            $newOSM->lon = $element->lon;
-            $newOSM->save();
-
-            $now = time();
-            foreach ($element->tags as $name => $value) {
-                $tag = \Eloquent\OSMTag::firstOrNew(['osm_id' => $newOSM->id, 'name' => $name]);
-                $tag->value = $value;
-                $newOSM->tags()->save($tag);
-            }
-            $tags = \Eloquent\OSMTag::where('osm_id', $newOSM->id)->where('updated_at', "<", $now)->get();
-            foreach ($tags as $tag) {
-                $tag->delete();
-            }
+              
+            $check = \Eloquent\OSMTag::where('osmtype',$element->type)
+                    ->where('osmid',$element->id)
+                    ->where('updated_at',">",$now)
+                    ->first();
+            if(!$check) {    
+                foreach ($element->tags as $name => $value) {
+                    #echo $element->type."-".$element->id."-".$name."<br/>";
+                    $tag = \Eloquent\OSMTag::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id, 'name' => $name]);
+                    $tag->value = $value;
+                    $tag->save();
+                }
+                $tags = \Eloquent\OSMTag::where('osmtype', $element->type)
+                        ->where('osmid', $element->id)
+                        ->where('updated_at', "<", $now)->get();
+                foreach ($tags as $tag) {
+                    $tag->delete();
+                }
+            } 
         }
     }
 
