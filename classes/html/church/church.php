@@ -34,15 +34,16 @@ class Church extends \Html\Html {
         }
 
         $church->MgetReligious_administration();
-
         
+        if( count($church->neighbours) < 1 ) {
+            $distance = new \Distance();        
+            $distance->MupdateChurch($church);
+        }        
+  
         copyArrayToObject($church->toArray(), $this);
-        $this->location = $church->location;
+        $this->neighbours = $church->neighbours;
         
-
-        #$church->closestNeighbour = $church->closestNeighbour()->first();
-        #$church->neighbourWithinDistance = $church->neighbourWithinDistance()->get();
-
+        
         if(isset($this->location->city))
             $this->setTitle($this->nev . " (" . $this->location->city['name'] . ")");
         else 

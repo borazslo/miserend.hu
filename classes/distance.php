@@ -33,44 +33,121 @@ class Distance {
         }
 
         foreach ($churches as $churchFrom) {
+            $this->MupdateChurch($churchFrom);
+        }
+    }
+    
+    function MupdateChurch($churchFrom, $maxDistance = 5000) { //maxDistance in meter
             set_time_limit('600');
+            $counter = 0;
+            if($churchFrom->location->lat == '' OR $churchFrom->location->lon == '') 
+                return false;
+               
+            $point = ['lon' => $churchFrom->location->lon, 'lat' => $churchFrom->location->lat];
+            
 
-            $point = ['lon' => $churchFrom->osm->lon, 'lat' => $churchFrom->osm->lat];
-            $maxDistance = 10000; //meter
-            $bbox = $this->getBBox($point, $maxDistance);
+            //TODO: Delete BBOX-on belüli távolságok. Vagy minden távolság?                        
+            
+            for($i=1;$i<10;$i++) {
+                $bbox = $this->getBBox($point, $maxDistance);
+                $churchesInBBox = \Eloquent\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id)->get();
+                if(count($churchesInBBox) > 12) break;
+                $maxDistance = $maxDistance * ( 120 / 100 );
+            }
+            
+            $highestDistance = 0;
+            foreach ($churchesInBBox as $churchTo) {  
+                $processingDistance = \Eloquent\Distance::findOrNew(['fromLat' => $churchFrom->lat, 'fromLon' => $churchFrom->lon, 'toLat' => $churchTo->lat, 'toLon' => $churchTo->lon])->first();
+                $processingDistance = \Eloquent\Distance::where('fromLat',$churchFrom->lat)
+                        ->where('fromLon',$churchFrom->lon)
+                        ->where('toLat',$churchTo->lat)
+                        ->where('toLon',$churchTo->lon)->first();
+                if(!$processingDistance) {
+                    $processingDistance = new \Eloquent\Distance();
+                    $processingDistance->fromLat = $churchFrom->lat;
+                    $processingDistance->fromLon = $churchFrom->lon;
+                    $processingDistance->toLat = $churchTo->lat;
+                    $processingDistance->toLon = $churchTo->lon;
+                }
+                if ($churchFrom->updated_at > $processingDistance->updated_at
+                        OR $churchTo->updated_at > $processingDistance->updated_at) {
 
-            $query = \Eloquent\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id);
-            $churchesInBBox = $query->get();
-
-            foreach ($churchesInBBox as $churchTo) {
-                $processingDistance = \Eloquent\Distance::findOrNew(['church_from' => $churchFrom->id, 'church_to' => $churchTo->id])->first();
-                if ($churchFrom->update_at > $processingDistance->update_at
-                        OR $churchTo->update_at > $processingDistance->update_at) {
-
-                    $pointFrom = ['lat' => $churchFrom->osm->lat, 'lon' => $churchFrom->osm->lon];
-                    $pointTo = ['lat' => $churchTo->osm->lat, 'lon' => $churchTo->osm->lon];
+                    $pointFrom = ['lat' => $churchFrom->location->lat, 'lon' => $churchFrom->location->lon];
+                    $pointTo = ['lat' => $churchTo->location->lat, 'lon' => $churchTo->location->lon];
                     $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
-
                     if ($rawDistance < $maxDistance AND $rawDistance > 0) {
                         $mapquest = new \ExternalApi\MapquestApi();
                         $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
-
                         if ($mapquestDistance == -2) {
                             return;
                         } elseif ($mapquestDistance > 0) {
                             $processingDistance->distance = $mapquestDistance;
+                            if($mapquestDistance > $highestDistance)
+                                $highestDistance = $mapquestDistance;
+                            $processingDistance->save();
                         }
                     } else {
-                        $processingDistance->distance = $rawDistance;
-                    }
-                    $processingDistance->save();
-                    $counter++;
-                    if ($counter >= $limit) {
-                        return true;
-                    }
+                        //Pontatlant inkább soha senem mentünk el.
+                        //$processingDistance->distance = $rawDistance;
+                    }        
+
+                    $counter++;                    
                 }
             }
-        }
+            /*
+             * Ha találtunk olyat, hogy útvonalon annyival hosszabb, akkor
+             * lehetséges, hogy van annál közelebbi is, ezért ki kell tágítani 
+             * a kört. 
+             */
+            if($highestDistance > $maxDistance) {
+                //echo "Van nagyobb kör is. Bocsesz.";
+                
+                //TODO: duplicated code
+                $bbox = $this->getBBox($point, $highestDistance);
+                $churchesInBBox = \Eloquent\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id);
+                
+                foreach ($churchesInBBox as $churchTo) {  
+
+                        $processingDistance = \Eloquent\Distance::findOrNew(['fromLat' => $churchFrom->lat, 'fromLon' => $churchFrom->lon, 'toLat' => $churchTo->lat, 'toLon' => $churchTo->lon])->first();
+                        $processingDistance = \Eloquent\Distance::where('fromLat',$churchFrom->lat)
+                                ->where('fromLon',$churchFrom->lon)
+                                ->where('toLat',$churchTo->lat)
+                                ->where('toLon',$churchTo->lon)->first();
+                        if(!$processingDistance) {
+                            $processingDistance = new \Eloquent\Distance();
+                            $processingDistance->fromLat = $churchFrom->lat;
+                            $processingDistance->fromLon = $churchFrom->lon;
+                            $processingDistance->toLat = $churchTo->lat;
+                            $processingDistance->toLon = $churchTo->lon;
+                        }
+                        $highestDistance = 0;
+                        if ($churchFrom->updated_at > $processingDistance->updated_at
+                                OR $churchTo->updated_at > $processingDistance->updated_at OR 4 == 4) {
+
+                            $pointFrom = ['lat' => $churchFrom->location->lat, 'lon' => $churchFrom->location->lon];
+                            $pointTo = ['lat' => $churchTo->location->lat, 'lon' => $churchTo->location->lon];
+                            $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
+
+                            if ($rawDistance < $maxDistance AND $rawDistance > 0) {
+                                $mapquest = new \ExternalApi\MapquestApi();
+                                $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
+                                if ($mapquestDistance == -2) {
+                                    return;
+                                } elseif ($mapquestDistance > 0) {
+                                    $processingDistance->distance = $mapquestDistance;
+                                    $processingDistance->save();
+                                }
+                            } else {
+                                //Pontatlant inkább soha senem mentünk el.
+                                //$processingDistance->distance = $rawDistance;
+                            }        
+
+                            $counter++;                    
+                        }
+                    }
+                
+            }
+            return $counter;
     }
 
     function getRawDistance($pointFrom, $pointTo) {

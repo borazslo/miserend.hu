@@ -7,7 +7,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 class Church extends \Illuminate\Database\Eloquent\Model {
 
     protected $table = 'templomok';
-    protected $appends = array('responsible','fullName');
+    protected $appends = array('responsible','fullName','location');
 
     public function photos() {
         return $this->hasMany('\Eloquent\Photo')->ordered();
@@ -21,19 +21,52 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany('\Eloquent\Remark')->orderBy('created_at', 'DESC');
     }
 
+    public function updateNeighbours() {
+        //TODO: Does not work! 
+        // "Call to undefined method Illuminate\Database\Query\Builder::MupdateChurch()"
+        $distance = new Distance();        
+        $distance->MupdateChurch($this);
+    }
+    
     public function neighbours() {
-        return $this->hasMany('\Eloquent\Distance', 'church_from', 'id')
-                ->join('templomok', 'templomok.id', '=', 'church_to')
-                ->where('templomok.ok', 'i')
-                ->orderBy('distance', 'ASC');
+        return $this->where('templomok.id',$this->id)
+                ->join('distances', function($join)
+                    {
+                      $join->on('distances.fromLon', '=', 'lon');
+                      $join->on('distances.fromLat', '=', 'lat');
+
+                    })
+                  ->join('templomok as churchTo',function($join)
+                    {
+                      $join->on('distances.toLon', '=', 'churchTo.lon');
+                      $join->on('distances.toLat', '=', 'churchTo.lat');
+                    })
+                ->select('distances.*','churchTo.*')    
+                ->where('churchTo.ok', 'i')
+                ->orderBy('distances.distance', 'ASC');
+
+    }
+    
+    public function neighbourss() {
+        return \Eloquent\Church::join('distances', function($join)
+                    {
+                      $join->on('distances.toLon', '=', 'lon');
+                      $join->on('distances.toLat', '=', 'lat');
+
+                    })
+                    ->where('distances.fromLon',$this->lon)
+                    ->where('distances.fromLat',$this->lat)
+                    ->where('ok','i')
+                            ->select('templomok.*','distances.distance')
+                    ->orderBy('distances.distance', 'ASC');                                               
     }
 
-    public function closestNeighbour() {
-        return $this->neighbours()->take(1);
-    }
-
-    public function neighbourWithinDistance($distance = 10000) {
-        return $this->neighbours()->where("distance", "<=", $distance);
+    public function getNeighboursAttribute () {
+        return $this->neighbourss()
+                    ->limit(10)
+                    ->get();
+        exit;
+        return $this->neighbours()->where("distance", "<=", $distance)->get();
     }    
     
     
@@ -55,10 +88,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     } 
     
     function scopeInBBox($query, $bbox) {
-        return $query->whereHas('osms', function($query) use ($bbox) {
-                    $query->whereBetween('lat', [$bbox['latMin'], $bbox['latMax']])
+        return $query->whereBetween('lat', [$bbox['latMin'], $bbox['latMax']])
                             ->whereBetween('lon', [$bbox['lonMin'], $bbox['lonMax']]);
-                });
     }
 
     function scopeChurchesAndMore($query) {

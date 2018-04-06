@@ -69,7 +69,8 @@ class OSM {
                
             } else {
                 $church = \Eloquent\Church::find($match[2]);
-                $this->saveOSM2Church($church,$element);
+                if($church)
+                    $this->saveOSM2Church($church,$element);
             }                                    
         }
     }
