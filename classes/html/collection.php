@@ -2,13 +2,16 @@
 
 namespace Html;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class Collection extends Html {
 
     public function __construct() {
         parent::__construct();
 
         preg_match('/(node|way|relation):([0-9]{1,8})$/i', $this->input['q'], $match);
-        $osm = \Eloquent\OSM::whereOSMId($match[1], $match[2])->first();
+        $osm = \Eloquent\Boundary::where('osmtype',$match[1])
+                ->where('osmid',$match[2])->first();
         $this->setTitle($osm->name);
 
         if ($osm->lat) {
@@ -24,9 +27,17 @@ class Collection extends Html {
         }
         $this->zoom = 12;
 
-        $churches = \Eloquent\Church::whereHas('osms.enclosing', function($query) use ($osm) {
-                    $query->where('enclosing_id', $osm->id);
-                });
+        $churchIds = DB::table('boundaries')
+                ->join('lookup_boundary_church','boundaries.id','=','lookup_boundary_church.boundary_id')
+                ->where('boundaries.osmtype',$match[1])
+                ->where('boundaries.osmid',$match[2])
+                ->select('church_id')
+                ->pluck('church_id');
+        
+        $churches = \Eloquent\Church::whereIn('id',$churchIds)
+                ->where('ok','i')
+                ->orderBy('nev')
+                ;
 
         $this->pagination->set($churches->count());
         $this->churches = $churches->skip($this->pagination->skip)->take($this->pagination->take)->get();
