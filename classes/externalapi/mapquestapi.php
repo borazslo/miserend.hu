@@ -14,7 +14,7 @@ class MapquestApi extends \ExternalApi\ExternalApi {
         global $config;
 
         if (!$config['mapquest']['appkey'] or $config['mapquest']['appkey'] == '***') {
-            return false;
+            throw new \Exception("Missing mapquest appkey.");
         }
 
         $this->query = "route?from=" . implode(',', $pointFrom) . "&to=" . implode(',', $pointTo) . "";

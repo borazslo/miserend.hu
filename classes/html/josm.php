@@ -14,33 +14,47 @@ class Josm extends Html {
             $cache->cache = '1 sec';
             $cache->clearOldCache();
 
-            $job = \Eloquent\Cron::where('class','\ExternalApi\OverpassApi')->where('function','updateUrlMiserend')->first();
+            $job = \Eloquent\Cron::where('class','\OSM')->where('function','checkUrlMiserend')->first();
             $job->run();                       
         }
 
         $this->setTitle('JOSM összeköttetés');
         $this->template = 'josm.twig';        
         
-        $this->cron = \Eloquent\Cron::where('class','\ExternalApi\OverpassApi')
-                ->where('function','updateUrlMiserend')->first();
+        $this->cron = \Eloquent\Cron::where('class','\OSM')
+                ->where('function','checkUrlMiserend')->first();
               
-        $this->osmWithoutChurch = \Eloquent\Osm::has('churches',0)
-                ->whereHas('tags', function ($query) {
-                    $query->where('name', 'url:miserend');
-                })->get();      
-        foreach($this->osmWithoutChurch as $key => $item) {   
-             foreach($item->tags as $tag)
-                  $tag->name;                         
+
+       $overpass = new \ExternalApi\OverpassApi();
+       $overpass->downloadUrlMiserend();
+        if (!$overpass->jsonData->elements) {
+            throw new Exception("Missing Json Elements from OverpassApi Query");
         }
-         
-                
-        $this->churchWithoutOSM = \Eloquent\Church::has('osms',0)
-                ->where('ok','i')
+
+        list($goodIDs, $this->osmWBadChurch) = $this->checkOsmElements($overpass->jsonData->elements);
+        $this->countOsmData = count($overpass->jsonData->elements);
+        
+        $this->churchesWNoOsm = \Eloquent\Church::where('ok','i')
+                ->whereNotIn('id',$goodIDs)
+                ->where(function ($query) {
+                    $query->whereNull('osmtype')
+                        ->orWhereNull('osmid');
+                })
                 ->orderBy('orszag')->orderBy('megye')->orderBy('varos')->orderBy('nev')
-                ->get();      
+                ->get();
+        
+        $this->churchesWBadOsm = \Eloquent\Church::where('ok','i')
+                ->whereNotIn('id',$goodIDs)
+                ->whereNotNull('osmtype')->whereNotNull('osmid')
+                ->orderBy('orszag')->orderBy('megye')->orderBy('varos')->orderBy('nev')
+                ->get();
+        
+        $this->churchesWBad = \Eloquent\Church::where('ok','i')
+                ->whereNotIn('id',$goodIDs)
+                ->get();
         
         
-        
+                        
         return;
         
         if (isset($_REQUEST['nosuccess']))
@@ -416,6 +430,39 @@ EOT;
         return $return;
     }
 
+   function checkOsmElements($elements) {
+       $osmWBadTag = array();
+       $goodOsmChurchIds = array();
+       
+        $c = 0;
+        foreach ($elements as $element) {
+            //$c++; if($c > 1900) break;
+            //printr($element);
+            if (isset($element->center->lat)) {
+            $element->lat = $element->center->lat;
+            }
+            if (isset($element->center->lon)) {
+                $element->lon = $element->center->lon;
+            }
+            
+            preg_match('/miserend\.hu\/\?{0,1}templom(\/|=)([0-9]{1,5})/i', $element->tags->{'url:miserend'}, $match);
+            if(!isset($match[2])) {                
+                $osmWBadTag[] = $element;
+            } else {
+                $church = \Eloquent\Church::find($match[2]);
+                if($church) {
+                    $goodOsmChurchIds[] = $match[2];
+                } else {
+                    $osmWBadTag[] = $element;
+                }
+                
+            }
+        }
+       return array($goodOsmChurchIds, $osmWBadTag);
+       
+   } 
+   
+                     
 }
 
 ?>

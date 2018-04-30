@@ -17,3 +17,8 @@
     {% include '_panelchurchlist.twig' %}
     <div id="osmedit" style="position:absolute;bottom:15px;left:5px"></div>
 {% endblock %}
+
+
+{% block rightsidebar %}   
+        {% include "panel.twig" with {title:'OSM adatok','body': '<div id="messages"><i>A térképen lévő jelekre kattintás után.</i></div>' } %}        
+{% endblock %}

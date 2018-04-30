@@ -45,25 +45,7 @@ class Catalogue extends \Html\Html {
         $this->pagination->set($this->search->count(), $url);
 
         $this->churches = $this->search->skip($this->pagination->skip)->take($this->pagination->take)->get();
-
-        foreach ($this->churches as &$church) {
-
-            $jelzes = $church->remarksStatus['html'];
-
-            if ($church->miseaktiv == 1) {
-                $countMasses = DB::table('misek')->where('tid', $church->id)->where('torles', '0000-00-00 00:00:00')->count();
-                if ($countMasses < 1) {
-                    $jelzes.=' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
-                }
-            }
-
-            if ($church->ok == 'n')
-                $jelzes.=" <i class='fa fa-ban fa-lg' title='Nem engedélyezett!' style='color:red'></i> ";
-            elseif ($church->ok == 'f')
-                $jelzes.=" <img src=/img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
-
-            $church->jelzes = $jelzes;
-        }
+        
     }
 
     function loadForm() {

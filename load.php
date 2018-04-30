@@ -50,6 +50,14 @@ $twig = new Twig_Environment($loader); // cache?
 //
 // ATTRIBUTES, LANGUAGES, PERIODS, ROLES 
 //
+use Illuminate\Database\Capsule\Manager as DB;
+
+$_egyhazmegyek = collect(DB::table('egyhazmegye')->get())->keyBy('id')->sortBy('sorrend');
+$_espereskeruletek = collect(DB::table('espereskerulet')->get())->keyBy('id');
+$_orszagok = collect(DB::table('orszagok')->get())->keyBy('id');
+$_megyek = collect(DB::table('megye')->select('*','megyenev as nev')->get())->keyBy('id');
+$_varosok = collect(DB::table('varosok')->get())->keyBy('id');
+
 $milyen = array(
     'csal' => array(
         'abbrev' => 'csal',

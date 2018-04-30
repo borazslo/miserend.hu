@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 
+{% set ICONS_CHURCH_EDIT = 'fa fa-edit' %}
+{% set ICONS_CHURCH_SEE = 'fa fa-eye' %}
+{% set ICONS_MASSSCHEDULE = 'far fa-clock' %}
+{% set ICONS_MAP_EDIT = 'fa fa-map' %}
+{% set ICONS_MAP_SEE = 'fa fa-map-marker' %}
+{% set ICONS_MAP_DIRECTION = 'fa fa-map-signs' %}
+{% set ICONS_DELETE = 'fa fa-trash-alt' %}
+
 <html lang="hu">
     <head>        
         {% if environment != 'production' %}<meta name="robots" content="noindex,nofollow">{% endif %}
@@ -23,8 +31,10 @@
 
         <link href="/css/bootstrap.min.css" rel="stylesheet">
         <link href="/css/jquery-ui.min.css" rel="stylesheet">
-        <link href="/css/font-awesome.min.css" rel="stylesheet">
-
+        
+        <link href="/fontawesome/css/fontawesome-all.css" rel="stylesheet">
+        <!--<link href="/css/font-awesome.min.css" rel="stylesheet">-->
+        
         <link href="/css/style.css" rel="stylesheet">
         <link href="/css/autocomplete.css" rel="stylesheet">
 

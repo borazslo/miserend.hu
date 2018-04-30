@@ -36,6 +36,8 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             ['\Api\Sqlite', 'cron', '1 day'],
             ['\ExternalApi\OverpassApi', 'updateUrlMiserend', '1 day'],
             ['\ExternalApi\OverpassApi', 'clearOldCache', '1 day'],
+            ['\OSM', 'checkBoundaries', '5 min'],
+            ['\OSM', 'checkUrlMiserend', '1 day'],            
             ['\KeywordShortcut', 'updateAll', '1 day'],
             ['\Distance', 'updateSome', '15 min']
         ];

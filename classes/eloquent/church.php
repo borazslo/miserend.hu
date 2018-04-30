@@ -7,8 +7,134 @@ use Illuminate\Database\Capsule\Manager as DB;
 class Church extends \Illuminate\Database\Eloquent\Model {
 
     protected $table = 'templomok';
-    protected $appends = array('fullName', 'responsible');
+    protected $appends = array('responsible','fullName','location');
 
+    public function photos() {
+        return $this->hasMany('\Eloquent\Photo')->ordered();
+    }
+
+    public function keywordshortcuts() {
+        return $this->hasMany('\Eloquent\KeywordShortcut');
+    }
+
+    public function remarks() {
+        return $this->hasMany('\Eloquent\Remark')->orderBy('created_at', 'DESC');
+    }
+
+    public function updateNeighbours() {
+        //TODO: Does not work! 
+        // "Call to undefined method Illuminate\Database\Query\Builder::MupdateChurch()"
+        $distance = new Distance();        
+        $distance->MupdateChurch($this);
+    }
+    
+    public function neighbours() {
+        return $this->where('templomok.id',$this->id)
+                ->join('distances', function($join)
+                    {
+                      $join->on('distances.fromLon', '=', 'lon');
+                      $join->on('distances.fromLat', '=', 'lat');
+
+                    })
+                  ->join('templomok as churchTo',function($join)
+                    {
+                      $join->on('distances.toLon', '=', 'churchTo.lon');
+                      $join->on('distances.toLat', '=', 'churchTo.lat');
+                    })
+                ->select('distances.*','churchTo.*')    
+                ->where('churchTo.ok', 'i')
+                ->orderBy('distances.distance', 'ASC');
+
+    }
+    
+    public function neighbourss() {
+        return \Eloquent\Church::join('distances', function($join)
+                    {
+                      $join->on('distances.toLon', '=', 'lon');
+                      $join->on('distances.toLat', '=', 'lat');
+
+                    })
+                    ->where('distances.fromLon',$this->lon)
+                    ->where('distances.fromLat',$this->lat)
+                    ->where('ok','i')
+                            ->select('templomok.*','distances.distance')
+                    ->orderBy('distances.distance', 'ASC');                                               
+    }
+
+    public function getNeighboursAttribute () {
+        return $this->neighbourss()
+                    ->limit(10)
+                    ->get();
+        exit;
+        return $this->neighbours()->where("distance", "<=", $distance)->get();
+    }    
+    
+    
+    /* 
+     * scopes
+     *  boundaries() 
+     *  inBBox()
+     *  churchesAndMore
+     *  countByUpdatedMonth
+     *  countByUpdatedYear
+     *  selectUpdatedMonth- ?
+     *  selectUpdatedYear
+     *  whereShortcutLike($keyword, $type)
+
+     */
+    function scopeBoundaries($query) {
+        return $query->belongsToMany('Eloquent\Boundary', 'lookup_boundary_church')
+                ->withTimestamps();
+    } 
+    
+    function scopeInBBox($query, $bbox) {
+        return $query->whereBetween('lat', [$bbox['latMin'], $bbox['latMax']])
+                            ->whereBetween('lon', [$bbox['lonMin'], $bbox['lonMax']]);
+    }
+
+    function scopeChurchesAndMore($query) {
+        return $query->where('nev', 'NOT LIKE', '%kápolna%');
+    }
+
+    function scopeSelectUpdatedMonth($query) {
+        return $query->addSelect(DB::raw('DATE_FORMAT(frissites,\'%Y-%m\') as updated_month'), DB::raw('COUNT(*) as count_updated_month'));
+    }
+
+    function scopeSelectUpdatedYear($query) {
+        return $query->addSelect(DB::raw('DATE_FORMAT(frissites,\'%Y\') as updated_year'), DB::raw('COUNT(*) as count_updated_year'));
+    }
+
+    function scopeCountByUpdatedMonth($query) {
+        return $query->selectUpdatedMonth()
+                        ->groupBy('updated_month')->orderBy('updated_month');
+    }
+
+    function scopeCountByUpdatedYear($query) {
+        return $query->selectUpdatedYear()
+                        ->groupBy('updated_year')->orderBy('updated_year');
+    }
+
+    function scopeWhereShortcutLike($query, $keyword, $type) {
+        return $query->whereHas('keywordshortcuts', function ($query) use ($keyword, $type) {
+                    $query->where('type', $type)->where('value', 'like', $keyword);
+                });
+    }
+    
+    /*
+     * getSomethingAttribute -> $this->something;
+     * 
+     * denomination
+     * responsible
+     * writeAccess
+     * jelzes
+     * fullName
+     * remarksSatus
+     * location
+     */
+    public function getDenominationAttribute($value) {
+        return  in_array($this->egyhazmegye,[34,17,18]) ? 'greek_catholic' : 'roman_catholic';
+    }
+    
     public function getResponsibleAttribute($value) {
         return array($this->letrehozta);
     }
@@ -17,47 +143,37 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         global $user;
         return $this->McheckWriteAccess($user);
     }
+    
+    public function getJelzesAttribute() {
+            $jelzes = $this->remarksStatus['html'];
 
-    public function photos() {
-        return $this->hasMany('\Eloquent\Photo')->ordered();
+            if ($this->miseaktiv == 1) {
+                $countMasses = DB::table('misek')->where('tid', $this->id)->where('torles', '0000-00-00 00:00:00')->count();
+                if ($countMasses < 1) {
+                    $jelzes.=' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
+                }
+            }
+
+            if ($this->ok == 'n')
+                $jelzes.=" <i class='fa fa-ban fa-lg' title='Nem engedélyezett!' style='color:red'></i> ";
+            elseif ($this->ok == 'f')
+                $jelzes.=" <img src=/img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
+
+            if($this->ok == 'i' AND $this->miseaktiv == 1) {
+                $updatedTime = strtotime($this->frissites);
+                if($updatedTime < strtotime("-10 years")) {
+                    $jelzes.=" <i class='fa fa-exclamation-triangle fa-lg' title='Több mint 10 éves adatok!' style='color:red'></i> ";
+                } elseif ($updatedTime < strtotime("-5 year")) {
+                    $jelzes.=" <i class='fa fa-exclamation fa-lg' title='Több mint öt éves adatok!' style='color:red'></i> ";
+                } 
+            }
+            if($this->lat <= 0 OR $this->lon <= 0)
+                $jelzes .= '<span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" style="color:red" title="Nincsen koordináta!"></span>';
+            if($this->osmid == '' OR $this->osmtype == '')
+                $jelzes .= '<span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" style="color:grey" title="OSM adat hiányzik még"></span>';
+            return $jelzes;
     }
-
-    public function osms() {
-        return $this->belongsToMany('\Eloquent\OSM', 'lookup_church_osm', 'church_id', 'osm_id');
-    }
-
-    public function keywordshortcuts() {
-        return $this->hasMany('\Eloquent\KeywordShortcut');
-    }
-
-    public function getOsmAttribute() {
-        if ($this->osms->first() AND $this->osms->first()->enclosing AND count($this->osms->first()->enclosing->toArray()) < 1) {
-            $overpass = new \ExternalApi\OverpassApi();
-            $overpass->updateEnclosing($this->osms->first());
-            $this->load('osms');
-        }
-        return $this->osms->first();
-    }
-
-    public function remarks() {
-        return $this->hasMany('\Eloquent\Remark')->orderBy('created_at', 'DESC');
-    }
-
-    public function neighbours() {
-        return $this->hasMany('\Eloquent\Distance', 'church_from', 'id')
-                ->join('templomok', 'templomok.id', '=', 'church_to')
-                ->where('templomok.ok', 'i')
-                ->orderBy('distance', 'ASC');
-    }
-
-    public function closestNeighbour() {
-        return $this->neighbours()->take(1);
-    }
-
-    public function neighbourWithinDistance($distance = 10000) {
-        return $this->neighbours()->where("distance", "<=", $distance);
-    }
-
+    
     function getFullNameAttribute($value) {
         $return = $this->nev;
         if (!empty($this->ismertnev)) {
@@ -69,6 +185,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     function getRemarksStatusAttribute($value) {
+        $return = false;
         $remark = $this->remarks()
                         ->select('allapot')
                         ->groupBy('allapot')
@@ -93,46 +210,54 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         }
         return $return;
     }
-
-    public function delete() {
-        #$this->neighbours()->delete();
-        Distance::where('church_to', $this->id)->delete();
-        Distance::where('church_from', $this->id)->delete();
-        $this->remarks()->delete();
-        $this->photos()->delete();
-        parent::delete();
-    }
-
+    
     function getLocationAttribute($value) {
         $location = new \stdClass();
 
         $location->lat = $this->lat;
         $location->lon = $this->lon;
-        if ($this->orszag > 0) {
-            $location->country = DB::table('orszagok')->where('id', $this->orszag)->pluck('nev')[0];
+        if($this->osmtype AND $this->osmid) {
+            $location->osm = array(
+                'type' => $this->osmtype, 
+                'id'=>$this->osmid,
+                'url' => 'https://www.openstreetmap.org/'.$this->osmtype.'/'.$this->osmid
+                 );
+        } else {
+            $location->access = $this->megkozelites;
+            $location->address = $this->cim;
         }
-        if ($this->megye > 0) {
-            $location->county = DB::table('megye')->where('id', $this->megye)->pluck('megyenev')[0];
-        }
-        $location->city = $this->varos;
-        $location->address = $this->cim;
-        $location->access = $this->megkozelites;
 
-        if ($this->cim == '') {
-            $location->address = $this->geoaddress;
+        /* Address addr:steet, addr:housenumber */
+        $tags = collect(\Eloquent\OSMTag::where('osmtype',$this->osmtype)
+                ->where('osmid',$this->osmid)
+                ->whereIn('name',['addr:street','addr:housenumber'])
+                ->orderBy('name','DESC')
+                ->get())->keyBy('name');
+        if(count($tags) > 0) {
+            $location->address = '';
+            foreach($tags as $tag) {
+                $location->address .= $tag->value." ";
+            }
         }
-        /*
-          if($this->osm) {
-          #printr($this->osm->toArray());
-          $location->lat = $this->osm->lat;
-          $location->lon = $this->osm->lon;
-          $location->osm = $this->osm->osmtype . "/" . $this->osm->osmid;
-          }
-         * 
-         */
+        
+        /* Adminisrative Boundaries(Country,County, City, District) */
+        $boundaries = $this->boundaries()
+                ->where('boundary','administrative')
+                ->whereIn('admin_level',[2,6,8,9,10])
+                ->orderBy('admin_level')              
+                ->get()->toArray();
+
+        if(array_key_exists(0, $boundaries)) $location->country = $boundaries[0];
+        if(array_key_exists(1, $boundaries)) $location->county = $boundaries[1];
+        if(array_key_exists(2, $boundaries)) $location->city = $boundaries[2];   
+        if(array_key_exists(3, $boundaries)) $location->district = $boundaries[3];        
+                
         return $location;
     }
 
+    /*
+     * What does 'M' mean?
+     */
     public function MgetReligious_administration() {
         $this->religious_administration = new \stdClass();
         $this->religious_administration->diocese = new \Diocese();
@@ -180,59 +305,118 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->religious_administration->diocese->id;
     }
 
-    function scopeInBBox($query, $bbox) {
-        return $query->whereHas('osms', function($query) use ($bbox) {
-                    $query->whereBetween('lat', [$bbox['latMin'], $bbox['latMax']])
-                            ->whereBetween('lon', [$bbox['lonMin'], $bbox['lonMax']]);
-                });
+    public function boundaries()
+    {
+        return $this->belongsToMany('Eloquent\Boundary', 'lookup_boundary_church')
+                ->withTimestamps();
     }
+    
+    function MdownloadOSMBoundaries() {
+        $overpass = new \ExternalApi\OverpassApi();
+        $overpass->downloadEnclosingBoundaries($this->lat, $this->lon);
+        
+        /* Elementjük az osmtags táblába az összes adatot. */
+        $overpass->saveElement(); 
 
-    function scopeChurchesAndMore($query) {
-        return $query->where('nev', 'NOT LIKE', '%kápolna%');
-    }
+        //Detach all boundaries but those manually added (without OSM integration);                    
+        $this->boundaries()->where('osmid','>','0')->detach();
+        foreach($overpass->jsonData->elements as $element) {
+            $boundary = \Eloquent\Boundary::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id]);
+            
+            $changed = false;
+            foreach ( array('boundary','admin_level','name','alt_name','denomination') as $key ) {
+                if(isset($element->tags->$key) AND $element->tags->$key != $boundary->$key ) {
+                    $boundary->$key = $element->tags->$key;
+                    $changed = true;
+                }                
+            }
+            $changed ? $boundary->save() : false;
 
-    function scopeSelectUpdatedMonth($query) {
-        return $query->addSelect(DB::raw('DATE_FORMAT(frissites,\'%Y-%m\') as updated_month'), DB::raw('COUNT(*) as count_updated_month'));
-    }
-
-    function scopeSelectUpdatedYear($query) {
-        return $query->addSelect(DB::raw('DATE_FORMAT(frissites,\'%Y\') as updated_year'), DB::raw('COUNT(*) as count_updated_year'));
-    }
-
-    function scopeCountByUpdatedMonth($query) {
-        return $query->selectUpdatedMonth()
-                        ->groupBy('updated_month')->orderBy('updated_month');
-    }
-
-    function scopeCountByUpdatedYear($query) {
-        return $query->selectUpdatedYear()
-                        ->groupBy('updated_year')->orderBy('updated_year');
-    }
-
-    function scopeWhereShortcutLike($query, $keyword, $type) {
-        return $query->whereHas('keywordshortcuts', function ($query) use ($keyword, $type) {
-                    $query->where('type', $type)->where('value', 'like', $keyword);
-                });
-    }
-
-    public function scopeWhereHasTag($query, $name, $value) {
-        if (is_array($name)) {
-            $nameOperator = $name[0];
-            $nameValue = $name[1];
-        } else {
-            $nameValue = $name;
-            $nameOperator = '=';
+            $this->boundaries()->attach($boundary->id);               
         }
-        if (is_array($value)) {
-            $valueOperator = $value[0];
-            $valueValue = $value[1];
-        } else {
-            $valueValue = $value;
-            $valueOperator = '=';
+        $this->boundaries()->touch();
+        $this->MmigrateBoundaries();        
+        
+        return;
+    }
+    
+    
+    /* 
+     * A régi templomok.egyhazmegye/espereskerulet/orszag/megye/varos -ból csinál
+     * boundary értéket, ha még nincs. Ill. összekapcsolást.
+     */
+    function MmigrateBoundaries() {
+        global $_egyhazmegyek, $_espereskeruletek, $_orszagok, $_megyek, $_varosok;
+                                           
+        /* egyházmegye */
+        $tmp = $this->boundaries()
+                ->where('boundary','religious_administration')
+                ->where('denomination','LIKE','%_catholic')
+                ->where('admin_level',6)
+                ->get()->toArray();        
+        if($tmp == array()) {
+            $boundary = \Eloquent\Boundary::firstOrNew(['boundary' => 'religious_administration', 'denomination' => $this->denomination, 'admin_level' => 6, 'name' => $_egyhazmegyek[$this->egyhazmegye]->nev]);
+            $boundary->save(); 
+            $this->boundaries()->attach($boundary->id);
         }
-        return $query->whereHas('tags', function ($query) use ( $nameOperator, $nameValue, $valueOperator, $valueValue ) {
-                    $query->where('name', $nameOperator, $nameValue)->where('value', $valueOperator, $valueValue);
-                });
+        
+        /* espereskerület */
+        $tmp = $this->boundaries()
+                ->where('boundary','religious_administration')
+                ->where('denomination','LIKE','%_catholic')
+                ->where('admin_level',7)
+                ->get()->toArray();
+        if($tmp == array()) {
+            $boundary = \Eloquent\Boundary::firstOrNew(['boundary' => 'religious_administration', 'denomination' => $this->denomination, 'admin_level' => 7, 'name' => $_espereskeruletek[$this->espereskerulet]->nev]);
+            $boundary->save();
+            $this->boundaries()->attach($boundary->id);            
+        }
+        
+        /* ország */
+        $tmp = $this->boundaries()
+                ->where('boundary','administrative')
+                ->where('admin_level',2)
+                ->get()->toArray();
+        if($tmp == array()) {
+            $boundary = \Eloquent\Boundary::firstOrNew(['boundary' => 'administrative', 'admin_level' => 2, 'name' => $_orszagok[$this->orszag]->nev]);
+            $boundary->save();
+            $this->boundaries()->attach($boundary->id);            
+        }
+        
+        /* megye */
+        $tmp = $this->boundaries()
+                ->where('boundary','administrative')
+                ->where('admin_level',6)
+                ->get()->toArray();
+        if($tmp == array()) {
+            if(isset($_megyek[$this->megye])) {
+                $boundary = \Eloquent\Boundary::firstOrNew(['boundary' => 'administrative', 'admin_level' => 6, 'name' => $_megyek[$this->megye]->nev." megye"]);
+                $boundary->save();
+                $this->boundaries()->attach($boundary->id);            
+            }
+        }        
+
+        /* város */
+        $tmp = $this->boundaries()
+                ->where('boundary','administrative')
+                ->where('admin_level',8)
+                ->get()->toArray();
+        if($tmp == array()) {
+            $boundary = \Eloquent\Boundary::firstOrNew(['boundary' => 'administrative', 'admin_level' => 8, 'name' => $this->varos]);
+            $boundary->save();
+            $this->boundaries()->attach($boundary->id);  
+        }
+
     }
 
+    public function delete() {
+        #$this->neighbours()->delete();
+        Distance::where('church_to', $this->id)->delete();
+        Distance::where('church_from', $this->id)->delete();
+        $this->remarks()->delete();
+        $this->photos()->delete();
+        parent::delete();
+    }
+
+  
 }
