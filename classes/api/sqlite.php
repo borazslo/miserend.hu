@@ -76,11 +76,9 @@ class Sqlite extends Api {
         echo "Sqlite is beginning right now...";
         if(!isset($this->sqliteFilePath)) {
             $this->setFilePath();
-        }
-    
+}
         $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFilePath);
         $this->sqlite->beginTransaction();
-
         $this->dropAllTables();
         echo "\nCreate Tables ...";
         $this->createTables();
@@ -212,13 +210,14 @@ class Sqlite extends Api {
             ];
 
             //Location
-            $insert['orszag'] = $church->location->country;
+	    //print_r($church->location);
+            $insert['orszag'] = $church->location->country['name'];
             if (isset($church->location->county)) {
-                $insert['megye'] = $church->location->county;
+                $insert['megye'] = $church->location->county['name'];
             } else {
                 $insert['megye'] = "";
             }
-            $insert['varos'] = $church->location->city;
+            $insert['varos'] = $church->location->city['name'];
             $insert['cim'] = $church->cim;
             $insert['geocim'] = $church->geoaddress;
             $insert['lng'] = $church->location->lon;
@@ -366,8 +365,9 @@ class Sqlite extends Api {
     }
 
     function cron() {
-        for ($i = 2; $i <= 4; $i++) {
+        for ($i = 4; $i >= 4; $i--) {
             $_REQUEST['v'] = $i;
+	    $this->version = $i;
             $this->run();
         }
     }
