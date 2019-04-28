@@ -1,53 +1,29 @@
 {% extends 'panel.twig' %}
 
-
-{% if location.lat %}
-    {% set title = 'Elhelyezked&eacute;s' ~ '&nbsp;<a href="https://www.google.com/maps/dir//' ~ location.lat ~ ',' ~ location.lon ~ '" target="_blank"><i class="' ~  ICONS_MAP_DIRECTION ~ ' title="Útvonaltervezés a Google Maps segítségével."></i></a>' %}
-{% else %}
-    {% set title = 'Elhelyezked&eacute;s' %}
-{% endif %}
+{% set title = 'Elhelyezkedés' ~ '&nbsp;<a href="https://www.google.com/maps/dir//' ~ location.lat ~ ',' ~ location.lon ~ '" target="_blank"><i class="' ~  ICONS_MAP_DIRECTION ~ ' title="Útvonaltervezés a Google Maps segítségével."></i></a>' %}
 
 {% if location.osm is not null %}
     {% set panel = 'primary' %}
 {% endif %}    
 
-{% set id = 'panel-map' %}
-
 {% block body %}    
-    <style>
-    #panel-map .panel-body {
-	padding: 0;
-    }
-
-    #maptext  {
-	padding: 15px;
-    }
-    </style>
-    {% if location.lat %}
-    <div id="map" style="height:260px;"></div>
-
-	<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
-	<script>
-	    map = new OpenLayers.Map("map");
-	    map.addLayer(new OpenLayers.Layer.OSM());
-
-	    var lonLat = new OpenLayers.LonLat( {{ location.lon }}, {{ location.lat}} )
-        	.transform(
-        	    new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-        	    map.getProjectionObject() // to Spherical Mercator Projection
-        	);
-	    var zoom=16;
-
-	    var markers = new OpenLayers.Layer.Markers( "Markers" );
-	    map.addLayer(markers);
-    
-	    markers.addMarker(new OpenLayers.Marker(lonLat));
-    
-	    map.setCenter (lonLat, zoom);
-	</script>
-    {% endif %}
-
-    <div id="maptext">
+    <div id="map" style="height:260px;  margin-top: -15px;margin-right: -15px;margin-bottom: 15px;margin-left: -15px;"></div>
+    <script>
+      function initMap() {
+        var uluru = {lat: {{ location.lat }}, lng: {{ location.lon }}};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: uluru
+        });
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFPvPprk1tXLz8l_Urbvu4OmwAgz_v8o0&callback=initMap">
+    </script>   
     {% if not user.isadmin %}
         <span class=alap>
             {% if location.country and location.country.name != 'Magyarország' %}{{ location.country.name }} <br/>{% endif %}
@@ -88,7 +64,6 @@
     {% endif %}
     <br/>
     {% if location.access %}{{ location.access|raw|nl2br }}  {% endif %}   
-    </div>
 {% endblock %}    
 
 {% macro osmlink(osm,title = false) %}
