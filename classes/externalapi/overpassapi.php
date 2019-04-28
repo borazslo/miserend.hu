@@ -12,7 +12,7 @@ class OverpassApi extends \ExternalApi\ExternalApi {
     function buildQuery() {
         $this->rawQuery = "[out:json][timeout:" . $this->queryTimeout . "];";
         $this->rawQuery .= $this->query;
-        $this->rawQuery = "?data=" . urlencode($this->rawQuery);
+        $this->rawQuery = "?data=" . urlencode($this->rawQuery); 
     }
 
     function buildEnclosingBoundariesQuery($lat, $lon) {
@@ -98,7 +98,7 @@ class OverpassApi extends \ExternalApi\ExternalApi {
 
     function saveElement() {
         if (!$this->jsonData->elements) {
-            throw new Exception("Missing Json Elements from OverpassApi Query");
+            throw new \Exception("Missing Json Elements from OverpassApi Query");
         }
         $now = time();
         
