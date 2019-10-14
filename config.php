@@ -8,7 +8,7 @@ $environment['default'] = [
         'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
     'path' => [
-        'domain' => 'http://miserend.hu'
+        'domain' => 'https://miserend.hu'
     ],
     'mapquest' => [
         'appkey' => env('MAPQUEST_CONSUMERKEY', '***'),
