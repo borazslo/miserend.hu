@@ -1,186 +1,33 @@
-{% import "forms.twig" as forms %}
-
 {% extends "layout.twig" %}
 
-{% set pageTitle = 'Miserend | VPP' %}
+{% set pageTitle = "Közlemény | Miserend" %}
+{% set title = "Imáinkkal és példánkkal erősítsük a bizalmat Istenben és egymásban – Az MKPK közleménye" %}
 
-
-{% block extraHead %}
-    <style>
-        .block:after{
-            clear: both;
-            content: "";
-            display: block;
-        }
-    </style>
-    <link href="/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet">
-    <script src="/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-    <script src="/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.hu.min.js"></script>
-
-{% endblock %}
-
-{% block pageHeader %}
-    <div class="page-header">
-        <h1>Miserend<small><span class="hidden-xs hidden-sm"> és templom keresés</span></small></h1>
-    </div>
-{%  endblock %}
 
 {% block content %}
+<p>A Magyar Katolikus Püspöki Konferencia (MKPK) a rájuk bízottakért érzett felelősségtől vezérelve a koronavírus-járvány Magyarországon való megjelenése miatt meghirdetett veszélyhelyzetben visszavonásig a következő rendelkezéseket lépteti életbe, hacsak az illetékes megyéspüspök másként nem rendelkezik.</p>
 
-    {{ alert|raw }}
+<p>1. A templomok mint a lelki feltöltődés és imádság helyei különösen is fontosak, ezért templomainkat nem zárjuk be. Mégis felelősen és körültekintően kell eljárni, ezért a nyilvános liturgia 2020. március 22., nagyböjt 4. vasárnapjától a templomokban szünetel. Egyetlen kivétel a temetés, amelyet egyszerű formában, röviden kell megtartani.</p>
 
-    <div class="miseurlap">
-        <form method=get action="index.php" name="kereses" id="kereses" class="form-group">
+<p>2. A paptestvéreket kérjük, hogy továbbra is tartsanak templomainkban vagy megfelelő kápolnában szentmiséket, tanúságot téve arról, amit a <i>Katolikus Egyház Katekizmusa</i> is tanít, hogy az Eucharisztia az Egyház életének középpontja (KEK 1343.). A már felvett miseszándékok így, sine populo módon engedélyezetten elvégezhetők vagy az <i>Egyházi Törvénykönyv</i> rendelkezése értelmében áthelyezhetők (CIC 1309. k.). A híveket pedig arra bátorítjuk, hogy otthonról kapcsolódjanak be a szent cselekménybe, ezzel is kifejezve, hogy minden szentmisében az egész Egyház egyesül Krisztus áldozatával (KEK 1369.).</p>
 
-            <div id="form_church"  style="margin-top:12px;">
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label">Templom</label>
-                    <div class="col-sm-6">{{ forms.input(searchform.kulcsszo) }}</div>
-                    <div class="cols-sm-2" style="text-align:right"><span class="btn glyphicon glyphicon-plus-sign" id="form_church_getdetails"></span></div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" ><span class="form_church_details" style="display:none">település</span></label>
-                    <div class="col-sm-8">{{ forms.input(searchform.varos) }} </div>
-                </div>
-            </div>
+<p>3. Az <i>Egyházi Törvénykönyv</i> előírásai szerint a megyéspüspök, ha úgy ítéli meg, felmentést adhat a vasárnapi szentmisén való részvétel kötelezettsége alól (CIC 87. k. 1. §., 1245. k.). Ezt a felmentést – a fertőzés elkerülése céljából – a Magyar Katolikus Püspöki Konferencia ordináriusai megadják.</p>
 
-            <div id="form_church_details"  style="display:none">
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >adott helyszín körül:</label>
-                    <div class="col-sm-8">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                {{ forms.input(searchform.hely) }}
-                            </div>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <div class="input-group-addon">+</div>
-                                    {{ forms.input(searchform.tavolsag) }}
-                                    <div class="input-group-addon">km</div>
-                                </div>
-                            </div>
-                        </div>    
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >egyházmegye</label>
-                    <div class="col-sm-8">{{ forms.select(searchform.ehm) }} </div>
-                </div>
-                <div class="form-group row" id="espkerlabel" style="display:none" >
-                    <label class="col-sm-4 control-label" >esperes kerület</label>
-                    <div class="col-sm-8">{% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}</div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >csak görögkatolikus</label>
-                    <div class="col-sm-8">{{ forms.input(searchform.gorog) }} </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >ahol van adott nyelvű mise is</label>
-                    <div class="col-sm-8">{{ forms.select(searchform.tnyelv) }} </div>
-                </div>
-            </div>
+<p>4. A jelenlegi kivételes helyzetben is érvényesek a katekizmusban (KEK 2183.) és az <i>Egyházi Törvénykönyvben</i> (CIC 1248. k. 2. §) található előírások, amelyek szerint ha valaki számára súlyos okból lehetetlenné válik az eucharisztikus ünneplésben való részvétel, igen ajánlatos, hogy helyette töltsön kellő időt imádsággal – a Szentírás olvasásával, zsolozsma végzésével vagy más imával – egyénileg vagy a családban. Több helyen van online miseközvetítés. A közszolgálati televízió vasárnap és ünnepnapokon szentmisét közvetít azért, hogy megerősítést, vigasztalást és bátorítást nyerjenek azok, akik most nem tudnak részt venni vasárnapi szentmisén. A közvetítések rendjéről felületeinken tájékoztatást adunk.</p>
 
-            <div id="form_mass" style="margin-top:12px;">
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label">Mise</label>
-                    <div class="col-sm-6">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                {{ forms.select(searchform.mikor) }}
-                            </div>
-                            <div class="form-group">
-                                {{ forms.input(searchform.mikordatum) }}
-                            </div>
-                        </div> 
-                    </div>
-                    <div class="cols-sm-2" style="text-align:right"><span class="btn glyphicon glyphicon-plus-sign" id="form_mass_getdetails"></span></div>      
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label"></label>
-                    <div class="col-sm-8">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                {{ forms.select(searchform.mikor2) }}
-                            </div>
-                            <div class="form-group">
-                                {{ forms.input(searchform.mikorido) }}
-                            </div>
-                        </div> 
-                    </div>
-                </div>
-            </div>
+<p>5. A betegellátás és a gyóntatás és a rendkívüli áldoztatás tekintetében is mindenben kövessük az állami járványügyi előírásokat. A rendkívüli helyzetre való tekintettel – szintén visszavonásig, azonnali hatállyal – lehetővé tesszük az általános feloldozás megadását (CIC 961–963. k.).</p>
 
-            <div id="form_mass_details" style="display:none">
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >nyelv</label>
-                    <div class="col-sm-8">{{ forms.select(searchform.nyelv) }} </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >zene</label>
-                    <div class="col-sm-8">
-                        <div class="checkbox">
-                            {% for key, item in searchform.zene %}
-                                <label>{{ forms.input(item) }}</label><br/>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >korosztály</label>
-                    <div class="col-sm-8">
-                        <div class="checkbox">
-                            {% for key, item in searchform.kor %}
-                                <label>{{ forms.input(item) }}</label><br/>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >rítus</label>
-                    <div class="col-sm-8">{{ forms.select(searchform.ritus) }} </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label" >igeliturgiák is</label>
-                    <div class="col-sm-8">{{ forms.input(searchform.ige) }} </div>
-                </div>
-            </div>
+<p>6. Oktatási, szociális és egészségügyi intézményeinkben mindenben kövessük az állami előírásokat. A hatóságokkal mindenben működjünk együtt és legyünk figyelemmel az általuk adott általános irányelvekre.</p>
 
-            <div align=center class="form-group" style="margin-top:12px">
-                <button type=submit name="q" value="SearchResultsMasses"  class="btn btn-primary">Mise keresése</button>
-                <button type=submit name="q" value="SearchResultsChurches"  class="btn btn-primary">Templom keresése</button>
-            </div>
+<p>7. A plébániai és a szerzetesközösségeket arra bátorítjuk, hogy – a járványügyi hatóságok előírásainak megtartása mellett – szervezzék meg a folyamatos imát a járvány érintettjeiért.</p>
 
-        </form>
-    </div>
+<p>Jelen rendelkezés Magyarország latin szertartású egyházmegyéire érvényes.</p>
 
-    <div id="favorites" style="margin-top:12px">
-        <h3>Kedvenc templomok</h3>
-        {% if user.uid < 1 %}
-            <p class="alap"><i>Bejelentkezett felhasználóink megjelelölhetnek templomokat kedvencként.</i></p>
-        {% endif %}
-        {% if favorites|length > 0 %}
-            <ul>
-                {% for key, item in favorites %}<li class="link">{{ item.li|raw }}</li>{% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+<p>A járvány időszaka rámutat törékenységünkre és arra, hogy a saját és mások életére vigyáznunk kell. Imáinkkal és példánkkal erősítsük a bizalmat Istenben és egymásban. Gyakoroljuk a nagylelkűség erényét, és ebben a helyzetben különösen is figyeljünk egymásra, főleg beteg és idős embertársainkra. Idős paptestvéreinket tisztelettel kérjük, hogy ebben a helyzetben különösen vigyázzanak egészségükre.</p>
 
-    <script>
-        $('input.datepicker').datepicker({
-            format: "yyyy-mm-dd",
-            weekStart: 1,
-            language: "hu",
-            autoclose: true,
-            todayHighlight: true
-        });
-    </script>
+<p>Budapest, 2020. március 17.</p>
 
-{%  endblock %}
+<p style="text-align:right">a Magyar Katolikus Püspöki Konferencia</p>
 
-{% set selfAdvertisement = true %}  
-{% block leftsidebar %}
-    {% if photo %}
-        {% set content = '<img src="' ~ constant('DOMAIN') ~ '/kepek/templomok/' ~ photo.church_id ~ '/' ~ photo.filename ~ '" class="img-responsive"><h5 class="text-center"><a href="/templom/' ~ photo.church_id ~'">' ~ photo.church.nev ~ ' (' ~ photo.church.location.city.name ~')</a></h5>' %}
-        {% include "panel.twig" with {'title' : ' ' , 'body': content,'panel':'default  ' } %}
-    {% endif %}
+
 {% endblock %}
