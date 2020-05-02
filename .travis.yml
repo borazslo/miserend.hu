@@ -14,7 +14,6 @@ before_script:
   - bower install
   - php composer.phar selfupdate
   - php composer.phar install
-  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
   - php install.php
 
 script:
