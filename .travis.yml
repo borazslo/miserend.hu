@@ -10,6 +10,7 @@ services:
 before_script:
   - mysql -e 'create database miserend_testing character set utf8 collate utf8_unicode_ci;'
   - npm install
+  - bower install
   - php composer.phar selfupdate
   - php composer.phar install
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
