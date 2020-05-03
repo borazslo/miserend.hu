@@ -1,33 +1,13 @@
 {% extends "layout.twig" %}
 
 {% set pageTitle = "Közlemény | Miserend" %}
-{% set title = "Imáinkkal és példánkkal erősítsük a bizalmat Istenben és egymásban – Az MKPK közleménye" %}
+{% set title = "Imáinkkal és példánkkal erősítsük a bizalmat Istenben és egymásban" %}
 
 
 {% block content %}
-<p>A Magyar Katolikus Püspöki Konferencia (MKPK) a rájuk bízottakért érzett felelősségtől vezérelve a koronavírus-járvány Magyarországon való megjelenése miatt meghirdetett veszélyhelyzetben visszavonásig a következő rendelkezéseket lépteti életbe, hacsak az illetékes megyéspüspök másként nem rendelkezik.</p>
 
-<p>1. A templomok mint a lelki feltöltődés és imádság helyei különösen is fontosak, ezért templomainkat nem zárjuk be. Mégis felelősen és körültekintően kell eljárni, ezért a nyilvános liturgia 2020. március 22., nagyböjt 4. vasárnapjától a templomokban szünetel. Egyetlen kivétel a temetés, amelyet egyszerű formában, röviden kell megtartani.</p>
-
-<p>2. A paptestvéreket kérjük, hogy továbbra is tartsanak templomainkban vagy megfelelő kápolnában szentmiséket, tanúságot téve arról, amit a <i>Katolikus Egyház Katekizmusa</i> is tanít, hogy az Eucharisztia az Egyház életének középpontja (KEK 1343.). A már felvett miseszándékok így, sine populo módon engedélyezetten elvégezhetők vagy az <i>Egyházi Törvénykönyv</i> rendelkezése értelmében áthelyezhetők (CIC 1309. k.). A híveket pedig arra bátorítjuk, hogy otthonról kapcsolódjanak be a szent cselekménybe, ezzel is kifejezve, hogy minden szentmisében az egész Egyház egyesül Krisztus áldozatával (KEK 1369.).</p>
-
-<p>3. Az <i>Egyházi Törvénykönyv</i> előírásai szerint a megyéspüspök, ha úgy ítéli meg, felmentést adhat a vasárnapi szentmisén való részvétel kötelezettsége alól (CIC 87. k. 1. §., 1245. k.). Ezt a felmentést – a fertőzés elkerülése céljából – a Magyar Katolikus Püspöki Konferencia ordináriusai megadják.</p>
-
-<p>4. A jelenlegi kivételes helyzetben is érvényesek a katekizmusban (KEK 2183.) és az <i>Egyházi Törvénykönyvben</i> (CIC 1248. k. 2. §) található előírások, amelyek szerint ha valaki számára súlyos okból lehetetlenné válik az eucharisztikus ünneplésben való részvétel, igen ajánlatos, hogy helyette töltsön kellő időt imádsággal – a Szentírás olvasásával, zsolozsma végzésével vagy más imával – egyénileg vagy a családban. Több helyen van online miseközvetítés. A közszolgálati televízió vasárnap és ünnepnapokon szentmisét közvetít azért, hogy megerősítést, vigasztalást és bátorítást nyerjenek azok, akik most nem tudnak részt venni vasárnapi szentmisén. A közvetítések rendjéről felületeinken tájékoztatást adunk.</p>
-
-<p>5. A betegellátás és a gyóntatás és a rendkívüli áldoztatás tekintetében is mindenben kövessük az állami járványügyi előírásokat. A rendkívüli helyzetre való tekintettel – szintén visszavonásig, azonnali hatállyal – lehetővé tesszük az általános feloldozás megadását (CIC 961–963. k.).</p>
-
-<p>6. Oktatási, szociális és egészségügyi intézményeinkben mindenben kövessük az állami előírásokat. A hatóságokkal mindenben működjünk együtt és legyünk figyelemmel az általuk adott általános irányelvekre.</p>
-
-<p>7. A plébániai és a szerzetesközösségeket arra bátorítjuk, hogy – a járványügyi hatóságok előírásainak megtartása mellett – szervezzék meg a folyamatos imát a járvány érintettjeiért.</p>
-
-<p>Jelen rendelkezés Magyarország latin szertartású egyházmegyéire érvényes.</p>
-
-<p>A járvány időszaka rámutat törékenységünkre és arra, hogy a saját és mások életére vigyáznunk kell. Imáinkkal és példánkkal erősítsük a bizalmat Istenben és egymásban. Gyakoroljuk a nagylelkűség erényét, és ebben a helyzetben különösen is figyeljünk egymásra, főleg beteg és idős embertársainkra. Idős paptestvéreinket tisztelettel kérjük, hogy ebben a helyzetben különösen vigyázzanak egészségükre.</p>
-
-<p>Budapest, 2020. március 17.</p>
-
-<p style="text-align:right">a Magyar Katolikus Püspöki Konferencia</p>
-
-
+    <div class="alert alert-primary" role="alert">
+        {%  include "covid19.twig" %}
+    </div>
+        
 {% endblock %}
