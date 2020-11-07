@@ -28,7 +28,8 @@
 
 
 {% block content %}
-
+    {% include 'announcment.twig' ignore missing %}
+    
     {{ alert|raw }}
 
     <div class="miseurlap">
