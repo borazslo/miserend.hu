@@ -1,10 +1,29 @@
+img {max-width: 100%;max-height: 100%;}
+.nopadding {padding: 0;}
+
+.logo {padding: 10px 0;}
+.tarsoldal {display: inline-block;margin-left: 15px;color: #6d3c8d;background-repeat: no-repeat;background-size: 26px;background-position: right center;padding: 8px 30px 5px 0;font-weight: 600;font-size: 20px;margin-top: 20px;}
+.tarsoldal:hover {border-bottom: 2px solid #6d3c8d;text-decoration: none;}
+.tszemle {background-image: url(/img/ikon-szemle.png);}
+.tvp2 {background-image: url(/img/ikon-vp2.png);}
+
+.menusav {width: 100%;background-color: #6d3c8d;margin-bottom: 20px;}
+.navbar a {color: #fff;}
+.navbar a:hover {color: #6d3c8d;background-color: #fff!important;}
+.navbar .open a {color: #6d3c8d;}
+.navbar .btn {color: #6d3c8d;}
+.navbar-form {padding: 0;}
+.navbar-default {background: none;border: none;}
+
 .footer {
     padding: 40px 0;
-    color: #999;
+    color: #efefef;
     text-align: center;
-    background-color: #f9f9f9;
-    border-top: 1px solid #e5e5e5;
+    background-color: #6d3c8d;
 }
+
+.footer a {color: #efefef;}
+.mobilapps a {display: inline-block;height: 26px;}
 
 .share {
     width: 120px;
