@@ -63,7 +63,7 @@ EOF
 
     source /etc/profile
     cd /vagrant
-    npm install
+    npm install --no-bin-links 
  
     sudo composer self-update
     composer install
@@ -71,7 +71,7 @@ EOF
     echo "creating test and example databases..."
     echo "create database if not exists miserend character set utf8 collate utf8_unicode_ci;" | mysql -u root --password="root"
     echo "create database if not exists miserend_testing character set utf8 collate utf8_unicode_ci;" | mysql -u root --password="root"
-    php install.php    
+    
     export MYSQL_MISEREND_DATABASE=miserend_testing
     php install.php
     export MYSQL_MISEREND_DATABASE=miserend

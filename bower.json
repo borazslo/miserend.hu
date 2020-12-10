@@ -1,6 +1,6 @@
 {
   "name": "miserend.hu",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "homepage": "https://github.com/borazslo/miserend.hu",
   "license": "GPL",
   "private": true,
@@ -9,12 +9,11 @@
     "bower_components"
   ],
   "dependencies": {
-    "jquery": ">=2",
-    "jquery-ui": ">=1.11",
+    "jquery": ">=3.5",
+    "jquery-ui": ">=1.12",
     "requirejs": "2.1.11",
     "jquery-colorbox": "1.5.*",
-    "bootstrap": "3.3.*",
-    "bootstrap-datepicker": ">=1.5",
-    "jqplot-bower":"*"
+    "bootstrap": "4.4.*",
+    "bootstrap-datepicker": ">=1.5"
   }
 }

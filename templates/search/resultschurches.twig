@@ -1,7 +1,8 @@
 {% extends "layout.twig" %}
 
 {% block content %}
-
+    {% include 'announcment.twig' ignore missing %}
+    
     {% if churches %}
         <div class="row" style="margin-bottom:12px">
             Összesen: {{ pagination.resultsCount }} találat<br/>

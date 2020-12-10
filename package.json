@@ -1,13 +1,10 @@
 {
   "name": "miserend.hu",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "dependencies": {
-    "jquery": "~2.1.4",
-    "jquery-ui": "~1.10.5",
-    "bower": "~1.7.2"
-  },
-  "scripts": {
-    "postinstall": "bower install"
+    "jquery": "3.5.0",
+    "jquery-ui": "1.12.1",
+    "bower": "1.8.8"
   }
 }
