@@ -111,7 +111,7 @@ class Remark {
         $lekerdez = mysql_query($query);
         $templom = mysql_fetch_assoc($lekerdez);
         $eszrevetel = '';
-        $eszrevetel.= "<a href=\"http://miserend.hu/?templom=" . $this->tid . "\">" . $templom['nev'] . " (";
+        $eszrevetel.= "<a href=\"https://miserend.hu/?templom=" . $this->tid . "\">" . $templom['nev'] . " (";
         if ($templom['ismertnev'] != "")
             $eszrevetel .= $templom['ismertnev'] . ", ";
         $eszrevetel .= $templom['varos'] . ")</a><br/>\n";

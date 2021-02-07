@@ -104,13 +104,13 @@
                                 <li>Az OSM szerkesztőjébe belépés, például ezen a linken: <a href="https://www.openstreetmap.org/edit?editor=id#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..." ></i></a></li>
                                 <li>A templom megkeresése a térképen</li> 
                                 <ol type="a">
-                                    <li>Ha létezik már a templom a térképen, akkor az OSM-ben hozzá kell adni az 'url:miserend' címkét, aminek értéke a 'http://miserend.hu/templom/{{ church.id }}' legyen.</li>
+                                    <li>Ha létezik már a templom a térképen, akkor az OSM-ben hozzá kell adni az 'url:miserend' címkét, aminek értéke a 'https://miserend.hu/templom/{{ church.id }}' legyen.</li>
                                     <li>Ha nem létezik a térképen, akkor hozzunk létre egy új pontot a következő címke/érték párosokkol:</li>
                                     <ul>
                                         <li>amenity = place_of_worship</li>
                                         <li>religion = christian</li>
                                         <li>denomination = {{ church.denomination }}</li>
-                                        <li>url:miserend = http://miserend.hu/templom/{{ church.id }}</li>
+                                        <li>url:miserend = https://miserend.hu/templom/{{ church.id }}</li>
                                     </ul>
                                 </ol>
                                 <li>A miserend.hu-n a naponta automatikusan lefutó ellenőrző mechanizmus után automatikusan felismeri a kapcsolatot. Ezt le lehet futtatni <a href="/josm?update">itt is.</a></li>
