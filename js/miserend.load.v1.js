@@ -4,7 +4,7 @@ http://shootitlive.com/2012/07/developing-an-embeddable-javascript-widget/
  */
 (function(global) {
 
-  var base = "http://miserend.hu/";
+  var base = "https://miserend.hu/";
 
   //LOAD CSS
   function loadjscssfile(filename, filetype){
@@ -23,7 +23,7 @@ http://shootitlive.com/2012/07/developing-an-embeddable-javascript-widget/
         document.getElementsByTagName("head")[0].appendChild(fileref)
   }
 
-  loadjscssfile("http://code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css", "css") ////dynamically load and add this .css file
+  loadjscssfile("https://code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css", "css") ////dynamically load and add this .css file
 
   loadjscssfile("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css", "css") ////dynamically load and add this .css file
   loadjscssfile("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js","js")
@@ -36,7 +36,7 @@ http://shootitlive.com/2012/07/developing-an-embeddable-javascript-widget/
       var script_tag = document.createElement('script');
       script_tag.setAttribute("type","text/javascript");
       script_tag.setAttribute("src",
-          "http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js");
+          "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js");
       if (script_tag.readyState) {
         script_tag.onreadystatechange = function () { // For old versions of IE
             if (this.readyState == 'complete' || this.readyState == 'loaded') {

@@ -29,13 +29,13 @@ class UploadImage extends Html {
         $photo->save();
         echo "Siker! Feltöltöttük. Jöhet a következő!<br/><img src='" . $photo->smallUrl . "'>";
 
-        $eszrevetel = "<a href=\"http://miserend.hu/templom/" . $this->church->id . "\">" . $this->church->nev . " (";
+        $eszrevetel = "<a href=\"https://miserend.hu/templom/" . $this->church->id . "\">" . $this->church->nev . " (";
         if ($this->church->ismertnev != "")
             $eszrevetel .= $this->church->ismertnev . ", ";
         $eszrevetel .= $this->church->varos . ")</a><br/>\n";
-        $eszrevetel .= "<img src='http://miserend.hu/" . $photo->url . "'><br/>\n";
+        $eszrevetel .= "<img src='https://miserend.hu/" . $photo->url . "'><br/>\n";
         $eszrevetel .= $photo->title . "<br/><br/>\n";
-        $eszrevetel .= "http://miserend.hu/" . $photo->url . "\n";
+        $eszrevetel .= "https://miserend.hu/" . $photo->url . "\n";
 
         $mail = new \Mail();
         $mail->subject = "Miserend - új kép érkezett";
