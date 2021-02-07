@@ -38,7 +38,7 @@ class ExternalApi {
             if (filemtime($this->cacheFilePath) > strtotime("-" . $this->cache)) {
                 $this->rawData = file_get_contents($this->cacheFilePath);
                 if (!$this->jsonData = json_decode($this->rawData)) {
-                    throw new \Exception("Overpass API return data is not a valid JSON! \n(" . $query . ")");
+                    throw new \Exception("External API data has been loaded from cache but data is not a valid JSON!");
                 } else {
                     return true;
                 }
@@ -57,11 +57,28 @@ class ExternalApi {
         }
     }
 
-    function downloadData() {
-        $this->rawData = @file_get_contents($this->apiUrl . $this->rawQuery);
-        if (!$this->jsonData = json_decode($this->rawData)) {
-            throw new \Exception("External API return data is not a valid JSON! \n(" . $this->rawQuery . ")");
-        }
+    function downloadData() {        
+        $header = array("cache-control: no-cache","Content-Type: application/json");
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,$this->apiUrl . $this->rawQuery);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,$header);
+        curl_setopt($ch, CURLOPT_HEADER  , false);  // we want headers
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+        
+        $this->rawData = curl_exec($ch);
+    
+        $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE );      
+        switch ($this->responseCode) {
+            case '200':
+                if (!$this->jsonData = json_decode($this->rawData)) {            
+                    throw new \Exception("External API return data is not a valid JSON!");
+                }
+                break;
+
+            default:
+                throw new \Exception("External API returned bad http response code:" . $this->responseCode);
+                break;
+        }        
     }
 
     function clearOldCache() {

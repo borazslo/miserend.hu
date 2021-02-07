@@ -20,8 +20,17 @@ class MapquestApi extends \ExternalApi\ExternalApi {
         $this->query = "route?from=" . implode(',', $pointFrom) . "&to=" . implode(',', $pointTo) . "";
         $this->query .= "&outFormat=json&unit=k&routeType=shortest&narrativeType=none";
         $this->query .= "&doReverseGeocode=false";
-        $this->runQuery();
-
+        
+        try {            
+            $this->runQuery();
+        }
+        catch (\Exception $e) {   
+            # Általában akkor kerül elő ez, ha a mapquestApin elfogyott a havi lekérdezés adagunk
+            // echo $this->responseCode // 403 = forbidden
+            //throw new \Exception($this->rawData);
+            return -2; # ??
+        }
+ 
         $mapquest = $this->jsonData;
         if (isset($mapquest->route->routeError->errorCode)) {
             if ($mapquest->info->statuscode == 602)
