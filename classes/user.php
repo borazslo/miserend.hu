@@ -182,12 +182,12 @@ class User {
 
             //email küldése
             $email = new Mail();
-            $email->subject = 'Regisztráció - Virtuális Plébánia Portál';
+            $email->subject = 'Regisztráció - Miserend.hu';
             $email->content = "Kedves " . $this->username . "!<br/><br/>";
-            $email->content = "Köszöntünk a Virtuális Plébánia Portál felhasználói között!<br/><br/>";
+            $email->content = "Köszöntünk a Miserend.hu felhasználói között!<br/><br/>";
             $email->content .="\n\nA belépéshez szükséges jelszó: $pwd<br/>";
             $email->content .="\nA belépést követően a BEÁLLÍTÁSOK menüben kérjük megváltoztatni a jelszót.<br><br/>";
-            $email->content .="\n\nVPP \nwww.plebania.net";
+            $email->content .="\n\nMiserend.hu \nhttps://miserend.hu";
             $email->to = $this->presaved['email'];
             if ($email->send())
                 addMessage("Elküldtük az emailt az új regisztrációról.", "success");

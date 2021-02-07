@@ -31,13 +31,13 @@ class LostPassword extends \Html\Html {
 
     function sendNewPasswordMail() {
         $email = new \Mail();
-        $email->subject = "Jelszó emlékeztető - Virtuális Plébánia Portál";
+        $email->subject = "Jelszó emlékeztető - Miserend.hu";
 
         $email->content = "Kedves " . $this->recoveredUser->username . "!<br/><br/>";
         $email->content.="\n\nKérésedre küldjük a bejelentkezéshez szükséges újjelszót:";
         $email->content.="\n" . $this->newpassword . "<br/><br>";
         $email->content.="Kérjük mihamarabb változtasd meg a jelszót.<br/><br/>";
-        $email->content.="\n\nVPP \nhttp://www.plebania.net";
+        $email->content.="\n\nMiserend.hu \nhttps://miserend.hu";
 
         $email->to = $this->recoveredUser->email;
         $email->send();

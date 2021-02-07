@@ -6,7 +6,7 @@ class Html {
 
     public $template;
     public $menu = array();
-    public $pageTitle = 'VPP - miserend';
+    //public $pageTitle = 'Miserend';
     public $templatesPath = 'templates';
     public $extraMeta;
 

@@ -175,7 +175,7 @@ class Remark {
         }
 
         $mail->content .= "</div>\n";
-        $mail->content .= "<strong>Köszönjük a munkádat!</strong><br/>\nVPP";
+        $mail->content .= "<strong>Köszönjük a munkádat!</strong><br/>\n miserend.hu";
 
         $mail->content = "<div style='display: none; visibility: hidden; color: #ffffff; font-size: 0px;'>" . $this->PreparedText4Email . "\n\n</div>" . $mail->content;
 
