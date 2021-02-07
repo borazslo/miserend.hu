@@ -1,4 +1,4 @@
- <script src="https://www.openlayers.org/api/OpenLayers.js"></script>
+ <script src="https://openlayers.org/api/OpenLayers.js"></script>
             <div id="mapdiv"></div>
 
             <script>
@@ -16,8 +16,8 @@
                                             '<span class="ui-icon ui-icon-alert red" style="float:left;margin-right:5px"></span>';
                                 }
                                 html += '<span class="alap">' +
-                                        '<a href="http://www.openstreetmap.org/' + e.feature.fid.replace(".", "/") + '" target="_blank">[OSM]</a> ' +
-                                        '<a href="http://www.openstreetmap.org/edit?' + e.feature.fid.replace(".", "=") + '" target="_blank">[OSM edit]</a>';
+                                        '<a href="https://www.openstreetmap.org/' + e.feature.fid.replace(".", "/") + '" target="_blank">[OSM]</a> ' +
+                                        '<a href="https://www.openstreetmap.org/edit?' + e.feature.fid.replace(".", "=") + '" target="_blank">[OSM edit]</a>';
                                 if (typeof e.feature.attributes['url:miserend'] !== "undefined") {
                                     html += ' <a href="' + e.feature.attributes['url:miserend'] + '" target="_blank">[Miserend.hu]</a>';
                                 }
