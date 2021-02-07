@@ -1,0 +1,86 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+    
+<div id="mapid" ></div>
+<script>
+        var mymap = L.map('mapid');    
+        mymap.on('load', onMapMoved);
+	mymap.setView([
+                {% if location %}
+                    {{ location.lat }}, {{ location.lon}} ], 13);
+                {% else %}
+                    {{ lat }}, {{ lon}} ], 13);
+                {% endif %}
+                        
+
+        //https://leaflet-extras.github.io/leaflet-providers/preview/
+        var CartoDB_Voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        });
+        CartoDB_Voyager.addTo(mymap);
+        
+        {% if location %}
+            var marker = L.marker([{{ location.lat }}, {{ location.lon}}]).addTo(mymap);
+        {% endif %}
+            
+
+        var myLayer = L.geoJSON().addTo(mymap);
+        function onMapMoved(e) {
+            console.log('b');
+            var box = this.getBounds();                
+            var params = box['_southWest']['lat'] + ";" + box['_southWest']['lng']  + ";" + box['_northEast']['lat'] + ";" + box['_northEast']['lng'] ;                        
+           
+            $.getJSON( "/ajax/churchesinbbox?bbox=" + params , function( data ) {                              
+                
+                if(data) {
+                
+                
+                myLayer.remove();
+                myLayer = L.geoJSON(null, {
+                    onEachFeature: onEachFeature
+                }).addTo(mymap);
+                
+                
+                var items = [];
+                $.each( data, function( key, val ) {
+                    var geojsonFeature = {
+                        "type": "Feature",
+                        "properties": {
+                            "name": val.nev,
+                            "popupContent": "<a href='/templom/" + val.id.toString() + "'>"  + val.nev + "</a>"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [ val.lon , val.lat]
+                        },
+                    };
+                                        
+                    myLayer.addData(geojsonFeature);
+                });
+                }
+            });                                       
+        }
+        
+        mymap.on('moveend', onMapMoved);
+        
+        function onEachFeature(feature, layer) {
+            // does this feature have a property named popupContent?
+            if (feature.properties && feature.properties.popupContent) {
+            layer.bindPopup(feature.properties.popupContent,{
+                    maxWidth: "auto",
+                    autoPan: false
+                  });
+            }
+        }
+    
+
+
+
+</script>   
