@@ -5,17 +5,19 @@
  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
-    
 <div id="mapid" ></div>
 <script>
         var mymap = L.map('mapid');    
         mymap.on('load', onMapMoved);
-	mymap.setView([
-                {% if location %}
-                    {{ location.lat }}, {{ location.lon}} ], 13);
+	mymap.setView(
+                {% if center %}
+                    [{{ center.lat }}, {{ center.lon}} ], {% if center.zoom %} {{ center.zoom }} {% else %} 13 {% endif %} 
+                {% elseif location %}
+                    [{{ location.lat }}, {{ location.lon}} ], {% if location.zoom %} {{ location.zoom }} {% else %} 13 {% endif %} 
                 {% else %}
-                    {{ lat }}, {{ lon}} ], 13);
-                {% endif %}
+                    [47.5, 19.05 ], 13
+                {% endif %} 
+                    );
                         
 
         //https://leaflet-extras.github.io/leaflet-providers/preview/
@@ -27,7 +29,17 @@
         CartoDB_Voyager.addTo(mymap);
         
         {% if location %}
-            var marker = L.marker([{{ location.lat }}, {{ location.lon}}]).addTo(mymap);
+            var greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+        var marker = L.marker([{{ location.lat }}, {{ location.lon}}], {icon: greenIcon}).addTo(mymap);
         {% endif %}
             
 
@@ -50,19 +62,22 @@
                 
                 var items = [];
                 $.each( data, function( key, val ) {
-                    var geojsonFeature = {
-                        "type": "Feature",
-                        "properties": {
-                            "name": val.nev,
-                            "popupContent": "<a href='/templom/" + val.id.toString() + "'>"  + val.nev + "</a>"
-                        },
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [ val.lon , val.lat]
-                        },
-                    };
-                                        
-                    myLayer.addData(geojsonFeature);
+                    var current = {% if church_id %} {{ church_id }} {% else %} -1 {% endif %};
+                    if( current != val.id) {
+                        var geojsonFeature = {
+                            "type": "Feature",
+                            "properties": {
+                                "name": val.nev,
+                                "popupContent": "<a href='/templom/" + val.id.toString() + "'>"  + val.nev + "</a>"
+                            },
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [ val.lon , val.lat]
+                            },
+                        };
+
+                        myLayer.addData(geojsonFeature);
+                    }
                 });
                 }
             });                                       

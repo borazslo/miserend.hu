@@ -7,18 +7,36 @@ class Map extends Html {
     public function __construct() {
         $this->setTitle("OSM Térkép");
 
-        if (isset($_REQUEST['lat']) AND is_numeric($_REQUEST['lat']))
-            $this->lat = $_REQUEST['lat'];
-        else
-            $this->lat = 47.5;
-        if (isset($_REQUEST['lon']) AND is_numeric($_REQUEST['lon']))
-            $this->lon = $_REQUEST['lon'];
-        else
-            $this->lon = 19.05;
-        if (isset($_REQUEST['zoom']) AND is_numeric($_REQUEST['zoom']))
-            $this->zoom = $_REQUEST['zoom'];
-        else
-            $this->zoom = 12;
+        if (isset($_REQUEST['tid']) AND is_numeric($_REQUEST['tid'])) {
+            $church = \Eloquent\Church::find($_REQUEST['tid']);
+            
+            $this->location = $church->location;
+            $this->church_id = $_REQUEST['tid'];   
+        }
+        
+        if(isset($_REQUEST['map'])) {
+            $parts = explode('/',$_REQUEST['map']);
+            foreach($parts as $part) {
+                if(!is_numeric($part)) return;
+            }
+            
+            if(count($parts) == 3) {
+                $this->center = [
+                    'zoom' => $parts[0],
+                    'lat' => $parts[1],
+                    'lon' => $parts[2]
+                ];
+            }
+            
+            if(count($parts) == 2) {
+                $this->center = [
+                    'lat' => $parts[0],
+                    'lon' => $parts[1]
+                ];
+            }
+            
+        }
+        
     }
 
 }
