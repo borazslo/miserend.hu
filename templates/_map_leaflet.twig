@@ -60,7 +60,12 @@
         var box = this.getBounds();                
         var params = box['_southWest']['lat'] + ";" + box['_southWest']['lng']  + ";" + box['_northEast']['lat'] + ";" + box['_northEast']['lng'] ;                        
 
-       $( "#maplink" ).attr("href", "/terkep?map=" + this.getZoom()  + "/" + this.getCenter().lat  + "/" + this.getCenter().lng  {% if church_id %} + "&tid={{ church_id }}"  {% endif %} );
+       var link = "/terkep?map=" + this.getZoom()  + "/" + this.getCenter().lat  + "/" + this.getCenter().lng  {% if church_id %} + "&tid={{ church_id }}"  {% endif %} ;
+       $( "#maplink" ).attr("href", link);
+       if(window.location.pathname == '/terkep') {       
+            history.replaceState(null, '', link);
+       }
+
 
         $.getJSON( "/ajax/churchesinbbox?bbox=" + params , function( data ) {                              
             if(data) {
