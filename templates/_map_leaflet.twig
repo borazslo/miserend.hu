@@ -68,7 +68,7 @@
     
     function loadBoundary(e) {
         {% if boundary %}        
-            $.getJSON( "http://192.168.33.10/ajax/boundarygeojson?osm={{ boundary }}" , function( data ) {
+            $.getJSON( "/ajax/boundarygeojson?osm={{ boundary }}" , function( data ) {
                     if(data) {
                         var boundaryLayer = L.geoJSON(data, { style: areaStyle
                            /* onEachFeature: onEachFeature */ 
@@ -76,7 +76,6 @@
                         /* polygon.setStyle({fillColor: '#0000FF'}); */
                         var bounds = L.latLngBounds([]);
                         boundaryLayer.addTo(mymap);
-                        console.log(boundaryLayer.getBounds());
                         mymap.fitBounds(boundaryLayer.getBounds());
                     }
                 });  
@@ -85,7 +84,6 @@
     
     var myLayer = L.geoJSON().addTo(mymap);
     function onMapMoved(e) {
-        console.log(this.getCenter());
         var box = this.getBounds();                
         var params = box['_southWest']['lat'] + ";" + box['_southWest']['lng']  + ";" + box['_northEast']['lat'] + ";" + box['_northEast']['lng'] ;                        
 
@@ -97,6 +95,13 @@
             history.replaceState(null, '', link);
        }
 
+       if( this.getZoom() < 11 ) {
+           if(myLayer) {
+                   myLayer.remove();
+            }
+                   return;
+      }
+       console.log(this.getZoom());
 
         $.getJSON( "/ajax/churchesinbbox?bbox=" + params , function( data ) {                              
             if(data) {
