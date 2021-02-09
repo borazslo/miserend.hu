@@ -43,6 +43,7 @@ class Path {
             ["^egyhazmegye\/list", "diocesecatalogue"],
             ["^impresszum$", "staticpage/impressum"],
             ["^hazirend$", "staticpage/termsandconditions"],
+            ["^terkep$", "map"],
             ["^$", "home"]
         ];
         foreach ($replacementPatterns as $replacementPattern) {
