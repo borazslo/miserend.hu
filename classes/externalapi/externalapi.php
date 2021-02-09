@@ -64,7 +64,8 @@ class ExternalApi {
         curl_setopt($ch, CURLOPT_HTTPHEADER,$header);
         curl_setopt($ch, CURLOPT_HEADER  , false);  // we want headers
         curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
-        
+        curl_setopt($ch, CURLOPT_USERAGENT, "miserend.hu");
+
         $this->rawData = curl_exec($ch);
     
         $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE );      
@@ -76,7 +77,7 @@ class ExternalApi {
                 break;
 
             default:
-                throw new \Exception("External API returned bad http response code:" . $this->responseCode);
+                throw new \Exception("External API returned bad http response code: " . $this->responseCode. "\n<br>" . $this->rawData);
                 break;
         }        
     }

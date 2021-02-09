@@ -37,6 +37,10 @@ class Map extends Html {
             
         }
         
+        if(isset($_REQUEST['boundary'])) {
+            $this->boundary = $_REQUEST['boundary'];
+        }
+        
     }
 
 }

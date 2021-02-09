@@ -19,8 +19,9 @@
     }
     logo.addTo(mymap);
         
-    //befpre .setView!
+    //before .setView!
     mymap.on('load', onMapMoved);
+    mymap.on('load', loadBoundary);
 
     mymap.setView(
         {% if center %}
@@ -52,15 +53,45 @@
         });
         var marker = L.marker([{{ location.lat }}, {{ location.lon}}], {icon: greenIcon}).addTo(mymap);
     {% endif %}
-            
-
+    
+    /* Feltételes formázásra példa itt: http://jsfiddle.net/hx5pxdt8/ */
+    function areaStyle(feature){
+	return {
+            fillColor: 'blue',
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.2
+          }
+    };
+    
+    function loadBoundary(e) {
+        {% if boundary %}        
+            $.getJSON( "http://192.168.33.10/ajax/boundarygeojson?osm={{ boundary }}" , function( data ) {
+                    if(data) {
+                        var boundaryLayer = L.geoJSON(data, { style: areaStyle
+                           /* onEachFeature: onEachFeature */ 
+                        });
+                        /* polygon.setStyle({fillColor: '#0000FF'}); */
+                        var bounds = L.latLngBounds([]);
+                        boundaryLayer.addTo(mymap);
+                        console.log(boundaryLayer.getBounds());
+                        mymap.fitBounds(boundaryLayer.getBounds());
+                    }
+                });  
+        {% endif %}    
+    }
+    
     var myLayer = L.geoJSON().addTo(mymap);
     function onMapMoved(e) {
         console.log(this.getCenter());
         var box = this.getBounds();                
         var params = box['_southWest']['lat'] + ";" + box['_southWest']['lng']  + ";" + box['_northEast']['lat'] + ";" + box['_northEast']['lng'] ;                        
 
-       var link = "/terkep?map=" + this.getZoom()  + "/" + this.getCenter().lat  + "/" + this.getCenter().lng  {% if church_id %} + "&tid={{ church_id }}"  {% endif %} ;
+       var link = "/terkep?map=" + this.getZoom()  + "/" + this.getCenter().lat  + "/" + this.getCenter().lng  {% if church_id %} + "&tid={{ church_id }}"  {% endif %} {% if boundary %} + "&boundary={{ boundary }}"  {% endif %} ;
+                     
+       
        $( "#maplink" ).attr("href", link);
        if(window.location.pathname == '/terkep') {       
             history.replaceState(null, '', link);
@@ -79,7 +110,7 @@
                     var current = {% if church_id %} {{ church_id }} {% else %} -1 {% endif %};
                     if( current != val.id) {
                         var geojsonFeature = {
-                            "type": "Feature",
+                            "type": "Feature",                                                      
                             "properties": {
                                 "name": val.nev,
                                 "popupContent": "<a href='/templom/" + val.id.toString() + "'>"  + val.nev + "</a>"
