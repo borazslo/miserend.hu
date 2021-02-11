@@ -91,6 +91,10 @@ class Church extends \Html\Html {
             $this->favorite = 1;
         }
 
+        $data = \Html\Map::getGeoJsonDioceses();                
+        $this->dioceseslayer = [];
+        $this->dioceseslayer['geoJson'] = json_encode($data);        
+        
         $this->miserend = $misek;
         $this->alert = LiturgicalDayAlert('html');
     }
