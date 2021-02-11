@@ -5,7 +5,7 @@
  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
    crossorigin=""></script>
-
+   <script src="https://makinacorpus.github.io/Leaflet.TextPath/leaflet.textpath.js"></script>
 <div id="mapid" ></div>
    
 <script>
@@ -41,6 +41,30 @@
     });
     CartoDB_Voyager.addTo(mymap);
     
+    
+    
+    {% if dioceseslayer %}
+    var diocesesLayer = L.geoJSON({{ dioceseslayer.geoJson|raw }}, { 
+            onEachFeature: function (feature, layer) {
+                /*layer.setText('maci maci', {repeat: true, offset: -5});*/
+            },
+            style: {
+                    fillColor: 'blue',
+                    weight: 3,
+                    opacity: 0.4,
+                    color: 'blue',
+                    dashArray: '3',
+                    fillOpacity: 0.2,
+                    fillRule: null,
+                    fill: null,
+                  }
+                           /* onEachFeature: onEachFeature */ 
+    });       
+    diocesesLayer.addTo(mymap);     
+    L.control.layers(null, {'Római katolikus egyházmegyék': diocesesLayer}).addTo(mymap);
+    {% endif %}               
+    
+      
     /* Marker of current church */
     {% if location %}
         var greenIcon = new L.Icon({
@@ -53,32 +77,28 @@
         });
         var marker = L.marker([{{ location.lat }}, {{ location.lon}}], {icon: greenIcon}).addTo(mymap);
     {% endif %}
-    
-    /* Feltételes formázásra példa itt: http://jsfiddle.net/hx5pxdt8/ */
-    function areaStyle(feature){
-	return {
-            fillColor: 'blue',
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.2
-          }
-    };
-    
+      
     function loadBoundary(e) {
         {% if boundary %}        
             $.getJSON( "/ajax/boundarygeojson?osm={{ boundary }}" , function( data ) {
                     if(data) {
-                        var boundaryLayer = L.geoJSON(data, { style: areaStyle
-                           /* onEachFeature: onEachFeature */ 
+                        var boundaryLayer = L.geoJSON(data, { 
+                            style: {
+                                /* Feltételes formázásra példa itt: http://jsfiddle.net/hx5pxdt8/ */
+                                fillColor: 'blue',
+                                weight: 2,
+                                opacity: 1,
+                                color: 'white',
+                                dashArray: '3',
+                                fillOpacity: 0.2,
+                              }
                         });
-                        /* polygon.setStyle({fillColor: '#0000FF'}); */
                         var bounds = L.latLngBounds([]);
                         boundaryLayer.addTo(mymap);
                         mymap.fitBounds(boundaryLayer.getBounds());
+                        // mymap.setZoom(mymap.getZoom() - 1 );
                     }
-                });  
+                });                  
         {% endif %}    
     }
     
@@ -101,8 +121,7 @@
             }
                    return;
       }
-       console.log(this.getZoom());
-
+      
         $.getJSON( "/ajax/churchesinbbox?bbox=" + params , function( data ) {                              
             if(data) {
                 myLayer.remove();
@@ -133,7 +152,7 @@
     }
         
     mymap.on('moveend', onMapMoved);
-        
+            
     function onEachFeature(feature, layer) {
         // does this feature have a property named popupContent?
         if (feature.properties && feature.properties.popupContent) {
