@@ -101,6 +101,7 @@ CREATE TABLE `egyhazmegye` (
   `felelos` varchar(20) NOT NULL DEFAULT '',
   `email` varchar(50) NOT NULL DEFAULT '',
   `csakez` enum('i','n') NOT NULL DEFAULT 'i',
+  `osm_relation` INT(45) NULL,
   PRIMARY KEY (`id`),
   KEY `id` (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 PACK_KEYS=1;
