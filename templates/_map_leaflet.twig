@@ -7,14 +7,30 @@
    crossorigin=""></script>
    <script src="https://makinacorpus.github.io/Leaflet.TextPath/leaflet.textpath.js"></script>
 <div id="mapid" ></div>
-   
+
+<!-- https://github.com/mlwilkerson/fa-custom-icon-demo --
+<script src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"></script>
 <script>
+    var faSplat = {
+  prefix: 'fac',
+  iconName: 'splat',
+  icon: [
+    512, 512,
+    [],
+    null,
+    'M414.64,343.52,414,507H108.11V341M226.38,507h66.88V396.77H226.38Zm33.44-139.33c-32.2,0-33.37,28.48-33.37,28.48h66.81S290.79,367.67,259.82,367.67ZM179,156m184.49,42.62L260,119.68l-102.29,78,32.29-24M190,279V173.69m140-1,2.5,106.5M108.11,341,55.63,381.29,190,278.8m224.64,64.72,50.15,37.77L333,280.76m-87.92-17H279v-55.9H245.08Zm17-70.66c-16.33,0-16.92,14.44-16.92,14.44H279S277.74,193.13,262,193.13ZM260,119V4M232,32h56M222,60h77M232,88h56'
+  ]
+}
+FontAwesome.library.add(faSplat)
+<!-- -->
+<script>
+    
     var mymap = L.map('mapid');  
         
     var logo = L.control({position: 'bottomright'});
     logo.onAdd = function(map){
         var div = L.DomUtil.create('div', 'myclass');
-        div.innerHTML= '<div class="leaflet-bar"><a id="maplink" href="/map/"><i class="fa fa-expand-arrows-alt" title=""></i></a></div>';
+        div.innerHTML= '<div class="leaflet-bar"><a id="maplink" href="/map/">  <i class="fac fa-splat"></i><i class="fa fa-expand-arrows-alt" title=""></i></a></div>';
         return div;
     }
     logo.addTo(mymap);
@@ -65,12 +81,13 @@
     {% endif %}               
     
       
+      
     /* Marker of current church */
     {% if location %}
         var greenIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            iconUrl: '/img/marker_church_gr.png', // https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
+            iconSize: [27, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
             shadowSize: [41, 41]
@@ -126,6 +143,34 @@
             if(data) {
                 myLayer.remove();
                 myLayer = L.geoJSON(null, {
+                    
+                    
+                    
+                      pointToLayer: function(feature, latlng) {
+                          var random = Math.floor(Math.random() * 4);
+                          console.log(random);
+                          if(random > 1 ) var iconUrl = '/img/marker_church_rm_inv.png';
+                          else if (random > 0) var iconUrl = '/img/marker_church_gr_inv.png';
+                          else var iconUrl = '/img/marker_church_rm.png';
+                          
+                          var greenIcon = new L.Icon({
+            iconUrl: iconUrl, // https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [27, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+                          
+                          
+        console.log(latlng, feature);
+        return L.marker(latlng, {
+          icon: greenIcon
+        });
+    } , 
+                    
+                    
+                    
                     onEachFeature: onEachFeature
                 }).addTo(mymap);
 

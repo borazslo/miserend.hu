@@ -692,7 +692,7 @@ function searchChurchesWhere($args) {
     }
 
     if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {
-        $where[] = "egyhazmegye IN (17,18)";
+        $where[] = "egyhazmegye IN (17,18, 34)";
     }
 
     if ($args['ehm'] != 0)
@@ -731,7 +731,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         $where[] = " m.tid IN (" . implode(",", $tids) . ")";
     }
     if ($args['gorog'] == 'gorog') {
-        $where[] = "egyhazmegye IN (17,18)";
+        $where[] = "egyhazmegye IN (17,18,34)";
     }
     //milyen nap
     if ($args['mikor'] == 'x')
@@ -824,13 +824,13 @@ function searchMasses($args, $offset = 0, $limit = 20) {
                 if ($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'gor')
                     $notgor[] = $abbrev;
             $where[] = "( m.milyen REGEXP '(^|,)(gor)([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' OR 
-                        ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen NOT REGEXP '(^|,)(" . implode("|", $notgor) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
+                        ( egyhazmegye IN (17,18,34) AND m.milyen NOT REGEXP '(^|,)(" . implode("|", $notgor) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
         } elseif ($args['ritus'] == 'rom') {
             foreach ($attributes as $abbrev => $attribute)
                 if ($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'rom')
                     $notrom[] = $abbrev;
-            $where[] = "( (m.milyen NOT REGEXP '(^|,)(" . implode("|", $notrom) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' AND egyhazmegye NOT IN (17,18)) OR 
-                        ( egyhazmegye IN (17,18) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
+            $where[] = "( (m.milyen NOT REGEXP '(^|,)(" . implode("|", $notrom) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' AND egyhazmegye NOT IN (17,18,34)) OR 
+                        ( egyhazmegye IN (17,18,34) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
         } else {
             $where[] = " m.milyen REGEXP '(^|,)(" . $args['ritus'] . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
         }
