@@ -121,8 +121,6 @@ FontAwesome.library.add(faSplat)
     }
     
     function layerIcon(feature, latlng, icon) {
-        console.log(feature.properties);
-
         if(feature.properties.active == 1 ) {
             if( feature.properties.denomination == 'roman_catholic') var iconUrl = '/img/marker_church_rm_inv.png';
             else if( feature.properties.denomination == 'greek_catholic') var iconUrl = '/img/marker_church_gr_inv.png';
@@ -214,7 +212,6 @@ FontAwesome.library.add(faSplat)
                         
                         if( val.active == 1 ) {
                             if( val.denomination == 'roman_catholic') {                            
-                                console.log('hozzáadva');
                                 activeRomanLayer.addData(geojsonFeature);
                             } else if ( val.denomination == 'greek_catholic') {
                                 activeGreekLayer.addData(geojsonFeature);
