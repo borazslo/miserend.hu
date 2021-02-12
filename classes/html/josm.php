@@ -268,7 +268,7 @@ class Josm extends Html {
                 $html .= "</td></tr>";
                 //}
                 //DENOM
-                if (in_array($church['egyhazmegye'], array(17, 18))) {
+                if (in_array($church['egyhazmegye'], array(17, 18, 34))) {
                     $denomN = 'görögkatolikus';
                     $denom = 'greek_catholic';
                 } else {
