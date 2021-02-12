@@ -19,11 +19,13 @@ class ChurchesInBBox extends Ajax {
             $church->photos;
             if (isset($church->photos[0])) $thumbnail = $church->photos[0]->smallUrl;
             else $thumbnail = false;
-                            
+            
             $return[] = [
                 'id' => $church->id,
                 'nev' => $church->nev,
                 'thumbnail' => $thumbnail,
+                'denomination' => $church->denomination,
+                'active' => $church->miseaktiv,
                 'lat'=> $church->location->lat,
                 'lon'=> $church->location->lon              
             ];
