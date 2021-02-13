@@ -30,14 +30,14 @@ class LostPassword extends \Html\Html {
     }
 
     function sendNewPasswordMail() {
-        $email = new \Mail();
+        $email = new \Eloquent\Email();
         $email->subject = "Jelszó emlékeztető - Miserend.hu";
 
-        $email->content = "Kedves " . $this->recoveredUser->username . "!<br/><br/>";
-        $email->content.="\n\nKérésedre küldjük a bejelentkezéshez szükséges újjelszót:";
-        $email->content.="\n" . $this->newpassword . "<br/><br>";
-        $email->content.="Kérjük mihamarabb változtasd meg a jelszót.<br/><br/>";
-        $email->content.="\n\nMiserend.hu \nhttps://miserend.hu";
+        $email->body = "Kedves " . $this->recoveredUser->username . "!<br/><br/>";
+        $email->body.="\n\nKérésedre küldjük a bejelentkezéshez szükséges újjelszót:";
+        $email->body.="\n" . $this->newpassword . "<br/><br>";
+        $email->body.="Kérjük mihamarabb változtasd meg a jelszót.<br/><br/>";
+        $email->body.="\n\nMiserend.hu \nhttps://miserend.hu";
 
         $email->to = $this->recoveredUser->email;
         $email->send();

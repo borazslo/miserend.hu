@@ -16,7 +16,7 @@
                 {% endif %}
             {% block extraInput %}{% endblock %}
             <input type=hidden name=type value="{{ mail.type }}">
-            <textarea name="text" id="codehere" class="form-control tinymce" rows="20" style="width:100%;margin-bottom:6px">{{ mail.content|nl2br }}</textarea>
+            <textarea name="text" id="codehere" class="form-control tinymce" rows="20" style="width:100%;margin-bottom:6px">{{ mail.body|nl2br }}</textarea>
         </div>
 
         <br/>&nbsp;

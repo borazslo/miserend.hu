@@ -147,7 +147,7 @@ class Remark {
         if(isset($this->tid)) $this->church_id = $this->tid;
         else $this->tid = $this->church_id;
         
-        $mail = new \Mail();
+        $mail = new \Eloquent\Email();
         if (!isset($this->EmailSubject))
             $mail->subject = "Miserend - észrevétel (" . $this->tid . ")";
         else
@@ -179,6 +179,7 @@ class Remark {
 
         $mail->content = "<div style='display: none; visibility: hidden; color: #ffffff; font-size: 0px;'>" . $this->PreparedText4Email . "\n\n</div>" . $mail->content;
 
+        $mail->body = $mail->content; unset($mail->content);
         $mail->to = $to;
         $mail->send();
     }

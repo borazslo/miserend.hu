@@ -181,13 +181,13 @@ class User {
             $this->presave('password', $pwd);
 
             //email küldése
-            $email = new Mail();
+            $email = new \Eloquent\Email();
             $email->subject = 'Regisztráció - Miserend.hu';
-            $email->content = "Kedves " . $this->username . "!<br/><br/>";
-            $email->content = "Köszöntünk a Miserend.hu felhasználói között!<br/><br/>";
-            $email->content .="\n\nA belépéshez szükséges jelszó: $pwd<br/>";
-            $email->content .="\nA belépést követően a BEÁLLÍTÁSOK menüben kérjük megváltoztatni a jelszót.<br><br/>";
-            $email->content .="\n\nMiserend.hu \nhttps://miserend.hu";
+            $email->body = "Kedves " . $this->username . "!<br/><br/>";
+            $email->body = "Köszöntünk a Miserend.hu felhasználói között!<br/><br/>";
+            $email->body .="\n\nA belépéshez szükséges jelszó: $pwd<br/>";
+            $email->body .="\nA belépést követően a BEÁLLÍTÁSOK menüben kérjük megváltoztatni a jelszót.<br><br/>";
+            $email->body .="\n\nMiserend.hu \nhttps://miserend.hu";
             $email->to = $this->presaved['email'];
             if ($email->send())
                 addMessage("Elküldtük az emailt az új regisztrációról.", "success");

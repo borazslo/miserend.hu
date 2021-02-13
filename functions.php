@@ -1240,12 +1240,12 @@ function assignUpdates() {
     //echo "Kiosztható: ".$cKioszthato;
     //echo $cUsers * $limit;
     if (($cUsers * $limit) > $cKioszthato) {
-        $mail = new Mail();
+        $mail = new \Eloquent\Email();
         $mail->subject = "Miserend.hu - Önkéntes FIGYELMEZTETÉS!";
-        $mail->content = "Itt a vége?\n\n" . $cUsers . " önkéntesünk van. Nekik kéne kiosztani " . ( $cUsers * $limit ) . " templomot, de csak " . $cKioszthato . " templom van a raktáron.";
+        $mail->body = "Itt a vége?\n\n" . $cUsers . " önkéntesünk van. Nekik kéne kiosztani " . ( $cUsers * $limit ) . " templomot, de csak " . $cKioszthato . " templom van a raktáron.";
         if ($cKioszthato > 0) {
             $limit = ceil($cKioszthato / $cUsers);
-            $mail->content .= "\nÚgy határoztunk hát, hogy csak " . $limit . " templomot osztunk ki fejenként.";
+            $mail->body.= "\nÚgy határoztunk hát, hogy csak " . $limit . " templomot osztunk ki fejenként.";
         }
         $mail->Send($config['mail']['debugger']);
     }
@@ -1339,7 +1339,7 @@ function assignUpdates() {
         else
             $ol = "és már csak";
 
-        $mail = new Mail();
+        $mail = new \Eloquent\Email();
 
         $mail->subject = "Miserend frissítése, " . date('W') . ". hét";
         $text = "
@@ -1373,7 +1373,7 @@ EOT;
             <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
         ";
         $mail->type = "heti7templom_hetiadag";
-        $mail->content = $text;
+        $mail->body = $text;
         $mail->Send($user['email']);
         /* */
     }
@@ -1425,7 +1425,7 @@ function clearoutVolunteers() {
                 $nev = $user->username;
 
 
-            $mail = new Mail();
+            $mail = new \Eloquent\Email();
 
             $mail->subject = "Miserend önkéntesség";
 
@@ -1438,7 +1438,7 @@ function clearoutVolunteers() {
 EOD;
             $text .= "<p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor módosíthatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
         ";
-            $mail->content = $text;
+            $mail->body = $text;
             $mail->type = "heti7templom_lemondas";
             $mail->Send($user->email);
             $user->presave('volunteer', 0);

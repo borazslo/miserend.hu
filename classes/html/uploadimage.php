@@ -37,7 +37,7 @@ class UploadImage extends Html {
         $eszrevetel .= $photo->title . "<br/><br/>\n";
         $eszrevetel .= "https://miserend.hu/" . $photo->url . "\n";
 
-        $mail = new \Mail();
+        $mail = new \Eloquent\Email();
         $mail->subject = "Miserend - új kép érkezett";
 
         //Mail küldése az egyházmegyei felelősnek
@@ -46,7 +46,7 @@ class UploadImage extends Html {
             foreach ($this->church->religious_administration->diocese->responsible as $responsible) {
                 $responsibleUser = new \User($responsible);
                 if ($responsibleUser->uid > 0) {
-                    $mail->content = "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
+                    $mail->body = "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
                     $mail->send($responsibleUser->email);
                 }
             }
@@ -54,12 +54,12 @@ class UploadImage extends Html {
 
         if (!empty($this->church->kontaktmail)) {
             //Mail küldés az karbantartónak felelősnek
-            $mail->content = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
+            $mail->body = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
             $mail->send($this->church->kontaktmail);
         }
 
         //Mail küldése a debuggernek, hogy boldog legyen
-        $mail->content = "Kedves admin!\n\n<br/><br/>Az egyik templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
+        $mail->body = "Kedves admin!\n\n<br/><br/>Az egyik templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
         global $config;
         $mail->send($config['mail']['debugger']);
 

@@ -29,8 +29,8 @@ class RemarkFeedback extends Email {
         if ($type) {
             $this->mail->type = "feedback_" . $type;
             global $twig;
-            $content = $twig->render('email/remarkfeedback' . strtolower($type) . '.twig', (array) $this);
-            $this->mail->content = $content;
+            $body = $twig->render('email/remarkfeedback' . strtolower($type) . '.twig', (array) $this);
+            $this->mail->body= $body;
         }
     }
 
