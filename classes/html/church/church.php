@@ -57,14 +57,8 @@ class Church extends \Html\Html {
         if ($user->checkRole('miserend') OR $user->checkRole('ehm:' . $this->religious_administration->diocese->id) OR ( isset($responsible) AND in_array($user->login, $responsible))) {
             $nev = " <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
                     . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-
-            $query = "select allapot from remarks where church_id = '" . $tid . "' GROUP BY allapot ORDER BY allapot limit 5;";
-            $result = mysql_query($query);
-            $allapotok = array();
-            while ($row = mysql_fetch_assoc($result)) {
-                if ($row['allapot'])
-                    $allapotok[] = $row['allapot'];
-            }
+            
+            $allapotok = \Eloquent\Remark::where('church_id',$tid)->groupBy('allapot')->pluck('allapot')->toArray();            
             if (in_array('u', $allapotok))
                 $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
             elseif (in_array('f', $allapotok))
