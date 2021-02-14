@@ -63,6 +63,7 @@
 {% endblock %}
 
 {% block content %}
+        {% if not newusercreated %}
 	<form method="post">
 		<input type="hidden" name="q" value="user/edit">
 
@@ -72,7 +73,7 @@
     		<label for="username">Felhasználói név {% include 'help_link.twig' with {'id': 18} %}</label>
     		<input type="text" class="form-control" id="username" name="edituser[username]" {% if not new %}readonly{% endif %} value="{{ edituser.username }}">
     		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-		    {% if helptext %}<p class="help-block">Lehetőség szerint ékezet és speciális karakterek nélkül, maximum 20 betű. Szóköz, idézőjel és aposztróf NEM lehet benne! Ez a név azonosít, ezzel tudsz majd belépni, de alább lehetőség van külön becenév megadására is.</p>{% endif %}
+		    {% if helptext %}<p class="help-block">Ékezet és speciális karakterek nélkül, maximum 20 betű. Szóköz, idézőjel és aposztróf NEM lehet benne! Ez a név azonosít, ezzel tudsz majd belépni, de alább lehetőség van külön becenév megadására is.</p>{% endif %}
   		</div>
 
 		<div class="form-group">
@@ -154,4 +155,5 @@
 
 		<input class="form-control" type="submit" name="submit" value="{% if new %}Létrehoz{% else %}Módosít{% endif %}"/>	    
 	</form>
+        {% endif %}
 {% endblock %}

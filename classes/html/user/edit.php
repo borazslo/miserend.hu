@@ -18,23 +18,26 @@ class Edit extends \Html\Html {
 
     function modify() {
         global $user;
-
-        $newuser = new \User($_REQUEST['edituser']['uid']);
-
+        
+        $newuser = new \User(isset($_REQUEST['edituser']['uid']) ? $_REQUEST['edituser']['uid'] : false);
+        
         if ((!isset($_REQUEST['terms']) OR $_REQUEST['terms'] != 1 ) AND $newuser->uid == 0 AND $user->uid == 0) {
             addMessage("El kell fogadni a <i>Házirendet és szabályzatot</i>!", 'danger');
             return false;
         } else {
             try {
-                $newuser->submit($_REQUEST['edituser']);
-                if ($user->uid < 1) {
-                    global $config;
-                    //require_once('moduls/miserend.php');
-                    //$tartalom = miserend_index();
-                    header("Location: " . $config['path']['domain']);
-                } else {
-                    $this->uid = $newuser->uid;
+                if($newuser->submit($_REQUEST['edituser'])) {                
+                    if ($user->uid < 1) {
+                        global $config;                    
+                        //require_once('moduls/miserend.php');
+                        //$tartalom = miserend_index();
+                        $this->newusercreated = true;
+                    } else {
+                        $this->uid = $newuser->uid;
+                    }
                     return true;
+                } else {
+                    return false;
                 }
             } catch (\Exceptions $e) {
                 addMessage($e->getMessage());
@@ -52,16 +55,24 @@ class Edit extends \Html\Html {
             $vars['roles'][$role] = $role;
         }
 
-        //Ha folyamatban van a szerkesztés, akkor azokat az adatokat tesszük be
+        //Ha folyamatban van meglévő felhasználó szerkesztéss, akkor azokat az adatokat tesszük be
         if (is_array($uid)) {
             $edituser = new \User();
             foreach ($uid as $key => $value) {
                 $edituser->$key = $value;
             }
+        //Ha folyamatban van új felszanáló szerkesztése
+        } elseif ($user->uid == 0 AND isset($_REQUEST['edituser'])) {    
+            $edituser = new \User();
+            foreach ($_REQUEST['edituser'] as $key => $value) {
+                $edituser->$key = $value;
+            }
+
+            
         } else
             $edituser = new \User($uid);
 
-        if ($edituser->uid == 0 AND $user->uid == 0) {
+        if ($edituser->uid == 0 AND $user->uid == 0) {                                
             $vars['title'] = "Regisztráció";
             $vars['new'] = true;
             $vars['helptext'] = true;
@@ -88,7 +99,8 @@ class Edit extends \Html\Html {
         if ($edituser->nickname == '*vendég*')
             $edituser->nickname = false;
 
-        $edituser->getRemarks(6);
+        if($user->loggedin)
+            $edituser->getRemarks(6);
 
         if ($user->checkRole('user')) {
             $user->isadmin = true;
@@ -100,7 +112,8 @@ class Edit extends \Html\Html {
             $this->$key = $value;
         }
         
-        $this->edituser->processResponsabilities();        
+        if($user->loggedin)
+            $this->edituser->processResponsabilities();        
     }
 
 }

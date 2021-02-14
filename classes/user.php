@@ -143,10 +143,10 @@ class User {
 
         $dangers = array(
             'uid' => 'Probléma támadt az azonosítóval!',
-            'username' => 'Probléma a felhasználónévvel! (A felhasználó nevet nem lehet megváltoztatni és nem lehet olyan név, ami már használatban van.)',
+            'username' => 'Probléma a felhasználónévvel! (Nem megfelelő karakterek, vagy már használatban van. A felhasználó nevet nem lehet megváltoztatni.)',
             'nickname' => 'Probléma a becenévvel!',
             'name' => 'Probléma a névvel!',
-            'email' => 'Nem megfelelő email cím!',
+            'email' => 'Nem megfelelő email cím! Talán már használatban van?',
             'volunteer' => 'Hibás értéke van az önkéntességnek!',
             'ok' => 'Csak az „i” = „igen” és a „n” = „nem” elfogadható érték az aktivitást illetően!',
             'roles' => 'Hibás formátumú jogkörök!',
@@ -161,7 +161,8 @@ class User {
             }
         }
 
-        if ($vars['password1'] != '' OR $vars['password2'] != '') {
+        
+        if (isset($vars['uid']) AND ( $vars['password1'] != '' OR $vars['password2'] != '')) {
             if ($vars['password1'] != $vars['password2'] OR $vars['password1'] == '') {
                 addMessage('A két jelszó nem egyezik meg egymással', 'danger');
                 $return = false;
@@ -172,33 +173,28 @@ class User {
                 }
             }
         }
-
+        
         if ($return == false)
             return false;
-
-        if (!$vars['uid']) {
+               
+        if (!isset($vars['uid'])) {
             $pwd = $this->generatePassword();
-            $this->presave('password', $pwd);
-
-            //email küldése
-            $email = new \Eloquent\Email();
-            $email->subject = 'Regisztráció - Miserend.hu';
-            $email->body = "Kedves " . $this->username . "!<br/><br/>";
-            $email->body = "Köszöntünk a Miserend.hu felhasználói között!<br/><br/>";
-            $email->body .="\n\nA belépéshez szükséges jelszó: $pwd<br/>";
-            $email->body .="\nA belépést követően a BEÁLLÍTÁSOK menüben kérjük megváltoztatni a jelszót.<br><br/>";
-            $email->body .="\n\nMiserend.hu \nhttps://miserend.hu";
-            $email->to = $this->presaved['email'];
-            if ($email->send())
-                addMessage("Elküldtük az emailt az új regisztrációról.", "success");
+            $this->presave('password', $pwd);                
         }
 
         if (!$this->save()) {
             addMessage("Nem sikerült elmenteni. Pedig minden rendben volt előtte.", "warning");
             return false;
         } else {
-            if (!$vars['uid'])
+            if (!isset($vars['uid'])) {
                 addMessage("A felhasználót sikeresen létrehoztuk.", "success");
+                
+                $this->newpwd = $pwd;
+                $email = new \Eloquent\Email();
+                $email->render('user_welcome', $this);
+                if ($email->send($this->email))
+                    addMessage("Elküldtük az emailt az új regisztrációról.", "success");                                
+            }    
             else
                 addMessage("A változásokat elmentettük.", "success");
         }
@@ -225,7 +221,7 @@ class User {
         } elseif (in_array($key, array('username', 'login'))) {
             if ($this->uid == 0) {
                 if (!checkUsername($val))
-                    return false;
+                    return false;                    
                 $this->presaved['login'] = sanitize($val);
             } elseif ($this->username != $val) {
                 return false;
@@ -274,7 +270,7 @@ class User {
             if (!filter_var($val, FILTER_VALIDATE_EMAIL)) {
                 return false;
             }
-            if ($this->isEmailInUse($val) AND $val != $this->email) {
+            if ($this->isEmailInUse($val) AND ( !isset($this->email) OR $val != $this->email )) {
                 return false;
             }
             $this->presaved[$key] = $val;
@@ -323,7 +319,10 @@ class User {
         $this->username = $this->login;
         $this->nickname = $this->becenev;
         $this->name = $this->nev;
-        $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
+        if(isset($this->jogok))
+            $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
+        else
+            $this->rolse = [];
 
         unset($this->presaved);
 
