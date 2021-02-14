@@ -41,21 +41,6 @@ class DioceseCatalogue extends Html {
             }
             
             return;
-            $query = "select templomok.id,templomok.nev,templomok.varos,espereskerulet.nev from espereskerulet, templomok where espereskerulet.id=templomok.espereskerulet and templomok.egyhazmegye=$ehm order by templomok.espereskerulet, templomok.varos";
-            if (!$lekerdez = mysql_query($query))
-                echo "<br>HIBA!<br>$query<br>" . mysql_error();
-            $a = 0;
-            $excel = '';
-            while (list($tid, $tnev, $varos, $espker) = mysql_fetch_row($lekerdez)) {
-                $a++;
-                if (!isset($espkerell) OR $espker != $espkerell) {
-                    $txt.= "<br><h3>$espker espereskerület</h3>";
-                    $espkerell = $espker;
-                }
-                $txt.= "$a. [$tid] $tnev ($varos)<br>";
-                $excel.="\n$tid;$tnev;$varos;$espker";
-            }
-            $txt.="<br><br><span class=alap>Az alábbi szöveget kimásolva excelbe importálható.<br>Excelben: Adatok / Szövegből oszlopok -> táblázattá alakítható</span><br><textarea class=urlap cols=60 rows=20>$excel</textarea>";
         }
 
 
