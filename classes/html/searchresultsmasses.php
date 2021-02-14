@@ -2,6 +2,8 @@
 
 namespace Html;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class SearchResultsMasses extends Html {
 
     public function __construct() {
@@ -34,19 +36,15 @@ class SearchResultsMasses extends Html {
 
         $ma = date('Y-m-d');
         $holnap = date('Y-m-d', (time() + 86400));
-
+      
         if ($ehm > 0) {
-            $query = "select nev from egyhazmegye where id=$ehm and ok='i'";
-            $lekerdez = mysql_query($query);
-            list($ehmnev) = mysql_fetch_row($lekerdez);
+            $ehmnev = DB::table('egyhazmegye')->where('id',$ehm)->pluck('nev')[0];            
         }
-
+                
         if ($espkerT[$ehm] > 0) {
-            $query = "select nev from espereskerulet where id='$espkerT[$ehm]'";
-            $lekerdez = mysql_query($query);
-            list($espkernev) = mysql_fetch_row($lekerdez);
+            $espkernev = DB::table('espereskerulet')->where('id',$espkerT[$ehm])->pluck('nev')[0];            
         }
-
+                
         $zeneT = array('g' => 'gitáros', 'o' => 'orgonás', 'cs' => 'csendes', 'na' => 'meghátorazatlan');
         $korT = array('csal' => 'családos', 'd' => 'diák', 'ifi' => 'ifjúsági', 'na' => 'meghátorazatlan');
         $ritusT = array('gor' => 'görögkatolikus', 'rom' => 'római katolikus', 'regi' => 'régi rítusú');
