@@ -14,7 +14,10 @@ class LostPassword extends \Html\Html {
                 $this->recoveredUser->newPassword($this->newpassword);
                 $this->sendNewPasswordMail();
             }
+        } else {
+            $this->input['data'] = \Request::Text('data');
         }
+        
     }
 
     function recoverUser() {
