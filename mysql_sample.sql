@@ -942,16 +942,12 @@ CREATE TABLE `user` (
   `login` varchar(20) NOT NULL DEFAULT '',
   `jelszo` varchar(255) NOT NULL DEFAULT '',
   `jogok` varchar(200) NOT NULL DEFAULT '',
-  `ok` enum('i','n','x','o') NOT NULL DEFAULT 'i',
-  `letrehozta` varchar(50) NOT NULL DEFAULT '',
   `regdatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `lastlogin` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `lastactive` datetime DEFAULT NULL,
   `email` varchar(100) NOT NULL DEFAULT '',
   `becenev` varchar(50) NOT NULL DEFAULT '',
-  `nev` varchar(100) NOT NULL DEFAULT '',
-  `adminmegj` text NOT NULL,
-  `atvett` enum('i','n') NOT NULL DEFAULT 'i',
+  `nev` varchar(100) NOT NULL DEFAULT '',  
   `volunteer` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`uid`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5822 DEFAULT CHARSET=utf8;
