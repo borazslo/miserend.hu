@@ -383,6 +383,7 @@ class User {
                 $favorite->save();
                 }
         }
+        return true;
     }
 
     function removeFavorites($tids) {
@@ -392,18 +393,13 @@ class User {
             if (!is_numeric($tid))
                 return false;
         }
-
-        $query = "DELETE FROM favorites WHERE ";
-        foreach ($tids as $key => $tid) {
-            $query .= "( uid = " . $this->uid . " AND tid = " . $tid . ")";
-            if ($key < count($tids) - 1)
-                $query .= " OR ";
-        }
-        $query .= ";";
-        if (mysql_query($query))
+        try {
+            $query = \Eloquent\Favorite::where('uid',$this->uid)->whereIn('tid',$tids)->delete();
             return true;
-        else
+        } catch (Exception $ex) {
+            addMessage($ex->getMessage(), 'danger');
             return false;
+        }                
     }
 
     function isEmailInUse($val) {
