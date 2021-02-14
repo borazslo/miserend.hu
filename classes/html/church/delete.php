@@ -10,8 +10,6 @@ class Delete extends \Html\Html {
             throw new \Exception('Nincs jogosultságod a templomot törölni.');
         }
 
-        $this->title = 'Templom és miserendje törlése';
-        $this->template = 'layout.twig';
         $this->input['tid'] = $path[0];
 
         $this->church2delete = \Eloquent\Church::find($this->input['tid']);
@@ -36,23 +34,7 @@ class Delete extends \Html\Html {
     }
 
     function askConfirmation() {
-        global $linkveg, $m_id, $user;
-
-        $tid = $this->input['tid'];
-
-        $kiir = "\n<span class=kiscim>Biztosan törölni akarod a következő templomot?<br><font color=red>FIGYELEM! A kapcsolódó misék és képek is törlődnek!</font></span>";
-
-        $query = "select nev from templomok where id='$tid'";
-        list($cim) = mysql_fetch_row(mysql_query($query));
-        if (!empty($cim)) {
-            $kiir.="\n<br><br><span class=alap><b><i>$cim</i></b></span>";
-
-            $kiir.="<br><br><a href='/templom/$tid/delete?confirmation=confirmed' class=link>Igen</a> - <a href='/templom/$tid/edit' class=link>NEM</a>";
-        } else {
-            $kiir.="<br><br><span class=hiba>HIBA! Ilyen templom nincs!</span>";
-        }
-
-        $this->content = $kiir;
+        // church/delete.twig
     }
 
 }
