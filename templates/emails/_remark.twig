@@ -1,0 +1,9 @@
+<a href="https://miserend.hu/?templom={{ tid }}">{{ church.nev }} ({% if church.ismertnev %}{{ church.ismertnev }},{% endif %} {{ church.varos }})</a><br/>
+
+{% if email %}
+<i><a href="mailto:{{ email }}" target="_blank">{{ name }}</a> ({{ username }}):</i><br/>
+{% else %}
+<i>{{ name }} ({{ username }}):</i><br/>
+{% endif %}
+
+{{ text }}

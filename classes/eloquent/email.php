@@ -55,11 +55,11 @@ class Email extends \Illuminate\Database\Eloquent\Model {
                     return $this->save();
                 }
             }
-        } else {
-            $this->status = "error";
-            $this->save();
+        } else {            
             addMessage('Nem tudtuk elküldeni az emailt. Kevés az adat.', 'danger');
         }
+        $this->status = "error";
+        $this->save();
         return false;
     }
     
@@ -69,6 +69,25 @@ class Email extends \Illuminate\Database\Eloquent\Model {
         $this->header = 'MIME-Version: 1.0' . "\r\n";
         $this->header .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
         $this->header .= 'From: ' . $config['mail']['sender'] . "\r\n";        
+    }
+    
+    function render($twigfile, $array) {
+        global $twig;
+        
+        if(!$this->type)
+            $this->type = $twigfile;
+                
+        $rendered = $twig->render('emails/' . strtolower($twigfile) . '.twig', (array) $array);        
+                
+        $lines=explode("\n", $rendered);
+        if(!$this->subject)
+            $this->subject = $lines[0];
+        
+        unset($lines[0]); unset($lines[1]);
+        
+        $this->body = implode("\n", $lines);
+        
+        return true;
     }
     
 }

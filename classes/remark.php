@@ -110,22 +110,11 @@ class Remark {
         $query = "select nev,ismertnev,varos,egyhazmegye, kontaktmail from templomok where id = " . $this->tid . " limit 0,1";
         $lekerdez = mysql_query($query);
         $templom = mysql_fetch_assoc($lekerdez);
-        $eszrevetel = '';
-        $eszrevetel.= "<a href=\"https://miserend.hu/?templom=" . $this->tid . "\">" . $templom['nev'] . " (";
-        if ($templom['ismertnev'] != "")
-            $eszrevetel .= $templom['ismertnev'] . ", ";
-        $eszrevetel .= $templom['varos'] . ")</a><br/>\n";
-        if (isset($this->email))
-            $eszrevetel.= "<i><a href=\"mailto:" . $this->email . "\" target=\"_blank\">" . $this->name . "</a> (" . $this->username . "):</i><br/>\n";
-        else
-            $eszrevetel.= "<i>" . $this->name . " (" . $this->username . "):</i><br/>\n";
-        $eszrevetel.= $this->text . "<br/>\n";
+        $this->church = $templom;
 
         $query = "select email from egyhazmegye where id='" . $templom['egyhazmegye'] . "'";
         $lekerdez = mysql_query($query);
         list($felelosmail) = mysql_fetch_row($lekerdez);
-
-        $this->PreparedText4Email = $eszrevetel;
 
         //Mail küldés az egyházmegyei felelősnek
         if (!empty($felelosmail) AND $felelosmail != '') {
@@ -145,43 +134,10 @@ class Remark {
 
     function sendMail($type, $to) {
         if(isset($this->tid)) $this->church_id = $this->tid;
-        else $this->tid = $this->church_id;
-        
-        $mail = new \Eloquent\Email();
-        if (!isset($this->EmailSubject))
-            $mail->subject = "Miserend - észrevétel (" . $this->tid . ")";
-        else
-            $mail->subject = $this->EmailSubject;
-
-        $mail->content = '';
-        switch ($type) {
-            case 'diocese':
-                $mail->content .= "<strong>Kedves egyházmegyei felelős!</strong>\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templom adataihoz észrevétel érkezett.<br/>\n";
-                $mail->content .= "<div style='margin: 5px 5px 5px 20px;background-color:#D1DDE9;padding:4px;'>\n";
-                $mail->content .= $this->PreparedText4Email;
-                break;
-
-            case 'contact':
-                $mail->content .= "<strong>Kedves templom karbantartó!</strong>\n\n<br/><br/>Az egyik karbantartott templomod adataihoz észrevétel érkezett.<br/>\n";
-                $mail->content .= "<div style='margin: 5px 5px 5px 20px;background-color:#D1DDE9;padding:4px;'>\n";
-                $mail->content .= $this->PreparedText4Email;
-                break;
-
-            case 'debug':
-                $mail->content .= "<strong>Kedves admin!</strong>\n\n<br/><br/>Az egyik templom adataihoz észrevétel érkezett.<br/>\n";
-                $mail->content .= "<div style='margin: 5px 5px 5px 20px;background-color:#D1DDE9;padding:4px;'>\n";
-                $mail->content .= $this->PreparedText4Email;
-                break;
-        }
-
-        $mail->content .= "</div>\n";
-        $mail->content .= "<strong>Köszönjük a munkádat!</strong><br/>\n miserend.hu";
-
-        $mail->content = "<div style='display: none; visibility: hidden; color: #ffffff; font-size: 0px;'>" . $this->PreparedText4Email . "\n\n</div>" . $mail->content;
-
-        $mail->body = $mail->content; unset($mail->content);
-        $mail->to = $to;
-        $mail->send();
+        else $this->tid = $this->church_id;        
+        $mail = new \Eloquent\Email();                
+        $mail->render('remark_'.$type,$this);
+        $mail->send($to);
     }
 
     function changeReliability($reliability) {

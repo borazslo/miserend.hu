@@ -18,7 +18,6 @@ class RemarkFeedback extends Email {
         $this->church = $this->remark->church;
 
         $this->mail->to = $this->remark->email;
-        $this->mail->subject = "Miserend - Köszönjük az észrevételt!";
 
         if (isset($path[1])) {
             $type = $path[1];
@@ -27,10 +26,7 @@ class RemarkFeedback extends Email {
         }
 
         if ($type) {
-            $this->mail->type = "feedback_" . $type;
-            global $twig;
-            $body = $twig->render('email/remarkfeedback' . strtolower($type) . '.twig', (array) $this);
-            $this->mail->body= $body;
+            $this->mail->render('remarkfeedback_' . $type, (array) $this );
         }
     }
 

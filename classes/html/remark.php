@@ -81,7 +81,7 @@ class Remark extends Html {
             addMessage("Nem sikerült elmenteni az észrevételt. Sajánljuk.", "danger");
         if (!$remark->emails())
             addMessage("Nem sikerült elküldeni az értesítő emaileket.", "warning");
-        $content = "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br></br>" . $remark->PreparedText4Email . "<br/><input type='button' value='Ablak bezárása' onclick='self.close()'>";
+        $content = "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br><input type='button' value='Ablak bezárása' onclick='self.close()'>";
         global $config;
         if ($config['debug'] < 1)
             $content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";

@@ -29,24 +29,16 @@ class UploadImage extends Html {
         $photo->save();
         echo "Siker! Feltöltöttük. Jöhet a következő!<br/><img src='" . $photo->smallUrl . "'>";
 
-        $eszrevetel = "<a href=\"https://miserend.hu/templom/" . $this->church->id . "\">" . $this->church->nev . " (";
-        if ($this->church->ismertnev != "")
-            $eszrevetel .= $this->church->ismertnev . ", ";
-        $eszrevetel .= $this->church->varos . ")</a><br/>\n";
-        $eszrevetel .= "<img src='https://miserend.hu/" . $photo->url . "'><br/>\n";
-        $eszrevetel .= $photo->title . "<br/><br/>\n";
-        $eszrevetel .= "https://miserend.hu/" . $photo->url . "\n";
-
-        $mail = new \Eloquent\Email();
-        $mail->subject = "Miserend - új kép érkezett";
-
+        $this->photo = $photo;
+        
         //Mail küldése az egyházmegyei felelősnek
         $this->church->MgetReligious_administration();
         if (isset($this->church->religious_administration->diocese->responsible)) {
             foreach ($this->church->religious_administration->diocese->responsible as $responsible) {
                 $responsibleUser = new \User($responsible);
                 if ($responsibleUser->uid > 0) {
-                    $mail->body = "Kedves egyházmegyei felelős!\n\n<br/><br/>Az egyházmegyéhez tartozó egyik templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
+                    $mail = new \Eloquent\Email();                
+                    $mail->render('image_diocese',$this);
                     $mail->send($responsibleUser->email);
                 }
             }
@@ -54,13 +46,15 @@ class UploadImage extends Html {
 
         if (!empty($this->church->kontaktmail)) {
             //Mail küldés az karbantartónak felelősnek
-            $mail->body = "Kedves templom karbantartó!\n\n<br/><br/>Az egyik karbantartott templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
+            $mail = new \Eloquent\Email();                
+            $mail->render('image_contact',$this);
             $mail->send($this->church->kontaktmail);
         }
 
         //Mail küldése a debuggernek, hogy boldog legyen
-        $mail->body = "Kedves admin!\n\n<br/><br/>Az egyik templomhoz új kép érkezett.<br/>\n" . $eszrevetel;
         global $config;
+        $mail = new \Eloquent\Email();
+        $mail->render('image_debug',$this);
         $mail->send($config['mail']['debugger']);
 
         exit;
