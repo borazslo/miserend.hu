@@ -2,6 +2,8 @@
 
 namespace Api;
 
+use Illuminate\Database\Capsule\Manager as DB;
+        
 class Updated extends Api {
 
     public $format = 'text';
@@ -22,11 +24,9 @@ class Updated extends Api {
             return;
         }
 
-        $query = "SELECT id, moddatum FROM templomok WHERE  moddatum >= '" . $this->date . "' ";
-        $result = mysql_query($query);
-        if (mysql_num_rows($result) > 0)
+        if( DB::table('templomok')->where('moddatum','>=',$this->date)->count() > 0) 
             $this->return = "1";
-        else
+        else 
             $this->return = "0";
     }
 
