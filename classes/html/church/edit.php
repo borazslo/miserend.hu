@@ -210,7 +210,6 @@ class Edit extends \Html\Html {
         $options = ['0' => 'Nincs megadva'];
         $users = \Illuminate\Database\Capsule\Manager::table('user')
                         ->select('login', 'uid')
-                        ->where('ok', 'i')
                         ->orderByRaw("CASE WHEN lastlogin > '" . date('Y-m-d H:i:s', strtotime('-2 month')) . "'     THEN 1 ELSE 0 END desc")
                         ->orderBy('login')->get();
         foreach ($users as $selectibleUser) {
