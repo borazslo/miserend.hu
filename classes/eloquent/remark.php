@@ -27,5 +27,9 @@ class Remark extends \Illuminate\Database\Eloquent\Model {
         return $query->selectCreatedYear()
                         ->groupBy('created_year')->orderBy('created_year');
     }
-
+   
+    public function getChurchAttribute($value) {
+        return \Eloquent\Church::find($this->church_id);
+        
+    }    
 }

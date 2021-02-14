@@ -113,22 +113,18 @@ class User {
     function getRemarks($limit = false, $ago = false) {
         if ($limit == false OR ! is_numeric($limit))
             $limit = 5;
-
+        
+        $query = \Eloquent\Remark::select('*',DB::raw('count(*) as total'))->where(function ($q) {
+                    $q->where('login', $this->username)->orWhere('email', $this->email);
+                });
         if ($ago != false)
-            $datum = " AND datum > '" . date('Y-m-d H:i:s', strtotime("-" . $ago)) . "' ";
-        else
-            $datum = '';
-
-        $query = "SELECT id FROM remarks WHERE 
-				(login = '" . $this->username . "' OR email = '" . $this->email . "') 
-				" . $datum . " ORDER BY created_at desc";
-        $result = mysql_query($query);
-        $this->remarksCount = mysql_num_rows($result);
-        $query .= " LIMIT " . $limit . ";";
-        $result = mysql_query($query);
-        while ($remark = mysql_fetch_assoc($result)) {
-            $this->remarks[$remark['id']] = new Remark($remark['id']);
-        }
+            $query = $query->where('datum','>', date('Y-m-d H:i:s', strtotime("-" . $ago)));
+            
+        $query = $query->groupBy('church_id')->orderBy('created_at','desc');
+        
+        $this->remarksCount = $query->count();
+        $this->remarks = $query->limit($limit)->get();
+                
         return true;
     }
 

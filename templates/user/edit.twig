@@ -23,12 +23,12 @@
 		<div class="panel-group" id="accordion">
 		    <div class="panel panel-default">
 		        <div class="panel-heading visible-lg-block visible-md-block">
-		            <h4 class="panel-title">Észrevételei</h4>
+		            <h4 class="panel-title">Észrevételezett templomai</h4>
 		        </div>
 	            <ul class="list-group">
-	                {% for key, remark in edituser.remarks %}
+	                {% for remark in edituser.remarks %}
 	                	<li class="list-group-item">
-	                		<a href="/templom/{{ remark.church.id }}">{{ remark.church.nev }}</a> ({{ remark.church.varos }})<br/>
+	                		<a href="/templom/{{ remark.church.id }}">{{ remark.church.nev }}</a> ({{ remark.church.varos }}) {%if remark.total > 1 %}({{ remark.total }}){%  endif %}<br/>
 	                		{{ remark.datum }} {% if user.isadmin %}<a href="{{ remark.marker.url }}">{% endif %}{{ remark.marker.html|raw }}{% if user.isadmin %}</a>{% endif %}
 	            		</li>
 	                {% endfor %}
