@@ -72,7 +72,7 @@ class Edit extends \Html\Html {
         } else
             $edituser = new \User($uid);
 
-        if ($edituser->uid == 0 AND $user->uid == 0) {                                
+        if ($edituser->uid == 0 AND $user->uid == 0 AND preg_match('/\/new$/i',$_SERVER['REQUEST_URI'])) {                                
             $vars['title'] = "Regisztráció";
             $vars['new'] = true;
             $vars['helptext'] = true;
@@ -80,16 +80,17 @@ class Edit extends \Html\Html {
             $vars['title'] = "Új felhasználó";
             if (!$user->checkRole('user')) {
                 addMessage("Nincs megfelelő jogosultságod!", "danger");
-                $vars['template'] = 'layout';
-                return $vars;
+                $vars['accessdenied'] = true;        
             }
             $vars['new'] = true;
         } else {
             $vars['title'] = "Adatok módosítása";
             if (!$user->checkRole('user') AND $user->uid != $edituser->uid) {
                 addMessage("Nincs megfelelő jogosultságod!", "danger");
-                $vars['template'] = 'layout';
-                return $vars;
+                $vars['accessdenied'] = true;                               
+            } elseif($edituser->uid == 0 AND $user->uid == 0 ) {
+                addMessage("A személyes adatok módosításához be kell előbb lépni.", "warning");
+                $vars['needtologin'] = true;
             }
             $vars['edit'] = true;
         }

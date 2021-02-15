@@ -63,7 +63,7 @@
 {% endblock %}
 
 {% block content %}
-        {% if not newusercreated %}
+        {% if not newusercreated and not needtologin and not accessdenied %}
 	<form method="post">
 		<input type="hidden" name="q" value="user/edit">
 
