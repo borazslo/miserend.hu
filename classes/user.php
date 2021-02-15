@@ -4,10 +4,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class User {
 
-    /*
-    ALTER TABLE `miserend`.`user` 
-    ADD COLUMN `notifications` INT(1) NULL DEFAULT '1' AFTER `email`;
-    */
     function __construct($uid = false) {
         if (isset($uid)) {
             $user = DB::table('user')

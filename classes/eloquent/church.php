@@ -312,6 +312,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
     
     function MdownloadOSMBoundaries() {
+        return;
         $overpass = new \ExternalApi\OverpassApi();
         $overpass->downloadEnclosingBoundaries($this->lat, $this->lon);
         

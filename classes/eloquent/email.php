@@ -3,14 +3,6 @@
 namespace Eloquent;
 
 class Email extends \Illuminate\Database\Eloquent\Model {
-
-    /*
-    ALTER TABLE `miserend`.`emails` 
-    DROP COLUMN `timestamp`,
-    ADD COLUMN `created_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00' AFTER `body`,
-    ADD COLUMN `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00' AFTER `created_at`,
-    ADD COLUMN `status` VARCHAR(45) NULL AFTER `updated_at`;
-    */
     
     public $debug;
     public $debugger;
@@ -46,7 +38,6 @@ class Email extends \Illuminate\Database\Eloquent\Model {
                 // black hole
             } else {
                 if (!mail($this->to, $this->subject, $this->body, $this->header)) {
-                    printr($this);
                     addMessage('Valami hiba történt az email elküldése közben.', 'danger');
                     $this->status = "error";
                     $this->save();
@@ -86,7 +77,7 @@ class Email extends \Illuminate\Database\Eloquent\Model {
         unset($lines[0]); unset($lines[1]);
         
         $this->body = implode("\n", $lines);
-        
+                
         return true;
     }
     
