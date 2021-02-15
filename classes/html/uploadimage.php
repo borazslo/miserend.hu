@@ -2,6 +2,8 @@
 
 namespace Html;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class UploadImage extends Html {
 
     public function __construct($path) {
@@ -31,32 +33,38 @@ class UploadImage extends Html {
 
         $this->photo = $photo;
         
-        //Mail küldése az egyházmegyei felelősnek
-        $this->church->MgetReligious_administration();
-        if (isset($this->church->religious_administration->diocese->responsible)) {
-            foreach ($this->church->religious_administration->diocese->responsible as $responsible) {
-                $responsibleUser = new \User($responsible);
-                if ($responsibleUser->uid > 0) {
-                    $mail = new \Eloquent\Email();                
-                    $mail->render('image_diocese',$this);
-                    $mail->send($responsibleUser->email);
-                }
-            }
+        
+        /*
+         * miserend adminiok
+         * egyházmegyei felelős(ök)
+         * templom feltöltésre jogosult felhasználó
+         */
+        $emails = [];        
+        /* Miserend Adminok */
+        $admins = DB::table('user')->where('jogok','LIKE','%miserend%')->where('notifications',1)->get();
+        foreach($admins as $admin) {
+           $emails[$admin->email] = ['image_admin',$admin->email,$admin];
+        }              
+        /* Egyházmegyei felelős (csak felhasználónév alapján) */
+        $responsabile = DB::table('egyhazmegye')->select('user.*')->where('egyhazmegye.id',$this->church->egyhazmegye)->leftJoin('user','user.login','=','egyhazmegye.felelos')->where('notifications',1)->first();
+        if($responsabile) {
+            $emails[$responsabile->email] = ['image_diocese', $responsabile->email, $responsabile];
         }
-
-        if (!empty($this->church->kontaktmail)) {
-            //Mail küldés az karbantartónak felelősnek
+        /* Templom felelős. Még csak egy!! */
+        $responsabile = DB::table('user')->where('login',$this->church->letrehozta)->where('notifications',1)->first();
+        if($responsabile) {
+            $emails[$responsabile->email] = ['image_responsible', $responsabile->email, $responsabile];
+        }
+        
+        foreach($emails as $email) {
+            if(isset($email[2])) $this->addressee = $email[2];
+            else $this->addressee = false;
             $mail = new \Eloquent\Email();                
-            $mail->render('image_contact',$this);
-            $mail->send($this->church->kontaktmail);
+            $mail->render($email[0],$this);
+            $mail->send($email[1]);
+            
         }
-
-        //Mail küldése a debuggernek, hogy boldog legyen
-        global $config;
-        $mail = new \Eloquent\Email();
-        $mail->render('image_debug',$this);
-        $mail->send($config['mail']['debugger']);
-
+              
         exit;
     }
 

@@ -4,6 +4,10 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class User {
 
+    /*
+    ALTER TABLE `miserend`.`user` 
+    ADD COLUMN `notifications` INT(1) NULL DEFAULT '1' AFTER `email`;
+    */
     function __construct($uid = false) {
         if (isset($uid)) {
             $user = DB::table('user')
@@ -144,9 +148,10 @@ class User {
             'email' => 'Nem megfelelő email cím! Talán már használatban van?',
             'volunteer' => 'Hibás értéke van az önkéntességnek!',
             'roles' => 'Hibás formátumú jogkörök!',
+            'notifications' => 'Email értesítések engedélyezése körül hiba lépett fel!',
         );
 
-        foreach (array('uid', 'username', 'nickname', 'name', 'email', 'volunteer', 'roles') as $input) {
+        foreach (array('uid', 'username', 'nickname', 'name', 'email', 'volunteer', 'roles','notifications') as $input) {
             if (isset($vars[$input])) {
                 if (!$this->presave($input, $vars[$input])) {
                     $return = false;
@@ -253,6 +258,9 @@ class User {
             if ($this->isEmailInUse($val) AND ( !isset($this->email) OR $val != $this->email )) {
                 return false;
             }
+            $this->presaved[$key] = $val;
+        } elseif ($key == 'notifications') {
+            if(!in_array($val,[0,1])) return false;            
             $this->presaved[$key] = $val;
         } else
             return false;

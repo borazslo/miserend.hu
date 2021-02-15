@@ -120,18 +120,20 @@
 		</div>
                 -->
 
-		{% if 'user' in user.roles %}
+                {%  if edit %}
 			<div class="form-group">
-		    	<label for="ok">Engedélyezés/kizárás</label>
-		    	<div id="ok" class="checkbox">
+		    	<label for="notifications">Email értesítések</label>
+		    	<div id="notifications" class="checkbox">
 		        	<label>
-	      				<input type="checkbox" name="edituser[ok]" value="i" {% if edituser.ok == 'i' %}checked{% endif %}> Aktív / engedélyezett
+                                        <input type='hidden' value='0' name='edituser[notifications]'>
+	      				<input type="checkbox" name="edituser[notifications]" value="1" {% if edituser.notifications == 1 %}checked{% endif %}> Engedélyezett
 	    			</label>
-	    			{% if helptext %}<p class="help-block">Vállalom, hogy hetente hét régen frissült templom miserendjét megpróbálom megtudakolni és megosztani a többiekkel. (Emailben értesítünk hétről hétre a megfelelő templomokról.)</p>{% endif %}
+	    			<p class="help-block">Leginkább a felelőssségi köreidbe tartozó templomokhoz érkező észrevételekről küldünk üzeneteket.</p>
 		    	</div>
-			</div>
-
-
+			</div>                    
+                {% endif %}
+                
+		{% if 'user' in user.roles %}
 			<div class="form-group">
 		    	<label for="roles">Jogosultságok</label>{{ edituser.jogok.miserend }}
 				{% for key, item in roles %}

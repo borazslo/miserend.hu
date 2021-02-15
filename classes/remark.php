@@ -107,34 +107,41 @@ class Remark {
         if(isset($this->tid)) $this->church_id = $this->tid;
         else $this->tid = $this->church_id;
 
-        $query = "select nev,ismertnev,varos,egyhazmegye, kontaktmail from templomok where id = " . $this->tid . " limit 0,1";
-        $lekerdez = mysql_query($query);
-        $templom = mysql_fetch_assoc($lekerdez);
-        $this->church = $templom;
-
-        $query = "select email from egyhazmegye where id='" . $templom['egyhazmegye'] . "'";
-        $lekerdez = mysql_query($query);
-        list($felelosmail) = mysql_fetch_row($lekerdez);
-
-        //Mail küldés az egyházmegyei felelősnek
-        if (!empty($felelosmail) AND $felelosmail != '') {
-            $this->SendMail('diocese', $felelosmail);
+        $this->church = \Eloquent\Church::find($this->church_id);
+        /*
+         * miserend adminiok
+         * egyházmegyei felelős(ök)
+         * templom feltöltésre jogosult felhasználó
+         */
+        $emails = [];        
+        /* Miserend Adminok */
+        $admins = DB::table('user')->where('jogok','LIKE','%miserend%')->where('notifications',1)->get();
+        foreach($admins as $admin) {
+           $emails[$admin->email] = ['admin',$admin->email,$admin];
+        }              
+        /* Egyházmegyei felelős (csak felhasználónév alapján) */
+        $responsabile = DB::table('egyhazmegye')->select('user.*')->where('egyhazmegye.id',$this->church->egyhazmegye)->leftJoin('user','user.login','=','egyhazmegye.felelos')->where('notifications',1)->first();
+        if($responsabile) {
+            $emails[$responsabile->email] = ['diocese', $responsabile->email, $responsabile];
         }
-
-        //Mail küldés a karbantartónak / felelősnek
-        if (!empty($templom['kontaktmail']) AND $templom['kontaktmail'] != '') {
-            $this->SendMail('contact', $templom['kontaktmail']);
+        /* Templom felelős. Még csak egy!! */
+        $responsabile = DB::table('user')->where('login',$this->church->letrehozta)->where('notifications',1)->first();
+        if($responsabile) {
+            $emails[$responsabile->email] = ['responsible', $responsabile->email, $responsabile];
         }
-
-        //Mail küldése a debuggernek, hogy boldog legyen
-        $this->SendMail('debug', $config['mail']['debugger']);
-
+        
+        foreach($emails as $email) {
+            $this->SendMail($email[0], $email[1], $email[2]);            
+        }
+                
         return true;
     }
 
-    function sendMail($type, $to) {
+    function sendMail($type, $to, $addressee = false) {
         if(isset($this->tid)) $this->church_id = $this->tid;
-        else $this->tid = $this->church_id;        
+        else $this->tid = $this->church_id;    
+        if($addressee) $this->addressee = $addressee;
+        else  $this->addressee = false;
         $mail = new \Eloquent\Email();                
         $mail->render('remark_'.$type,$this);
         $mail->send($to);
