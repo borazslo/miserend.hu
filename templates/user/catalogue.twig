@@ -16,22 +16,28 @@
          <br/>
 	<table class="table table-hover table-condensed table-striped">
 		<tr>
-    		<th class="col-md-4">Felhasználónév / Név</th>
-    		<th class="col-md-4">Email</th>
+    		<th class="col-md-3">Felhasználónév / Név</th>
+                <th class="col-md-3">Email</th>
+                <th class="col-md-1"><img src="/img/templom1.gif" title="Ellátott templomok száma"></th>
     		<th class="col-md-3">{{ field }}</th>
     		<th class="col-md-1"><span class="glyphicon glyphicon-trash" aria-hidden="true" style=""></span></th>
   		</tr>
 		{% for user in users %}
 			<tr>
-				<td>
+				<td>                                        
 					<a href="/user/{{ user.uid }}/edit">
 						<strong>{{ user.login }}</strong> ({{ user.nev }})
+                                                {% if 'miserend' in user.jogok %}<span class="glyphicon glyphicon-asterisk" aria-hidden="true" title="Admin"></span>{% endif %}
+                                                {% if user.responsible.diocese|length > 0 %}<span class="glyphicon glyphicon-asterisk green" aria-hidden="true" title="Egyházmegye felelőse"></span>{% endif %}
 					</a>
 				</td>
 				<td>
 					<a href="mailto:{{ user.email }}">{{ user.email }}</a>
-				</td>
-				<td>
+				</td>                                
+                                <td>
+                                    {{ user.responsible.church|length }}
+                                </td>                               
+                                <td>
 					{{ attribute(user, field)}} 
 				</td>
 				<td>

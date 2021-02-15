@@ -21,6 +21,11 @@ class Catalogue extends \Html\Html {
         $this->buildForm();
         $this->buildQuery();
 
+        if($this->input['limit'] < $this->query->count()) {
+            $this->more = "Van még ".($this->query->count() - $this->input['limit'])." találat.";
+        }
+        $this->query->orderByRaw($this->input['sort']);
+        
         $results = $this->query->get();
 
         foreach ($results as $result) {
@@ -28,15 +33,11 @@ class Catalogue extends \Html\Html {
                 $field = preg_replace(array('/ /i', '/-/i'), array('&nbsp;', '&#8209;'), $match[1]);
             else
                 $field = 'lastlogin';
-
+            
             $this->users[$result->uid] = new \User($result->uid);
         }
-
         $this->field = $field;
         
-        if($this->input['limit'] < $this->query->count()) {
-            $this->more = "Van még ".($this->query->count() - $this->input['limit'])." találat.";
-        }
     }
 
     function buildForm() {
@@ -47,7 +48,8 @@ class Catalogue extends \Html\Html {
             'nev' => 'név',
             'lastlogin desc' => 'utolsó belépés',
             'lastactive desc' => 'utolsó aktivitás',
-            'regdatum desc' => 'regisztracio'
+            'regdatum desc' => 'regisztracio',
+            'templomok desc' => 'ellátott templomok'
         ];
 
         $this->form = array(
@@ -90,15 +92,17 @@ class Catalogue extends \Html\Html {
             $query->where('jogok', 'like', "%" . $this->input['adminok'] . "%");
         }
 
+        if($this->input['sort'] == 'templomok desc')
+            $query->addSelect(DB::raw('count(templomok.id) as templomok'))->leftJoin('templomok', 'templomok.letrehozta','=','user.login')->groupBy('uid');
+                
         if (!empty($this->input['kulcsszo'])) {
             $input = $this->input;
             $query->where(function ($q) use ($input) {
-                $q->where('login', 'like', "%" . $input['kulcsszo'] . "%")
-                        ->orWhere('nev', 'like', "%" . $input['kulcsszo'] . "%")
-                        ->orWhere('email', 'like', "%" . $input['kulcsszo'] . "%");
+                $q->where('user.login', 'like', "%" . $input['kulcsszo'] . "%")
+                        ->orWhere('user.nev', 'like', "%" . $input['kulcsszo'] . "%")
+                        ->orWhere('user.email', 'like', "%" . $input['kulcsszo'] . "%");
             });
         }
-        $query->orderByRaw($this->input['sort']);
         $query->take($this->input['limit']);       
         $this->query = $query;
     }
