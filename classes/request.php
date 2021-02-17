@@ -3,8 +3,8 @@
 class Request {
 
     static function Integer($name) {
-        $value = self::get($name);
-        if (!is_numeric($value)) {
+        $value = self::get($name);    
+        if ($value <> '' AND !is_numeric($value)) {
             throw new Exception("Required '$name' is not an Integer.");
         }
         return $value;

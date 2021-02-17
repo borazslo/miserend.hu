@@ -12,7 +12,7 @@
                 {% if mail.subject %}
                     <input type=hidden name=subject value="{{ mail.subject }}">
                 {% else %}
-                    Tárgy: <input type=text name=subject  class="form-control"><br/>
+                    Tárgy: <input type=text name=subject value="Miserend - " class="form-control"><br/>
                 {% endif %}
             {% block extraInput %}{% endblock %}
             <input type=hidden name=type value="{{ mail.type }}">
