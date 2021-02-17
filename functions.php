@@ -1594,13 +1594,13 @@ function feltoltes_block() {
     $kod_tartalom = '<ul>';
     foreach( $churches as $church) { 
         if ($church->eszrevetel == 'i')
-            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->tid."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
         elseif ($church->eszrevetel == 'f')
-            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->tid."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
         else
             $jelzes = '';
 
-        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->tid."/edit' class=link_kek title='".$church->varos."'>".$church->nev."</a></li>";
+        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->id."/edit' class=link_kek title='".$church->varos."'>".$church->nev."</a></li>";
     }
 
     $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";
