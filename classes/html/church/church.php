@@ -54,6 +54,7 @@ class Church extends \Html\Html {
 
         //Miseidőpontok
         $misek = getMasses($tid);
+        $responsible = $church->responsible;
         
         if ($user->checkRole('miserend') OR $user->checkRole('ehm:' . $this->religious_administration->diocese->id) OR ( isset($responsible) AND in_array($user->login, $responsible))) {
             $nev = " <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
