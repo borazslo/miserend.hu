@@ -12,7 +12,7 @@ class User {
             if(!is_numeric($uid) AND filter_var($uid, FILTER_VALIDATE_EMAIL) ) {
                 $user = $user->where('email', $uid);
             } elseif (!is_numeric($uid)) {
-                $user = $user->where('nev', $uid);
+                $user = $user->where('login', $uid);
             } else {
                 $user = $user->where('uid', $uid);
             }
