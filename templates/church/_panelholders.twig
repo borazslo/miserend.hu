@@ -1,0 +1,61 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Felelősök' %}
+
+{% block body %}     
+
+    {% for status, holders in church.holders %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th colspan="2" >
+                         {% set statuses = {
+                                'allowed': 'Enegedélyezett felelősök',
+                                'denied': 'Elutasított kérések',
+                                'asked': 'Engedélyezési kérések',
+                                'revoked': 'Visszavont engedélyek',
+                                'left': 'Visszalépett felelősök'
+                        } %}
+                        {{ statuses[status] }}                 
+                    </th>
+                </tr>
+            </thead>
+        {% for holder in holders %}
+            <tbody>
+                <tr  class="bg-secondary">
+                    <tr colspan="2">
+                    <a href="/user/{{ holder.user.uid }}/edit">
+                            <strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }})
+                            {% if 'miserend' in holder.user.jogok %}<span class="glyphicon glyphicon-asterisk" aria-hidden="true" title="Admin"></span>{% endif %}
+                            {% if holder.user.responsible.diocese|length > 0 %}<span class="glyphicon glyphicon-asterisk green" aria-hidden="true" title="Egyházmegye felelőse"></span>{% endif %}
+                    </a>
+
+                    <div style="float:right"><i class="{{ ICONS_DELETE }}" title="Templom törlése..."></i></div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td  class="col-md-6">Utolsó aktivitása:</td>
+                    <td>{{ holder.user.lastactive }}</td>
+                </tr>
+                <tr>
+                    <td>Vállalt templomok:</td>
+                    <td>{{ holder.user.responsibilities.church.allowed|length }} {% if holder.user.responsibilities.church.asked %} + {{ holder.user.responsibilities.church.asked|length }} {% endif %}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>{{ holder.description}}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        {% endfor %}
+        </table>
+    {% endfor %}    
+{%  endblock %}

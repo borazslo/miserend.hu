@@ -124,7 +124,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * getSomethingAttribute -> $this->something;
      * 
      * denomination
-     * responsible
+     * holders
+     * OBSOLATE: responsible
      * writeAccess
      * jelzes
      * fullName
@@ -135,6 +136,12 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return  in_array($this->egyhazmegye,[34,17,18]) ? 'greek_catholic' : 'roman_catholic';
     }
     
+    public function getHoldersAttribute($value) {
+        $holders =  \Eloquent\ChurchHolder::where('church_id',$this->id)->get()->groupBy('status');
+        return $holders;
+    }
+    
+    /* obsolate */
     public function getResponsibleAttribute($value) {
         return array($this->letrehozta);
     }

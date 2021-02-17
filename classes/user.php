@@ -74,7 +74,7 @@ class User {
     }
 
     function getResponsabilities() {
-        $this->responsible = array(
+        $this->responsibilities = array(
             'diocese' => array(),
             'church' => array()
         );
@@ -87,6 +87,10 @@ class User {
             foreach ($results as $result) {
                 $this->responsible['diocese'][] = $result->id;
             }
+            
+            
+            $this->responsibilities['church'] = \Eloquent\ChurchHolder::where('user_id',$this->uid)->get()->groupBy('status');
+            
             $results = DB::table('templomok')
                     ->select('id')
                     ->where('ok', 'i')
@@ -96,6 +100,7 @@ class User {
                 $this->responsible['church'][] = $result->id;
             }            
         }
+        
     }
 
     function processResponsabilities() {
