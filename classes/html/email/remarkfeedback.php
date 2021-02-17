@@ -39,7 +39,8 @@ class RemarkFeedback extends Email {
 
     public function send() {
         parent::send();
-        $this->remark->appendComment("email küldve: " . $this->mail->type);
+        
+        $this->remark->appendComment("email küldve: " . $this->mail->type." (".$this->mail->id.")");
         $this->remark->save();
     }
     
