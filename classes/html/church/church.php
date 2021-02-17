@@ -25,8 +25,9 @@ class Church extends \Html\Html {
         }
 
         $church->photos = $church->photos()->get();
-        
-        /*
+                
+        $church->append('liturgiatv')->get();
+         /*
          * 
          */
         if( $church->lat != '' AND !isset($church->location->city)) {

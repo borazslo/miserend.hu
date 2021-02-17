@@ -35,6 +35,11 @@
 
 {% block content %}
     {{ alert|raw }}
+    
+    {% if liturgiatv is not empty %}
+        {% include 'church/_panelliturgiatv.twig' %}
+    {% endif %}
+    
     <h5><b>Frissítve:</b> {{ updated }}</h5>
 
     {% if miseaktiv == 1 %}
