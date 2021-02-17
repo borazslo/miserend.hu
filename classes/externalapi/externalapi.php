@@ -72,11 +72,12 @@ class ExternalApi {
         $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE );      
         switch ($this->responseCode) {
             case '200':
-                if (!$this->jsonData = json_decode($this->rawData)) {            
+                $this->jsonData = json_decode($this->rawData);
+                if ($this->jsonData === null ) {            
                     throw new \Exception("External API return data is not a valid JSON!");
                 }
                 break;
-
+               
             case '404':
                 $this->Response404();
                 break;
