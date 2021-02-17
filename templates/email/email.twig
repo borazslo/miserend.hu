@@ -1,5 +1,7 @@
 {% extends "layout_simpliest.twig" %}
 
+{%  set title = "Email adatok &nbsp;" ~ mail.id %}
+
 {% block content %}
     {% if mail %}
         <form method=post>
@@ -51,6 +53,11 @@
                         <input type="submit" name="clear" class="btn btn-default" value="Mégsem" onclick="history.go(-1);">
                     </td>
                 </tr>
+                {%  else %}
+                    <tr>
+                        <td><strong>Elküldve:</strong></td>
+                        <td>{{ mail.updated_at }}</td>
+                    </tr>
                 {% endif %}
             </table>     
     </form>
