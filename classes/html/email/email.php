@@ -31,7 +31,11 @@ class Email extends \Html\Html {
     }
 
     public function preparePage($path) {
-
+        $id = \Request::Integer('id');
+        
+        if($id) {
+            $this->mail = \Eloquent\Email::find($id);
+        }      
     }
 
     function checkPermission() {
