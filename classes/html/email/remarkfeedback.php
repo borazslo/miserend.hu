@@ -28,14 +28,11 @@ class RemarkFeedback extends Email {
             $type = \Request::Text('type');
         }
 
-        if ($type) {
-            global $user;
+        global $user;
+        if ($type) {            
             $this->mail->render('remarkfeedback_' . $type, (array) $this );
         } else {
-            $this->mail->type = "remarkfeedback_custom";
-            $this->mail->body = "\n\n\n\n<strong>Üdvözlettel:</strong>\n";
-            
-            $this->mail->body .= $this->user->nev.", önkéntes";          
+            $this->mail->render('remarkfeedback' . $type, (array) $this );            
         }
         
     }
