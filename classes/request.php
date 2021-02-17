@@ -43,6 +43,14 @@ class Request {
         $value = sanitize($value);
         return $value;
     }
+    
+    static function InArrayRequired($name, $array) {
+        $value = self::get($name);
+        if(!in_array($value, $array)) {
+            throw new Exception("Required '$name' is not in Array.");
+        }
+        return $value;
+    }
 
     static function Simpletext($name) {
         $value = self::get($name);

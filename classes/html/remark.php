@@ -7,90 +7,90 @@ class Remark extends Html {
     public $template;
 
     public function __construct($path) {
-        $action = $path[0];
+        $this->action = $path[0];
         $this->tid = $rid = $path[1];
 
-        switch ($action) {
+        $this->church = \Eloquent\Church::find($this->tid);
+        $this->disclaimer = 'Figyelem! Nem állunk közvetlen kapcsolatban a plébániákkal ezért plébániai ügyekben (pl. keresztelési okiratok, stb.) sajnos nem tudunk segíteni.';
+        
+        switch ($this->action) {
             case 'list':
-                if (isset($_REQUEST['remark']) AND $_REQUEST['remark'] == 'modify') {
-                    $rid = \Request::IntegerRequired('rid');
-                    $remark = new \Remark($rid);
-                    $state = \Request::Simpletext('state');
-                    $remark->changeState($state);
-                    $comment = \Request::Text('adminmegj');
-                    if ($comment != '') {
-                        $remark->addComment($comment);
-                    }
-                    $this->tid = $remark->church_id;
-                }
-                $this->template = 'remark_list.twig';
-                $church = \Eloquent\Church::find($this->tid);
-                $this->listOfChurch($church);
+                $this->pageList();
+                $this->template = 'remark_list.twig';                        
                 break;
 
-            case 'addform':
-                $church = \Eloquent\Church::find($this->tid);
-                $this->newForm($church);
+            case 'addform':                
+                $this->template = 'remark_form.twig';
                 break;
 
             case 'add':
-                $church = \Eloquent\Church::find($this->tid);
-                $this->add($church);
+                $this->pageAdded();
+                $this->template = 'remark.twig';
                 break;
         }
     }
-
-    function listOfChurch($church) {
-        $this->setTitle('Észrevételek');
-        $this->pageDescription = "Javítások/észrevételek kezelése";
-
-        $this->church = $church->toArray();
-        $this->remarks = $church->remarks->toArray();
-
+    
+    function pageList() {
+        if (\Request::Simpletext('remark') == 'modify') {
+            $rid = \Request::IntegerRequired('rid');
+            $remark = \Eloquent\Remark::find($rid);
+            
+            $remark->allapot = \Request::Simpletext('state');
+            $remark->admindatum = date('Y-m-d H:i:s');
+            
+            $remark->appendComment(\Request::Text('adminmegj'));
+            $remark->save();
+            
+            if($this->tid != $remark->church_id) { // Hogy ne lehessen csalni
+                $this->tid = $remark->church_id;
+                $this->church = \Eloquent\Church::find($this->tid);
+            }
+        }
+       
         global $user;
-        if (!$user->checkRole('miserend') and ! ($user->username == $templom->letrehozta ) and ! $user->checkRole('ehm:' . $templom['egyhazmegye'])) {
+        if (!$user->checkRole('miserend') and ! ($user->username == $this->church->letrehozta ) and ! $user->checkRole('ehm:' . $this->church->egyhazmegye)) {
             addMessage("Hiányzó jogosultság. Elnézést.", "danger");
             return;
         }
+        
+        $this->church->remarks;        
     }
+       
+   
+    function pageAdded() {
+                
+        $remark = new \Eloquent\Remark;
 
-    function newForm($church) {
-        $this->setTitle("Észrevétel beküldése");
-        $this->church = $church;
-
-        $this->pageDescription = "Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban.";
-        $this->disclaimer = 'Figyelem! Nem állunk közvetlen kapcsolatban a plébániákkal ezért plébániai ügyekben (pl. keresztelési okiratok, stb.) sajnos nem tudunk segíteni.';
-
-        $this->template = 'remark_form.twig';
-    }
-
-    function add($church) {
-        $this->setTitle("Észrevétel beküldése");
-        $this->church = $church;
-        $remark = new \Remark();
-
-        $remark->church_id = $church->id;
-
-        $remark->text = \Request::TextRequired('leiras');
-        $remark->name = \Request::TextRequired('nev');
+        $remark->church_id = $this->church->id;
+        $remark->allapot = 'u';
+        $remark->leiras = \Request::TextRequired('leiras');
         $remark->email = \Request::TextRequired('email');
-
-        if ($remark->email == '')
-            unset($remark->email);
+        $remark->nev = \Request::Text('nev');
+        if($remark->nev == '') $remark->nev = $remark->email;
+        
+       
+        // Belépett felhasználónál hidden email és név adat volt, de nem bízunk benne
+        global $user;
+        if ($user->username != "*vendeg*") {
+            $remark->login = $user->username;
+            $remark->email = $user->email;
+        }
+        
+        $megbizhato = \Eloquent\Remark::select('megbizhato')->where('email',$remark->email)->orderBy('created_at','desc')->limit(1)->first();
+        if($megbizhato)
+            $remark->megbizhato = $megbizhato->megbizhato;
+        else
+            $remark->megbizhato = '?';
+                                
         if (!$remark->save())
             addMessage("Nem sikerült elmenteni az észrevételt. Sajánljuk.", "danger");
+                
         if (!$remark->emails())
             addMessage("Nem sikerült elküldeni az értesítő emaileket.", "warning");
-        $content = "<h2>Köszönjük!</h2><strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br><input type='button' value='Ablak bezárása' onclick='self.close()'>";
+                
         global $config;
-        if ($config['debug'] < 1)
-            $content .= "<script language=Javascript>setTimeout(function(){self.close();},3000);</script>";
-
-        $this->content = $content;
-
-        $this->pageDescription = "Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban.";
-
-        $this->template = 'Remark.twig';
+        $this->debug = $config['debug'];        
+        
     }
 
 }

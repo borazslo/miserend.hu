@@ -5,13 +5,20 @@ namespace Html\Ajax;
 class SwitchReliable extends Ajax {
 
     public function __construct() {
-        if (!is_numeric($_REQUEST['rid']))
-            exit;
-        if (!in_array($_REQUEST['reliable'], array('i', 'n', '?', 'e')))
-            exit;
+        $rid = \Request::IntegerRequired('rid');
+        $reliable = \Request::InArrayRequired('reliable', array('i', 'n', '?', 'e'));
+        
+        $remark = \Eloquent\Remark::find($rid);
 
-        $remark = new \Remark($_REQUEST['rid']);
-        $remark->changeReliability($_REQUEST['reliable']);
+        global $user;
+        if (!$user->checkRole('miserend') and ! ($user->username == $remark->church->letrehozta ) and ! $user->checkRole('ehm:' . $remark->church->egyhazmegye)) {
+            throw new Exception("Hiányzó jogosultság.");            
+        }
+        $remark->megbizhato = $reliable;
+        $remark->save();
+        
+        header("Content-Type: text/plain"); 
+        echo 'ok';
     }
 
 }
