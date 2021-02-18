@@ -52,16 +52,28 @@ class ChurchHolder extends Model {
          */
         $this->append('church')->get();
         $emails = [];        
-        /* Miserend Adminok */
-        $admins = DB::table('user')->where('jogok','LIKE','%miserend%')->where('notifications',1)->get();
-        foreach($admins as $admin) {
+        
+        if($this->status == 'asked') {
+            /* Miserend Adminok */
+            $admins = DB::table('user')->where('jogok','LIKE','%miserend%')->where('notifications',1)->get();
+            foreach($admins as $admin) {
+                $emails[$admin->email] = [$this->status."_admin",$admin];            
+            }
+        } elseif($this->status == 'allowed') {
+            $emails[$this->user->email] = [$this->status."_user",$this->user];
             
-            $this->addressee = $admin;
+        }
+        
+        
+        foreach($emails as $addressee) {
+            $this->addressee = $addressee[1];
             $mail = new \Eloquent\Email();                
             
-            $mail->render('churchholders_asked_admin',$this);
-            $mail->send($admin->email);
-        }                                           
+            $mail->render('churchholders_'.$addressee[0],$this);
+            $mail->send($addressee[1]->email);    
+            
+            
+        }
         return true;
     }
 }

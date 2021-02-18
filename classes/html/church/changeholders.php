@@ -25,7 +25,8 @@ class ChangeHolders extends \Html\Html {
         global $user;
         if($user->checkRole('miserend')) {
             
-           \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+           $churchHolder = \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+           $churchHolder->sendEmails();
            addMessage('A változtatást sikeresen elmentettük.', 'info');
            return $this->redirect('/templom/'.$where['church_id'].'/edit');
            
