@@ -99,7 +99,7 @@ class Edit extends \Html\Html {
 
         global $user;
         if ($user->checkRole('miserend')) {
-            $this->addFormResponsible();
+            $this->addFormNewHolder();
         }
 
         $this->addFormAdministrative();
@@ -206,21 +206,30 @@ class Edit extends \Html\Html {
         $this->form['deaneries'] = $selectReligiousAdministration['deaneries'];
     }
 
-    function addFormResponsible() {
+    function addFormNewHolder() {
         $options = ['0' => 'Nincs megadva'];
         $users = \Illuminate\Database\Capsule\Manager::table('user')
-                        ->select('login', 'uid')
-                        ->orderByRaw("CASE WHEN lastlogin > '" . date('Y-m-d H:i:s', strtotime('-2 month')) . "'     THEN 1 ELSE 0 END desc")
+                        ->select('login', 'nev', 'uid')
+                        ->orderByRaw("CASE WHEN lastlogin > '" . date('Y-m-d H:i:s', strtotime('-6 month')) . "'     THEN 1 ELSE 0 END desc")
                         ->orderBy('login')->get();
         foreach ($users as $selectibleUser) {
-            $options[$selectibleUser->login] = $selectibleUser->login;
+            $options[$selectibleUser->uid] = $selectibleUser->login." (".$selectibleUser->nev.")";
         }
-        $this->form['responsible'] = array(
+        $this->form['holder_uid'] = array(
             'type' => 'select',
-            'name' => 'church[letrehozta]',
-            'options' => $options,
-            'selected' => $this->church->letrehozta
+            'name' => 'uid',
+            'options' => $options
         );
+        $this->form['holder_decription'] = array(
+            'type' => 'text',
+            'name' => 'description',
+            'placeholder' => 'Megjegyzés / jogosultság / kapcsolat a templommal.'
+        );        
+        $this->form['holder_access'] = array(
+            'type' => 'hidden',
+            'name' => 'access',
+            'value'=> 'allowed'
+        );        
     }
 
 }

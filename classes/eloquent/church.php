@@ -137,7 +137,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
     
     public function getHoldersAttribute($value) {
-        $holders =  \Eloquent\ChurchHolder::where('church_id',$this->id)->get()->groupBy('status');
+        $holders =  \Eloquent\ChurchHolder::where('church_id',$this->id)->orderBy('status')->orderBy('updated_at','desc')->get()->groupBy('status');
         return $holders;
     }
     
@@ -309,7 +309,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     function MgetDioceseId() {
-        return $this->religious_administration->diocese->id;
+        if($this->religious_administratin)
+            return $this->religious_administration->diocese->id;
+        else 
+            return false;
     }
 
     public function boundaries()
