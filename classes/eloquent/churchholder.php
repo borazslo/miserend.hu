@@ -32,6 +32,9 @@ class ChurchHolder extends Model {
             return new \User($this->user_id);
         }
         
+        function getChurchAttribute($value) {
+            return \Eloquent\Church::find($this->church_id);
+        }
         
         static function migrate() {
             $tmps = DB::table('templomok')->select('templomok.id as church_id','user.uid as user_id')->leftJoin('user','templomok.letrehozta','=','user.login')->where('user.uid','<>','')->get();            
