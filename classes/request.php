@@ -3,8 +3,8 @@
 class Request {
 
     static function Integer($name) {
-        $value = self::get($name);
-        if (!is_numeric($value)) {
+        $value = self::get($name);    
+        if ($value <> '' AND !is_numeric($value)) {
             throw new Exception("Required '$name' is not an Integer.");
         }
         return $value;
@@ -41,6 +41,14 @@ class Request {
     static function TextRequired($name) {
         $value = self::getRequired($name);
         $value = sanitize($value);
+        return $value;
+    }
+    
+    static function InArrayRequired($name, $array) {
+        $value = self::get($name);
+        if(!in_array($value, $array)) {
+            throw new Exception("Required '$name' is not in Array.");
+        }
         return $value;
     }
 

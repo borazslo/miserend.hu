@@ -1,17 +1,20 @@
 {% extends "remark.twig" %}
 
+{% set title = "Észrevételek" %}
+{% set pageDescription = "Javítások/észrevételek kezelése" %}
+
 {% block content %}
 <table cellpadding=0 cellspacing=1 class="table table-striped table-hover">
-{% for remark in remarks %}
+{% for remark in church.remarks %}
     <tr>
     	<td valign=top width=35 style="padding:3px">
     		{% if remark.allapot == 'u' %}
-			    	<img src=/img/Folderdownloads.gif border=0 title='új észrevétel'>
-			{% elseif remark.allapot == 'f' %}
-			   		<img src=/img/Filesedit.gif border=0 title='folyamatban van -> {{ remak.admin }} ({{ remark.admindatum }})'>
-			{% else %}
-			   		<img src=/img/Hand.gif border=0 title='Javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})'>
-			{% endif %}
+                        <img src=/img/Folderdownloads.gif border=0 title='új észrevétel'>
+                {% elseif remark.allapot == 'f' %}
+                        <img src=/img/Filesedit.gif border=0 title='folyamatban van -> {{ remak.admin }} ({{ remark.admindatum }})'>
+                {% else %}
+                        <img src=/img/Hand.gif border=0 title='Javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})'>
+                {% endif %}
 		</td>
 		<td valign=top width="140" style="padding:3px">
                     <form method=post action='/templom/{{ remark.church_id }}/eszrevetelek'>

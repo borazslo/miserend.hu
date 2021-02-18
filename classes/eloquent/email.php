@@ -64,6 +64,9 @@ class Email extends \Illuminate\Database\Eloquent\Model {
     
     function render($twigfile, $array) {
         global $twig;
+
+        if(method_exists($array, 'toArray')) 
+            $array = $array->toArray();
         
         if(!$this->type)
             $this->type = $twigfile;

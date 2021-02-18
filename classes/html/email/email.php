@@ -5,10 +5,8 @@ namespace Html\Email;
 class Email extends \Html\Html {
 
     public function __construct($path) {
-        global $user;
-        $this->user = $user;
-        if (!$this->user->checkRole('"any"')) {
-            throw new \Excpetion("Nincs jogod levélküldéshez.");
+        if(!$this->checkPermission()) {
+            throw new \Exception("Nincs jogod levélküldéshez.");
         }
 
         $this->mail = new \Eloquent\Email();
@@ -17,7 +15,7 @@ class Email extends \Html\Html {
             $this->template = 'layout_simpliest.twig';
             $this->body = "Köszönjük, elküldtük.";
             unset($this->mail);
-        } else {
+        } else {            
             $this->preparePage($path);
         }
     }
@@ -33,7 +31,20 @@ class Email extends \Html\Html {
     }
 
     public function preparePage($path) {
+        $id = \Request::Integer('id');
         
+        if($id) {
+            $this->mail = \Eloquent\Email::find($id);
+        }      
     }
 
+    function checkPermission() {
+        global $user;
+        $this->user = $user;
+        if (!$this->user->checkRole('"any"')) {
+            return false;   
+        }
+        return true;
+    }
+    
 }

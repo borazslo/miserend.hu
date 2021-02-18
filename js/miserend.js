@@ -271,8 +271,12 @@ $(document).ready(function() {
              type:"POST",
              url:"/ajax/switchreliable",
              data:"rid="+rid+"&reliable="+reliable,
+             dataType: "text",
              success:function(response){
-              console.log(response);
+                 console.log('hse');
+                 console.log(response);
+              if(response == 'ok') {
+                  console.log('meget');
                 if(here.hasClass('check')) {
                     if(here.hasClass('lightgrey')) {
                           here.parent().parent().find('.alert').removeClass('red');
@@ -303,6 +307,7 @@ $(document).ready(function() {
                         }    
                     });
                 }
+            }
             }, 
         });        
   

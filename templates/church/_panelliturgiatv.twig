@@ -1,0 +1,36 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Elő közvetítések' %}
+{% set panel = 'primary' %}
+{% set footer = true %}
+
+{% block body %}
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .material-icons.highlight
+        {
+           color: #b58f04;
+       }
+       .material-icons.live {
+           color: red;
+       }
+       .material-icons.disabled {
+           color: #00000042;
+       }
+    </style>
+    <table class="table table-striped">
+        {% for stream in liturgiatv %}
+            <tr>
+                <td>{{ stream.date|date('m.d.') }} <strong>{{ stream.time|date('H:i') }}</strong></td>
+                <td>{{ stream.name }}</td>
+                <td><a href="{{ stream.url }}"><i class="material-icons {{ stream.iconstate }}">&#xe63a;</i></a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block footer %}
+    További közvetítések: <a href="https://zsolozsma.herokuapp.com/">zsolozsma.herokuapp.com</a>
+{% endblock %}
+
+

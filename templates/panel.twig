@@ -12,5 +12,8 @@
                 {% block body %}{{ body|raw }}{% endblock %}
             </div>
         </div>
+       {%  if footer %}     
+       <div class="panel-footer">{% block footer %}{% endblock %}</div>
+       {% endif %}
     </div>
 </div>

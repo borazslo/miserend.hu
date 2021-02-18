@@ -6,7 +6,7 @@ namespace ExternalApi;
 
 class NominatimApi extends \ExternalApi\ExternalApi {
 
-    public $name = 'mapquest';
+    public $name = 'nominatim';
     public $apiUrl = "https://nominatim.openstreetmap.org/" ;
 
     function OSM2GeoJson($osmtype, $osmid) {
