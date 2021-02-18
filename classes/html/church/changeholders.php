@@ -16,23 +16,33 @@ class ChangeHolders extends \Html\Html {
         
         $where['user_id'] = \Request::IntegerRequired('uid');
         
-        $data['status'] = \Request::InArrayRequired('access', ['allowed','denied','revoked']);                
+        $data['status'] = \Request::InArrayRequired('access', ['allowed','denied','revoked','asked']);                
         $description = \Request::Text('description');
         if($description != '') {
             $data['description'] = $description;
         }
        
-        
         global $user;
-        if(!$user->checkRole('miserend')) {
+        if($user->checkRole('miserend')) {
+            
+           \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+           addMessage('A változtatást sikeresen elmentettük.', 'info');
+           return $this->redirect('/templom/'.$where['church_id'].'/edit');
+           
+        } elseif ( $user->uid == $where['user_id'] AND $data['status'] == 'asked' )  {
+            
+            \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+            addMessage('A kérést köszönettel elmentettük.', 'info');
+            return $this->redirect('/templom/'.$where['church_id']);
+        
+        } else {
             throw new \Exception('Hiányzó jogosultság');
-        } 
+        }
         
-        \Eloquent\ChurchHolder::updateOrCreate($where,$data);
         
-        addMessage('A változtatást sikeresen elmentettük.', 'info');
         
-        return $this->redirect('/templom/'.$where['church_id'].'/edit');
+        
+        
         
     }
             

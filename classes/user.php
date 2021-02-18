@@ -73,6 +73,12 @@ class User {
             return false;
     }
 
+    function getHoldingData($church_id) {
+        $holding = \Eloquent\ChurchHolder::where('user_id',$this->uid)->where('church_id',$church_id)->orderBy('updated_at','desc')->first();
+        if($holding) $holding->setAppends([]);
+        return $holding;
+    }
+    
     function getResponsabilities() {
         $this->responsibilities = array(
             'diocese' => array(),

@@ -93,6 +93,8 @@ class Church extends \Html\Html {
         
         $this->miserend = $misek;
         $this->alert = LiturgicalDayAlert('html');
+        
+        $this->isChurchHolder = $user->getHoldingData($this->id);                
     }
 
     static function factory($path) {
