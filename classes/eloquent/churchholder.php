@@ -42,5 +42,26 @@ class ChurchHolder extends Model {
                 $item = \Eloquent\ChurchHolder::updateOrCreate((array) $tmp, ['status' => 'allowed','description' => 'Ő a létrehozója a templomnak.']);
             }
         }
+        
+        /* custom */
+    function sendEmails() {                
+        /*
+         * miserend adminiok
+         * egyházmegyei felelős(ök)
+         * templom feltöltésre jogosult felhasználó
+         */
+        $this->append('church')->get();
+        $emails = [];        
+        /* Miserend Adminok */
+        $admins = DB::table('user')->where('jogok','LIKE','%miserend%')->where('notifications',1)->get();
+        foreach($admins as $admin) {
+            
+            $this->addressee = $admin;
+            $mail = new \Eloquent\Email();                
+            
+            $mail->render('churchholders_asked_admin',$this);
+            $mail->send($admin->email);
+        }                                           
+        return true;
+    }
 }
-

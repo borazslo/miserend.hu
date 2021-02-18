@@ -36,12 +36,13 @@ class ChangeHolders extends \Html\Html {
             
                 $churchHolder = \Eloquent\ChurchHolder::where('user_id',$where['user_id'])->where('church_id',$where['church_id'])->first();
                 if(!$churchHolder) {
-                    $churchHolder = \Eloquent\ChurchHolder::create(array_merge($where,$data));
+                    $churchHolder = new \Eloquent\ChurchHolder(array_merge($where,$data));
                 }
                 $this->holder = $churchHolder;
                            
             } else {            
-                \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+                $churchHolder = \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+                $churchHolder->sendEmails();
                 addMessage('A kérést köszönettel elmentettük.', 'info');
                 return $this->redirect('/templom/'.$where['church_id']);
             }
