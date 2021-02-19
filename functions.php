@@ -1585,14 +1585,18 @@ function getInputJSON() {
 
 function feltoltes_block() {
     global $user;
-
-    $churches = \Eloquent\Church::where('letrehozta',$user->login)->limit(5)->get();
-
+    
+    $allowed = $user->responsibilities['church']['allowed'];
+    $ids = [];
+    foreach($allowed as $church) {
+        $ids[] = $church->church_id;
+    }
+    $churches = \Eloquent\Church::whereIn('id',$ids)->get();
+    
     if(count($churches) == 0) return;
-
     
     $kod_tartalom = '<ul>';
-    foreach( $churches as $church) { 
+    foreach( $churches as $church) {         
         if ($church->eszrevetel == 'i')
             $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
         elseif ($church->eszrevetel == 'f')

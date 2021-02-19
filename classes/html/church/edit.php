@@ -6,18 +6,15 @@ class Edit extends \Html\Html {
 
     public function __construct($path) {
         global $user;
-
+   
         $this->input = $_REQUEST;
         $this->tid = $path[0];
-        $this->church = \Eloquent\Church::find($this->tid);
+        $this->church = \Eloquent\Church::find($this->tid)->append(['writeAccess']);
         if (!$this->church) {
             throw new \Exception('Nincs ilyen templom.');
         }
-        $this->setTitle($this->church->nev);
 
-        if (!$this->church->McheckWriteAccess($user)) {
-            $this->title = 'Templom szerkesztése!';
-            addMessage('Hiányzó jogosultság!', 'danger');
+        if (!$this->church->writeAccess) {
             throw new \Exception('Hiányzó jogosultság!');
             return;
         }
@@ -39,11 +36,6 @@ class Edit extends \Html\Html {
             'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml', 'pleb_url',
             'megjegyzes', 'miseaktiv', 'misemegj', 'leiras', 'ok', 'frissites',
             'lat','lon'];
-
-        global $user;
-        if ($user->checkRole('miserend')) {
-            $allowedFields[] = 'letrehozta';
-        }
 
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $this->input['church'])) {

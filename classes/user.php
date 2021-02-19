@@ -97,14 +97,8 @@ class User {
             
             $this->responsibilities['church'] = \Eloquent\ChurchHolder::where('user_id',$this->uid)->get()->groupBy('status');
             
-            $results = DB::table('templomok')
-                    ->select('id')
-                    ->where('ok', 'i')
-                    ->where('letrehozta', $this->username)
-                    ->get();
-            foreach ($results as $result) {
-                $this->responsible['church'][] = $result->id;
-            }            
+            
+            $this->responsible['church'] = \Eloquent\ChurchHolder::where('user_id',$this->uid)->where('status','allowed')->get()->Pluck('church_id')->toArray();
         }
         
     }
@@ -361,7 +355,7 @@ class User {
         else {
             $favorites = \Eloquent\Favorite::groupBy('tid')->select('tid', DB::raw('count(*) as total'))->orderBy('total','DESC')->limit(10)->get();
         }        
-
+        
         foreach ($favorites as $favorite) {
             $this->favorites[$favorite->tid] = $favorite; 
         }
@@ -371,7 +365,7 @@ class User {
 
     function checkFavorite($tid) {
         if (!isset($this->favorites)) {
-            $this->getFavorites();
+            $this->favorites = $this->getFavorites();
         }
         foreach ($this->favorites as $favorite) {
             if ($favorite['tid'] == $tid) {
