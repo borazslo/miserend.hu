@@ -3,7 +3,7 @@
 {% set title = 'Felelősök' %}
 
 {% block body %}     
-    {% if isadmin %}
+    {% if user.isadmin %}
         {% for status, holders in church.holders %}
             <table class="table">
                     <tr class="bg-primary">
