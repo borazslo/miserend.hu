@@ -7,7 +7,7 @@ https://github.com/molnarm/zsolozsma#api
 class LiturgiatvApi extends \ExternalApi\ExternalApi {
 
     public $name = 'liturgiatv';
-    public $apiUrl = "https://zsolozsma.herokuapp.com/" ;
+    public $apiUrl = "https://liturgia.tv/" ;
     public $cache = "6 hours";
 
     function getByChurch($church_id) {

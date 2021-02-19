@@ -19,7 +19,7 @@
        }
     </style>
     <table class="table table-striped">
-        {% for stream in liturgiatv %}
+        {% for stream in liturgiatv|slice(0, 5) %}
             <tr>
                 <td>{{ stream.date|date('m.d.') }} <strong>{{ stream.time|date('H:i') }}</strong></td>
                 <td>{{ stream.name }}</td>
@@ -30,7 +30,7 @@
 {% endblock %}
 
 {% block footer %}
-    További közvetítések: <a href="https://zsolozsma.herokuapp.com/">zsolozsma.herokuapp.com</a>
+    További közvetítések: <a href="https://liturgia.tv/miserend/{{ id }}">liturgia.tv</a>
 {% endblock %}
 
 
