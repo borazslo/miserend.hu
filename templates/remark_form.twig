@@ -1,5 +1,8 @@
  {% extends "remark.twig" %}
 
+{% set title = "Észrevétel beküldése" %}
+{% set pageDescription = "Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban." %}
+
  {% block content %}
 <div>  
     <form method=post action="/remark/add/{{ church.id }}">

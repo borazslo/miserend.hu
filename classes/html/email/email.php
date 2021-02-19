@@ -5,19 +5,17 @@ namespace Html\Email;
 class Email extends \Html\Html {
 
     public function __construct($path) {
-        global $user;
-        $this->user = $user;
-        if (!$this->user->checkRole('"any"')) {
-            throw new \Excpetion("Nincs jogod levélküldéshez.");
+        if(!$this->checkPermission()) {
+            throw new \Exception("Nincs jogod levélküldéshez.");
         }
 
-        $this->mail = new \Mail();
+        $this->mail = new \Eloquent\Email();
         if (isset($_REQUEST['send'])) {
             $this->send();
             $this->template = 'layout_simpliest.twig';
-            $this->content = "Köszönjük, elküldtük.";
+            $this->body = "Köszönjük, elküldtük.";
             unset($this->mail);
-        } else {
+        } else {            
             $this->preparePage($path);
         }
     }
@@ -25,7 +23,7 @@ class Email extends \Html\Html {
     public function send() {
         $this->mail->to = \Request::TextRequired('email');
         $this->mail->subject = \Request::TextRequired('subject');
-        $this->mail->content = \Request::TextRequired('text');
+        $this->mail->body = \Request::TextRequired('text');
         $this->mail->type = \Request::Simpletext('type');
         if (!$this->mail->send()) {
             addMessage('Nem sikerült elküldeni az emailt. Bocsánat.', 'danger');
@@ -33,7 +31,20 @@ class Email extends \Html\Html {
     }
 
     public function preparePage($path) {
+        $id = \Request::Integer('id');
         
+        if($id) {
+            $this->mail = \Eloquent\Email::find($id);
+        }      
     }
 
+    function checkPermission() {
+        global $user;
+        $this->user = $user;
+        if (!$this->user->checkRole('"any"')) {
+            return false;   
+        }
+        return true;
+    }
+    
 }

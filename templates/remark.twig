@@ -1,5 +1,9 @@
 {% extends "layout_simpliest.twig" %}
 
+{% set title = "Észrevétel beküldése" %}
+{% set pageDescription = "Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban." %}
+
+
 {% block pageHeader %}
 <div class="jumbotron">
 	<h3>
@@ -12,11 +16,10 @@
 
 {% block content %}
 <div style="width:100%-10px;background-color:#ffffff;padding:5">  
-  {{ content|raw }}
-  {% if disclaimer %}
-    <div style="width:100%-20px;background-color:#F5CC4C;padding:5;margin-bottom:6px" class="alap">
-        {{ disclaimer|raw }}
-    </div>
-  {% endif %}
+  <h2>Köszönjük!</h2>
+  <strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br>
+  <input type='button' value='Ablak bezárása' onclick='self.close()'>
+  
+  {% if debug < 1 %}<script language=Javascript>setTimeout(function(){self.close();},3000);</script>{% endif %}
 </div>
 {% endblock %}

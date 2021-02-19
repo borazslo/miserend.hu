@@ -692,7 +692,7 @@ function searchChurchesWhere($args) {
     }
 
     if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {
-        $where[] = "egyhazmegye IN (17,18)";
+        $where[] = "egyhazmegye IN (17,18, 34)";
     }
 
     if ($args['ehm'] != 0)
@@ -731,7 +731,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         $where[] = " m.tid IN (" . implode(",", $tids) . ")";
     }
     if ($args['gorog'] == 'gorog') {
-        $where[] = "egyhazmegye IN (17,18)";
+        $where[] = "egyhazmegye IN (17,18,34)";
     }
     //milyen nap
     if ($args['mikor'] == 'x')
@@ -824,13 +824,13 @@ function searchMasses($args, $offset = 0, $limit = 20) {
                 if ($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'gor')
                     $notgor[] = $abbrev;
             $where[] = "( m.milyen REGEXP '(^|,)(gor)([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' OR 
-                        ( (egyhazmegye = 17 OR egyhazmegye = 18 ) AND m.milyen NOT REGEXP '(^|,)(" . implode("|", $notgor) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
+                        ( egyhazmegye IN (17,18,34) AND m.milyen NOT REGEXP '(^|,)(" . implode("|", $notgor) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
         } elseif ($args['ritus'] == 'rom') {
             foreach ($attributes as $abbrev => $attribute)
                 if ($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'rom')
                     $notrom[] = $abbrev;
-            $where[] = "( (m.milyen NOT REGEXP '(^|,)(" . implode("|", $notrom) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' AND egyhazmegye NOT IN (17,18)) OR 
-                        ( egyhazmegye IN (17,18) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
+            $where[] = "( (m.milyen NOT REGEXP '(^|,)(" . implode("|", $notrom) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' AND egyhazmegye NOT IN (17,18,34)) OR 
+                        ( egyhazmegye IN (17,18,34) AND m.milyen REGEXP '(^|,)(rom)([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ) )";
         } else {
             $where[] = " m.milyen REGEXP '(^|,)(" . $args['ritus'] . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
         }
@@ -1240,12 +1240,12 @@ function assignUpdates() {
     //echo "Kiosztható: ".$cKioszthato;
     //echo $cUsers * $limit;
     if (($cUsers * $limit) > $cKioszthato) {
-        $mail = new Mail();
+        $mail = new \Eloquent\Email();
         $mail->subject = "Miserend.hu - Önkéntes FIGYELMEZTETÉS!";
-        $mail->content = "Itt a vége?\n\n" . $cUsers . " önkéntesünk van. Nekik kéne kiosztani " . ( $cUsers * $limit ) . " templomot, de csak " . $cKioszthato . " templom van a raktáron.";
+        $mail->body = "Itt a vége?\n\n" . $cUsers . " önkéntesünk van. Nekik kéne kiosztani " . ( $cUsers * $limit ) . " templomot, de csak " . $cKioszthato . " templom van a raktáron.";
         if ($cKioszthato > 0) {
             $limit = ceil($cKioszthato / $cUsers);
-            $mail->content .= "\nÚgy határoztunk hát, hogy csak " . $limit . " templomot osztunk ki fejenként.";
+            $mail->body.= "\nÚgy határoztunk hát, hogy csak " . $limit . " templomot osztunk ki fejenként.";
         }
         $mail->Send($config['mail']['debugger']);
     }
@@ -1339,7 +1339,7 @@ function assignUpdates() {
         else
             $ol = "és már csak";
 
-        $mail = new Mail();
+        $mail = new \Eloquent\Email();
 
         $mail->subject = "Miserend frissítése, " . date('W') . ". hét";
         $text = "
@@ -1373,7 +1373,7 @@ EOT;
             <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
         ";
         $mail->type = "heti7templom_hetiadag";
-        $mail->content = $text;
+        $mail->body = $text;
         $mail->Send($user['email']);
         /* */
     }
@@ -1425,7 +1425,7 @@ function clearoutVolunteers() {
                 $nev = $user->username;
 
 
-            $mail = new Mail();
+            $mail = new \Eloquent\Email();
 
             $mail->subject = "Miserend önkéntesség";
 
@@ -1438,7 +1438,7 @@ function clearoutVolunteers() {
 EOD;
             $text .= "<p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor módosíthatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
         ";
-            $mail->content = $text;
+            $mail->body = $text;
             $mail->type = "heti7templom_lemondas";
             $mail->Send($user->email);
             $user->presave('volunteer', 0);
@@ -1594,13 +1594,13 @@ function feltoltes_block() {
     $kod_tartalom = '<ul>';
     foreach( $churches as $church) { 
         if ($church->eszrevetel == 'i')
-            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->tid."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
         elseif ($church->eszrevetel == 'f')
-            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->tid."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
         else
             $jelzes = '';
 
-        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->tid."/edit' class=link_kek title='".$church->varos."'>".$church->nev."</a></li>";
+        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->id."/edit' class=link_kek title='".$church->varos."'>".$church->nev."</a></li>";
     }
 
     $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";

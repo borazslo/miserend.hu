@@ -2,15 +2,12 @@
 
 namespace Html\Ajax;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class EventsList extends Ajax {
 
     public function __construct() {
-        $query = "SELECT name FROM events GROUP BY name";
-        if (!$lekerdez = mysql_query($query))
-            echo "HIBA a város keresőben!<br>$query<br>" . mysql_error();
-        while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
-            $return[] = $row['name'];
-        }
+        $return = DB::table('events')->groupBy('name')->pluck('name');        
         $this->content = json_encode(array('events' => $return));
     }
 

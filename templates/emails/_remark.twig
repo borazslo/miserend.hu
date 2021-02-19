@@ -1,0 +1,9 @@
+<a href="https://miserend.hu/?templom={{ church.id }}">{{ church.nev }} ({% if church.ismertnev %}{{ church.ismertnev }}, {% endif %}{{ church.varos }})</a><br/>
+
+{% if email %}
+<i><a href="mailto:{{ email }}" target="_blank">{{ nev }}</a> ({{ login }}):</i><br/>
+{% else %}
+<i>{{ nev }} ({{ login }}):</i><br/>
+{% endif %}
+
+{{ leiras|striptags('<br><p>')|raw }}

@@ -7,13 +7,12 @@ class User {
     function __construct($uid = false) {
         if (isset($uid)) {
             $user = DB::table('user')
-                    ->select('*')
-                    ->where('ok', 'i');
+                    ->select('*');
             
             if(!is_numeric($uid) AND filter_var($uid, FILTER_VALIDATE_EMAIL) ) {
                 $user = $user->where('email', $uid);
             } elseif (!is_numeric($uid)) {
-                $user = $user->where('nev', $uid);
+                $user = $user->where('login', $uid);
             } else {
                 $user = $user->where('uid', $uid);
             }
@@ -114,22 +113,18 @@ class User {
     function getRemarks($limit = false, $ago = false) {
         if ($limit == false OR ! is_numeric($limit))
             $limit = 5;
-
+        
+        $query = \Eloquent\Remark::select('*',DB::raw('count(*) as total'))->where(function ($q) {
+                    $q->where('login', $this->username)->orWhere('email', $this->email);
+                });
         if ($ago != false)
-            $datum = " AND datum > '" . date('Y-m-d H:i:s', strtotime("-" . $ago)) . "' ";
-        else
-            $datum = '';
-
-        $query = "SELECT id FROM remarks WHERE 
-				(login = '" . $this->username . "' OR email = '" . $this->email . "') 
-				" . $datum . " ORDER BY created_at desc";
-        $result = mysql_query($query);
-        $this->remarksCount = mysql_num_rows($result);
-        $query .= " LIMIT " . $limit . ";";
-        $result = mysql_query($query);
-        while ($remark = mysql_fetch_assoc($result)) {
-            $this->remarks[$remark['id']] = new Remark($remark['id']);
-        }
+            $query = $query->where('datum','>', date('Y-m-d H:i:s', strtotime("-" . $ago)));
+            
+        $query = $query->groupBy('church_id')->orderBy('created_at','desc');
+        
+        $this->remarksCount = $query->count();
+        $this->remarks = $query->limit($limit)->get();
+                
         return true;
     }
 
@@ -143,16 +138,16 @@ class User {
 
         $dangers = array(
             'uid' => 'Probléma támadt az azonosítóval!',
-            'username' => 'Probléma a felhasználónévvel! (A felhasználó nevet nem lehet megváltoztatni és nem lehet olyan név, ami már használatban van.)',
+            'username' => 'Probléma a felhasználónévvel! (Nem megfelelő karakterek, vagy már használatban van. A felhasználó nevet nem lehet megváltoztatni.)',
             'nickname' => 'Probléma a becenévvel!',
             'name' => 'Probléma a névvel!',
-            'email' => 'Nem megfelelő email cím!',
+            'email' => 'Nem megfelelő email cím! Talán már használatban van?',
             'volunteer' => 'Hibás értéke van az önkéntességnek!',
-            'ok' => 'Csak az „i” = „igen” és a „n” = „nem” elfogadható érték az aktivitást illetően!',
             'roles' => 'Hibás formátumú jogkörök!',
+            'notifications' => 'Email értesítések engedélyezése körül hiba lépett fel!',
         );
 
-        foreach (array('uid', 'username', 'nickname', 'name', 'email', 'volunteer', 'ok', 'roles') as $input) {
+        foreach (array('uid', 'username', 'nickname', 'name', 'email', 'volunteer', 'roles','notifications') as $input) {
             if (isset($vars[$input])) {
                 if (!$this->presave($input, $vars[$input])) {
                     $return = false;
@@ -161,7 +156,8 @@ class User {
             }
         }
 
-        if ($vars['password1'] != '' OR $vars['password2'] != '') {
+        
+        if (isset($vars['uid']) AND ( $vars['password1'] != '' OR $vars['password2'] != '')) {
             if ($vars['password1'] != $vars['password2'] OR $vars['password1'] == '') {
                 addMessage('A két jelszó nem egyezik meg egymással', 'danger');
                 $return = false;
@@ -172,33 +168,28 @@ class User {
                 }
             }
         }
-
+        
         if ($return == false)
             return false;
-
-        if (!$vars['uid']) {
+               
+        if (!isset($vars['uid'])) {
             $pwd = $this->generatePassword();
-            $this->presave('password', $pwd);
-
-            //email küldése
-            $email = new Mail();
-            $email->subject = 'Regisztráció - Virtuális Plébánia Portál';
-            $email->content = "Kedves " . $this->username . "!<br/><br/>";
-            $email->content = "Köszöntünk a Virtuális Plébánia Portál felhasználói között!<br/><br/>";
-            $email->content .="\n\nA belépéshez szükséges jelszó: $pwd<br/>";
-            $email->content .="\nA belépést követően a BEÁLLÍTÁSOK menüben kérjük megváltoztatni a jelszót.<br><br/>";
-            $email->content .="\n\nVPP \nwww.plebania.net";
-            $email->to = $this->presaved['email'];
-            if ($email->send())
-                addMessage("Elküldtük az emailt az új regisztrációról.", "success");
+            $this->presave('password', $pwd);                
         }
 
         if (!$this->save()) {
             addMessage("Nem sikerült elmenteni. Pedig minden rendben volt előtte.", "warning");
             return false;
         } else {
-            if (!$vars['uid'])
+            if (!isset($vars['uid'])) {
                 addMessage("A felhasználót sikeresen létrehoztuk.", "success");
+                
+                $this->newpwd = $pwd;
+                $email = new \Eloquent\Email();
+                $email->render('user_welcome', $this);
+                if ($email->send($this->email))
+                    addMessage("Elküldtük az emailt az új regisztrációról.", "success");                                
+            }    
             else
                 addMessage("A változásokat elmentettük.", "success");
         }
@@ -210,7 +201,6 @@ class User {
             $this->presaved = array();
         //TODO: check duplicate for: logn + email
         //TODO: van, amit ne engedjen, csak, amikor még tök új a cuccos.
-        //TODO: törölhető oszlop: ismerosok, baratok, regip, lastip, log, adminmegj,atvett
         //TODO: a nickname - becenev / name - nev esetén ez nem segít, bár nem sok dupla munka azért
         //TODO: elrontja ...
         //if($this->$key == $val) return true;
@@ -225,7 +215,7 @@ class User {
         } elseif (in_array($key, array('username', 'login'))) {
             if ($this->uid == 0) {
                 if (!checkUsername($val))
-                    return false;
+                    return false;                    
                 $this->presaved['login'] = sanitize($val);
             } elseif ($this->username != $val) {
                 return false;
@@ -243,26 +233,13 @@ class User {
             $this->presaved['becenev'] = sanitize($val);
         } elseif ($key == 'name' or $key == 'nev') {
             $this->presaved['nev'] = sanitize($val);
-        } elseif ($key == 'ok') {
-            $con = array(1 => 'i', 0 => 'n');
-            if ($val == '')
-                $this->presaved[$key] = 'n';
-            elseif (in_array($val, array('i', 'n')))
-                $this->presaved[$key] = $val;
-            elseif (in_array($val, array(1, 0)))
-                $this->presaved[$key] = $con[$val];
-            else
-                return false;
         } elseif ($key == 'volunteer') {
             if ($val == '')
                 $this->presaved[$key] = 0;
             elseif (in_array($val, array(0, 1)))
                 $this->presaved[$key] = $val;
             else
-                return false;
-        } elseif (in_array($key, array('letrehozta'))) {
-            //TODO: túlzás lenne megnézni, hogy valódi name-e? (bár ha törölt... user...)
-            $this->presaved[$key] = sanitize($val);
+                return false;       
         } elseif (in_array($key, array('regdatum', 'lastlogin', 'lastactive'))) {
             if (is_numeric($val)) {
                 $this->presaved[$key] = date('Y-m-d H:i:s', $val);
@@ -274,9 +251,12 @@ class User {
             if (!filter_var($val, FILTER_VALIDATE_EMAIL)) {
                 return false;
             }
-            if ($this->isEmailInUse($val) AND $val != $this->email) {
+            if ($this->isEmailInUse($val) AND ( !isset($this->email) OR $val != $this->email )) {
                 return false;
             }
+            $this->presaved[$key] = $val;
+        } elseif ($key == 'notifications') {
+            if(!in_array($val,[0,1])) return false;            
             $this->presaved[$key] = $val;
         } else
             return false;
@@ -290,30 +270,25 @@ class User {
 
         //Set Deafult
         if ($this->uid < 1) {
-            if (!isset($this->presaved['ok']))
-                $this->presave('ok', 'i');
             if (!isset($this->presaved['regdatum']))
                 $this->presave('regdatum', time());
-            global $user;
-            if (!isset($this->presaved['letrehozta']))
-                $this->presave('letrehozta', $user->username);
         }
-
-        foreach ($this->presaved as $key => $val) {
-            $keys[] = $key;
-            $vals[] = $val;
-            $sets[] = $key . ' = "' . $val . '"';
-        }
-
+        
         if ($this->uid == 0 AND isset($this->presaved['login'])) {
-            $query = "INSERT INTO user (" . implode(', ', $keys) . ") VALUES ('" . implode("', '", $vals) . "');";
-            if (!mysql_query($query))
+            try {
+                $this->uid = DB::table('user')->insertGetId($this->presaved);
+            } catch (Exception $e) {
+                addMessage($e->getMessage(),'danger');
                 return false;
-            $this->uid = mysql_insert_id();
+            }           
         } elseif ($this->uid > 0) {
-            $query = "UPDATE user SET " . implode(', ', $sets) . " WHERE uid = " . $this->uid . " LIMIT 1;";
-            if (!mysql_query($query))
+            try {
+                DB::table('user')->where('uid',$this->uid )->update($this->presaved);
+            } catch (Exception $e) {
+                addMessage($e->getMessage(),'danger');
                 return false;
+            }           
+            
         }
 
         foreach ($this->presaved as $key => $val)
@@ -323,7 +298,10 @@ class User {
         $this->username = $this->login;
         $this->nickname = $this->becenev;
         $this->name = $this->nev;
-        $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
+        if(isset($this->jogok))
+            $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
+        else
+            $this->rolse = [];
 
         unset($this->presaved);
 
@@ -409,6 +387,7 @@ class User {
                 $favorite->save();
                 }
         }
+        return true;
     }
 
     function removeFavorites($tids) {
@@ -418,18 +397,13 @@ class User {
             if (!is_numeric($tid))
                 return false;
         }
-
-        $query = "DELETE FROM favorites WHERE ";
-        foreach ($tids as $key => $tid) {
-            $query .= "( uid = " . $this->uid . " AND tid = " . $tid . ")";
-            if ($key < count($tids) - 1)
-                $query .= " OR ";
-        }
-        $query .= ";";
-        if (mysql_query($query))
+        try {
+            $query = \Eloquent\Favorite::where('uid',$this->uid)->whereIn('tid',$tids)->delete();
             return true;
-        else
+        } catch (Exception $ex) {
+            addMessage($ex->getMessage(), 'danger');
             return false;
+        }                
     }
 
     function isEmailInUse($val) {
@@ -476,7 +450,7 @@ class User {
 
     static function login($name, $password) {
         $name = sanitize($name);
-        $userRow = DB::table('user')->where('login', $name)->where('ok', '!=', 'n')->first();
+        $userRow = DB::table('user')->where('login', $name)->first();
         if (!$userRow) {
             throw new \Exception("There is no such user.");
         }

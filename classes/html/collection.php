@@ -14,19 +14,17 @@ class Collection extends Html {
                 ->where('osmid',$match[2])->first();
         $this->setTitle($osm->name);
 
-        if ($osm->lat) {
-            $this->lat = $osm->lat;
-        } else {
-            $this->lat = 47.5;
-        }
-
-        if ($osm->lon) {
-            $this->lon = $osm->lon;
-        } else {
-            $this->lon = 19.05;
-        }
-        $this->zoom = 12;
-
+        // Mivel a kirajzolás után magától középre teszi magát, ezért nem kell ez a felesleges kör.         
+        $location = $osm->location();
+        if( $location ) {
+            $this->center = [
+                'lat' => $location->lat,
+                'lon' => $location->lon
+            ];
+        }        
+        
+        $this->boundary = $match[1].':'.$match[2];
+        
         $churchIds = DB::table('boundaries')
                 ->join('lookup_boundary_church','boundaries.id','=','lookup_boundary_church.boundary_id')
                 ->where('boundaries.osmtype',$match[1])
@@ -44,6 +42,10 @@ class Collection extends Html {
         foreach ($this->churches as &$church) {
             $church->photos;
         }
+        
+        $data = \Html\Map::getGeoJsonDioceses();                
+        $this->dioceseslayer = [];
+        $this->dioceseslayer['geoJson'] = json_encode($data);        
     }
 
 }

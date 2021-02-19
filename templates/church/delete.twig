@@ -1,0 +1,19 @@
+{% extends "layout.twig" %}
+
+{% set pageTitle = 'Templom és miserendje törlése' %}
+
+
+{% block content %}
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">{{ church2delete.nev }}</h4>
+        <p>Biztosan törölni akarod a következő templomot?</p>
+        <hr>
+        <p>FIGYELEM! A kapcsolódó misék és képek is törlődnek!</p>
+        <hr>
+
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a href='/templom/{{ church2delete.id }}/delete?confirmation=confirmed' class='btn btn-danger button'>igen</a>
+          <a href='/templom/{{ church2delete.id }}/edit' class='btn btn-success button'>MÉGSEM</a>  
+        </div>
+    </div>  
+{% endblock %}

@@ -23,12 +23,12 @@
 		<div class="panel-group" id="accordion">
 		    <div class="panel panel-default">
 		        <div class="panel-heading visible-lg-block visible-md-block">
-		            <h4 class="panel-title">Észrevételei</h4>
+		            <h4 class="panel-title">Észrevételezett templomai</h4>
 		        </div>
 	            <ul class="list-group">
-	                {% for key, remark in edituser.remarks %}
+	                {% for remark in edituser.remarks %}
 	                	<li class="list-group-item">
-	                		<a href="/templom/{{ remark.church.id }}">{{ remark.church.nev }}</a> ({{ remark.church.varos }})<br/>
+	                		<a href="/templom/{{ remark.church.id }}">{{ remark.church.nev }}</a> ({{ remark.church.varos }}) {%if remark.total > 1 %}({{ remark.total }}){%  endif %}<br/>
 	                		{{ remark.datum }} {% if user.isadmin %}<a href="{{ remark.marker.url }}">{% endif %}{{ remark.marker.html|raw }}{% if user.isadmin %}</a>{% endif %}
 	            		</li>
 	                {% endfor %}
@@ -63,6 +63,7 @@
 {% endblock %}
 
 {% block content %}
+        {% if not newusercreated and not needtologin and not accessdenied %}
 	<form method="post">
 		<input type="hidden" name="q" value="user/edit">
 
@@ -72,7 +73,7 @@
     		<label for="username">Felhasználói név {% include 'help_link.twig' with {'id': 18} %}</label>
     		<input type="text" class="form-control" id="username" name="edituser[username]" {% if not new %}readonly{% endif %} value="{{ edituser.username }}">
     		<span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-		    {% if helptext %}<p class="help-block">Lehetőség szerint ékezet és speciális karakterek nélkül, maximum 20 betű. Szóköz, idézőjel és aposztróf NEM lehet benne! Ez a név azonosít, ezzel tudsz majd belépni, de alább lehetőség van külön becenév megadására is.</p>{% endif %}
+		    {% if helptext %}<p class="help-block">Ékezet és speciális karakterek nélkül, maximum 20 betű. Szóköz, idézőjel és aposztróf NEM lehet benne! Ez a név azonosít, ezzel tudsz majd belépni, de alább lehetőség van külön becenév megadására is.</p>{% endif %}
   		</div>
 
 		<div class="form-group">
@@ -105,6 +106,8 @@
 		    {% if helptext %}<p class="help-block">A regisztrációhoz szükséges egy valós emailcím! Erre a címre küldjük ki az ideiglenes jelszót. Elküldés előtt kérjük ellenőrizd!</p>{% endif %}
   		</div>
 
+                
+                <!--
 		<div class="form-group">
 	    	<label for="volunteer">Önkéntesség</label>
 	    	<div id="volunteer" class="checkbox">
@@ -115,19 +118,22 @@
     			{% if helptext %}<p class="help-block">Vállalom, hogy hetente hét régen frissült templom miserendjét megpróbálom megtudakolni és megosztani a többiekkel. (Emailben értesítünk hétről hétre a megfelelő templomokról.)</p>{% endif %}
 	    	</div>
 		</div>
+                -->
 
-		{% if 'user' in user.roles %}
+                {%  if edit %}
 			<div class="form-group">
-		    	<label for="ok">Engedélyezés/kizárás</label>
-		    	<div id="ok" class="checkbox">
+		    	<label for="notifications">Email értesítések</label>
+		    	<div id="notifications" class="checkbox">
 		        	<label>
-	      				<input type="checkbox" name="edituser[ok]" value="i" {% if edituser.ok == 'i' %}checked{% endif %}> Aktív / engedélyezett
+                                        <input type='hidden' value='0' name='edituser[notifications]'>
+	      				<input type="checkbox" name="edituser[notifications]" value="1" {% if edituser.notifications == 1 %}checked{% endif %}> Engedélyezett
 	    			</label>
-	    			{% if helptext %}<p class="help-block">Vállalom, hogy hetente hét régen frissült templom miserendjét megpróbálom megtudakolni és megosztani a többiekkel. (Emailben értesítünk hétről hétre a megfelelő templomokról.)</p>{% endif %}
+	    			<p class="help-block">Leginkább a felelőssségi köreidbe tartozó templomokhoz érkező észrevételekről küldünk üzeneteket.</p>
 		    	</div>
-			</div>
-
-
+			</div>                    
+                {% endif %}
+                
+		{% if 'user' in user.roles %}
 			<div class="form-group">
 		    	<label for="roles">Jogosultságok</label>{{ edituser.jogok.miserend }}
 				{% for key, item in roles %}
@@ -154,4 +160,5 @@
 
 		<input class="form-control" type="submit" name="submit" value="{% if new %}Létrehoz{% else %}Módosít{% endif %}"/>	    
 	</form>
+        {% endif %}
 {% endblock %}

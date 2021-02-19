@@ -110,7 +110,7 @@ class Table extends Api {
                 switch ($column) {
                     case 'denomination':
                         //http://wiki.openstreetmap.org/wiki/Key:denomination#Christian_denominations
-                        if (in_array($row['egyhazmegye'], array(17, 18))) {
+                        if (in_array($row['egyhazmegye'], array(17, 18, 34))) {
                             $tmp[$column] = 'greek_catholic';
                         } else {
                             $tmp[$column] = 'roman_catholic';

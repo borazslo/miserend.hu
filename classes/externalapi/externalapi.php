@@ -37,8 +37,9 @@ class ExternalApi {
         if (file_exists($this->cacheFilePath)) {
             if (filemtime($this->cacheFilePath) > strtotime("-" . $this->cache)) {
                 $this->rawData = file_get_contents($this->cacheFilePath);
-                if (!$this->jsonData = json_decode($this->rawData)) {
-                    throw new \Exception("Overpass API return data is not a valid JSON! \n(" . $query . ")");
+                $this->jsonData = json_decode($this->rawData);
+                if ($this->jsonData === null) {
+                    throw new \Exception("External API data has been loaded from cache but data is not a valid JSON!\n".$this->rawData);
                 } else {
                     return true;
                 }
@@ -57,11 +58,34 @@ class ExternalApi {
         }
     }
 
-    function downloadData() {
-        $this->rawData = @file_get_contents($this->apiUrl . $this->rawQuery);
-        if (!$this->jsonData = json_decode($this->rawData)) {
-            throw new \Exception("External API return data is not a valid JSON! \n(" . $this->rawQuery . ")");
-        }
+    function downloadData() {        
+        $header = array("cache-control: no-cache","Content-Type: application/json");
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,$this->apiUrl . $this->rawQuery);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,$header);
+        curl_setopt($ch, CURLOPT_HEADER  , false);  // we want headers
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+        curl_setopt($ch, CURLOPT_USERAGENT, "miserend.hu");
+
+        $this->rawData = curl_exec($ch);
+    
+        $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE );      
+        switch ($this->responseCode) {
+            case '200':
+                $this->jsonData = json_decode($this->rawData);
+                if ($this->jsonData === null ) {            
+                    throw new \Exception("External API return data is not a valid JSON!");
+                }
+                break;
+               
+            case '404':
+                $this->Response404();
+                break;
+                
+            default:
+                throw new \Exception("External API returned bad http response code: " . $this->responseCode. "\n<br>" . $this->rawData);
+                break;
+        }        
     }
 
     function clearOldCache() {
@@ -82,5 +106,8 @@ class ExternalApi {
     function loadCacheFilePath() {
         $this->cacheFilePath = $this->cacheDir . $this->name . "_" . md5($this->query) . ".json";
     }
-
+    
+    function Response404() {
+        throw new \Exception("External API returned 404 = Not Found.");
+    }
 }
