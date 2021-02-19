@@ -1596,9 +1596,12 @@ function feltoltes_block() {
     if(count($churches) == 0) return;
     
     $kod_tartalom = '<ul>';
-    foreach( $churches as $church) {         
-        if ($church->eszrevetel == 'i')
+    foreach( $churches as $church) { 
+        $jelzes = '';        
+        if ($church->eszrevetel == 'u')
             $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+        elseif ($church->eszrevetel == 'i')
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";
         elseif ($church->eszrevetel == 'f')
             $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
         else
