@@ -1,0 +1,101 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Felelősök' %}
+
+{% block body %}     
+    {% if user.isadmin %}
+        {% for status, holders in church.holders %}
+            <table class="table">
+                    <tr class="bg-primary">
+                        <td colspan="2" >
+                            {% set statuses = {
+                                    'allowed': 'Enegedélyezett felelősök',
+                                    'denied': 'Elutasított kérések',
+                                    'asked': 'Engedélyezési kérések',
+                                    'revoked': 'Visszavont engedélyek',
+                                    'left': 'Visszalépett felelősök'
+                            } %}
+                             {% set updated_at = {
+                                    'allowed': 'Engedélyezve',
+                                    'denied': 'Elutasítva',
+                                    'asked': 'Kérve',
+                                    'revoked': 'Visszavonva',
+                                    'left': 'Visszalépve'
+                            } %}
+                            {{ statuses[status] }}                 
+                        </td>
+                    </tr>
+            {% for holder in holders %}
+
+                    <tr  class="bg-secondary" >
+                        <td colspan="2" bgcolor="#efefef">
+                            <a href="/user/{{ holder.user.uid }}/edit">
+                                    <strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }})
+                            </a>
+
+                            <div style="float:right">
+                                {% if status in ['allowed'] %}
+                                    <i class="{{ ICONS_GRANT_ACCESS}} green" title="A felhasználó tudja szerkeszteni a templom adatait."></i>
+                                {% else %}
+                                    <a href="/church/{{ church.id }}/changeholders?uid={{ holder.user.uid }}&access=allowed"><i class="{{ ICONS_GRANT_ACCESS}} grey" title="Az engedélyezéshey kattints ide."></i></a>
+                                {% endif %}
+                                {% if status in ['denied','revoked','left']  %}
+                                    <i class="{{ ICONS_DENY_ACCESS}} red" title="A felhasználó nem szerkesztheti a templom adatait."></i>
+                                {% else %}
+                                    <a href="/church/{{ church.id }}/changeholders?uid={{ holder.user.uid }}&access={% if status == 'asked' %}denied{% else %}revoked{% endif %}"><i class="{{ ICONS_DENY_ACCESS}} grey" title="A letiltáshoz kattints ide."></i></a>
+                                {% endif %}
+
+                            </div>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td  class="col-md-6">{{ updated_at[status] }}:</td>
+                        <td>{{ holder.updated_at|date('Y. m. d.') }}</td>
+                    </tr>
+                    <tr>
+                        <td  class="col-md-6">Utoljára aktív:</td>
+                        <td>{{ holder.user.lastactive|date('Y. m. d.') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Templomai:</td>
+                        <td>{{ holder.user.responsibilities.church.allowed|length }} {% if holder.user.responsibilities.church.asked %} + {{ holder.user.responsibilities.church.asked|length }} {% endif %}</td>
+                    </tr>
+                    {% if holder.description %}
+                        <tr>
+                            <td colspan="2">„{{ holder.description}}”</td>                        
+                        </tr>
+                    {% endif %}
+            {% endfor %}
+            </table>
+        {% endfor %}
+        <FORM ENCTYPE='multipart/form-data' action="/templom/{{ church.id }}/changeholders" method=post>
+            <table class="table">
+                <tr class="bg-primary">
+                    <td colspan="2" >Új felelős megadása</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        {{ forms.select(form.holder_uid) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        {{ forms.input(form.holder_decription) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ forms.input(form.holder_access) }}
+                        <input type=submit name='submit' value=Mehet class=urlap>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    {%  else  %}
+        {% for holder in church.holders.allowed %}
+            <strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }}): {{ holder.user.update_at|date('Y. m. d.') }}<br/>
+        {%  endfor %}
+        
+    {%  endif  %}
+{%  endblock %}

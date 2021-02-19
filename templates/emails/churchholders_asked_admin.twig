@@ -1,0 +1,39 @@
+Miserend - {{ user.login }} templomfelelős szeretne lenni
+
+<strong>Kedves admin!</strong><br/>
+<br/>
+Az egyik felhasználónk templomfelelős szeretne lenni. Milyen jó, hogy vannak még önkéntesek!<br/>
+
+<div style='margin: 5px 5px 5px 20px;background-color:#D1DDE9;padding:4px;'>
+    <table class="table table-striped align-middle">
+            <tr>
+                <td>Templom:</td>
+                <td>
+                    <a href="https://miserend.hu/templom/{{ church_id }}/edit" title='{{ church.ismertnev }}'><strong>{{ church.nev }}</strong> ({{ church.varos }})
+                </td>
+            </tr>
+            <tr>
+                <td>Felhasználó:</td>
+                <td>                
+                    <a href="https://miserend.hu/user/{{ user.uid }}/edit" ><strong>{{ user.login }}</strong> ({{ user.nev }})
+                </td>
+            </tr>
+            <tr>
+                <td>Templomai:</td>
+                <td>{{ user.responsibilities.church.allowed|length }} {% if user.responsibilities.church.asked %} + {{ user.responsibilities.church.asked|length }} {% endif %}</td>
+            </tr>
+            <tr>
+                <td class="align-middle">Megjegyzés:</td>
+                <td>
+                    {{ description }}
+                </td>
+            </tr>                    
+    </table>
+</div>           
+ Jóváhagyhatod, vagy elutasíthatod a kérést a templom szerkesztése oldalon jobboldalt a neve mellett lévő szürke (+) vagy (-) jelre kattintva.<br/><br/>
+
+<strong>Köszönjük a munkádat!</strong><br/>
+
+<br/><br/><small>Ezt a levelet azért kaptad, mert a <a href="https://miserend.hu">Miserend</a> oldalon admin jogosultsággal rendelkezel és be van kapcsolva a személyes beállításoknál az email értesítések fogadása. 
+    Ha nem kívánsz több ilyen leveleket kapni a továbbiakban, akkor belépés után a <a href="https://miserend.hu/user/edit">beállításoknál</a> kikapcsolhatod az értesítéseket. 
+    Ha nem tudsz belépni, akkor <a href="https://miserend.hu/user/lostpassword{% if addressee %}?data={{ addressee.email }}{%  endif %}">kérhetsz új jelszót</a>.</small>

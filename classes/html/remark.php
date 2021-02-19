@@ -48,7 +48,7 @@ class Remark extends Html {
         }
        
         global $user;
-        if (!$user->checkRole('miserend') and ! ($user->username == $this->church->letrehozta ) and ! $user->checkRole('ehm:' . $this->church->egyhazmegye)) {
+        if (!$this->church->writeAccess) {
             addMessage("Hiányzó jogosultság. Elnézést.", "danger");
             return;
         }

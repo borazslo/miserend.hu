@@ -4,14 +4,29 @@
 {% set panel = 'primary' %}
 
 {% block body %}
+    
     <p class=alapkizart>
         Ha észrevételed van a templommal vagy a miserenddel kapcsolatban, írd meg nekünk!
+        {% if ( not isChurchHolder or isChurchHolder.status == 'left' ) and user.loggedin %}
+            Vagy akár vállalhatod, hogy karbantartod ennek a templomnak az adatait.
+        {% endif %}
     </p>
     <div align=center>
         <a href="javascript:OpenNewWindow('/templom/{{ id }}/ujeszrevetel',450,530);" class=link>
             <font color=#8D317C size='+1'><b>Észrevétel beküldése</b></font>
         </a>
     </div>
+    {% if ( not isChurchHolder or isChurchHolder.status == 'left' ) and user.loggedin %}
+    <div align=center>
+        <a href="/templom/{{ id }}/changeholders/?uid={{ user.uid }}&access=asked&confirmation=needed">
+            <font color=#8D317C size='+1' class=""><b>Gondnokság vállalása</b></font>
+        </a>
+    </div>    
+    {% elseif isChurchHolder.status == 'asked' %}            
+        <div align=center>        
+            <font color=#8D317C size='+1' class="grey"><b>(Jelentkezésed elbírálás alatt van.)</b></font>
+    </div>  
+    {% endif %}
     <div align=center>
         <a href="javascript:OpenNewWindow('/templom/{{ id }}/ujkep',450,530);" class=link>
             <font color=#8D317C size=''><b>Új kép beküldése</b></font>

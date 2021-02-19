@@ -73,8 +73,14 @@ class User {
             return false;
     }
 
+    function getHoldingData($church_id) {
+        $holding = \Eloquent\ChurchHolder::where('user_id',$this->uid)->where('church_id',$church_id)->orderBy('updated_at','desc')->first();
+        if($holding) $holding->setAppends([]);
+        return $holding;
+    }
+    
     function getResponsabilities() {
-        $this->responsible = array(
+        $this->responsibilities = array(
             'diocese' => array(),
             'church' => array()
         );
@@ -87,15 +93,14 @@ class User {
             foreach ($results as $result) {
                 $this->responsible['diocese'][] = $result->id;
             }
-            $results = DB::table('templomok')
-                    ->select('id')
-                    ->where('ok', 'i')
-                    ->where('letrehozta', $this->username)
-                    ->get();
-            foreach ($results as $result) {
-                $this->responsible['church'][] = $result->id;
-            }            
+            
+            
+            $this->responsibilities['church'] = \Eloquent\ChurchHolder::where('user_id',$this->uid)->get()->groupBy('status');
+            
+            
+            $this->responsible['church'] = \Eloquent\ChurchHolder::where('user_id',$this->uid)->where('status','allowed')->get()->Pluck('church_id')->toArray();
         }
+        
     }
 
     function processResponsabilities() {
@@ -350,7 +355,7 @@ class User {
         else {
             $favorites = \Eloquent\Favorite::groupBy('tid')->select('tid', DB::raw('count(*) as total'))->orderBy('total','DESC')->limit(10)->get();
         }        
-
+        
         foreach ($favorites as $favorite) {
             $this->favorites[$favorite->tid] = $favorite; 
         }
@@ -360,7 +365,7 @@ class User {
 
     function checkFavorite($tid) {
         if (!isset($this->favorites)) {
-            $this->getFavorites();
+            $this->favorites = $this->getFavorites();
         }
         foreach ($this->favorites as $favorite) {
             if ($favorite['tid'] == $tid) {
