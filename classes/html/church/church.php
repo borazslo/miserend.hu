@@ -36,8 +36,8 @@ class Church extends \Html\Html {
         $church->MgetReligious_administration();
         
         if( count($church->neighbours) < 1 ) {
-            $distance = new \Distance();        
-            $distance->MupdateChurch($church);
+           // $distance = new \Distance();        
+           // $distance->MupdateChurch($church);
         }        
   
         copyArrayToObject($church->toArray(), $this);
