@@ -15,22 +15,35 @@ class ExternalApi {
     }
 
     function runQuery() {
-        if (!isset($this->rawQuery)) {
-            $this->buildQuery();
-        }
+        try {
+        
+            if (!isset($this->rawQuery)) {
+                $this->buildQuery();
+            }
 
-        if ($this->cache) {
-            $this->loadCacheFilePath();
-            $this->tryToLoadFromCache();
-        }
+            if ($this->cache) {
+                $this->loadCacheFilePath();
+                $this->tryToLoadFromCache();
+            }
 
-        if (!isset($this->rawData)) {
-            $this->downloadData();
-        }
+            if (!isset($this->rawData)) {
+                $this->downloadData();
+            }
 
-        if ($this->cache) {
-            $this->saveToCache();
+            if ($this->cache) {
+                $this->saveToCache();
+            }
+            
+            
+        } catch(\Exception $e){
+            global $config;
+            $this->jsonData = [];
+            $this->error = \Html\Html::printExceptionVerbose($e,true);
+            if($config['debug'] > 1) echo $this->error;
+            elseif($config['debug'] > 0) addMessage($this->error,'warning');
+            return false;
         }
+        return true;
     }
 
     function tryToLoadFromCache() {
