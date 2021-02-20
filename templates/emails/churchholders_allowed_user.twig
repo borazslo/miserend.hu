@@ -2,7 +2,7 @@ Miserend - Templomfelelős lettél! ({{ church.id }})
 
 <strong>Kedves {{ user.nev }}!</strong><br/><br/>
 
-Egy adminisztártor jóváhagyta, hogy a <a href="http://miserend.hu/templom/{{ church.id }}">{{ church.nev }} {% if church.ismertnev %}({{ church.ismertnev }}){% endif %}</a> a te felelősségi körödbe tartozzon.<br/>
+Egy adminisztártor jóváhagyta, hogy a <a href="http://miserend.hu/templom/{{ church.id }}">{{ church.fullName }}</a> a te felelősségi körödbe tartozzon.<br/>
 Kérünk, hogy a következőkre figyelj:
 <ul>
     <li><strong>Rendszeresen ellenőrizd a miserendet és <a href="http://miserend.hu/templom/{{ church.id }}/editschedule">javítsd</a>, ha szükség van rá.</strong>
