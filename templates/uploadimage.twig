@@ -30,19 +30,18 @@
 
             //function to check file size before uploading.
             function beforeSubmit() {
+                console.log('nis?');
                 //check whether browser fully supports all File API
                 if (window.File && window.FileReader && window.FileList && window.Blob)
                 {
-
                     if (!$('#FileInput').val()) //check empty input filed
                     {
-                        $('#output').html('Viccelsz?');
+                        $('#output').html('Nincs fájl megadva. Mit töltsek fel?').show();
                         return false
                     }
 
                     var fsize = $('#FileInput')[0].files[0].size; //get file size
                     var ftype = $('#FileInput')[0].files[0].type; // get file type
-
 
                     //allow file types 
                     switch (ftype)
@@ -60,24 +59,24 @@
                              case 'video/mp4':*/
                             break;
                         default:
-                            $('#output').html('<b>' + ftype + '</b> Nem támogatott formátum!');
+                            $('#output').html('<b>' + ftype + '</b> Nem támogatott formátum!').show();
                             return false
                     }
 
                     //Allowed file size is less than 5 MB (1048576)
                     if (fsize > 5242880)
                     {
-                        $('#output').html('<b>' + bytesToSize(fsize) + '</b> Túl nagy a file! <br />A file nem lehet nagyobb mint 5 MB.');
+                        $('#output').html('<b>' + bytesToSize(fsize) + '</b> Túl nagy a file! <br />A file nem lehet nagyobb mint 5 MB.').show();
                         return false
                     }
 
                     $('#submit-btn').hide(); //hide submit button
                     $('#loading-img').show(); //hide submit button
-                    $('#output').html('');
+                    $('#output').html('').hide();
                 } else
                 {
                     //Output error to older unsupported browsers that doesn't support HTML5 File API
-                    $('#output').html('Kérlek, frissítsd a böngésződet, hogy teljesíthessük kérésedet!');
+                    $('#output').html('Kérlek, frissítsd a böngésződet, hogy teljesíthessük kérésedet!').show();
                     return false;
                 }
             }
@@ -146,8 +145,9 @@
             <img src="/img/ajax-loader.gif" id="loading-img" style="display:none;" alt="Türelem, türelem..."/>
 
             <div id="progressbox" ><div id="progressbar"></div ><div id="statustxt">0%</div></div>
-            <div id="output"></div>
+            
         </div>
+        <div  class="alert alert-warning" id="output" style="display:none"></div>
     </center>
     <div class="alert alert-info">
         Kérjük kellően jó minőségű és méretű jpeg képet töltsön csak fel.
