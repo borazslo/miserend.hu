@@ -29,6 +29,7 @@ class RemarkFeedback extends Email {
         }
 
         global $user;
+        $this->user = $user;
         if ($type) {            
             $this->mail->render('remarkfeedback_' . $type, (array) $this );
         } else {
