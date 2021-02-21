@@ -141,7 +141,9 @@
 		        		<label>
                                                 <input type="hidden"   name="edituser[roles][{{ key }}]" value="false">
                                                 <input type="checkbox" name="edituser[roles][{{ key }}]" value="{{ item }}" {% if item in edituser.roles %}checked{% elseif 'user' not in user.roles %}disabled{% endif %}  > {{ item }} 
-                                                {% if ( 'user' not in user.roles and item in edituser.roles ) or item == 'user' %}<small>--> <span class="alert-danger">Lemondhatsz erről a jogodról, de csak egy adminisztrátor tudja majd visszaadni.</span></small>{% endif %}
+                                                {%  if user.uid == edituser.uid %}
+                                                    {% if  item in edituser.roles and ( 'user' not in user.roles or item == 'user' ) %}<small>--> <span class="alert-danger">Lemondhatsz erről a jogodról, de csak egy adminisztrátor tudja majd visszaadni.</span></small>{% endif %}
+                                                {% endif %}
 	    				</label>
 		    		</div>
     			{% endfor %}		    	
