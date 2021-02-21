@@ -81,7 +81,7 @@ class Stat extends Html {
             $this->s5['labels'][$c] = $apiname;
             $this->s5['data'][$c] = [];
             foreach($api as $date) {
-                $this->s5['data'][$c][] = [$date->date,$date->count];
+                $this->s5['data'][$c][] = [$date->date,(int) $date->count];
             }
             $c++;
         }        
