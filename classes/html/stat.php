@@ -9,73 +9,67 @@ class Stat extends Html {
     public function __construct() {
         parent::__construct();
         $this->setTitle('Statisztika');
-
+        
         global $user;
         if (!$user->loggedin) {
             addMessage("Hozzáférés megtagadva!", "danger");
             $this->redirect('/');
         }
 
-        $groups = \Eloquent\Church::where('ok', 'i')
+        /* 
+         * Templomok frissítettsége + észrevételek: Elmúlt év
+         */
+        $this->s1  = [
+            'labels' => ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'],
+            'data' => [0 => [], 1 => [] ] 
+            ];
+        $churches = \Eloquent\Church::where('ok', 'i')
                 ->countByUpdatedYear()
                 ->get();
-        $s1 = [];
+        foreach($churches as $church) {
+            $this->s1['data'][0][] = [(int) $church->updated_year,$church->count_updated_year];
+        }        
+        $remarks = \Eloquent\Remark::countByCreatedYear()->get();
+        foreach($remarks as $remark) {
+            if($remark->created_year > 0)
+                $this->s1['data'][1][] = [(int) $remark->created_year,$remark->count_created_year];
+        }       
 
-        foreach ($groups as $group) {
-            if ($group->updated_year > 0)
-                $s1[] = [ $group->updated_year, $group->count_updated_year];
-        }
-        $this->s1 = $this->array2jslist($s1);
-
-        $groups = \Eloquent\Remark::countByCreatedYear()->get();
-        $s2 = [];
-        foreach ($groups as $group) {
-            if ($group->created_year > 0)
-                $s2[] = [ $group->created_year, $group->count_created_year];
-        }
-        $this->s2 = $this->array2jslist($s2);
-
-        $groups = \Eloquent\Church::where('ok', 'i')
+        /* 
+         * Templomok frissítettsége + észrevételek: Elmúlt év
+         */
+        $this->s3['labels'] = ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
+        $churches = \Eloquent\Church::where('ok', 'i')
                 ->countByUpdatedMonth()
                 ->where('frissites', '>', date('Y-m-d', strtotime('-1 year')))
                 ->get();
-        $s1 = [];
-        $c = 0;
-        foreach ($groups as $group) {
-            if ($group->updated_month > 0)
-                $s1[] = [ $c++, $group->count_updated_month];
-        }
-        $this->s3 = $this->array2jslist($s1);
-
-        $groups = \Eloquent\Remark::countByCreatedMonth()
+        $this->s3['data'] = [0=>[],1=>[]];
+        foreach($churches as $church) {
+            $this->s3['data'][0][] = [$church->updated_month,$church->count_updated_month];
+        }        
+        $remarks= \Eloquent\Remark::countByCreatedMonth()
                 ->where('created_at', '>', date('Y-m-d', strtotime('-1 year')))
                 ->get();
-        $s2 = [];
-        $c = 0;
-        foreach ($groups as $group) {
-            if ($group->created_month > 0)
-                $s2[] = [ $c++, $group->count_created_month];
-        }
-        $this->s4 = $this->array2jslist($s2);
-    }
-
-    function array2jslist($array) {
-        $r = "";
-        if (is_array($array)) {
-            $r .= '[';
-            foreach ($array as $key => $value) {
-                $r .= $this->array2jslist($value);
-                if ($key < count($array) - 1)
-                    $r .= ',';
+        foreach($remarks as $remark) {
+            $this->s3['data'][1][] = [$remark->created_month,$remark->count_created_month];
+        }        
+        
+        /* 
+         * ExternalApi Stats 
+         */
+        $this->s5 = ['data'=>[],'labels'=>[]];
+        $data = DB::table('stats_externalapi')->select('name','date',DB::raw('SUM(count) count'),DB::raw('CONCAT(name,date)  namedate'))->where('date','>',date('Y-m-d',strtotime('-1 month')))->groupBy('namedate')->orderBy('date','asc')->get();        
+        $data = collect($data)->groupBy(['name'])->toArray(); //->transform(function($item, $k) {return $item->groupBy('name');})->toArray();
+        $c = 0;        
+        foreach($data as $apiname => $api) {
+            $this->s5['labels'][$c] = $apiname;
+            $this->s5['data'][$c] = [];
+            foreach($api as $date) {
+                $this->s5['data'][$c][] = [$date->date,$date->count];
             }
-            $r .= ']';
-        } else {
-            if (is_numeric($array))
-                $r .= $array;
-            else
-                $r .= "'" . $array . "'";
-        }
-        return $r;
+            $c++;
+        }        
+        
+        
     }
-
 }

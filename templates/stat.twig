@@ -10,36 +10,61 @@
 <script type="text/javascript" src="/bower_components/jqplot-bower/dist/plugins/jqplot.highlighter.js"></script>
 <script type="text/javascript" src="/bower_components/jqplot-bower/dist/plugins/jqplot.cursor.js"></script>
 <script type="text/javascript" src="/bower_components/jqplot-bower/dist/plugins/jqplot.pointLabels.js"></script>
+<script type="text/javascript" src="/bower_components/jqplot-bower/dist/plugins/jqplot.dateAxisRenderer.js"></script>
+
 {% endblock %}
 
 
 {% block content %}
     
-    <div id="info1" class="row">
-        <strong>zöld</strong>: templomok, amik akkor frissültek utoljára.<br/>
-        <strong>narancsa</strong>: beküldött észrevételek száma az adott időben.<br/>
-    </div>    
-    <h5>Az elmúlt években:</h5>
-    <div id="chart1" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target">
-       </div>
-    <h5>Az elmúlt 12 hónapban:</h5> (Vigyázzat: január az 2016, de február-december 2015)
+    <h3>Templom statisztikák</h3>    
+    <div id="chart1" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>   
     <div id="chart2" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
+    
+    <h3>Egyéb statisztikák</h3>
+    <div id="chart3" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
+
     <script>
     $(document).ready(function () {
-    var s1 = {{ s1|raw }};
-    var s2 = {{ s2|raw }};
- 
-    plot1 = $.jqplot("chart1", [s1, s2], {
+        
+    var grid = {
+              drawBorder: false,
+              shadow: false,
+              // background: 'rgba(0,0,0,0)'  works to make transparent.
+              background: 'white'
+          };
+    var highlighter = {
+            show: true, 
+            showLabel: true, 
+            tooltipAxes: 'y',
+            sizeAdjust: 7.5 , tooltipLocation : 'ne'
+        };
+    var legend = {
+              show: true,
+              renderer: $.jqplot.EnhancedLegendRenderer,
+              placement: "insideGrid",
+              labels: false,
+              location: "ne",
+              rowSpacing: "2px",
+              rendererOptions: {
+                  // set to true to replot when toggling series on/off
+                  // set to an options object to pass in replot options.
+                  seriesToggle: 'normal',
+                  seriesToggleReplot: {resetAxes: true}
+              }
+          };
+    var seriesDefaults = {
+              showMarker: false
+          };
+        
+    legend['labels'] = {{ s1.labels|json_encode()|raw }};   
+    plot1 = $.jqplot("chart1", {{ s1.data|json_encode()|raw }}, {
         // Turns on animatino for all series in this plot.
         animate: true,
         // Will animate plot on calls to plot1.replot({resetAxes:true})
         animateReplot: true,
-        cursor: {
-            show: true,
-            zoom: true,
-            looseZoom: true,
-            showTooltip: false
-        },
+        seriesDefaults: seriesDefaults,
+        title: 'Templomaink frissítettsége',
         series:[
             {
                 pointLabels: {
@@ -106,32 +131,23 @@
                 }
             }
         },
-        highlighter: {
-            show: true, 
-            showLabel: true, 
-            tooltipAxes: 'y',
-            sizeAdjust: 7.5 , tooltipLocation : 'ne'
-        }
+        highlighter: highlighter,
+        legend: legend,
+        grid: grid,
     });
    
    
    
    
    
-       var s3 = {{ s3|raw }};
-    var s4 = {{ s4|raw }};
- 
-    plot1 = $.jqplot("chart2", [s3, s4], {
+    legend['labels'] = {{ s3.labels|json_encode()|raw }};   
+    plot2 = $.jqplot("chart2", {{ s3.data|json_encode()|raw }}, {
         // Turns on animatino for all series in this plot.
         animate: true,
         // Will animate plot on calls to plot1.replot({resetAxes:true})
         animateReplot: true,
-        cursor: {
-            show: true,
-            zoom: true,
-            looseZoom: true,
-            showTooltip: false
-        },
+        seriesDefaults: seriesDefaults,
+        title: 'Az elmúlt 12 hónap frissítései',
         series:[
             {
                 pointLabels: {
@@ -170,15 +186,15 @@
         axes: {
             // These options will set up the x axis like a category axis.
             xaxis: {
-                tickInterval: 1,
-                drawMajorGridlines: false,
-                drawMinorGridlines: true,
-                drawMajorTickMarks: false,
-                rendererOptions: {
-                tickInset: 0.5,
-                minorTicks: 1
-            }
-            },
+                label: "",                  
+                renderer: $.jqplot.DateAxisRenderer,
+                tickOptions:{formatString:'%Y.%m.'},
+                tickInterval:'2 month',
+                /*  min:dates[0],
+                max:dates[dates.length-1],
+                tickInterval: '1 day',                  
+                */                  
+             },
             yaxis: {
                 tickOptions: {
                     formatString: "%'d"
@@ -198,14 +214,51 @@
                 }
             }
         },
-        highlighter: {
-            show: true, 
-            showLabel: true, 
-            tooltipAxes: 'y',
-            sizeAdjust: 7.5 , tooltipLocation : 'ne'
-        }
+        highlighter: highlighter,
+        legend: legend,
+        grid: grid,
     });
    
+   
+   
+   
+    
+      var data = {{ s5.data|json_encode()|raw }};
+      legend['labels'] = {{ s5.labels|json_encode()|raw }};
+
+      // make the plot
+      plot3 = $.jqplot("chart3", data, {
+          title: "Külső API-khoz intézett lekérések",
+          animate: true,
+          axesDefaults: {
+               labelRenderer: $.jqplot.CanvasAxisLabelRenderer 
+          },
+          seriesDefaults: seriesDefaults,
+          legend: legend,
+          axes: {
+              xaxis: {
+                label: "",                  
+                renderer: $.jqplot.DateAxisRenderer,
+                tickOptions:{formatString:'%Y.%m.%d.'},
+                tickInterval:'2 day',
+                /*  min:dates[0],
+                max:dates[dates.length-1],
+                tickInterval: '1 day',                  
+                */                  
+              },
+              yaxis: {
+                  label: '',                 
+              }
+          },
+          grid: grid,
+          legend: legend,
+          highlighter: highlighter,
+      });
+
 });
+
+
+
+
     </script>
     {% endblock%}
