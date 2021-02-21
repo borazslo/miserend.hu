@@ -803,7 +803,6 @@ CREATE TABLE `templomok` (
   `kontakt` varchar(250) NOT NULL DEFAULT '',
   `kontaktmail` varchar(70) NOT NULL DEFAULT '',
   `adminmegj` text NOT NULL,
-  `letrehozta` varchar(20) NOT NULL DEFAULT '',
   `megbizhato` enum('i','n') NOT NULL DEFAULT 'n',
   `regdatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modositotta` varchar(20) NOT NULL DEFAULT '',

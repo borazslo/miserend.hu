@@ -198,9 +198,7 @@ class SearchResultsMasses extends Html {
             foreach ($results['churches'] as $result) {
                 $tartalom .= "<img src=/img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
 				<a href='/templom/" . $result['tid'] . "' class=felsomenulink><b>" . $result['nev'] . "</b> <font color=#8D317C>(" . $result['varos'] . ")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">" . $result['ismertnev'] . "</span>";
-                if ($user->checkRole('miserend') OR $result['letrehozta'] == $user->login)
-                    $tartalom.=" <a href='/templom/" . $result['tid'] . "/edit'><img src=/img/edit.gif title='szerkesztés' align=absmiddle border=0></a>  <a href='/templom/" . $result['tid'] . "/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
-
+                
                 $tartalom.=$ertek . '<br> &nbsp; &nbsp; &nbsp;';
 
                 if ($_REQUEST['mikor'] == 'x')

@@ -36,12 +36,6 @@ class ChurchHolder extends Model {
             return \Eloquent\Church::find($this->church_id);
         }
         
-        static function migrate() {
-            $tmps = DB::table('templomok')->select('templomok.id as church_id','user.uid as user_id')->leftJoin('user','templomok.letrehozta','=','user.login')->where('user.uid','<>','')->get();            
-            foreach($tmps as $tmp) {                
-                $item = \Eloquent\ChurchHolder::updateOrCreate((array) $tmp, ['status' => 'allowed','description' => 'Ő a létrehozója a templomnak.']);
-            }
-        }
         
         /* custom */
     function sendEmails() {                
