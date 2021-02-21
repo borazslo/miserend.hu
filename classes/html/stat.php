@@ -54,6 +54,22 @@ class Stat extends Html {
             $this->s3['data'][1][] = [$remark->created_month,$remark->count_created_month];
         }        
         
+        /*
+         * Templom karbantartók statisztikái
+         */
+        $this->s4 = ['data'=>[],'labels'=>[]];
+        
+        $data = \Eloquent\ChurchHolder::select('user_id',DB::raw('count(*) as count'))->groupBy('user_id')->orderBy('count')->get();
+        
+        foreach($data as $uid => $count ) {
+            if(isset($tmp[$count->count]))
+             $tmp[$count->count]++;
+            else
+                $tmp[$count->count] = 1;
+        }   
+        foreach($tmp as $k => $v)
+            $this->s4['data'][] = [$k,$v];
+        
         /* 
          * ExternalApi Stats 
          */
