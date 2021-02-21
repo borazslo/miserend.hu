@@ -25,7 +25,7 @@
 	>
 		{% for key, option in array.options %}
 			<option value="{{ key }}" 
-			{% if key == array.selected %} selected {% endif %}
+			{% if array.selected and key == array.selected %} selected {% endif %}
 			>{{ option }}</option>
 		{% endfor %}
 	

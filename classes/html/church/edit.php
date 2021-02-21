@@ -207,7 +207,7 @@ class Edit extends \Html\Html {
     }
 
     function addFormNewHolder() {
-        $options = ['0' => 'Nincs megadva'];
+        $options = [];
         $users = \Illuminate\Database\Capsule\Manager::table('user')
                         ->select('login', 'nev', 'uid')
                         ->orderByRaw("CASE WHEN lastlogin > '" . date('Y-m-d H:i:s', strtotime('-6 month')) . "'     THEN 1 ELSE 0 END desc")
@@ -218,6 +218,7 @@ class Edit extends \Html\Html {
         $this->form['holder_uid'] = array(
             'type' => 'select',
             'name' => 'uid',
+            'id' => 'combobox',
             'options' => $options
         );
         $this->form['holder_decription'] = array(
