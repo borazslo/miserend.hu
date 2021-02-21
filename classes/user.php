@@ -26,6 +26,9 @@ class User {
                 $this->nickname = $user->becenev;
                 $this->name = $user->nev;
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
+                foreach($this->roles as $k => $v)
+                    if($v == '')
+                        unset($this->roles[$k]);                
                 $this->getResponsabilities();
                 if ($this->checkRole('miserend')) {
                     $this->isadmin = true;
@@ -230,10 +233,14 @@ class User {
         } elseif ($key == 'roles' OR $key == 'jogok') {
             if (!is_array($val))
                 $val = array($val);
-            foreach ($val as $k => $i)
-                $val['jogok'] = trim(sanitize($i), "-");
-            $val = array_unique($val);
-            $this->presaved['jogok'] = implode('-', $val);
+            $jogok = [];
+            foreach ($val as $k => $i) {
+                if($k == $i ) {
+                    $jogok[$k] = trim(sanitize($i), "-");
+                }
+            }
+            $jogok = array_unique($jogok);
+            $this->presaved['jogok'] = implode('-', $jogok);
         } elseif ($key == 'nickname' or $key == 'becenev') {
             $this->presaved['becenev'] = sanitize($val);
         } elseif ($key == 'name' or $key == 'nev') {
@@ -447,7 +454,7 @@ class User {
         } else {
             setcookie('token', 'macska', time() + 10000);
             return \User::emptyUser();
-        }
+        }        
         $user->loggedin = true;
         $user->active();
         return $user;
