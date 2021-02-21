@@ -64,10 +64,18 @@ class Edit extends \Html\Html {
             }
         }
 
+        global $user;
         $now = date('Y-m-d H:i:s');
         $this->church->moddatum = $now;
         $this->church->log .= "\nMod: " . $user->login . " (" . $now . ")";
-        $this->church->save();
+        
+        /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt...*/
+        $model = $this->church;
+        foreach ($model->getAttributes() as $key => $value) {
+        if(!in_array($key, array_keys($model->getOriginal())))
+            unset($model->$key);
+        }
+        $model->save();
 
         switch ($this->input['modosit']) {
             case 'n':
