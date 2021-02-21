@@ -93,7 +93,7 @@ class Catalogue extends \Html\Html {
         }
 
         if($this->input['sort'] == 'templomok desc')
-            $query->addSelect(DB::raw('count(templomok.id) as templomok'))->leftJoin('templomok', 'templomok.letrehozta','=','user.login')->groupBy('uid');
+            $query->addSelect(DB::raw('count(church_holders.church_id) as templomok'))->leftJoin('church_holders', 'church_holders.user_id','=','user.uid')->where('church_holders.status','allowed')->groupBy('uid');
                 
         if (!empty($this->input['kulcsszo'])) {
             $input = $this->input;
