@@ -128,7 +128,15 @@ class EditSchedule extends \Html\Html {
         $this->church->adminmegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['adminmegj']);
         $this->church->miseaktiv = $_REQUEST['miseaktiv'];
         $this->church->moddatum =  date('Y-m-d H:i:s');
-        $this->church->save();
+        
+        /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt...*/
+        $model = $this->church;
+        foreach ($model->getAttributes() as $key => $value) {
+        if(!in_array($key, array_keys($model->getOriginal())))
+            unset($model->$key);
+        }
+        $model->save();
+        
 
         $modosit = $_REQUEST['modosit'];
         if ($modosit == 'i') {
