@@ -22,10 +22,11 @@ class ChangeHolders extends \Html\Html {
             $data['description'] = $description;
         }
        
+        $confirmation = \Request::Simpletext('confirmation');
+        
         global $user;                   
         if ( $user->uid == $where['user_id'] AND $data['status'] == 'asked' )  {
-            
-            $confirmation = \Request::Simpletext('confirmation');
+                        
             if($confirmation == 'needed') {
             
                 $churchHolder = \Eloquent\ChurchHolder::where('user_id',$where['user_id'])->where('church_id',$where['church_id'])->first();
@@ -49,7 +50,13 @@ class ChangeHolders extends \Html\Html {
            return $this->redirect('/templom/'.$where['church_id'].'/edit');
             
         } else {
-            throw new \Exception('Hiányzó jogosultság');
+            if($confirmation == 'needed') {
+                                                
+            } else {                        
+                
+                throw new \Exception('Hiányzó jogosultság');
+                
+            }
         }
         
         
