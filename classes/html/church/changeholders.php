@@ -22,15 +22,8 @@ class ChangeHolders extends \Html\Html {
             $data['description'] = $description;
         }
        
-        global $user;
-        if($user->checkRole('miserend')) {
-            
-           $churchHolder = \Eloquent\ChurchHolder::updateOrCreate($where,$data);
-           $churchHolder->sendEmails();
-           addMessage('A változtatást sikeresen elmentettük.', 'info');
-           return $this->redirect('/templom/'.$where['church_id'].'/edit');
-           
-        } elseif ( $user->uid == $where['user_id'] AND $data['status'] == 'asked' )  {
+        global $user;                   
+        if ( $user->uid == $where['user_id'] AND $data['status'] == 'asked' )  {
             
             $confirmation = \Request::Simpletext('confirmation');
             if($confirmation == 'needed') {
@@ -48,6 +41,13 @@ class ChangeHolders extends \Html\Html {
                 return $this->redirect('/templom/'.$where['church_id']);
             }
         
+        } else if($user->checkRole('miserend')) {
+            
+           $churchHolder = \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+           $churchHolder->sendEmails();
+           addMessage('A változtatást sikeresen elmentettük.', 'info');
+           return $this->redirect('/templom/'.$where['church_id'].'/edit');
+            
         } else {
             throw new \Exception('Hiányzó jogosultság');
         }
