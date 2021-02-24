@@ -14,17 +14,25 @@ class ChangeHolders extends \Html\Html {
             $where['church_id'] = \Request::IntegerRequired('tid');
         }
         
-        $where['user_id'] = \Request::IntegerRequired('uid');
+        $where['user_id'] = \Request::Integer('uid');
+        $confirmation = \Request::Simpletext('confirmation');
+        
+        if(!$where['user_id']) {
+            if($confirmation) {
+                // Boldogok vagyunk
+                return;
+            } else {
+                throw new \Exception("Required 'uid' is required.");
+            }            
+        }
         
         $data['status'] = \Request::InArrayRequired('access', ['allowed','denied','revoked','asked']);                
         $description = \Request::Text('description');
         if($description != '') {
             $data['description'] = $description;
         }
-       
-        $confirmation = \Request::Simpletext('confirmation');
-        
-        global $user;                   
+               
+        global $user;   
         if ( $user->uid == $where['user_id'] AND $data['status'] == 'asked' )  {
                         
             if($confirmation == 'needed') {
@@ -50,20 +58,10 @@ class ChangeHolders extends \Html\Html {
            return $this->redirect('/templom/'.$where['church_id'].'/edit');
             
         } else {
-            if($confirmation == 'needed') {
-                                                
-            } else {                        
-                
+            
                 throw new \Exception('Hiányzó jogosultság');
-                
-            }
         }
-        
-        
-        
-        
-        
-        
+  
     }
             
 }
