@@ -10,7 +10,7 @@
     <p>A felelős feladata az is, hogy a beérkezett észrevételekre reagáljon, ha szükségs, amihez honlapunk segítséget nyújt.</p> 
     <hr>
     
-    {% if user.isloggedin %}    
+    {% if user.loggedin %}    
         <p><strong>Ha vállalod a gondoksággal járó felelősséget, akkor kattints lenn a „Kérés küldése” gombra.</strong></p>    
     
         <FORM ENCTYPE='multipart/form-data' action="/templom/{{ holder.church_id }}/changeholders" method=post>
