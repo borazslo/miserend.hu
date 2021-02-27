@@ -340,7 +340,7 @@
                 data:"church_id={{ church.id }}&href="+ $( this ).find( '#add-link-href').val() +"&title="+ $( this ).find( '#add-link-title').val() +"&action=add",
                 dataType: "text",
                 success:function(response){
-                    $('#church-links').find('.church-link').last().prev().append(response);                                      
+                    $('#church-links').find('.church-link').last().prev().after(response);                                      
                }, 
              });
         newLinkDialog.dialog( "close" );
