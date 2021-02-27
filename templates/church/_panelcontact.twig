@@ -18,7 +18,7 @@
         </div>
         {% if links %}
             {% for link in links %}
-                <br/>{{ link.html|raw }}
+                <div style="white-space: nowrap;">{{ link.html|raw }}</div>
             {% endfor %}
         {% endif %}
     </div>    

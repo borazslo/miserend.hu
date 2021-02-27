@@ -161,9 +161,13 @@
                     <textarea name=church[plebania] id="plebania" class="urlap form-control tinymce" cols=50 rows=4  placeholder="A plébánia neve, címe, telefonja, egyéb elérhetősége. Ill. hivatali idők.">{{ church.plebania|nl2br }}</textarea>
                     <input type=text class="urlap form-control" name=church[pleb_eml] value='{{ church.pleb_eml }}' size=40 class=urlap maxlength=100  placeholder="Email cím">
                     <input type=text class="urlap form-control" name=church[pleb_url] value='{{ church.pleb_url }}' size=40 class=urlap maxlength=100  placeholder="http://plébnia_honlapja.hu">
-                    
-                    
-                    <div id="church-links" style="padding-top:10px;padding-bottom:10px;" >
+                </td>
+                <td>{% include 'help_link.twig' with {'id': 6} %}</td>
+            </tr>
+            <tr>
+                <td bgcolor=#efefef class=kiscim align=right>Linkek:</td>
+                <td bgcolor=#efefef>
+                    <div id="church-links" >
                     {% if church.links %}                        
                         {% for link in church.links %}
                             <div class="church-link" data-link-id="{{ link.id }}">
@@ -173,12 +177,11 @@
                     {% endif %}
                     <div class="church-link"><i style="float:right" title="Új link hozzáadása" class="church-link-add {{ ICONS_ADD }} green" ></i></div>
                     </div>
-                    
-                    
-                    
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 6} %}</td>
-            </tr>
+                <td></td>
+            </tr>            
+            
+            
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Megjegyzés:</td>
                 <td bgcolor=#ffffff>
