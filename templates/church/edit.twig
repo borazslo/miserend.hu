@@ -159,8 +159,7 @@
                 <td bgcolor=#efefef class=kiscim align=right>Plébánia adatai:</td>
                 <td bgcolor=#efefef>
                     <textarea name=church[plebania] id="plebania" class="urlap form-control tinymce" cols=50 rows=4  placeholder="A plébánia neve, címe, telefonja, egyéb elérhetősége. Ill. hivatali idők.">{{ church.plebania|nl2br }}</textarea>
-                    <input type=text class="urlap form-control" name=church[pleb_eml] value='{{ church.pleb_eml }}' size=40 class=urlap maxlength=100  placeholder="Email cím">
-                    <input type=text class="urlap form-control" name=church[pleb_url] value='{{ church.pleb_url }}' size=40 class=urlap maxlength=100  placeholder="http://plébnia_honlapja.hu">
+                    <input type=text class="urlap form-control" name=church[pleb_eml] value='{{ church.pleb_eml }}' size=40 class=urlap maxlength=100  placeholder="Email cím">                    
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 6} %}</td>
             </tr>

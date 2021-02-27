@@ -73,4 +73,11 @@ class ChurchLink extends Model {
         function getChurchAttribute($value) {
             return \Eloquent\Church::find($this->church_id);
         }
+        
+        static function migrate() {
+            $links = \Eloquent\Church::select('id','pleb_url')->where('pleb_url','<>','')->get()->toArray();
+            foreach($links as $link) {
+                \Eloquent\ChurchLink::firstOrCreate(['church_id'=>$link['id'],'href'=>$link['pleb_url']]);
+            }            
+        }
 }    

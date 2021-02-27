@@ -11,9 +11,6 @@
         <div style="white-space: nowrap;overflow: hidden;o-text-overflow: ellipsis;text-overflow: ellipsis;">
         {% if religious_administration.parish.email %}
             Email: <a target="_blank" href='mailto:{{ religious_administration.parish.email }}' class=link>{{ religious_administration.parish.email }}</a><br/>
-        {% endif %}
-        {% if religious_administration.parish.url %}
-            Honlap: <a target="_blank" href='{{ religious_administration.parish.url }}' class=link>{{ religious_administration.parish.url }}</a>
         {% endif %}        
         </div>
         {% if links %}

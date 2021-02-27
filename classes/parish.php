@@ -6,7 +6,7 @@ class Parish {
 
     public function getByChurchId($id) {
         $result = DB::table('templomok')
-                ->select('plebania', 'pleb_url', 'pleb_eml')
+                ->select('plebania', 'pleb_eml')
                 ->where('id', "=", $id)
                 ->limit(1)
                 ->get();
@@ -15,7 +15,6 @@ class Parish {
         }
         $this->name = "";
         $this->description = $result[0]->plebania;
-        $this->url = $result[0]->pleb_url;
         $this->email = $result[0]->pleb_eml;
     }
 

@@ -34,7 +34,7 @@ class Edit extends \Html\Html {
 
         $allowedFields = ['adminmegj', 'kontakt', 'kontaktmail', 'nev',
             'ismertnev', 'orszag', 'megye', 'varos', 'cim', 'megkozelites',
-            'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml', 'pleb_url',
+            'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml', 
             'megjegyzes', 'miseaktiv', 'misemegj', 'leiras', 'ok', 'frissites',
             'lat','lon'];
 
