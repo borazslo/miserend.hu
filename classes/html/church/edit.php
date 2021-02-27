@@ -9,10 +9,11 @@ class Edit extends \Html\Html {
    
         $this->input = $_REQUEST;
         $this->tid = $path[0];
-        $this->church = \Eloquent\Church::find($this->tid)->append(['writeAccess']);
+        $this->church = \Eloquent\Church::find($this->tid);
         if (!$this->church) {
             throw new \Exception('Nincs ilyen templom.');
         }
+        $this->church = $this->church->append(['writeAccess']);
 
         if (!$this->church->writeAccess) {
             throw new \Exception('Hiányzó jogosultság!');

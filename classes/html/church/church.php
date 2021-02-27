@@ -9,11 +9,13 @@ class Church extends \Html\Html {
 
         $tid = $path[0];
 
-        $church = \Eloquent\Church::find($tid)->append(['readAccess','writeAccess','liturgiatv']);
+        $church = \Eloquent\Church::find($tid);
         
         if(!$church) {
             throw new \Exception("Church with tid = '$tid' does not exist.");
-        }        
+        }
+        $church = $church->append(['readAccess','writeAccess','liturgiatv']);
+        
         if (!$church->readAccess) {
             throw new \Exception("Read access denied to church tid = '$tid'");
         }
