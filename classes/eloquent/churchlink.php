@@ -65,4 +65,8 @@ class ChurchLink extends Model {
             } else 
                 return $link;            
         }
+        
+        function getChurchAttribute($value) {
+            return \Eloquent\Church::find($this->church_id);
+        }
 }    
