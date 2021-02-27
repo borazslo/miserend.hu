@@ -14,7 +14,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     use \Illuminate\Database\Eloquent\SoftDeletes;
     
     protected $table = 'templomok';
-    protected $appends = array('fullName','location');
+    protected $appends = array('fullName','location','links');
 
     public function photos() {
         return $this->hasMany('\Eloquent\Photo')->ordered();
@@ -133,6 +133,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * liturgiatv
      * denomination
      * holders
+     * links
      * readAcess (of current user)
      * writeAccess (of current user)
      * jelzes
@@ -175,6 +176,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     public function getHoldersAttribute($value) {
         $holders =  \Eloquent\ChurchHolder::where('church_id',$this->id)->orderBy('status')->orderBy('updated_at','desc')->get()->groupBy('status');
         return $holders;
+    }
+    
+    public function getLinksAttribute($value) {
+        $links =  $this->hasMany('\Eloquent\ChurchLink')->get();
+        return $links;
     }
     
     public function getReadAccessAttribute($value) {

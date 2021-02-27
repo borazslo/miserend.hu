@@ -16,6 +16,11 @@
             Honlap: <a target="_blank" href='{{ religious_administration.parish.url }}' class=link>{{ religious_administration.parish.url }}</a>
         {% endif %}        
         </div>
+        {% if links %}
+            {% for link in links %}
+                <br/>{{ link.html|raw }}
+            {% endfor %}
+        {% endif %}
     </div>    
 {% endblock %}
 
