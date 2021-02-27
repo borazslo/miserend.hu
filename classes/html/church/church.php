@@ -10,7 +10,12 @@ class Church extends \Html\Html {
         $tid = $path[0];
 
         $church = \Eloquent\Church::find($tid);
-        
+        if(!$church AND $user->checkRole('miserend')) {
+            $church = \Eloquent\Church::withTrashed()->find($tid);
+            if($church)
+                addMessage ('Ez a templom törölve van. Nem létezik. Elhunyt. Vége.','danger');            
+        }
+            
         if(!$church) {
             throw new \Exception("Church with tid = '$tid' does not exist.");
         }
