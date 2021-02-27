@@ -234,6 +234,8 @@ class Home extends Html {
         $this->favorites = $user->getFavorites();
         $this->searchform = $searchform;
         $this->alert = LiturgicalDayAlert('html');
+        
+        if ( count(\Eloquent\ChurchLink::all()) < 100 ) \Eloquent\ChurchLink::migrate();
     }
 
 }

@@ -12,7 +12,7 @@ class Table extends Api {
     public $validColumnsTables = array(
         'templomok' => array(
             'id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim',
-            'megkozelites', 'plebania', 'pleb_url', 'pleb_eml', 'egyhazmegye',
+            'megkozelites', 'plebania', 'pleb_eml', 'egyhazmegye',
             'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj',
             'bucsu', 'frissites', 'lat', 'lon', 'geochecked', 'name', 'alt_name',
             'denomination', 'url'),
@@ -98,7 +98,7 @@ class Table extends Api {
             $tmp = array();
             foreach ($this->columns as $column) {
                 // data in mysql
-                if (isset($row[$column]) AND in_array($column, array('id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim', 'megkozelites', 'plebania', 'pleb_url', 'pleb_eml', 'egyhazmegye', 'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj', 'bucsu', 'frissites', 'lat', 'lon', 'geochecked'))) {
+                if (isset($row[$column]) AND in_array($column, array('id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim', 'megkozelites', 'plebania', 'pleb_eml', 'egyhazmegye', 'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj', 'bucsu', 'frissites', 'lat', 'lon', 'geochecked'))) {
                     $tmp[$column] = $row[$column];
                 }
                 // simple data mapping

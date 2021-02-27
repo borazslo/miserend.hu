@@ -159,11 +159,28 @@
                 <td bgcolor=#efefef class=kiscim align=right>Plébánia adatai:</td>
                 <td bgcolor=#efefef>
                     <textarea name=church[plebania] id="plebania" class="urlap form-control tinymce" cols=50 rows=4  placeholder="A plébánia neve, címe, telefonja, egyéb elérhetősége. Ill. hivatali idők.">{{ church.plebania|nl2br }}</textarea>
-                    <input type=text class="urlap form-control" name=church[pleb_eml] value='{{ church.pleb_eml }}' size=40 class=urlap maxlength=100  placeholder="Email cím">
-                    <input type=text class="urlap form-control" name=church[pleb_url] value='{{ church.pleb_url }}' size=40 class=urlap maxlength=100  placeholder="http://plébnia_honlapja.hu">
+                    <input type=text class="urlap form-control" name=church[pleb_eml] value='{{ church.pleb_eml }}' size=40 class=urlap maxlength=100  placeholder="Email cím">                    
                 </td>
                 <td>{% include 'help_link.twig' with {'id': 6} %}</td>
             </tr>
+            <tr>
+                <td bgcolor=#efefef class=kiscim align=right>Linkek:</td>
+                <td bgcolor=#efefef>
+                    <div id="church-links" >
+                    {% if church.links %}                        
+                        {% for link in church.links %}
+                            <div class="church-link" data-link-id="{{ link.id }}">
+                                {{ link.html|raw }}<i style="float:right" title="Link törlése" class="church-link-delete {{ ICONS_DELETE }} red" data-link-id="{{ link.id }}"></i>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="church-link"><i style="float:right" title="Új link hozzáadása" class="church-link-add {{ ICONS_ADD }} green" ></i></div>
+                    </div>
+                </td>
+                <td></td>
+            </tr>            
+            
+            
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Megjegyzés:</td>
                 <td bgcolor=#ffffff>
@@ -246,6 +263,107 @@
     </form>                
     <script language="javascript" type="text/javascript" src="/vendor/tinymce/tinymce/tinymce.min.js"></script>
     <script language="javascript" type="text/javascript" src="/js/tiny_mce_init.js"></script>
+    
+    
+    <script>
+  $( function() {
+          
+    $('.church-link-delete').click(function(){ 
+        console.log(this);  
+        var html = "<p>Biztosan törlöd ezt a linket?</p>";
+        html += $( this ).prev().attr('href');
+        $('#church-link-delete-confirm').data('link-id',$( this ).data('link-id'));
+        $('#church-link-delete-confirm').html(html);
+        $('#church-link-delete-confirm').dialog('open'); 
+    });
+    
+      
+    $( "#church-link-delete-confirm" ).dialog({
+      autoOpen: false,
+      resizable: false,
+      height: "auto",
+      width: 400,
+      modal: true,
+      buttons: {
+        "Igen törlöm": function() { 
+            var id = $( this ).data('link-id');
+            $.ajax({
+                type:"POST",
+                url:"/ajax/churchlink",
+                data:"id="+id+"&action=delete",
+                dataType: "text",
+                success:function(response){
+                    console.log(response);
+                   if(response == 'ok') {
+                        $('*[data-link-id="' + id + '"]').remove();
+                    }
+               }, 
+             });
+          $( this ).dialog( "close" );
+        },
+        "Mégsem": function() {
+            
+          $( this ).dialog( "close" );
+        }
+      }
+    });
+    
+    
+    newLinkDialog = $( "#church-link-add-form" ).dialog({
+      autoOpen: false,
+      buttons: {
+        "Link létrehozása": addLink,
+        "Mégsem": function() {
+          newLinkDialog.dialog( "close" );
+        }
+      },
+      close: function() {
+        form[ 0 ].reset();
+      }
+    });
+ 
+    form = newLinkDialog.find( "form" ).on( "submit", function( event ) {
+      event.preventDefault();
+      addLink();
+    });
+ 
+    $( ".church-link-add" ).on( "click", function() {
+      newLinkDialog.dialog( "open" );
+    });
+    
+    function addLink() {
+        console.log( $( this ).find( '#add-link-href').val() ) ;
+        
+         $.ajax({
+                type:"POST",
+                url:"/ajax/churchlink",
+                data:"church_id={{ church.id }}&href="+ $( this ).find( '#add-link-href').val() +"&title="+ $( this ).find( '#add-link-title').val() +"&action=add",
+                dataType: "text",
+                success:function(response){
+                    $('#church-links').find('.church-link').last().prev().append(response);                                      
+               }, 
+             });
+        newLinkDialog.dialog( "close" );
+    }
+  } );
+  </script>
+    <div id="church-link-delete-confirm"></div>
+    <div id="church-link-add-form">
+        <p class="validateTips">Új link létrehozása:</p>
+
+        <form>
+            <div class="form-group">
+                <label for="name">Url</label>
+                <input type="text" name="href" id="add-link-href" class="form-control text ui-widget-content ui-corner-all">
+            </div>
+            <div class="form-group">
+                <label for="email">Felirat</label>
+                <input type="text" name="title" id="add-link-title" placeHolder="Nem kötelező..."  class="form-control text ui-widget-content ui-corner-all">
+            </div> 
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </form>
+    </div> 
 {% endblock %}
 
 {% block leftsidebar %}    

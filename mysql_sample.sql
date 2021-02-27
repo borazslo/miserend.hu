@@ -786,7 +786,6 @@ CREATE TABLE `templomok` (
   `cim` varchar(250) NOT NULL DEFAULT '',
   `megkozelites` tinytext NOT NULL,
   `plebania` text NOT NULL,
-  `pleb_url` varchar(100) NOT NULL DEFAULT '',
   `pleb_eml` varchar(100) NOT NULL DEFAULT '',
   `egyhazmegye` int(2) NOT NULL DEFAULT '0',
   `espereskerulet` int(3) NOT NULL DEFAULT '0',
