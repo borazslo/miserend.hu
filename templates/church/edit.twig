@@ -163,15 +163,16 @@
                     <input type=text class="urlap form-control" name=church[pleb_url] value='{{ church.pleb_url }}' size=40 class=urlap maxlength=100  placeholder="http://plébnia_honlapja.hu">
                     
                     
-                    {% if church.links %}
-                        <div id="church-links" style="padding-top:10px;padding-bottom:10px;" >
+                    <div id="church-links" style="padding-top:10px;padding-bottom:10px;" >
+                    {% if church.links %}                        
                         {% for link in church.links %}
                             <div class="church-link" data-link-id="{{ link.id }}">
-                                {{ link.html|raw }}<i style="float:right" class="church-link-delete {{ ICONS_DELETE }} red" data-link-id="{{ link.id }}"></i>
+                                {{ link.html|raw }}<i style="float:right" title="Link törlése" class="church-link-delete {{ ICONS_DELETE }} red" data-link-id="{{ link.id }}"></i>
                             </div>
                         {% endfor %}
-                        </div>
                     {% endif %}
+                    <div class="church-link"><i style="float:right" title="Új link hozzáadása" class="church-link-add {{ ICONS_ADD }} green" ></i></div>
+                    </div>
                     
                     
                     
@@ -304,11 +305,63 @@
         }
       }
     });
+    
+    
+    newLinkDialog = $( "#church-link-add-form" ).dialog({
+      autoOpen: false,
+      buttons: {
+        "Link létrehozása": addLink,
+        "Mégsem": function() {
+          newLinkDialog.dialog( "close" );
+        }
+      },
+      close: function() {
+        form[ 0 ].reset();
+      }
+    });
+ 
+    form = newLinkDialog.find( "form" ).on( "submit", function( event ) {
+      event.preventDefault();
+      addLink();
+    });
+ 
+    $( ".church-link-add" ).on( "click", function() {
+      newLinkDialog.dialog( "open" );
+    });
+    
+    function addLink() {
+        console.log( $( this ).find( '#add-link-href').val() ) ;
+        
+         $.ajax({
+                type:"POST",
+                url:"/ajax/churchlink",
+                data:"church_id={{ church.id }}&href="+ $( this ).find( '#add-link-href').val() +"&title="+ $( this ).find( '#add-link-title').val() +"&action=add",
+                dataType: "text",
+                success:function(response){
+                    $('#church-links').find('.church-link').last().prev().append(response);                                      
+               }, 
+             });
+        newLinkDialog.dialog( "close" );
+    }
   } );
   </script>
-    <div id="church-link-delete-confirm" title="Biztosan törlöd ezt a linket?">                
-    </div>
- 
+    <div id="church-link-delete-confirm"></div>
+    <div id="church-link-add-form">
+        <p class="validateTips">Új link létrehozása:</p>
+
+        <form>
+            <div class="form-group">
+                <label for="name">Url</label>
+                <input type="text" name="href" id="add-link-href" class="form-control text ui-widget-content ui-corner-all">
+            </div>
+            <div class="form-group">
+                <label for="email">Felirat</label>
+                <input type="text" name="title" id="add-link-title" placeHolder="Nem kötelező..."  class="form-control text ui-widget-content ui-corner-all">
+            </div> 
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </form>
+    </div> 
 {% endblock %}
 
 {% block leftsidebar %}    

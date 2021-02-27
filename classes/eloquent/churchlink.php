@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 class ChurchLink extends Model {
         use \Illuminate\Database\Eloquent\SoftDeletes;
         
-        protected $fillable = array('church_id','href');
+        protected $fillable = array('church_id','href','title');
         protected $appends = array('type','icon','html');
 
         protected $icons = [
@@ -56,14 +56,18 @@ class ChurchLink extends Model {
         }
         
         function getTitleAttribute($value) {
-            $link =  trim(preg_replace('/^http(s|):\/\//i','',$this->href),'/');
-            $link = preg_replace('/^www\./i','',$link);
-            if($this->type) {                
-                $parts = explode('/',$link);                
-                unset($parts[0]);
-                return implode('/',$parts);
-            } else 
-                return $link;            
+            if(!$value) {
+                $link =  trim(preg_replace('/^http(s|):\/\//i','',$this->href),'/');
+                $link = preg_replace('/^www\./i','',$link);
+                if($this->type) {                
+                    $parts = explode('/',$link);                
+                    unset($parts[0]);
+                    return implode('/',$parts);
+                } else 
+                    return $link;            
+            } else
+                return $value;
+           
         }
         
         function getChurchAttribute($value) {
