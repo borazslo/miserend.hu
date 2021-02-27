@@ -1,19 +1,5 @@
 <?php
-/*
-    CREATE TABLE `miserend`.`church_links` (
-      `id` INT(10) NOT NULL AUTO_INCREMENT,
-      `church_id` INT(10) NOT NULL,
-      `href` VARCHAR(255) NULL,
-      `title` VARCHAR(255) NULL,
-      `created_at` TIMESTAMP NOT NULL DEFAULT  CURRENT_TIMESTAMP(),
-      `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
-      `deleted_at` TIMESTAMP NULL DEFAULT NULL,
-      PRIMARY KEY (`id`))
-    ENGINE = InnoDB
-    DEFAULT CHARACTER SET = utf8
-    COLLATE = utf8_bin;
-*/
-    
+   
 namespace Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
@@ -74,10 +60,4 @@ class ChurchLink extends Model {
             return \Eloquent\Church::find($this->church_id);
         }
         
-        static function migrate() {
-            $links = \Eloquent\Church::select('id','pleb_url')->where('pleb_url','<>','')->get()->toArray();
-            foreach($links as $link) {
-                \Eloquent\ChurchLink::firstOrCreate(['church_id'=>$link['id'],'href'=>$link['pleb_url']]);
-            }            
-        }
 }    

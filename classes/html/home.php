@@ -235,7 +235,6 @@ class Home extends Html {
         $this->searchform = $searchform;
         $this->alert = LiturgicalDayAlert('html');
         
-        if ( count(\Eloquent\ChurchLink::all()) < 100 ) \Eloquent\ChurchLink::migrate();
     }
 
 }
