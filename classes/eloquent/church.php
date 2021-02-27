@@ -4,8 +4,15 @@ namespace Eloquent;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
+/*
+ ALTER TABLE `miserend`.`templomok` 
+ ADD COLUMN `deleted_at` TIMESTAMP NULL DEFAULT NULL AFTER `updated_at`;
+ */
+
 class Church extends \Illuminate\Database\Eloquent\Model {
 
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+    
     protected $table = 'templomok';
     protected $appends = array('fullName','location');
 
@@ -459,11 +466,23 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function delete() {
+
         #$this->neighbours()->delete();
-        Distance::where('church_to', $this->id)->delete();
-        Distance::where('church_from', $this->id)->delete();
+        #Distance::where('church_to', $this->id)->delete(); fromLat, fromLon
+        #Distance::where('church_from', $this->id)->delete(); toLat, toLon
+        
+        \Eloquent\ChurchHolder::where('church_id',$this->id)->delete();
+        \Eloquent\Favorite::where('tid',$this->id)->delete();
+        
+        //Nem elegáns:
+        DB::table('lookup_boundary_church')->where('church_id',$this->id)->delete();
+        DB::table('lookup_church_osm')->where('church_id',$this->id)->delete();
+        
+        DB::table('misek')->where('tid',$this->tid)->delete();
+        
         $this->remarks()->delete();
         $this->photos()->delete();
+
         parent::delete();
     }
 

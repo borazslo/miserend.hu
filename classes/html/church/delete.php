@@ -22,14 +22,28 @@ class Delete extends \Html\Html {
         if (!$this->input['confirmation']) {
             $this->askConfirmation();
             return;
-        } else {
+        } else {            
             $this->delete();
         }
     }
 
     function delete() {
-        $this->church2delete->remarks()->delete();
+        global $user;
+        
+        $comment = \Request::Text('comment');
+        if($this->church2delete->adminmegj != '')
+            $this->church2delete->adminmegj .= "\n";
+        $this->church2delete->adminmegj .= "Törölte ".$user->login;
+        if($comment)
+            $this->church2delete->adminmegj .= ": ".$comment;        
+        $this->church2delete->ok = 'n';
+        $now = date('Y-m-d H:i:s');
+        $this->church2delete->moddatum = $now;
+        $this->church2delete->log .= "\nDel: " . $user->login . " (" . $now . ")";
+        $this->church2delete->save();
+                
         $this->church2delete->delete();
+        addMessage('A templomot sikeresen töröltük.','info');
         header("Location: /templom/list");
     }
 

@@ -8,12 +8,21 @@
         <h4 class="alert-heading">{{ church2delete.nev }}</h4>
         <p>Biztosan törölni akarod a következő templomot?</p>
         <hr>
-        <p>FIGYELEM! A kapcsolódó misék és képek is törlődnek!</p>
+        <p>FIGYELEM! A kapcsolódó misék, képek, kedvencek, felelősök, stb. is törlődnek!</p>
         <hr>
 
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <a href='/templom/{{ church2delete.id }}/delete?confirmation=confirmed' class='btn btn-danger button'>igen</a>
-          <a href='/templom/{{ church2delete.id }}/edit' class='btn btn-success button'>MÉGSEM</a>  
+        <form role="form" method="post" class="form"
+                      action="/templom/{{ church2delete.id }}/delete">
+            
+            <div class="controls" class="form-group">            
+                <label for="comment">Indoklás:</label><br/>
+                <input type="text" name="comment" class="form-control">
+            </div><br/>
+                   
+        <div class="btn-group form-inline" role="group" aria-label="Basic example">
+          <button name="confirmation" value="confirmed" class='form-control btn btn-danger button'>igen</button>
+          <a href='/templom/{{ church2delete.id }}/edit' class='btn btn-success button'>MÉGSEM</a>            
         </div>
+        </form>
     </div>  
 {% endblock %}
