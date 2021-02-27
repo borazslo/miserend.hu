@@ -1,21 +1,5 @@
 <?php
 
-/*
- CREATE TABLE `miserend`.`church_holders` (
-  `id` INT(10) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `church_id` INT(10) NOT NULL,
-  `description` VARCHAR(255) NULL,
-  `status` ENUM('asked', 'allowed', 'denied', 'revoked') NOT NULL DEFAULT 'asked',
-  `created_at` TIMESTAMP NOT NULL DEFAULT  CURRENT_TIMESTAMP(),
-  `updated_at` TIMESTAMP NULL DEFAULT '0000-00-00 00:00:00',
-  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_bin;
- */
-
 namespace Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
