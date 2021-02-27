@@ -4,10 +4,17 @@ namespace Eloquent;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
+/*
+ ALTER TABLE `miserend`.`templomok` 
+ ADD COLUMN `deleted_at` TIMESTAMP NULL DEFAULT NULL AFTER `updated_at`;
+ */
+
 class Church extends \Illuminate\Database\Eloquent\Model {
 
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+    
     protected $table = 'templomok';
-    protected $appends = array('responsible','fullName','location');
+    protected $appends = array('fullName','location');
 
     public function photos() {
         return $this->hasMany('\Eloquent\Photo')->ordered();
@@ -125,8 +132,9 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * 
      * liturgiatv
      * denomination
-     * responsible
-     * writeAccess
+     * holders
+     * readAcess (of current user)
+     * writeAccess (of current user)
      * jelzes
      * fullName
      * remarksSatus
@@ -164,13 +172,19 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return  in_array($this->egyhazmegye,[34,17,18]) ? 'greek_catholic' : 'roman_catholic';
     }
     
-    public function getResponsibleAttribute($value) {
-        return array($this->letrehozta);
+    public function getHoldersAttribute($value) {
+        $holders =  \Eloquent\ChurchHolder::where('church_id',$this->id)->orderBy('status')->orderBy('updated_at','desc')->get()->groupBy('status');
+        return $holders;
     }
-
+    
+    public function getReadAccessAttribute($value) {
+        global $user;
+        return $this->checkReadAccess($user);
+    }
+    
     public function getWriteAccessAttribute($value) {
         global $user;
-        return $this->McheckWriteAccess($user);
+        return $this->checkWriteAccess($user);
     }
     
     public function getJelzesAttribute() {
@@ -305,33 +319,45 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         $this->religious_administration->parish = $parish;
     }
 
-    function McheckReadAccess($user) {
+    function checkReadAccess($_user) {
+        $access = false;
         if ($this->ok == 'i')
-            return true;
-        if ($this->letrehozta == $user->username)
-            return true;
-        if ($user->checkRole('miserend'))
-            return true;
-        return false;
+            $access = true;
+       
+        if($this->checkWriteAccess($_user)) 
+            $access = true;       
+        
+        global $user;                
+        if($user->uid == $_user->uid) {
+            $this->readAcess = $access;
+        }         
+        return $access;
     }
 
-    function McheckWriteAccess($user) {
-        if ($user->checkRole('miserend'))
-            return true;
-        if ($this->letrehozta == $user->username)
-            return true;
-        if (!is_array($user->responsible))
-            return false;
-        if (in_array($this->id, $user->responsible['church']))
-            return true;
-        if (in_array($this->MgetDioceseId(), $user->responsible['diocese']))
-            return true;
+    function checkWriteAccess($_user) {
+        $access = false;
 
-        return false;
+        if ($_user->checkRole('miserend'))
+            $access = true;        
+        
+        if(\Eloquent\ChurchHolder::where('church_id',$this->id)->where('user_id',$_user->uid)->where('status','allowed')->first())
+            $access = true;
+               
+        if(DB::table('egyhazmegye')->where('id',$this->egyhazmegye)->where('felelos',$_user->username)->first())        
+            $access = true;
+        
+        global $user;
+        if($user->uid == $_user->uid) {
+            $this->writeAcess = $access;
+        }         
+        return $access;
     }
 
     function MgetDioceseId() {
-        return $this->religious_administration->diocese->id;
+        if($this->religious_administratin)
+            return $this->religious_administration->diocese->id;
+        else 
+            return false;
     }
 
     public function boundaries()
@@ -440,11 +466,23 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function delete() {
+
         #$this->neighbours()->delete();
-        Distance::where('church_to', $this->id)->delete();
-        Distance::where('church_from', $this->id)->delete();
+        #Distance::where('church_to', $this->id)->delete(); fromLat, fromLon
+        #Distance::where('church_from', $this->id)->delete(); toLat, toLon
+        
+        \Eloquent\ChurchHolder::where('church_id',$this->id)->delete();
+        \Eloquent\Favorite::where('tid',$this->id)->delete();
+        
+        //Nem elegáns:
+        DB::table('lookup_boundary_church')->where('church_id',$this->id)->delete();
+        DB::table('lookup_church_osm')->where('church_id',$this->id)->delete();
+        
+        DB::table('misek')->where('tid',$this->tid)->delete();
+        
         $this->remarks()->delete();
         $this->photos()->delete();
+
         parent::delete();
     }
 

@@ -1,5 +1,7 @@
 {% extends "layout.twig" %}
 
+{% set title = nev %}
+
 {% block pageHeader %}
     <div class="page-header">
         <h2>
@@ -29,7 +31,6 @@
             {% endif %}
         </h2>
     </div>
-    {% include 'announcment.twig' ignore missing %}
 {%  endblock %}
 
 
@@ -63,7 +64,11 @@
 
 {% set selfAdvertisement = true %}
 {% block leftsidebar %}
-    {% include "church/_panelaskingremark.twig" %}    
+    {% if isChurchHolder != 'allowed '%}
+        {% include "church/_panelaskingremark.twig" %}
+    {% endif %}
+    {% include 'announcment.twig' ignore missing %}
+    
 {% endblock %}
 
 {% block rightsidebar %}

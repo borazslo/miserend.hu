@@ -174,17 +174,21 @@ class Html {
         return false;
     }
     
-    static function printExceptionVerbose($e) {
-        echo $e->getMessage();
-        echo "<pre>";
+    static function printExceptionVerbose($e, $toString = false) {
+        
+        $return = "<strong>".$e->getMessage()."</strong>\n";        
         foreach ($e->getTrace() as $trace) {
-            if ($trace['class'])
-                echo $trace['class'] . "::" . $trace['function'] . "()";
-            if ($trace['file'])
-                echo $trace['file'] . ":" . $trace['line'] . " -> " . $trace['function'] . "()";
-            echo "\n";
+            if (isset($trace['class']))
+                $return .= $trace['class'] . "::" . $trace['function'] . "()";
+            if (isset($trace['file']))
+                $return .= $trace['file'] . ":" . $trace['line'] . " -> " . $trace['function'] . "()";
+            $return .= "\n";
         }
-        echo "</pre>";
+
+        if(!$toString)
+            echo "<pre>".$return."<pre>";
+       
+        return $return;
     }
 
 }

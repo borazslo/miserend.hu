@@ -26,6 +26,9 @@ class User {
                 $this->nickname = $user->becenev;
                 $this->name = $user->nev;
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
+                foreach($this->roles as $k => $v)
+                    if($v == '')
+                        unset($this->roles[$k]);                
                 $this->getResponsabilities();
                 if ($this->checkRole('miserend')) {
                     $this->isadmin = true;
@@ -73,8 +76,14 @@ class User {
             return false;
     }
 
+    function getHoldingData($church_id) {
+        $holding = \Eloquent\ChurchHolder::where('user_id',$this->uid)->where('church_id',$church_id)->orderBy('updated_at','desc')->first();
+        if($holding) $holding->setAppends([]);
+        return $holding;
+    }
+    
     function getResponsabilities() {
-        $this->responsible = array(
+        $this->responsibilities = array(
             'diocese' => array(),
             'church' => array()
         );
@@ -87,15 +96,14 @@ class User {
             foreach ($results as $result) {
                 $this->responsible['diocese'][] = $result->id;
             }
-            $results = DB::table('templomok')
-                    ->select('id')
-                    ->where('ok', 'i')
-                    ->where('letrehozta', $this->username)
-                    ->get();
-            foreach ($results as $result) {
-                $this->responsible['church'][] = $result->id;
-            }            
+            
+            
+            $this->responsibilities['church'] = \Eloquent\ChurchHolder::where('user_id',$this->uid)->get()->groupBy('status');
+            
+            
+            $this->responsible['church'] = \Eloquent\ChurchHolder::where('user_id',$this->uid)->where('status','allowed')->get()->Pluck('church_id')->toArray();
         }
+        
     }
 
     function processResponsabilities() {
@@ -225,10 +233,14 @@ class User {
         } elseif ($key == 'roles' OR $key == 'jogok') {
             if (!is_array($val))
                 $val = array($val);
-            foreach ($val as $k => $i)
-                $val['jogok'] = trim(sanitize($i), "-");
-            $val = array_unique($val);
-            $this->presaved['jogok'] = implode('-', $val);
+            $jogok = [];
+            foreach ($val as $k => $i) {
+                if($k == $i ) {
+                    $jogok[$k] = trim(sanitize($i), "-");
+                }
+            }
+            $jogok = array_unique($jogok);
+            $this->presaved['jogok'] = implode('-', $jogok);
         } elseif ($key == 'nickname' or $key == 'becenev') {
             $this->presaved['becenev'] = sanitize($val);
         } elseif ($key == 'name' or $key == 'nev') {
@@ -350,7 +362,7 @@ class User {
         else {
             $favorites = \Eloquent\Favorite::groupBy('tid')->select('tid', DB::raw('count(*) as total'))->orderBy('total','DESC')->limit(10)->get();
         }        
-
+        
         foreach ($favorites as $favorite) {
             $this->favorites[$favorite->tid] = $favorite; 
         }
@@ -360,7 +372,7 @@ class User {
 
     function checkFavorite($tid) {
         if (!isset($this->favorites)) {
-            $this->getFavorites();
+            $this->favorites = $this->getFavorites();
         }
         foreach ($this->favorites as $favorite) {
             if ($favorite['tid'] == $tid) {
@@ -442,7 +454,7 @@ class User {
         } else {
             setcookie('token', 'macska', time() + 10000);
             return \User::emptyUser();
-        }
+        }        
         $user->loggedin = true;
         $user->active();
         return $user;

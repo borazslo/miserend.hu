@@ -51,48 +51,48 @@ class Map extends Html {
     
     static function getGeoJsonDioceses() {
         if(!$jsonData = \Html\Map::geoJsonDiocesesFromCache()) {
-            
+            $cacheTime = '1 week';
+
             $results = DB::table('egyhazmegye')
                 ->whereNotNull('osm_relation')
                 ->select("osm_relation")
                 ->pluck('osm_relation'); 
-            $osms = \Eloquent\OSM::where('osmtype','relation')->whereIn('osmid',$results);
+            $osms = \Eloquent\OSM::where('osmtype','relation')->whereIn('osmid',$results)->where('updated_at','<',date('Y-m-d H:i:s',strtotime('-'.$cacheTime)));
             $osmids = $osms->pluck('osmid')->toArray();
-            
-            //Ha még nem tároljuk az osm adatait, akkor itt az ideje
-            $diff = array_diff ($results, $osmids);
+            //Ha még nem tároljuk az osm adatait VAGY már régen akkor itt az ideje
+            $diff = array_diff ($results, array()); //$osmids);
             if(count($diff) > 0 ) {
                 foreach($diff as $d) {              
                     $overpass = new \ExternalApi\OverpassApi();
                     $overpass->query = "relation(id:".$d.");out tags qt center;";
                     $overpass->buildQuery();
                     $overpass->run();
-                    $overpass->saveElement();
+                    $overpass->saveElement();                    
 
-
-                    $element = $overpass->jsonData->elements[0];
-                    print_R($element);
-                    \Eloquent\OSM::create([
+                    $element = $overpass->jsonData->elements[0];                    
+                    
+                    $osm = \Eloquent\OSM::updateOrCreate([
                         'osmid' => $element->id,
-                        'osmtype' => $element->type,
-                        'lat' => $element->lat,
-                        'lon' => $element->lon
-                    ]);
-                
-                    $osimds[] = $d;
+                        'osmtype' => $element->type],
+                        ['lat' => $element->lat,
+                        'lon' => 'ss'.$element->lon                         
+                    ])->touch();
+
+                    $osmids[] = $d;
                 }                
-            }
-            
+            }                        
             $geoJsons = [];
             foreach($osmids as $osmid) {
                 $nominatim = new \ExternalApi\NominatimApi();
                 $geoJsons[] = json_encode($nominatim->OSM2GeoJson('R', $osmid));                
             }
-            $json = "[".implode(',',$geoJsons)."]";
+
+            if(count($geoJsons) < 1) $json = "{}";
+            else $json = "[".implode(',',$geoJsons)."]";
 
             $cacheDir = PATH . 'fajlok/tmp/'; // Vigyázz! Egyezzen: geoJsonDiocesesFromCache();
             $cacheFilePath = $cacheDir . 'GeojsonDioceses';  // Vigyázz! Egyezzen: geoJsonDiocesesFromCache();
-            if (!file_put_contents($cacheFilePath, $json)) {
+            if (!file_put_contents($cacheFilePath,$json)) {
                 throw new \Exception("We could not save the cacheFile to " . $cacheFilePath);
             }
             return json_decode($json);
@@ -102,10 +102,10 @@ class Map extends Html {
     }
         
         
-    static function geoJsonDiocesesFromCache() {        
+    static function geoJsonDiocesesFromCache() {  
         $cacheDir = PATH . 'fajlok/tmp/';
         $cacheFilePath = $cacheDir . 'GeojsonDioceses';
-        $cacheTime = '1 week'; // Ez hiába rövid, ha az externalApi cache-e hosszú
+        $cacheTime = '1 sec'; // Ez hiába rövid, ha az externalApi cache-e hosszú
         if (file_exists($cacheFilePath)) {
             if (filemtime($cacheFilePath) > strtotime("-" . $cacheTime)) {
                 $rawData = file_get_contents($cacheFilePath);

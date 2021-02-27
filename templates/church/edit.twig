@@ -2,8 +2,6 @@
 
 {% import "forms.twig" as forms %}
 
-{% set columns2 = true %}
-
 {% import "forms.twig" as forms %}
 
 {% block content %}
@@ -47,7 +45,7 @@
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Feltöltő (jogosult):</td>
                 <td bgcolor=#efefef>
-                    {{ forms.select(form.responsible) }}
+                    <i>Ez az elem átkerült a jobb oldali oszlopba, mert már több felelőse is lehet egyetlen templomnak.</i>
                 </td>
                 <td></td>
             </tr>
@@ -66,6 +64,28 @@
                 <td>{% include 'help_link.twig' with {'id': 4} %}</td>
             </tr>
            
+            {% if not church.varos %}
+            <tr>
+                <td class=kiscim align=right>Elhelyezkedés:</td>
+                <td>
+                    {% if church.osm.administrative %}
+                        OSM 
+                        {% for key,administraion in church.osm.administrative %}
+                            > {{ administraion.name }}
+                        {% endfor %}   
+                    {% endif %}
+                    {{ forms.select(form.country) }}
+                    {% for county in form.counties %}
+                        {{ forms.select(county) }}
+                    {% endfor %}
+                    {% for city in form.cities %}
+                        {{ forms.select(city) }}
+                    {% endfor %}
+                    <input type=text name=church[cim] value="{{ church.cim }}" class=form-control  placeholder="Utca házszám">                                                    
+                </td>
+                <td></td>
+            </tr>
+            {%  endif %}
             {% if church.location.osm %}
                 <tr>
                     <td class=kiscim align=right>OSM azonosító:</td>
@@ -231,5 +251,9 @@
 {% block leftsidebar %}    
     {% if church.osm and user.isadmin %}
         {% include 'church/_panelosm.twig' %}
-    {% endif %}    
+    {% endif %}
+{% endblock %}
+
+{% block rightsidebar %}    
+    {% include 'church/_panelholders.twig' %}
 {% endblock %}

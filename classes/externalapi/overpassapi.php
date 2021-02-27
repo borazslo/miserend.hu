@@ -120,6 +120,7 @@ class OverpassApi extends \ExternalApi\ExternalApi {
                     $tag = \Eloquent\OSMTag::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id, 'name' => $name]);
                     $tag->value = $value;
                     $tag->save();
+                    $tag->touch();
                 }
                 $tags = \Eloquent\OSMTag::where('osmtype', $element->type)
                         ->where('osmid', $element->id)

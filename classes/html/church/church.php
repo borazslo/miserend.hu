@@ -10,11 +10,18 @@ class Church extends \Html\Html {
         $tid = $path[0];
 
         $church = \Eloquent\Church::find($tid);
-
+        if(!$church AND $user->checkRole('miserend')) {
+            $church = \Eloquent\Church::withTrashed()->find($tid);
+            if($church)
+                addMessage ('Ez a templom törölve van. Nem létezik. Elhunyt. Vége.','danger');            
+        }
+            
         if(!$church) {
             throw new \Exception("Church with tid = '$tid' does not exist.");
         }
-        if (!$church->McheckReadAccess($user)) {
+        $church = $church->append(['readAccess','writeAccess','liturgiatv']);
+        
+        if (!$church->readAccess) {
             throw new \Exception("Read access denied to church tid = '$tid'");
         }
 
@@ -26,7 +33,6 @@ class Church extends \Html\Html {
 
         $church->photos = $church->photos()->get();
                 
-        $church->append('liturgiatv')->get();
          /*
          * 
          */
@@ -37,8 +43,8 @@ class Church extends \Html\Html {
         $church->MgetReligious_administration();
         
         if( count($church->neighbours) < 1 ) {
-            $distance = new \Distance();        
-            $distance->MupdateChurch($church);
+           // $distance = new \Distance();        
+           // $distance->MupdateChurch($church);
         }        
   
         copyArrayToObject($church->toArray(), $this);
@@ -54,9 +60,8 @@ class Church extends \Html\Html {
 
         //Miseidőpontok
         $misek = getMasses($tid);
-        $responsible = $church->responsible;
-        
-        if ($user->checkRole('miserend') OR $user->checkRole('ehm:' . $this->religious_administration->diocese->id) OR ( isset($responsible) AND in_array($user->login, $responsible))) {
+                
+        if ($this->writeAcess)  {
             $nev = " <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
                     . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
             
@@ -93,6 +98,8 @@ class Church extends \Html\Html {
         
         $this->miserend = $misek;
         $this->alert = LiturgicalDayAlert('html');
+        
+        $this->isChurchHolder = $user->getHoldingData($this->id);                
     }
 
     static function factory($path) {

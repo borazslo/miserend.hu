@@ -132,14 +132,18 @@
 		    	</div>
 			</div>                    
                 {% endif %}
-                
-		{% if 'user' in user.roles %}
+
+                {% if user.roles is not empty %}
 			<div class="form-group">
 		    	<label for="roles">Jogosultságok</label>{{ edituser.jogok.miserend }}
 				{% for key, item in roles %}
 		    		<div id="roles" class="checkbox">
 		        		<label>
-	      					<input type="checkbox" name="edituser[roles][]" value="{{ item }}" {% if item in edituser.roles %}checked{% endif %}> {{ item }}
+                                                <input type="hidden"   name="edituser[roles][{{ key }}]" value="false">
+                                                <input type="checkbox" name="edituser[roles][{{ key }}]" value="{{ item }}" {% if item in edituser.roles %}checked{% elseif 'user' not in user.roles %}disabled{% endif %}  > {{ item }} 
+                                                {%  if user.uid == edituser.uid %}
+                                                    {% if  item in edituser.roles and ( 'user' not in user.roles or item == 'user' ) %}<small>--> <span class="alert-danger">Lemondhatsz erről a jogodról, de csak egy adminisztrátor tudja majd visszaadni.</span></small>{% endif %}
+                                                {% endif %}
 	    				</label>
 		    		</div>
     			{% endfor %}		    	

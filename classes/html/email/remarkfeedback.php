@@ -29,6 +29,7 @@ class RemarkFeedback extends Email {
         }
 
         global $user;
+        $this->user = $user;
         if ($type) {            
             $this->mail->render('remarkfeedback_' . $type, (array) $this );
         } else {
@@ -46,9 +47,7 @@ class RemarkFeedback extends Email {
     
     function checkPermission() {
         /* Csak templomgazda küldhet ki emailt */
-        global $user;
-        $this->user = $user;
-        if (!$user->checkRole('miserend') and ! ($user->username == $this->remark->church->letrehozta ) and ! $user->checkRole('ehm:' . $this->remark->church->egyhazmegye)) {
+        if (!$this->remark->church->writeAccess) {
             addMessage("Hiányzó jogosultság. Elnézést.", "danger");
             return false;
         }

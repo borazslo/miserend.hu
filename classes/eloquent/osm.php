@@ -13,7 +13,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function tags() {
-        return $this->hasMany('\Eloquent\OSMTag', 'osm_id', 'id')->orderBy('name');
+        return $this->hasMany('\Eloquent\OSMTag', 'osmid', 'id')->orderBy('name');
     }
 
     public function churches() {

@@ -16,7 +16,6 @@ class Create extends \Html\Html {
         $church = new \Eloquent\Church;
         $church->nev = 'Új misézőhely';
         $church->ok = 'n';
-        $church->letrehozta = $user->login;
         $church->megbizhato = 'i';
         $church->frissites = date('Y-m-d');
         $church->moddatum = date('Y-m-d');

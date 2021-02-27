@@ -223,38 +223,6 @@ function event2Date($event, $year = false) {
     return $event;
 }
 
-function checkPrivilege($type, $privilege, $object, $user = false) {
-    if (!$user)
-        global $user;
-
-    switch ($type) {
-        case 'church':
-
-            switch ($privilege) {
-                case 'read':
-
-                    if ($object['ok'] == 'i')
-                        return true;
-                    if ($object['letrehozta'] == $user->username)
-                        return true;
-                    if ($user->checkRole('miserend'))
-                        return true;
-                    break;
-
-                default:
-                    return false;
-                    break;
-            }
-
-            break;
-
-        default:
-            return false;
-            break;
-    }
-    return false;
-}
-
 function getMasses($tid, $date = false) {
     if ($date == false OR $date == '')
         $date = date('Y-m-d');
@@ -596,7 +564,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     $where = searchChurchesWhere($args);
 
 
-    $query = "SELECT templomok.id,nev,ismertnev,varos,letrehozta,lat,lon FROM templomok ";
+    $query = "SELECT templomok.id,nev,ismertnev,varos,lat,lon FROM templomok ";
     if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
         $query .= " INNER JOIN misek ON misek.tid = templomok.id ";
         if ($args['tnyelv'] == 'h')
@@ -852,7 +820,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     if (count($not) > 0)
         $where[] = " m.milyen NOT REGEXP '(^|,)(" . implode('|', $not) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
 
-    $select = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos,templomok.letrehozta \nFROM misek m \n";
+    $select = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos \nFROM misek m \n";
     $select .= " LEFT JOIN templomok ON m.tid = templomok.id \n";
 
     //Tudjuk meg, hogy hány templomban van megfelelő összesen
@@ -1585,16 +1553,23 @@ function getInputJSON() {
 
 function feltoltes_block() {
     global $user;
-
-    $churches = \Eloquent\Church::where('letrehozta',$user->login)->limit(5)->get();
-
+    
+    $allowed = $user->responsibilities['church']['allowed'];
+    $ids = [];
+    foreach($allowed as $church) {
+        $ids[] = $church->church_id;
+    }
+    $churches = \Eloquent\Church::whereIn('id',$ids)->get();
+    
     if(count($churches) == 0) return;
-
     
     $kod_tartalom = '<ul>';
     foreach( $churches as $church) { 
-        if ($church->eszrevetel == 'i')
+        $jelzes = '';        
+        if ($church->eszrevetel == 'u')
             $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+        elseif ($church->eszrevetel == 'i')
+            $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";
         elseif ($church->eszrevetel == 'f')
             $jelzes.="<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
         else

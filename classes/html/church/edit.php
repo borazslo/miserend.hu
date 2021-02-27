@@ -6,18 +6,16 @@ class Edit extends \Html\Html {
 
     public function __construct($path) {
         global $user;
-
+   
         $this->input = $_REQUEST;
         $this->tid = $path[0];
         $this->church = \Eloquent\Church::find($this->tid);
         if (!$this->church) {
             throw new \Exception('Nincs ilyen templom.');
         }
-        $this->setTitle($this->church->nev);
+        $this->church = $this->church->append(['writeAccess']);
 
-        if (!$this->church->McheckWriteAccess($user)) {
-            $this->title = 'Templom szerkesztése!';
-            addMessage('Hiányzó jogosultság!', 'danger');
+        if (!$this->church->writeAccess) {
             throw new \Exception('Hiányzó jogosultság!');
             return;
         }
@@ -39,11 +37,6 @@ class Edit extends \Html\Html {
             'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml', 'pleb_url',
             'megjegyzes', 'miseaktiv', 'misemegj', 'leiras', 'ok', 'frissites',
             'lat','lon'];
-
-        global $user;
-        if ($user->checkRole('miserend')) {
-            $allowedFields[] = 'letrehozta';
-        }
 
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $this->input['church'])) {
@@ -72,10 +65,16 @@ class Edit extends \Html\Html {
             }
         }
 
-        $now = date('Y-m-d H:i:s');
-        $this->church->moddatum = $now;
-        $this->church->log .= "\nMod: " . $user->login . " (" . $now . ")";
-        $this->church->save();
+        global $user;
+        $this->church->log .= "\nMod: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
+        
+        /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt...*/
+        $model = $this->church;
+        foreach ($model->getAttributes() as $key => $value) {
+        if(!in_array($key, array_keys($model->getOriginal())))
+            unset($model->$key);
+        }
+        $model->save();
 
         switch ($this->input['modosit']) {
             case 'n':
@@ -99,7 +98,7 @@ class Edit extends \Html\Html {
 
         global $user;
         if ($user->checkRole('miserend')) {
-            $this->addFormResponsible();
+            $this->addFormNewHolder();
         }
 
         $this->addFormAdministrative();
@@ -206,21 +205,31 @@ class Edit extends \Html\Html {
         $this->form['deaneries'] = $selectReligiousAdministration['deaneries'];
     }
 
-    function addFormResponsible() {
-        $options = ['0' => 'Nincs megadva'];
+    function addFormNewHolder() {
+        $options = [];
         $users = \Illuminate\Database\Capsule\Manager::table('user')
-                        ->select('login', 'uid')
-                        ->orderByRaw("CASE WHEN lastlogin > '" . date('Y-m-d H:i:s', strtotime('-2 month')) . "'     THEN 1 ELSE 0 END desc")
+                        ->select('login', 'nev', 'uid')
+                        ->orderByRaw("CASE WHEN lastlogin > '" . date('Y-m-d H:i:s', strtotime('-6 month')) . "'     THEN 1 ELSE 0 END desc")
                         ->orderBy('login')->get();
         foreach ($users as $selectibleUser) {
-            $options[$selectibleUser->login] = $selectibleUser->login;
+            $options[$selectibleUser->uid] = $selectibleUser->login." (".$selectibleUser->nev.")";
         }
-        $this->form['responsible'] = array(
+        $this->form['holder_uid'] = array(
             'type' => 'select',
-            'name' => 'church[letrehozta]',
-            'options' => $options,
-            'selected' => $this->church->letrehozta
+            'name' => 'uid',
+            'id' => 'combobox',
+            'options' => $options
         );
+        $this->form['holder_decription'] = array(
+            'type' => 'text',
+            'name' => 'description',
+            'placeholder' => 'Megjegyzés / jogosultság / kapcsolat a templommal.'
+        );        
+        $this->form['holder_access'] = array(
+            'type' => 'hidden',
+            'name' => 'access',
+            'value'=> 'allowed'
+        );        
     }
 
 }

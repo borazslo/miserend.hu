@@ -11,7 +11,13 @@ class Edit extends \Html\Html {
 
         $isForm = \Request::Text('submit');
         if ($isForm) {
-            $this->modify();
+            if($this->modify()) {
+                /* Ha az aktuális felhasználót frissítettük, akkor be kell töltenünk újra a felhasználót a friss adatokkal */
+                if($this->uid == $user->uid) {
+                    $user2 = new \User($this->uid);
+                    $user = $user2->load();
+                }
+            }
         }
         $this->preparePage();
     }
@@ -26,6 +32,17 @@ class Edit extends \Html\Html {
             return false;
         } else {
             try {
+                // Jogokat nem adhat akárki, de lemondhat akráki.
+                if(!$user->checkRole('user') AND isset($_REQUEST['edituser']['roles'])) {
+                    foreach($_REQUEST['edituser']['roles'] as $key => $value) {
+                        /* Ha eddig nem volt joga, de a formban joga lenne, akkor baj van */
+                        if(!in_array($key,$user->roles) AND $key == $value) {
+                            $_REQUEST['edituser']['roles'][$key] = false;
+                            addMessage('A „'.$key.'” jogosultság megadásához nem rendelkezel elég jogosultsággal.','danger');
+                        }
+                    }
+                }
+                
                 if($newuser->submit($_REQUEST['edituser'])) {                
                     if ($user->uid < 1) {
                         global $config;                    
@@ -50,19 +67,14 @@ class Edit extends \Html\Html {
         global $user;
         $uid = $this->uid;
         $roles = unserialize(ROLES);
-        $vars['roles'] = array();
-        foreach ($roles as $role) {
+        $vars['roles'] = array();        
+        foreach ($roles as $role) {            
             $vars['roles'][$role] = $role;
         }
 
-        //Ha folyamatban van meglévő felhasználó szerkesztéss, akkor azokat az adatokat tesszük be
-        if (is_array($uid)) {
-            $edituser = new \User();
-            foreach ($uid as $key => $value) {
-                $edituser->$key = $value;
-            }
+
         //Ha folyamatban van új felszanáló szerkesztése
-        } elseif ($user->uid == 0 AND isset($_REQUEST['edituser'])) {    
+        if ($user->uid == 0 AND isset($_REQUEST['edituser'])) {    
             $edituser = new \User();
             foreach ($_REQUEST['edituser'] as $key => $value) {
                 $edituser->$key = $value;
