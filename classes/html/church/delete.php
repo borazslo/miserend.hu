@@ -37,9 +37,7 @@ class Delete extends \Html\Html {
         if($comment)
             $this->church2delete->adminmegj .= ": ".$comment;        
         $this->church2delete->ok = 'n';
-        $now = date('Y-m-d H:i:s');
-        $this->church2delete->moddatum = $now;
-        $this->church2delete->log .= "\nDel: " . $user->login . " (" . $now . ")";
+        $this->church2delete->log .= "\nDel: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
         $this->church2delete->save();
                 
         $this->church2delete->delete();

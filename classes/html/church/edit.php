@@ -66,9 +66,7 @@ class Edit extends \Html\Html {
         }
 
         global $user;
-        $now = date('Y-m-d H:i:s');
-        $this->church->moddatum = $now;
-        $this->church->log .= "\nMod: " . $user->login . " (" . $now . ")";
+        $this->church->log .= "\nMod: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
         
         /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt...*/
         $model = $this->church;

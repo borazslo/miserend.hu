@@ -126,8 +126,7 @@ class EditSchedule extends \Html\Html {
             $this->church->frissites = date('Y-m-d');
         $this->church->misemegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['misemegj']);
         $this->church->adminmegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['adminmegj']);
-        $this->church->miseaktiv = $_REQUEST['miseaktiv'];
-        $this->church->moddatum =  date('Y-m-d H:i:s');
+        $this->church->miseaktiv = $_REQUEST['miseaktiv'];        
         
         /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt...*/
         $model = $this->church;

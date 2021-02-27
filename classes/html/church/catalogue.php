@@ -24,7 +24,7 @@ class Catalogue extends \Html\Html {
         $this->filterDiocese = (isset($this->input['church']['egyhazmegye']) ? $this->input['church']['egyhazmegye'] : false);
         $this->filterDeanery = ((isset($this->input['church']['espereskerulet']) AND $this->input['church']['espereskerulet'] != 0 ) ? $this->input['church']['espereskerulet'] : false);
         $this->filterStatus = (isset($this->input['church']['status']) ? $this->input['church']['status'] : false);
-        $this->orderBy = (isset($this->input['church']['orderBy']) ? $this->input['church']['orderBy'] : 'moddatum DESC');
+        $this->orderBy = (isset($this->input['church']['orderBy']) ? $this->input['church']['orderBy'] : 'updated_at DESC');
         
         $params = [
             'church[keyword]' => $this->filterKeyword,
@@ -69,7 +69,7 @@ class Catalogue extends \Html\Html {
         $this->form['orderBy'] = [
             'name' => 'church[orderBy]',
             'options' => [
-                'moddatum DESC' => 'utolsó módosítás',
+                'updated_at DESC' => 'utolsó módosítás',
                 'frissites DESC' => 'utolsó frissítés',
                 'varos' => 'település',
                 'nev' => 'név',
@@ -133,7 +133,7 @@ class Catalogue extends \Html\Html {
 
         if ($this->orderBy) {
             if (in_array($this->orderBy, [
-                        'moddatum DESC', 'moddatum', 'frissites DESC', 'frissites',
+                        'updated_at DESC', 'updated_at', 'frissites DESC', 'frissites',
                         'nev', 'ismertnev', 'varos'])) {
                 $search = $search->orderByRaw($this->orderBy);
             } elseif ($this->orderBy == 'remarks.created_at') {

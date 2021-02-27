@@ -18,7 +18,7 @@ class Distance {
             $limit = 120;
         }
 
-        $query = \Eloquent\Church::has('osms')->take($limit)->orderBy('moddatum', 'desc');
+        $query = \Eloquent\Church::has('osms')->take($limit)->orderBy('updated_at', 'desc');
         if ($church_id) {
             if (is_array($church_id)) {
                 $query = $query->whereIn('id', $church_id);
