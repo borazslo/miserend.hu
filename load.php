@@ -1,9 +1,6 @@
 <?php
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-    define('PATH', dirname(__FILE__) . "/");
-}
+define('PATH', dirname(__FILE__) . "/");
 
 $vars = array();
 
@@ -30,15 +27,14 @@ define('DOMAIN', $config['path']['domain']);
 if (isset($_REQUEST['login'])) {
     try {
         \User::login($_REQUEST['login'], $_REQUEST['passw']);
-    } catch (\Exception $ex) {
+    } catch (\Exception $ex) {        
         addMessage('Hibás név és/vagy jelszó!<br/><br/>Ha elfelejtetted a jelszavadat, <a href="/user/lostpassword">kérj ITT új jelszót</a>.', 'danger');
     }
 }
-$user = \User::load();
 if (isset($_REQUEST['logout'])) {
-    $user->logout();
+    \User::logout();
 }
-
+$user = \User::load();
 //TODO: delete this (see: \Html\Html::loadTwig());
 require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();

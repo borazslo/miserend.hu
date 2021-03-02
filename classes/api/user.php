@@ -19,13 +19,14 @@ class User extends Api {
     public function run() {
         parent::run();
         $this->getInputJson();
-        if (!$token = validateToken($this->input['token'])) {
+        $token = \Eloquent\Token::where('name',$this->input['token'])->first();
+        if(!$token or !$token->isValid) {
             throw new \Exception("Invalid token.");
-        }
-
+        }    
+        
         //TODO: delete global somehow
         global $user;
-        $user = new \User($token['uid']);
+        $user = new \User($token->uid);
         $user->getFavorites();
         $data = array(
             'username' => $user->username,

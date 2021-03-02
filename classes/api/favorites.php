@@ -34,13 +34,14 @@ class Favorites extends Api {
         parent::run();
         $this->getInputJson();
 
-        if (!$token = validateToken($this->input['token'])) {
+        $token = \Eloquent\Token::where('name',$this->input['token'])->first();
+        if(!$token or !$token->isValid) {
             throw new \Exception("Invalid token.");
-        }
+        }    
 
         //TODO: delete global somehow
         global $user;
-        $user = new \User($token['uid']);
+        $user = new \User($token->uid);
 
         if (isset($this->input['remove'])) {
             if (!$user->removeFavorites($this->input['remove'])) {
@@ -60,6 +61,7 @@ class Favorites extends Api {
         }
 
         $this->return['favorites'] = $favorites;
+        
     }
 
 }

@@ -23,7 +23,7 @@ class Login extends Api {
         if (!$userId) {
             throw new \Exception("Invalid username or password.");
         }
-        $token = generateToken($userId, 'API');
+        $token = \Token::create($userId, 'API');
 
         $this->return['token'] = $token;
     }

@@ -325,7 +325,14 @@ class User {
             return false;
 
         DB::table('user')->where('uid', $this->uid)->delete();
-        $this->selfEmpty();
+        
+        foreach ($this as $key => $value)
+            unset($this->$key);
+        $this->loggedin = false;
+        $this->uid = 0;
+        $this->username = '*vendeg*';
+        $this->nickname = '*vendeg*';
+        
         addMessage('Sikeresen töröltük a felhasználót.', 'success');
         return true;
     }
@@ -430,37 +437,26 @@ class User {
             return false;
     }
 
-    static function emptyUser() {
-        return new \User();
-    }
+    static function load() {        
+        if (!isset($_COOKIE['token'])) 
+            return new \User();
+                        
+        $token = \Eloquent\Token::where('name',$_COOKIE['token'])->first();
+        if(!$token or !$token->isValid) {
+            \Token::delete();
+            return new \User();
+        }                        
 
-    static function load() {
-        if (isset($_SESSION['token'])) {
-            if (!$token = validateToken($_SESSION['token'])) {
-                setcookie('token', 'null', time());
-                return \User::emptyUser();
-            }
-            $user = new \User($token['uid']);
-        } elseif (isset($_COOKIE['token'])) {
-            if (!$token = validateToken($_COOKIE['token'])) {
-                setcookie('token', 'null', time());
-                return \User::emptyUser();
-            }
-            $timeout = '+1 month';
-            $newToken = generateToken($token['uid'], 'web', $timeout);
-            setcookie('token', $newToken, strtotime($timeout));
-            $_SESSION['token'] = $_COOKIE['token'] = $newToken;
-            $user = new \User($token['uid']);
-        } else {
-            setcookie('token', 'macska', time() + 10000);
-            return \User::emptyUser();
-        }        
+        $token->extend();
+        
+        $user = new \User($token->uid);
         $user->loggedin = true;
         $user->active();
         return $user;
     }
 
     static function login($name, $password) {
+        \Token::delete();
         $name = sanitize($name);
         $userRow = DB::table('user')->where('login', $name)->first();
         if (!$userRow) {
@@ -469,34 +465,14 @@ class User {
         if (!password_verify($password, $userRow->jelszo)) {
             throw new \Exception("Invalid password.");
         }
-
-        $timeout = '+1 month';
-        $token = generateToken($userRow->uid, 'web', $timeout);
-        setcookie('token', $token, strtotime($timeout));
-        $_COOKIE['token'] = $token;
-        $_SESSION['token'] = $token;
-
+  
+        Token::create($userRow->uid, 'web');
+        
         DB::table('user')->where('uid', $userRow->uid)->update(['lastlogin' => date('Y-m-d H:i:s')]);
         return $userRow->uid;
     }
 
-    function logout() {
-        unset($_SESSION['token']);
-        unset($_COOKIE['token']);
-        setcookie('token', 'null', time());
-
-        $this->selfEmpty();
-        session_destroy();
-        session_unset();
-    }
-
-    function selfEmpty() {
-        foreach ($this as $key => $value)
-            unset($this->$key);
-        $this->loggedin = false;
-        $this->uid = 0;
-        $this->username = '*vendeg*';
-        $this->nickname = '*vendeg*';
-    }
-
+    static function logout() {
+        \Token::delete();
+    } 
 }

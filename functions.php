@@ -73,23 +73,7 @@ function checkUsername($username) {
     return true;
 }
 
-function cookieSave($uid, $name) {
-    $isCLI = ( php_sapi_name() == 'cli' );
-
-    $salt = 'Yzsdf';
-    $identifier = md5($salt . md5($uid . $salt));
-    $token = md5(uniqid(rand(), TRUE));
-    $timeout = time() + 60 * 60 * 24 * 7;
-    if (!$isCLI)
-        setcookie('auth', "$identifier:$token:" . md5($timeout), $timeout);
-    $query = "DELETE FROM session WHERE uid = " . $uid . " AND login = '$name' LIMIT 1;";
-    mysql_query($query);
-    $query = "INSERT INTO session (uid,login,sessid,lejarat) VALUES (" . $uid . ",'$name','$identifier:$token:" . md5($timeout) . "',$timeout);";
-    mysql_query($query);
-    $_SESSION['auth'] = "$identifier:$token:" . md5($timeout);
-    $query = "UPDATE user SET lastlogin = " . time() . " LIMIT 1;";
-    mysql_query($query);
-}
+// DROP TABLE `miserend`.`session`;
 
 function mapquestGeocode($location) {
     global $config;
@@ -1474,64 +1458,6 @@ function updatesCampaign() {
         'title' => 'Hét nap, hét frissítése',
         'content' => nl2br($dobozszoveg)
     );
-}
-
-function generateToken($forUserId, $type, $timeout = false) {
-    if ($timeout == false) {
-        global $config;
-        $timeout = date('Y-m-d H:i:s', strtotime("+" . $config['token']['timeout']));
-    } else {
-        $timeout = date('Y-m-d H:i:s', strtotime($timeout));
-    }
-
-    $inserted = false;
-    #for ($i = 1; $i < 5; $i++) {
-
-    try{ 
-        $token = new Eloquent\Token;
-
-        $token->name = md5(uniqid(mt_rand(), true));
-        $token->type = $type;
-        $token->uid = $forUserId;
-        $token->timeout = $timeout;
-
-        $token->save();
-    }
-    catch(\Exception $e){
-       throw new \Exception("Token cannot saved. Sorry");
-       echo $e->getMessage();   // insert query
-    }
-    return $token->name;
-}
-
-function validateToken($token) {
-     $token = Eloquent\Token::where('name', $token)->first();
-    
-    if (!$token) {        
-        #throw new \Exception("Invalid token");
-        return false;
-    } elseif ($token->timeout < date('Y-m-d H:i:s')) {
-        #throw new \Exception("Outdated token");
-        return false;
-    }
-    //TODO: check also: type,uid
-
-    extendToken($token);
-    return $token;
-}
-
-function extendToken($token) {
-    global $config;
-    try {
-        $token->timeout = date('Y-m-d H:i:s', strtotime("+" . $config['token']['timeout']));
-        $token->save();
-        }
-    catch(\Exception $e){
-       throw new \Exception("Token cannot be extended.");
-       echo $e->getMessage();   // insert query
-    }
-    return true;
-
 }
 
 function getInputJSON() {
