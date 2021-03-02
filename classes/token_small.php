@@ -1,6 +1,5 @@
 <?php
 
-
 class Token {
        
     static function create($forUserId, $type) {
