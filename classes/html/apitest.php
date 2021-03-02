@@ -16,6 +16,7 @@ class Apitest extends Html {
             $this->redirect('/');
         }
 
+        
    
         if(isset($_REQUEST['json'])) {
                 $json = array();
@@ -47,7 +48,8 @@ class Apitest extends Html {
                     }
                 }
 
-                $url = 'http://'.$_SERVER['SERVER_NAME'].$_REQUEST['url'];
+                $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'https://' : 'http://';
+                $url = $protocol .$_SERVER['SERVER_NAME'].$_REQUEST['url'];
                 $response = sendJson($url,$json);
                 printr($response);
 

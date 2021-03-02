@@ -24,7 +24,7 @@ class Updated extends Api {
             return;
         }
 
-        if( DB::table('templomok')->where('moddatum','>=',$this->date)->count() > 0) 
+        if( DB::table('templomok')->where('frissites','>=',$this->date)->count() > 0) 
             $this->return = "1";
         else 
             $this->return = "0";

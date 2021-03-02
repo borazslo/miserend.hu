@@ -15,14 +15,14 @@ class ReportByUser extends Report {
         if (!isset($this->input['token'])) {
             throw new \Exception("JSON input misses token.");
         }
-        $token = \Eloquent\Token::where('name',$this->input['token'])->first();
-        if(!$token or !$token->isValid) {
+        $this->token = \Eloquent\Token::where('name',$this->input['token'])->first();
+        if(!$this->token or !$this->token->isValid) {
             throw new \Exception("Invalid token.");
         }            
     }
 
-    public function prepareUser() {
-        $this->user = new User($token['uid']);
+    public function prepareUser() {        
+        $this->user = new \User($this->token->uid);
     }
 
 }

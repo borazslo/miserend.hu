@@ -41,8 +41,8 @@ class Report extends Api {
         parent::run();
         $this->getInputJson();
         $this->prepareUser();
-
         $this->prepareRemark();
+
         try {
             $this->remark->save();
             $this->remark->emails();
@@ -52,18 +52,17 @@ class Report extends Api {
         }
     }
 
-    public function prepareRemark() {
-        $this->remark = new \Remark();
-        $this->remark->tid = $this->input['tid'];
-        $this->remark->name = $this->user->name;
+    public function prepareRemark() {        
+        $this->remark = new \Eloquent\Remark;
+
+        $this->remark->church_id = $this->input['tid'];
+        $this->remark->nev = $this->user->name;
         if(isset($this->user->email))
             $this->remark->email = $this->user->email;
         if (isset($this->input['timestamp'])) {
-            $this->remark->timestamp = $this->input['timestamp'];
+            $this->remark->created_at = $this->input['timestamp'];
         }
-        if (isset($this->input['dbdate'])) {
-            $this->remark->dbdate = $this->input['dbdate'];
-        }
+        
         if ($this->user->uid > 0) {
             $this->user->active();
         }
@@ -75,7 +74,7 @@ class Report extends Api {
         if (!isset($this->input['text'])) {
             $this->input['text'] = "";
         } else {
-            $this->input['text'] = sanitize($this->input['text']);
+            $this->input['text'] = sanitize($this->input['text'])."<br/>";
         }
 
         switch ($this->input['pid']) {
@@ -87,17 +86,17 @@ class Report extends Api {
                 break;
         }
 
-        $this->remark->text = "Mobilalkalmazáson keresztül érkezett információ:\n" . $this->input['text'] . "\n <i>verzió:" . $this->version . ", pid:" . $this->input['pid'] . "</i>";
+        $this->remark->leiras = "Mobilalkalmazáson keresztül érkezett információ:<br/>\n" . $this->input['text'] . "<br/>\n <i>verzió:" . $this->version . ", pid:" . $this->input['pid'] . "</i>";
         if (isset($this->input['dbdate'])) {
             if (!is_numeric($this->input['dbdate'])) {
                 $this->input['dbdate'] = strtotime($this->input['dbdate']);
             }
-            $this->remark->text .= "<i>, adatbázis: " . date("Y-m-d H:i", $this->input['dbdate']) . "</i>";
+            $this->remark->leiras .= "<i>, adatbázis: " . date("Y-m-d H:i", $this->input['dbdate']) . "</i>";
 
-            $church = \Eloquent\Church::find($this->remark->tid)->toArray();
+            $church = \Eloquent\Church::find($this->remark->church_id)->toArray();
             $updated = strtotime($church['frissites']);
             if ($this->input['dbdate'] < $updated) {
-                $this->remark->text .= "\n\n<strong>Figyelem! Elavult adatok alapján történt a bejelentés!</strong>";
+                $this->remark->leiras .= "<br/>\n<br/>\n<strong>Figyelem! Elavult adatok alapján történt a bejelentés!</strong>";
             }
         }
     }
