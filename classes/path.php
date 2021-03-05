@@ -42,6 +42,7 @@ class Path {
             ["^remark\/([0-9]{1,5})\/feedback", "email/remarkfeedback/$1"],
             ["^egyhazmegye\/list", "diocesecatalogue"],
             ["^impresszum$", "staticpage/impressum"],
+            ["^gdpr$", "staticpage/gdpr"],
             ["^hazirend$", "staticpage/termsandconditions"],
             ["^terkep$", "map"],
             ["^$", "home"]
