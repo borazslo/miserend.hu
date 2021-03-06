@@ -10,8 +10,7 @@ class Photos {
             whereNull('width')
             ->orWhereNull('height')
             ->orWhere('width',0)
-            ->orWhere('height',0)
-            ->limit(2)
+            ->orWhere('height',0)            
             ->get();
         
         foreach($photos as $photo) {
