@@ -116,6 +116,12 @@ class Edit extends \Html\Html {
             'selected' => $this->church->ok
         );
         $this->title = $this->church->fullName;
+        
+        for($i = 1; $i < 50; $i++) {
+            $help = new \Help($i);
+            if($help)
+                $this->help[$i] = $help->html;
+        }
     }
 
     function addFormAdministrative() {

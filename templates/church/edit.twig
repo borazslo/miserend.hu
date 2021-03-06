@@ -2,8 +2,6 @@
 
 {% import "forms.twig" as forms %}
 
-{% import "forms.twig" as forms %}
-
 {% block content %}
     <FORM ENCTYPE='multipart/form-data' method=post>
         <input type=hidden name=church[id] value={{ church.id }}>
@@ -32,16 +30,18 @@
                 <td bgcolor=#ECE5C8>
                     <textarea name=church[adminmegj] class="urlap form-control tinymce" cols=50 placeholder="Adminisztrátori megjegyzés" rows=2>{{ church.adminmegj|nl2br }}</textarea>                    
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 1} %}</td>
+                <td>{{ _self.helplink(1, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(1,help) }}
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Felelős:</td>
                 <td bgcolor=#efefef>
                     <textarea name=church[kontakt] class="urlap form-control tinymce" cols=50 rows=2 placeholder="Felelős neve és telefonszáma, ha elérhető">{{ church.kontakt|nl2br }}</textarea>                    
                     <input type=text name=church[kontaktmail] size=40 class="urlap form-control" value='{{ church.kontaktmail }}'  placeholder="Felelős email címe">                    
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 2} %}</td>
+                <td>{{ _self.helplink(2, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(2,help) }}
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Feltöltő (jogosult):</td>
                 <td bgcolor=#efefef>
@@ -54,15 +54,17 @@
                 <td bgcolor=#F5CC4C>
                     <input type=text name=church[nev] value="{{ church.nev }}" class="urlap form-control" size=80 maxlength=150  placeholder="Templom neve">
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 3} %}</td>
+                <td>{{ _self.helplink(3, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(3,help) }}
             <tr>
                 <td bgcolor=#FAE19C class=kiscim align=right>Közismert neve:</td>
                 <td bgcolor=#FAE19C>                    
                     <input type=text name=church[ismertnev] value="{{ church.ismertnev }}" class=form-control size=80 maxlength=150  placeholder="Közismert név">                    
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 4} %}</td>
+                <td>{{ _self.helplink(4, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(4,help) }}
            
             {% if not church.varos %}
             <tr>
@@ -93,16 +95,17 @@
                         <b><a href="{{ church.location.osm.url }}" target="_blank">{{ church.location.osm.type }}/{{ church.location.osm.id }}</a>
                             <a href="https://www.openstreetmap.org/edit?editor=id&{{ church.location.osm.type }}={{ church.location.osm.id }}#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}"  title="OSM szerkesztése..."></i></a>
                         </b><br/>
-                        <div class="small" style="margin-top:10px">Ez a templom sikeresen össze van kötve az Open Street Map térkép adatbázissal.<br/> 
-                            A templom térkép-adatainak szerkesztése az OSM-ben lehetséges az előbbi <a href="https://www.openstreetmap.org/edit?editor=id&{{ church.location.osm.type }}={{ church.location.osm.id }}#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..." "></i></a> ikonra kattintva.<br/>
-                            Összekötés szétkapcsolása: <ol>
-                                <li>Az OSM szerkesztőben az 'url:miserend' címke törlése.</li>
-                                <li>A mySQL adatbázisból kézzel ki kell törölni az adott templom OSM beállításait: <i>UPDATE `templomok` SET `osmid`= NULL, `osmtype`= NULL WHERE `id`='{{ church.id }}';</i></li>
-                        
-
-                        </div>
                     </td>
-                <tr>   
+                    <td>{{ _self.helplink(55, ICONS_INFO ) }}</td>                        
+                <tr>
+                <tr id="help55" style="display:none"><td colspan="3">
+                        Ez a templom sikeresen össze van kötve az Open Street Map térkép adatbázissal.<br/> 
+                        A templom térkép-adatainak szerkesztése az OSM-ben lehetséges az előbbi <a href="https://www.openstreetmap.org/edit?editor=id&{{ church.location.osm.type }}={{ church.location.osm.id }}#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..." "></i></a> ikonra kattintva.<br/>
+                        Összekötés szétkapcsolása: <ol>
+                            <li>Az OSM szerkesztőben az 'url:miserend' címke törlése.</li>
+                            <li>A mySQL adatbázisból kézzel ki kell törölni az adott templom OSM beállításait: <i>UPDATE `templomok` SET `osmid`= NULL, `osmtype`= NULL WHERE `id`='{{ church.id }}';</i></li>
+                       
+                    </td></tr>
             {% else %}
                 <tr>
                     <td class=kiscim align=right>Koordináta:</td>
@@ -117,8 +120,12 @@
                             <div class="col-md-2">
                                 <a href="https://www.openstreetmap.org/edit?editor=id#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank" ><span class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..."></i></a>
                             </div>
-                        </div>
-                        <div class="small"  style="margin-top:10px">Ez a templom nincs összekötve az Open Street Map térkép adatbázissal.<br/> 
+                        </div>                        
+                    </td>
+                    <td>{{ _self.helplink(55, ICONS_INFO ) }}</td>                        
+                </tr>
+                <tr id="help55" style="display:none"><td colspan="3">
+                        Ez a templom nincs összekötve az Open Street Map térkép adatbázissal.<br/> 
                             A templom térkép-adatainak szerkesztése csak az OSM-ben lehetséges!<br/>
                             Összekötés az OSM adatbázissal: <ol>
                                 <li>Az OSM szerkesztőjébe belépés, például ezen a linken: <a href="https://www.openstreetmap.org/edit?editor=id#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..." ></i></a></li>
@@ -134,10 +141,7 @@
                                     </ul>
                                 </ol>
                                 <li>A miserend.hu-n a naponta automatikusan lefutó ellenőrző mechanizmus után automatikusan felismeri a kapcsolatot. Ezt le lehet futtatni <a href="/josm?update">itt is.</a></li>
-                        </div>
-                    </td>
-                    <td></td>
-                </tr>
+                    </td></tr>
             {% endif %}
             <tr>
                 <td class=kiscim align=right>Egyházigazgatási cím:</td>
@@ -153,15 +157,16 @@
                         {{ forms.select(deanery) }}
                     {% endfor %}
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 5} %}</td>
-            </tr>  
+                <td>{{ _self.helplink(5, ICONS_INFO ) }}</td>
+            </tr>
+            {{ _self.helptr(5,help) }}
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Plébánia adatai:</td>
                 <td bgcolor=#efefef>
                     <textarea name=church[plebania] id="plebania" class="urlap form-control tinymce" cols=50 rows=4  placeholder="A plébánia neve, címe, telefonja, egyéb elérhetősége. Ill. hivatali idők.">{{ church.plebania|nl2br }}</textarea>
                     <input type=text class="urlap form-control" name=church[pleb_eml] value='{{ church.pleb_eml }}' size=40 class=urlap maxlength=100  placeholder="Email cím">                    
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 6} %}</td>
+                <td>{{ _self.helplink(6, ICONS_INFO ) }}</td>
             </tr>
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Linkek:</td>
@@ -179,15 +184,16 @@
                 </td>
                 <td></td>
             </tr>            
-            
+            {{ _self.helptr(6,help) }}
             
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Megjegyzés:</td>
                 <td bgcolor=#ffffff>
                     <textarea name=church[megjegyzes] id=megjegyzes class="urlap form-control tinymce" cols=50 rows=3>{{ church.megjegyzes|nl2br }}</textarea>                
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 10} %}</td>
+                <td>{{ _self.helplink(10, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(10,help) }}
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Aktív misézőhely:</td>
                 <td bgcolor=#ffffff>
@@ -207,15 +213,17 @@
                 <td bgcolor=#ffffff>
                     <textarea name=church[misemegj] id=misemegj class="form-control tinymce" cols=50 rows=5>{{ church.misemegj|nl2br }}</textarea>
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 41} %}</td>
+                <td>{{ _self.helplink(41, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(41,help) }}
             <tr>
                 <td valign=top class=kiscim align=right>Részletes leírás, templom története:</td>
                 <td valign=top>                
                     <textarea name=church[leiras] id="leiras" class="form-control szoveg tinymce" cols=90 rows=10>{{ church.leiras|nl2br }}</textarea>
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 9} %}</td>
+                <td>{{ _self.helplink(9, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(9,help) }}
             <tr>
                 <td bgcolor=#efefef valign=top class=kiscim align=right>Képek:</td>
                 <td bgcolor=#efefef >
@@ -231,15 +239,17 @@
                         (Legutóbbi frissítés: {{ church.frissites }})
                     </div>
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 15} %}</td>
+                <td>{{ _self.helplink(14, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(14,help) }}
             <tr>
                 <td bgcolor=#efefef valign=top class=kiscim align=right>Megjelenhet:</td>
                 <td bgcolor=#efefef valign=top>
                     {{ forms.select(form.ok) }}
                 </td>
-                <td>{% include 'help_link.twig' with {'id': 15} %}</td>
+                <td>{{ _self.helplink(15, ICONS_INFO ) }}</td>
             </tr>
+            {{ _self.helptr(15,help) }}
             <tr>
                 <td valign=top class=kiscim align=right>Történet:</td>
                 <td valign=top>
@@ -327,6 +337,11 @@
       addLink();
     });
  
+    $( ".info" ).on( "click", function() { 
+        console.log($( this ).data('id'));
+               $('#help' + $( this ).data('id') ).toggle(600);
+    });
+ 
     $( ".church-link-add" ).on( "click", function() {
       newLinkDialog.dialog( "open" );
     });
@@ -375,3 +390,11 @@
 {% block rightsidebar %}    
     {% include 'church/_panelholders.twig' %}
 {% endblock %}
+
+{% macro helplink(id, icon) %}
+    <span title="Súgó" class="grey {{ icon }} info" aria-hidden="true" data-id="{{ id }}"></span>
+{% endmacro %}
+
+{% macro helptr(id, help) %}
+    <tr style="display:none" id="help{{ id }}"><td colspan="3">{{ help[id]|raw }}</td></tr>
+{% endmacro %}

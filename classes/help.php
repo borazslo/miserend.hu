@@ -208,7 +208,7 @@ class Help {
                 $this->html = 'Lehetséges periódusok:' .
                         '<ul>';
                 foreach (unserialize(PERIODS) as $name => $attr) {
-                    $this->html .= "<li> " . $attr['abbrev'] . " = " . $attr['description'] . $attr['name'] . " héten</li>";
+                    $this->html .= "<li> " . $attr['abbrev'] . " = " . ( isset($attr['description']) ? $attr['description'] : " " ) . $attr['name'] . " héten</li>";
                 }
                 $this->html .= '</ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust. Vagyis ha nincs itt periódus érték megadva, akkor a mise periódusa érvényes.';
 
@@ -228,7 +228,7 @@ class Help {
                 $this->html = '</p>Lehetséges periódusok:
 		<ul>';
                 foreach (unserialize(PERIODS) as $name => $attr) {
-                    $this->html .= "<li> " . $attr['abbrev'] . " = " . $attr['description'] . $attr['name'] . " héten</li>";
+                    $this->html .= "<li> " . $attr['abbrev'] . " = " . ( isset($attr['description']) ? $attr['description'] : " " ) . $attr['name'] . " héten</li>";
                 }
                 $this->html .= '</ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust. Vagyis ha nincs itt periódus érték megadva, akkor a mise periódusa érvényes.';
                 break;
