@@ -2,6 +2,8 @@
 
 namespace Html\Church;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class EditSchedule extends \Html\Html {
 
     public function __construct($path) {
@@ -37,20 +39,35 @@ class EditSchedule extends \Html\Html {
         //DELETE
         if (isset($_REQUEST['delete']['period'])) {
             foreach ($_REQUEST['delete']['period'] as $period) {
-                $query = "UPDATE misek SET torles = '" . $most . "', torolte = '" . $user->login . "' WHERE tid = " . $_REQUEST['tid'] . " AND idoszamitas = '" . $period . "' ;";
-                mysql_query($query);
+                DB::table('misek')
+                        ->where('tid',$_REQUEST['tid'])
+                        ->where('idoszamitas',$period)
+                        ->update([
+                            'torles' => $most,
+                            'torolte' => $user->login
+                        ]);                
             }
         }
         if (isset($_REQUEST['delete']['particular'])) {
             foreach ($_REQUEST['delete']['particular'] as $particular) {
-                $query = "UPDATE misek SET torles = '" . $most . "', torolte = '" . $user->login . "' WHERE tid = " . $_REQUEST['tid'] . " AND idoszamitas = '" . $particular . "' ;";
-                mysql_query($query);
+                DB::table('misek')
+                        ->where('tid',$_REQUEST['tid'])
+                        ->where('idoszamitas',$particular)
+                        ->update([
+                            'torles' => $most,
+                            'torolte' => $user->login
+                        ]);                
             }
         }
         if (isset($_REQUEST['delete']['mass'])) {
             foreach ($_REQUEST['delete']['mass'] as $mid) {
-                $query = "UPDATE misek SET torles = '" . $most . "', torolte = '" . $user->login . "' WHERE tid = " . $_REQUEST['tid'] . " AND id = '" . $mid . "' LIMIT 1;";
-                mysql_query($query);
+                DB::table('misek')
+                        ->where('tid',$_REQUEST['tid'])
+                        ->where('id',$mid)
+                        ->update([
+                            'torles' => $most,
+                            'torolte' => $user->login
+                        ]);                
             }
         }
 
@@ -74,23 +91,37 @@ class EditSchedule extends \Html\Html {
                         $mass['nyelv'] = cleanMassAttr($mass['nyelv']);
 
 
+                        $data = [
+                            'nap' => $mass['napid'],
+                            'ido' => $mass['ido'] . ":00",
+                            'nap2' => $mass['nap2'],
+                            'idoszamitas' => $mass['idoszamitas'],
+                            'weight' =>  $mass['weight'],
+                            'tol' => $mass['tol'],
+                            'ig' => $mass['ig'],
+                            'nyelv' => $mass['nyelv'],
+                            'milyen' => $mass['milyen'],
+                            'megjegyzes' => $mass['megjegyzes'],                                                           
+                        ];
+                               
                         if ($mass['id'] != 'new') {
-                            $query = "UPDATE misek SET ";
-                            $query .= "nap='" . $mass['napid'] . "',ido='" . $mass['ido'] . ":00',nap2='" . $mass['nap2'] . "',idoszamitas='" . $mass['idoszamitas'] . "',weight='" . $mass['weight'] . "',tol='" . $mass['tol'] . "',ig='" . $mass['ig'] . "',nyelv='" . $mass['nyelv'] . "',milyen='" . $mass['milyen'] . "',megjegyzes='" . $mass['megjegyzes'] . "',";
-                            $query .= "modositotta='" . $user->login . "',moddatum='" . $most . "'";
-                            $query .= " WHERE tid = " . $mass['tid'] . " AND id = " . $mass['id'] . " LIMIT 1";
+                            DB::table('misek')
+                                    ->where('tid',$mass['tid'])
+                                    ->where('id',$mass['id'])
+                                    ->update($data);
                         } else {
-                            $query = "INSERT INTO misek ";
-                            $query .= " (tid,nap,ido,nap2,idoszamitas,weight,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
-                            $query .= " VALUES ('" . $mass['tid'] . "','" . $mass['napid'] . "','" . $mass['ido'] . ":00','" . $mass['nap2'] . "','" . $mass['idoszamitas'] . "','" . $mass['weight'] . "','" . $mass['tol'] . "','" . $mass['ig'] . "','" . $mass['nyelv'] . "','" . $mass['milyen'] . "','" . $mass['megjegyzes'] . "',";
-                            $query .= "'" . $user->login . "','" . $most . "')";
+                            $data['modositotta'] = $user->login; 
+                            $data['moddatum'] = $most;
+                            $data['tid'] = $mass['tid'];
+                                                                                    
+                            DB::table('misek')                                    
+                                    ->insert($data);                                                        
                         }
-                        mysql_query($query);
                     }
                 }
             }
         }
-        if (is_array($_REQUEST['particular'])) {
+        if (isset($_REQUEST['particular']) AND is_array($_REQUEST['particular'])) {
             foreach ($_REQUEST['particular'] as $particular) {
                 foreach ($particular as $key => $mass) {
                     if (is_numeric($key)) {
@@ -103,18 +134,32 @@ class EditSchedule extends \Html\Html {
                         $mass['ig'] = $mass['tol'];
                         $mass['napid'] = 0;
 
+                      $data = [
+                            'nap' => $mass['napid'],
+                            'ido' => $mass['ido'] . ":00",
+                            'nap2' => isset($mass['nap2']) ? $mass['nap2'] : false,
+                            'idoszamitas' => $mass['idoszamitas'],
+                            'weight' =>  $mass['weight'],
+                            'tol' => $mass['tol'],
+                            'ig' => $mass['ig'],
+                            'nyelv' => $mass['nyelv'],
+                            'milyen' => $mass['milyen'],
+                            'megjegyzes' => $mass['megjegyzes'],                                                           
+                        ];
+                               
                         if ($mass['id'] != 'new') {
-                            $query = "UPDATE misek SET ";
-                            $query .= "nap='" . $mass['napid'] . "',ido='" . $mass['ido'] . ":00',nap2='" . $mass['nap2'] . "',idoszamitas='" . $mass['idoszamitas'] . "',weight='" . $mass['weight'] . "',tol='" . $mass['tol'] . "',ig='" . $mass['ig'] . "',nyelv='" . $mass['nyelv'] . "',milyen='" . $mass['milyen'] . "',megjegyzes='" . $mass['megjegyzes'] . "',";
-                            $query .= "modositotta='" . $user->login . "',moddatum='" . $most . "'";
-                            $query .= " WHERE tid = " . $mass['tid'] . " AND id = " . $mass['id'] . " LIMIT 1";
+                            DB::table('misek')
+                                    ->where('tid',$mass['tid'])
+                                    ->where('id',$mass['id'])
+                                    ->update($data);
                         } else {
-                            $query = "INSERT INTO misek ";
-                            $query .= " (tid,nap,ido,nap2,idoszamitas,weight,tol,ig,nyelv,milyen,megjegyzes,modositotta,moddatum) ";
-                            $query .= " VALUES ('" . $mass['tid'] . "','" . $mass['napid'] . "','" . $mass['ido'] . ":00','" . $mass['nap2'] . "','" . $mass['idoszamitas'] . "','" . $mass['weight'] . "','" . $mass['tol'] . "','" . $mass['ig'] . "','" . $mass['nyelv'] . "','" . $mass['milyen'] . "','" . $mass['megjegyzes'] . "',";
-                            $query .= "'" . $user->login . "','" . $most . "')";
+                            $data['modositotta'] = $user->login; 
+                            $data['moddatum'] = $most;
+                            $data['tid'] = $mass['tid'];
+                                                                                    
+                            DB::table('misek')                                    
+                                    ->insert($data);                                                        
                         }
-                        mysql_query($query);
                     }
                 }
             }
