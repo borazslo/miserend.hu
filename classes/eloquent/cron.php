@@ -2,8 +2,6 @@
 
 namespace Eloquent;
 
-use Illuminate\Database\Capsule\Manager as DB;
-
 class Cron extends \Illuminate\Database\Eloquent\Model {
 
     protected $fillable = array('class', 'function');
@@ -31,7 +29,7 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
     public function initialize() {
         $jobsToSave = [
             ['\Eloquent\Cron', 'initialize', '1 week'],
-            ['\Eloquent\Cron', 'hourly', '1 hour'],
+            ['\Message', 'clean', '1 hour'],
             ['\Html\Cron', 'oldWeekly', '1 week'],
             ['\Api\Sqlite', 'cron', '1 day'],
             ['\ExternalApi\OverpassApi', 'updateUrlMiserend', '1 day'],
@@ -39,31 +37,14 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             ['\OSM', 'checkBoundaries', '5 min'],
             ['\OSM', 'checkUrlMiserend', '1 day'],            
             ['\KeywordShortcut', 'updateAll', '1 day'],
-            ['\Distance', 'updateSome', '15 min']
+            ['\Distance', 'updateSome', '15 min'],
+            ['\Token', 'cleanOut', '2 hours']
         ];
         foreach ($jobsToSave as $jobToSave) {
             $job = \Eloquent\Cron::firstOrCreate(['class' => $jobToSave[0], 'function' => $jobToSave[1]]);
             $job->frequency = $jobToSave[2];
             $job->save();
         }
-    }
-
-    function hourly() {
-        $this->clearoutMessages();
-        $this->clearoutTokens();
-    }
-
-    private function clearoutMessages() {
-        DB::table('messages')
-                ->where('timestamp', '<', date('Y-m-d H:i:s', strtotime('-1 month')))
-                ->orWhere('shown', 1)
-                ->delete();
-    }
-
-    private function clearoutTokens() {
-        DB::table('tokens')
-                ->where('timeout', '<', date('Y-m-d H:i:s'))
-                ->delete();
     }
     
     function run() {

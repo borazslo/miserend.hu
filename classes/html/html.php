@@ -31,7 +31,7 @@ class Html {
             $this->chat = chat_load();
         }
 
-        $this->messages = getMessages();
+        $this->messages = \Message::getToShow();
 
         $this->loadTwig();
         $this->getTemplateFile();

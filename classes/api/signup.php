@@ -30,7 +30,7 @@ class Signup extends Api {
 
         $success = $newuser->submit($fieldsToSubmit);
 
-        $messages = getMessages();
+        $messages = \Message::getToShow();
         if (!$success) {
             $exceptionTexts = array();            
             foreach ($messages as $message) {
