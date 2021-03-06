@@ -1685,31 +1685,6 @@ function callPageFake($uri, $post, $phpinput = array()) {
     return $page;
 }
 
-function sendJson($url, $content) {
-    if (!preg_match('/^http:\/\//i', $url)) {
-        global $config;
-        $url = $config['path']['domain'] . $url;
-    }
-    print_r($_REQUEST);
-    $contentEncoded = json_encode($content);
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_HEADER, false);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
-    curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $contentEncoded);
-
-    $response = curl_exec($curl);
-    if (!$responseArray = json_decode($response, true)) {
-        $responseArray = $response;
-    } else
-        $responseArray['status'] = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-    curl_close($curl);
-
-    return $responseArray;
-}
-
 spl_autoload_register(function ($class) {
     $classpath = PATH . '/classes/' . str_replace('\\', '/', strtolower($class)) . '.php';
     if ($file = file_exists_ci($classpath)) {
