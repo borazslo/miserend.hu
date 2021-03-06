@@ -239,4 +239,15 @@ FontAwesome.library.add(faSplat)
           layer.openPopup();
         });
     }
+    
+
+    // check for Geolocation 
+    {% if not center and not location %}
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            mymap.flyTo(new L.LatLng(position.coords.latitude, position.coords.longitude));      
+        });  
+    }
+    {% endif %}
+
 </script>   
