@@ -2,6 +2,7 @@
 
 namespace Html;
 
+
 class Cron extends Html {
 
     public $template = 'layout_empty.twig';
@@ -10,13 +11,17 @@ class Cron extends Html {
         set_time_limit('300');
         ini_set('memory_limit', '512M');
 
-        $job = \Eloquent\Cron::nextJobs()->first();
+        if($jobId = \Request::Integer('cron_id'))
+            $job = \Eloquent\Cron::find($jobId);
+        else
+            $job = \Eloquent\Cron::nextJobs()->first();
 
         if (!$job)
             return;
 
         $job->attempts++;
         $job->save();
+
         try {
             $this->runJob($job);
         } catch (\Exception $exception) {
@@ -33,12 +38,10 @@ class Cron extends Html {
     function oldWeekly() {
         #clearoutVolunteers();
         #assignUpdates();
-
-        updateImageSizes();
+                
         generateMassTmp();
 
         updateCleanMassLanguages();
-        updateGorogkatolizalas();
         updateDeleteZeroMass();
         updateComments2Attributes();
         //not so fast!
@@ -59,5 +62,5 @@ class Cron extends Html {
             throw new \Exception("Function " . $className . "->" . $functionName . "() does not exists.");
         }
     }
-
+    
 }

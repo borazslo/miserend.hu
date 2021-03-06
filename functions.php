@@ -979,32 +979,6 @@ function upload2ftp($ftp_server, $ftp_user_name, $ftp_user_pass, $destination_fi
     ftp_close($conn_id);
 }
 
-
-function updateGorogkatolizalas() {
-    global $config;
-    // görög katolikus -> görögkatolikus
-    $tables = array(
-        'templomok' => array('nev', 'ismertnev', 'megjegyzes', 'misemegj', 'leiras', 'megkozelites'),
-        'misek' => array('megjegyzes'),
-        'photos' => array('title')
-    );
-    $c = 0;
-    foreach ($tables as $table => $fields) {
-        foreach ($fields as $key => $field) {
-            $query = "SELECT id," . $field . " from " . $table . " WHERE " . $field . " LIKE '%görög katolikus%' ";
-            $result = mysql_query($query);
-            while (($row = mysql_fetch_array($result))) {
-                $text = preg_replace('/(görög) katolikus/i', '$1katolikus', $row[$field]);
-                $query = "UPDATE " . $table . " SET " . $field . " = '" . $text . "' WHERE id = " . $row['id'] . " LIMIT 1;";
-                mysql_query($query);
-                $c++;
-            }
-        }
-    }
-    if ($config['debug'] > 0)
-        echo $c . " db görögkatolizálás<br/>";
-}
-
 function updateDeleteZeroMass() {
     global $config;
 
@@ -1427,22 +1401,6 @@ function updatesCampaign() {
     );
 }
 
-function getInputJSON() {
-    global $config;
-
-    $inputJSON = file_get_contents('php://input');
-    $input = json_decode($inputJSON, TRUE); //convert JSON into array
-    if ($config['debug'] > 0 AND is_array($input)) {
-        $input = array_replace($input, $_REQUEST);
-    } elseif ($config['debug'] > 0)
-        $input = $_REQUEST;
-
-    if (!is_array($input)) {
-        throw new Exception("Nem érkezett megfelelő JSON input.");
-    }
-
-    return $input;
-}
 
 function feltoltes_block() {
     global $user;
