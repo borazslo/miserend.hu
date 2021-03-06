@@ -2,6 +2,8 @@
 
 namespace Api;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class Table extends Api {
 
     public $tableName;
@@ -58,8 +60,15 @@ class Table extends Api {
 
         switch ($this->tableName) {
             case 'templomok':
-                $this->prepareTemplomokQuery();
-                $this->runQuery();
+                
+                $this->table = DB::table("templomok as t")
+                        ->SELECT("t.*","orszagok.nev as orszag","megye.megyenev as megye")
+                        ->leftJoin('orszagok', 'orszagok.id','=','t.orszag')
+                        ->leftJoin('megye', 'megye.id',"=","megye")
+                        ->where('t.ok',"=","i")
+                        ->limit(100)
+                        ->get();
+                
                 $this->mapTemplomok();
                 break;
 
@@ -75,36 +84,21 @@ class Table extends Api {
 
         return;
     }
-
-    function runQuery() {
-        $this->resultRows = array();
-        $result = mysql_query($this->query);
-        while ($row = mysql_fetch_assoc($result)) {
-            $this->table[] = $row;
-        }
-    }
-
-    function prepareTemplomokQuery() {
-        $this->query = "SELECT t.*,orszagok.nev as orszag, megye.megyenev as megye,lat,lon, geochecked FROM templomok as t 
-                    LEFT JOIN orszagok ON orszagok.id = t.orszag 
-                    LEFT JOIN megye ON megye.id = megye  
-                    WHERE t.ok = 'i' 
-                    LIMIT 10000";
-    }
-
+    
+  
     function mapTemplomok() {
         $output = array();
         foreach ($this->table as $row) {
             $tmp = array();
             foreach ($this->columns as $column) {
                 // data in mysql
-                if (isset($row[$column]) AND in_array($column, array('id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim', 'megkozelites', 'plebania', 'pleb_eml', 'egyhazmegye', 'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj', 'bucsu', 'frissites', 'lat', 'lon', 'geochecked'))) {
-                    $tmp[$column] = $row[$column];
+                if (isset($row->$column) AND in_array($column, array('id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim', 'megkozelites', 'plebania', 'pleb_eml', 'egyhazmegye', 'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj', 'bucsu', 'frissites', 'lat', 'lon', 'geochecked'))) {
+                    $tmp[$column] = $row->$column;
                 }
                 // simple data mapping
                 $mapping = array('name' => 'nev', 'alt_name' => 'ismertnev');
                 if (array_key_exists($column, $mapping)) {
-                    $tmp[$column] = $row[$mapping[$column]];
+                    $tmp[$column] = $row->{$mapping[$column]};
                 }
                 //extra mapping
                 switch ($column) {
@@ -118,7 +112,7 @@ class Table extends Api {
                         break;
 
                     case 'url':
-                        $tmp[$column] = DOMAIN . '/templom/' . $row['id'];
+                        $tmp[$column] = DOMAIN . '/templom/' . $row->id;
                         break;
 
                     default:
