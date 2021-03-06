@@ -46,11 +46,9 @@ class Apitest extends Html {
                     'action'=> $path[3],
                     'v'=> intval(ltrim($path[2],'v'))
                 );
-                    
-                $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'https://' : 'http://';
-                $url = $protocol .$_SERVER['SERVER_NAME'].$_REQUEST['url'];
-                
-                
+                                    
+                $url = $_REQUEST['url'];
+                                
                 print_r($url); echo "<br/>";
                 print_r($json);
                 echo "</pre><hr>Válasz:";
