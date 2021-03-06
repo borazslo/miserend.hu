@@ -30,7 +30,7 @@
                     <tr  class="bg-secondary" >
                         <td colspan="2" bgcolor="#efefef">
                             <a href="/user/{{ holder.user.uid }}/edit">
-                                    <strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }})
+                                    <strong>{{ holder.user.username }}</strong> ({{ holder.user.nev }})
                             </a>
 
                             <div style="float:right">
@@ -94,7 +94,7 @@
         </form>
     {%  else  %}
         {% for holder in church.holders.allowed %}
-            <strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }}): {{ holder.user.update_at|date('Y. m. d.') }}<br/>
+            <strong>{{ holder.user.username }}</strong> ({{ holder.user.nev }}): {{ holder.user.update_at|date('Y. m. d.') }}<br/>
         {%  endfor %}
         
     {%  endif  %}
