@@ -2,6 +2,8 @@
 
 namespace Html;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class EventsCatalogue extends Html {
 
     public function __construct($path) {
@@ -29,24 +31,27 @@ class EventsCatalogue extends Html {
     function form($order = false) {
         if (!$order)
             $order = 'year, date';
-        $query = "SELECT * FROM events WHERE year >= " . date('Y', strtotime('-1 year')) . " ORDER BY " . $order . ";";
-        $result = mysql_query($query);
+        
+        $results = DB::table('events')
+                ->where('year','>=',date('Y', strtotime('-1 year')))
+                ->orderByRaw($order)
+                ->get();
+                
         $years = array();
-        $names = array();
-        while (($row = mysql_fetch_array($result, MYSQL_ASSOC))) {
-            $name = $row['name'];
-            $form[$name][$row['year']]['input'] = array(
-                'name' => 'events[' . $name . '][' . $row['year'] . '][input]',
-                'value' => $row['date'],
+        $names = array();        
+        foreach($results as $row) {
+            $form[$row->name][$row->year]['input'] = array(
+                'name' => 'events[' . $row->name . '][' . $row->year . '][input]',
+                'value' => $row->date,
                 'class' => 'input-sm')
             ;
-            $form[$name][$row['year']]['id'] = array(
+            $form[$row->name][$row->year]['id'] = array(
                 'type' => 'hidden',
-                'name' => 'events[' . $name . '][' . $row['year'] . '][id]',
-                'value' => $row['id']);
+                'name' => 'events[' . $row->name . '][' . $row->year . '][id]',
+                'value' => $row->id);
 
-            $years[$row['year']] = $row['year'];
-            $names[$name] = $name;
+            $years[$row->year] = $row->year;
+            $names[$row->name] = $row->name;
         }
         //new line
         //$array_shift(array_values($form))
@@ -60,10 +65,13 @@ class EventsCatalogue extends Html {
         $years[date('Y', strtotime('+1 years'))] = date('Y', strtotime('+1 years'));
 
         foreach (array('tol', 'ig') as $tolig) {
-            $query = "SELECT " . $tolig . " FROM misek WHERE " . $tolig . " NOT REGEXP('^([0-9]{1,4})') GROUP BY " . $tolig . " ";
-            $result = mysql_query($query);
-            while (($row = mysql_fetch_array($result, MYSQL_ASSOC))) {
-                $name = preg_replace('/ (\+|-)([0-9]{1,3}$)/i', '', $row[$tolig]);
+            $results = DB::table('misek')
+                    ->select($tolig)
+                    ->whereRaw($tolig." NOT REGEXP('^([0-9]{1,4})')")
+                    ->groupBy($tolig)
+                    ->get();
+            foreach($results as $row) {
+                $name = preg_replace('/ (\+|-)([0-9]{1,3}$)/i', '', $row->$tolig);
                 if (!isset($names[$name]))
                     $names[$name] = $name;
             }
@@ -78,12 +86,13 @@ class EventsCatalogue extends Html {
                 }
             }
             //stats
-            $query = "SELECT count(*) as sum FROM misek where ig  REGEXP '^(" . $name . ")(( +| -)[0-9]{1,3})|)$'";
-            $result = mysql_query($query);
-            $row = mysql_fetch_array($result, MYSQL_ASSOC);
-            $stats[$name] = $row['sum'];
+            $result = DB::table('misek')
+                    ->selectRaw('count(*) as sum')
+                    ->whereRaw(" ig  REGEXP '^(" . $name . ")(( +| -)[0-9]{1,3})|)$' ")
+                    ->first();
+            if($result)
+                $stats[$name] = $result->sum;            
         }
-
 
         return array('form' => $form, 'names' => $names, 'years' => $years, 'stats' => $stats);
     }
@@ -96,16 +105,22 @@ class EventsCatalogue extends Html {
                         $date = date('Y-m-d', strtotime($input['input']));
                     else
                         $date = '';
-                    $query = "UPDATE events SET `date` = '" . $date . "' WHERE id = " . $input['id'] . " LIMIT 1";
-                    mysql_query($query);
+                    DB::table('events')
+                            ->where('id',$input['id'])
+                            ->update([
+                                'date' => $date
+                            ]);
                 } else {
                     if ($input['input'] != '') {
                         if ($name == 'new')
                             $name = sanitize($form['new']);
                         if ($name != 'new' OR $form['new'] != '') {
-                            $query = "INSERT INTO events (name,year,date) VALUES ('" . $name . "','" . $year . "','" . $input['input'] . "');";
-                            mysql_query($query);
-                            //echo $query."<br/>";
+                            DB::table('events')
+                                    ->insert([
+                                        'name' => $name,
+                                        'year' => $year,
+                                        'date' => $input['input']
+                                    ]);                            
                         }
                     }
                 }
