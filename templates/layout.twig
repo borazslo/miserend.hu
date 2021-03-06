@@ -125,7 +125,6 @@
                         </div>
                     {% if columns2 %}{% else %}  
                     <div class="col-md-3 col-sm-3">
-                            {% if campaign %}{% include "panel.twig" with {'title': campaign.title ,'body': campaign.content|raw,'panel':'danger' } %}{% endif %}
                              {% block rightsidebar %}{% endblock %}
                         </div>
                     {% endif %}    

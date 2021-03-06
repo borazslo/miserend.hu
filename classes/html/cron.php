@@ -36,8 +36,6 @@ class Cron extends Html {
     }
 
     function oldWeekly() {
-        #clearoutVolunteers();
-        #assignUpdates();
                 
         generateMassTmp();
 
