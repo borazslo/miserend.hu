@@ -49,13 +49,15 @@
                         </td>
 
                     </tr>
+                    {% if holder.updated_at > "2000-01-01 12:00:00"%}
                     <tr>
                         <td  class="col-md-6">{{ updated_at[status] }}:</td>
                         <td>{{ holder.updated_at|date('Y. m. d.') }}</td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <td  class="col-md-6">Utoljára aktív:</td>
-                        <td>{{ holder.user.lastactive|date('Y. m. d.') }}</td>
+                        <td>{% if holder.user.lastactive %} {{ holder.user.lastactive|date('Y. m. d.') }} {% endif %}</td>
                     </tr>
                     <tr>
                         <td>Templomai:</td>
