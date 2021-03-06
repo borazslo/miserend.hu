@@ -73,8 +73,6 @@ function checkUsername($username) {
     return true;
 }
 
-// DROP TABLE `miserend`.`session`;
-
 function mapquestGeocode($location) {
     global $config;
     $url = "http://www.mapquestapi.com/geocoding/v1/address?key=" . $config['mapquest']['appkey'];
@@ -178,7 +176,7 @@ function checkDateBetween($date, $start, $end) {
     }
 }
 
-function event2Date($event, $year = false) {
+function event2Date($event, $year = false) {    
     if ($year == false)
         $year = date('Y');
 
@@ -196,10 +194,13 @@ function event2Date($event, $year = false) {
     $event = preg_replace('/(\+|-)1$/', '${1}1 day', $event);
     $events = array();
     $query = "SELECT name, date FROM events WHERE year = '" . $year . "' ";
-    $result = mysql_query($query);
-    while (($row = mysql_fetch_array($result))) {
-        $events['name'][] = '/^' . $row['name'] . '( (\+|-)([0-9]{1,3})|)( day|)$/i';
-        $events['date'][] = $row['date'] . "$1$4";
+    $results = DB::table('events')
+            ->select('name','date')
+            ->where('year',$year)
+            ->get();
+    foreach($results as $row)  {
+        $events['name'][] = '/^' . $row->name . '( (\+|-)([0-9]{1,3})|)( day|)$/i';
+        $events['date'][] = $row->date . "$1$4";
     }
     $event = preg_replace($events['name'], $events['date'], $event);
     $event = preg_replace('/^([0-9]{2})(\.|-)([0-9]{2})/i', date('Y') . '$2$1$2$3', $event);
@@ -401,7 +402,7 @@ function formMass($pkey, $mkey, $mass = false, $group = false) {
         'nap2' => array(
             'name' => $group . "[" . $pkey . "][" . $mkey . "][nap2]",
             'options' => $nap2options,
-            'selected' => $mass['nap2_raw']),
+            'selected' => isset($mass['nap2_raw']) ? $mass['nap2_raw'] : false ),
         'ido' => array(
             'name' => $group . "[" . $pkey . "][" . $mkey . "][ido]",
             'value' => $mass['ido'],
@@ -896,36 +897,33 @@ function sugolink($id, $height = false) {
     return $twig->render('help_link.html', $args);
 }
 
-function generateMassTmp($where = false) {
+function generateMassTmp($where = false) {   
     global $config;
-    $updates = array();
-    $query = "SELECT id, tol, ig FROM misek WHERE torles = '0000-00-00 00:00:00' ";
+    
+    $results = DB::table('misek')
+            ->select('id','tol','ig')
+            ->where('torles','0000-00-00 00:00:00');
     if ($where != false)
-        $query .= "AND ( " . $where . " ) ";
-    if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
-    while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
-        if ($row['tol'] == '')
-            $row['tol'] = '01-01';
-        $row['tmp_datumtol'] = event2Date($row['tol']);
-        if ($row['ig'] == '')
-            $row['ig'] = '12-31';
-        $row['tmp_datumig'] = event2Date($row['ig']);
-        if ($row['tmp_datumig'] > $row['tmp_datumtol'])
-            $row['tmp_relation'] = '<';
-        elseif ($row['tmp_datumtol'] == $row['tmp_datumig'])
-            $row['tmp_relation'] = '=';
+        $results = $results->whereRaw($where);        
+    $results = $results->get();
+    foreach($results as $row) {
+        if ($row->tol == '')
+            $row->tol = '01-01';
+        $row->tmp_datumtol = event2Date($row->tol);
+        if ($row->ig == '')
+            $row->ig = '12-31';
+        $row->tmp_datumig = event2Date($row->ig);
+        if ($row->tmp_datumig > $row->tmp_datumtol)
+            $row->tmp_relation = '<';
+        elseif ($row->tmp_datumtol == $row->tmp_datumig)
+            $row->tmp_relation = '=';
         else
-            $row['tmp_relation'] = '>';
-        $updates[] = $row;
-    }
-
-    foreach ($updates as $update) {
-        $query = "UPDATE misek SET tmp_datumtol = '" . $update['tmp_datumtol'] . "',tmp_datumig = '" . $update['tmp_datumig'] . "',tmp_relation = '" . $update['tmp_relation'] . "' WHERE id = " . $update['id'] . " LIMIT 1";
-        if ($config['debug'] > 1)
-            echo $query . "<br/>";
-        mysql_query($query);
-    }
+            $row->tmp_relation = '>';
+                
+        DB::table('misek')
+                ->where('id',$row->id)
+                ->update(collect($row)->toArray());        
+    }    
 }
 
 function widget_miserend($args) {
@@ -981,37 +979,6 @@ function upload2ftp($ftp_server, $ftp_user_name, $ftp_user_pass, $destination_fi
     ftp_close($conn_id);
 }
 
-function updateImageSizes() {
-    global $config;
-
-    $query = 'SELECT * FROM photos WHERE width IS NULL OR height IS NULL OR width = 0 OR height = 0 ';
-    $result = mysql_query($query);
-    while (($kep = mysql_fetch_array($result))) {
-
-        $file = "kepek/templomok/" . $kep['church_id'] . "/" . $kep['filename'];
-
-        if (file_exists($file)) {
-            if (preg_match('/(jpg|jpeg)$/i', $file)) {
-                $src_img = @ImagecreateFromJpeg($file);
-                $kep['height'] = @imagesy($src_img);  # original height
-                $kep['width'] = @imagesx($src_img);  # original width
-
-                if ($kep['height'] != '' AND $kep['width'] != '') {
-                    $query = "UPDATE photos SET height = '" . $kep['height'] . "', width = '" . $kep['width'] . "' WHERE id = " . $kep['id'] . " LIMIT 1";
-                    if ($config['debug'] > 0)
-                        echo $query . "<br>";
-                    mysql_query($query);
-                }
-            } else {
-                if ($config['debug'] > 0)
-                    echo "A kép nem jpg: " . $file . "<br>";
-            }
-        } else {
-            if ($config['debug'] > 0)
-                echo "Hiányzó kép: " . $file . "<br>";
-        }
-    }
-}
 
 function updateGorogkatolizalas() {
     global $config;
@@ -1512,34 +1479,7 @@ function feltoltes_block() {
 }
 
 function addMessage($text, $severity = false) {
-    $id = DB::table('messages')->insertGetId([
-        'sid' => session_id(),
-        'timestamp' => date('Y-m-d H:i:s'),
-        'severity' => $severity,
-        'text' => $text
-    ]);
-    return true;
-}
-
-function getMessages() {
-    $messages = DB::table('messages')
-            ->select('id', 'timestamp', 'text', 'severity')
-            ->where('shown', 0)
-            ->where('sid', session_id())
-            ->get();
-    if (!count($messages)) {
-        return array();
-    }
-
-    foreach ($messages as $message) {
-        $ids[] = $message->id;
-        $return[] = (array) $message;
-    }
-    DB::table('messages')
-            ->whereIn('id', $ids)
-            ->update(['shown' => 1]);
-
-    return (array) $return;
+    return \Message::add($text,$severity);    
 }
 
 function chat_load() {
