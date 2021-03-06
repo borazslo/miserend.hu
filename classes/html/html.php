@@ -63,13 +63,17 @@ class Html {
         if (isset($this->user->responsible['diocese']) AND count($this->user->responsible['diocese']) > 0 AND ! $this->user->checkRole('miserend')) {
             $this->loadResponsibleMenu();
         }
+        $this->menu[] = [
+            'title' => 'Térkép',
+            'url' => '/terkep'
+        ];
     }
 
     function loadAdminMenu() {
         $adminmenuitems = [
             ['title' => 'Miserend', 'url' => '/termplom/list', 'permission' => 'miserend', 'mid' => 27,
                 'items' => [
-                    ['title' => 'lista', 'url' => '/templom/list', 'permission' => ''],
+                    ['title' => 'teljes lista', 'url' => '/templom/list', 'permission' => ''],
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
                     ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
@@ -77,11 +81,7 @@ class Html {
                     ['title' => 'OSM kapcsolat', 'url' => '/josm', 'permission' => 'miserend'],
                 ]
             ],
-            ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user',
-                'items' => [
-                    ['title' => 'lista', 'url' => '/user/catalogue', 'permission' => 'user'],
-                ]
-            ],
+            ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user'],
         ];
         $adminmenuitems = $this->clearMenu($adminmenuitems);
         $this->menu = array_merge($this->menu, $adminmenuitems);
