@@ -56,6 +56,33 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         parent::delete();
     }
 
+    /*/
+     * Ha nincs a kép méretéről adat, akkor kitaláljuk és elmentjük.
+     * @return boolean
+     */
+    function updateSize() {
+        $file = "kepek/templomok/" . $this->church_id . "/" . $this->filename;
+
+        if (file_exists($file)) {
+            if (preg_match('/(jpg|jpeg)$/i', $file)) {
+                $src_img = @ImagecreateFromJpeg($file);
+                $this->height = @imagesy($src_img);  # original height
+                $this->width = @imagesx($src_img);  # original width
+                if ($this->height != '' AND $this->width != '') {
+                    $this->save();
+                    return true;
+                } else {
+                    echo "A képnek nincs mérete: ". $file . "<br>\n";
+                }
+            } else {            
+                    echo "A kép nem jpg: " . $file . "<br>\n";
+            }
+        } else {            
+                echo "Hiányzó kép: " . $file . "<br>\n";
+        }
+        return false;        
+    }
+    
     function uploadFile($inputFile) {
         if ($inputFile["error"] != UPLOAD_ERR_OK) {
             throw new \Exception("There is no correct \$_FILES['FileInput'].");

@@ -38,7 +38,8 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             ['\OSM', 'checkUrlMiserend', '1 day'],            
             ['\KeywordShortcut', 'updateAll', '1 day'],
             ['\Distance', 'updateSome', '15 min'],
-            ['\Token', 'cleanOut', '2 hours']
+            ['\Token', 'cleanOut', '2 hours'],
+            ['\Photos', 'cron', '1 week']
         ];
         foreach ($jobsToSave as $jobToSave) {
             $job = \Eloquent\Cron::firstOrCreate(['class' => $jobToSave[0], 'function' => $jobToSave[1]]);
