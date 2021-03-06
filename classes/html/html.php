@@ -28,7 +28,9 @@ class Html {
             $this->mychurches = feltoltes_block();
         }
         if ($this->user->checkRole('"any"')) {
-            $this->chat = chat_load();
+            $this->chat = new \Chat;
+            $this->chat->load();
+            $this->chat = collect($this->chat)->toArray();
         }
 
         $this->messages = \Message::getToShow();

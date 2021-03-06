@@ -53,7 +53,7 @@
  		});
 
 		$("body").on('click', '#chat_loadnext', function() {
-			$.post( "/ajax/chatload", { date: $( this ).prev().data("date"), rev: true }, function( data ) {
+			$.post( "/ajax/chat", { action: "load", date: $( this ).prev().data("date"), rev: true }, function( data ) {
 	  			if(data.result === "loaded") {  
 	  				var index;
 					for (index = 0; index < data.comments.length; ++index) {
@@ -124,8 +124,7 @@
 	 		 		
 	 		var text = $(string).text();
 	 		$("#chat_text").html('<i>Küldés folyamatban...</i>');
-	 		$.post( "/ajax/chatsave", { text: text }, function( data ) {
-
+	 		$.post( "/ajax/chat", { action: "save", text: text }, function( data ) {
 	  			if(data.result === "saved") {
 					$("#chat_text").html('<i>Frissítés folyamatban...</i>');
 	  				chat_update('clear');
@@ -141,7 +140,8 @@
 	}
 
 	function chat_update(clear) {
-		$.post( "/ajax/chatload", { date: $("#chat_comments").data("last") }, function( data ) {
+		$.post( "/ajax/chat", { action: "load", date: $("#chat_comments").data("last") }, function( data ) {
+
 	  			if(data.result === "loaded") {  
 	  				var index;
 					for (index = 0; index < data.comments.length; ++index) {
@@ -178,7 +178,7 @@
 	}
 
 	function chat_users() {
-		$.post( "/ajax/chatusers", { }, function( data ) {
+		$.post( "/ajax/chat", { action: "getusers" }, function( data ) {
 	  			if(data.result === "loaded") { 
 	  				$("#chat_users").html(data.text);
 	  			}

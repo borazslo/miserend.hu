@@ -1405,6 +1405,9 @@ function updatesCampaign() {
 function feltoltes_block() {
     global $user;
     
+    if(!isset($user->responsibilities['church']['allowed']))
+        return false;
+    
     $allowed = $user->responsibilities['church']['allowed'];
     $ids = [];
     foreach($allowed as $church) {
@@ -1438,105 +1441,6 @@ function feltoltes_block() {
 
 function addMessage($text, $severity = false) {
     return \Message::add($text,$severity);    
-}
-
-function chat_load() {
-
-    $vars['comments'] = chat_getcomments();
-    $vars['lastcomment'] = $vars['comments'][0]['datum_raw'];
-    $vars['users'] = chat_getusers('html');
-    return $vars;
-}
-
-function chat_getcomments($args = array()) {
-    global $user;
-    $limit = 10;
-
-    $return = array();
-
-    $loginkiir1 = urlencode($user->login);
-
-    $comments = DB::table('chat')->where(function($query)
-            {
-                global $user;
-                $query->orWhere('kinek', '')
-                      ->orWhere('kinek', $user->login)
-                      ->orWhere('user', $user->login);
-            })
-            ->orderBy('datum','DESC')
-            ->limit($limit);
-    if (isset($args['last']))
-        $comments = $comments->where('datum','>',$args['last']);
-    if (isset($args['first']))
-        $comments = $comments->where('datum','<',$args['first']);
-    
-    $comments = $comments->get();
-    $comments = collect($comments)->map(function($x){ return (array) $x; })->toArray();
-    
-    foreach($comments as $row) {
-
-        $row['datum_raw'] = $row['datum'];
-        if (date('Y', strtotime($row['datum'])) < date('Y'))
-            $row['datum'] = date('Y.m.d.', strtotime($row['datum']));
-        elseif (date('m', strtotime($row['datum'])) < date('m'))
-            $row['datum'] = date('m.d.', strtotime($row['datum']));
-        elseif (date('d', strtotime($row['datum'])) < date('d'))
-            $row['datum'] = date('m.d. H:i', strtotime($row['datum']));
-        else
-            $row['datum'] = date('H:i', strtotime($row['datum']));
-
-        if ($row['user'] == $user->login)
-            $row['color'] = '#394873';
-        elseif ($row['kinek'] == $user->login)
-            $row['color'] = 'red';
-        elseif (preg_match('/@' . $user->login . '([^a-zA-Z]{1}|$)/i', $row['szoveg']))
-            $row['color'] = 'red';
-
-        if ($row['kinek'] != '') {
-            if ($row['kinek'] == $user->login)
-                $loginkiir2 = urlencode($user->login);
-            else
-                $loginkiir2 = urlencode($row['kinek']);
-
-            $row['jelzes'] = "<span class='response_closed link' title='Válasz csak neki' data-to='" . $row['kinek'] . "' ><img src=img/lakat.gif align=absmiddle height='13' border=0><i> " . $row['kinek'] . "</i></span>: ";
-            //$row['jelzes'] .= "<a class='response_open link' title='Nyilvános válasz / említés' data-to='".$row['kinek']."'><i> ".$row['kinek']."</i></a>: ";
-        }
-
-        $row['szoveg'] = preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1" target="_blank">$1</a>', $row['szoveg']);
-        $row['szoveg'] = preg_replace('@>(https?://miserend\.hu/)@', '>', $row['szoveg']);
-        $row['szoveg'] = preg_replace('/@(\w+)/i', '<span class="response_open" data-to="$1" style="background-color: rgba(0,0,0,0.15);">$1</span>', $row['szoveg']);
-
-
-        $return[] = $row;
-    }
-
-    return $return;
-}
-
-function chat_getusers($format = false) {
-    global $user;
-    $return = array();
-    
-    $onlineUsers = DB::table('user')
-        ->select('login')
-        ->where('jogok','!=','')
-        ->where('lastactive','>=',date('Y-m-d H:i:s', strtotime("-5 minutes")))
-        ->where('login','<>',$user->login)
-        ->orderBy('lastactive','DESC')
-        ->get();
-
-    foreach($onlineUsers as $onlineUser)
-            $return[] = $onlineUser->login;
-    
-    if ($format == 'html') {
-        foreach ($return as $k => $i)
-            $return[$k] = '<span class="response_closed" data-to="' . $i . '" style="background-color: rgba(0,0,0,0.15);">' . $i . '</span>';
-        $text = '<strong>Online adminok:</strong> ' . implode(', ', $return);
-        if (count($return) == 0)
-            $text = '<strong><i>Nincs (más) admin online.</i></strong>';
-        $return = $text;
-    }
-    return $return;
 }
 
 function copyArrayToObject($array, &$object) {
