@@ -1,3 +1,0 @@
-ALTER TABLE `miserend`.`templomok` 
-DROP COLUMN `letrehozta`;
-

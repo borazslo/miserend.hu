@@ -85,3 +85,10 @@ span.toggle.active {
         content: "";
         display: block;
 }
+
+@media (min-width: 1800px) {
+    .container {
+        width: 1770px;
+    }
+}
+

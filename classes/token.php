@@ -4,7 +4,7 @@ class Token {
        
     static function create($forUserId, $type) {
         global $config;
-        
+                
         if(isset($_COOKIE['token'])) {
                 \Eloquent\Token::where('name',$_COOKIE['token'])->delete();
         }
@@ -32,11 +32,10 @@ class Token {
             unset($_COOKIE['token']);
         }        
     }
- 
+     
     static function cleanOut() {
-        // INSERT INTO `miserend`.`crons` (`class`, `function`, `frequency`) VALUES ('\\Token', 'cleanOut', '5 min');
         \Eloquent\Token::where('timeout','<',date('Y-m-d H:i:s'))->delete();
     }
-    
+        
     
 }

@@ -44,6 +44,16 @@ class Request {
         return $value;
     }
     
+    static function InArray($name, $array) {
+        $value = self::get($name);
+        if(!$value) return false;
+        
+        if(!in_array($value, $array)) {
+            throw new Exception("Array '$name' is not in Array.");
+        }
+        return $value;
+    }
+    
     static function InArrayRequired($name, $array) {
         $value = self::get($name);
         if(!in_array($value, $array)) {
@@ -113,7 +123,7 @@ class Request {
             return $_REQUEST[$name];
         } else {
             return false;
-        }
+        }        
     }
 
 }

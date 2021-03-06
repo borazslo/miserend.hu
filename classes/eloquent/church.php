@@ -479,6 +479,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         
         \Eloquent\ChurchHolder::where('church_id',$this->id)->delete();
         \Eloquent\Favorite::where('tid',$this->id)->delete();
+        \Eloquent\ChurchLink::where('church_id',$this->id)->delete();
         
         //Nem elegáns:
         DB::table('lookup_boundary_church')->where('church_id',$this->id)->delete();

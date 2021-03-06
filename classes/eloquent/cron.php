@@ -29,7 +29,7 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
     public function initialize() {
         $jobsToSave = [
             ['\Eloquent\Cron', 'initialize', '1 week'],
-            ['\Message', 'clean', '1 hour'],
+           ['\Message', 'clean', '1 hour'],
             ['\Html\Cron', 'oldWeekly', '1 week'],
             ['\Api\Sqlite', 'cron', '1 day'],
             ['\ExternalApi\OverpassApi', 'updateUrlMiserend', '1 day'],
