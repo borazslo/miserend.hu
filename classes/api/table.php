@@ -66,7 +66,7 @@ class Table extends Api {
                         ->leftJoin('orszagok', 'orszagok.id','=','t.orszag')
                         ->leftJoin('megye', 'megye.id',"=","megye")
                         ->where('t.ok',"=","i")
-                        ->limit(100)
+                        ->limit(10000)
                         ->get();
                 
                 $this->mapTemplomok();
