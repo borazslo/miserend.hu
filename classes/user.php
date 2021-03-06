@@ -324,6 +324,9 @@ class User {
         if ($this->uid == 0)
             return false;
 
+        \Eloquent\ChurchHolder::where('user_id',$this->uid)->delete();
+        \Eloquent\Favorite::where('uid',$this->uid)->delete();
+        
         DB::table('user')->where('uid', $this->uid)->delete();
         
         foreach ($this as $key => $value)
