@@ -43,8 +43,8 @@ class Apitest extends Html {
                 $path = explode("/",$_REQUEST['url']);
                 $request = array(
                     'q'=> $path[1],
-                    'action'=> $path[3],
-                    'v'=> intval(ltrim($path[2],'v'))
+                    'action'=> isset($path[3]) ? $path[3] : false,
+                    'v'=> isset($path[2]) ? intval(ltrim($path[2],'v')) : false
                 );
                                     
                 $url = $_REQUEST['url'];
@@ -65,7 +65,7 @@ class Apitest extends Html {
         if (!preg_match('/^http:\/\//i', $url)) {
             global $config;
             $url = $config['path']['domain'] . $url;
-        }        
+        }                
         $contentEncoded = json_encode($content);
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_HEADER, false);
