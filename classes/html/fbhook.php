@@ -26,85 +26,30 @@ class FbHook extends \Api\Api {
         $this->getInputJson();
         
         $this->log('Received: '.json_encode($this->input));
-        
-        // v10.10 test data
-        if(isset($this->input['field'])) {
-            switch ($this->input['field']) {
-                case 'live_videos':
-                    /*
-                     {
-                        "field": "live_videos",
-                        "value": {
-                          "id": "4444444444",
-                          "status": "live_stopped"
-                        }
-                      }
-                     */
-                    break;
-
-                case 'feed':
-                    /*
-                    {
-                      "field": "feed",
-                      "value": {
-                        "item": "status",
-                        "post_id": "44444444_444444444",
-                        "verb": "add",
-                        "published": 1,
-                        "created_time": 1615407988,
-                        "message": "Example post content.",
-                        "from": {
-                          "name": "Test Page",
-                          "id": "1067280970047460"
-                        }
-                      }
-                    }
-                     */
-
-                    break;
-
-                default:
-                    break;
-            }
-        }
+                
         // Event notification exmaple
         // https://developers.facebook.com/docs/graph-api/webhooks/getting-started
         // https://developers.facebook.com/docs/pages/realtime/
-        elseif(isset($this->input[0]['object'])) {
-            /*
-             [
-                {
-                  "entry": [
-                    {
-                      "changes": [
-                        {
-                          "field": "feed",
-                          "value": {
-                            "from": {
-                              "id": "{user-id}",
-                              "name": "Cinderella Hoover"
-                            },
-                            "item": "post",
-                            "post_id": "{page-post-id}",
-                            "verb": "add",
-                            "created_time": 1520544814,
-                            "is_hidden": false,
-                            "message": "It's Thursday and I want to eat cake."
-                          }
-                        }
-                      ],
-                      "id": "{page-id}",
-                      "time": 1520544816
+        if(isset($this->input['object']) AND $this->input['object'] == 'page') {
+            foreach($this->input['entry'] as $entry) {
+            
+                // $entry['id'] = (int) page-id;
+                // $entry['time'] = (int) timestamp;
+                
+                foreach($entry['changes'] as $change) {
+                                        
+                    if($change['field'] == 'feed' AND $change['value']['verb'] == 'add' ) {
+                        //https://www.facebook.com/permalink.php?story_fbid=814898132425521&id=249586975623309    
+                        $this->log($change['value']['from']['name']." has added a new ".$change['value']['item'].": ".$change['value']['message']);                                                
                     }
-                  ],
-                  "object": "page"
+                    
+                    if($change['field'] == 'live_videos') {
+                        $this->log("Live video ".$change['value']['id']." has ".preg_replace('/live_/','',$change['value']['status']).".");
+                    }                    
                 }
-              ]
-             
-             */
-            //We subscirbed 'page' data only.
-            if($this->input[0]['object'] != 'page' ) throw new \Exception('FBHook reacts to page objects only.');
-                                    
+            }              
+        } else {
+            throw new \Exception('FBHook reacts to page objects only.');
         }
         
     }
