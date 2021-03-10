@@ -38,9 +38,10 @@ class FbHook extends \Api\Api {
                 
                 foreach($entry['changes'] as $change) {
                                         
-                    if($change['field'] == 'feed' AND $change['value']['verb'] == 'add' ) {
+                    // https://developers.facebook.com/docs/graph-api/webhooks/reference/page/
+                    if($change['field'] == 'feed' AND $change['value']['verb'] == 'add' AND $change['value']['published'] == 1 AND in_array($change['value']['item'],['link','note','page','photo','post','share','status','story','video'])) {
                         //https://www.facebook.com/permalink.php?story_fbid=814898132425521&id=249586975623309    
-                        $this->log($change['value']['from']['name']." has added a new ".$change['value']['item'].": ".$change['value']['message']);                                                
+                        $this->log($change['value']['from']['name']." has added a new ".$change['value']['item']." on Page=".$entry['id'].": ".$change['value']['message']);                                                
                     }
                     
                     if($change['field'] == 'live_videos') {
