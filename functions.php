@@ -663,6 +663,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         'offset' => $offset,
         'limit' => $limit);
     $where = array(" m.torles = '0000:00:00 00:00:00' ");
+    $where[] = ' templomok.miseaktiv = 1 ';
 
     //templomok
     if (isset($args['templom']) AND is_numeric($args['templom'])) {
