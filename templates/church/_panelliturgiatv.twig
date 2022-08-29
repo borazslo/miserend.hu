@@ -1,6 +1,6 @@
 {% extends 'panel.twig' %}
 
-{% set title = 'Elő közvetítések  a <a href="https://liturgia.tv/miserend/' ~ id  ~ '">liturgia.tv</a> segítségével:' %}
+{% set title = 'Következő közvetítések  a <a href="https://liturgia.tv/miserend/' ~ id  ~ '">liturgia.tv</a> segítségével:' %}
 
 {% set panel = 'primary' %}
 {% set footer = true %}
@@ -22,7 +22,7 @@
     <table class="table table-striped">
         {% for stream in liturgiatv|slice(0, 5) %}
             <tr>
-                <td>{{ stream.date|date('m.d.') }} <strong>{{ stream.time|date('H:i') }}</strong></td>
+                <td>{{ _honapok[stream.date | date('n')][0] }}. {{ stream.date| date('d.')}} <strong>{{ stream.time|date('H:i') }}</strong></td>
                 <td>{{ stream.name }}</td>
                 <td><a href="{{ stream.url }}"><i class="material-icons {{ stream.iconstate }}">&#xe63a;</i></a></td>
             </tr>

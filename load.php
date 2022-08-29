@@ -54,6 +54,22 @@ $_orszagok = collect(DB::table('orszagok')->get())->keyBy('id');
 $_megyek = collect(DB::table('megye')->select('*','megyenev as nev')->get())->keyBy('id');
 $_varosok = collect(DB::table('varosok')->get())->keyBy('id');
 
+
+$_honapok = [
+	1 => ['jan','január'],
+	2 => ['feb','február'],
+	3 => ['márc','március'],
+	4 => ['ápr','április'],
+	5 => ['máj','május'],
+	6 => ['jún','június'],
+	7 => ['júl','július'],
+	8 => ['aug','augusztus'],
+	9 => ['szept','szeptember'],
+	10 => ['okt','október'],
+	11 => ['nov','november'],
+	12 => ['dec','december'],
+];
+
 $milyen = array(
     'csal' => array(
         'abbrev' => 'csal',

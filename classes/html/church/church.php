@@ -32,7 +32,10 @@ class Church extends \Html\Html {
         }
 
         $church->photos = $church->photos()->get();
-                
+           
+		global $_honapok;
+		$this->_honapok = $_honapok;
+		
          /*
          * 
          */
