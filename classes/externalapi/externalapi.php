@@ -78,9 +78,12 @@ class ExternalApi {
         $header = array("cache-control: no-cache","Content-Type: application/json");
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,$this->apiUrl . $this->rawQuery);
+		echo $this->apiUrl . $this->rawQuery."\n";
         curl_setopt($ch, CURLOPT_HTTPHEADER,$header);
         curl_setopt($ch, CURLOPT_HEADER  , false);  // we want headers
         curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($ch, CURLOPT_USERAGENT, "miserend.hu");
 
         $this->rawData = curl_exec($ch);
@@ -88,12 +91,12 @@ class ExternalApi {
         $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE ); 
         
         $this->saveStat();
-        
+        		
         switch ($this->responseCode) {
             case '200':
                 $this->jsonData = json_decode($this->rawData);
-                if ($this->jsonData === null ) {            
-                    throw new \Exception("External API return data is not a valid JSON!");
+                if ($this->jsonData === null ) {            					
+                    throw new \Exception("External API return data is not a valid JSON: " . $this->rawData );
                 }
                 break;
                
@@ -102,7 +105,7 @@ class ExternalApi {
                 break;
                 
             default:
-                throw new \Exception("External API returned bad http response code: " . $this->responseCode. "\n<br>" . $this->rawData);
+                throw new \Exception("External API returned bad http response code: " . $this->responseCode. "\n<br>" . curl_error($ch));
                 break;
         }        
     }
