@@ -78,7 +78,7 @@ class ExternalApi {
         $header = array("cache-control: no-cache","Content-Type: application/json");
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,$this->apiUrl . $this->rawQuery);
-		echo $this->apiUrl . $this->rawQuery."\n";
+		//echo $this->apiUrl . $this->rawQuery."\n";
         curl_setopt($ch, CURLOPT_HTTPHEADER,$header);
         curl_setopt($ch, CURLOPT_HEADER  , false);  // we want headers
         curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
