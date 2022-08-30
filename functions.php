@@ -556,7 +556,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 	$search->where('ok','i');
 	
 	// keyword
-	if ($args['kulcsszo'] != '') {
+	if (isset($args['kulcsszo']) AND $args['kulcsszo'] != '') {
         $subwhere = array();
         if (preg_match('(\*|\?)', $args['kulcsszo'])) {
             $regexp = preg_replace('/\*/i', '.*', $args['kulcsszo']);
@@ -572,7 +572,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     }
 	
 	// varos
-	if ($args['varos'] != '') {
+	if (isset($args['varos']) AND $args['varos'] != '') {
         if ($args['varos'] == 'Budapest')
             $args['varos'] = 'Budapest*';
 
@@ -599,7 +599,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     }
 
 	// egyhazmegye
-    if ($args['ehm'] != 0)
+    if (isset($args['ehm']) AND $args['ehm'] != 0)
         $search->where("egyhazmegy",$args['ehm']);
 
 	// espereskerulet
