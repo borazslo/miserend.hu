@@ -1,0 +1,24 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Akadálymentesség' %}
+{% set panel = 'primary' %}
+{% set footer = true %}
+
+{% block body %}
+	{% if accessibility['wheelchair'] == 'yes' %} 
+		<strong>Teljesen</strong> akadálymentes: A bejáratnál és a helyiségekben sincsenek lépcsők.</li>		
+	{% elseif accessibility['wheelchair'] == 'limited' %}
+		<strong>Részben</strong> akadálymentes: A bejáratnak egy lépcsőfoka van, max. 7 cm magas, vagy van elérhető rámpa. A legtöbb ill. legfontosabb helyiségek lépcső nélküliek.
+	{% elseif accessibility['wheelchair'] == 'no' %}
+		<strong>Egyáltalán nem</strong> akadálymentes: A bejáratnál egy vagy több lépcső van, a fontosabb helyiségek nem hozzáférhetőek.
+	{% endif %}
+	{% if accessibility['wheelchair:description'] %}
+		<br/><strong>{{ accessibility['wheelchair:description'] }}</strong>
+	{% endif %}
+{% endblock %}
+
+{% block footer %}
+    <small>© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> közreműködők.</small>
+{% endblock %}
+
+
