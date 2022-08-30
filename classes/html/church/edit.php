@@ -44,6 +44,28 @@ class Edit extends \Html\Html {
             }
         }
 
+		
+		$allowedOSMFields = ['wheelchair', 'wheelchair:description'];		
+		foreach($allowedOSMFields as $field) {
+			if (array_key_exists($field, $this->input['church']['osm'])) {
+                //echo $field." = ".$this->input['church']['osm'][$field];
+				
+				$args = [
+					'osmtype' => $this->church->osmtype, 
+					'osmid' => $this->church->osmid,
+					'name' => $field 
+					];				
+				$osmtag = \Eloquent\OSMTag::firstOrNew($args);
+				$osmtag->value = $this->input['church']['osm'][$field];
+				$osmtag->save();
+
+            }
+		
+		}
+		/* save OSM fields */
+		$this->church->osm->upload();
+
+		
         if (isset($this->input['photos'])) {
             foreach ($this->input['photos'] as $modPhoto) {
                 $origPhoto = \Eloquent\Photo::find($modPhoto['id']);
@@ -105,6 +127,9 @@ class Edit extends \Html\Html {
         $this->addFormReligiousAdministration();
 
         $this->church->photos;
+		
+		$this->church->osm;
+		$this->church->osm->updateFromOverpass();
 
         $this->form['ok'] = array(
             'name' => 'church[ok]',
@@ -116,8 +141,9 @@ class Edit extends \Html\Html {
             'selected' => $this->church->ok
         );
         $this->title = $this->church->fullName;
+		
         
-        for($i = 1; $i < 50; $i++) {
+        for($i = 1; $i < 60; $i++) {
             $help = new \Help($i);
             if($help)
                 $this->help[$i] = $help->html;

@@ -304,6 +304,17 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $location;
     }
 
+	function getOsmAttribute($value) {	
+		if($this->osmid == false OR $this->osmtype == false ) return false;
+		
+		$osm = \Eloquent\OSM::where('osmtype',$this->osmtype)
+                ->where('osmid',$this->osmid)                
+                ->first();
+		if(!$osm) $osm = new \Eloquent\OSM(['osmid'=>$this->osmid, 'osmtype' => $this->osmtype]);
+		
+		return $osm;				
+	}
+	
     /*
      * What does 'M' mean?
      */
@@ -365,7 +376,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         else 
             return false;
     }
-
+	
     public function boundaries()
     {
         return $this->belongsToMany('Eloquent\Boundary', 'lookup_boundary_church')

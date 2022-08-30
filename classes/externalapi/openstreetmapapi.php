@@ -1,0 +1,38 @@
+<?php
+
+namespace ExternalApi;
+
+# https://wiki.openstreetmap.org/wiki/API_v0.6
+
+class OpenstreetmapApi extends \ExternalApi\ExternalApi {
+
+		
+    public $name = 'openstreetmap';    
+	public $format = 'xml';
+	
+	function __construct() {
+		global $config;
+		$this->apiUrl = $config['openstreetmap']['apiurl']."/api/0.6/"; //dev and prod is different
+		$this->userpwd = $config['openstreetmap']['user:pwd']; //dev and prod is different
+	}
+	
+	function buildQuery() {      
+        $this->rawQuery = $this->query;        
+    }
+	
+	function prepareNewChangeset() {
+		$changeset = new \SimpleXMLElement("<osm></osm>");
+		$changeset->addChild('changeset');
+		$tag = $changeset->changeset->addChild('tag');
+		$tag->addAttribute('k','created_by');
+		$tag->addAttribute('v','borazslo');
+		$tag = $changeset->changeset->addChild('tag');
+		$tag->addAttribute('k','comment');
+		$tag->addAttribute('v','Changes made based on miserend.hu\'s users\' experiences.');
+		
+		//echo $changeset->asXML();
+		return $changeset;		
+	}
+   
+
+}

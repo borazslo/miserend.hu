@@ -11,6 +11,8 @@ class ExternalApi {
     public $queryTimeout = 30;
     public $query;
     public $name = 'external';
+	public $format = 'json';
+	private $curl_opts = [];
 
     function run() {
         $this->runQuery();
@@ -39,7 +41,8 @@ class ExternalApi {
             
         } catch(\Exception $e){
             global $config;
-            $this->jsonData = [];
+            if($this->format == 'json' ) $this->jsonData = [];
+			if($this->format == 'yml' ) $this->xmlData = [];
             $this->error = \Html\Html::printExceptionVerbose($e,true);
             if($config['debug'] > 1) echo $this->error;
             elseif($config['debug'] > 0) addMessage($this->error,'warning');
@@ -53,12 +56,22 @@ class ExternalApi {
             $this->cacheFileTime = date('Y-m-d H:i:s',filemtime($this->cacheFilePath));
             if (filemtime($this->cacheFilePath) > strtotime("-" . $this->cache)) {
                 $this->rawData = file_get_contents($this->cacheFilePath);
-                $this->jsonData = json_decode($this->rawData);
-                if ($this->jsonData === null) {
-                    throw new \Exception("External API data has been loaded from cache but data is not a valid JSON!\n".$this->rawData);
-                } else {
-                    return true;
-                }
+				if($this->format == 'json' ) {
+					$this->jsonData = json_decode($this->rawData);
+					if ($this->jsonData === null) {
+						throw new \Exception("External API data has been loaded from cache but data is not a valid JSON!\n".$this->rawData);
+					} else {
+						return true;
+					}
+				} elseif($this->format == 'xml' ) {
+					$this->xmlData = @simplexml_load_string($this->rawData);					
+					if ($this->xmlData == false) {
+						throw new \Exception("External API data has been loaded from cache but data is not a valid XML!\n".$this->rawData);
+					} else {
+						return true;
+					}
+				
+				}
             } else {
                 unlink($this->cacheFilePath);
                 return false;
@@ -75,17 +88,25 @@ class ExternalApi {
     }
 
     function downloadData() {        
-        $header = array("cache-control: no-cache","Content-Type: application/json");
+        $header = array("cache-control: no-cache","Content-Type: application/".$this->format);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,$this->apiUrl . $this->rawQuery);
 		//echo $this->apiUrl . $this->rawQuery."\n";
         curl_setopt($ch, CURLOPT_HTTPHEADER,$header);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
         curl_setopt($ch, CURLOPT_HEADER  , false);  // we want headers
         curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
 		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($ch, CURLOPT_USERAGENT, "miserend.hu");
 
+
+
+		foreach($this->curl_opts as $name => $value ) {
+			curl_setopt($ch, $name, $value );
+		}
+		
         $this->rawData = curl_exec($ch);
     
         $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE ); 
@@ -94,10 +115,17 @@ class ExternalApi {
         		
         switch ($this->responseCode) {
             case '200':
-                $this->jsonData = json_decode($this->rawData);
-                if ($this->jsonData === null ) {            					
-                    throw new \Exception("External API return data is not a valid JSON: " . $this->rawData );
-                }
+				if($this->format == 'json' ) {
+					$this->jsonData = json_decode($this->rawData);
+					if ($this->jsonData === null ) {            					
+						throw new \Exception("External API return data is not a valid JSON: " . $this->rawData );
+					}
+				} else if ($this->format == 'xml') {					
+					$this->xmlData = @simplexml_load_string($this->rawData);					
+					if ($this->xmlData == false ) {            					
+						throw new \Exception("External API return data is not a valid XML: " . $this->rawData );
+					}
+				}
                 break;
                
             case '404':
@@ -115,7 +143,7 @@ class ExternalApi {
         $this->cacheDir;
         $files = scandir($this->cacheDir);
         foreach ($files as $file) {
-            if (preg_match('/^' . $this->name . '_(.*)\.json/i', $file)) {
+            if (preg_match('/^' . $this->name . '_(.*)\.'.$this->format.'/i', $file)) {
                 $filemtime = filemtime($this->cacheDir . $file);
                 $deadline = strtotime('now -' . $this->cache);
                 if ($filemtime < $deadline) {
@@ -126,7 +154,7 @@ class ExternalApi {
     }
 
     function loadCacheFilePath() {
-        $this->cacheFilePath = $this->cacheDir . $this->name . "_" . md5($this->query) . ".json";
+        $this->cacheFilePath = $this->cacheDir . $this->name . "_" . md5($this->query) . ".".$this->format;
     }
        
     function saveStat() {
@@ -161,4 +189,10 @@ class ExternalApi {
     function Response404() {
         throw new \Exception("External API returned 404 = Not Found.");
     }
+	
+	function curl_setopt($name, $value) {
+		$this->curl_opts[$name] = $value;
+	
+	
+	}
 }

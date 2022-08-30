@@ -7,6 +7,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     protected $table = 'osm';
     protected $fillable = array('osmid', 'osmtype');
     protected $appends = array('tagList', 'name');
+	protected $allowedFields = ['wheelchair', 'wheelchair:description'];
 
     public function scopeWhereOSMId($query, $osmtype, $osmid) {
         return $query->where('osmtype', $osmtype)->where('osmid', $osmid);
@@ -102,12 +103,33 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
 
     public function getTagListAttribute($value) {
         $return = [];
-        foreach ($this->tags()->get() as $tag) {
+		$tags = \Eloquent\OSMTag::where('osmtype',$this->osmtype)
+                ->where('osmid',$this->osmid)                
+                ->get();
+				
+		foreach ($tags as $tag) {
             $return[$tag->name] = $tag->value;
         }
         return $return;
     }
 
+	/* Update all tags from OSM's Overpass API */
+	function updateFromOverpass() {
+		$overpass = new \ExternalApi\OverpassApi();
+		//$overpass->cache = false; // We need the fresh data
+		$overpass->query = $this->osmtype."(id:".$this->osmid.");out tags qt center;";
+		$overpass->run();
+		$overpass->saveElement();
+		$this->fresh(); 	/* Be aware that you need ->fresh() to reload the data */
+		return true;
+	}
+	
+	public function fresh(array $with = array())
+	{
+		$key = $this->getKeyName();
+		return $this->exists ? static::with($with)->where($key, $this->getKey())->first() : null;
+	}
+	
     //Returns OSM elements that encloses this element. This element enclosed by the returning ones.
     public function enclosing() {
         return $this->belongsToMany('\Eloquent\OSM', 'lookup_osm_enclosed', 'osm_id', 'enclosing_id');
@@ -117,10 +139,107 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     public function enclosed() {
         return $this->belongsToMany('\Eloquent\OSM', 'lookup_osm_enclosed', 'enclosing_id', 'osm_id');
     }
-
+		
     public function delete() {
         $this->tags()->delete();
         parent::delete();
     }
 
+	/* Create a changeset and upload to OSM */
+	/* TODO: it works only with tags yet. No lat, lon, and anything else */
+	function upload() {
+		$tags = \Eloquent\OSMTag::where('osmtype',$this->osmtype)
+                ->where('osmid',$this->osmid)                
+                ->get()->keyBy('name')->toArray();
+	
+		//$this->osmtype = "node";
+		//$this->osmid = "4332337979";
+	
+		//Get the exact data we need to change
+		$osm = new \ExternalApi\OpenstreetmapApi();
+		$osm->cache = false;
+		$osm->query = $this->osmtype."/".$this->osmid;
+		$osm->run();
+		$xmlData = $osm->xmlData;
+				
+		
+		//Add node/way/relation to the changeset
+		//TODO: ellenőrizni, hogy van-e változás, vagy felküldjük agresszíven
+		//TODO: üreseket nem beküldeni? vagy törölni? vagy mi van?
+		$elements = $xmlData->xpath("//".$this->osmtype."[@id='".$this->osmid."']");
+		$element = $elements[0];
+
+		$remove = [];
+		$update = false;
+		foreach($this->allowedFields as $field) {
+			if(array_key_exists($field,$tags)) {
+					$tag = $element->xpath("tag[@k='".$field."']");
+					//Ha már létezik korábbról
+					if(count($tag) > 0 ) {
+						//Ha változott
+						if($tags[$field]['value'] != $tag[0]->attributes()->v ) {
+							$tag[0]->attributes()->v = $tags[$field]['value'];
+							$update = true;
+							
+							if($tag[0]->attributes()->v == '') {
+								//az unset meg remove nem működik :(
+								$remove[] = $tag[0]->asXML();
+							} 
+						}
+					//Ha nem létezik korábbról ÉS van azért valami értéke
+					} elseif ( $tags[$field]['value'] != '' )  {
+						$tag[0] = $element->addChild('tag');
+						$tag[0]->addAttribute('k',$field);
+						$tag[0]->addAttribute('v',$tags[$field]['value']);
+						$update = true;
+					}
+										
+					
+			}
+		}
+				
+		if($update == true) {
+				
+			//Open empty changeset
+			//TODO: created_by és comment és egyebek
+			$osm = new \ExternalApi\OpenstreetmapApi();
+			$osm->cache = false;		
+			$changeset = $osm->prepareNewChangeset();
+			$osm->curl_setopt(CURLOPT_USERPWD, $osm->userpwd);
+			$osm->query = "changeset/create";
+			$osm->format = 'text';
+			$osm->curl_setopt(CURLOPT_CUSTOMREQUEST ,"PUT");		 	
+			$osm->curl_setopt(CURLOPT_POSTFIELDS,$changeset->asXML());
+			$osm->run();
+			$changesetID = (int) $osm->rawData;
+			
+			$xmlData->{$this->osmtype}[0]->attributes()->changeset = $changesetID;	
+			$xmlString = $xmlData->asXML();
+			
+			$xmlString = str_replace($remove, '', $xmlString); //Sajnos kell ez.
+			
+			$osm = new \ExternalApi\OpenstreetmapApi();
+			$osm->cache = false;		
+			$osm->query = $this->osmtype."/".$this->osmid;
+			$osm->curl_setopt(CURLOPT_USERPWD, $osm->userpwd);
+			$osm->curl_setopt(CURLOPT_CUSTOMREQUEST ,"PUT");		 	
+			$osm->format = 'text';
+			$osm->curl_setopt(CURLOPT_POSTFIELDS,$xmlString);
+			$osm->run();
+			$versionID = (int) $osm->rawData;		
+			
+			//Close changeset
+			$osm = new \ExternalApi\OpenstreetmapApi();
+			$osm->cache = false;		
+			$osm->curl_setopt(CURLOPT_USERPWD, $osm->userpwd);
+			$osm->query = "changeset/".$changesetID."/close";
+			$osm->format = 'text';
+			$osm->curl_setopt(CURLOPT_CUSTOMREQUEST ,"PUT");		 			
+			$osm->run();
+			
+			$messageurl = $osm->apiUrl."changeset/".$changesetID; 
+			
+			addMessage ('Közvelenül OSM adatokat is módosítottunk. Nagyon izgalmat. <a href="'.$messageurl.'">changeset/'.$changesetID.'</a>','success');
+		}
+	}
 }

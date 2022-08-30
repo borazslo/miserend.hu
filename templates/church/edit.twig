@@ -195,6 +195,26 @@
             </tr>
             {{ _self.helptr(10,help) }}
             <tr>
+                <td bgcolor=#efefef class=kiscim align=right>Akadálymentesség:</td>
+                <td bgcolor=#efefef>
+                    <div class="control-group">					
+                        <div class="controls form-inline">            
+							<!-- TODO: mi van, ha korábbi érték nem ebből a háromból van. -->
+							<select name=church[osm][wheelchair] class="form-control">
+								<option value="unknown">Nincs információ</option>
+								<option value="yes" {{ church.osm.tagList['wheelchair'] == 'yes' ? ' selected ' }}>Akadálymentes</option>
+								<option value="limited" {{ church.osm.tagList['wheelchair'] == 'limited' ? ' selected ' }}>Részben akadálymentes</option>
+								<option value="no" {{ church.osm.tagList['wheelchair'] == 'no' ? ' selected ' }}>Egyáltalán nem akadálymentes</option>
+							</select>                            
+							<input type=text class="form-control" name=church[osm][wheelchair:description] value='{{ church.osm.tagList['wheelchair:description'] }}' size=40 class=urlap maxlength=100  placeholder="Akadálymentesség leírása, amennyiban szükséges.">
+                                                    
+                        </div>
+                    </div>
+                </td>
+				<td>{{ _self.helplink(51, ICONS_INFO ) }}</td>
+            </tr>
+			{{ _self.helptr(51,help) }}
+			<tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Aktív misézőhely:</td>
                 <td bgcolor=#ffffff>
                     <div class="control-group">
@@ -381,14 +401,11 @@
     </div> 
 {% endblock %}
 
-{% block leftsidebar %}    
-    {% if church.osm and user.isadmin %}
-        {% include 'church/_panelosm.twig' %}
-    {% endif %}
-{% endblock %}
-
 {% block rightsidebar %}    
     {% include 'church/_panelholders.twig' %}
+	{% if church.osm and user.isadmin %}
+        {% include 'church/_panelosm.twig' %}
+    {% endif %}
 {% endblock %}
 
 {% macro helplink(id, icon) %}

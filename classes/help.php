@@ -249,6 +249,17 @@ class Help {
                 $this->html = '<h4>Periódus határok</h4>' .
                         'Minden periódusnak, más néven időszaknak, be kell állítani a kezdetét és a végét. Több féleképpen adhatjuk meg a kezdő napot és a lezáró napot.<ul><li>Megadhatjuk egy konkért dátum nélküli kifejezéssel. Például: <i>első tanítási nap</i> vagy <i>Krisztus Király vasárnapja</i>. Gépelés közben megjelennek a választható kezdeti időpontok. Ha szükség lenne olyanra, ami még nincs, akkor írj nekem: eleklaszlosj@gmail.com. Azért nagyon praktikus ilyen kifejezéssel megadni egy időszak határát, mert így nem kell minden évben átírni. A miserend.hu tudja, hogy melyik évben mikor van pl. Húsvét.</li><li>Ha minden évben ugyan azon a naptári napon van az időszak váltása, akkor megadhatunk egy dátumot is. Például: <i>12-25</i>. Ilyenkor minden évben, pont ez lesz a forduló nap.</li><li>Nagy ritkán előfordulhat, hogy egy periódus/időszak csak egy adott évben létezik és más években nincsen rá szükség. Ilyen esetben meg lehet adni teljes tádummal a határt. Például: <i>2016-03-12</i>. Fontos, hogy így az adott időszaki miserend nem fog megjelenni más évben.</li></ul>Fontos, hogy nem szabad két különböző időszaknak pontosan ugyan azokat a határokat megadni, mert akkor nincs ami megkülönböztesse azokat egymástól.';
                 break;
+				
+			 case 51:
+				//templom űrlap - akadálymentesség
+				$this->html = '<h4>Akadálymentesség</h4>' .
+                        '<ul>
+						<li><strong>Teljesen</strong>: A bejáratnál és a helyiségekben sincsenek lépcsők.</li>
+						<li><strong>Részben</strong>: A bejáratnak egy lépcsőfoka van, max. 7 cm magas, vagy van elérhető rámpa. A legtöbb ill. legfontosabb helyiségek lépcső nélküliek.</li>
+						<li><strong>Egyáltalán nem</strong>: A bejáratnál egy vagy több lépcső van, a fontosabb helyiségek nem hozzáférhetőek.</li>						
+						</ul>';
+				$this->html .= 'Az OSM alapú <a href="https://wheelmap.org/" target="_blank">wheelmap.org</a> kategóriáit alkalmazzuk. További információ az <a href="https://wiki.openstreetmap.org/wiki/Hu:Key:wheelchair" target="_blank">OSM wiki</a> oldalán.';
+                break;
 
             default:
                 $this->html = 'Nincs ilyen segítség.';
