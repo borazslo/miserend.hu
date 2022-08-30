@@ -42,15 +42,12 @@ class SearchResultsChurches extends Html {
         $results = searchChurches($_REQUEST, $offset, $limit);
         $resultsCount = $results['sum'];
 
-        if (!isset($_REQUEST['gorog']))
-            $_REQUEST['gorog'] = false;
-
-        //Data For Pagination
-        $params = ['varos' => $_REQUEST['varos'], 'tavolsag' => $_REQUEST['tavolsag'],
-            'hely' => $_REQUEST['hely'], 'kulcsszo' => $_REQUEST['kulcsszo'],
-            'gorog' => $_REQUEST['gorog'], 'tnyelv' => $_REQUEST['tnyelv'],
-            'espker' => $_REQUEST['espker'], 'ehm' => $_REQUEST['ehm'],
-            'q' => 'SearchResultsChurches'];
+		//Data for pagination
+		$params = [];
+		foreach( ['varos','tavolsag','hely','kulcsszo','gorog','tnyelv','espker','ehm'] as $param ) {
+			if( isset($_REQUEST[$param]) ) $params[$param] = $_REQUEST[$param];
+		}
+        $params['q'] = 'SearchResultsChurches';
         $url = \Pagination::qe($params);
         $this->pagination->set($resultsCount, $url);
 

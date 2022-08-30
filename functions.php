@@ -532,7 +532,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         'offset' => $offset,
         'limit' => $limit);
 
-    if ($args['hely'] AND $args['hely'] != '') {
+    if (isset($args['hely']) AND $args['hely'] != '') {
         if ($args['tavolsag'] == '')
             $args['tavolsag'] = 1;
 
@@ -549,27 +549,86 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     $where = searchChurchesWhere($args);
 
 
-    $query = "SELECT templomok.id,nev,ismertnev,varos,lat,lon FROM templomok ";
-    if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
-        $query .= " INNER JOIN misek ON misek.tid = templomok.id ";
-        if ($args['tnyelv'] == 'h')
-            $args['tnyelv'] = 'hu|h';
-        $where[] = " misek.nyelv  REGEXP '(^|,)(" . $args['tnyelv'] . ")([0-5]{0,1}|-1|ps|pt)(,|$)' ";
-    }
-    if (count($where) > 0)
-        $query .= "WHERE " . implode(' AND ', $where);
-    if (isset($args['tnyelv']) AND $args['tnyelv'] != '0')
-        $query .= " GROUP BY templomok.id ";
+	$search = DB::table('templomok')
+		->select('templomok.id','nev','ismertnev','varos','lat','lon');
 
-    $query .= " ORDER BY nev ";
-    if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
-    $return['sum'] = mysql_num_rows($lekerdez);
-    if (!isset($filterdistance))
-        $query .= " LIMIT " . ($offset ) . "," . ($limit);
-    if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
-    while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
+	/* WHERE */
+	$search->where('ok','i');
+	
+	// keyword
+	if ($args['kulcsszo'] != '') {
+        $subwhere = array();
+        if (preg_match('(\*|\?)', $args['kulcsszo'])) {
+            $regexp = preg_replace('/\*/i', '.*', $args['kulcsszo']);
+            $regexp = preg_replace('/\?/i', '.{1}', $regexp);
+            $text = " REGEXP '" . $regexp . "'";
+        } else {
+            $text = " LIKE '%" . $args['kulcsszo'] . "%'";
+        }
+        foreach (array('nev', 'ismertnev', 'varos', 'cim', 'megkozelites', 'plebania', 'templomok.megjegyzes', 'misemegj') as $column) {
+            $subwhere[] = $column . $text;
+        }
+        $search->whereRaw(" (" . implode(' OR ', $subwhere) . ") ");
+    }
+	
+	// varos
+	if ($args['varos'] != '') {
+        if ($args['varos'] == 'Budapest')
+            $args['varos'] = 'Budapest*';
+
+        if (preg_match('(\*|\?)', $args['varos'])) {
+            $regexp = preg_replace('/\*/i', '.*', $args['varos']);
+            $regexp = preg_replace('/\?/i', '.{1}', $regexp);
+            $search->where("varos","REGEXP","^" . $regexp . "$");
+        } else {
+            $search->where("varos",$args['varos']);
+        }
+    }
+	
+	// tnyelv
+    if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
+		if ($args['tnyelv'] == 'h') $args['tnyelv'] = 'hu|h';
+		
+		$search->join('misek','misek.tid','=','templomok.id');		
+        $search->where("misek.nyelv","REGEXP","(^|,)(" . $args['tnyelv'] . ")([0-5]{0,1}|-1|ps|pt)(,|$)");
+    }
+	
+	// gorog only
+	if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {
+        $search->whereIn("egyhazmegye",[17,18,34]);
+    }
+
+	// egyhazmegye
+    if ($args['ehm'] != 0)
+        $search->where("egyhazmegy",$args['ehm']);
+
+	// espereskerulet
+    if (isset($args['espker']) AND $args['espker'] != 0)
+        $search->where("espereskerulet",$args['espker']);
+	
+	
+    if (count($where) > 0) {
+		foreach($where as $w)
+			$search->whereRaw($w);
+	}
+	
+	$search->groupBy('templomok.id'); //Igazából ez csak a tnyelv esetén szükséges
+	$search->orderBy('nev');
+	
+	$sum = $search;
+    $return['sum'] = count($sum->get());
+				
+	if (!isset($filterdistance)) {
+	
+        $search->offset($offset)->limit($limit);
+		$results = $search->get();			
+		$return['results']  = array_map(function ($value) {return (array)$value;}, $results);		
+		
+	} else {
+		
+    
+	
+	foreach($rows as $row) {    
         if (isset($filterdistance)) {
             //acos(sin(:lat)*sin(radians(Lat)) + cos(:lat)*cos(radians(Lat))*cos(radians(Lon)-:lon)) * :R < :rad
             $d = acos(sin(deg2rad($lat)) * sin(deg2rad($row['lat'])) + cos(deg2rad($lat)) * cos(deg2rad($row['lat'])) * cos(deg2rad($row['lon']) - deg2rad($lon))) * $R;
@@ -583,9 +642,10 @@ function searchChurches($args, $offset = 0, $limit = 20) {
                 }
             }
         } else {
-            $return['results'][] = $row;
+            $return['results'][] = (array) $row;
         }
     }
+	}
 
     if (isset($filterdistance)) {
         $return['sum'] = count($return['results']);
@@ -596,37 +656,13 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 }
 
 function searchChurchesWhere($args) {
-    $where = array(" ok = 'i' ");
+    $where = [];
 
-    if ($args['kulcsszo'] != '') {
-        $subwhere = array();
-        if (preg_match('(\*|\?)', $args['kulcsszo'])) {
-            $regexp = preg_replace('/\*/i', '.*', $args['kulcsszo']);
-            $regexp = preg_replace('/\?/i', '.{1}', $regexp);
-            $text = " REGEXP '" . $regexp . "'";
-        } else {
-            $text = " LIKE '%" . $args['kulcsszo'] . "%'";
-        }
-        foreach (array('nev', 'ismertnev', 'varos', 'cim', 'megkozelites', 'plebania', 'templomok.megjegyzes', 'misemegj') as $column) {
-            $subwhere[] = $column . $text;
-        }
-        $where[] = " (" . implode(' OR ', $subwhere) . ") ";
-    }
+   
 
-    if ($args['varos'] != '') {
-        if ($args['varos'] == 'Budapest')
-            $args['varos'] = 'Budapest*';
+    
 
-        if (preg_match('(\*|\?)', $args['varos'])) {
-            $regexp = preg_replace('/\*/i', '.*', $args['varos']);
-            $regexp = preg_replace('/\?/i', '.{1}', $regexp);
-            $where[] = "varos REGEXP '^" . $regexp . "$'";
-        } else {
-            $where[] = "varos='" . $args['varos'] . "'";
-        }
-    }
-
-    if ($args['hely'] AND $args['hely'] != '') {
+    if (isset($args['hely']) AND $args['hely'] != '') {
 
         $latlng = $args['hely_geocode'];
         $lat = $latlng['lat']; // latitude of centre of bounding circle in degrees
@@ -644,15 +680,7 @@ function searchChurchesWhere($args) {
         $where[] = "( lat BETWEEN " . $minLat . " AND " . $maxLat . " AND lon BETWEEN " . $minLon . " AND " . $maxLon . ")";
     }
 
-    if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {
-        $where[] = "egyhazmegye IN (17,18, 34)";
-    }
-
-    if ($args['ehm'] != 0)
-        $where[] = "egyhazmegye='" . $args['ehm'] . "'";
-
-    if (isset($args['espker']) AND $args['espker'] != 0)
-        $where[] = "espereskerulet='" . $args['espker'] . "'";
+    
     return $where;
 }
 
