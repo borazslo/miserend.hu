@@ -34,7 +34,8 @@ class Church extends \Html\Html {
         $church->photos = $church->photos()->get();
 		
 		$church->accessibility = $church->osm->tagList;
-		   
+		$church->kozossegek = $church->kozossegek;
+				   
 		global $_honapok;
 		$this->_honapok = $_honapok;
 		

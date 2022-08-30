@@ -83,5 +83,8 @@
     {% if neighbours|length > 1 %}
         {% include 'church/_panelneighbours.twig' %}
     {% endif %}    
+	{% if kozossegek|length > 1 %}
+        {% include 'church/_panelkozossegek.twig' %}
+    {% endif %}    
 	{% include 'church/_panelfacebookpageplugin.twig' %}
 {% endblock %}

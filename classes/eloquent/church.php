@@ -140,6 +140,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * fullName
      * remarksSatus
      * location
+	 * osm
+	 * kozossegek
      */
     public function getLiturgiatvAttribute($value) {
         $litapi = new \ExternalApi\LiturgiatvApi();
@@ -313,6 +315,16 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 		if(!$osm) $osm = new \Eloquent\OSM(['osmid'=>$this->osmid, 'osmtype' => $this->osmtype]);
 		
 		return $osm;				
+	}
+	
+	public function getKozossegekAttribute($value) {
+		$api = new \ExternalApi\KozossegekApi();		
+		$api->query = "miserend/".$this->id;
+		$api->run();
+		if(isset($api->jsonData->data) > 0 )
+			return $api->jsonData->data;
+		else
+			return false;			
 	}
 	
     /*
