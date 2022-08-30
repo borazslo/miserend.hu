@@ -32,7 +32,9 @@ class Church extends \Html\Html {
         }
 
         $church->photos = $church->photos()->get();
-           
+		
+		$church->accessibility = $church->osm->tagList;
+		   
 		global $_honapok;
 		$this->_honapok = $_honapok;
 		
@@ -103,6 +105,8 @@ class Church extends \Html\Html {
         $this->alert = LiturgicalDayAlert('html');
         
         $this->isChurchHolder = $user->getHoldingData($this->id);                
+		
+		
     }
 
     static function factory($path) {
