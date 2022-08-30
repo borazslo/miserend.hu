@@ -16,19 +16,21 @@ class SearchResultsChurches extends Html {
 
         //Beginning of new Search Egine
         $search = \Eloquent\Church::where('ok', 'i');
-        if ($this->input['kulcsszo']) {
+        if (isset($this->input['kulcsszo'])) {
             $keyword = preg_replace("/\*/", "%", $this->input['kulcsszo']);
             $search->whereShortcutLike($keyword, 'name');
         }
-        if ($this->input['varos']) {
+        if (isset($this->input['varos'])) {
             $keyword = preg_replace("/\*/", "%", $this->input['varos']);
             $search->whereShortcutLike($keyword, 'administrative');
         }
 
         //Data For _panelSearchForChurch.twig
-        $this->form['varos']['value'] = $_REQUEST['varos'];
-        $this->form['kulcsszo']['value'] = $_REQUEST['kulcsszo'];
-        $selectReligiousAdministration = \Form::religiousAdministrationSelection(['diocese' => $_REQUEST['ehm'], 'deanery' => $_REQUEST['espker']]);
+        $this->form['varos']['value'] = isset($_REQUEST['varos']) ? $_REQUEST['varos'] : false;
+        $this->form['kulcsszo']['value'] = isset($_REQUEST['kulcsszo']) ? $_REQUEST['kulcsszo'] : false ;
+        
+		
+		$selectReligiousAdministration = \Form::religiousAdministrationSelection(['diocese' => isset($_REQUEST['ehm']) ? $_REQUEST['ehm'] : false , 'deanery' => isset($_REQUEST['espker']) ? $_REQUEST['espker'] : false ]);
         $this->form['diocese'] = $selectReligiousAdministration['dioceses'];
         $this->form['diocese']['name'] = 'ehm';
         $this->form['deaneries'] = $selectReligiousAdministration['deaneries'];
@@ -45,11 +47,15 @@ class SearchResultsChurches extends Html {
 		//Data for pagination
 		$params = [];
 		foreach( ['varos','tavolsag','hely','kulcsszo','gorog','tnyelv','espker','ehm'] as $param ) {
-			if( isset($_REQUEST[$param]) ) $params[$param] = $_REQUEST[$param];
+		
+			if( isset($_REQUEST[$param]) AND $_REQUEST[$param] != ''  AND $_REQUEST[$param] != '0' ) {
+				$params[$param] = $_REQUEST[$param];
+			}
 		}
+		
         $params['q'] = 'SearchResultsChurches';
-        $url = \Pagination::qe($params);
-        $this->pagination->set($resultsCount, $url);
+        $url = \Pagination::qe($params, '/?' );
+        $this->pagination->set($resultsCount, $url );
 
         if ($resultsCount < 1) {
             addMessage('A keresés nem hozott eredményt', 'info');
