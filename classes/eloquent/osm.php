@@ -7,7 +7,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
     protected $table = 'osm';
     protected $fillable = array('osmid', 'osmtype');
     protected $appends = array('tagList', 'name');
-	protected $allowedFields = ['wheelchair', 'wheelchair:description'];
+	protected $allowedFields = ['wheelchair', 'wheelchair:description','toilets:wheelchair','disabled:description','hearing_loop','toilets'];
 
     public function scopeWhereOSMId($query, $osmtype, $osmid) {
         return $query->where('osmtype', $osmtype)->where('osmid', $osmid);

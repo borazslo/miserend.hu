@@ -68,7 +68,7 @@
         {% include "church/_panelaskingremark.twig" %}
     {% endif %}
     {% include 'announcment.twig' ignore missing %}
-	{% if accessibility.wheelchair %}
+	{% if accessibility['wheelchair'] or accessibility['wheelchair:description'] or accessibility['hearing_loop'] or accessibility['toilets:wheelchair'] or accessibility['disabled:description'] %}
 		{% include 'church/_panelaccessibility.twig'  %}
 	{% endif %}
     

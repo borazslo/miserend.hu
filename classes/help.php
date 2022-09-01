@@ -252,13 +252,21 @@ class Help {
 				
 			 case 51:
 				//templom űrlap - akadálymentesség
-				$this->html = '<h4>Akadálymentesség</h4>' .
-                        '<ul>
-						<li><strong>Teljesen</strong>: A bejáratnál és a helyiségekben sincsenek lépcsők.</li>
-						<li><strong>Részben</strong>: A bejáratnak egy lépcsőfoka van, max. 7 cm magas, vagy van elérhető rámpa. A legtöbb ill. legfontosabb helyiségek lépcső nélküliek.</li>
-						<li><strong>Egyáltalán nem</strong>: A bejáratnál egy vagy több lépcső van, a fontosabb helyiségek nem hozzáférhetőek.</li>						
-						</ul>';
-				$this->html .= 'Az OSM alapú <a href="https://wheelmap.org/" target="_blank">wheelmap.org</a> kategóriáit alkalmazzuk. További információ az <a href="https://wiki.openstreetmap.org/wiki/Hu:Key:wheelchair" target="_blank">OSM wiki</a> oldalán.';
+				$this->html = '<h4>Akadálymentesség</h4>
+				<h5>Kerekesszékkel hozzáférhetőség:</h5>
+				<ul>
+					<li><strong>Teljesen</strong>: A bejáratnál és a helyiségekben sincsenek lépcsők.</li>
+					<li><strong>Részben</strong>: A bejáratnak egy lépcsőfoka van, max. 7 cm magas, vagy van elérhető rámpa. A legtöbb ill. legfontosabb helyiségek lépcső nélküliek.</li>
+					<li><strong>Egyáltalán nem</strong>: A bejáratnál egy vagy több lépcső van, a fontosabb helyiségek nem hozzáférhetőek.</li>						
+				</ul>
+				<h5>Kiegészítés, ha szükséges:</h5>
+				Például: <i>Rámpa az oldalsó ajtónál érhető el.</i>
+				<h5>Akadálymentes mosdó:</h5>
+				Akadálymentes egy mosdó, ha az ajtó belső szélessége ≥ 90 cm, és az elérhető padlóterület ≥ 150 cm széles, és van kerekesszék magasságú WC ülőke, és vannak lehajtható kapaszkodók, és akadálymentesített a kézmosó.
+				<h5>Hallást segítő indukciós hurok:</h5>
+				<h5>További leírás bármilyen akadálymentesség kapcsán:</h5>
+				Ide jöhet leírás arról, ha például minden szöveget kivetítenek a hallássérülteknek. Vagy van a padlót a látássérülteket segítő burkolat.';
+				$this->html .= 'Az OSM alapú <a href="https://wheelmap.org/" target="_blank">wheelmap.org</a> kategóriáit alkalmazzuk. További információ az <a href="https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities" target="_blank">OSM wiki</a> oldalán.';
                 break;
 
             default:

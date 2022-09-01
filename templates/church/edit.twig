@@ -194,26 +194,19 @@
                 <td>{{ _self.helplink(10, ICONS_INFO ) }}</td>
             </tr>
             {{ _self.helptr(10,help) }}
+
             <tr>
-                <td bgcolor=#efefef class=kiscim align=right>Akadálymentesség:</td>
+                <td bgcolor=#efefef class=kiscim align=right>Akadálymentesség</td>
                 <td bgcolor=#efefef>
-                    <div class="control-group">					
-                        <div class="controls form-inline">            
-							<!-- TODO: mi van, ha korábbi érték nem ebből a háromból van. -->
-							<select name=church[osm][wheelchair] class="form-control">
-								<option value="">Nincs információ</option>
-								<option value="yes" {{ church.osm.tagList['wheelchair'] == 'yes' ? ' selected ' }}>Akadálymentes</option>
-								<option value="limited" {{ church.osm.tagList['wheelchair'] == 'limited' ? ' selected ' }}>Részben akadálymentes</option>
-								<option value="no" {{ church.osm.tagList['wheelchair'] == 'no' ? ' selected ' }}>Egyáltalán nem akadálymentes</option>
-							</select>                            
-							<input type=text class="form-control" name=church[osm][wheelchair:description] value='{{ church.osm.tagList['wheelchair:description'] }}' size=40 class=urlap maxlength=100  placeholder="Akadálymentesség leírása, amennyiban szükséges.">
-                                                    
-                        </div>
-                    </div>
+                    {{ forms.select(form['osm']['wheelchair']) }}
+					{{ forms.input (form['osm']['wheelchair:description']) }}
+					{{ forms.select(form['osm']['toilets:wheelchair']) }}	
+					{{ forms.select(form['osm']['hearing_loop']) }}
+					{{ forms.input (form['osm']['disabled:description']) }}
                 </td>
 				<td>{{ _self.helplink(51, ICONS_INFO ) }}</td>
             </tr>
-			{{ _self.helptr(51,help) }}
+			{{ _self.helptr(51,help) }}						
 			<tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Aktív misézőhely:</td>
                 <td bgcolor=#ffffff>

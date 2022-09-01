@@ -6,15 +6,35 @@
 
 {% block body %}
 	{% if accessibility['wheelchair'] == 'yes' %} 
-		<strong>Teljesen</strong> akadálymentes: A bejáratnál és a helyiségekben sincsenek lépcsők.</li>		
+		<p><strong>Teljesen</strong> akadálymentes: A bejáratnál és a helyiségekben sincsenek lépcsők.</p>		
 	{% elseif accessibility['wheelchair'] == 'limited' %}
-		<strong>Részben</strong> akadálymentes: A bejáratnak egy lépcsőfoka van, max. 7 cm magas, vagy van elérhető rámpa. A legtöbb ill. legfontosabb helyiségek lépcső nélküliek.
+		<p><strong>Részben</strong> akadálymentes: A bejáratnak egy lépcsőfoka van, max. 7 cm magas, vagy van elérhető rámpa. A legtöbb ill. legfontosabb helyiségek lépcső nélküliek.</p>
 	{% elseif accessibility['wheelchair'] == 'no' %}
-		<strong>Egyáltalán nem</strong> akadálymentes: A bejáratnál egy vagy több lépcső van, a fontosabb helyiségek nem hozzáférhetőek.
+		<p><strong>Egyáltalán nem</strong> akadálymentes: A bejáratnál egy vagy több lépcső van, a fontosabb helyiségek nem hozzáférhetőek.</p>
 	{% endif %}
+
+	{% if accessibility['toilets:wheelchair'] == 'yes' %} 
+		<p><strong>A mosdó kerekesszékkel is elérhető.</strong></p>
+	{% elseif accessibility['toilets:wheelchair'] == 'no' %}
+		<p>Nincs mosdó, vagy kerekesszékkel nem elérhető.</p>
+	{% endif %}		
+	
 	{% if accessibility['wheelchair:description'] %}
-		<br/><strong>{{ accessibility['wheelchair:description'] }}</strong>
+		<p><strong>{{ accessibility['wheelchair:description'] }}</strong></p>
 	{% endif %}
+	
+	{% if accessibility['hearing_loop'] == 'yes' %} 
+		<p><strong>Hallást segítő indukciós hurok elérhető.</strong></p>
+	{% elseif accessibility['hearing_loop'] == 'limited' %}
+		<p>Hallást segítő indukciós hurok elérhetőm de tenni kell érte, hogy működjön / hozzáférjenek.</p>
+	{% elseif accessibility['hearing_loop'] == 'no' %}
+		<p>Nincs indukciós hurok a helyszínen.</p>
+	{% endif %}	
+	
+	{% if accessibility['disabled:description'] %}
+		<p>További információ: <strong>{{ accessibility['disabled:description'] }}</strong></p>
+	{% endif %}
+	
 {% endblock %}
 
 {% block footer %}
