@@ -478,4 +478,44 @@ class User {
     static function logout() {
         \Token::delete();
     } 
+	
+	static function sendActivationNotification() {
+	
+		$users2notify = DB::table('user')
+			->where('lastlogin', '0000-00-00 00:00:00')			
+			->orderByRaw("RAND()")
+			->limit(5)			
+			->get();
+			
+
+		foreach($users2notify as $user) {					
+			$lastEmail = DB::table('emails')
+				->where('type','user_pleaseactivate')
+				->where('to',$user->email)
+				->whereIn('status',['queued','sent'])				
+				->orderBy('updated_at','desc')				
+				->first();
+					
+			// Van olyan emlékztetőnk ami a sorban várakozik
+			// vagy nincs egy hete hogy küldtünk neki értesítőt
+			if (isset($lastEmail) AND (
+					$lastEmail->status == 'queued' OR 
+					$lastEmail->updated_at > strtotime('-1 week')
+					) ) {
+				// Nincs mit tenni
+			} else {
+			
+				// Nincs még korábbi értesítő, vagy az már öregebb mint egy hét			
+				$user->inactiveDays = abs( round ( ( time() - strtotime($user->regdatum)) / 86400 ) );
+				
+				$email = new \Eloquent\Email();
+				$email->to = $user->email;
+				$email->render('user_pleaseactivate',$user);			
+				// $email->addToQueue();
+				$email->send();
+			}
+		}
+		
+		return true;
+	}
 }
