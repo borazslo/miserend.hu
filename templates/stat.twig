@@ -21,11 +21,12 @@
     
     <h3>Templom statisztikák</h3>    
     <div id="chart1" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>   
-    <div id="chart2" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
+    {% if s3.data[0]|length > 1 %}<div id="chart2" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>{% endif %}
     <div id="chart4" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
     
     <h3>Egyéb statisztikák</h3>
     <div id="chart5" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
+	<div id="chart3" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
 
     <script>
     $(document).ready(function () {
@@ -141,7 +142,7 @@
    
    
    
-   
+   {% if s3.data[0]|length > 1 %}
    
     legend['labels'] = {{ s3.labels|json_encode()|raw }};   
     plot2 = $.jqplot("chart2", {{ s3.data|json_encode()|raw }}, {
@@ -221,7 +222,7 @@
         legend: legend,
         grid: grid,
     });
-   
+   {% endif %}
    
    plot4 = $.jqplot("chart4", [{{ s4.data|json_encode()|raw }}], {
         // Turns on animatino for all series in this plot.
@@ -293,6 +294,87 @@
           legend: legend,
           highlighter: highlighter,
       });
+
+
+	legend['labels'] = {{ s2.labels|json_encode()|raw }};   
+    plot1 = $.jqplot("chart3", {{ s2.data|json_encode()|raw }}, {
+        // Turns on animatino for all series in this plot.
+        animate: true,
+        // Will animate plot on calls to plot1.replot({resetAxes:true})
+        animateReplot: true,
+        seriesDefaults: seriesDefaults,
+        title: 'Felhasználóink utolsó aktivitásai',
+        series:[
+            {
+                pointLabels: {
+                    show: true
+                },
+                renderer: $.jqplot.BarRenderer,
+                showHighlight: false,
+                yaxis: 'y2axis',
+                rendererOptions: {
+                    // Speed up the animation a little bit.
+                    // This is a number of milliseconds.  
+                    // Default for bar series is 3000.  
+                    animation: {
+                        speed: 2500
+                    },
+                    barWidth: 15,
+                    barPadding: -15,
+                    barMargin: 0,
+                    highlightMouseOver: false
+                }
+            }, 
+            {
+                rendererOptions: {
+                    // speed up the animation a little bit.
+                    // This is a number of milliseconds.
+                    // Default for a line series is 2500.
+                    animation: {
+                        speed: 2000
+                    }
+                }
+            }
+        ],
+        axesDefaults: {
+            pad: 0
+        },
+        axes: {
+            // These options will set up the x axis like a category axis.
+            xaxis: {
+                tickInterval: 1,
+                drawMajorGridlines: false,
+                drawMinorGridlines: true,
+                drawMajorTickMarks: false,
+                rendererOptions: {
+                    tickInset: 0.5,
+                    minorTicks: 1
+                }
+            },
+            yaxis: {
+                tickOptions: {
+                    formatString: "%'d"
+                },
+                rendererOptions: {
+                    forceTickAt0: true
+                }
+            },
+            y2axis: {
+                tickOptions: {
+                    formatString: "%'d"
+                },
+                rendererOptions: {
+                    // align the ticks on the y2 axis with the y axis.
+                    alignTicks: true,
+                    forceTickAt0: true
+                }
+            }
+        },
+        highlighter: highlighter,
+        legend: legend,
+        grid: grid,
+    });
+   
 
 });
 

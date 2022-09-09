@@ -70,6 +70,34 @@ class Stat extends Html {
         foreach($tmp as $k => $v)
             $this->s4['data'][] = [$k,$v];
         
+		/* 
+         * Felhasználók regisztráltása és utolsó ténykedése
+         */
+        $stat  = [
+            'labels' => ['utoljára aktív felhsználók','újonnan regisztrált felhasználók'],
+            'data' => [0 => [], 1 => [] ] 
+            ];
+        
+			
+		 $results = DB::table('user')
+                    ->select(DB::raw('COUNT(*) as count'),DB::raw("date_format(lastactive,'%Y') as lastactive_year"))
+					->where('lastactive','>',0)
+					->groupBy('lastactive_year')
+					->get();
+		foreach($results as $result) {
+			$stat['data'][1][] = [ (int) $result->lastactive_year, (int) $result->count];
+		}
+		 $results = DB::table('user')
+                    ->select(DB::raw('COUNT(*) as count'),DB::raw("date_format(regdatum,'%Y') as regdatum_year"))
+					->where('regdatum','<>','0000-00-00 00:00:00')
+					->groupBy('regdatum_year')
+					->get();
+		foreach($results as $result) {
+			$stat['data'][0][] = [(int) $result->regdatum_year, (int) $result->count];
+		}				
+		$this->s2 = $stat;
+
+			
         /* 
          * ExternalApi Stats 
          */
