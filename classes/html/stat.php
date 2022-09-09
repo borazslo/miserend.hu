@@ -74,7 +74,7 @@ class Stat extends Html {
          * Felhasználók regisztráltása és utolsó ténykedése
          */
         $stat  = [
-            'labels' => ['utoljára aktív felhsználók','újonnan regisztrált felhasználók'],
+            'labels' => ['utoljára aktív felhsználók','újonnan regisztrált (és aktivizált) felhasználók'],
             'data' => [0 => [], 1 => [] ] 
             ];
         
@@ -85,15 +85,16 @@ class Stat extends Html {
 					->groupBy('lastactive_year')
 					->get();
 		foreach($results as $result) {
-			$stat['data'][1][] = [ (int) $result->lastactive_year, (int) $result->count];
+			$stat['data'][0][] = [ (int) $result->lastactive_year, (int) $result->count];
 		}
 		 $results = DB::table('user')
                     ->select(DB::raw('COUNT(*) as count'),DB::raw("date_format(regdatum,'%Y') as regdatum_year"))
 					->where('regdatum','<>','0000-00-00 00:00:00')
+					->where('lastlogin','<>','0000-00-00 00:00:00')
 					->groupBy('regdatum_year')
 					->get();
 		foreach($results as $result) {
-			$stat['data'][0][] = [(int) $result->regdatum_year, (int) $result->count];
+			$stat['data'][1][] = [(int) $result->regdatum_year, (int) $result->count];
 		}				
 		$this->s2 = $stat;
 
