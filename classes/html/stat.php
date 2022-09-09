@@ -80,20 +80,22 @@ class Stat extends Html {
         
 			
 		 $results = DB::table('user')
-                    ->select(DB::raw('COUNT(*) as count'),DB::raw("date_format(lastactive,'%Y') as lastactive_year"))
-					->where('lastactive','>',0)
+                    ->select(DB::raw('COUNT(*) as count'),DB::raw("date_format(lastactive,'%Y') as lastactive_year"))					
 					->groupBy('lastactive_year')
 					->get();
 		foreach($results as $result) {
+			if($result->lastactive_year == 0) $stat['early'] = $result->count;
+			else
 			$stat['data'][0][] = [ (int) $result->lastactive_year, (int) $result->count];
 		}
 		 $results = DB::table('user')
                     ->select(DB::raw('COUNT(*) as count'),DB::raw("date_format(regdatum,'%Y') as regdatum_year"))
 					->where('regdatum','<>','0000-00-00 00:00:00')
+					->where('regdatum','>','2015-00-00 00:00:00')
 					->where('lastlogin','<>','0000-00-00 00:00:00')
 					->groupBy('regdatum_year')
 					->get();
-		foreach($results as $result) {
+		foreach($results as $result) {		
 			$stat['data'][1][] = [(int) $result->regdatum_year, (int) $result->count];
 		}				
 		$this->s2 = $stat;
