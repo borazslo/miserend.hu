@@ -7,6 +7,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 class Catalogue extends \Html\Html {
 
     public function __construct() {
+		parent::__construct();
         global $user;
 
         if (!$user->checkRole('user')) {
@@ -16,17 +17,29 @@ class Catalogue extends \Html\Html {
         $this->input['kulcsszo'] = \Request::Text('kulcsszo');
         $this->input['sort'] = \Request::TextwDefault('sort', 'lastactive desc');
         $this->input['adminok'] = \Request::SimpleTextwDefault('adminok', '');
-        $this->input['limit'] = \Request::IntegerwDefault('limit', 50);
-
+        
+		$this->pagination->take = \Request::IntegerwDefault('take', 50);		
+		$offset = $this->pagination->take * $this->pagination->active;
+        $take = $this->pagination->take;
+				
         $this->buildForm();
         $this->buildQuery();
-
-        if($this->input['limit'] < $this->query->count()) {
-            $this->more = "Van még ".($this->query->count() - $this->input['limit'])." találat.";
-        }
-        $this->query->orderByRaw($this->input['sort']);
-        
-        $results = $this->query->get();
+	
+		$maxResults = count($this->query->get());
+		
+		//Data for pagination
+		$params = [];
+		foreach( ['kulcsszo','sort','adminok','take'] as $param ) {		
+			if( isset($_REQUEST[$param]) AND $_REQUEST[$param] != ''  AND $_REQUEST[$param] != '0' ) {
+				$params[$param] = $_REQUEST[$param];
+			}
+		}
+		$params['q'] = 'user/catalogue';
+        $url = \Pagination::qe($params, '/?' );
+        $this->pagination->set($maxResults, $url );
+		        
+        $this->query->orderByRaw($this->input['sort']);        
+        $results = $this->query->offset($offset)->limit($take)->get();
 
         foreach ($results as $result) {
             if (preg_match('/^(lastlogin|lastactive|regdatum)/i', $this->input['sort'], $match))
@@ -108,7 +121,6 @@ class Catalogue extends \Html\Html {
                         ->orWhere('user.email', 'like', "%" . $input['kulcsszo'] . "%");
             });
         }
-        $query->take($this->input['limit']);       
         $this->query = $query;
     }
 

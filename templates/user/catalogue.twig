@@ -14,6 +14,15 @@
             <input type=submit value=Lista class=urlap>
         </form>
          <br/>
+		 <div class="row" style="margin-bottom:12px">
+            Összesen: {{ pagination.resultsCount }} találat<br/>
+            Listázás: {{ (pagination.active * pagination.take) + 1 }} - 
+            {% if pagination.resultsCount < ( pagination.active + 1 ) * pagination.take %}
+                {{ pagination.resultsCount }}
+            {% else %}
+                {{ ( pagination.active + 1 ) * pagination.take }} 
+            {% endif %}
+        </div>
 	<table class="table table-hover table-condensed table-striped">
 		<tr>
     		<th class="col-md-3">Felhasználónév / Név</th>
@@ -51,7 +60,6 @@
 			</tr>
 		{% endfor %}
 	</table>
-        {{ more }}
-
+	{% include '_pagination.twig' %}
 
 {% endblock %}
