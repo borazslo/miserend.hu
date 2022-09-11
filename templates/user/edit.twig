@@ -23,7 +23,7 @@
 		<div class="panel-group" id="accordion">
 		    <div class="panel panel-default">
 		        <div class="panel-heading visible-lg-block visible-md-block">
-		            <h4 class="panel-title">Észrevételezett templomai</h4>
+		            <h4 class="panel-title">Észrevételezett templomai: {{ edituser.remarks|length }}</h4>
 		        </div>
 	            <ul class="list-group">
 	                {% for remark in edituser.remarks %}
@@ -39,11 +39,11 @@
 		    </div>
 		</div>
 		{% endif %}
-                {% if edituser.responsible.church|length > 0 %}
+		{% if edituser.responsible.church|length > 0 %}
 		<div class="panel-group" id="accordion">
 		    <div class="panel panel-default">
 		        <div class="panel-heading visible-lg-block visible-md-block">
-		            <h4 class="panel-title">Felelősségi körei</h4>
+		            <h4 class="panel-title">Felelősségi körei: {{ edituser.responsible.church|length }}</h4>
 		        </div>
 	            <ul class="list-group">
 	                {% for key, church in edituser.responsible.church %}
