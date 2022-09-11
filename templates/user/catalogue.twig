@@ -19,6 +19,8 @@
     		<th class="col-md-3">Felhasználónév / Név</th>
                 <th class="col-md-3">Email</th>
                 <th class="col-md-1"><img src="/img/templom1.gif" title="Ellátott templomok száma"></th>
+				<th class="col-md-1"><span class="ui-icon ui-icon-star yellow" title="Kedvenc templomok száma">
+                </span></th>
     		<th class="col-md-3">{{ field }}</th>
     		<th class="col-md-1"><span class="glyphicon glyphicon-trash" aria-hidden="true" style=""></span></th>
   		</tr>
@@ -36,7 +38,10 @@
 				</td>                                
                                 <td>
                                     {{ user.responsible.church|length }}
-                                </td>                               
+                                </td>
+				<td>
+					{{ user.favorites|length}}
+				</td>								
                                 <td>
 					{{ attribute(user, field)}} 
 				</td>

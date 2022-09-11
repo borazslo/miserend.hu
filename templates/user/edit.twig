@@ -58,6 +58,22 @@
 		    </div>
 		</div>
 		{% endif %}
+		 {% if edituser.favorites|length > 0 %}
+		<div class="panel-group" id="accordion">
+		    <div class="panel panel-default">
+		        <div class="panel-heading visible-lg-block visible-md-block">
+		            <h4 class="panel-title">Kedvenc templomai: {{ edituser.favorites|length }}</h4>
+		        </div>
+	            <ul class="list-group">
+	                {% for key, favorite in edituser.favorites %}
+	                	<li class="list-group-item">
+	                		<a href="/templom/{{ favorite.church['id'] }}">{{ favorite.church['nev'] }}</a> ({{ favorite.church['varos']}})	
+	            		</li>
+	                {% endfor %}
+	            </ul>            
+		    </div>
+		</div>
+		{% endif %}
 	{% endif %}
 	{{ parent() }}
 {% endblock %}

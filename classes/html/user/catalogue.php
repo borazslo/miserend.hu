@@ -49,7 +49,8 @@ class Catalogue extends \Html\Html {
             'lastlogin desc' => 'utolsó belépés',
             'lastactive desc' => 'utolsó aktivitás',
             'regdatum desc' => 'regisztracio',
-            'templomok desc' => 'ellátott templomok'
+            'templomok desc' => 'ellátott templomok',
+			'favorites desc' => 'kedvenc templomok'
         ];
 
         $this->form = array(
@@ -86,7 +87,7 @@ class Catalogue extends \Html\Html {
     function buildQuery() {
 
         $query = DB::table('user')
-                ->select('uid');
+                ->select('user.uid');
 
         if (!empty($this->input['adminok'])) {
             $query->where('jogok', 'like', "%" . $this->input['adminok'] . "%");
@@ -94,7 +95,11 @@ class Catalogue extends \Html\Html {
 
         if($this->input['sort'] == 'templomok desc')
             $query->addSelect(DB::raw('count(church_holders.church_id) as templomok'))->leftJoin('church_holders', 'church_holders.user_id','=','user.uid')->where('church_holders.status','allowed')->groupBy('uid');
-                
+        
+		if($this->input['sort'] == 'favorites desc')
+            $query->addSelect(DB::raw('count(favorites.tid) as favorites'))->leftJoin('favorites', 'favorites.uid','=','user.uid')->groupBy('user.uid');
+			
+			
         if (!empty($this->input['kulcsszo'])) {
             $input = $this->input;
             $query->where(function ($q) use ($input) {
