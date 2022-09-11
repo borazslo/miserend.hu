@@ -95,9 +95,23 @@
             </table>
         </form>
     {%  else  %}
-        {% for holder in church.holders.allowed %}
-            <strong>{{ holder.user.username }}</strong> ({{ holder.user.nev }}): {{ holder.user.update_at|date('Y. m. d.') }}<br/>
+		<table class="table">
+        {% for holder in church.holders.allowed %}			
+			<tr class="bg-secondary">
+				<td colspan="2"><strong>{{ holder.user.username }}</strong> ({{ holder.user.nev }})</td>
+			</tr>
+			<tr>
+				<td>Utoljára aktív:</td><td>{{ holder.user.lastactive|date('Y. N. j.') }}</td>
+			</tr>
+			<tr>
+				<td>Engedély:</td><td>{{ holder.updated_at|date("Y. N. j.") }}</td>
+			</tr>
+			<tr>
+				<td colspan="2">„{{ holder.description}}”</td>
+			</tr>
+            
         {%  endfor %}
+		</table>
         
     {%  endif  %}
     
