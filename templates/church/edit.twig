@@ -262,19 +262,12 @@
                 </td>
                 <td>{{ _self.helplink(15, ICONS_INFO ) }}</td>
             </tr>
-            {{ _self.helptr(15,help) }}
-            <tr>
-                <td valign=top class=kiscim align=right>Történet:</td>
-                <td valign=top>
-                    <textarea cols=50 rows=6 class="form-control" disabled>{{ church.log }}</textarea>
-                </td>
-                <td></td>
-            </tr>
+            {{ _self.helptr(15,help) }}            
             <tr>
                 <td>
                     <div align=right><input type=submit name='submit' value=Mehet class=urlap>&nbsp;</div>
                 </td>
-                <td>
+                <td>					
                     <input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span><br/>
                     <input type=radio name=modosit value=m class=urlap><span class=alap> és tovább a miserendre</span><br/>
                     <input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span><br/>
@@ -290,7 +283,7 @@
     
     <script>
   $( function() {
-          
+		  
     $('.church-link-delete').click(function(){ 
         console.log(this);  
         var html = "<p>Biztosan törlöd ezt a linket?</p>";
@@ -399,6 +392,7 @@
 	{% if church.osm and user.isadmin %}
         {% include 'church/_panelosm.twig' %}
     {% endif %}
+	{% include 'church/_panelhistory.twig' %}
 {% endblock %}
 
 {% macro helplink(id, icon) %}
