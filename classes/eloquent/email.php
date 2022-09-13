@@ -6,9 +6,11 @@ class Email extends \Illuminate\Database\Eloquent\Model {
     
     public $debug;
     public $debugger;
+	
     
     
-    function addToQueue() {
+    function addToQueue($to = false) {
+		if($to) $this->to = $to;
         $this->status = 'queued';
         return $this->save();        
     }
