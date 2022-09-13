@@ -483,6 +483,7 @@ class User {
 	
 		$users2notify = DB::table('user')
 			->where('lastlogin', '0000-00-00 00:00:00')			
+			->where('notifications', 1) 
 			->orderByRaw("RAND()")
 			->limit(5)			
 			->get();
@@ -518,4 +519,66 @@ class User {
 		
 		return true;
 	}
+	
+		static function sendUpdateNotification() {
+	
+
+			$users2notify = DB::table('templomok')
+				->select('templomok.id as tid','templomok.nev','templomok.ismertnev','templomok.varos','templomok.frissites')
+				->join('church_holders','templomok.id','=','church_holders.church_id')
+				->addSelect('church_holders.description')
+				->join('user','user.uid','=','church_holders.user_id')
+				->addSelect('user.*');
+				
+				$users2notify->where(DB::RAW(" NOT EXISTS ( 
+					SELECT * 
+					FROM emails
+					WHERE
+						`type` = 'user_pleaseupdate' AND 
+						`status` IN ('sent','queued') AND
+						emails.to = user.email AND
+						updated_at > '".date('Y-m-d H:i:s',strtotime('-2 weeks'))."'
+						ORDER BY updated_at DESC
+						LIMIT 1
+					) "));
+				
+			$users2notify = $users2notify->where('church_holders.status','allowed')
+				->whereNull('church_holders.deleted_at')
+				->where('user.jogok','not like','%miserend%')->where('user.notifications',1)
+				->where('templomok.frissites','<',date('Y-m-d',strtotime('-1 year')))->where('templomok.ok','i')
+								
+			->groupBy('user.email')
+			->orderByRaw("RAND()")
+			->limit(5)
+			->get();
+		
+			/*
+		global $config;
+		$config['debug'] = 2;
+		$config['mail']['debug'] = 3;
+		*/
+		// printr($users2notify);		
+		// $tmp = new stdClass(); $tmp->uid = 1595; $users2notify = [ $tmp ];
+				
+		foreach($users2notify as $user2notify) {					
+			$user = new User($user2notify->uid);
+			$user->getResponsabilities();
+			
+			foreach($user->responsible['church'] as $key => $churchID) {
+				$user->responsible['church'][$churchID] = \Eloquent\Church::find($churchID);
+				unset($user->responsible['church'][$key]);
+			}
+		
+			
+			$email = new \Eloquent\Email();
+			$email->to = $user->email;
+			$email->render('user_pleaseupdate',$user);			
+			// $email->addToQueue();
+			$email->send();
+					
+		}
+		
+		return true;
+		}
+
 }
