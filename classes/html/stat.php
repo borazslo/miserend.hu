@@ -117,6 +117,52 @@ class Stat extends Html {
             $c++;
         }        
         
+        /*	
+		SELECT count(*), YEAR(frissites) as year, DATEDIFF(NOW(), frissites) DIV 365 as yearago, templomok.* FROM miserend.templomok 
+	where 
+		orszag = 12 AND
+		ok = 'i' AND
+        ( nev not LIKE '%isézőhely%' AND nev not like '%ápolna' AND nev not like '%Közösségi Ház%' And nev not like '%imaház%' And nev not like '%imaterem%' ) 
         
+  group by yearago
+ORDER BY frissites desc;
+-*/
+		$stat = DB::table('templomok')
+			->selectRaw("DATEDIFF(NOW(), frissites) DIV 365 as yearago")
+			->selectRAW("count(*) as count");		
+		$stat->where('orszag',12)->where('ok','i');
+		foreach(['%isézőhely%','%ápolna','%özösségi%', '%imaház%', '%imaterem%'] as $notlike)
+			$stat->where('nev','not like', $notlike);
+		$stat->orderBy('frissites','DESC');
+		
+		$results = $stat->groupBy('yearago')->get();		
+		$sum = 0; $maxYear = 0;
+		
+		if($results[0]->yearago > 0 ) {
+			array_unshift($results,new \stdClass() );
+			$results[0]->yearago = 0;
+			$results[0]->count = 0;
+		}
+		
+		foreach($results as $result) {
+			$sum += $result->count;
+			if($maxYear < $result->yearago) $maxYear = $result->yearago;
+		}
+			
+		$minColor = [255,0,0]; 
+		$maxColor = [139,42,42];
+		foreach($results as $k => $result) {
+			$results[$k]->percent = round ( $result->count / ( $sum / 100 ) );
+			
+			$r = round( $minColor[0] + ( ( $maxColor[0] - $minColor[0] ) / ( $maxYear - 2 ) * ( $result->yearago - 2 ) ) );
+			$g = round ( $minColor[1] + ( ( $maxColor[1] - $minColor[1] ) / ( $maxYear - 2 ) * ( $result->yearago - 2 ) ) );
+			$b = round ( $minColor[2] + ( ( $maxColor[2] - $minColor[2] ) / ( $maxYear - 2 ) * ( $result->yearago - 2 ) ) );
+			
+			if($result->yearago == 0 ) $results[$k]->rgb = [0,255,255];
+			elseif($result->yearago == 1 ) $results[$k]->rgb = [255,255,0];
+			else $results[$k]->rgb = [$r,$g,$b];
+		}
+		
+		$this->magyar = $results;
     }
 }
