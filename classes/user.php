@@ -501,7 +501,7 @@ class User {
 			// vagy nincs egy hete hogy küldtünk neki értesítőt
 			if (isset($lastEmail) AND (
 					$lastEmail->status == 'queued' OR 
-					$lastEmail->updated_at > strtotime('-1 week')
+					strtotime($lastEmail->updated_at) > strtotime('-1 week')
 					) ) {
 				// Nincs mit tenni
 			} else {
@@ -530,14 +530,11 @@ class User {
 				->join('user','user.uid','=','church_holders.user_id')
 				->addSelect('user.*');
 				
-				$users2notify->where(DB::RAW(" NOT EXISTS ( 
+				$users2notify->whereRaw(DB::RAW(" NOT EXISTS ( 
 					SELECT * 
 					FROM emails
 					WHERE
-						`type` = 'user_pleaseupdate' AND 
-						`status` IN ('sent','queued') AND
-						emails.to = user.email AND
-						updated_at > '".date('Y-m-d H:i:s',strtotime('-2 weeks'))."'
+						emails.to = user.email 
 						ORDER BY updated_at DESC
 						LIMIT 1
 					) "));
