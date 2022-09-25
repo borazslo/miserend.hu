@@ -534,7 +534,10 @@ class User {
 					SELECT * 
 					FROM emails
 					WHERE
-						emails.to = user.email 
+						`type` = 'user_pleaseupdate' AND 
+						`status` IN ('sent','queued') AND
+						emails.to = user.email AND
+						updated_at > '".date('Y-m-d H:i:s',strtotime('-2 weeks'))."'
 						ORDER BY updated_at DESC
 						LIMIT 1
 					) "));
