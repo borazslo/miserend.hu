@@ -546,6 +546,7 @@ class User {
 				->whereNull('church_holders.deleted_at')
 				->where('user.jogok','not like','%miserend%')->where('user.notifications',1)
 				->whereNotNull('user.email')
+				->where('user.email','<>','')
 				->where('templomok.frissites','<',date('Y-m-d',strtotime('-1 year')))->where('templomok.ok','i')
 								
 			->groupBy('user.email')
