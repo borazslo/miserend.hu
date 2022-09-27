@@ -13,5 +13,10 @@ class KozossegekApi extends \ExternalApi\ExternalApi {
         $this->rawQuery = $this->query;        
     }
 
+	function Response404() {        
+        $this->rawData = "[]";
+        $this->saveToCache();
+        $this->jsonData = json_decode($this->rawData);
+    }
 }
 
