@@ -45,6 +45,20 @@ class Catalogue extends \Html\Html {
         $this->pagination->set($this->search->count(), $url);
 
         $this->churches = $this->search->skip($this->pagination->skip)->take($this->pagination->take)->get();
+		
+		$accessibilityOSMTags = ['wheelchair', 'wheelchair:description','toilets:wheelchair','hearing_loop','disabled:description'];
+		
+		foreach($this->churches as $church) {
+			if($church->osm) {
+					foreach($accessibilityOSMTags as $tag) {
+						if(array_key_exists($tag,$church->osm->tagList) AND $church->osm->tagList[$tag] != '' ) {
+								$church->hasAccessibilityTag = true;
+								break;
+						}
+					}			
+			}			
+		}
+		
         
     }
 

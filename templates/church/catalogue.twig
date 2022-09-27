@@ -54,7 +54,14 @@
         </tr>
         {% for church in churches %}
             <tr>
-                <td>{{ church.jelzes|raw }}</td>
+                <td>
+					{{ church.jelzes|raw }}
+					{% if church.hasAccessibilityTag %}
+						<i class="{{ ICONS_WHEELCHAIR }} blue" title="Van információnk az akadálymentességéről." ></i>
+					{% endif %}
+					
+				
+				</td>
                 <td>
                     <a href="/templom/{{ church.id }}/edit" title='{{ church.ismertnev }}'>
                         <strong>{{ church.nev }}</strong> ({{ church.varos }})
