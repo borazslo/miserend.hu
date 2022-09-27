@@ -158,7 +158,7 @@ ORDER BY frissites desc;
 			$g = round ( $minColor[1] + ( ( $maxColor[1] - $minColor[1] ) / ( $maxYear - 2 ) * ( $result->yearago - 2 ) ) );
 			$b = round ( $minColor[2] + ( ( $maxColor[2] - $minColor[2] ) / ( $maxYear - 2 ) * ( $result->yearago - 2 ) ) );
 			
-			if($result->yearago == 0 ) $results[$k]->rgb = [0,255,255];
+			if($result->yearago == 0 ) $results[$k]->rgb = [0,255,0];
 			elseif($result->yearago == 1 ) $results[$k]->rgb = [255,255,0];
 			else $results[$k]->rgb = [$r,$g,$b];
 		}
