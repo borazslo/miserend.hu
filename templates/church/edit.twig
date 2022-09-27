@@ -35,8 +35,7 @@
             {{ _self.helptr(1,help) }}
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Felelős:</td>
-                <td bgcolor=#efefef>
-                    <textarea name=church[kontakt] class="urlap form-control tinymce" cols=50 rows=2 placeholder="Felelős neve és telefonszáma, ha elérhető">{{ church.kontakt|nl2br }}</textarea>                    
+                <td bgcolor=#efefef>                
                     <input type=text name=church[kontaktmail] size=40 class="urlap form-control" value='{{ church.kontaktmail }}'  placeholder="Felelős email címe">                    
                 </td>
                 <td>{{ _self.helplink(2, ICONS_INFO ) }}</td>
@@ -169,7 +168,7 @@
                 <td>{{ _self.helplink(6, ICONS_INFO ) }}</td>
             </tr>
             <tr>
-                <td bgcolor=#efefef class=kiscim align=right>Linkek:</td>
+                <td bgcolor=#efefef class=kiscim align=right>Weblapok:</td>
                 <td bgcolor=#efefef>
                     <div id="church-links" >
                     {% if church.links %}                        

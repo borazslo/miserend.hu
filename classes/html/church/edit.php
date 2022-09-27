@@ -32,7 +32,7 @@ class Edit extends \Html\Html {
             throw new \Exception("Gond van a módosítandó templom azonosítójával.");
         }
 
-        $allowedFields = ['adminmegj', 'kontakt', 'kontaktmail', 'nev',
+        $allowedFields = ['adminmegj', 'kontaktmail', 'nev',
             'ismertnev', 'orszag', 'megye', 'varos', 'cim', 'megkozelites',
             'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml', 
             'megjegyzes', 'miseaktiv', 'misemegj', 'leiras', 'ok', 'frissites',
