@@ -45,26 +45,27 @@ class Edit extends \Html\Html {
         }
 
 		
-		$allowedOSMFields = ['wheelchair', 'wheelchair:description','toilets:wheelchair','toilets','hearing_loop','disabled:description'];		
-		foreach($allowedOSMFields as $field) {
-			if (array_key_exists($field, $this->input['church']['osm'])) {
-                //echo $field." = ".$this->input['church']['osm'][$field];
-				
-				$args = [
-					'osmtype' => $this->church->osmtype, 
-					'osmid' => $this->church->osmid,
-					'name' => $field 
-					];				
-				$osmtag = \Eloquent\OSMTag::firstOrNew($args);
-				$osmtag->value = $this->input['church']['osm'][$field];
-				$osmtag->save();
+		if(isset($this->input['church']['osm'])) {
+			$allowedOSMFields = ['wheelchair', 'wheelchair:description','toilets:wheelchair','toilets','hearing_loop','disabled:description'];		
+			foreach($allowedOSMFields as $field) {
+				if (array_key_exists($field, $this->input['church']['osm'])) {
+					//echo $field." = ".$this->input['church']['osm'][$field];
+					
+					$args = [
+						'osmtype' => $this->church->osmtype, 
+						'osmid' => $this->church->osmid,
+						'name' => $field 
+						];				
+					$osmtag = \Eloquent\OSMTag::firstOrNew($args);
+					$osmtag->value = $this->input['church']['osm'][$field];
+					$osmtag->save();
 
-            }
-		
+				}
+			
+			}
+			/* save OSM fields */
+			$this->church->osm->upload();
 		}
-		/* save OSM fields */
-		$this->church->osm->upload();
-
 		
         if (isset($this->input['photos'])) {
             foreach ($this->input['photos'] as $modPhoto) {
@@ -129,7 +130,7 @@ class Edit extends \Html\Html {
         $this->church->photos;
 		
 		$this->church->osm;
-		$this->church->osm->updateFromOverpass();
+		if($this->church->osm) $this->church->osm->updateFromOverpass();
 
         $this->form['ok'] = array(
             'name' => 'church[ok]',
@@ -143,6 +144,8 @@ class Edit extends \Html\Html {
 
 		
 		## OSM informations 
+		if($this->church->osm) {
+		
 		# Disabilities
 		# https://wiki.openstreetmap.org/wiki/Disabilitydescription
 		# https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
@@ -203,7 +206,8 @@ class Edit extends \Html\Html {
 			];
 		if(array_key_exists("disabled:description",$this->church->osm->tagList)) 
 				$this->form['osm']['disabled:description']['value'] = $this->church->osm->tagList["disabled:description"];		
-				
+		}
+		// END of OSM informations
 				
 				
         $this->title = $this->church->fullName;

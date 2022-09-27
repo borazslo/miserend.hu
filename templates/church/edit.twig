@@ -198,11 +198,16 @@
             <tr>
                 <td bgcolor=#efefef class=kiscim align=right>Akadálymentesség</td>
                 <td bgcolor=#efefef>
-                    {{ forms.select(form['osm']['wheelchair']) }}
-					{{ forms.input (form['osm']['wheelchair:description']) }}
-					{{ forms.select(form['osm']['toilets:wheelchair']) }}	
-					{{ forms.select(form['osm']['hearing_loop']) }}
-					{{ forms.input (form['osm']['disabled:description']) }}
+					{% if church.osm %}
+						{{ forms.select(form['osm']['wheelchair']) }}
+						{{ forms.input (form['osm']['wheelchair:description']) }}
+						{{ forms.select(form['osm']['toilets:wheelchair']) }}	
+						{{ forms.select(form['osm']['hearing_loop']) }}
+						{{ forms.input (form['osm']['disabled:description']) }}
+					{% else %}
+						<span color="red"><i>Mivel az akadálymentességi adatok közvetlen összeköttetésben állnak az OpenStreetMap (OSM) térképadatokkal, ezért ez a rész összekötés vagyis OSM azonosító hiányában nem tölthető ki.</i></span>
+					{% endif %}
+					
                 </td>
 				<td>{{ _self.helplink(51, ICONS_INFO ) }}</td>
             </tr>
