@@ -1,6 +1,6 @@
 {% extends 'panel.twig' %}
 
-{% set title = 'Akadálymentesség' %}
+{% set title = "<i class='"  ~ ICONS_WHEELCHAIR ~ "'></i> Akadálymentesség" %}
 {% set panel = 'primary' %}
 {% set footer = true %}
 
@@ -33,6 +33,10 @@
 	
 	{% if accessibility['disabled:description'] %}
 		<p>További információ: <strong>{{ accessibility['disabled:description'] }}</strong></p>
+	{% endif %}
+	
+	{% if accessibility['wheelchair'] or accessibility['wheelchair:description'] or accessibility['hearing_loop'] or accessibility['toilets:wheelchair'] or accessibility['disabled:description'] %}{% else %}
+		<p>Ha van információja az akadálymentességről: tolókocsival hozzáférhetőségről, akadálymentes mosdóról, indukciós hurokról, vagy bármi más akadálymentességről (vagy azok hiányáról), akkor kérjük <a href="javascript:OpenNewWindow('/templom/{{ id }}/ujeszrevetel',450,530);" class=link>észrevétel beküldésével</a> jelezze nekünk! Köszönjük!</p>	
 	{% endif %}
 	
 {% endblock %}
