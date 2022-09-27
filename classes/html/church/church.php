@@ -68,8 +68,8 @@ class Church extends \Html\Html {
         $misek = getMasses($tid);
                 
         if ($this->writeAcess)  {
-            $nev = " <a href='/templom/$tid/edit'><img src=/img/edit.gif align=absmiddle border=0 title='Szerkesztés/módosítás'></a> "
-                    . "<a href='/templom/$tid/editschedule'><img src=/img/mise_edit.gif align=absmiddle border=0 title='mise módosítása'></a>";
+            $nev = " <a href='/templom/$tid/edit'><i class='fa fa-edit blue' style='font-size:medium'  title='Szerkesztés/módosítás'></i></a> "
+                    . "<a href='/templom/$tid/editschedule' ><i class='blue far fa-clock ' style='font-size:medium' title='mise módosítása'></i></a>";
             
             $allapotok = \Eloquent\Remark::where('church_id',$tid)->groupBy('allapot')->pluck('allapot')->toArray();            
             if (in_array('u', $allapotok))
