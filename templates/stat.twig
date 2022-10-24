@@ -37,6 +37,18 @@
 	{% endfor %}
 	</div><br/>
 	
+	<h3>Akadálymentesség</h3>
+	Akadálymentességi információval rendelkező misézőhelyek száma: <strong>{{ accessibility.churches|length }}</strong>
+	
+	<table class="table">
+	{% for name,tag in accessibility.tags %}
+	<tr><td colspan=2><strong>{{ name }}</td></tr>
+		{% for value, count in tag %}
+			<tr><td>{{ value }}</td><td>{{ count }}</td></tr>
+		{% endfor %}
+	{% endfor%}
+	</table>
+	
     <h3>Egyéb statisztikák</h3>
     <div id="chart5" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
 	<div id="chart3" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>

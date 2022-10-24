@@ -89,6 +89,34 @@ class Stat extends Html {
         foreach($tmp as $k => $v)
             $this->s4['data'][] = [$k,$v];
         
+		
+		/*
+		* Templomok ahol van Accessibility adat
+		*/
+		$accessibilityOSMTags = ['wheelchair', 'wheelchair:description','toilets:wheelchair','hearing_loop','disabled:description'];
+		$results = DB::table('osmtags')
+			->select('osmtags.*','templomok.id as church_id')
+			->join('templomok',function($join)
+                         {
+                             $join->on('templomok.osmid', '=', 'osmtags.osmid');
+                             $join->on('templomok.osmtype','=','osmtags.osmtype');                           
+                         })
+			->whereNotNull('templomok.id')
+			->whereIn('osmtags.name',$accessibilityOSMTags)
+			->where('osmtags.value','<>','')			
+			->get();
+			
+		$this->accessibility['churches'] = [];
+		foreach($accessibilityOSMTags as $tag) $this->accessibility['tags'][$tag] = [];
+		foreach($results as $res) {			
+			$this->accessibility['churches'][$res->church_id] = $res->church_id;
+			if(isset($this->accessibility['tags'][$res->name][$res->value])) $this->accessibility['tags'][$res->name][$res->value]++;
+			else $this->accessibility['tags'][$res->name][$res->value] = 1;			
+		}
+		// Megjelenítendő: $this->accessibility 
+		// printr($this->accessibility);
+		
+		
 		/* 
          * Felhasználók regisztráltása és utolsó ténykedése
          */
