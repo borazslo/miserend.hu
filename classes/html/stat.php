@@ -9,6 +9,7 @@ class Stat extends Html {
     public function __construct() {
         parent::__construct();
         $this->setTitle('Statisztika');
+		$this->stats = [];
         
         global $user;
         if (!$user->loggedin) {
@@ -19,40 +20,58 @@ class Stat extends Html {
         /* 
          * Templomok frissítettsége + észrevételek: Elmúlt év
          */
-        $this->s1  = [
-            'labels' => ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'],
-            'data' => [0 => [], 1 => [] ] 
-            ];
+		$stat = new \Jqplots('chart_templomaink');
+		$stat->title = 'Templomaink frissítettsége';
+		$stat->labels = ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
+		$stat->axes['xaxis'] = [];
+				
+		
+		$stat->data = [0 => [], 1 => [] ] ;
+            
         $churches = \Eloquent\Church::where('ok', 'i')
                 ->countByUpdatedYear()
                 ->get();
         foreach($churches as $church) {
-            $this->s1['data'][0][] = [(int) $church->updated_year,$church->count_updated_year];
+            $stat->data[0][] = [(int) $church->updated_year,$church->count_updated_year];
         }        
         $remarks = \Eloquent\Remark::countByCreatedYear()->get();
         foreach($remarks as $remark) {
             if($remark->created_year > 0)
-                $this->s1['data'][1][] = [(int) $remark->created_year,$remark->count_created_year];
+                $stat->data[1][] = [(int) $remark->created_year,$remark->count_created_year];
         }       
-
+        $stat->prepare_html();
+		$stat->prepare_script();
+		$this->stats[$stat->id] = (array) $stat;
+		unset($stat);
+		
+		
         /* 
          * Templomok frissítettsége + észrevételek: Elmúlt év
          */
-        $this->s3['labels'] = ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
+		$stat = new \Jqplots('chartN');
+		$stat->title = 'Az elmúlt 12 hónap frissítései';
+		$stat->labels = ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
+		
+		
         $churches = \Eloquent\Church::where('ok', 'i')
                 ->countByUpdatedMonth()
                 ->where('frissites', '>', date('Y-m-d', strtotime('-1 year')))
                 ->get();
-        $this->s3['data'] = [0=>[],1=>[]];
+        $stat->data = [0=>[],1=>[]];
         foreach($churches as $church) {
-            $this->s3['data'][0][] = [$church->updated_month,$church->count_updated_month];
+            $stat->data[0][] = [$church->updated_month,$church->count_updated_month];
         }        
         $remarks= \Eloquent\Remark::countByCreatedMonth()
                 ->where('created_at', '>', date('Y-m-d', strtotime('-1 year')))
                 ->get();
         foreach($remarks as $remark) {
-            $this->s3['data'][1][] = [$remark->created_month,$remark->count_created_month];
-        }        
+            $stat->data[1][] = [$remark->created_month,$remark->count_created_month];
+        }
+        $stat->prepare_html();
+		$stat->prepare_script();
+		$this->stats[$stat->id] = (array) $stat;
+		unset($stat);
+		
         
         /*
          * Templom karbantartók statisztikái
