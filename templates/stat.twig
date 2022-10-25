@@ -26,7 +26,7 @@
     {% if s3.data[0]|length > 1 %}{{ stats['chartN'].title }}{% endif %}
     <div id="chart4" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
     
-	<h3>Magyarországi (!) templomok (!) frissítettségi statisztikája:</h3>
+	<h3>Magyarországi (!) aktív (!) templomok (!) frissítettségi statisztikája:</h3>
 	<p>Kevesebb mint egy éves adattal rendelkező magyarországi templom: <strong>{{ magyar[0].count }} db = {{ magyar[0].percent }}%</strong></p>
 	<p>Kevesebb mint két éves adattal rendelkező magyarországi templom: <strong>{{ magyar[0].count + magyar[1].count }} db = {{ magyar[0].percent + magyar[1].percent }}%</strong></p>
 	<div id="stat">

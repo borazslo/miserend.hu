@@ -21,14 +21,15 @@ class Stat extends Html {
          * Templomok frissítettsége + észrevételek: Elmúlt év
          */
 		$stat = new \Jqplots('chart_templomaink');
-		$stat->title = 'Templomaink frissítettsége';
-		$stat->labels = ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
+		$stat->title = 'Aktív misézőhelyeink frissítettsége';
+		$stat->labels = ['aktív misézőhelyek, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
 		$stat->axes['xaxis'] = [];
 				
 		
 		$stat->data = [0 => [], 1 => [] ] ;
             
         $churches = \Eloquent\Church::where('ok', 'i')
+				->where('miseaktiv',1)
                 ->countByUpdatedYear()
                 ->get();
         foreach($churches as $church) {
@@ -50,10 +51,11 @@ class Stat extends Html {
          */
 		$stat = new \Jqplots('chartN');
 		$stat->title = 'Az elmúlt 12 hónap frissítései';
-		$stat->labels = ['templomok, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
+		$stat->labels = ['aktív misézőhelyek, amik akkor frissültek utoljára','beküldött észrevételek száma az adott időben'];
 		
 		
         $churches = \Eloquent\Church::where('ok', 'i')
+				->where('miseaktiv',1)		
                 ->countByUpdatedMonth()
                 ->where('frissites', '>', date('Y-m-d', strtotime('-1 year')))
                 ->get();
@@ -164,20 +166,13 @@ class Stat extends Html {
             $c++;
         }        
         
-        /*	
-		SELECT count(*), YEAR(frissites) as year, DATEDIFF(NOW(), frissites) DIV 365 as yearago, templomok.* FROM miserend.templomok 
-	where 
-		orszag = 12 AND
-		ok = 'i' AND
-        ( nev not LIKE '%isézőhely%' AND nev not like '%ápolna' AND nev not like '%Közösségi Ház%' And nev not like '%imaház%' And nev not like '%imaterem%' ) 
-        
-  group by yearago
-ORDER BY frissites desc;
--*/
+        /*
+		 * Magyarországi aktív templomok frissítettségének statisztikája
+		*/
 		$stat = DB::table('templomok')
 			->selectRaw("DATEDIFF(NOW(), frissites) DIV 365 as yearago")
 			->selectRAW("count(*) as count");		
-		$stat->where('orszag',12)->where('ok','i');
+		$stat->where('orszag',12)->where('ok','i')->where('miseaktiv',1);
 		foreach(['%isézőhely%','%ápolna','%özösségi%', '%imaház%', '%imaterem%'] as $notlike)
 			$stat->where('nev','not like', $notlike);
 		$stat->orderBy('frissites','DESC');
