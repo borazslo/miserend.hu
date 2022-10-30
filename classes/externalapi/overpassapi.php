@@ -114,7 +114,8 @@ class OverpassApi extends \ExternalApi\ExternalApi {
                     ->where('osmid',$element->id)
                     ->where('updated_at',">",$now)
                     ->first();
-            if(!$check) {    
+			// Mi a csudáért kellett ez a !check rész? Ezért nem frissültek az adatok. Uuuupsz. e0c4c4e7b19e011c5aa4ac3c474da92536eea77a
+            //if(!$check) {    				
                 foreach ($element->tags as $name => $value) {
                     #echo $element->type."-".$element->id."-".$name."<br/>";
                     $tag = \Eloquent\OSMTag::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id, 'name' => $name]);
@@ -128,7 +129,7 @@ class OverpassApi extends \ExternalApi\ExternalApi {
                 foreach ($tags as $tag) {
                     $tag->delete();
                 }
-            } 
+            //} 
         }
     }
 
