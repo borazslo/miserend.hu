@@ -49,6 +49,29 @@
 	{% endfor%}
 	</table>
 	
+	
+	<h3>OSM statisztika</h3>
+	
+	<table class="table table-hover table-condensed table-striped">
+	<tr>
+		<th class="col-md-3">name</th>
+		<th class="col-md-2">count</th>
+		<th >distinct</th>
+		<th class="col-md-1">sql</th>
+	</tr>
+	{% for osmtag in osmtags %}
+	<tr>
+		<td><a href="https://taginfo.openstreetmap.org/keys/{{ osmtag.name }}">{{ osmtag.name }}</a></td>
+		<td>{{ osmtag.count }}{% if osmtag.count == 1 %} (<a href="/templom/{{ osmtag.church_id }}/edit">{{ osmtag.church_id }}</a>){% endif %}</td>
+		<td>{{ osmtag.dist }}{% if osmtag.dist == 1 %} ({{ osmtag.value }}){% endif %}
+		</td>
+		<td><span onClick="alert('SELECT templomok.osmtype, templomok.osmid, templomok.id as church_id, osmtags.name, osmtags.value FROM miserend.osmtags LEFT JOIN templomok ON ( templomok.osmid =  osmtags.osmid AND templomok.osmtype = osmtags.osmtype ) WHERE   templomok.id IS NOT NULL AND   value <> \'\'  AND   name = \'{{ osmtag.name }}\'   ORDER BY name')">query</span></td>
+	</tr>
+	{% endfor %}
+	</table>
+		
+				
+	
     <h3>Egyéb statisztikák</h3>
     <div id="chart5" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>
 	<div id="chart3" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>

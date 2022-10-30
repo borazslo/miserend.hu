@@ -206,5 +206,32 @@ class Stat extends Html {
 		}
 		
 		$this->magyar = $results;
+		
+		
+		/* OSM tag variácók */
+		$osmtags = DB::table('osmtags')
+			->select([
+				DB::raw("count(*) as count"),
+				DB::raw("count(distinct osmtags.value) as dist"),
+				DB::raw("templomok.id as church_id"),
+				"osmtags.*"
+			])
+			->join('templomok', function($join)
+                         {
+                             $join->on('templomok.osmid', '=', 'osmtags.osmid');
+                             $join->on('templomok.osmtype','>=','osmtags.osmtype');
+                         })
+			->where('value','<>','')
+			->whereNotNull('templomok.id')
+			->groupBy('osmtags.name')
+			->orderBy('count','desc')
+			->orderBy('dist','desc')
+			->orderBy('name')
+			->get();
+		
+		$this->osmtags = $osmtags;
+		
+		
+		
     }
 }
