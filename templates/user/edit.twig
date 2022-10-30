@@ -176,6 +176,11 @@
 	    			</label>
 		    	</div>
 			</div>
+			<div class="form-group">
+		    	<label for="robot">Mi a Magyar Katolikus Püspöki Konferencia négy betűs rövidítése?</label>
+				<input type="text" class="form-control" id="robot" name="robot" >
+				{% if helptext %}<p class="help-block">Sajnos automata robotok is folyton regisztrálnak és ellenük kell ilyen kérdést feltennünk.</p>{% endif %}
+			</div>
 		{% endif %}
 
 		<input class="form-control" type="submit" name="submit" value="{% if new %}Létrehoz{% else %}Módosít{% endif %}"/>	    

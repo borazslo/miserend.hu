@@ -30,7 +30,11 @@ class Edit extends \Html\Html {
         if ((!isset($_REQUEST['terms']) OR $_REQUEST['terms'] != 1 ) AND $newuser->uid == 0 AND $user->uid == 0) {
             addMessage("El kell fogadni a <i>Házirendet és szabályzatot</i>!", 'danger');
             return false;
-        } else {
+        } else if ((!isset($_REQUEST['robot']) OR $_REQUEST['robot'] != 'MKPK' ) AND $newuser->uid == 0 AND $user->uid == 0) {
+            addMessage("Sajnos, ha nem válaszol az MKPK-val kapcsolatos kérdésre, akkor önt robotnak nézzük és nem regisztrálhat!", 'danger');
+            return false;
+        } 		
+		else {
             try {
                 // Jogokat nem adhat akárki, de lemondhat akráki.
                 if(!$user->checkRole('user') AND isset($_REQUEST['edituser']['roles'])) {
