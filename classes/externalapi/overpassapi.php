@@ -100,7 +100,7 @@ class OverpassApi extends \ExternalApi\ExternalApi {
         if (!$this->jsonData->elements) {
             throw new \Exception("Missing Json Elements from OverpassApi Query");
         }
-        $now = time();
+        $now = date('Y-m-d H:i:s',time());
         
         foreach ($this->jsonData->elements as $element) {
             if (isset($element->center->lat)) {
