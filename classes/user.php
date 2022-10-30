@@ -479,7 +479,53 @@ class User {
         \Token::delete();
     } 
 	
+	static function deleteNonActivatedUsers() {
+		$waitingBeforeDelete = '2 weeks';
+		
+		$users2delete = DB::table('user')
+			->where('lastlogin', '0000-00-00 00:00:00')
+			->where('regdatum','<',date('Y-m-d H:i:s',strtotime('-'.$waitingBeforeDelete)));						
+		//We delete on if we have already sent user_pleaseactivate message		
+		$users2delete->whereRaw(DB::RAW(" EXISTS ( 
+					SELECT * 
+					FROM emails
+					WHERE
+						`type` = 'user_pleaseactivate' AND 
+						`status` = 'sent' AND
+						emails.to = user.email AND
+						updated_at < '".date('Y-m-d H:i:s',strtotime('-2 days'))."'
+						ORDER BY updated_at DESC
+						LIMIT 1
+					) "));
+		
+		$results = $users2delete->orderByRaw("RAND()")
+			->limit(20)			// Lehetne végtelen, de jobb az óvatosság. Pláne, hogy még egyesével mennek az emailek
+			->get();			// Lehetne itt rögtön ->delete(), de a debug dolog miatt jobb, ha tovább is van
+
+		$ids2delete = [];
+		foreach($results as $result) {
+			$ids2delete[] = $result->uid;
+			
+			$email = new \Eloquent\Email();
+			$email->to = $result->email;
+			$email->render('user_youhavebeendeleted',$result);			
+			// $email->addToQueue();
+			$email->send();
+			
+		}
+		$count = DB::table('user')->whereIN('uid',$ids2delete)->delete();
+		
+		if($count != count($ids2delete)) {
+			        addMessage('Nem sikerül mindenkit törölni.', 'error');
+					echo "Nem sikerült mindenkit aki még nem lépett be törölni! ".print_r($ids2delete,1)." ";
+		}
+		
+			
+	}
+	
+
 	static function sendActivationNotification() {
+		$lastEmail = '-1 week';
 	
 		$users2notify = DB::table('user')
 			->where('lastlogin', '0000-00-00 00:00:00')			
@@ -501,7 +547,7 @@ class User {
 			// vagy nincs egy hete hogy küldtünk neki értesítőt
 			if (isset($lastEmail) AND (
 					$lastEmail->status == 'queued' OR 
-					strtotime($lastEmail->updated_at) > strtotime('-1 week')
+					strtotime($lastEmail->updated_at) > strtotime($lastEmail)
 					) ) {
 				// Nincs mit tenni
 			} else {
