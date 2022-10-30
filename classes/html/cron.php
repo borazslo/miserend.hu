@@ -19,6 +19,14 @@ class Cron extends Html {
         if (!$job)
             return;
 
+		if( $job->from != '' AND $job->until != '' ) {
+			if( strtotime($job->from) < time() AND time() < strtotime($job->until) ) {
+				// Itt az idő
+			} else {
+				// Nincs itt az idő
+				return;
+			}
+		}		
         $job->attempts++;
         $job->save();
 
