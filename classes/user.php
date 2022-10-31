@@ -525,7 +525,7 @@ class User {
 	
 
 	static function sendActivationNotification() {
-		$lastEmail = '-1 week';
+		$lastEmailDiff = '-1 week';
 	
 		$users2notify = DB::table('user')
 			->where('lastlogin', '0000-00-00 00:00:00')			
@@ -547,7 +547,7 @@ class User {
 			// vagy nincs egy hete hogy küldtünk neki értesítőt
 			if (isset($lastEmail) AND (
 					$lastEmail->status == 'queued' OR 
-					strtotime($lastEmail->updated_at) > strtotime($lastEmail)
+					strtotime($lastEmail->updated_at) > strtotime($lastEmailDiff)
 					) ) {
 				// Nincs mit tenni
 			} else {
