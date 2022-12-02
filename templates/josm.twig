@@ -6,11 +6,11 @@
 {% block content %}{{ content|raw }}
 <span class="small">Ekkor futott utoljára a <a href="?update">{{ cron.class }}::{{ cron.function }}</a>: {{ cron.lastsuccess_at }}.</span><br/><br/>
 
-<span class"alap">Az Open Street Map térkép-adatbázisban {{ countOsmData }} element találtunk, aminek van 
+<span class"alap">Az Open Street Map térkép-adatbázisban {{ countOsmData }} elemet találtunk, aminek van 
       <i>url:miserend</i> címkéje. Ebből {{ osmWBadChurch|length }} elemnek az <i>url:miserend</i> értéke 
     valamilyen módon hibás. <br/>A templomok között akad {{ churchesWNoOsm|length }} templom, aminek nincs OSM adata.
     Illetve {{ churchesWBadOsm|length }} templomnak van OSM adata megadva, de mégsem találtunk megfelelő OSM elemet.
-    (Összesen {{ churchesWBad|length }} templomal van gond OSM szempontjából.)</span>
+    (Összesen {{ churchesWBad|length }} templommal van gond OSM szempontjából.)</span>
     
     
 {% if osmWBadChurch|length %}        
