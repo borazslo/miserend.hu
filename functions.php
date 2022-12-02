@@ -600,7 +600,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 
 	// egyhazmegye
     if (isset($args['ehm']) AND $args['ehm'] != 0)
-        $search->where("egyhazmegy",$args['ehm']);
+        $search->where("egyhazmegye",$args['ehm']);
 
 	// espereskerulet
     if (isset($args['espker']) AND $args['espker'] != 0)
