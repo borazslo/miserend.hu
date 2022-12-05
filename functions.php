@@ -222,6 +222,7 @@ function getMasses($tid, $date = false) {
     $return = array();
     $query = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid GROUP BY idoszamitas ORDER BY weight DESC";
     $result = mysql_query($query);
+	$currentExists = false;
     while (($row = mysql_fetch_array($result))) {
         $tmp = array();
         $tmp['nev'] = $row['idoszamitas'];
@@ -231,8 +232,13 @@ function getMasses($tid, $date = false) {
         $tmp['datumtol'] = $datumtol = $row['tmp_datumtol']; //event2Date($row['tol']);
         $tmp['datumig'] = $datumig = $row['tmp_datumig']; //event2Date($row['ig']);
 
-        if (checkDateBetween($date, $datumtol, $datumig))
+        if (checkDateBetween($date, $datumtol, $datumig)) {
             $tmp['now'] = true;
+			if($currentExists == false) {
+				$tmp['current'] = true;
+				$currentExists = true;
+			}
+		}
 
         for ($i = 1; $i < 8; $i++) {
             $tmp['napok'][$i]['nev'] = $napok[($i)];

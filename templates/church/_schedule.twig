@@ -8,7 +8,7 @@
                       <span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span>
               </h4>
           </div>
-          <div id="collapsePeriod{{ key }}" class="panel-collapse collapse {% if idoszak.now %}in{% endif %}">
+          <div id="collapsePeriod{{ key }}" class="panel-collapse collapse {% if idoszak.current %}in{% endif %}">
               <div class="panel-body">
                     {% for nap in idoszak.napok %}
 
