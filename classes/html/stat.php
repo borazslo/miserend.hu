@@ -12,10 +12,12 @@ class Stat extends Html {
 		$this->stats = [];
         
         global $user;
+        /*
         if (!$user->loggedin) {
             addMessage("Hozzáférés megtagadva!", "danger");
             $this->redirect('/');
         }
+        */ 
 
         /* 
          * Templomok frissítettsége + észrevételek: Elmúlt év
