@@ -8,3 +8,5 @@ composer.phar
 /nbproject/
 .vagrant/*
 /obs/*
+.idea/
+mysql/dump.sql

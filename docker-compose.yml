@@ -1,0 +1,58 @@
+version: "3.3"
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql:/tools
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pw
+      MYSQL_DATABASE: miserend
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pw
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    networks:
+      inner:
+        aliases:
+          - mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8081:80
+    networks:
+      inner:
+        aliases:
+          - pma
+  miserend:
+    container_name: miserend
+    build:
+      context: ./
+      dockerfile: Dockerfile.development
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    networks:
+      inner:
+        aliases:
+          - miserend
+networks:
+  inner:
+    driver: bridge
+
+volumes:
+  db_data: {}
