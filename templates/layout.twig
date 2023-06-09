@@ -99,15 +99,15 @@
     	        </div>
            </div>
            <div class="container">
-                <div class="row">
-                    <div class="col-md-3  col-sm-3">
+                <div class="row church-site-sidebar-holder">
+                    <div class="col-md-3  col-sm-3 church-site-left-sidebar">
                         <!--{% include 'search/quicksearchform.twig' %}-->
                         {% block leftsidebar %}{% endblock %}
                         {% if chat %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
                         {% if mychurches %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
                         {% if selfAdvertisement %}{% include "_panelselfadvertisement.twig"  %}{% endif %}
                     </div>
-                    <div class="col-md-{% if columns2 %}9{% else %}6{% endif %} col-sm-6">
+                    <div class="col-md-{% if columns2 %}9{% else %}6{% endif %} col-sm-6 church-site-main-content">
                         {% block pageHeader %}
                             <div class="page-header">
                                 <h2>{{ title|raw }}</h2>
@@ -126,7 +126,7 @@
                         {% block content %}{{ content|raw }}{% endblock %}<br/>
                         </div>
                     {% if columns2 %}{% else %}  
-                    <div class="col-md-3 col-sm-3">
+                    <div class="col-md-3 col-sm-3 church-site-right-sidebar">
                              {% block rightsidebar %}{% endblock %}
                         </div>
                     {% endif %}    
