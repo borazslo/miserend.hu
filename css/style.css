@@ -99,7 +99,7 @@ span.toggle.active {
     flex-wrap: wrap;
 }
 
-@media(max-width: 767px) {
+@media(max-width: 766px) {
     .church-site-left-sidebar {
         order: 1;
         width: 100%
