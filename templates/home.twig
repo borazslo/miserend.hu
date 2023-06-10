@@ -188,7 +188,7 @@
 {% set selfAdvertisement = true %}  
 {% block leftsidebar %}
     {% if photo %}
-        {% set content = '<img src="' ~ constant('DOMAIN') ~ '/kepek/templomok/' ~ photo.church_id ~ '/' ~ photo.filename ~ '" class="img-responsive"><h5 class="text-center"><a href="/templom/' ~ photo.church_id ~'">' ~ photo.church.nev ~ ' (' ~ photo.church.location.city.name ~')</a></h5>' %}
+        {% set content = '<img src="' ~ constant('DOMAIN') ~ '/kepek/templomok/' ~ photo.church_id ~ '/' ~ photo.filename ~ '" class="img-responsive" loading="lazy"><h5 class="text-center"><a href="/templom/' ~ photo.church_id ~'">' ~ photo.church.nev ~ ' (' ~ photo.church.location.city.name ~')</a></h5>' %}
         {% include "panel.twig" with {'title' : ' ' , 'body': content,'panel':'default  ' } %}
     {% endif %}
 {% endblock %}
