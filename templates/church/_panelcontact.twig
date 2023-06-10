@@ -4,7 +4,7 @@
 {% set panel = 'primary' %}
 
 {% block body %}
-    <div style="width: 230px;overflow: hidden;o-text-overflow: ellipsis;text-overflow: ellipsis;">        
+    <div style="overflow: hidden;o-text-overflow: ellipsis;text-overflow: ellipsis;">        
         {% if religious_administration.parish.description %}
             {{ religious_administration.parish.description|raw|nl2br }}<br/>
         {% endif %}

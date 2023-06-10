@@ -101,12 +101,12 @@ span.toggle.active {
 
 @media(max-width: 766px) {
     .church-site-left-sidebar {
-        order: 1;
+        order: 2;
         width: 100%
     }
 
     .church-site-right-sidebar {
-        order: 2;
+        order: 1;
         width: 100%
     }
 
