@@ -9,4 +9,3 @@ composer.phar
 .vagrant/*
 /obs/*
 .idea/
-mysql/dump.sql
