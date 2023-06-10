@@ -8,3 +8,4 @@ composer.phar
 /nbproject/
 .vagrant/*
 /obs/*
+.idea/

@@ -1,0 +1,9 @@
+FROM yousan/php5.6-apache
+
+WORKDIR /app
+
+COPY . .
+
+RUN docker-php-ext-install mysql mysqli pdo pdo_mysql && a2enmod rewrite && service apache2 start
+
+CMD "./entrypoint.sh"

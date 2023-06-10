@@ -2,9 +2,9 @@
 
 $environment['default'] = [
     'connection' => [
-        'host' => env('MYSQL_MISEREND_HOST', 'localhost'),
-        'user' => env('MYSQL_MISEREND_USER', 'miserend'),
-        'password' => env('MYSQL_MISEREND_PASSWORD', '***'),
+        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
+        'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
         'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
     'path' => [
@@ -32,9 +32,10 @@ $environment['testing'] = [
         'debug' => 5
     ],   
     'connection' => [
-        'database' => 'miserend_testing',
-        'user' => 'root',
-        'password' => 'root'
+        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
+        'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
+        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
     'error_reporting' => E_ERROR | E_WARNING | E_PARSE
 ];
@@ -48,7 +49,10 @@ $environment['staging'] = [
         'domain' => 'http://staging.miserend.hu'
     ],
     'connection' => [
-        'database' => 'miserend_staging'
+        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
+        'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
+        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
     'error_reporting' => E_ERROR | E_WARNING | E_PARSE
 ];
@@ -59,9 +63,10 @@ $environment['vagrant'] = [
         'debug' => 0
     ],
     'connection' => [
-        'database' => 'miserend',
-        'user' => 'root',
-        'password' => 'root'
+        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
+        'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
+        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
     'error_reporting' => E_ALL
 ];
