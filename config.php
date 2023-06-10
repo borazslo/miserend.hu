@@ -3,7 +3,7 @@
 $environment['default'] = [
     'connection' => [
         'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'user'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
         'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
         'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
@@ -33,7 +33,7 @@ $environment['testing'] = [
     ],   
     'connection' => [
         'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'user'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
         'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
         'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
@@ -50,7 +50,7 @@ $environment['staging'] = [
     ],
     'connection' => [
         'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'user'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
         'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
         'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],
@@ -64,7 +64,7 @@ $environment['vagrant'] = [
     ],
     'connection' => [
         'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'user'),
+        'user' => env('MYSQL_MISEREND_USER', 'root'),
         'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
         'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
     ],

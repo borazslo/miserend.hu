@@ -3,6 +3,8 @@ version: "3.3"
 services:
   mysql:
     container_name: mysql
+    build:
+      dockerfile: mysql/Dockerfile
     image: mysql:5.7
     volumes:
       - db_data:/var/lib/mysql
@@ -44,6 +46,7 @@ services:
       dockerfile: Dockerfile.development
     volumes:
       - ./:/app
+      - ./apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
     ports:
       - "8000:8000"
     networks:

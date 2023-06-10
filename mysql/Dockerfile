@@ -1,0 +1,1 @@
+RUN mysql -u root < /tools/dump.sql miserend
