@@ -1,1 +1,1 @@
-RUN mysql -u root < /tools/dump.sql miserend
+RUN mysql -u root -ppw < /tools/dump.sql miserend
