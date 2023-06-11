@@ -9,3 +9,4 @@ composer.phar
 .vagrant/*
 /obs/*
 .idea/
+.env

@@ -34,7 +34,7 @@ services:
       PMA_ARBITRARY: 1
     restart: always
     ports:
-      - 8081:80
+      - ${PMA_PORT}:80
     networks:
       inner:
         aliases:
@@ -48,7 +48,7 @@ services:
       - ./:/app
       - ./apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
     ports:
-      - "8000:8000"
+      - "${MISEREND_PORT}:8000"
     networks:
       inner:
         aliases:
