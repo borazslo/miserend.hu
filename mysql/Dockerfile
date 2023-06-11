@@ -1,0 +1,1 @@
+RUN mysql -u root -ppw < /tools/dump.sql miserend

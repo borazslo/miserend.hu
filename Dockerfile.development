@@ -1,16 +1,9 @@
-FROM php:5.6.40-alpine
+FROM yousan/php5.6-apache
 
 WORKDIR /app
 
 COPY . .
 
-EXPOSE 8000
-
-RUN
-
-RUN apk update
-RUN apk add php5
-RUN apk add npm
-RUN docker-php-ext-install mysql pdo_mysql
+RUN docker-php-ext-install mysql mysqli pdo pdo_mysql && a2enmod rewrite && service apache2 start
 
 CMD "./entrypoint.sh"
