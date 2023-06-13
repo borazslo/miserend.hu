@@ -4,20 +4,22 @@ miserend.hu
 A miserend.hu teljes forrása a /kepek és /fajlok kivételével. [![Build Status](https://travis-ci.org/borazslo/miserend.hu.png)](https://travis-ci.org/borazslo/miserend.hu)
 
 ## Telepítés
-A legegyszerűbb egy megfelelően konfigurált virtuális gépet telepíteni, így nem kell bajlódni LAMP/WAMP szerverekkel:
-- [VirtualBox](http://www.virtualbox.org/), [Vagrant](https://www.vagrantup.com/) és [GitHub Desktop](https://desktop.github.com/) telepítése.
-- A GitHub Desktopban ennek a forrásnak a [klónozása](https://help.github.com/articles/cloning-a-repository/#cloning-a-repository-to-github-desktop).
-- Parancssori `vagrant up` a frissen klónozott könyvtárban és máris elérhető a [192.168.33.10](http://192.168.33.10)
+A legegyszerűbb egy megfelelően konfigurált docker containert felhúzni, amit ez a projekt szintén tartalmaz:
+
+**Note: Nem lehetetlen windows alatt is futtatni, de ajánlott linux környezetben fejleszteni :-)**
+- [Docker](https://docs.docker.com/engine/install/) telepítése.
+- `.env.example` fájl tartalmának átmásolása `.env` fájlba (ezt létre kell hozni). Ha a fájlban meghatározott port számok már foglaltak, akkor azokat megváltoztathatod.
+- A projekt root könyvtárában futtatni kell ezt: `docker compose up`
+  - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
 
 ## További segítség
-- A virtuális gép a http://192.168.33.10/ címen érhető el. 
-- SSH, mySQL, Mailcatcher, stb. eléréséhez valamint a virtuális gép irányításához lásd: [box.scotch.io](https://box.scotch.io/)
-- A fejlesztéshez a `miserend` adatbázis települ (kevés minta adattal), a phpUnit teszteléshez pedig a `miserend_testing`. (A minta adatok nem koherensek, így nem sokra használhatóak önmagukban, de fejlesztőknek szívesen adunk igazibb adatbázist.)
-- Ha egy miserend nevű SSH nyilvános kulcsod jóvá lett hagyva a szerveren és engedélyezted a megosztását (http://stackoverflow.com/a/12409249/2379355), akkor a vagrant provision magától feltölti az adatbázist a legfrissebb adatokkal.
-- A [MailCatcher](http://mailcatcher.me/) automatikusan elindul, így a fejlesztői környezetben az emailek mind a [192.168.33.10:1080](http://192.168.33.10:1080) oldalra futnak be.
-- [NetBeans](https://netbeans.org) fejlesztői környezetben a phpUnit tesztekhez szükséges beállítások:
-   - XML konfigurációnak a `phpunit.xml`-t kell megadni.
-   - Egyéni scriptnek pedig a `phpunitOnVagrant.sh` fájlt. 
+- Ha minden jól ment, a miserend lokális példánya a `http://localhost:8000` (a port száma az, amit a `.env`-ben határoztál meg) érhető el.
+  - A phpymadmin: `http://localhost:8081` (a port szintén eltérhet)
+- Belépés a web app konténerbe: `docker exec -it miserend bash`
+- Belépés a mysql konténerbe: `docker exec -it mysql bash`
+- A `mailcatcher` még nincs beüzemelve a dockerbe, de tervbe van véve.
+- `composer` használata:  `docker exec miserend ./composer.phar install|require|update`. Interactive (`-it`) módban természetesen elég a `./composer.phar...`
+- Unit testing: `docker exec miserend ./vendor/bin/phpunit tests`
 
 ## Néhány vegyes gondolat
 - continuous deployment van, azaz:
