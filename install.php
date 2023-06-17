@@ -20,7 +20,7 @@ if ($result) {
     $output = sprintf("[error] Database '%s' is not empty.\n", $config['connection']['database']
     );
 } else {
-    $command = sprintf('MYSQL_PWD=%s mysql -h %s -u %s %s < %s 2>&1', escapeshellarg($config['connection']['password']), escapeshellarg($config['connection']['host']), escapeshellarg($config['connection']['user']), escapeshellarg($config['connection']['database']), 'mysql_sample.sql'
+    $command = sprintf('MYSQL_PWD=%s mysql -h %s -u %s %s < %s 2>&1', escapeshellarg($config['connection']['password']), escapeshellarg($config['connection']['host']), escapeshellarg($config['connection']['user']), escapeshellarg($config['connection']['database']), 'mysql/dump.sql'
     );
     $output = shell_exec($command);
 }
