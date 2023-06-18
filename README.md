@@ -11,13 +11,14 @@ A legegyszerűbb egy megfelelően konfigurált docker containert felhúzni, amit
 - `.env.example` fájl tartalmának átmásolása `.env` fájlba (ezt létre kell hozni). Ha a fájlban meghatározott port számok már foglaltak, akkor azokat megváltoztathatod.
 - A projekt root könyvtárában futtatni kell ezt: `docker compose up`
   - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
-
-## További segítség
 - Ha minden jól ment, a miserend lokális példánya a `http://localhost:8000` (a port száma az, amit a `.env`-ben határoztál meg) érhető el.
   - A phpymadmin: `http://localhost:8081` (a port szintén eltérhet)
+  - Az emaileket a `mailcatcher` kapja el, így nem megy ki a felhasználóknak, de elérhetőek: `http://localhost:1080`
+
+## További segítség
 - Belépés a web app konténerbe: `docker exec -it miserend bash`
 - Belépés a mysql konténerbe: `docker exec -it mysql bash`
-- A `mailcatcher` még nincs beüzemelve a dockerbe, de tervbe van véve.
+- A `mailcatcher` csak az env['production'] esetén nem lép közbe.
 - Fejlesztéshez jól jöhet a `composer` használata, bár telepíti magát:  `docker exec miserend composer install|require|update`. Interactive (`-it`) módban természetesen elég a `composer...`
 - Unit testing: `docker exec miserend ./vendor/bin/phpunit tests`
 
@@ -34,5 +35,6 @@ A legegyszerűbb egy megfelelően konfigurált docker containert felhúzni, amit
     - __DE__ még nem működik olyan simán, mint a [szentiras.hu](https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k#n%C3%A9h%C3%A1ny-vegyes-gondolat)! (Nincs wekiszolgáló leállítás, stb.)
 
 ## Mappákról
+Szükséges néhány könyvtár, amit az install.php létrehoz.
 - Létrehozandó: /kepek; /kepek/templomok
 - Létrehozandó: /fajlok/igenaptar; /fajlok/sqlite; /fajlok/staticmaps; /fajlok/tmp

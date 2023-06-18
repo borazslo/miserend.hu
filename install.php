@@ -11,7 +11,11 @@ $env = env('MISEREND_WEBAPP_ENVIRONMENT', 'staging'); /* testing, staging, produ
 fwrite(STDERR, sprintf("[debug] \$env = '%s'\n", $env));
 configurationSetEnvironment('testing');
 
-mysql_query("SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+//mysql_query("SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+
+mysql_query("SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+
+
 $result = DB::table('information_schema.tables')
         ->where('table_type', "=", 'BASE TABLE')
         ->where('table_schema', '=', $config['connection']['database'])

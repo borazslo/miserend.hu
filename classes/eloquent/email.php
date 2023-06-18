@@ -2,6 +2,10 @@
 
 namespace Eloquent;
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 class Email extends \Illuminate\Database\Eloquent\Model {
     
     public $debug;
@@ -39,7 +43,47 @@ class Email extends \Illuminate\Database\Eloquent\Model {
             } else if ($this->debug == 5) {
                 // black hole
             } else {
-                if (!mail($this->to, $this->subject, $this->body, $this->header)) {
+			
+			$mail = new PHPMailer(true);
+
+			//$mail->SMTPDebug = SMTP::DEBUG_SERVER;
+			$mail->CharSet = "UTF-8";
+
+			printr($config);
+			
+			//FOR PROD: sendmail
+			if($config['env'] == 'production') {
+				$mail->isSendmail();
+			} else {
+			//FOR DEV: to mailcatcher
+				$mail->isSMTP();
+				$mail->Host = 'mailcatcher';
+				$mail->Port = 1025;
+				$mail->SMTPAuth = false;
+				$mail->SMTPSecure = false;
+			}
+			
+			//Recipients
+			$mail->setFrom('info@miserend.hu', 'Miserend.hu');
+			//$mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
+			$mail->addAddress($this->to);               //Name is optional
+			//$mail->addReplyTo('info@example.com', 'Information');
+			//$mail->addCC('cc@example.com');
+			//$mail->addBCC('bcc@example.com');
+
+			//Attachments
+			//$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+			//$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+			//Content
+			$mail->isHTML(true);                                  //Set email format to HTML
+			$mail->Subject = $this->subject;
+			$mail->Body    = $this->body;
+			//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+			
+			
+			//if (!mail($this->to, $this->subject, $this->body, $this->header)) {
+                if (!$mail->send()) {
                     addMessage('Valami hiba történt az email elküldése közben.', 'danger');
                     $this->status = "error";
                     $this->save();
