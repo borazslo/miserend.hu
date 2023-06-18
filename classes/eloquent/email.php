@@ -48,9 +48,7 @@ class Email extends \Illuminate\Database\Eloquent\Model {
 
 			//$mail->SMTPDebug = SMTP::DEBUG_SERVER;
 			$mail->CharSet = "UTF-8";
-
-			printr($config);
-			
+		
 			//FOR PROD: sendmail
 			if($config['env'] == 'production') {
 				$mail->isSendmail();
