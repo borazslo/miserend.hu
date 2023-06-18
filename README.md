@@ -18,7 +18,7 @@ A legegyszerűbb egy megfelelően konfigurált docker containert felhúzni, amit
 - Belépés a web app konténerbe: `docker exec -it miserend bash`
 - Belépés a mysql konténerbe: `docker exec -it mysql bash`
 - A `mailcatcher` még nincs beüzemelve a dockerbe, de tervbe van véve.
-- `composer` használata:  `docker exec miserend ./composer.phar install|require|update`. Interactive (`-it`) módban természetesen elég a `./composer.phar...`
+- Fejlesztéshez jól jöhet a `composer` használata, bár telepíti magát:  `docker exec miserend composer install|require|update`. Interactive (`-it`) módban természetesen elég a `composer...`
 - Unit testing: `docker exec miserend ./vendor/bin/phpunit tests`
 
 ## Néhány vegyes gondolat
