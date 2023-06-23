@@ -33,8 +33,4 @@ A legegyszerűbb egy megfelelően konfigurált docker containert felhúzni, amit
     - a production branch kerül ki az élesbe
     - a production branchet normál esetben a master után pull requesttel húzzuk. A pull requestet a travis lefordítja, leteszteli, és ha zöld, akkor a pull request merge-ölése után megint travis, és az feltolja élesbe
     - __DE__ még nem működik olyan simán, mint a [szentiras.hu](https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k#n%C3%A9h%C3%A1ny-vegyes-gondolat)! (Nincs wekiszolgáló leállítás, stb.)
-
-## Mappákról
-Szükséges néhány könyvtár, amit az install.php létrehoz.
-- Létrehozandó: /kepek; /kepek/templomok
-- Létrehozandó: /fajlok/igenaptar; /fajlok/sqlite; /fajlok/staticmaps; /fajlok/tmp
+	
