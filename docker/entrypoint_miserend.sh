@@ -23,8 +23,6 @@ composer install
 chown www-data:www-data -R /app/fajlok/tmp/
 service apache2 restart
 
-php install.php
-
 while true
 do
    sleep 1

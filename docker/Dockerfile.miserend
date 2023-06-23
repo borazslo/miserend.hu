@@ -6,4 +6,6 @@ COPY . .
 
 RUN docker-php-ext-install mysql mysqli pdo pdo_mysql && a2enmod rewrite
 
-CMD "./entrypoint.sh"
+ENTRYPOINT ["./docker/entrypoint_miserend.sh"]
+
+CMD ["run"]

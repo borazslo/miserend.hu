@@ -4,11 +4,11 @@ services:
   mysql:
     container_name: mysql
     build:
-      dockerfile: mysql/Dockerfile
+      dockerfile: docker/Dockerfile.mysql
     image: mysql:5.7
     volumes:
       - db_data:/var/lib/mysql
-      - ./mysql:/tools
+      - ./docker/mysql:/tools
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: pw
@@ -54,10 +54,11 @@ services:
     container_name: miserend
     build:
       context: ./
-      dockerfile: Dockerfile.development
+      dockerfile: docker/Dockerfile.miserend
+    command: ["./docker/entrypoint_miserend.sh"]
     volumes:
       - ./:/app
-      - ./apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
+      - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
     ports:
       - "${MISEREND_PORT}:8000"
     networks:
