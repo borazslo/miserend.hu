@@ -4,5 +4,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN docker-php-ext-install mysqli pdo pdo_mysql && a2enmod rewrite
+
+CMD "./entrypoint.sh"
 
 CMD ["run"]
