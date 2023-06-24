@@ -853,10 +853,10 @@ function searchMasses($args, $offset = 0, $limit = 20) {
         $query .= " WHERE " . implode("\n AND ", $where);
     $query .= "\n GROUP BY tid \n";
     $query .= ") groups ;";
-    if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
-    $row = mysql_fetch_row($lekerdez, MYSQL_ASSOC);
-    $return['sum'] = $row['sum'];
+	
+	$lekerdez = DB::select($query);
+	
+    $return['sum'] = $lekerdez[0]->sum;
 
     //Akkor jöhet a limitált csoportos lekérdezés, mert az jó
     $query = $select;
@@ -871,11 +871,13 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     if (count($where) > 0)
         $query .= " WHERE " . implode(' AND ', $where);
     $query .= " ORDER BY ido, templomok.varos, templomok.nev ";
-    if (!$lekerdez = mysql_query($query))
-        echo "HIBA a templom keresőben!<br>$query<br>" . mysql_error();
+	
+	//echo $query;
+	$lekerdez = DB::select($query);
     $masses = array();
-    //echo $query;
-    while ($row = mysql_fetch_row($lekerdez, MYSQL_ASSOC)) {
+    
+	foreach($lekerdez as $row) {
+		$row = (array) $row;
         if ($row['tmp_datumtol'] == $row['tmp_datumig'])
             $type = 'particulars';
         else
