@@ -4,39 +4,28 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 function dbconnect() {
 
-    global $config;
-    if (!@mysql_connect($config['connection']['host'], $config['connection']['user'], $config['connection']['password'])) {
-        if ($config['debug'] > 0)
-            die("Adatbázisszerverhez nem lehet csatlakozni!\n" . mysql_error());
-        else
-            die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
-    }
-    mysql_query("SET NAMES UTF8");
-    //mysql_query("SET CHARACTER SET 'UTF8'");
+    global $config, $capsule;
+	
+	try {
+		$capsule = new DB;
+		$capsule->addConnection([
+			'driver' => 'mysql',
+			'host' => $config['connection']['host'],
+			'database' => $config['connection']['database'],
+			'username' => $config['connection']['user'],
+			'password' => $config['connection']['password'],
+			'charset' => 'utf8',
+			'collation' => 'utf8_unicode_ci',
+			'prefix' => '',
+				], 'default');
+		// Make this Capsule instance available globally via static methods... (optional)
+		$capsule->setAsGlobal();
+		$capsule->bootEloquent();
+		DB::statement("SET time_zone='+05:00';");
+	} catch(PDOException $e) {
+		echo $e->getMessage();		
+	}
 
-    if (!mysql_select_db($config['connection']['database'])) {
-        if ($config['debug'] > 0)
-            die("Az '" . $config['connection']['database'] . "' adatbázis nem létezik, vagy nincs megfelelő jogosultság elérni azt!\n" . mysql_error());
-        else
-            die('Elnézést kérünk, a szolgáltatás jelenleg nem érhető el.');
-    };
-    
-    global $capsule;
-    $capsule = new DB;
-    $capsule->addConnection([
-        'driver' => 'mysql',
-        'host' => $config['connection']['host'],
-        'database' => $config['connection']['database'],
-        'username' => $config['connection']['user'],
-        'password' => $config['connection']['password'],
-        'charset' => 'utf8',
-        'collation' => 'utf8_unicode_ci',
-        'prefix' => '',
-            ], 'default');
-    // Make this Capsule instance available globally via static methods... (optional)
-    $capsule->setAsGlobal();
-    $capsule->bootEloquent();
-    DB::statement("SET time_zone='+05:00';");
 }
 
 function sanitize($text) {
@@ -218,13 +207,19 @@ function getMasses($tid, $date = false) {
         1 => '1. héten', 2 => '2. héten', 3 => '3. héten', 4 => '4. héten', 5 => '5. héten',
         '-1' => 'utolsó héten',
         'ps' => 'páros héten', 'pt' => 'páratlan héten');
-
-    $return = array();
-    $query = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid GROUP BY idoszamitas ORDER BY weight DESC";
-    $result = mysql_query($query);
+    
+    $results = DB::table('misek')
+		->where('torles','0000-00-00 00:00:00')
+		->where('tid',$tid)
+		->groupBy('idoszamitas')
+		->orderBy('weight','DESC')
+		->get();
+			
 	$currentExists = false;
-	if($result) {
-    while (($row = mysql_fetch_array($result))) {
+
+	foreach($results as $row) {
+		$row = (array) $row;
+		
         $tmp = array();
         $tmp['nev'] = $row['idoszamitas'];
         $tmp['weight'] = $row['weight'];
@@ -246,9 +241,16 @@ function getMasses($tid, $date = false) {
         }
         //unset($tmp['napok'][1]);  $tmp['napok'][1]['nev'] = $napok[1];
 
-        $query2 = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid AND idoszamitas = '" . $row['idoszamitas'] . "'  ORDER BY nap, ido";
-        $result2 = mysql_query($query2);
-        while (($row2 = mysql_fetch_array($result2, MYSQL_ASSOC))) {
+		$results2 = DB::table('misek')
+			->where('torles','0000-00-00 00:00:00')
+			->where('tid',$tid)
+			->where('idoszamitas',$row['idoszamitas'])
+			->orderBy('nap')
+			->orderBy('ido')
+			->get();
+		
+		foreach($results2 as $row2) {
+			$row2 = (array) $row2;
             if ($row2['milyen'] != '') {
                 $row2['attr'] = decodeMassAttr($row2['milyen']);
             } else
@@ -271,7 +273,6 @@ function getMasses($tid, $date = false) {
         else
             $return['periods'][] = $tmp;
     }
-	}
 
     //order byweight
 
