@@ -223,6 +223,7 @@ function getMasses($tid, $date = false) {
     $query = "SELECT * FROM misek WHERE torles = '0000-00-00 00:00:00' AND tid = $tid GROUP BY idoszamitas ORDER BY weight DESC";
     $result = mysql_query($query);
 	$currentExists = false;
+	if($result) {
     while (($row = mysql_fetch_array($result))) {
         $tmp = array();
         $tmp['nev'] = $row['idoszamitas'];
@@ -270,6 +271,7 @@ function getMasses($tid, $date = false) {
         else
             $return['periods'][] = $tmp;
     }
+	}
 
     //order byweight
 
