@@ -90,8 +90,9 @@ class Stat extends Html {
             else
                 $tmp[$count->count] = 1;
         }   
-        foreach($tmp as $k => $v)
-            $this->s4['data'][] = [$k,$v];
+		if($tmp)
+			foreach($tmp as $k => $v)
+				$this->s4['data'][] = [$k,$v];
         
 		
 		/*

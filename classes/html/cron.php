@@ -24,6 +24,7 @@ class Cron extends Html {
 				// Itt az idő
 			} else {
 				// Nincs itt az idő
+				// echo "Nincs itt az idő.<br/>".date('Y-m-d H:i:s',strtotime($job->from))."<br/>".date('Y-m-d H:i:s')."<br/>".date('Y-m-d H:i:s',strtotime($job->until));
 				return;
 			}
 		}		
