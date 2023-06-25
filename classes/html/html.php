@@ -41,10 +41,10 @@ class Html {
     }
 
     function loadTwig() {
-        #require_once PATH.'vendor/twig/twig/lib/Twig/Autoloader.php';        
-        #\Twig_Autoloader::register();        
-        $loader = new \Twig_Loader_Filesystem(PATH . $this->templatesPath);
-        $this->twig = new \Twig_Environment($loader); // cache?                  
+
+		$loader = new \Twig\Loader\FilesystemLoader(PATH . $this->templatesPath);
+		$this->twig = new \Twig\Environment($loader); //cache:
+
     }
 
     function getTemplateFile() {

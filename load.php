@@ -35,11 +35,10 @@ if (isset($_REQUEST['logout'])) {
     \User::logout();
 }
 $user = \User::load();
-//TODO: delete this (see: \Html\Html::loadTwig());
-require_once 'vendor/twig/twig/lib/Twig/Autoloader.php';
-Twig_Autoloader::register();
-$loader = new Twig_Loader_Filesystem(PATH . 'templates');
-$twig = new Twig_Environment($loader); // cache?      
+
+$loader = new \Twig\Loader\FilesystemLoader(PATH . 'templates');
+$twig = new \Twig\Environment($loader);
+
 
 //
 //  Useful CONSTANTS

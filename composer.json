@@ -2,7 +2,7 @@
     "name": "miserend.hu/miserend-webapp",
     "description": "Miserend.hu web application",
     "require": {
-        "twig/extensions": "1.0.*",
+        "twig/twig": "3.6.*",
         "phpunit/phpunit": "4.8@stable",
         "tinymce/tinymce": ">= 4",
 		"phpmailer/phpmailer": "^6.8.0",
