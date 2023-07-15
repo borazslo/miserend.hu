@@ -34,7 +34,7 @@ services:
       PMA_ARBITRARY: 1
     restart: always
     ports:
-      - ${PMA_PORT}:80
+      - ${PHPMYADMIN_PORT}:80
     networks:
       inner:
         aliases:
