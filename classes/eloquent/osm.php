@@ -239,7 +239,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
 			
 			$messageurl = $osm->apiUrl."changeset/".$changesetID; 
 			
-			addMessage ('Közvelenül OSM adatokat is módosítottunk. Nagyon izgalmat. <a href="'.$messageurl.'">changeset/'.$changesetID.'</a>','success');
+			addMessage ('Közvelenül OSM adatokat is módosítottunk. Nagyon izgalmas. <a href="'.$messageurl.'">changeset/'.$changesetID.'</a>','success');
 		}
 	}
 }
