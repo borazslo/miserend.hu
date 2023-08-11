@@ -1,42 +1,40 @@
 {% set externalIcon %}<span class="glyphicon glyphicon-new-window"></span>{% endset %}
 
-<nav class="navbar navbar-default" role="navigation">
-    <!--<div class="container-fluid">-->
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Menü</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <!--<a class="navbar-brand" href="/">Miserend.hu</a>-->
-        </div>
-
-        <div class="collapse navbar-collapse" id="navbar">
-            <ul class="nav navbar-nav">   
-                {% if menu %}
-                    {% for items in menu %}
-                        {% if items.items|length %}
-                        <li class="dropdown">
-                            <a href="{{ items.url }}" class="dropdown-toggle" data-toggle="dropdown">{{ items.title }}<span class="caret"></span></a>
-                                {% if items.items %}
-                                <ul class="dropdown-menu">
-                                    {% for item in items.items %}
-                                        <li><a href="{{ item.url }}">{{ item.title }}</a></li>
-                                        {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </li>
-                        {% else %}
-                            <li>
-                                <a href="{{ items.url }}">{{ items.title }}</a>
-                            </li>
-                        {% endif %}                        
-                    {% endfor %}
-                {% endif %}
-            </ul>
-            {% if user.loggedin %}
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+		{% if menu %}
+			{% for items in menu %}
+				{% if items.items|length %}
+					<li class="nav-item dropdown">
+					  <a class="nav-link dropdown-toggle" href="{{ items.url }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						{{ items.title }}
+					  </a>
+					  <ul class="dropdown-menu">
+						{% if items.items %}
+							{% for item in items.items %}
+								<li><a class="dropdown-item" href="{{ item.url }}">{{ item.title }}</a></li>
+							{% endfor %}
+						{% endif %}											
+					  </ul>
+					</li>			   
+				{% else %}
+					<li class="nav-item">
+						<a class="nav-link" href="{{ items.url }}">{{ items.title }}</a>
+					</li>
+				{% endif %}                        
+			{% endfor %}
+		{% endif %}                
+      </ul>
+	  
+	  
+	  
+	   {% if user.loggedin %}
                 <div class="navbar-form navbar-right" role="search">
                     <a class="button btn btn-default" href="/user/edit">{{ user.username }}</a>
                     <a class="button btn btn-default" href="/?logout=true" id="quit">Kilépés</a>
@@ -53,6 +51,8 @@
                     <a class="button btn btn-default" href="/user/new">Regisztrálás</a>
                 </form>
             {% endif %}
-        </div><!-- /.navbar-collapse -->
-    <!--</div><!-- /.container-fluid -->
+	  
+	  
+    </div>
+  </div>
 </nav>
