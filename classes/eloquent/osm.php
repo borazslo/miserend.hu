@@ -124,7 +124,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
 		return true;
 	}
 	
-	public function fresh(array $with = array())
+	public function fresh($with = [])
 	{
 		$key = $this->getKeyName();
 		return $this->exists ? static::with($with)->where($key, $this->getKey())->first() : null;

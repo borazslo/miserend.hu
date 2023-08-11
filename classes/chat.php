@@ -8,8 +8,8 @@ class Chat {
     public $alert = 0;
     
     function load() {
-        $this->loadComments();
-        $this->lastcomment = $this->comments[0]['datum_raw'];
+        $this->loadComments();		
+        $this->lastcomment = isset($this->comments[0]['datum_raw']) ? $this->comments[0]['datum_raw'] : false;
         $this->getUsers('html');
     }
     
