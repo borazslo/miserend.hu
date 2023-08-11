@@ -195,4 +195,10 @@ class ExternalApi {
 	
 	
 	}
+	
+	
+}
+
+class Exception extends \Exception {
+	
 }

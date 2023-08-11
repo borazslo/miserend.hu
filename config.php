@@ -14,8 +14,13 @@ $environment['default'] = [
         'appkey' => env('MAPQUEST_CONSUMERKEY', '***'),
         'useitforsearch' => false
     ],
+	'openstreetmap' => [
+		'user:pwd' => 'user:password',
+		'apiurl' => 'https://api.openstreetmap.org/'	
+    ],	
     'token' => [
-        'timeout' => "15 minutes"
+        'web' => "2 weeks",
+		'API' => "15 minutes"
     ],
     'mail' => [
         'sender' => 'miserend.hu <info@miserend.hu>',
@@ -31,12 +36,6 @@ $environment['testing'] = [
     'mail' => [
         'debug' => 5
     ],   
-    'connection' => [
-        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'root'),
-        'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
-        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
-    ],
     'error_reporting' => E_ERROR | E_WARNING | E_PARSE
 ];
 
@@ -48,26 +47,22 @@ $environment['staging'] = [
     'path' => [
         'domain' => 'http://staging.miserend.hu'
     ],
-    'connection' => [
-        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'root'),
-        'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
-        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
-    ],
+	'openstreetmap' => [
+		'user:pwd' => 'devuser:devpassword',
+		'apiurl' => 'https://master.apis.dev.openstreetmap.org/'	
+    ],	
+	
+	
+	
     'error_reporting' => E_ERROR | E_WARNING | E_PARSE
 ];
 
-$environment['vagrant'] = [
+$environment['development'] = [
     'debug' => 1,
     'mail' => [
         'debug' => 0
     ],
-    'connection' => [
-        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'root'),
-        'password' => env('MYSQL_MISEREND_PASSWORD', 'pw'),
-        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend')
-    ],
+	'openstreetmap' => false,
     'error_reporting' => E_ALL
 ];
 

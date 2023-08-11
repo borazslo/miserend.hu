@@ -148,6 +148,13 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
 	/* Create a changeset and upload to OSM */
 	/* TODO: it works only with tags yet. No lat, lon, and anything else */
 	function upload() {
+		global $config;
+		if( $config['openstreetmap'] == false ) {
+			addMessage('Az OpenStreetMap API nincs bekapcsolva. Így az esetleges OSM adat változásokat nem töltöttük fel.','warning');
+			return;
+		}
+	
+	
 		$tags = \Eloquent\OSMTag::where('osmtype',$this->osmtype)
                 ->where('osmid',$this->osmid)                
                 ->get()->keyBy('name')->toArray();
