@@ -214,21 +214,14 @@
 			<tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Aktív misézőhely:</td>
                 <td bgcolor=#ffffff>
-                    <div class="control-group">
-                        <div class="controls form-inline">            
-                            <input type=radio name=church[miseaktiv] class="form-control" value=1 {% if church.miseaktiv == 1 %}checked{% endif %}>
-                            <label for="inputValue">Van rendszeresen mise</label> &nbsp;
-                            <input type=radio name=church[miseaktiv] class="urlap form-control" value=0 {% if church.miseaktiv != 1 %}checked{% endif %}>
-                            <label for="inputKey">Nincs rendszeresen mise</label>
-                        </div>
-                    </div>
+					{{ forms.radio(form.miseaktiv) }}                    
                 </td>
                 <td></td>
             </tr>
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Mise megjegyzés:</td>
                 <td bgcolor=#ffffff>
-                    <textarea name=church[misemegj] id=misemegj class="form-control tinymce" cols=50 rows=5>{{ church.misemegj|nl2br }}</textarea>
+					{{ forms.textarea(form.misemegj) }}                    
                 </td>
                 <td>{{ _self.helplink(41, ICONS_INFO ) }}</td>
             </tr>
@@ -250,11 +243,8 @@
             <tr>
                 <td valign=top class=kiscim align=right>Frissítés:</td>
                 <td valign=top>
-                    <div class="controls form-inline">                         
-                        <input type=checkbox name="church[frissites]" value="{{ date('now')|date("Y-m-d") }}" class="urlap form-control">
-                        <label class=alap> Frissítsük a dátumot</label>
-                        (Legutóbbi frissítés: {{ church.frissites }})
-                    </div>
+					{{ forms.input(form.frissites) }}
+                   
                 </td>
                 <td>{{ _self.helplink(14, ICONS_INFO ) }}</td>
             </tr>

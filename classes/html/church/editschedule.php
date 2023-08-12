@@ -230,11 +230,13 @@ class EditSchedule extends \Html\Html {
         $this->misemegj = array(
             'type' => 'textbox',
             'name' => "misemegj",
+			'class' => 'tinymce',
             'value' => $this->church->misemegj,
             'label' => 'Rendszeres rózsafűzér, szentségimádás, hittan, stb.<br/>');
         $this->adminmegj = array(
             'type' => 'textbox',
             'name' => "adminmegj",
+			'class' => 'tinymce',
             'value' => $this->church->adminmegj,
             'labelback' => ' A templom szerkesztésével kacsolatosan.');
 
@@ -243,7 +245,7 @@ class EditSchedule extends \Html\Html {
             'name' => "update",
             'value' => 'i',
             'checked' => true,
-            'labelback' => 'Utoljára frissítve: ' . date('Y.m.d.', strtotime($this->church->frissites))
+            'labelback' => 'Frissítsük a dátumot! (Utoljára frissítve: ' . date('Y.m.d.', strtotime($this->church->frissites)).')'
         );
 
         $this->helptext = '<span class="alap">Figyelem! Ha átfedés van két periódus/időszak vagy különleges miserend között, akkor a listában lejjebb lévő vagyis „nehezebb” periódus vagy különleges miserend jelenik meg a keresőben!</span>';

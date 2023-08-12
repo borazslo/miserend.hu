@@ -132,7 +132,26 @@ class Edit extends \Html\Html {
 		$this->church->osm;
 		if($this->church->osm) $this->church->osm->updateFromOverpass();
 
-        $this->form['ok'] = array(
+		
+		$this->form['misemegj'] = array(
+			'class' => 'tinymce',
+            'name' => 'church[misemegj]',
+			'type' => 'textarea',
+			'value' => $this->church->misemegj
+        );
+		
+		$this->form['miseaktiv'] = array(
+            'name' => 'church[miseaktiv]',
+			'id' => 'miseaktiv',
+			'type' => 'radio',
+            'options' => array(
+                '1' => 'Van rendszeresen mise',
+                '0' => 'Nincs rendszeresen mise'
+            ),
+            'selected' => $this->church->miseaktiv
+        );
+		
+		$this->form['ok'] = array(
             'name' => 'church[ok]',
             'options' => array(
                 'i' => 'megjelenhet',
@@ -142,6 +161,14 @@ class Edit extends \Html\Html {
             'selected' => $this->church->ok
         );
 
+		$this->form['frissites'] = array(
+            'type' => 'checkbox',
+            'name' => "church[frissites]",
+            'value' => date('Y-m-d'),
+            'checked' => true,
+            'labelback' => 'Frissítsük a dátumot! (Utoljára frissítve: ' . date('Y.m.d.', strtotime($this->church->frissites)).')'
+        );
+		
 		
 		## OSM informations 
 		if($this->church->osm) {
