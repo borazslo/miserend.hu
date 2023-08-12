@@ -17,13 +17,21 @@ class DioceseCatalogue extends Html {
         $ehm = !empty($_REQUEST['ehm']) ? $_REQUEST['ehm'] : 'false';
         
         $ehmsDB = DB::table('egyhazmegye')->where('ok','i')->orderBy('sorrend')->get();
-        $this->ehms = array();        
+        $this->ehms = $options = array();        
         foreach($ehmsDB as $tmp) {
             $this->ehms[$tmp->id] = $tmp;
+			$options[$tmp->id] = $tmp->nev;
         }
                
+		$this->form['diocese'] = array(
+            'type' => 'select',
+            'name' => 'ehm',
+            'options' => $options,
+        );
+
         if (is_numeric($ehm) AND $ehm > 0) {
             $this->ehms[$ehm]->selected = "selected";
+			$this->form['diocese']['selected'] = $ehm;
                                                           
             $this->title = "Templomok listája: ".$this->ehms[$ehm]->nev. " egyházmegye";
             

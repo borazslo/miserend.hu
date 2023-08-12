@@ -21,7 +21,7 @@
     {% if array.disabled %} disabled="{{array.disabled}}" {% endif %}
     {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
     {% if array.style %} style="{{array.style}}" {% endif %}
-    class="input-sm form-control {{ array.class }}" 
+    class="form-select form-control-lg {{ array.class }}" 
 	>
 		{% for key, option in array.options %}
 			<option value="{{ key }}" 

@@ -1,18 +1,16 @@
 {% set columns2 = true  %}
 {% extends "layout.twig" %}
 
+{% import "forms.twig" as forms %}
+
 {% set pageTitle = "Egyházmegyei katalógus | Miserend" %}
                  
 {% block content %}
     <div class="form">
         <form method=get class="form-group">
             <div class="form-group row">
-                <select name=ehm class="input-sm form-control urlap">
-                    <option value="">Válassz egyházmegyét</option>
-                    {% for ehm in ehms %}
-                        <option value="{{ ehm.id }}" {{ ehm.selected }}>{{ ehm.nev }}</option>
-                    {% endfor %}
-                </select>
+				{{ forms.select(form.diocese) }}
+                
             </div>
                 <div class="form-group row">
                 <input type=submit value=Mutat class="input-sm form-control urlap">

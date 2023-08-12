@@ -435,6 +435,9 @@ function formMass($pkey, $mkey, $mass = false, $group = false) {
             'value' => $mass['megjegyzes'],
             'style' => 'margin-top:4px;width:*')
     );
+	foreach($form as $k => $v ) {
+		$form[$k]['style'] = 'display:inline;width:unset';
+	}
     return $form;
 }
 
@@ -480,11 +483,13 @@ function formPeriod($pkey, $period = false, $group = false) {
     if ($group == 'period') {
         $form['from2'] = array(
             'name' => $group . "[" . $pkey . "][from2]",
+			'style' => 'display:inline;width:unset',
             'options' => array(
                 0 => '≤',
                 '+1' => '<'));
         $form['to2'] = array(
             'name' => $group . "[" . $pkey . "][to2]",
+			'style' => 'display:inline;width:unset',
             'options' => array(
                 0 => '≤',
                 '-1' => '<'));
@@ -516,9 +521,13 @@ function formPeriod($pkey, $period = false, $group = false) {
     if (preg_match('/(\+|-)([0-9]{1})$/i', $period['ig'], $match))
         $form['to2']['selected'] = $match[1] . $match[2];
 
-
+	foreach($form as $k => $v ) {
+		$form[$k]['style'] = 'display:inline;width:unset';
+	}
     $form['pkey'] = $pkey;
 
+
+	
     foreach ($period['napok'] as $dkey => $day) {
         if (isset($day['misek'])) {
             foreach ($day['misek'] as $mkey => $mass) {
