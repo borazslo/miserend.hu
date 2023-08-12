@@ -57,10 +57,10 @@ class Map extends Html {
                 ->whereNotNull('osm_relation')
                 ->select("osm_relation")
                 ->pluck('osm_relation'); 
-            $osms = \Eloquent\OSM::where('osmtype','relation')->whereIn('osmid',$results)->where('updated_at','<',date('Y-m-d H:i:s',strtotime('-'.$cacheTime)));
+            $osms = \Eloquent\OSM::where('osmtype','relation')->whereIn('osmid',$results->toArray())->where('updated_at','<',date('Y-m-d H:i:s',strtotime('-'.$cacheTime)));
             $osmids = $osms->pluck('osmid')->toArray();
             //Ha még nem tároljuk az osm adatait VAGY már régen akkor itt az ideje
-            $diff = array_diff ($results, array()); //$osmids);
+            $diff = array_diff ($results->toArray(), array()); //$osmids);
             if(count($diff) > 0 ) {
                 foreach($diff as $d) {              
                     $overpass = new \ExternalApi\OverpassApi();
