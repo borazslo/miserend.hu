@@ -53,14 +53,15 @@ services:
   miserend:
     container_name: miserend
     build:
-      context: ./
       dockerfile: docker/Dockerfile.miserend
-    command: ["./docker/entrypoint_miserend.sh"]
     volumes:
       - ./webapp:/app
       - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
+      - ./docker:/tools:ro
     ports:
       - "${MISEREND_PORT}:8000"
+    environment:
+        MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT}
     networks:
       inner:
         aliases:
