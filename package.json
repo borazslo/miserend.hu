@@ -9,7 +9,8 @@
     "@popperjs/core": "2.11.*",
     "requirejs": "2.1.11",
     "jquery-colorbox": "1.5.*",
-    "composer": "*"
+    "composer": "*",
+    "jqplot": "1.0.*"
   },
   "config": {
     "unsafe-perm": true

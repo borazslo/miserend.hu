@@ -1,4 +1,4 @@
-FROM yousan/php7.2-apache
+FROM php7.2-apache
 
 WORKDIR /app
 
