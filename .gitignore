@@ -1,7 +1,2 @@
-composer.lock
-composer.phar
 /nbproject/
-.vagrant/*
-/obs/*
-.idea/
 .env
