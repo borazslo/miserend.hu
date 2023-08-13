@@ -57,7 +57,7 @@ services:
       dockerfile: docker/Dockerfile.miserend
     command: ["./docker/entrypoint_miserend.sh"]
     volumes:
-      - ./:/app
+      - ./webapp:/app
       - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
     ports:
       - "${MISEREND_PORT}:8000"
