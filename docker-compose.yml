@@ -4,6 +4,8 @@ services:
   mysql:
     image: mysql:5.7
     container_name: mysql
+    build:
+      dockerfile: docker/Dockerfile.mysql
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - db_data:/var/lib/mysql
