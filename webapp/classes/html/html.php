@@ -23,7 +23,7 @@ class Html {
         $this->user = $user;
 
         $this->loadMenu();
-        if ($this->user->loggedin AND ! $this->user->checkRole('miserend')) {
+        if (isset($this->user->loggedin) AND $this->user->loggedin AND ! $this->user->checkRole('miserend')) {
             $this->mychurches = feltoltes_block();
         }
         if ($this->user->checkRole('"any"')) {

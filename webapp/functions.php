@@ -283,7 +283,7 @@ function getMasses($tid, $date = false) {
     }
 
 
-    return $return;
+    return isset($return) ? $return : [] ;
 }
 
 function cmp($a, $b) {
