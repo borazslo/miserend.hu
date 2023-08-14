@@ -5,12 +5,12 @@ A miserend.hu teljes forrása elavult mintaadatokkal.
 
 ## Telepítés
 - [Docker](https://docs.docker.com/engine/install/) telepítése a számítógépre.
-- Az `.env.example` fájl tartalmának átmásolása `.env` fájlba (ezt létre kell hozni). 
-  - Ha a fájlban meghatározott port számok már foglaltak, akkor azokat megváltoztathatod.
-  - `MISEREND_WEBAPP_ENVIRONMENT`= development | staging | production
 - A projekt root könyvtárában futtatni kell ezt: `docker-compose up`
   - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
-- És máris elérhető miserend lokális példánya a `http://localhost:8000` (a port száma az, amit a `.env`-ben határoztál meg)
+- Egyes beállításokat, pl. portokat, az `.env.example` fájl tartalmának átmásolásával az `.env` fájlban lehet módosítani. 
+  - Ha a docker up hibát generál, mondván hogy egy port már foglalt, akkor ez lehet a megoldás. Egyébiránt opcionális.
+  - `MISEREND_WEBAPP_ENVIRONMENT`= development | staging | production
+- És máris elérhető miserend lokális példánya a `http://localhost:8000` (vagy amit az `.env`-ben meghatároztunk)
   - Van egy regisztrált felhasználó is: `admin` névvel és a meglepő `admin` jelszóval.
 
 ## Konténerek
