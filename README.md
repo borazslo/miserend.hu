@@ -1,36 +1,36 @@
 miserend.hu
 ========
 
-A miserend.hu teljes forrása a /kepek és /fajlok kivételével. [![Build Status](https://travis-ci.org/borazslo/miserend.hu.png)](https://travis-ci.org/borazslo/miserend.hu)
+A miserend.hu teljes forrása elavult mintaadatokkal.
 
 ## Telepítés
-A legegyszerűbb egy megfelelően konfigurált docker containert felhúzni, amit ez a projekt szintén tartalmaz:
-
-**Note: Nem lehetetlen windows alatt is futtatni, de ajánlott linux környezetben fejleszteni :-)**
-- [Docker](https://docs.docker.com/engine/install/) telepítése.
-- `.env.example` fájl tartalmának átmásolása `.env` fájlba (ezt létre kell hozni). Ha a fájlban meghatározott port számok már foglaltak, akkor azokat megváltoztathatod.
-- A projekt root könyvtárában futtatni kell ezt: `docker compose up`
+- [Docker](https://docs.docker.com/engine/install/) telepítése a számítógépre.
+- Az `.env.example` fájl tartalmának átmásolása `.env` fájlba (ezt létre kell hozni). 
+  - Ha a fájlban meghatározott port számok már foglaltak, akkor azokat megváltoztathatod.
+  - `MISEREND_WEBAPP_ENVIRONMENT`= development | staging | production
+- A projekt root könyvtárában futtatni kell ezt: `docker-compose up`
   - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
-- Ha minden jól ment, a miserend lokális példánya a `http://localhost:8000` (a port száma az, amit a `.env`-ben határoztál meg) érhető el.
-  - A phpymadmin: `http://localhost:8081` (a port szintén eltérhet)
-  - Az emaileket a `mailcatcher` kapja el, így nem megy ki a felhasználóknak, de elérhetőek: `http://localhost:1080`
+- És máris elérhető miserend lokális példánya a `http://localhost:8000` (a port száma az, amit a `.env`-ben határoztál meg)
+  - Van egy regisztrált felhasználó is: `admin` névvel és a meglepő `admin` jelszóval.
+
+## Konténerek
+A [docker-compose.yml](docker-compose.yml) a következő konténereket építi fel és indítja el:
+
+**mysql**: Az adatbáziszerver. Ebbe tölti be a minta adatokat. A mysql adatbázisokat megőrzi későbbi leállítás / törlés esetén (`docker-compose remove mysql`) is! Az adatok törlése csak a konténerhez tartozó megfelelő *volume* törlésével lehet például a Docker Desktop alkalmazásban.
+
+**pma**: Egy phpMyAdmin is elérhetővé válik a mysql adminisztrálás támogatására a `http://localhost:8081` címen. (A port eltérhet a `.env` beállítása alapján.) Éles környezetben ezt le kell állítani!
+
+**mailcatcher**: Fejlesztői környezetekben az emaileket ténylegesen nem küldjük el, hanem elkapjuk őket és megtekinthetőek itt: `http://localhost:1080`. Éles környzetben ezt le kell állítani, és figyelni kell arra, hogy helyes beállítással kimenjenek ténylegesen a levelek.
+
+**miserend**: Maga a honlap mindene. A forráskódból a /webapp rész kerül csak összekötésre / feltöltésre.
 
 ## További segítség
-- Belépés a web app konténerbe: `docker exec -it miserend bash`
-- Belépés a mysql konténerbe: `docker exec -it mysql bash`
+- Belépés az egyes konténerekbe: `docker exec -it [mysql|pma|mailcatcher|miserend] bash`
 - A `mailcatcher` csak az env['production'] esetén nem lép közbe.
 - Fejlesztéshez jól jöhet a `composer` használata, bár telepíti magát:  `docker exec miserend composer install|require|update`. Interactive (`-it`) módban természetesen elég a `composer...`
-- Unit testing: `docker exec miserend ./vendor/bin/phpunit tests`
+- [később] Unit testing: `docker exec miserend ./vendor/bin/phpunit tests`
 
 ## Néhány vegyes gondolat
-- continuous deployment van, azaz:
-    - push után a http://travis-mc.org/borazslo/miserend.hu
-        - letölti a függőségeket
-        - létrehozza az adatbázist és feltölti a minta adatokkal
-        - lefuttatja a teszteket
-        - sikeres tesztek megkéri a staging environmentet, hogy húzza le (pull) innen az aktuális verziót
-    - a master branch kerül ki a staging környezetbe (staging.miserend.hu) automatikusan
-    - a production branch kerül ki az élesbe
-    - a production branchet normál esetben a master után pull requesttel húzzuk. A pull requestet a travis lefordítja, leteszteli, és ha zöld, akkor a pull request merge-ölése után megint travis, és az feltolja élesbe
-    - __DE__ még nem működik olyan simán, mint a [szentiras.hu](https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k#n%C3%A9h%C3%A1ny-vegyes-gondolat)! (Nincs wekiszolgáló leállítás, stb.)
+  - a master branch kerül ki a staging környezetbe (staging.miserend.hu), de még nem automatikusan
+  - a production branch kerül ki az éles honlapra
 	
