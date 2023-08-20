@@ -639,7 +639,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 	if (!isset($filterdistance)) {
 	
         $search->offset($offset)->limit($limit);
-		$results = $search->get();			
+		$results = $search->get()->toArray();		
 		$return['results']  = array_map(function ($value) {return (array)$value;}, $results);		
 		
 	} else {
