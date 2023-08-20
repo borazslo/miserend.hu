@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# An example hook
+docker exec miserend bash -c "git rev-parse --short HEAD > git_hash"
+echo "current git_hash has been copied"
+
+

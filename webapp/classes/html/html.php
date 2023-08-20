@@ -168,10 +168,14 @@ class Html {
     }
 
     function getGitHash() {
-        //GIT version
-        exec('git rev-parse --verify HEAD 2> /dev/null', $output);
-        if (isset($output[0]) AND $output[0] != '')
-            return $output[0];
+        //GIT version        ;
+        // exec('git rev-parse --verify HEAD 2> /dev/null', $v);
+
+        $v = trim(file_get_contents('../version')); // See: (.)git/hooks/post-checkout
+        //Validate short of git_hash
+        if(strlen($v) == 7 AND preg_match('/^[a-zA-Z0-9]{7}$/i',$v,$match) ) { 
+            return $v;
+        }
         return false;
     }
     
