@@ -59,6 +59,7 @@ services:
       - ./webapp:/app
       - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
       - ./docker:/tools:ro
+      - images:/app/kepek
     ports:
       - "${MISEREND_PORT:-8000}:8000"
     environment:
@@ -73,3 +74,4 @@ networks:
 
 volumes:
   db_data: {}
+  images: {}
