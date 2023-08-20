@@ -5,7 +5,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 class User {
 
     function __construct($uid = false) {
-        if (isset($uid)) {
+        if (isset($uid) AND $uid != false) {
             $user = DB::table('user')
                     ->select('*');
             
