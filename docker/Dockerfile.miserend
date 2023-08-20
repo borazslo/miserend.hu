@@ -22,10 +22,11 @@ RUN php -r "unlink('composer-setup.php');"
 RUN apt-get update --fix-missing
 RUN apt-get install git unzip -y
  
-COPY ./docker/apache2/miserend.conf /etc/apache2/sites-enabled/miserend.conf
 RUN docker-php-ext-install mysqli pdo pdo_mysql && a2enmod rewrite
-RUN service apache2 restart
 
+# Settings
+COPY ./docker/apache2/miserend.conf /etc/apache2/sites-enabled/miserend.conf
+RUN service apache2 restart
 
 # RUN apt-get install php-cli php-mbstring -y
 # RUN apt-get install wget sendmail -y
