@@ -56,9 +56,8 @@ services:
     build:
       dockerfile: docker/Dockerfile.miserend
     volumes:
-      - ./webapp:/app
+      - .:/miserend
       - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
-      - ./docker:/tools:ro
       - images:/app/kepek
     ports:
       - "${MISEREND_PORT:-8000}:8000"

@@ -1,11 +1,11 @@
 FROM php:7.2-apache
 
-WORKDIR /app
+WORKDIR /miserend
 
 COPY . .
 
 # Ezt majd még ellenőrizni kell, hogy így marad-e
-COPY --chown=www-data:www-data ./webapp/fajlok/tmp/ /app/fajlok/tmp/ 
+RUN chown -R www-data:www-data webapp/fajlok
 
 # Install NodeJS
 SHELL ["/bin/bash", "--login", "-c"]
@@ -25,12 +25,11 @@ RUN apt-get install git unzip -y
 RUN docker-php-ext-install mysqli pdo pdo_mysql && a2enmod rewrite
 
 # Settings
-COPY ./docker/apache2/miserend.conf /etc/apache2/sites-enabled/miserend.conf
 RUN service apache2 restart
 
 # RUN apt-get install php-cli php-mbstring -y
 # RUN apt-get install wget sendmail -y
 
 # Fix Entrypoint Problmes
-COPY --chmod=0755 ./docker/entrypoint_miserend.sh /tools/entrypoint_miserend.sh
-ENTRYPOINT ["/tools/entrypoint_miserend.sh"]
+RUN chmod 0755 ./docker/entrypoint_miserend.sh
+ENTRYPOINT ["./docker/entrypoint_miserend.sh"]

@@ -2,6 +2,7 @@
 
 # Line endings should be LF instead of CRLF !!
 
+cd webapp
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
