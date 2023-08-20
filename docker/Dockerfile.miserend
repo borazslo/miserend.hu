@@ -31,5 +31,5 @@ RUN service apache2 restart
 # RUN apt-get install wget sendmail -y
 
 # Fix Entrypoint Problmes
-RUN chmod 0755 ./docker/entrypoint_miserend.sh
+# RUN chmod 0755 ./docker/entrypoint_miserend.sh
 ENTRYPOINT ["./docker/entrypoint_miserend.sh"]
