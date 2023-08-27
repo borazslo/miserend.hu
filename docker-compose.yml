@@ -1,0 +1,76 @@
+version: "3.4"
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    build:
+      dockerfile: docker/Dockerfile.mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d    
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pw
+      MYSQL_DATABASE: miserend
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pw           
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","user","-ppw"]
+      timeout: 5s
+      retries: 10
+    networks:
+      inner:
+        aliases:
+          - mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - ${PHPMYADMIN_PORT:-8081}:80
+    networks:
+      inner:
+        aliases:
+          - pma
+  mailcatcher:
+    image: dockage/mailcatcher
+    container_name: mailcatcher
+    ports:
+    - 1025:1025
+    - 1080:1080
+    restart: on-failure:10
+    networks:
+      inner:
+        aliases:
+          - mailcatcher
+  miserend:
+    container_name: miserend
+    build:
+      dockerfile: docker/Dockerfile.miserend
+    volumes:
+      - .:/miserend
+      - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
+      - images:/app/kepek
+    ports:
+      - "${MISEREND_PORT:-8000}:8000"
+    environment:
+        MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
+    networks:
+      inner:
+        aliases:
+          - miserend
+networks:
+  inner:
+    driver: bridge
+
+volumes:
+  db_data: {}
+  images: {}

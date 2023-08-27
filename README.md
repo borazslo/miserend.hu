@@ -1,36 +1,36 @@
 miserend.hu
 ========
 
-A miserend.hu teljes forrása a /kepek és /fajlok kivételével. [![Build Status](https://travis-ci.org/borazslo/miserend.hu.png)](https://travis-ci.org/borazslo/miserend.hu)
+A miserend.hu teljes forrása elavult mintaadatokkal.
 
 ## Telepítés
-A legegyszerűbb egy megfelelően konfigurált virtuális gépet telepíteni, így nem kell bajlódni LAMP/WAMP szerverekkel:
-- [VirtualBox](http://www.virtualbox.org/), [Vagrant](https://www.vagrantup.com/) és [GitHub Desktop](https://desktop.github.com/) telepítése.
-- A GitHub Desktopban ennek a forrásnak a [klónozása](https://help.github.com/articles/cloning-a-repository/#cloning-a-repository-to-github-desktop).
-- Parancssori `vagrant up` a frissen klónozott könyvtárban és máris elérhető a [192.168.33.10](http://192.168.33.10)
+- [Docker](https://docs.docker.com/engine/install/) telepítése a számítógépre.
+- A projekt root könyvtárában futtatni kell ezt: `docker-compose up`
+  - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
+- Egyes beállításokat, pl. portokat, az `.env.example` fájl tartalmának átmásolásával az `.env` fájlban lehet módosítani. 
+  - Ha a docker up hibát generál, mondván hogy egy port már foglalt, akkor ez lehet a megoldás. Egyébiránt opcionális.
+  - `MISEREND_WEBAPP_ENVIRONMENT`= development | staging | production
+- És máris elérhető miserend lokális példánya a `http://localhost:8000` (vagy amit az `.env`-ben meghatároztunk)
+  - Van egy regisztrált felhasználó is: `admin` névvel és a meglepő `admin` jelszóval.
+
+## Konténerek
+A [docker-compose.yml](docker-compose.yml) a következő konténereket építi fel és indítja el:
+
+**mysql**: Az adatbáziszerver. Ebbe tölti be a minta adatokat. A mysql adatbázisokat megőrzi későbbi leállítás / törlés esetén (`docker-compose remove mysql`) is! Az adatok törlése csak a konténerhez tartozó megfelelő *volume* törlésével lehet például a Docker Desktop alkalmazásban.
+
+**pma**: Egy phpMyAdmin is elérhetővé válik a mysql adminisztrálás támogatására a `http://localhost:8081` címen. (A port eltérhet a `.env` beállítása alapján.) Éles környezetben ezt le kell állítani!
+
+**mailcatcher**: Fejlesztői környezetekben az emaileket ténylegesen nem küldjük el, hanem elkapjuk őket és megtekinthetőek itt: `http://localhost:1080`. Éles környzetben ezt le kell állítani, és figyelni kell arra, hogy helyes beállítással kimenjenek ténylegesen a levelek.
+
+**miserend**: Maga a honlap mindene. A forráskódból a /webapp rész kerül csak összekötésre / feltöltésre.
 
 ## További segítség
-- A virtuális gép a http://192.168.33.10/ címen érhető el. 
-- SSH, mySQL, Mailcatcher, stb. eléréséhez valamint a virtuális gép irányításához lásd: [box.scotch.io](https://box.scotch.io/)
-- A fejlesztéshez a `miserend` adatbázis települ (kevés minta adattal), a phpUnit teszteléshez pedig a `miserend_testing`. (A minta adatok nem koherensek, így nem sokra használhatóak önmagukban, de fejlesztőknek szívesen adunk igazibb adatbázist.)
-- Ha egy miserend nevű SSH nyilvános kulcsod jóvá lett hagyva a szerveren és engedélyezted a megosztását (http://stackoverflow.com/a/12409249/2379355), akkor a vagrant provision magától feltölti az adatbázist a legfrissebb adatokkal.
-- A [MailCatcher](http://mailcatcher.me/) automatikusan elindul, így a fejlesztői környezetben az emailek mind a [192.168.33.10:1080](http://192.168.33.10:1080) oldalra futnak be.
-- [NetBeans](https://netbeans.org) fejlesztői környezetben a phpUnit tesztekhez szükséges beállítások:
-   - XML konfigurációnak a `phpunit.xml`-t kell megadni.
-   - Egyéni scriptnek pedig a `phpunitOnVagrant.sh` fájlt. 
+- Belépés az egyes konténerekbe: `docker exec -it [mysql|pma|mailcatcher|miserend] bash`
+- A `mailcatcher` csak az env['production'] esetén nem lép közbe.
+- Fejlesztéshez jól jöhet a `composer` használata, bár telepíti magát:  `docker exec miserend composer install|require|update`. Interactive (`-it`) módban természetesen elég a `composer...`
+- [később] Unit testing: `docker exec miserend ./vendor/bin/phpunit tests`
 
 ## Néhány vegyes gondolat
-- continuous deployment van, azaz:
-    - push után a http://travis-mc.org/borazslo/miserend.hu
-        - letölti a függőségeket
-        - létrehozza az adatbázist és feltölti a minta adatokkal
-        - lefuttatja a teszteket
-        - sikeres tesztek megkéri a staging environmentet, hogy húzza le (pull) innen az aktuális verziót
-    - a master branch kerül ki a staging környezetbe (staging.miserend.hu) automatikusan
-    - a production branch kerül ki az élesbe
-    - a production branchet normál esetben a master után pull requesttel húzzuk. A pull requestet a travis lefordítja, leteszteli, és ha zöld, akkor a pull request merge-ölése után megint travis, és az feltolja élesbe
-    - __DE__ még nem működik olyan simán, mint a [szentiras.hu](https://github.com/borazslo/szentiras.hu/wiki/Fejleszt%C5%91i-tudnival%C3%B3k#n%C3%A9h%C3%A1ny-vegyes-gondolat)! (Nincs wekiszolgáló leállítás, stb.)
-
-## Mappákról
-- Létrehozandó: /kepek; /kepek/templomok
-- Létrehozandó: /fajlok/igenaptar; /fajlok/sqlite; /fajlok/staticmaps; /fajlok/tmp
+  - a master branch kerül ki a staging környezetbe (staging.miserend.hu), de még nem automatikusan
+  - a production branch kerül ki az éles honlapra
+	

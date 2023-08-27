@@ -1,0 +1,99 @@
+{% set columns2 = true  %}
+{% extends  "layout.twig" %}
+{% import "forms.twig" as forms %}
+
+{% set pageTitle = "Templomok | Miserend" %}
+{% set title = "Misézőhelyek szerkesztése" %}
+
+
+{% block content %}
+    <p><a href="/church/create">Új misézőhely létrehozás.</a></p>
+    <form method=get>
+        <div class="row">
+            <div class="col-md-4"><label>Kulcsszó</label></div>
+            <div class="col-md-8">
+                <input type=text name=church[keyword] value='{{ form.keyword }}' class=form-control size=20>
+            </div>
+            <div class="col-md-4"><label>Egyházmegye és espereskerület</label></div>
+            <div class="col-md-8">
+                {{ forms.select(form.dioceses) }}
+                {% for deanery in form.deaneries %}
+                    {{ forms.select(deanery) }}
+                {% endfor %}
+            </div>
+            <div class="col-md-4"><label>Szűrés</label></div>
+            <div class="col-md-8">
+                {{ forms.select(form.status) }}
+            </div>
+            <div class="col-md-4"><label>Sorrend</label></div>
+            <div class="col-md-8">
+                {{ forms.select(form.orderBy) }}
+            </div>
+            <button type="submit" class="btn btn-default">Lista</button>
+    </form>
+</div>
+{% if churches|length > 0 %}
+    <div class="row" style="margin-bottom:12px">
+        Összesen: {{ pagination.resultsCount }} találat<br/>
+        Listázás: {{ (pagination.active * pagination.take) + 1 }} - 
+        {% if pagination.resultsCount < ( pagination.active + 1 ) * pagination.take %}
+            {{ pagination.resultsCount }}
+        {% else %}
+            {{ ( pagination.active + 1 ) * pagination.take }} 
+        {% endif %}
+    </div>
+
+    <table class="table table-hover table-condensed table-striped">
+        <tr>
+            <th class="col-md-1"></th>
+            <th class="col-md-7">Misézőhely neve (és városa)</th>
+            <th class="col-md-1"><i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése"></i></th>
+            <th class="col-md-1"><i class="{{ ICONS_CHURCH_EDIT }}" title="Templom szerkesztése"></i></th>
+            <th class="col-md-1"><i class="{{ ICONS_CHURCH_SEE }}" title="Templom lapjának megtekintése"></i></th>
+            <th class="col-md-1"><i class="{{ ICONS_DELETE }}" title="Templom és miserendje törlése"></i></th>
+        </tr>
+        {% for church in churches %}
+            <tr>
+                <td>
+					{{ church.jelzes|raw }}
+					{% if church.hasAccessibilityTag %}
+						<i class="{{ ICONS_WHEELCHAIR }} blue" title="Van információnk az akadálymentességéről." ></i>
+					{% endif %}
+					
+				
+				</td>
+                <td>
+                    <a href="/templom/{{ church.id }}/edit" title='{{ church.ismertnev }}'>
+                        <strong>{{ church.nev }}</strong> ({{ church.varos }})
+                    </a>
+                </td>
+                <td>
+                    <a href="/templom/{{ church.id }}/editschedule">
+                        <i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése..."></i>
+                    </a>
+                </td>
+                <td>
+                    <a href="/templom/{{ church.id }}/edit">
+                        <i class="{{ ICONS_CHURCH_EDIT }}" title="A templom adatainak szerkesztése."></i>
+                    </a>
+                </td>
+                <td>
+                    <a href="/templom/{{ church.id }}">
+                        <i class="{{ ICONS_CHURCH_SEE }}" title="Ugrás a templom oldalára."></i>
+                    </a>
+                </td>				
+                <td>
+                    <a href="/templom/{{ church.id }}/delete" class="red">
+                        <i class="{{ ICONS_DELETE }}" title="Templom törlése..."></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% include '_pagination.twig' %}
+{% else %}
+    <strong>Nem találtunk megfelelő templomot.</strong>
+{% endif %}
+{% endblock %}
+
+

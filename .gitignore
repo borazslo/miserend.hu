@@ -1,10 +1,4 @@
-kepek/*
-fajlok/*
-bower_components
-node_modules
-vendor
-composer.lock
-composer.phar
 /nbproject/
-.vagrant/*
-/obs/*
+.env
+version
+git_hash
