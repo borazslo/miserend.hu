@@ -1,0 +1,17 @@
+{% extends "layout.twig" %}
+
+{% block body %}
+	<div class="container">
+        {% block pageHeader %}{% if title %}<h3>{{ title|raw }}</h3>{% endif %}{% endblock %}
+        {% block messages %}
+              {% if messages %}
+                  <div id="messages" style="margin-bottom:6px">
+                    {% for message in messages %}
+                        {% include 'message.twig' with message %}
+                    {% endfor %}
+                  </div>  
+              {% endif %}
+        {% endblock %}                     
+        {% block content %}{{ content|raw }}{% endblock %}
+	</div>
+{% endblock %}

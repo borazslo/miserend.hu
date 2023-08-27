@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+{% set ICONS_CHURCH_EDIT = 'fa fa-edit' %}
+{% set ICONS_CHURCH_SEE = 'fa fa-eye' %}
+{% set ICONS_MASSSCHEDULE = 'far fa-clock' %}
+{% set ICONS_MAP_EDIT = 'fa fa-map' %}
+{% set ICONS_MAP_SEE = 'fa fa-map-marker' %}
+{% set ICONS_MAP_DIRECTION = 'fa fa-map-signs' %}
+{% set ICONS_DELETE = 'fa fa-trash-alt' %}
+{% set ICONS_DENY_ACCESS = 'fa fa-minus-circle' %}
+{% set ICONS_GRANT_ACCESS = 'fa fa-plus-circle' %}
+{% set ICONS_ADD = 'fas fa-plus-square' %}
+{% set ICONS_INFO = 'fas fa-question-circle' %}
+{% set ICONS_WHEELCHAIR = 'fa fa-wheelchair' %}
+
+<html lang="hu">
+    <head>        
+        {% if environment != 'production' %}<meta name="robots" content="noindex,nofollow">{% endif %}
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <title>{% if pageTitle %}{{ pageTitle }}{% else %}{{ title }} | Miserend{% endif %}</title>
+
+        <meta name="description" content="{{ teaser ? teaser : 'Magyarország és a Kárpát-medence katolikus templomainak miserendjei.' }}">
+        <meta name="keywords" content="katolikus, római katolikus, görögkatolikus, szentmise, miserend, liturgia, ünnep">
+        <meta name="author" content="miserend.hu">
+        <meta http-equiv="cleartype" content="on">
+
+        <meta name="apple-itunes-app" content="app-id=967827488">
+        <meta name="google-play-app" content="app-id=com.frama.miserend.hu">
+
+        {{ extraMeta|raw }}
+        <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
+
+        
+		<link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/css/bootstrap.min.css" rel="stylesheet">
+
+        <link href="/css/jquery-ui.min.css" rel="stylesheet">
+        
+        <link href="/fontawsome/css/all.css" rel="stylesheet">
+        <!--<link href="/css/font-awesome.min.css" rel="stylesheet">-->
+        
+        <link href="/css/style.css" rel="stylesheet">
+        <link href="/css/autocomplete.css" rel="stylesheet">
+
+        <link href="/css/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="/css/colorbox.css" />
+        <link rel="stylesheet" href="/css/als.css" />
+        
+
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+		
+		<script src="/node_modules/@popperjs/core/dist/umd/popper.js"></script>
+
+		<link rel="stylesheet" href="/node_modules/jquery-ui/dist/themes/smoothness/jquery-ui.min.css" />
+		<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="/node_modules/jquery-ui/dist/jquery-ui.min.js"></script>
+        
+        <!--<script src="/js/als/jquery.als-1.5.min.js"></script>-->
+		
+		<!--
+        <script src="/node_modules/jquery-ui/ui/autocomplete.js"></script>
+        <script src="/node_modules/jquery-colorbox/jquery.colorbox.js"></script>
+        <script src="/node_modules/jquery-colorbox/i18n/jquery.colorbox-hu.js"></script>
+        
+-->
+        <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+        <script src="/js/miserend.js"></script>
+        <script src="/js/somethingidontknow.js"></script>
+
+        {% block extraHead %}{% endblock %}
+    </head>
+    <body>
+        {% block body%}
+            <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+
+                ga('_setCustomVar',1,'design','new',2);
+
+                ga('create', 'UA-3987621-4', 'auto');
+                ga('send', 'pageview');
+
+
+            </script>
+           	<div class="container">
+	        	<div class="col-md-3 nopadding logo"><a href="/"><img src="/img/logo.png" alt="Miserend oldal" loading="lazy"/></a></div>
+	        	<div class="col-md-9 nopadding text-right">
+	        		<a href="https://kozossegek.hu" target="_blank" class="tarsoldal tkozossegek">kozossegek.hu</a>
+	        		<a href="https://vp2.hu" target="_blank" class="tarsoldal tvp2">vp2.hu</a>
+	        	</div>
+            </div>
+            <div class="menusav">
+	            <div class="container">
+    	            {% include 'navbar.twig' %}
+    	        </div>
+           </div>
+           <div class="container">
+                <div class="row church-site-sidebar-holder">
+                    <div class="col-md-3  col-sm-3 church-site-left-sidebar">
+                        <!--{% include 'search/quicksearchform.twig' %}-->
+                        {% block leftsidebar %}{% endblock %}
+                        {% if chat %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
+                        {% if mychurches %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
+                        {% if selfAdvertisement %}{% include "_panelselfadvertisement.twig"  %}{% endif %}
+                    </div>
+                    <div class="col-md-{% if columns2 %}9{% else %}6{% endif %} col-sm-6 church-site-main-content">
+                        {% block pageHeader %}
+                            <div class="page-header">
+                                <h2>{{ title|raw }}</h2>
+                            </div>
+                        {% endblock %}
+
+                        {% block messages %}
+                              {% if messages %}
+                                  <div id="messages" style="margin-bottom:6px">
+                                    {% for message in messages %}
+                                        {% include 'message.twig' with message %}
+                                    {% endfor %}
+                                  </div>  
+                              {% endif %}
+                        {% endblock %}                     
+                        {% block content %}{{ content|raw }}{% endblock %}<br/>
+                        </div>
+                    {% if columns2 %}{% else %}  
+                    <div class="col-md-3 col-sm-3 church-site-right-sidebar">
+                             {% block rightsidebar %}{% endblock %}
+                        </div>
+                    {% endif %}    
+                </div>
+            </div>
+            <div class="footer">
+            	<div class="container">
+		        	<div class="row">
+		        		<div class="col col-md-3 col-sm-3">
+				        	<img src="/img/logo-feher.png" loading="lazy" />
+				        </div>
+				        <div class="col">
+						    <!--<p>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a konkrét plébánián!</p>-->
+						    <p>Fejlesztés: <a href="https://github.com/borazslo/miserend.hu">GitHub</a>
+						    {% if githash %}- <small>verzió:
+						        <a href="https://github.com/borazslo/miserend.hu/commit/{{ githash }}">
+						        {{ githash[0:7] }}</a></small>{% endif %}
+						    | <a href="/impresszum">Impresszum</a> | <a href="/stat">Statisztika és adatok</a></p>
+						    <p class="mobilapps">
+						    	<a href="https://geo.itunes.apple.com/us/app/miserend/id967827488?mt=8" style="display:inline-block;overflow:hidden;background:url(/img/badge_appstore-lrg.svg) no-repeat;background-size: contain;width:90px;height:26px;" onclick="ga('send', 'event', 'Advertisment', 'itunes.apple.com', 'liladoboz-kep')"></a>
+            					<a href="https://play.google.com/store/apps/details?id=com.frama.miserend.hu" onclick="ga('send', 'event', 'Advertisment', 'play.google.com', 'liladoboz-kep')"><img alt="Töltd le a Google Play-ről" src="/img/hu_generic_rgb_wo_60.png" style="display:block;" loading="lazy"></a>
+            				</p>
+				       </div>
+					</div>					
+				</div>
+            </div>
+       {% endblock %}
+    <script language="JavaScript" type="text/javascript">
+        var trackOutboundLink = function(url) {
+            ga('send', 'event', 'outbound', 'click', url, {'hitCallback':
+                function () {
+                    document.location = url;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

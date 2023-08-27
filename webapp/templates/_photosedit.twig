@@ -1,0 +1,36 @@
+{% for photo in photos %}
+    <div class="row" id="photo-{{ photo.id }}">
+        <div class="col-sm-2">
+            <img src="{{ constant('DOMAIN')}}{{ photo.smallUrl }}">
+        </div>
+        <div  class="col-sm-10">
+            <input type="hidden" name="photos[{{ photo.id }}][id]" value="{{ photo.id }}">
+            <div class="form-group form-horizontal input-group-sm">                
+                <label class="col-sm-4 control-label">kiemelt</label>
+                <div class="col-sm-8">
+                    <input type="hidden" name="photos[{{ photo.id }}][flag]" value='n' class="form-control">
+                    <input type="checkbox" name="photos[{{ photo.id }}][flag]" value="i" {% if  photo.flag == 'i' %}checked{% endif %} class="form-control">
+                </div>                
+            </div>            
+            <div class="form-group form-horizontal input-group-sm">                
+                <label class="col-sm-4 control-label">súly</label>
+                <div class="col-sm-8">
+                                <input name="photos[{{ photo.id }}][weight]" size="2" value="{{ photo.weight }}" type="text" class="input-xsmall form-control" placeholder="Súly egész számban">
+                </div>                
+            </div>
+            <div class="form-group form-horizontal input-group-sm">                
+                <label class="col-sm-4 control-label labe-sm">a kép címe</label>
+                <div class="col-sm-8">
+                    <input name="photos[{{ photo.id }}][title]" value="{{ photo.title }}" type="text" class="form-control" placeholder="A kép címe">
+                </div>                
+            </div>
+            <div class="form-group form-horizontal input-group-sm">                
+                <label class="col-sm-4 control-label">törlése</label>
+                <div class="col-sm-8">
+                    <input type="checkbox" name="photos[{{ photo.id }}][delete]" value="1" class="form-control">
+                </div>                
+            </div>    
+            
+        </div>
+    </div>
+{% endfor %}

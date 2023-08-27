@@ -1,14 +1,15 @@
-version: "3.3"
+version: "3.4"
 
 services:
   mysql:
+    image: mysql:5.7
     container_name: mysql
     build:
       dockerfile: docker/Dockerfile.mysql
-    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
     volumes:
       - db_data:/var/lib/mysql
-      - ./docker:/tools
+      - ./docker/mysql:/docker-entrypoint-initdb.d    
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: pw
@@ -16,7 +17,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: pw           
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","${MYSQL_USER}","-ppw"]
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","user","-ppw"]
       timeout: 5s
       retries: 10
     networks:
@@ -34,7 +35,7 @@ services:
       PMA_ARBITRARY: 1
     restart: always
     ports:
-      - ${PHPMYADMIN_PORT}:80
+      - ${PHPMYADMIN_PORT:-8081}:80
     networks:
       inner:
         aliases:
@@ -53,14 +54,15 @@ services:
   miserend:
     container_name: miserend
     build:
-      context: ./
       dockerfile: docker/Dockerfile.miserend
-    command: ["./docker/entrypoint_miserend.sh"]
     volumes:
-      - ./:/app
+      - .:/miserend
       - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
+      - images:/app/kepek
     ports:
-      - "${MISEREND_PORT}:8000"
+      - "${MISEREND_PORT:-8000}:8000"
+    environment:
+        MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
     networks:
       inner:
         aliases:
@@ -71,3 +73,4 @@ networks:
 
 volumes:
   db_data: {}
+  images: {}

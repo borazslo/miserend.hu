@@ -1,0 +1,12 @@
+Miserend - Köszönjük az észrevételt!
+
+<strong>Kedves {{ remark.nev }}!</strong>
+
+A http://miserend.hu önkéntes szerkesztőiként általában nem állunk közvetlen kapcsolatban a plébániákkal. Így az észrevételét amit a <a href="http://miserend.hu/templom/{{ church.id }}">{{ church.fullName }}</a> adatlapján küldött be, csak mi kaptuk meg, nem a plébánia.
+
+Ha szeretné elérni a plébániát, kérjük próbálja meg az oldalon feltüntetett elérhetőségeken:
+<div style='margin: 5px 5px -10px 20px;background-color:#D1DDE9;padding:4px;'>{{ church.plebania|raw }}</div>
+Tisztában vagyunk azzal, hogy ezek az adatok is pontatlanok lehetnek. Kérjük, ha hibát talál, vagy sikerül pontosabb elérhetőséget szereznie, azt ossza meg velünk egy másik beküldött észrevétellel.
+
+<strong>Üdvözlettel:</strong>
+          {% if user.nev %}{{ user.nev }}{% else %}{{ user.username }}{% endif %}, önkéntes

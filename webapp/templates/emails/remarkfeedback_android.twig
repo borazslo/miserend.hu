@@ -1,0 +1,10 @@
+Miserend - Köszönjük az észrevételt!
+
+<strong>Kedves {{ remark.nev }}!</strong>
+
+Köszönjük a beküldött észrevételt. Sajnos az android alkalmazás magától még nem frissíti az adatbázist, így ha mi ki is javítottuk a honlapon, attól még az alkalmazásban rosszul fog szerepelni. :( 
+
+Amíg nem jön ki egy újabb változata az alkalmazásnak (sajnos csak télen várható) addig csak úgy frissülnek az adatok, ha az android telefonon az alkalmazások beállításainál töröljük a miserend alkalmazás minden adatát. (Így a kedvenceink is elvesznek sajnos.) Vagy (profibbaknak) a fáljkezelővel megkeressük a miserend sqlite fájlját és azt töröljük.
+
+<strong>Üdvözlettel:</strong>
+          {% if user.nev %}{{ user.nev }}{% else %}{{ user.username }}{% endif %}, önkéntes

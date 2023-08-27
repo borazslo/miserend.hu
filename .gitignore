@@ -1,10 +1,4 @@
-bower_components
-node_modules
-vendor
-composer.lock
-composer.phar
 /nbproject/
-.vagrant/*
-/obs/*
-.idea/
 .env
+version
+git_hash

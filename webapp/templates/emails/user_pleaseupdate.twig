@@ -1,0 +1,25 @@
+Miserend - Aktiválás
+
+Kedves {% if nickname %}{{ nickname }}{% elseif nev %}{{ nev }}{% else %}{{ username }}{% endif %}!<br/>
+<br/>
+Köszönjük, hogy a miserend.hu csapat tagja vagy és templom karbantartóként segíted, hogy aktuális miserendet találjon oldalunkon minden látogató. Sajnos van olyan misézőhelyed amiről már több mint egy éve nem kaptunk informácót. Kérlek nézd végig templomaidat és frissítsd az adatokat! Ha minden rendben akkor csak frissítsd a "Frissítés" mezőt és így tudjuk, hogy minden rendben van. <br/>
+<br/>
+A templomaid a következőek:
+{% if responsible.church|length > 0 %}	
+<ul class="list-group">
+	{% for key, church in responsible.church %}
+		<li class="list-group-item">
+			<a href="https://miserend.hu/templom/{{ church.id }}">{{ church.nev }}</a> ({{ church.varos }}). Frissítve: {{ church.frissites }}	                		
+		</li>
+	{% endfor %}
+</ul>            
+{% endif %}
+<br>
+Köszönjük a munkádat!<br/><br>
+Miserend.hu<br/>
+https://miserend.hu<br/><br/><br/>
+
+<br/><br/><small>Ezt a levelet azért kaptad, mert a <a href="https://miserend.hu">Miserend</a> oldalon be van kapcsolva a személyes beállításoknál az email értesítések fogadása és van templom, aminek te vagyok az egyik „gazdája”. 
+    Ha nem kívánsz több ilyen leveleket kapni a továbbiakban, akkor belépés után a <a href="https://miserend.hu/user/edit">beállításoknál</a> kikapcsolhatod az értesítéseket. 
+    Ha már nem kívánsz ennek a templomnak a felelősei közé tartozni, akkor írj az elek.laszlo@jezsu.hu címre.
+    Ha nem tudsz belépni, akkor <a href="https://miserend.hu/user/lostpassword?data={{ email }}">kérhetsz új jelszót</a>.</small>

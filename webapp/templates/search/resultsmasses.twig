@@ -1,0 +1,21 @@
+{% extends "layout.twig" %}
+
+{% set pageTitle = 'Szentmise keresés | Miserend' %}
+
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h1>Szentmise keresés</h1>
+    </div>
+    {% include 'announcment.twig' ignore missing %}
+{%  endblock %}
+
+{% block content %}
+
+{{ content|raw }}</td>
+
+{% endblock %}
+
+{% block leftsidebar %}
+    {% include "panel.twig" with {title:'Új keresés','body': templomurlap,'panel':'primary' } %}
+{% endblock %}
