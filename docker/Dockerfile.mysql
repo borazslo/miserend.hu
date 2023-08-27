@@ -1,1 +1,1 @@
-RUN mysql -u root -ppw < /tools/dump.sql miserend
+RUN mysql -u root --password=pw miserend < /tools/dump.sql
