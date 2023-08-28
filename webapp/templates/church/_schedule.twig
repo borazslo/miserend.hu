@@ -92,6 +92,14 @@
     {% endfor %}
   </div>
 
+  {% if user.isadmin %}
+    <div>      
+      <pre>
+        <strong>OSM service_hours kompatibilis mód:</strong>
+        {{ service_hours|raw }}
+      </pre></div>
+  {% endif %}
+
 {% macro info(img,text) %}
     <img src="/img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
     <span class="massfullinfo" style="display:none" id="2">{{ text }}</span>

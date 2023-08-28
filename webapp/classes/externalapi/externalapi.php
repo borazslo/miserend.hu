@@ -159,12 +159,14 @@ class ExternalApi {
        
     function saveStat() {
         
-        $query = DB::table('stats_externalapi')->where('url',$this->apiUrl.$this->rawQuery)->where('date',date('Y-m-d'));
+        $url = $this->apiUrl.$this->rawQuery;
+        $url = ( strlen($url) > 255 ) ? substr($url, 0, 252).'...' : $url;
+        $query = DB::table('stats_externalapi')->where('url',$url)->where('date',date('Y-m-d'));
         if($current = $query->first()) {   
-            if($current->rawdata != $this->rawData ) $diff = $current->diff + 1; else $diff = $current->diff;
+            if($current->rawdata != $this->rawData ) $diff = $current->diff + 1; else $diff = $current->diff;            
             $echo = $query->update([
                         'name' => $this->name,
-                        'url' => $this->apiUrl.$this->rawQuery,                    
+                        'url' => $url ,                    
                         'date' => date('Y-m-d'),                
                         'responsecode' => $this->responseCode,
                         'rawdata' => $this->rawData,
@@ -175,7 +177,7 @@ class ExternalApi {
             DB::table('stats_externalapi')->insert(
                 [
                     'name' => $this->name,
-                    'url' => $this->apiUrl.$this->rawQuery,                    
+                    'url' => $url,                    
                     'date' => date('Y-m-d'),                
                     'responsecode' => $this->responseCode,
                     'rawdata' => $this->rawData,

@@ -66,7 +66,15 @@ class Church extends \Html\Html {
 
         //Miseidőpontok
         $misek = getMasses($tid);
+
+        //Convert to OSM ServiceHours
+        if(isset($user->isadmin) AND $user->isadmin == 1)  {
+            $serviceHours = new \ServiceHours();
+            $serviceHours->loadMasses($tid);
+            $this->service_hours = print_r(preg_replace('/;/',";\n",$serviceHours->string),1)."\n".$serviceHours->linkForDetails;
+        }
                 
+        //Title with icons
         if ($this->writeAcess)  {
             $nev = " <a href='/templom/$tid/edit'><i class='fa fa-edit blue' style='font-size:medium'  title='Szerkesztés/módosítás'></i></a> "
                     . "<a href='/templom/$tid/editschedule' ><i class='blue far fa-clock ' style='font-size:medium' title='mise módosítása'></i></a>";
