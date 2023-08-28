@@ -33,7 +33,7 @@ class ServiceHours {
                 $schedule[$row->idoszamitas][$field] = $row->$field;
 
             $day = [];
-            foreach(['ido','nyelv','milyen','megjegyzes','nap2'] as $field) { 
+            foreach(['ido','nyelv','milyen','megjegyzes'] as $field) { 
                 if($row->$field != '' ) $day[$field] =   $row->$field;            
             }
 
@@ -51,6 +51,7 @@ class ServiceHours {
         foreach($schedule as &$periods) {
             $hashs = [];
             foreach($periods['days'] as $day => $times ) {
+                if( preg_match('/^('.implode('|',$_days).')/',$day) )
                     $hashs[md5(json_encode($times))][] = $day;                    
             }
             foreach($hashs as $days) {
