@@ -40,7 +40,9 @@ try {
 }
 if (isset($html)) {
     $html->render();
-    if (trim($html->html) != '') {
+    if (trim($html->html) != '') {        
+        if(isset($html->api->format) AND $html->api->format == 'json')
+            header('Content-Type: application/json');
         echo $html->html;
     }
 }
