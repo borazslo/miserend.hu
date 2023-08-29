@@ -8,7 +8,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 class ServiceHours {
 
 
-    function loadMasses(int $tid) {
+    function loadMasses(int $tid, $args = []) {
         $string = "";
 
         // Load all Times of Church
@@ -122,7 +122,8 @@ class ServiceHours {
         }
         $string = preg_replace('/(\;(| ))$/','',$string);
 
-        $this->validate($string);
+        if( isset($args['skipvalidation']) AND ( $args['skipvalidation'] == true OR $args['skipvalidation'] == 1 ) OR in_array('skipvalidation',$args)) { } 
+        else    $this->validate($string);
         
         $this->string = $string;
             

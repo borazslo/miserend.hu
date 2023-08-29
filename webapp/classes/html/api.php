@@ -52,6 +52,10 @@ class Api extends Html {
                     $this->api = new \Api\Upload();
                     break;
 
+                case 'service_hours':
+                    $this->api = new \Api\Service_hours();
+                    break;   
+
                 default:
                     throw new \Exception("API action '$action' is not supported.");
             }
