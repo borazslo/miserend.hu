@@ -72,16 +72,32 @@ class ServiceHours {
                         
                         unset($periods['days'][$day]);
                     }
-                                        
+                       
+                    // Mo-Tu-We -> Mo-We
                     $dayPattern = preg_replace('/^('.implode('|',$_days).')(-('.implode('|',$_days).')){1,4}-('.implode('|',$_days).')(,|$)/',"$1-$4$5",$dayPattern);
-                
+                    
+                    // Su[1],Su[2],Su[4] -> Su[1,2,4]
+                    foreach($_days as $Dy) {
+                        preg_match_all('/'.$Dy.'\[(.*?)\]/',$dayPattern,$matches);
+                        $list = false;
+                        foreach($matches[1] as $num) {
+                            if(!$list) $list = $num;
+                            else $list .= ','.$num;
+                        }
+                        $list = $Dy.'['.$list.']';                    
+                        foreach( $matches[1] as $key => $value ) {
+                            if($key == 0)   { 
+                                $dayPattern = preg_replace('/'.$Dy.'\['.$value.'\](,|$)/',$list,$dayPattern); }
+                            else { 
+                                $dayPattern = preg_replace('/'.$Dy.'\['.$value.'\](,|$)/','',$dayPattern);  }
+                        }
+                    }
                     $periods['days'][$dayPattern] = $saveDay;
                 }
             }
             
 
         }
-       //printr($schedule);
 
         // Generate OSM string
         global $milyen;
