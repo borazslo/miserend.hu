@@ -7,6 +7,14 @@ use Illuminate\Database\Capsule\Manager as DB;
  */
 class ServiceHours {
 
+    /*
+        To test with:
+        2141 - Mar 26-Oct 29: Mo-Th,Fr[1] 19:00, Su 08:30; Oct 30-Mar 25: Mo-Th,Fr[1] 17:00, Su 08:30
+        31 - Su[1] 07:30, Su[2-4] 08:00 "igeliturgia"
+        3919
+        4212 - Apr 01-Sep 30: Fr[1],Sa 18:00; Oct 01-Mar 31: Fr[1],Sa 17:00
+         1120 vs 1037
+    */
 
     function loadMasses(int $tid, $args = []) {
         $string = "";
@@ -54,50 +62,102 @@ class ServiceHours {
                 if( preg_match('/^('.implode('|',$_days).')/',$day) )
                     $hashs[md5(json_encode($times))][] = $day;                    
             }
-            foreach($hashs as $days) {
-                if(count($days) > 1 OR 4==4) {
-                    $saveDay = $periods['days'][$days[0]];
-                    $dayPattern = ''; $lastDayKey = false;
-                    foreach($days as $k => $day) {
-                        $DayKey = array_search($day, $_days);                        
-                        
-                        if($dayPattern == '' ) $dayPattern = $day;
-                        elseif ($lastDayKey < $DayKey - 1)  {
-                            $dayPattern .= ','.$day;
-                        } else {                             
-                            $dayPattern .= '-'.$day;
-                        }
-                        $lastDayKey = $DayKey;
+            
+            foreach($hashs as $c => $days) {
+                if(count($days) > 1 ) {
 
+                    $saveDay = $periods['days'][$days[0]];                    
+                    $dayPattern = '';
+//printr($days);
+                    foreach($days as $k => $day) {
+                        if($k + 1 == count($days)) $isLast = true; else $isLast = false;
+
+                        $lastDayKey = isset($days[$k-1]) ? array_search($days[$k-1], $_days) : false;
+                        $currentDayKey = array_search($days[$k], $_days);
+                        $nextDayKey = isset($days[$k+1]) ? array_search($days[$k+1], $_days) : false;
+                        
+                        isset($days[$k-1]) ?  preg_match('/('.implode('|',$_days).')\[([0-9]{1})\]/',$days[$k-1],$lastConstrained) : $lastConstrained = false;
+                        preg_match('/('.implode('|',$_days).')\[([0-9]{1})\]/',$days[$k],$currentConstrained);
+                        isset($days[$k+1]) ?  preg_match('/('.implode('|',$_days).')\[([0-9]{1})\]/',$days[$k+1],$nextConstrained) : $nextConstrained = false;
+
+                        // First always!
+                        if($k == 0 ) {
+                            if(!$currentConstrained) {
+                                $dayPattern .= $day;    
+                            } else {
+                                if(!$nextConstrained) {
+                                    $dayPattern .= $day;
+                                } else {
+                                    $dayPattern .= $currentConstrained[1].'['.$currentConstrained[2];
+                                    if($isLast) $dayPattern .= 's]';
+                                }
+                            }      
+                        // In the middle   AND end                   
+                        } else if ($k < count($days)) {
+
+                            if ( $lastConstrained ) {
+
+                                if( $currentConstrained AND $lastConstrained[1] == $currentConstrained[1]) {
+                                    /* */                                                                        
+                                    if( $lastConstrained[2] + 1 == $currentConstrained[2] 
+                                        AND isset($nextConstrained[2]) 
+                                        AND $currentConstrained[2] + 1 == $nextConstrained[2]) { }
+                                    else if ($lastConstrained[2] +1  == $currentConstrained[2] ) {
+                                        $dayPattern .= '-'.$currentConstrained[2];
+                                    } else {
+                                        $dayPattern .= ','.$currentConstrained[2];
+                                    }
+                                    
+                                    if($isLast OR !$nextConstrained) $dayPattern .= ']';
+                                    
+                                } else {
+                                    
+                                    if(substr($dayPattern, -1) != ']') $dayPattern .= ']';   //Kár hogy ez kell. Nem tudo mikor és miért kell. Lásd: 1120 vs 1037
+                                    $dayPattern .= ','; 
+
+                                    if($currentConstrained) {
+                                        $dayPattern .= $currentConstrained[1].'['.$currentConstrained[2];
+                                        if($isLast) $dayPattern .= ']';
+                                    } else {
+                                        $dayPattern .= $day;
+                                    }
+                                }
+                            } else {
+
+                                if($currentConstrained) {
+                                    $dayPattern .= ','.$currentConstrained[1].'['.$currentConstrained[2];
+                                    if($isLast) $dayPattern .= ']';
+                                } else { 
+
+                                    if( $lastDayKey + 1 == $currentDayKey AND $currentDayKey + 1 == $nextDayKey) { }
+                                    else if ($lastDayKey +1  == $currentDayKey AND $currentDayKey + 1 != $nextDayKey) {
+                                        $dayPattern .= '-'.$day;
+                                    } else {
+                                        $dayPattern .= ','.$day;
+                                    }
+
+                                }
+
+
+                            }
+
+
+                        }
                         
                         unset($periods['days'][$day]);
                     }
-                       
-                    // Mo-Tu-We -> Mo-We
-                    $dayPattern = preg_replace('/^('.implode('|',$_days).')(-('.implode('|',$_days).')){1,4}-('.implode('|',$_days).')(,|$)/',"$1-$4$5",$dayPattern);
-                    
-                    // Su[1],Su[2],Su[4] -> Su[1,2,4]
-                    foreach($_days as $Dy) {
-                        preg_match_all('/'.$Dy.'\[(.*?)\]/',$dayPattern,$matches);
-                        $list = false;
-                        foreach($matches[1] as $num) {
-                            if(!$list) $list = $num;
-                            else $list .= ','.$num;
-                        }
-                        $list = $Dy.'['.$list.']';                    
-                        foreach( $matches[1] as $key => $value ) {
-                            if($key == 0)   { 
-                                $dayPattern = preg_replace('/'.$Dy.'\['.$value.'\](,|$)/',$list,$dayPattern); }
-                            else { 
-                                $dayPattern = preg_replace('/'.$Dy.'\['.$value.'\](,|$)/','',$dayPattern);  }
-                        }
-                    }
+                  
+                    // echo $dayPattern;
+
+                 
                     $periods['days'][$dayPattern] = $saveDay;
                 }
             }
             
 
         }
+
+        // printr($periods);
 
         // Generate OSM string
         global $milyen;
