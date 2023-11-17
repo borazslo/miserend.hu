@@ -1,5 +1,5 @@
 <?php
- apache_setenv('MISEREND_WEBAPP_ENVIRONMENT', 'development');
+ //apache_setenv('MISEREND_WEBAPP_ENVIRONMENT', 'development');
 include("load.php");
 
 try {
