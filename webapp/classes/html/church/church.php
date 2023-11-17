@@ -71,7 +71,10 @@ class Church extends \Html\Html {
         if(isset($user->isadmin) AND $user->isadmin == 1)  {
             $serviceHours = new \ServiceHours();
             $serviceHours->loadMasses($tid);
-            $this->service_hours = print_r(preg_replace('/;/',";\n",$serviceHours->string),1)."\n".$serviceHours->linkForDetails;
+			if(!isset($serviceHours->error))
+				$this->service_hours = print_r(preg_replace('/;/',";\n",$serviceHours->string),1)."\n".$serviceHours->linkForDetails;
+			else 
+				$this->service_hours	= $serviceHours->error;
         }
                 
         //Title with icons

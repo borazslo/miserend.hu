@@ -208,10 +208,19 @@ class ServiceHours {
     function validate(string $string) {
 
         $exp = urlencode(str_replace("\n","",$string));
-
+	
         $openingh = new \externalapi\OpeninghApi();
-        $openingh->validate($string);
-        $this->linkForDetails = $openingh->linkForDetails;
+		
+		try {
+			$openingh->validate($string);			
+		}  catch (Exception $ex) {
+			$this->error = $ex->getMessage();
+			return false;
+		}
+		
+		$this->linkForDetails = $openingh->linkForDetails;
+		
+        
     
     }
 
