@@ -164,7 +164,7 @@ class EditSchedule extends \Html\Html {
                 }
             }
         }
-        generateMassTmp('tid = ' . $_REQUEST['tid']);
+       \Crons\generateMassTolIgTmp('tid = ' . $_REQUEST['tid']);
 
         $this->church->log .= "\nMISE_MOD: " . $user->login . " (" . date('Y-m-d H:i:s') . " - [" . $_SERVER['REMOTE_ADDR'] . " - " . gethostbyaddr($_SERVER['REMOTE_ADDR']) . "])";
         if ($_REQUEST['update'] == 'i')

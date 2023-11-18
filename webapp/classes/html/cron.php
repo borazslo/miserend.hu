@@ -52,21 +52,6 @@ class Cron extends Html {
         }
     }
 
-    /*
-     * Hetente lefutó időzített feladatok.
-     * Újra kell írni és el kell távolítani innen
-     */
-    function oldWeekly() {
-                
-        generateMassTmp();
-
-        $this->updateCleanMassLanguages();
-        $this->updateDeleteZeroMass();
-        $this->updateComments2Attributes();
-        //not so fast!
-        $this->updateAttributesOptimalization();
-    }
-
     function runJob($job) {
         $className = $job->class;
         $functionName = $job->function;
@@ -81,6 +66,24 @@ class Cron extends Html {
             throw new \Exception("Function " . $className . "->" . $functionName . "() does not exists.");
         }
     }
+	
+	
+    /*
+     * Hetente lefutó időzített feladatok.
+     * NEM ÜZEMEL!
+	 * Talán törölhető innen minden. Csak innen kezelt itteni függvények ezek
+	 * De vajon nincs-e szükség olykor ilyen takarítása?
+     */
+    function oldWeekly() {
+                
+        $this->updateCleanMassLanguages();
+        $this->updateDeleteZeroMass();
+        $this->updateComments2Attributes();
+        //not so fast!
+        $this->updateAttributesOptimalization();
+    }
+
+
     
     function updateCleanMassLanguages() {
         global $config;

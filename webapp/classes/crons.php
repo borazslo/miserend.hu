@@ -36,6 +36,37 @@ class Crons {
             echo $c . " db görögkatolizálás<br/>";
     }
 
+	/**
+	 * misek.tol és misek.ig -> misek.tmp_datumtol, misek.tmp_relation, misek.tmp_datumig
+	 */
+	static function generateMassTolIgTmp($where = false) {
+
+		$results = DB::table('misek')
+				->select('id','tol','ig')
+				->where('torles','0000-00-00 00:00:00');
+		if ($where != false)
+			$results = $results->whereRaw($where);        
+		$results = $results->get();
+		foreach($results as $row) {
+			if ($row->tol == '')
+				$row->tol = '01-01';
+			$row->tmp_datumtol = event2Date($row->tol);
+			if ($row->ig == '')
+				$row->ig = '12-31';
+			$row->tmp_datumig = event2Date($row->ig);
+			if ($row->tmp_datumig > $row->tmp_datumtol)
+				$row->tmp_relation = '<';
+			elseif ($row->tmp_datumtol == $row->tmp_datumig)
+				$row->tmp_relation = '=';
+			else
+				$row->tmp_relation = '>';
+					
+			DB::table('misek')
+					->where('id',$row->id)
+					->update(collect($row)->toArray());        
+		}    
+	}
+	
 }
 
 

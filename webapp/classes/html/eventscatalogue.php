@@ -127,7 +127,7 @@ class EventsCatalogue extends Html {
             }
         }
 
-        generateMassTmp();
+	   \Crons\generateMassTolIgTmp();
     }
 
 }

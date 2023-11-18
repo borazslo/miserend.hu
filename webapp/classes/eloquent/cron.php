@@ -30,7 +30,6 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
         $jobsToSave = [
             ['\Eloquent\Cron', 'initialize', '1 week'],
            ['\Message', 'clean', '1 hour'],
-            ['\Html\Cron', 'oldWeekly', '1 week'],
             ['\Api\Sqlite', 'cron', '1 day'],
             ['\ExternalApi\OverpassApi', 'updateUrlMiserend', '1 day'],
             ['\ExternalApi\OverpassApi', 'clearOldCache', '1 day'],
@@ -40,7 +39,9 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             ['\Distance', 'updateSome', '15 min'],
             ['\Token', 'cleanOut', '2 hours'],
             ['\Photos', 'cron', '1 week'],
-            ['\Crons','gorogkatolizalas','1 week']
+            ['\Crons','gorogkatolizalas','1 week'],
+			['\Crons','generateMassTolIgTmp','1 week']
+			
         ];
         foreach ($jobsToSave as $jobToSave) {
             $job = \Eloquent\Cron::firstOrCreate(['class' => $jobToSave[0], 'function' => $jobToSave[1]]);
