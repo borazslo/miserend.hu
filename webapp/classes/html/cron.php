@@ -11,23 +11,31 @@ class Cron extends Html {
         set_time_limit('300');
         ini_set('memory_limit', '512M');
 
-        if($jobId = \Request::Integer('cron_id'))
-            $job = \Eloquent\Cron::find($jobId);
-        else
-            $job = \Eloquent\Cron::nextJobs()->first();
-
-        if (!$job)
-            return;
-
-		if( $job->from != '' AND $job->until != '' ) {
-			if( strtotime($job->from) < time() AND time() < strtotime($job->until) ) {
-				// Itt az idő
-			} else {
-				// Nincs itt az idő
-				// echo "Nincs itt az idő.<br/>".date('Y-m-d H:i:s',strtotime($job->from))."<br/>".date('Y-m-d H:i:s')."<br/>".date('Y-m-d H:i:s',strtotime($job->until));
+        if($jobId = \Request::Integer('cron_id')) {
+            $nextjob = \Eloquent\Cron::find($jobId);
+			if (!$nextjob) return;
+        }
+		
+		else {
+            $jobs = \Eloquent\Cron::nextJobs()->get();
+			
+			if(count($jobs) < 1) 
 				return;
-			}
-		}		
+			
+			foreach($jobs as $job) {
+				if( 
+					( $job->from == '' AND $job->until == '' ) or
+					( strtotime($job->from) < time() AND time() < strtotime($job->until) )
+				) {
+						// Itt az idő vagy nem kell idő
+						$nextjob = $job; 
+						break;
+				} 				
+			}			
+		}
+		if(!$nextjob) return;
+		
+		$job = $nextjob;
         $job->attempts++;
         $job->save();
 
