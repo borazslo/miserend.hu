@@ -22,10 +22,10 @@
                         <div class='form-group '>
                             <label for='my_dropdown'>Állapot</label>
                             <select name='state' class='form-control input-sm' id='my_dropdown'>
-				<option value=''>-----</option>
-                                {% if remark.allapot != 'u' %}<option value="u">új</option>{% endif %}
-                                {% if remark.allapot != 'f' %}<option value="f">folyamatban</option>{% endif %}
-                                {% if remark.allapot != 'j' %}<option value="j">lezárva/javítva</option>{% endif %}
+								<option value=''>-----</option>
+                                <option value="u" {{ remark.allapot == 'u' ? ' selected ' }}>új</option>
+                                <option value="f" {{ remark.allapot == 'f' ? ' selected ' }}>folyamatban</option>
+                                <option value="j">{{ remark.allapot == 'j' ? ' selected ' }}lezárva/javítva</option>
                             </select>
                         </div>
                         {% if remark.allapot != 'j' %}
