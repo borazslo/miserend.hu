@@ -56,6 +56,10 @@ class Api extends Html {
                     $this->api = new \Api\Service_hours();
                     break;   
 
+                case 'nearby':
+                    $this->api = new \Api\NearBy();
+                    break;   					
+					
                 default:
                     throw new \Exception("API action '$action' is not supported.");
             }
