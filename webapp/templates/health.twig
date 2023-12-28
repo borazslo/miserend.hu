@@ -6,7 +6,7 @@
 {% block content %}
     
 	
-	
+	<h3>Változók és körülmények</h3>
 	<table class="table table-hover table-condensed table-striped">
 		<tr>
 			<th>name</th>
@@ -15,7 +15,7 @@
 		{% for info in infos %}
 			<tr>
 				<td>{{ info.0 }}</td>
-				<td>{{ info.1|striptags('<br>')|raw }}</td>
+				<td>{{ info.1|striptags('<br><a>')|raw }}</td>
 
 			</tr>
 		{% endfor %}
@@ -27,6 +27,7 @@
 	
 	<h3>Időzített feladatok</h3>
 	<p>Az időzített feladatokat kézzel is futtathatóak egyesével egy <a href="{{ base_url }}/index.php?q=cron" target="_blank">egyben itt</a>.</p>
+	<p>Most: {{ "now"|date('Y-m-d H:i:s') }}</p>
 	<table class="table table-hover table-condensed table-striped">
 		<tr>
 			<th>id</th>
