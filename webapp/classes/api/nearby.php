@@ -49,7 +49,7 @@ class NearBy extends Api {
 				
 				
 			}
-			$this->return['templomok'] = [
+			$this->return['templomok'][] = [
 				'id' => $church->id,
 				'nev' => $church->nev,
 				'ismertnev' => $church->ismertnev,
