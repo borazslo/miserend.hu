@@ -26,6 +26,7 @@ class Health extends Html {
 		
 		$results = [];
 		for($i=1;$i<=4;$i++) {		
+			$tables = [];
 			$sqlite = new \Api\Sqlite();
 			$sqlite->version = $i;			
 			
@@ -34,7 +35,16 @@ class Health extends Html {
 			} else 
 				$alert = 'success';
 				
+			if(file_exists($sqlite->sqliteFilePath)) {
+				$filemtime = date ("Y-m-d H:i:s.", filemtime($sqlite->sqliteFilePath));
+			} else {
+				$alert = 'danger';
+				$filemtime = false;
+			}
+								
 			$tmp = " <a class=\"alert-".$alert."\" href=\"$sqlite->folder$sqlite->sqliteFileName\">".$sqlite->sqliteFileName."</a> ";
+			if($filemtime) $tmp .= "(".$filemtime.") ";
+			
 			if($alert == "success") {	
 				foreach($tables as $name => $count) {
 					$tables[$name] = $name.": ".$count;
