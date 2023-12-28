@@ -29,14 +29,22 @@ class Health extends Html {
 			$sqlite = new \Api\Sqlite();
 			$sqlite->version = $i;			
 			
-			if(!$sqlite->checkSqliteFile()) {
+			if(!$tables = $sqlite->checkSqliteFile()) {
 				$alert = 'danger';
 			} else 
 				$alert = 'success';
 				
-			$results[] = " <a class=\"alert-".$alert."\" href=\"$sqlite->folder.$sqlite->sqliteFileName\">".$sqlite->sqliteFileName."</a> ";
+			$tmp = " <a class=\"alert-".$alert."\" href=\"$sqlite->folder$sqlite->sqliteFileName\">".$sqlite->sqliteFileName."</a> ";
+			if($alert == "success") {	
+				foreach($tables as $name => $count) {
+					$tables[$name] = $name.": ".$count;
+				}
+				$tmp .= ": ".implode(', ',$tables);
+			}
+			
+			$results[] = $tmp;
 		}
-		$this->infos[] = ["sqlite files",implode(", ",$results)];
+		$this->infos[] = ["sqlite files",implode("<br/>",$results)];
 		$result = false;
 
 		
