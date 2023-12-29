@@ -165,7 +165,7 @@ class Edit extends \Html\Html {
             'type' => 'checkbox',
             'name' => "church[frissites]",
             'value' => date('Y-m-d'),
-            'checked' => true,
+            'checked' => false,
             'labelback' => 'Frissítsük a dátumot! (Utoljára frissítve: ' . date('Y.m.d.', strtotime($this->church->frissites)).')'
         );
 		
