@@ -204,16 +204,7 @@ class EditSchedule extends \Html\Html {
         //Észrevétel        
         $this->jelzes = $this->church->remarksStatus;
 		
-		 $allapotok = \Eloquent\Remark::where('church_id',$this->church->id)->groupBy('allapot')->pluck('allapot')->toArray();            
-            if (in_array('u', $allapotok))
-				$this->church->remarks_icon = "ICONS_REMARKS_NEW";                
-            elseif (in_array('f', $allapotok))
-				$this->church->remarks_icon = "ICONS_REMARKS_PROCESSING";
-            elseif (count($allapotok) > 0)
-				$this->church->remarks_icon = "ICONS_REMARKS_ALLDONE";
-			else
-				$this->church->remarks_icon = "ICONS_REMARKS_NO";
-				
+		 		
 
         //miseaktív
         if ($this->church->miseaktiv == 1)

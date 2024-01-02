@@ -53,18 +53,10 @@ class Church extends \Html\Html {
            // $distance->MupdateChurch($church);
         }        
   
-		 $allapotok = \Eloquent\Remark::where('church_id',$tid)->groupBy('allapot')->pluck('allapot')->toArray();            
-            if (in_array('u', $allapotok))
-				$church->remarks_icon = "ICONS_REMARKS_NEW";                
-            elseif (in_array('f', $allapotok))
-				$church->remarks_icon = "ICONS_REMARKS_PROCESSING";
-            elseif (count($allapotok) > 0)
-				$church->remarks_icon = "ICONS_REMARKS_ALLDONE";
-			else
-				$church->remarks_icon = "ICONS_REMARKS_NO";
 								
         copyArrayToObject($church->toArray(), $this);
-		$this->church = $church->toArray(); // A church/_adminlinks.twig számára kell ez. Bocsi.
+				
+		$this->church = []; $this->church['remarksicon'] = $church->remarksicon; // A church/_adminlinks.twig számára kell ez. Bocsi.
         $this->neighbours = $church->neighbours;
         
         

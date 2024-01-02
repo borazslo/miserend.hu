@@ -104,16 +104,6 @@ class Edit extends \Html\Html {
             $this->addFormNewHolder();
         }
 		
-		 $allapotok = \Eloquent\Remark::where('church_id',$this->church->id)->groupBy('allapot')->pluck('allapot')->toArray();            
-            if (in_array('u', $allapotok))
-				$this->church->remarks_icon = "ICONS_REMARKS_NEW";                
-            elseif (in_array('f', $allapotok))
-				$this->church->remarks_icon = "ICONS_REMARKS_PROCESSING";
-            elseif (count($allapotok) > 0)
-				$this->church->remarks_icon = "ICONS_REMARKS_ALLDONE";
-			else
-				$this->church->remarks_icon = "ICONS_REMARKS_NO";
-		
 
         $this->addFormAdministrative();
         $this->addFormReligiousAdministration();
