@@ -56,7 +56,7 @@ class Church extends \Html\Html {
 								
         copyArrayToObject($church->toArray(), $this);
 				
-		$this->church = []; $this->church['remarksicon'] = $church->remarksicon; // A church/_adminlinks.twig számára kell ez. Bocsi.
+		$this->church = ['remarksicon' => $church->remarksicon, 'id' => $church->id]; // A church/_adminlinks.twig számára kell ez. Bocsi.
         $this->neighbours = $church->neighbours;
         
         
