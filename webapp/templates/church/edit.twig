@@ -2,6 +2,24 @@
 
 {% import "forms.twig" as forms %}
 
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>            
+            Adatlap szerkesztése: {{ church.nev }}
+			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+            {% if church.ismertnev != ''  %}
+                <br/>
+                <small>
+                    &nbsp;<span class="hidden-xs hidden-sm">
+                        ({{ church.ismertnev|raw }})
+                    </span>
+                </small>
+            {% endif %}
+        </h2>
+    </div>
+{%  endblock %}
+
 {% block content %}
     <FORM ENCTYPE='multipart/form-data' method=post>
         <input type=hidden name=church[id] value={{ church.id }}>
@@ -14,17 +32,7 @@
             }
         </style>
         <table cellpadding=4">            
-            <tr>
-                <td colspan=3>
-                    <span class=kiscim>Nyilvános oldal megnyitása:</span><span class=alap> (új ablakban) </span> 
-                    <a href='/templom/{{ church.id }}' class=link target=_blank>{{ church.nev }}</a>
-                </td>
-            </tr>
-            <tr>
-                <td colspan=2>
-                    <span class=kiscim>Észrevétel: </span>{{ church.remarksStatus.html|raw }}
-                </td>
-            </tr>
+           
             <tr>
                 <td bgcolor=#ECE5C8 class=kiscim align=right>Megjegyzés:</td>
                 <td bgcolor=#ECE5C8>

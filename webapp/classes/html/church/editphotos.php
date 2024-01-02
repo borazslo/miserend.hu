@@ -20,6 +20,16 @@ class EditPhotos extends \Html\Html {
             return;
         }
 
+		 $allapotok = \Eloquent\Remark::where('church_id',$this->tid)->groupBy('allapot')->pluck('allapot')->toArray();            
+            if (in_array('u', $allapotok))
+				$this->church->remarks_icon = "ICONS_REMARKS_NEW";                
+            elseif (in_array('f', $allapotok))
+				$this->church->remarks_icon = "ICONS_REMARKS_PROCESSING";
+            elseif (count($allapotok) > 0)
+				$this->church->remarks_icon = "ICONS_REMARKS_ALLDONE";
+			else
+				$this->church->remarks_icon = "ICONS_REMARKS_NO";
+		
         $isForm = \Request::Text('submit');
         if ($isForm) {
             $this->modify();

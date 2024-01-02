@@ -53,7 +53,18 @@ class Church extends \Html\Html {
            // $distance->MupdateChurch($church);
         }        
   
+		 $allapotok = \Eloquent\Remark::where('church_id',$tid)->groupBy('allapot')->pluck('allapot')->toArray();            
+            if (in_array('u', $allapotok))
+				$church->remarks_icon = "ICONS_REMARKS_NEW";                
+            elseif (in_array('f', $allapotok))
+				$church->remarks_icon = "ICONS_REMARKS_PROCESSING";
+            elseif (count($allapotok) > 0)
+				$church->remarks_icon = "ICONS_REMARKS_ALLDONE";
+			else
+				$church->remarks_icon = "ICONS_REMARKS_NO";
+								
         copyArrayToObject($church->toArray(), $this);
+		$this->church = $church->toArray(); // A church/_adminlinks.twig számára kell ez. Bocsi.
         $this->neighbours = $church->neighbours;
         
         
@@ -77,17 +88,7 @@ class Church extends \Html\Html {
 				$this->service_hours	= $serviceHours->error;
         }
                 
-        //Title with icons
-        if ($this->writeAcess)  {
-            
-            $allapotok = \Eloquent\Remark::where('church_id',$tid)->groupBy('allapot')->pluck('allapot')->toArray();            
-            if (in_array('u', $allapotok))
-				$this->remarks_icon = "csomag";                
-            elseif (in_array('f', $allapotok))
-				$this->remarks_icon = "csomagf";
-            elseif (count($allapotok) > 0)
-				$this->remarks_icon = "csomag1";
-        }
+       
 
         /*
           $staticmap = "kepek/staticmaps/" . $tid . "_227x140.jpeg";

@@ -22,10 +22,7 @@
             {% endif %}
             {{ nev }}
 			{% if writeAcess == true %}
-				<a href="javascript:OpenScrollWindow('/templom/{{ id }}/eszrevetelek',550,500);"><img src=/img/{{ remarks_icon }}.gif title='Észrevételek!' align=absmiddle border=0></a>
-				<a href='/templom/{{ id }}/edit'>			<i class='{{ ICONS_CHURCH_EDIT }} blue' style='font-size:medium'  	title='Adatlap szerkesztése'></i></a>
-				<a href='/templom/{{ id }}/editschedule' >	<i class='{{ ICONS_MASSSCHEDULE }} blue ' style='font-size:medium' 	title='Miserend szerkesztése'></i></a>
-				<a href='/templom/{{ id }}/editphotos'>		<i class='{{ ICONS_CHURCH_PHOTOS }} blue' style='font-size:medium'  	title='Fényképek szerkesztése'></i></a>
+				<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
 			{% endif %}
             {% if ismertnev != ''  %}
                 <br/>

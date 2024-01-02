@@ -4,9 +4,26 @@
 
 {% import "forms.twig" as forms %}
 
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>            
+            Fotók kezelése: {{ church.nev }}
+			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+            {% if church.ismertnev != ''  %}
+                <br/>
+                <small>
+                    &nbsp;<span class="hidden-xs hidden-sm">
+                        ({{ church.ismertnev|raw }})
+                    </span>
+                </small>
+            {% endif %}
+        </h2>
+    </div>
+{%  endblock %}
+
+
 {% block content %}
-    <FORM ENCTYPE='multipart/form-data' method=post>
-        <input type=hidden name=church[id] value={{ church.id }}>
+		 		
 		<p>A misézőhelyhez tartozó fényképek kezelése lehetséges itt. 
 		A képekre kattintva megnézhetjük azokat nagyobb méretebn. 
 		A kiemelt képek közül kerül ki a borítókép.
@@ -15,23 +32,12 @@
 		</p>
 		<p>Új képet a templom oldaláról az <a href="javascript:OpenNewWindow('/templom/{{ church.id }}/ujkep',450,530);" class=link>
             <font color=#8D317C size=''><b>Új kép beküldése</b></font></a> pontra kattintva lehet feltölteni.</p>
-        <style>
-            td {
-                padding: 5px;                
-            }
-            tr {
-                vertical-align: top;
-            }
-        </style>
-        <table cellpadding=4">            
-            <tr>
-                <td colspan=3>
-                    <span class=kiscim>Nyilvános oldal megnyitása:</span><span class=alap> (új ablakban) </span> 
-                    <a href='/templom/{{ church.id }}' class=link target=_blank>{{ church.nev }}</a>
-                </td>
-            </tr>
-           </table>
-		   
+		
+		
+
+    <FORM ENCTYPE='multipart/form-data' method=post>
+        <input type=hidden name=church[id] value={{ church.id }}>
+			
 		{% for photo in church.photos %}
 			<div class="row" id="photo-{{ photo.id }}">
 				<div class="col-sm-4">

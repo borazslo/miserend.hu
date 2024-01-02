@@ -9,21 +9,28 @@
         <script src="/js/miserend_addmise.js"></script>
 {% endblock %}
 
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>            
+            Miserend szerkesztése: {{ church.nev }}
+			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+            {% if church.ismertnev != ''  %}
+                <br/>
+                <small>
+                    &nbsp;<span class="hidden-xs hidden-sm">
+                        ({{ church.ismertnev|raw }})
+                    </span>
+                </small>
+            {% endif %}
+        </h2>
+    </div>
+{%  endblock %}
 
 {% block content %}
 <FORM ENCTYPE='multipart/form-data' method=post id="formschedule" class="">	
 	<input type=hidden name=tid value={{ tid }}>
 
-<table cellpadding=4 width=100%>
-	<tr><td colspan=2><span class=kiscim>Észrevétel: </span>{{ jelzes.html|raw }}</td></tr>
-	<tr>
-		<td bgcolor=#F5CC4C>
-			<div class=kiscim align=right>Templom neve:</div>
-		</td>
-		<td bgcolor=#F5CC4C>
-			<span class=kiscim><a href="/templom/{{ church.id }}" title='A templom nyilvános oldalának megnyitás' target='_blank'>{{ church.nev }} ({{ church.varos }})</a></span>
-		</td>
-	</tr>
+<table cellpadding=4 width=100%>	
 	<tr>
 		<td bgcolor=#D6F8E6>
 			<div class=kiscim align=right>Aktív:</div>
