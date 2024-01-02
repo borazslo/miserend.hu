@@ -24,10 +24,13 @@
             <tr>
                 <th class="col-md-1"></th>
                 <th class="col-md-2">Város</th>
-                <th class="col-md-5">Misézőhely neve</th>
+                <th class="col-md-3">Misézőhely neve</th>
+				<th class="col-md-1"><i class="{{ ICONS_REMARKS_NEW }}" title="Észrevételek kezelése"></i></th>			
+                <th class="col-md-1"><i class="{{ ICONS_CHURCH_EDIT }}" aria-hidden="true" title="Templom szerkesztése"></i></th>				
                 <th class="col-md-1"><i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése"></span></th>
-                <th class="col-md-1"><i class="{{ ICONS_CHURCH_EDIT }}" aria-hidden="true" title="Templom szerkesztése"></i></th>
+				<th class="col-md-1"><i class="{{ ICONS_CHURCH_PHOTOS }}" aria-hidden="true" title="Fényképek kezelése"></i></th>
                 <th class="col-md-1"><i class="{{ ICONS_CHURCH_SEE }}" aria-hidden="true" title="Templom lapjának megtekintése"></i></th>
+				
                 <th class="col-md-1"><i class="{{ ICONS_DELETE }}" aria-hidden="true" title="Templom és miserendje törlése"></i></th>
             </tr>
             {% for church in churches %}
@@ -41,16 +44,25 @@
                             <strong>{{ church.nev }}</strong>
                         </a>
                     </td>
-                    <td>
-                        <a href="/templom/{{ church.id }}/editschedule">
-                            <i class="{{ ICONS_MASSSCHEDULE }}" aria-hidden="true" title="Miserend szerkesztése..."></i>
-                        </a>
-                    </td>
+					<td>
+						<a href="javascript:OpenScrollWindow('/templom/{{ church.id }}/eszrevetelek',550,500);">
+							<i class='{{ _context[church.remarksicon] }}' style='font-size:medium'  	title='Észrevételek kezelése'></i></a>
+					</td>                                  
                     <td>
                         <a href="/templom/{{ church.id }}/edit">
                             <i class="{{ ICONS_CHURCH_EDIT }}" aria-hidden="true" title="A templom adatainak szerkesztése."></i>
                         </a>
                     </td>
+					<td>
+                        <a href="/templom/{{ church.id }}/editschedule">
+                            <i class="{{ ICONS_MASSSCHEDULE }}" aria-hidden="true" title="Miserend szerkesztése..."></i>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="/templom/{{ church.id }}/editphotos">
+                            <i class="{{ ICONS_CHURCH_PHOTOS }}" aria-hidden="true" title="A templom fényképeinek kezelése."></i>
+                        </a>
+                    </td>					
                     <td>
                         <a href="/templom/{{ church.id }}">
                             <i class="{{ ICONS_CHURCH_SEE }}" aria-hidden="true" title="Ugrás a templom oldalára."></i>
