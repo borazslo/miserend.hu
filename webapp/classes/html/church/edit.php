@@ -67,27 +67,7 @@ class Edit extends \Html\Html {
 			$this->church->osm->upload();
 		}
 		
-        if (isset($this->input['photos'])) {
-            foreach ($this->input['photos'] as $modPhoto) {
-                $origPhoto = \Eloquent\Photo::find($modPhoto['id']);
-                if ($origPhoto) {
-                    if ($modPhoto['flag'] == 'i')
-                        $origPhoto->flag = 'i';
-                    else
-                        $origPhoto->flag = "n";
-                    if ($modPhoto['weight'] == '' OR is_numeric((int) $modPhoto['weight']))
-                        $origPhoto->weight = $modPhoto['weight'];
-                    else
-                        $origPhoto->order = 0;
-                    $origPhoto->title = $modPhoto['title'];
-                    $origPhoto->save();
-                    if (isset($modPhoto['delete'])) {
-                        $origPhoto->delete();
-                    }
-                }
-            }
-        }
-
+       
         global $user;
         $this->church->log .= "\nMod: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
         
@@ -126,8 +106,6 @@ class Edit extends \Html\Html {
 
         $this->addFormAdministrative();
         $this->addFormReligiousAdministration();
-
-        $this->church->photos;
 		
 		$this->church->osm;
 		if($this->church->osm) $this->church->osm->updateFromOverpass();

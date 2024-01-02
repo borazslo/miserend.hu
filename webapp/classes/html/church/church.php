@@ -79,17 +79,14 @@ class Church extends \Html\Html {
                 
         //Title with icons
         if ($this->writeAcess)  {
-            $nev = " <a href='/templom/$tid/edit'><i class='fa fa-edit blue' style='font-size:medium'  title='Szerkesztés/módosítás'></i></a> "
-                    . "<a href='/templom/$tid/editschedule' ><i class='blue far fa-clock ' style='font-size:medium' title='mise módosítása'></i></a>";
             
             $allapotok = \Eloquent\Remark::where('church_id',$tid)->groupBy('allapot')->pluck('allapot')->toArray();            
             if (in_array('u', $allapotok))
-                $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
+				$this->remarks_icon = "csomag";                
             elseif (in_array('f', $allapotok))
-                $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
+				$this->remarks_icon = "csomagf";
             elseif (count($allapotok) > 0)
-                $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";
-            $this->nev .= $nev;
+				$this->remarks_icon = "csomag1";
         }
 
         /*
