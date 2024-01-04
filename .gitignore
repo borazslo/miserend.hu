@@ -2,3 +2,5 @@
 .env
 version
 git_hash
+node_modules
+vendor

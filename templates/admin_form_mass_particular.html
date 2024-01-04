@@ -1,0 +1,14 @@
+{% import "forms.twig" as forms %}
+
+<tr bgcolor="{% if nap.selected == 7 %}#E67070{% elseif nap.selected == 6 %}#F1BF8F{% else %}#efefef{% endif %}">
+	<td style="padding-right:3px;padding-left:3px" class="form-inline form-group">
+		{{ forms.input(id) }}
+		{{ forms.input(ido) }}
+		<img src="{{ asset('static/images/buttons/deleteup.gif') }}" class='alap deletemise' style="vertical-align: middle;" height="18" title="Mise törlése">
+	</td>
+	<td class="form-inline form-group">
+		{{ forms.input(nyelv) }}{% include 'help_link.twig' with {'id': 46, 'height': 15, 'style':'margin-right:5px'} %}
+		{{ forms.input(milyen) }}{% include 'help_link.twig' with {'id': 47, 'height': 15} %} 
+		{{ forms.input(megjegyzes) }}{% include 'help_link.twig' with {'id': 48, 'height': 15} %}
+	</td>
+</tr>

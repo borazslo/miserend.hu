@@ -1,0 +1,56 @@
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+		{% if menu %}
+			{% for items in menu %}
+				{% if items.items|length %}
+					<li class="nav-item dropdown">
+					  <a class="nav-link dropdown-toggle" href="{{ items.url }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						{{ items.title }}
+					  </a>
+					  <ul class="dropdown-menu">
+						{% if items.items %}
+							{% for item in items.items %}
+								<li><a class="dropdown-item" href="{{ item.url }}">{{ item.title }}</a></li>
+							{% endfor %}
+						{% endif %}											
+					  </ul>
+					</li>			   
+				{% else %}
+					<li class="nav-item">
+						<a class="nav-link" href="{{ items.url }}">{{ items.title }}</a>
+					</li>
+				{% endif %}                        
+			{% endfor %}
+		{% endif %}                
+      </ul>
+	  
+	  
+	  
+	   {% if user.loggedin %}
+                <div class="navbar-form navbar-right" role="search">
+                    <a class="button btn btn-default" href="/user/edit">{{ user.username }}</a>
+                    <a class="button btn btn-default" href="/?logout=true" id="quit">Kilépés</a>
+                </div>
+            {% else %}
+                <form class="navbar-form navbar-right" role="search"  method="post">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="login" placeholder="Név" size="10">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="passw" placeholder="Jelszó" size="10">
+                    </div>
+                    <button type="submit" class="btn btn-default">Belépés</button>
+                    <a class="button btn btn-default" href="/user/new">Regisztrálás</a>
+                </form>
+            {% endif %}
+	  
+	  
+    </div>
+  </div>
+</nav>
