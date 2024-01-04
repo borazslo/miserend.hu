@@ -160,7 +160,7 @@ class ServiceTimes {
         // printr($periods);
 
         // Generate OSM string
-        global $milyen;
+        global $milyen, $nyelv;
         $string = '';
         foreach($schedule as $key => $periodss) {            
             if(count($schedule) == 1 AND $periodss['tmp_datumtol'] == '01-01' AND $periodss['tmp_datumig'] == '12-31') { }
@@ -177,16 +177,23 @@ class ServiceTimes {
 
                     //add comment(s)
                     /**/ 
-                    if(isset($time['milyen']) OR isset($time['megjegyzes']) ) {
-                        $string .= " \"";
-                        if(isset($time['milyen'])) {
-                            if(isset($milyen[$time['milyen']])) $string .= $milyen[$time['milyen']]['name'];
-                            else $string .= $time['milyen'];
-                        }
-                        if(isset($time['milyen']) AND isset($time['megjegyzes']) ) $string .= ", ";
-                        if(isset($time['megjegyzes'])) $string .= $time['megjegyzes'];
-                        $string .= "\"";
-                    }
+					$comments = [];
+					
+					if(isset($time['nyelv'])) {						
+						if(isset($nyelv[$time['nyelv']])) $comments[] = $nyelv[$time['nyelv']]['description'];
+						else $comments[] = $time['nyelv'];
+					}
+                    if(isset($time['milyen'])) {
+						if(isset($milyen[$time['milyen']])) $comments[] = $milyen[$time['milyen']]['name'];
+						else $comments[] = $time['milyen'];
+					}
+                    if(isset($time['megjegyzes'])) {
+						$comments[] = $time['megjegyzes'];
+					}					
+					
+					if(count($comments) > 0 )
+						$string .= " \"". implode( ", ", $comments) . "\"";
+									
                     /**/
                     $string .= ',';
                 }
