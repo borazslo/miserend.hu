@@ -5,7 +5,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 /**
  * A miserendek és az OSM/open_hours közötti kapcsolatot biztosítja
  */
-class ServiceHours {
+class ServiceTimes {
 
     /*
         To test with:

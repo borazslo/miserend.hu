@@ -25,7 +25,7 @@
     RewriteRule ^api/v([0-9]{1,4})/updated/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ /index.php?q=api&action=updated&v=$1&datum=$2 [NC]
     RewriteRule ^api/v([0-9]{1,4})/user/favorites(/|)$ /index.php?q=api&action=favorites&v=$1 [NC,QSA]
     RewriteRule ^api/v([0-9]{1,4})/upload(/|)$ /index.php?q=api&action=upload&v=$1 [NC,QSA]
-    RewriteRule ^api/v([0-9]{1,4})/service_hours(/|)$ /index.php?q=api&action=service_hours&v=$1 [NC,QSA]
+    RewriteRule ^api/v([0-9]{1,4})/service_times(/|)$ /index.php?q=api&action=service_times&v=$1 [NC,QSA]
 	RewriteRule ^api/v([0-9]{1,4})/nearby(/|)$ /index.php?q=api&action=nearby&v=$1 [NC,QSA]
 
     RewriteRule ^api/ https://github.com/borazslo/miserend.hu/wiki/API [NC]

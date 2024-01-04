@@ -70,14 +70,14 @@ class Church extends \Html\Html {
         //Miseidőpontok
         $misek = getMasses($tid);
 
-        //Convert to OSM ServiceHours
+        //Convert to OSM ServiceTimes
         if(isset($user->isadmin) AND $user->isadmin == 1)  {
-            $serviceHours = new \ServiceHours();
-            $serviceHours->loadMasses($tid);
-			if(!isset($serviceHours->error))
-				$this->service_hours = print_r(preg_replace('/;/',";\n",$serviceHours->string),1)."\n".$serviceHours->linkForDetails;
+            $serviceTimes = new \ServiceTimes();
+            $serviceTimes->loadMasses($tid);
+			if(!isset($serviceTimes->error))
+				$this->service_times = print_r(preg_replace('/;/',";\n",$serviceTimes->string),1)."\n".$serviceTimes->linkForDetails;
 			else 
-				$this->service_hours	= $serviceHours->error;
+				$this->service_times	= $serviceTimes->error;
         }
                 
        

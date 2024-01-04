@@ -52,8 +52,8 @@ class Api extends Html {
                     $this->api = new \Api\Upload();
                     break;
 
-                case 'service_hours':
-                    $this->api = new \Api\Service_hours();
+                case 'service_times':
+                    $this->api = new \Api\Service_times();
                     break;   
 
                 case 'nearby':
