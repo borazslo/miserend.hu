@@ -73,6 +73,17 @@ $collection->add('terms_and_conditions', new Route('/hazirend', defaults: [
     '_class' => StaticPage::class,
 ]));
 
+$symfonyRoutes = [
+    'wdt' => '/_wdt/{token}',
+    'profiler' => '/_profiler/{token}',
+];
+
+foreach ($symfonyRoutes as $routeName => $routePath) {
+    $collection->add($routeName, new Route($routePath, defaults: [
+        'handler' => 'symfony',
+    ]));
+}
+
 /*
 ["^templom\/([0-9]{1,5})\/eszrevetelek$", "remark/list/$1"],
             ["^templom\/([0-9]{1,5})\/ujeszrevetel$", "remark/addform/$1"],

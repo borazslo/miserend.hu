@@ -1,0 +1,9 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    strict_variables: false # todo remove
+    globals:
+        environment: "%kernel.environment%"
+
+when@test:
+    twig:
+        strict_variables: true

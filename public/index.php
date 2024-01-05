@@ -5,6 +5,8 @@ namespace App;
 
 use App\Html\Html;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 require_once '../src/load.php';
@@ -46,9 +48,26 @@ try {
     }
 
     if (isset($matchedRoute['handler']) && $matchedRoute['handler'] === 'symfony') {
+        $app->loadDotenv();
+
         $response = $app->forwardToSymfony($request);
 
-        $response->send();
+        if (Kernel::VERSION_ID >= 60400) {
+            $response->send(false);
+
+            if (\function_exists('fastcgi_finish_request') && !$app->getDebug()) {
+                fastcgi_finish_request();
+            } else {
+                Response::closeOutputBuffers(0, true);
+                flush();
+            }
+        } else {
+            $response->send();
+        }
+
+        if ($app->getKernel() instanceof TerminableInterface) {
+            $app->getKernel()->terminate($request, $response);
+        }
 
         exit(0);
     }

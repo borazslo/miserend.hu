@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -27,10 +28,38 @@ class Application
         return $matcher->matchRequest($request);
     }
 
+    public function getDebug(): bool
+    {
+        return true;
+    }
+
+    public function loadDotenv(): void
+    {
+        $options = [
+            'project_dir' => PROJECT_ROOT,
+        ];
+
+        (new Dotenv('APP_ENV', 'APP_DEBUG'))
+            ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
+            ->usePutenv($options['use_putenv'] ?? false)
+            ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
+
+    }
+
+    protected Kernel $kernel;
+
+    public function getKernel(): Kernel
+    {
+        if (!isset($this->kernel)) {
+            // TODO env and debug from dotenv
+            $this->kernel = new Kernel('dev', true);
+        }
+
+        return $this->kernel;
+    }
+
     public function forwardToSymfony(Request $request)
     {
-        // TODO env and debug from dotenv
-        $kernel = new Kernel('dev', true);
-        return $kernel->handle($request);
+        return $this->getKernel()->handle($request);
     }
 }
