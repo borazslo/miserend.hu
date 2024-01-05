@@ -9,6 +9,9 @@ class LiturgiatvApi extends \ExternalApi\ExternalApi {
     public $name = 'liturgiatv';
     public $apiUrl = "https://liturgia.tv/" ;
     public $cache = "6 hours";
+	public $testQuery = ''; // Ez a minden templomot lekérő query
+	public $strictFormat = false; // Ha létezik a templom, de nincs hozzá liturgia.tv, akkor is 404-et de szöveggel
+
 
     function getByChurch($church_id) {
         
@@ -21,12 +24,6 @@ class LiturgiatvApi extends \ExternalApi\ExternalApi {
 
     function buildQuery() {
         $this->rawQuery = $this->query."?json";        
-    }
-
-    function Response404() {        
-        $this->rawData = "[]";
-        $this->saveToCache();
-        $this->jsonData = json_decode($this->rawData);
     }
     
 }

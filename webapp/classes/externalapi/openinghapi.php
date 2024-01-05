@@ -10,6 +10,7 @@ class OpeninghApi extends \ExternalApi\ExternalApi {
         'mode' => 2,
         'warnings_severity' => 7
     ]; 
+	public $testQuery = "validate?value=PH";
     
     function buildQuery() {
         foreach($this->settings as $key => $value) {
@@ -41,10 +42,6 @@ class OpeninghApi extends \ExternalApi\ExternalApi {
         return $this->linkForDetails;
     }
 
-	function Response404() {        
-        $this->rawData = "[]";
-        $this->saveToCache();
-        $this->jsonData = json_decode($this->rawData);
-    }
+
 }
 

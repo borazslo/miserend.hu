@@ -9,12 +9,16 @@ class OpenstreetmapApi extends \ExternalApi\ExternalApi {
 		
     public $name = 'openstreetmap';    
 	public $format = 'xml';
+	public $testQuery = 'user/gpx_files';
+	
 	
 	function __construct() {
 		global $config;	
 		if($config['openstreetmap'] == false) throw new Exception("OpenStreetMap API is disabled or undefined!");
 		$this->apiUrl = $config['openstreetmap']['apiurl']."/api/0.6/"; //dev and prod is different
 		$this->userpwd = $config['openstreetmap']['user:pwd']; //dev and prod is different
+		$this->curl_setopt(CURLOPT_USERPWD, $this->userpwd);
+
 	}
 	
 	function buildQuery() {      

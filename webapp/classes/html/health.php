@@ -55,15 +55,56 @@ class Health extends Html {
 			$results[] = $tmp;
 		}
 		$this->infos[] = ["sqlite files",implode("<br/>",$results)];
-		$result = false;
+		$results = [] ;
 
 		
 		// Health of CronJobs
 		$this->cronjobs = \Eloquent\Cron::orderBy('deadline_at','DESC')->get()->toArray();
 		
+		// Health of ExternalApis
+		$apisToTest = ['liturgiatvapi','kozossegekapi','mapquestapi','openinghapi','openstreetmapapi','overpassapi'];		
+		foreach($apisToTest as $apiToTest) {
+			$this->externalapis[$apiToTest] = ['name' => $apiToTest, 'stat' => 0];
+			
+			try {
+			
+				$className = "\ExternalApi\\".$apiToTest;
+				
+				if(!class_exists($className) )				
+					throw new \Exception('Hiányzó osztály!');
+				
+				$externalapi = new $className();
+				
+				if(!method_exists($externalapi,'test')) 
+					throw new \Exception('Hiányzik a tesztelő függvény!');
+				
+				
+				$testresult = $externalapi->test();
+				$this->externalapis[$apiToTest]['apiUrl'] = $externalapi->apiUrl ;
+				$this->externalapis[$apiToTest]['testQuery'] = $externalapi->rawQuery;
+				
+				if($testresult !== true) 
+					throw new \Exception($testresult);
+				
+				$this->externalapis[$apiToTest]['testresult'] = 'OK';
+			}
+			catch (\Exception $e) {
+				$this->externalapis[$apiToTest]['testresult'] = $e->getMessage();
+			}
+			
+		}
 		
-		
-		
+		$results = [];
+        $results = DB::table('stats_externalapi')
+			->select('name',DB::raw('SUM(count) count'))
+			->where('date','>',date('Y-m-d',strtotime('-1 month')))
+			->groupBy('name')->orderBy('date','asc')
+			->get();        
+		foreach($results as $result) {			
+			if(array_key_exists($result->name."api", $this->externalapis))
+				 $this->externalapis[$result->name."api"]['stat'] = $result->count; 							 								 
+		}
+       		
 		return;
 			
     }
