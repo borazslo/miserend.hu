@@ -20,10 +20,21 @@ Encore
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
     .enableSourceMaps(true)
-    .enableVersioning(true)
+    .enableVersioning(!Encore.isDevServer())
     .autoProvidejQuery()
     .addEntry('app', './assets/js/app.js')
     .addEntry('home', './assets/js/home.js')
 ;
+
+if (Encore.isDevServer()) {
+    Encore.setPublicPath(`http://${process.env.MISEREND_HOSTNAME ?? 'connor.d'}:${process.env.MISEREND_WEBPACK_DEV_SERVER_PORT}/static`)
+    Encore.setManifestKeyPrefix('static/')
+    Encore.configureDevServerOptions(devServerOptions => {
+        devServerOptions.allowedHosts = 'all'
+        devServerOptions.host = '0.0.0.0'
+        devServerOptions.port = process.env.MISEREND_WEBPACK_DEV_SERVER_PORT
+        devServerOptions.hot = true
+    })
+}
 
 module.exports = Encore.getWebpackConfig();
