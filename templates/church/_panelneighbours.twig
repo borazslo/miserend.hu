@@ -1,6 +1,10 @@
 {% extends 'panel.twig' %}
 
-{% set title = 'Szomszédos templomok' %}
+
+{% block title -%}
+    Szomszédos templomok
+{%- endblock %}
+
 
 {% block body %}
     {% if neighbours|length > 1 %}
@@ -11,7 +15,8 @@
             {% if neighbours|length > 9 %}<li style="display:inline">...</li>{% endif %}
         </ul>
     {% endif %}    
-{% endblock %}    
+{% endblock %}
+
 
 {% macro neighbour(array,location) %}
     <li>

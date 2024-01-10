@@ -21,9 +21,13 @@ Encore
     .cleanupOutputBeforeBuild()
     .enableSourceMaps(true)
     .enableVersioning(!Encore.isDevServer())
+    .enableStimulusBridge('./assets/controllers.json')
     .autoProvidejQuery()
     .addEntry('app', './assets/js/app.js')
     .addEntry('home', './assets/js/home.js')
+    .autoProvideVariables({
+        '$.fn.autocomplete': 'jquery-ui'
+    })
 ;
 
 if (Encore.isDevServer()) {

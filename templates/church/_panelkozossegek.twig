@@ -1,8 +1,10 @@
 {% extends 'panel.twig' %}
-
-{% set title = 'Közösségek a helyszínen' %}
 {% set panel = 'primary' %}
-{% set footer = true %}
+
+
+{% block title -%}
+    Közösségek a helyszínen
+{%- endblock %}
 
 
 {% block body %}
@@ -17,6 +19,7 @@
         </ul>
     {% endif %}    
 {% endblock %}    
+
 
 {% block footer %}
     <small>További információk és csatlakozási lehetőség a <a href="https://kozossegek.hu" target="_blank">közösségek.hu</a> partnerünknél.</small>

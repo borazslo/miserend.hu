@@ -1,18 +1,19 @@
 {% extends 'panel.twig' %}
-
-
-{% if location.lat %}
-    {% set title = 'Elhelyezked&eacute;s' ~ '&nbsp;<a href="https://www.google.com/maps/dir//' ~ location.lat ~ ',' ~ location.lon ~ '" target="_blank"><i class="' ~  ICONS_MAP_DIRECTION ~ ' title="Útvonaltervezés a Google Maps segítségével."></i></a>' %}
-{% else %}
-    {% set title = 'Elhelyezked&eacute;s' %}
-{% endif %}
-
 {% if location.osm is not null %}
     {% set panel = 'primary' %}
-{% endif %}    
-
+{% endif %}
 {% set church_id = id %}
 {% set id = 'panel-map' %}
+
+
+{% block title %}
+    {% if location.lat %}
+        Elhelyezkedés&nbsp;<a href="https://www.google.com/maps/dir//{{ location.lat }},{{ location.lon }}" target="_blank"><i class="{{ ICONS_MAP_DIRECTION }}" title="Útvonaltervezés a Google Maps segítségével."></i></a>
+    {% else %}
+        Elhelyezkedés
+    {% endif %}
+{% endblock %}
+
 
 {% block body %}    
     <style>
@@ -31,8 +32,6 @@
             }
         </style>
         {%  include '_map_leaflet.twig' %}
-
-
     {% endif %}
 
     <div id="maptext">
@@ -79,8 +78,8 @@
     </div>
 {% endblock %}    
 
+
 {% macro osmlink(osm,title = false) %}
     <!--<a href="/collection/{{ osm.osmtype }}:{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>-->
     <a href="{{ osm.url }}" title="{{ title }}" target="_blank">{{ osm.name }}</a>
 {% endmacro %}
-

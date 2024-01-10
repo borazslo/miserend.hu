@@ -1,8 +1,11 @@
 {% extends 'panel.twig' %}
-
-{% set title = "<i class='"  ~ ICONS_WHEELCHAIR ~ "'></i> Akadálymentesség" %}
 {% set panel = 'primary' %}
-{% set footer = true %}
+
+
+{% block title %}
+	<i class="{{ ICONS_WHEELCHAIR }}"></i> Akadálymentesség
+{% endblock %}
+
 
 {% block body %}
 	{% if accessibility['wheelchair'] == 'yes' %} 
@@ -41,8 +44,7 @@
 	
 {% endblock %}
 
+
 {% block footer %}
     <small>© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> közreműködők.</small>
 {% endblock %}
-
-

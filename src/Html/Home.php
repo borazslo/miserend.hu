@@ -44,6 +44,11 @@ class Home extends Html
                 'placeholder' => 'kulcsszó',
                 'attr' => [
                     'data-controller' => 'autocomplete',
+                    'data-endpoint' => '/ajax/AutocompleteKeyword',
+                ],
+                'label' => 'Templom',
+                'labelAttr' => [
+                    'class' => 'col-sm-4 control-label',
                 ],
             ],
             'varos' => [
@@ -51,47 +56,50 @@ class Home extends Html
                 'size' => 20,
                 'id' => 'varos',
                 'class' => 'keresourlap',
-                'placeholder' => 'település'
+                'placeholder' => 'település',
+                'attr' => [
+                    'data-controller' => 'autocomplete',
+                    'data-endpoint' => '/ajax/AutocompleteCity',
+                ],
+                'label' => 'település',
+                'labelAttr' => [
+                    'class' => 'col-sm-4 control-label',
+                ],
             ],
             'hely' => [
                 'name' => 'hely',
                 'size' => 20,
                 'id' => 'varos',
-                'class' => 'keresourlap'
+                'class' => 'keresourlap',
             ],
             'tavolsag' => [
                 'name' => 'tavolsag',
                 'size' => 1,
                 'id' => 'tavolsag',
                 'class' => 'keresourlap',
-                'value' => 4
+                'value' => 4,
             ],
         ];
 
         $searchform['ehm'] = [
             'name' => 'ehm',
             'class' => 'keresourlap',
-            'onChange' => "
-						var a = document.getElementsByName('espker');
-						for (index = 0; index < a.length; ++index) {
-						    console.log(a[index]);
-						    a[index].style.display = 'none';
-						}
-
-						if(this.value!=0) {
-							document.getElementById('espkerlabel').style.display='inline';
-							document.getElementById('ehm'+this.value).style.display='inline';
-
-						} else {
-							document.getElementById('espkerlabel').style.display='none';
-						}", ];
-        $searchform['ehm']['options'][0] = 'mindegy';
+            'label' => 'egyházmegye',
+            'labelAttr' => [
+                'class' => 'col-sm-4 control-label',
+            ],
+            'id' => 'egyhazmegye',
+            'options' => [
+                0 => 'mindegy',
+            ],
+        ];
 
         $egyhmegyes = DB::table('egyhazmegye')
                     ->select('id', 'nev')
                     ->where('ok', 'i')
                     ->orderBy('sorrend')
                     ->get();
+
         foreach ($egyhmegyes as $egyhmegye) {
             $searchform['ehm']['options'][$egyhmegye->id] = $egyhmegye->nev;
         }
@@ -100,8 +108,8 @@ class Home extends Html
             $searchform['espker'][$ehm] = [
                 'name' => 'espker',
                 'id' => 'ehm'.$ehm,
-                'style' => 'display:none',
-                'class' => 'keresourlap'];
+                'class' => 'keresourlap'
+            ];
             $searchform['espker'][$ehm]['options'][0] = 'mindegy';
             if (\is_array($espker)) {
                 foreach ($espker as $espid => $espnev) {
@@ -114,15 +122,25 @@ class Home extends Html
             'type' => 'checkbox',
             'name' => 'gorog',
             'id' => 'gorog',
-            'class' => 'keresourlap',
+            'class' => 'form-check-input',
             'value' => 'gorog',
+            'label' => 'csak görögkatolikus',
+            'labelAttr' => [
+                'class' => 'form-check-label',
+            ],
         ];
 
         $searchform['tnyelv'] = [
             'name' => 'tnyelv',
             'id' => 'tnyelv',
             'class' => 'keresourlap',
-            'options' => [0 => 'bármilyen'],
+            'options' => [
+                0 => 'bármilyen'
+            ],
+            'label' => 'ahol van adott nyelvű mise is',
+            'labelAttr' => [
+                'class' => 'col-sm-4 control-label',
+            ],
         ];
         foreach ($languages as $abbrev => $language) {
             $searchform['tnyelv']['options'][$abbrev] = $language['name'];
@@ -139,35 +157,40 @@ class Home extends Html
         $searchform['mikor'] = [
             'name' => 'mikor',
             'id' => 'mikor',
-            'class' => 'keresourlap',
-            'onChange' => "if (this.value == 'x') $('#md').show().focus(); else $('#md').hide();",
-            'options' => [$vasarnap => 'vasárnap', $ma => 'ma', $holnap => 'holnap', 'x' => 'adott napon:'],
+            'class' => 'keresourlap rounded-1',
+            'options' => [
+                $vasarnap => 'vasárnap',
+                $ma => 'ma',
+                $holnap => 'holnap',
+                'x' => 'adott napon:'
+            ],
+            'label' => 'Mise',
+            'labelAttr' => [
+                'class' => 'col-sm-4 control-label',
+            ],
         ];
         $searchform['mikordatum'] = [
             'name' => 'mikordatum',
             'id' => 'md',
-            'style' => 'display:none',
-            'class' => 'keresourlap datepicker',
+            'class' => 'keresourlap datepicker d-none',
             'size' => '10',
             'value' => $ma,
         ];
         $searchform['mikor2'] = [
             'name' => 'mikor2',
             'id' => 'mikor2',
-            'style' => 'margin-top:12px',
-            'class' => 'keresourlap',
-            'onChange' => "
-						if(this.value == 'x') {
-							document.getElementById('md2').style.display='inline';
-							alert('FIGYELEM! Fontos a formátum!');}
-						else {document.getElementById('md2').style.display='none';}",
-            'options' => [0 => 'egész nap', 'de' => 'délelőtt', 'du' => 'délután', 'x' => 'adott időben:'],
+            'class' => 'keresourlap rounded-1',
+            'options' => [
+                0 => 'egész nap',
+                'de' => 'délelőtt',
+                'du' => 'délután',
+                'x' => 'adott időben:'
+            ],
         ];
         $searchform['mikorido'] = [
             'name' => 'mikorido',
             'id' => 'md2',
-            'style' => 'display:none;',
-            'class' => 'keresourlap',
+            'class' => 'keresourlap  d-none',
             'size' => '7',
             'value' => $mikor,
         ];
@@ -177,32 +200,43 @@ class Home extends Html
             'name' => 'nyelv',
             'id' => 'nyelv',
             'class' => 'keresourlap',
-            'options' => [0 => 'mindegy'],
+            'options' => [
+                0 => 'mindegy'
+            ],
+            'label' => 'nyelv',
+            'labelAttr' => [
+                'class' => 'col-sm-4 control-label',
+            ],
         ];
         foreach ($languages as $abbrev => $language) {
             $searchform['nyelv']['options'][$abbrev] = $language['name'];
         }
 
         // group music
-        $music['na'] = '<i>meghatározatlan</i>';
+        $music['na'] = 'meghatározatlan';
         foreach ($attributes as $abbrev => $attribute) {
             if ('music' == $attribute['group']) {
                 $music = [$abbrev => $attribute['name']] + $music;
             }
         }
+
+        $searchform['zene'] = [];
         foreach ($music as $value => $label) {
             $searchform['zene'][] = [
                 'type' => 'checkbox',
                 'name' => 'zene[]',
-                'class' => 'keresourlap',
+                'class' => 'form-check-input',
                 'value' => $value,
-                'labelback' => $label,
                 'checked' => true,
+                'label' => $label,
+                'labelAttr' => [
+                    'class' => 'form-check-label'. ($value === 'na' ? ' fst-italic' : ''),
+                ],
             ];
         }
 
         // group age
-        $age['na'] = '<i>meghatározatlan</i>';
+        $age['na'] = 'meghatározatlan';
         foreach ($attributes as $abbrev => $attribute) {
             if ('age' == $attribute['group']) {
                 $age = [$abbrev => $attribute['name']] + $age;
@@ -212,10 +246,13 @@ class Home extends Html
             $searchform['kor'][] = [
                 'type' => 'checkbox',
                 'name' => 'kor[]',
-                'class' => 'keresourlap',
+                'class' => 'form-check-input',
                 'value' => $value,
                 'checked' => true,
-                'labelback' => $label,
+                'label' => $label,
+                'labelAttr' => [
+                    'class' => 'form-check-label'. ($value === 'na' ? ' fst-italic' : ''),
+                ],
             ];
         }
 
@@ -224,7 +261,13 @@ class Home extends Html
             'name' => 'ritus',
             'id' => 'ritus',
             'class' => 'keresourlap',
-            'options' => [0 => 'mindegy'],
+            'options' => [
+                0 => 'mindegy'
+            ],
+            'label' => 'rítus',
+            'labelAttr' => [
+                'class' => 'col-sm-4 control-label',
+            ],
         ];
         foreach ($attributes as $abbrev => $attribute) {
             if ('liturgy' == $attribute['group'] && isset($attribute['isitmass'])) {
@@ -239,6 +282,10 @@ class Home extends Html
             'checked' => true,
             'class' => 'keresourlap',
             'value' => 'ige',
+            'label' => 'igeliturgiák is',
+            'labelAttr' => [
+                'class' => 'col-sm-4 control-label',
+            ],
         ];
 
         $this->photo = \App\Model\Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();

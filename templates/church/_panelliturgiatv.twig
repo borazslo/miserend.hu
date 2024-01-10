@@ -1,9 +1,11 @@
 {% extends 'panel.twig' %}
-
-{% set title = 'Következő közvetítések  a <a href="https://liturgia.tv/miserend/' ~ id  ~ '">liturgia.tv</a> segítségével:' %}
-
 {% set panel = 'primary' %}
-{% set footer = true %}
+
+
+{% block title %}
+    Következő közvetítések a <a href="https://liturgia.tv/miserend/{{ id }}">liturgia.tv</a> segítségével:
+{% endblock %}
+
 
 {% block body %}
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -30,12 +32,12 @@
     </table>
 {% endblock %}
 
+
 {% block footer %}
     További közvetítések: <a href="https://liturgia.tv/miserend/{{ id }}">liturgia.tv</a>
 	<div style="float:right"><span class="glyphicon glyphicon-warning-sign"></span>
 		<a href="https://docs.google.com/forms/d/e/1FAIpQLSfhe8nNAO_u80yTvgb1XD2T8GB-TMC5o8pvC5RLW7rLTa5coA/viewform?entry.1880037708={{ "A(z) " ~ nev| striptags ~ "(miserend/" ~ id ~ ") nem ekkor közvetít, hanem " | url_encode }}&entry.1366122954={{ "Hiányzó vagy hibás közvetítés" | url_encode }} " target="_blank">Hiba jelzése itt.</a>
 	</div>
-	
 {% endblock %}
 
 

@@ -1,10 +1,13 @@
 {% extends 'panel.twig' %}
-
-{% set title = '<span class="glyphicon glyphicon-warning-sign"></span> Segítsd munkánkat!' %}
 {% set panel = 'primary' %}
 
+
+{% block title %}
+    <span class="glyphicon glyphicon-warning-sign"></span> Segítsd munkánkat!
+{% endblock %}
+
+
 {% block body %}
-    
     <p class=alapkizart>
         Ha észrevételed van a templommal vagy a miserenddel kapcsolatban, írd meg nekünk!
         {% if ( not isChurchHolder or isChurchHolder.status == 'left' ) and user.loggedin %}
@@ -16,7 +19,7 @@
             <font color=#8D317C size='+1'><b>Észrevétel beküldése</b></font>
         </a>
     </div>
-    {% if ( not isChurchHolder or isChurchHolder.status == 'left' )  %}
+    {% if not isChurchHolder or isChurchHolder.status == 'left' %}
     <div align=center>
         <a href="/templom/{{ id }}/changeholders/?uid={{ user.uid }}&access=asked&confirmation=needed">
             <font color=#8D317C size='+1' class=""><b>Gondnokság vállalása</b></font>

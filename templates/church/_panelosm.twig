@@ -1,14 +1,17 @@
 {% extends 'panel.twig' %}
-
-{% set title = 'OSM Data' %}
-
 {% set panel = 'success' %}
 
-{% if church %}
-    {% set osm = church.osm %}
-{% endif %}
+
+{% block title -%}
+    OSM Data
+{%- endblock %}
+
 
 {% block body %}
+    {% if church %}
+        {% set osm = church.osm %}
+    {% endif %}
+
     <style>
 		.fixed_headers {
 			width: 100%;
