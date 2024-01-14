@@ -27,7 +27,7 @@ Encore
 ;
 
 if (Encore.isDevServer()) {
-    Encore.setPublicPath(`http://${process.env.MISEREND_HOSTNAME ?? 'connor.d'}:${process.env.MISEREND_WEBPACK_DEV_SERVER_PORT}/static`)
+    Encore.setPublicPath(`http://${process.env.MISEREND_HOSTNAME ?? 'localhost'}:${process.env.MISEREND_WEBPACK_DEV_SERVER_PORT}/static`)
     Encore.setManifestKeyPrefix('static/')
     Encore.configureDevServerOptions(devServerOptions => {
         devServerOptions.allowedHosts = 'all'
