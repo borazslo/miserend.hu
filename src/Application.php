@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 use Symfony\Component\Dotenv\Dotenv;
@@ -43,7 +50,6 @@ class Application
             ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
             ->usePutenv($options['use_putenv'] ?? false)
             ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
-
     }
 
     protected Kernel $kernel;

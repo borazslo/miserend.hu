@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Html;
 
-class Api extends Html {
-
-    public function __construct() {
+class Api extends Html
+{
+    public function __construct()
+    {
         ini_set('memory_limit', '256M');
 
         try {
@@ -14,13 +22,12 @@ class Api extends Html {
         }
 
         try {
-
-            if(!isset($action)) {
+            if (!isset($action)) {
                 $this->redirect('https://github.com/borazslo/miserend.hu/wiki/API');
             }
             switch ($action) {
                 case 'sqlite':
-                    $this->redirect(DOMAIN . '/fajlok/sqlite/miserend_v' . $_REQUEST['v'] . '.sqlite3');
+                    $this->redirect(DOMAIN.'/fajlok/sqlite/miserend_v'.$_REQUEST['v'].'.sqlite3');
                     exit;
                     break;
                 case 'signup':
@@ -54,12 +61,12 @@ class Api extends Html {
 
                 case 'service_times':
                     $this->api = new \App\Api\Service_times();
-                    break;   
+                    break;
 
                 case 'nearby':
                     $this->api = new \App\Api\NearBy();
-                    break;   					
-					
+                    break;
+
                 default:
                     throw new \Exception("API action '$action' is not supported.");
             }
@@ -70,19 +77,22 @@ class Api extends Html {
         }
     }
 
-    function render() {
-        //Because of the Report::factoryCreate();
+    public function render()
+    {
+        // Because of the Report::factoryCreate();
 
         if (!isset($this->api)) {
             $this->html = json_encode(['error' => 1, 'text' => $this->error]);
+
             return;
         } elseif (isset($this->error)) {
             $this->api->return = ['error' => '1', 'text' => $this->error];
         }
 
-        if (!$this->api->format)
+        if (!$this->api->format) {
             $this->api->format = 'text';
-        $renderfunction = 'render' . ucfirst($this->api->format);
+        }
+        $renderfunction = 'render'.ucfirst($this->api->format);
         if (method_exists($this->api, $renderfunction)) {
             $this->api->$renderfunction();
         } else {
@@ -90,36 +100,37 @@ class Api extends Html {
         }
     }
 
-    public function renderText() {
-        if (is_array($this->api->return)) {
+    public function renderText()
+    {
+        if (\is_array($this->api->return)) {
             $this->html = '';
             foreach ($this->api->return as $key => $value) {
-                $this->html .= $key . ": \"" . $value . "\";\n";
+                $this->html .= $key.': "'.$value."\";\n";
             }
         } else {
             $this->html = $this->api->return;
         }
     }
 
-    public function renderJson() {
+    public function renderJson()
+    {
         if (!isset($this->api->return['error'])) {
             $this->api->return['error'] = 0;
         }
         $this->html = json_encode($this->api->return);
     }
 
-    public function renderCsv() {
-        if (is_array($this->api->return)) {
-
-            //TODO: a szöveg nem tartalmazhatja az elválasztó karaktert, különben gond van.
+    public function renderCsv()
+    {
+        if (\is_array($this->api->return)) {
+            // TODO: a szöveg nem tartalmazhatja az elválasztó karaktert, különben gond van.
             $columnNames = array_keys($this->api->return[$this->api->tableName][0]);
-            $this->html = implode($this->api->delimiter, $columnNames) . ";\n";
+            $this->html = implode($this->api->delimiter, $columnNames).";\n";
             foreach ($this->api->return[$this->api->tableName] as $row) {
-                $this->html .= implode($this->api->delimiter, $row) . ";\n";
+                $this->html .= implode($this->api->delimiter, $row).";\n";
             }
         } else {
             $this->html = $this->api->return;
         }
     }
-
 }

@@ -1,13 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 class Distance
 {
-
     public function __construct()
     {
-
     }
 
     public function updateSome()
@@ -15,16 +20,16 @@ class Distance
         $this->update(false, 50);
     }
 
-    function update($church_id = false, $limit = false)
+    public function update($church_id = false, $limit = false)
     {
         $counter = 0;
-        if (!is_numeric($limit) or $limit == false) {
+        if (!is_numeric($limit) || false == $limit) {
             $limit = 120;
         }
 
-        $query = \App\Model\Church::has('osms')->take($limit)->orderBy('updated_at', 'desc');
+        $query = Model\Church::has('osms')->take($limit)->orderBy('updated_at', 'desc');
         if ($church_id) {
-            if (is_array($church_id)) {
+            if (\is_array($church_id)) {
                 $query = $query->whereIn('id', $church_id);
             } else {
                 $query = $query->where('id', $church_id);
@@ -41,54 +46,52 @@ class Distance
         }
     }
 
-    function MupdateChurch($churchFrom, $maxDistance = 5000)
-    { //maxDistance in meter
+    public function MupdateChurch($churchFrom, $maxDistance = 5000)
+    { // maxDistance in meter
         set_time_limit('600');
         $counter = 0;
-        if ($churchFrom->location->lat == '' or $churchFrom->location->lon == '') {
+        if ('' == $churchFrom->location->lat || '' == $churchFrom->location->lon) {
             return false;
         }
 
         $point = ['lon' => $churchFrom->location->lon, 'lat' => $churchFrom->location->lat];
 
+        // TODO: Delete BBOX-on belüli távolságok. Vagy minden távolság?
 
-        //TODO: Delete BBOX-on belüli távolságok. Vagy minden távolság?
-
-        for ($i = 1; $i < 10; $i++) {
+        for ($i = 1; $i < 10; ++$i) {
             $bbox = $this->getBBox($point, $maxDistance);
-            $churchesInBBox = \App\Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id)->get();
-            if (count($churchesInBBox) > 12) {
+            $churchesInBBox = Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id)->get();
+            if (\count($churchesInBBox) > 12) {
                 break;
             }
-            $maxDistance = $maxDistance * (120 / 100);
+            $maxDistance *= (120 / 100);
         }
 
         $highestDistance = 0;
         foreach ($churchesInBBox as $churchTo) {
-            $processingDistance = \App\Model\Distance::findOrNew(
+            $processingDistance = Model\Distance::findOrNew(
                 ['fromLat' => $churchFrom->lat, 'fromLon' => $churchFrom->lon, 'toLat' => $churchTo->lat, 'toLon' => $churchTo->lon]
             )->first();
-            $processingDistance = \App\Model\Distance::where('fromLat', $churchFrom->lat)
+            $processingDistance = Model\Distance::where('fromLat', $churchFrom->lat)
                 ->where('fromLon', $churchFrom->lon)
                 ->where('toLat', $churchTo->lat)
                 ->where('toLon', $churchTo->lon)->first();
             if (!$processingDistance) {
-                $processingDistance = new \App\Model\Distance();
+                $processingDistance = new Model\Distance();
                 $processingDistance->fromLat = $churchFrom->lat;
                 $processingDistance->fromLon = $churchFrom->lon;
                 $processingDistance->toLat = $churchTo->lat;
                 $processingDistance->toLon = $churchTo->lon;
             }
             if ($churchFrom->updated_at > $processingDistance->updated_at
-                or $churchTo->updated_at > $processingDistance->updated_at) {
-
+                || $churchTo->updated_at > $processingDistance->updated_at) {
                 $pointFrom = ['lat' => $churchFrom->location->lat, 'lon' => $churchFrom->location->lon];
                 $pointTo = ['lat' => $churchTo->location->lat, 'lon' => $churchTo->location->lon];
                 $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
-                if ($rawDistance < $maxDistance and $rawDistance > 0) {
-                    $mapquest = new \App\ExternalApi\MapquestApi();
+                if ($rawDistance < $maxDistance && $rawDistance > 0) {
+                    $mapquest = new ExternalApi\MapquestApi();
                     $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
-                    if ($mapquestDistance == -2) {
+                    if (-2 == $mapquestDistance) {
                         return;
                     } elseif ($mapquestDistance > 0) {
                         $processingDistance->distance = $mapquestDistance;
@@ -98,11 +101,11 @@ class Distance
                         $processingDistance->save();
                     }
                 } else {
-                    //Pontatlant inkább soha senem mentünk el.
-                    //$processingDistance->distance = $rawDistance;
+                    // Pontatlant inkább soha senem mentünk el.
+                    // $processingDistance->distance = $rawDistance;
                 }
 
-                $counter++;
+                ++$counter;
             }
         }
         /*
@@ -111,23 +114,22 @@ class Distance
          * a kört.
          */
         if ($highestDistance > $maxDistance) {
-            //echo "Van nagyobb kör is. Bocsesz.";
+            // echo "Van nagyobb kör is. Bocsesz.";
 
-            //TODO: duplicated code
+            // TODO: duplicated code
             $bbox = $this->getBBox($point, $highestDistance);
-            $churchesInBBox = \App\Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id);
+            $churchesInBBox = Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id);
 
             foreach ($churchesInBBox as $churchTo) {
-
-                $processingDistance = \App\Model\Distance::findOrNew(
+                $processingDistance = Model\Distance::findOrNew(
                     ['fromLat' => $churchFrom->lat, 'fromLon' => $churchFrom->lon, 'toLat' => $churchTo->lat, 'toLon' => $churchTo->lon]
                 )->first();
-                $processingDistance = \App\Model\Distance::where('fromLat', $churchFrom->lat)
+                $processingDistance = Model\Distance::where('fromLat', $churchFrom->lat)
                     ->where('fromLon', $churchFrom->lon)
                     ->where('toLat', $churchTo->lat)
                     ->where('toLon', $churchTo->lon)->first();
                 if (!$processingDistance) {
-                    $processingDistance = new \App\Model\Distance();
+                    $processingDistance = new Model\Distance();
                     $processingDistance->fromLat = $churchFrom->lat;
                     $processingDistance->fromLon = $churchFrom->lon;
                     $processingDistance->toLat = $churchTo->lat;
@@ -135,46 +137,44 @@ class Distance
                 }
                 $highestDistance = 0;
                 if ($churchFrom->updated_at > $processingDistance->updated_at
-                    or $churchTo->updated_at > $processingDistance->updated_at or 4 == 4) {
-
+                    || $churchTo->updated_at > $processingDistance->updated_at || 4 == 4) {
                     $pointFrom = ['lat' => $churchFrom->location->lat, 'lon' => $churchFrom->location->lon];
                     $pointTo = ['lat' => $churchTo->location->lat, 'lon' => $churchTo->location->lon];
                     $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
 
-                    if ($rawDistance < $maxDistance and $rawDistance > 0) {
-                        $mapquest = new \App\ExternalApi\MapquestApi();
+                    if ($rawDistance < $maxDistance && $rawDistance > 0) {
+                        $mapquest = new ExternalApi\MapquestApi();
                         $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
-                        if ($mapquestDistance == -2) {
+                        if (-2 == $mapquestDistance) {
                             return;
                         } elseif ($mapquestDistance > 0) {
                             $processingDistance->distance = $mapquestDistance;
                             $processingDistance->save();
                         }
                     } else {
-                        //Pontatlant inkább soha senem mentünk el.
-                        //$processingDistance->distance = $rawDistance;
+                        // Pontatlant inkább soha senem mentünk el.
+                        // $processingDistance->distance = $rawDistance;
                     }
 
-                    $counter++;
+                    ++$counter;
                 }
             }
-
         }
 
         return $counter;
     }
 
-    function getRawDistance($pointFrom, $pointTo)
+    public function getRawDistance($pointFrom, $pointTo)
     {
         $this->validatePoint($pointFrom);
         $this->validatePoint($pointTo);
 
-        $lat1 = $pointFrom['lat'] * M_PI / 180;
-        $lat2 = $pointTo['lat'] * M_PI / 180;
-        $long1 = $pointFrom['lon'] * M_PI / 180;
-        $long2 = $pointTo['lon'] * M_PI / 180;
+        $lat1 = $pointFrom['lat'] * \M_PI / 180;
+        $lat2 = $pointTo['lat'] * \M_PI / 180;
+        $long1 = $pointFrom['lon'] * \M_PI / 180;
+        $long2 = $pointTo['lon'] * \M_PI / 180;
 
-        if ($lat1 == $lat2 and $long1 == $long2) {
+        if ($lat1 == $lat2 && $long1 == $long2) {
             return 0;
         }
 
@@ -184,7 +184,7 @@ class Distance
         return $d;
     }
 
-    function getBBox($point, $distanceInM)
+    public function getBBox($point, $distanceInM)
     {
         $this->validatePoint($point);
 
@@ -203,7 +203,7 @@ class Distance
         return $bbox;
     }
 
-    function validatePoint($point)
+    public function validatePoint($point)
     {
         if (!$this->isPoint($point)) {
             throw new \Exception('$point has wrong format: '.print_r($point, 1));
@@ -212,25 +212,24 @@ class Distance
         }
     }
 
-    function isPoint($point)
+    public function isPoint($point)
     {
-        if (!isset($point['lat']) or !isset($point['lon'])) {
+        if (!isset($point['lat']) || !isset($point['lon'])) {
             return false;
         }
-        if ($point['lat'] == '' or $point['lon'] == '') {
+        if ('' == $point['lat'] || '' == $point['lon']) {
             return false;
         }
-        if (!is_numeric($point['lat']) or !is_numeric($point['lon'])) {
+        if (!is_numeric($point['lat']) || !is_numeric($point['lon'])) {
             return false;
         }
-        if ($point['lat'] < -90 or $point['lat'] > 90) {
+        if ($point['lat'] < -90 || $point['lat'] > 90) {
             return false;
         }
-        if ($point['lon'] < -180 or $point['lon'] > 180) {
+        if ($point['lon'] < -180 || $point['lon'] > 180) {
             return false;
         }
 
         return true;
     }
-
 }

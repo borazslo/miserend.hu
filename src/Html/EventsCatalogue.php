@@ -1,22 +1,31 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Html;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
-class EventsCatalogue extends Html {
-
-    public function __construct($path) {
+class EventsCatalogue extends Html
+{
+    public function __construct($path)
+    {
         global $user;
 
         if (!$user->checkRole('miserend')) {
             throw new \Exception('Nincs jogosultságod megnézni az események listáját.');
         }
 
-        if (isset($_REQUEST['save']))
+        if (isset($_REQUEST['save'])) {
             $this->save($_REQUEST);
+        }
 
-        if (isset($_REQUEST['order']) AND in_array($_REQUEST['order'], array('year, date', 'name'))) {
+        if (isset($_REQUEST['order']) && \in_array($_REQUEST['order'], ['year, date', 'name'])) {
             $order = $_REQUEST['order'];
         } else {
             $order = false;
@@ -28,106 +37,112 @@ class EventsCatalogue extends Html {
         }
     }
 
-    function form($order = false) {
-        if (!$order)
+    public function form($order = false)
+    {
+        if (!$order) {
             $order = 'year, date';
-        
+        }
+
         $results = DB::table('events')
-                ->where('year','>=',date('Y', strtotime('-1 year')))
+                ->where('year', '>=', date('Y', strtotime('-1 year')))
                 ->orderByRaw($order)
                 ->get();
-                
-        $years = array();
-        $names = array();        
-        foreach($results as $row) {
-            $form[$row->name][$row->year]['input'] = array(
-                'name' => 'events[' . $row->name . '][' . $row->year . '][input]',
+
+        $years = [];
+        $names = [];
+        foreach ($results as $row) {
+            $form[$row->name][$row->year]['input'] = [
+                'name' => 'events['.$row->name.']['.$row->year.'][input]',
                 'value' => $row->date,
-                'class' => 'input-sm')
+                'class' => 'input-sm']
             ;
-            $form[$row->name][$row->year]['id'] = array(
+            $form[$row->name][$row->year]['id'] = [
                 'type' => 'hidden',
-                'name' => 'events[' . $row->name . '][' . $row->year . '][id]',
-                'value' => $row->id);
+                'name' => 'events['.$row->name.']['.$row->year.'][id]',
+                'value' => $row->id];
 
             $years[$row->year] = $row->year;
             $names[$row->name] = $row->name;
         }
-        //new line
-        //$array_shift(array_values($form))
-        $newname = array(
+        // new line
+        // $array_shift(array_values($form))
+        $newname = [
             'name' => 'newname',
-            'size' => 12);
+            'size' => 12];
         global $twig;
         $names['new'] = 'new';
 
         $years[date('Y')] = date('Y');
         $years[date('Y', strtotime('+1 years'))] = date('Y', strtotime('+1 years'));
 
-        foreach (array('tol', 'ig') as $tolig) {
+        foreach (['tol', 'ig'] as $tolig) {
             $results = DB::table('misek')
                     ->select($tolig)
                     ->whereRaw($tolig." NOT REGEXP('^([0-9]{1,4})')")
                     ->groupBy($tolig)
                     ->get();
-            foreach($results as $row) {
+            foreach ($results as $row) {
                 $name = preg_replace('/ (\+|-)([0-9]{1,3}$)/i', '', $row->$tolig);
-                if (!isset($names[$name]))
+                if (!isset($names[$name])) {
                     $names[$name] = $name;
+                }
             }
         }
         foreach ($names as $name) {
             foreach ($years as $year) {
                 if (!isset($form[$name][$year])) {
-                    $form[$name][$year] = array(
-                        'input' => array(
-                            'name' => 'events[' . $name . '][' . $year . '][input]',
-                            'size' => '8'));
+                    $form[$name][$year] = [
+                        'input' => [
+                            'name' => 'events['.$name.']['.$year.'][input]',
+                            'size' => '8']];
                 }
             }
-            //stats
+            // stats
             $result = DB::table('misek')
                     ->selectRaw('count(*) as sum')
-                    ->whereRaw(" ig  REGEXP '^(" . $name . ")(( +| -)[0-9]{1,3})|)$' ")
+                    ->whereRaw(" ig  REGEXP '^(".$name.")(( +| -)[0-9]{1,3})|)$' ")
                     ->first();
-            if($result)
-                $stats[$name] = $result->sum;            
+            if ($result) {
+                $stats[$name] = $result->sum;
+            }
         }
 
-        return array('form' => $form, 'names' => $names, 'years' => $years, 'stats' => $stats);
+        return ['form' => $form, 'names' => $names, 'years' => $years, 'stats' => $stats];
     }
 
-    function save($form) {
+    public function save($form)
+    {
         foreach ($form['events'] as $name => $years) {
             foreach ($years as $year => $input) {
                 if (isset($input['id'])) {
-                    if ($input['input'] != '')
+                    if ('' != $input['input']) {
                         $date = date('Y-m-d', strtotime($input['input']));
-                    else
+                    } else {
                         $date = '';
+                    }
                     DB::table('events')
-                            ->where('id',$input['id'])
+                            ->where('id', $input['id'])
                             ->update([
-                                'date' => $date
+                                'date' => $date,
                             ]);
                 } else {
-                    if ($input['input'] != '') {
-                        if ($name == 'new')
+                    if ('' != $input['input']) {
+                        if ('new' == $name) {
                             $name = sanitize($form['new']);
-                        if ($name != 'new' OR $form['new'] != '') {
+                        }
+                        if ('new' != $name || '' != $form['new']) {
                             DB::table('events')
                                     ->insert([
                                         'name' => $name,
                                         'year' => $year,
-                                        'date' => $input['input']
-                                    ]);                            
+                                        'date' => $input['input'],
+                                    ]);
                         }
                     }
                 }
             }
         }
 
-	   \App\Crons::generateMassTolIgTmp();
+        \App\Crons::generateMassTolIgTmp();
     }
-
 }

@@ -1,18 +1,22 @@
 <?php
 
-//source: http://news-from-the-basement.blogspot.com/2011/07/mocking-phpinput.html
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace App;
 
 class MockPhpStream
 {
-
     protected $index = 0;
-    protected $length = null;
+    protected $length;
     protected $data = 'hello world';
     public $context;
 
-    function __construct()
+    public function __construct()
     {
         if (file_exists($this->buffer_filename())) {
             $this->data = file_get_contents($this->buffer_filename());
@@ -20,7 +24,7 @@ class MockPhpStream
             $this->data = '';
         }
         $this->index = 0;
-        $this->length = strlen($this->data);
+        $this->length = \strlen($this->data);
     }
 
     protected function buffer_filename()
@@ -28,49 +32,48 @@ class MockPhpStream
         return sys_get_temp_dir().'/php_input.txt';
     }
 
-    function stream_open($path, $mode, $options, &$opened_path)
+    public function stream_open($path, $mode, $options, &$opened_path)
     {
         return true;
     }
 
-    function stream_close()
+    public function stream_close()
     {
-
     }
 
-    function stream_stat()
+    public function stream_stat()
     {
-        return array();
+        return [];
     }
 
-    function stream_flush()
+    public function stream_flush()
     {
         return true;
     }
 
-    function stream_read($count)
+    public function stream_read($count)
     {
-        if (is_null($this->length) === true) {
-            $this->length = strlen($this->data);
+        if ((null === $this->length) === true) {
+            $this->length = \strlen($this->data);
         }
         $length = min($count, $this->length - $this->index);
         $data = substr($this->data, $this->index);
-        $this->index = $this->index + $length;
+        $this->index += $length;
 
         return $data;
     }
 
-    function stream_eof()
+    public function stream_eof()
     {
-        return ($this->index >= $this->length ? true : false);
+        return $this->index >= $this->length ? true : false;
     }
 
-    function stream_write($data)
+    public function stream_write($data)
     {
         return file_put_contents($this->buffer_filename(), $data);
     }
 
-    function unlink()
+    public function unlink()
     {
         if (file_exists($this->buffer_filename())) {
             unlink($this->buffer_filename());
@@ -79,7 +82,4 @@ class MockPhpStream
         $this->index = 0;
         $this->length = 0;
     }
-
 }
-
-?>

@@ -1,15 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
 /**
- * A miserendek és az OSM/open_hours közötti kapcsolatot biztosítja
+ * A miserendek és az OSM/open_hours közötti kapcsolatot biztosítja.
  */
 class ServiceTimes
 {
-
     /*
         To test with:
         2141 - Mar 26-Oct 29: Mo-Th,Fr[1] 19:00, Su 08:30; Oct 30-Mar 25: Mo-Th,Fr[1] 17:00, Su 08:30
@@ -19,9 +25,9 @@ class ServiceTimes
          1120 vs 1037
     */
 
-    function loadMasses(int $tid, $args = [])
+    public function loadMasses(int $tid, $args = [])
     {
-        $string = "";
+        $string = '';
 
         // Load all Times of Church
         $results = DB::table('misek')
@@ -34,12 +40,11 @@ class ServiceTimes
             ->get();
 
         global $milyen;
-        $days = $_days = array('Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su');
-        $months = ["Jan", "Feb", "Mar", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $days = $_days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+        $months = ['Jan', 'Feb', 'Mar', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-
-        $period = "";
-        $nap = "";
+        $period = '';
+        $nap = '';
         $schedule = [];
         foreach ($results as $row) {
             foreach (['idoszamitas', 'weight', 'tol', 'ig', 'tmp_datumtol', 'tmp_relation', 'tmp_datumig'] as $field) {
@@ -55,21 +60,21 @@ class ServiceTimes
 
             $d = $days[$row->nap > 0 ? $row->nap - 1 : 6];
             if ($row->tol == $row->ig) {
-                $d = "Mo-Su";
+                $d = 'Mo-Su';
             }
             if (isset($row->nap2)) {
-                if ($row->nap2 == 'pt') {
+                if ('pt' == $row->nap2) {
                     $d = 'week 1-53/2 '.$d;
-                } elseif ($row->nap2 == 'ps') {
+                } elseif ('ps' == $row->nap2) {
                     $d = 'week 2-53/2 '.$d;
-                } elseif ($row->nap2 != 0) {
+                } elseif (0 != $row->nap2) {
                     $d .= '['.$row->nap2.']';
                 }
             }
             $schedule[$row->idoszamitas]['days'][$d][] = $day;
         }
 
-        //Optimze days
+        // Optimze days
         foreach ($schedule as &$periods) {
             $hashs = [];
             foreach ($periods['days'] as $day => $times) {
@@ -79,13 +84,12 @@ class ServiceTimes
             }
 
             foreach ($hashs as $c => $days) {
-                if (count($days) > 1) {
-
+                if (\count($days) > 1) {
                     $saveDay = $periods['days'][$days[0]];
                     $dayPattern = '';
-//printr($days);
+                    // printr($days);
                     foreach ($days as $k => $day) {
-                        if ($k + 1 == count($days)) {
+                        if ($k + 1 == \count($days)) {
                             $isLast = true;
                         } else {
                             $isLast = false;
@@ -108,7 +112,7 @@ class ServiceTimes
                         ) : $nextConstrained = false;
 
                         // First always!
-                        if ($k == 0) {
+                        if (0 == $k) {
                             if (!$currentConstrained) {
                                 $dayPattern .= $day;
                             } else {
@@ -121,17 +125,14 @@ class ServiceTimes
                                     }
                                 }
                             }
-                            // In the middle   AND end
+                        // In the middle   AND end
                         } else {
-                            if ($k < count($days)) {
-
+                            if ($k < \count($days)) {
                                 if ($lastConstrained) {
-
-                                    if ($currentConstrained and $lastConstrained[1] == $currentConstrained[1]) {
-                                        /* */
+                                    if ($currentConstrained && $lastConstrained[1] == $currentConstrained[1]) {
                                         if ($lastConstrained[2] + 1 == $currentConstrained[2]
-                                            and isset($nextConstrained[2])
-                                            and $currentConstrained[2] + 1 == $nextConstrained[2]) {
+                                            && isset($nextConstrained[2])
+                                            && $currentConstrained[2] + 1 == $nextConstrained[2]) {
                                         } else {
                                             if ($lastConstrained[2] + 1 == $currentConstrained[2]) {
                                                 $dayPattern .= '-'.$currentConstrained[2];
@@ -140,15 +141,13 @@ class ServiceTimes
                                             }
                                         }
 
-                                        if ($isLast or !$nextConstrained) {
+                                        if ($isLast || !$nextConstrained) {
                                             $dayPattern .= ']';
                                         }
-
                                     } else {
-
-                                        if (substr($dayPattern, -1) != ']') {
+                                        if (']' != substr($dayPattern, -1)) {
                                             $dayPattern .= ']';
-                                        }   //Kár hogy ez kell. Nem tudo mikor és miért kell. Lásd: 1120 vs 1037
+                                        }   // Kár hogy ez kell. Nem tudo mikor és miért kell. Lásd: 1120 vs 1037
                                         $dayPattern .= ',';
 
                                         if ($currentConstrained) {
@@ -161,29 +160,22 @@ class ServiceTimes
                                         }
                                     }
                                 } else {
-
                                     if ($currentConstrained) {
                                         $dayPattern .= ','.$currentConstrained[1].'['.$currentConstrained[2];
                                         if ($isLast) {
                                             $dayPattern .= ']';
                                         }
                                     } else {
-
-                                        if ($lastDayKey + 1 == $currentDayKey and $currentDayKey + 1 == $nextDayKey) {
+                                        if ($lastDayKey + 1 == $currentDayKey && $currentDayKey + 1 == $nextDayKey) {
                                         } else {
-                                            if ($lastDayKey + 1 == $currentDayKey and $currentDayKey + 1 != $nextDayKey) {
+                                            if ($lastDayKey + 1 == $currentDayKey && $currentDayKey + 1 != $nextDayKey) {
                                                 $dayPattern .= '-'.$day;
                                             } else {
                                                 $dayPattern .= ','.$day;
                                             }
                                         }
-
                                     }
-
-
                                 }
-
-
                             }
                         }
 
@@ -192,12 +184,9 @@ class ServiceTimes
 
                     // echo $dayPattern;
 
-
                     $periods['days'][$dayPattern] = $saveDay;
                 }
             }
-
-
         }
 
         // printr($periods);
@@ -206,26 +195,26 @@ class ServiceTimes
         global $milyen, $nyelv;
         $string = '';
         foreach ($schedule as $key => $periodss) {
-            if (count($schedule) == 1 and $periodss['tmp_datumtol'] == '01-01' and $periodss['tmp_datumig'] == '12-31') {
+            if (1 == \count($schedule) && '01-01' == $periodss['tmp_datumtol'] && '12-31' == $periodss['tmp_datumig']) {
             } else {
                 if ($periodss['tmp_datumtol'] == $periodss['tmp_datumig']) {
-                    $string .= date("M d", strtotime("2023-".$periodss['tmp_datumtol'])).": ";
+                    $string .= date('M d', strtotime('2023-'.$periodss['tmp_datumtol'])).': ';
                 } else {
-                    $string .= date("M d", strtotime("2023-".$periodss['tmp_datumtol']))."-".date(
-                            "M d",
-                            strtotime("2023-".$periodss['tmp_datumig'])
-                        ).": ";
+                    $string .= date('M d', strtotime('2023-'.$periodss['tmp_datumtol'])).'-'.date(
+                        'M d',
+                        strtotime('2023-'.$periodss['tmp_datumig'])
+                    ).': ';
                 }
             }
 
             foreach ($periodss['days'] as $key => $times) {
                 // if(count($periodss['days']) == 1 AND $key == 'Mo-Su') { } else  // Ez logikus lenne, de a feldolgozó nem szereti
-                $string .= $key." ";
+                $string .= $key.' ';
                 foreach ($times as $time) {
                     $string .= date('H:i', strtotime($time['ido']));
 
-                    //add comment(s)
-                    /**/
+                    // add comment(s)
+
                     $comments = [];
 
                     if (isset($time['nyelv'])) {
@@ -246,39 +235,36 @@ class ServiceTimes
                         $comments[] = $time['megjegyzes'];
                     }
 
-                    if (count($comments) > 0) {
-                        $string .= " \"".implode(", ", $comments)."\"";
+                    if (\count($comments) > 0) {
+                        $string .= ' "'.implode(', ', $comments).'"';
                     }
 
-                    /**/
                     $string .= ',';
                 }
                 $string = preg_replace('/(\,(| ))$/', '', $string);
-                $string .= ", ";
+                $string .= ', ';
             }
             $string = preg_replace('/(\,(| ))$/', '', $string);
-            $string .= "; ";
+            $string .= '; ';
         }
         $string = preg_replace('/(\;(| ))$/', '', $string);
 
-        if (isset($args['skipvalidation']) and ($args['skipvalidation'] == true or $args['skipvalidation'] == 1) or in_array(
-                'skipvalidation',
-                $args
-            )) {
+        if (isset($args['skipvalidation']) && (true == $args['skipvalidation'] || 1 == $args['skipvalidation']) || \in_array(
+            'skipvalidation',
+            $args
+        )) {
         } else {
             $this->validate($string);
         }
 
         $this->string = $string;
-
     }
 
-    function validate(string $string)
+    public function validate(string $string)
     {
+        $exp = urlencode(str_replace("\n", '', $string));
 
-        $exp = urlencode(str_replace("\n", "", $string));
-
-        $openingh = new \App\ExternalApi\OpeninghApi();
+        $openingh = new ExternalApi\OpeninghApi();
 
         try {
             $openingh->validate($string);
@@ -289,9 +275,5 @@ class ServiceTimes
         }
 
         $this->linkForDetails = $openingh->linkForDetails;
-
-
     }
-
-
 }

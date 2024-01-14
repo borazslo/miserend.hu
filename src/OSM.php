@@ -1,27 +1,32 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
 class OSM
 {
-
     /*
     * Az OSM-el rendelkező templomoknál letöltjük, hogy milyen területekhez
     * tartozik.
     */
 
-    function checkBoundaries($limit = 50)
+    public function checkBoundaries($limit = 50)
     {
-
-        $churches = \App\Model\Church::where('ok', 'i')->where('lat', '<>', '')
+        $churches = Model\Church::where('ok', 'i')->where('lat', '<>', '')
             ->doesntHave('boundaries')
-            ->orderByRaw("RAND()")
+            ->orderByRaw('RAND()')
             ->take($limit)
             ->get();
 
-        if (count($churches) < 1) {
+        if (\count($churches) < 1) {
             $results = DB::table('templomok')
                 ->join('lookup_boundary_church', 'templomok.id', '=', 'lookup_boundary_church.church_id')
                 ->select('lookup_boundary_church.*')
@@ -29,27 +34,26 @@ class OSM
                 ->groupBy('church_id')
                 ->limit($limit)
                 ->get();
-            $churches = array();
+            $churches = [];
             foreach ($results as $result) {
-                $churches[] = \App\Model\Church::find($result->church_id);
+                $churches[] = Model\Church::find($result->church_id);
             }
         }
-        /**/
+
         foreach ($churches as $church) {
             $church->MdownloadOSMBoundaries();
             $church->MmigrateBoundaries();
         }
-
     }
 
     /*
-     * Az OSM-ből az url:miserend -es cuccok lekérése és a templomok azok 
+     * Az OSM-ből az url:miserend -es cuccok lekérése és a templomok azok
      * alapján való mentése.
      */
 
-    function checkUrlMiserend()
+    public function checkUrlMiserend()
     {
-        $overpass = new \App\ExternalApi\OverpassApi();
+        $overpass = new ExternalApi\OverpassApi();
         $overpass->downloadUrlMiserend();
 
         /*
@@ -59,23 +63,22 @@ class OSM
         $overpass->saveElement();
 
         if (!$overpass->jsonData->elements) {
-            throw new Exception("Missing Json Elements from OverpassApi Query");
+            throw new Exception('Missing Json Elements from OverpassApi Query');
         }
         $c = 0;
         foreach ($overpass->jsonData->elements as $element) {
-            $c++;
+            ++$c;
             if ($c > 10000) {
                 exit;
             }
             preg_match('/miserend\.hu\/\?{0,1}templom(\/|=)([0-9]{1,5})/i', $element->tags->{'url:miserend'}, $match);
             if (!isset($match[2])) {
                 /*
-                 * TODO: Van url:miserend, de az értéke vacak. 
+                 * TODO: Van url:miserend, de az értéke vacak.
                  */
-                //printr($element);
-
+                // printr($element);
             } else {
-                $church = \App\Model\Church::find($match[2]);
+                $church = Model\Church::find($match[2]);
                 if ($church) {
                     $this->saveOSM2Church($church, $element);
                 }
@@ -83,7 +86,7 @@ class OSM
         }
     }
 
-    function saveOSM2Church($church, $element)
+    public function saveOSM2Church($church, $element)
     {
         if (isset($element->center->lat)) {
             $element->lat = $element->center->lat;
@@ -102,19 +105,18 @@ class OSM
         }
         */
 
-        if ($element->id != $church->osmid or $element->type != $church->osmtype) {
+        if ($element->id != $church->osmid || $element->type != $church->osmtype) {
             $church->osmtype = $element->type;
             $church->osmid = $element->id;
             $changed = true;
         }
 
         /* TODO: biztosan fejetlenül átmentjük a koordinátákat? */
-        if ($element->lat != $church->lat or $element->lon != $church->lon) {
+        if ($element->lat != $church->lat || $element->lon != $church->lon) {
             $church->lon = $element->lon;
             $church->lat = $element->lat;
             $changed = true;
         }
         $changed ? $church->save() : false;
     }
-
 }

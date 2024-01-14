@@ -1,95 +1,93 @@
 <?php
 
 /*
- * Heti hét templom frissítését vállalhatták embereek.
- * Jelenleg nem üzemel és ez a kód már erőst elavilt.
- * Az egész rész újraírandó, amikor újra élesztjük
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace App;
 
 class Campaign
 {
-
-
-    function assignUpdates()
+    public function assignUpdates()
     {
         global $config;
 
         $limit = 7;
 
-        $numbers = array('nulla', 'egy', 'kettő', 'három', 'négy', 'öt', 'hat', 'hét', 'nyolc', 'kilenc', 'tiz');
+        $numbers = ['nulla', 'egy', 'kettő', 'három', 'négy', 'öt', 'hat', 'hét', 'nyolc', 'kilenc', 'tiz'];
 
-
-        //users
+        // users
         $query = "
-            SELECT user.uid,login,email,becenev,nev,c FROM user 
+            SELECT user.uid,login,email,becenev,nev,c FROM user
             LEFT JOIN (
                 SELECT count(*) as c, uid FROM updates
-                WHERE timestamp > '".date('Y-m-d H:i:s', strtotime("-160 hours"))."' 
-                GROUP BY uid 
+                WHERE timestamp > '".date('Y-m-d H:i:s', strtotime('-160 hours'))."'
+                GROUP BY uid
                 ORDER BY timestamp DESC
-            ) u ON u.uid = user.uid 
-            WHERE volunteer = 1 AND (c < ".$limit." OR c IS NULL)
-        ;";
+            ) u ON u.uid = user.uid
+            WHERE volunteer = 1 AND (c < ".$limit.' OR c IS NULL)
+        ;';
         $result = mysql_query($query);
-        $users = array();
+        $users = [];
         while ($user = mysql_fetch_assoc($result)) {
             $users[$user['uid']] = $user;
         }
         $cUsers = mysql_num_rows($result);
 
-        //templomok
+        // templomok
         $query = "
-            SELECT t.id,t.nev,t.ismertnev,t.varos,t.nev,t.frissites,u.uid, u.timestamp 
+            SELECT t.id,t.nev,t.ismertnev,t.varos,t.nev,t.frissites,u.uid, u.timestamp
             FROM templomok  t
                 LEFT JOIN (
                     SELECT * FROM updates
-                    WHERE timestamp > '".date('Y-m-d', strtotime("-2 months"))."' 
+                    WHERE timestamp > '".date('Y-m-d', strtotime('-2 months'))."'
                     ORDER BY timestamp DESC
-                ) u ON u.tid = t.id  
+                ) u ON u.tid = t.id
                 LEFT JOIN (
                     SELECT * FROM eszrevetelek
-                    WHERE allapot = 'u' or allapot = 'f' 
+                    WHERE allapot = 'u' or allapot = 'f'
                     GROUP BY hol_id
                     ORDER BY datum
                 ) e ON e.hol_id = t.id
-            WHERE 
-                ok = 'i' 
+            WHERE
+                ok = 'i'
                 AND orszag = 12
                 AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
-                AND frissites < '".date('Y-m-d', strtotime("-2 years"))."' 
+                AND frissites < '".date('Y-m-d', strtotime('-2 years'))."'
                 AND u.timestamp IS NULL
-                AND e.allapot IS NULL                
+                AND e.allapot IS NULL
             GROUP BY t.id
             ORDER BY frissites, t.id ";
-        //$query .= " LIMIT ".( $limit * $cUsers );
+        // $query .= " LIMIT ".( $limit * $cUsers );
 
         $result = mysql_query($query);
-        $templomok = array();
+        $templomok = [];
         while ($templom = mysql_fetch_assoc($result)) {
             $templomokFull[$templom['id']] = $templom;
         }
         $cKioszthato = mysql_num_rows($result);
-        //echo "Kiosztható: ".$cKioszthato;
-        //echo $cUsers * $limit;
+        // echo "Kiosztható: ".$cKioszthato;
+        // echo $cUsers * $limit;
         if (($cUsers * $limit) > $cKioszthato) {
-            $mail = new \App\Model\Email();
-            $mail->subject = "Miserend.hu - Önkéntes FIGYELMEZTETÉS!";
-            $mail->body = "Itt a vége?\n\n".$cUsers." önkéntesünk van. Nekik kéne kiosztani ".($cUsers * $limit)." templomot, de csak ".$cKioszthato." templom van a raktáron.";
+            $mail = new Model\Email();
+            $mail->subject = 'Miserend.hu - Önkéntes FIGYELMEZTETÉS!';
+            $mail->body = "Itt a vége?\n\n".$cUsers.' önkéntesünk van. Nekik kéne kiosztani '.($cUsers * $limit).' templomot, de csak '.$cKioszthato.' templom van a raktáron.';
             if ($cKioszthato > 0) {
                 $limit = ceil($cKioszthato / $cUsers);
-                $mail->body .= "\nÚgy határoztunk hát, hogy csak ".$limit." templomot osztunk ki fejenként.";
+                $mail->body .= "\nÚgy határoztunk hát, hogy csak ".$limit.' templomot osztunk ki fejenként.';
             }
             $mail->Send($config['mail']['debugger']);
         }
 
-        //változók a levélhez
+        // változók a levélhez
         $query = "
             SELECT count(*),t.nev FROM eszrevetelek
                     RIGHT JOIN templomok t ON t.id = eszrevetelek.hol_id
-                WHERE datum > '".date('Y-m-d H:i:s', strtotime("-1 week"))."' 
-                    AND ok = 'i' 
+                WHERE datum > '".date('Y-m-d H:i:s', strtotime('-1 week'))."'
+                    AND ok = 'i'
                     AND orszag = 12
                     AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
                 GROUP BY hol_id
@@ -97,11 +95,10 @@ class Campaign
         $result = mysql_query($query);
         $M = mysql_num_rows($result);
 
-
         $query = "
             SELECT count(*) FROM templomok t
-                WHERE frissites > '".date('Y-m-d', strtotime("-6 months"))."' 
-                    AND ok = 'i' 
+                WHERE frissites > '".date('Y-m-d', strtotime('-6 months'))."'
+                    AND ok = 'i'
                     AND orszag = 12
                     AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
         ;";
@@ -111,8 +108,8 @@ class Campaign
 
         $query = "
             SELECT count(*) FROM templomok t
-                WHERE frissites < '".date('Y-m-d', strtotime("-2 years"))."' 
-                    AND ok = 'i' 
+                WHERE frissites < '".date('Y-m-d', strtotime('-2 years'))."'
+                    AND ok = 'i'
                     AND orszag = 12
                     AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
         ;";
@@ -120,37 +117,35 @@ class Campaign
         $tmp = mysql_fetch_row($result);
         $O = $tmp[0];
 
-
-        //minden felhasználó egyesével
+        // minden felhasználó egyesével
         $c = 0;
         foreach ($users as $uid => $user) {
+            $templomok = \array_slice($templomokFull, $c * $limit, $limit, true);
+            ++$c;
 
-            $templomok = array_slice($templomokFull, $c * $limit, $limit, true);
-            $c++;
-
-            $list = "<ul>";
+            $list = '<ul>';
             foreach ($templomok as $tid => $templom) {
-                $query = "INSERT INTO updates (uid,tid) VALUES (".$uid.",".$tid.");";
+                $query = 'INSERT INTO updates (uid,tid) VALUES ('.$uid.','.$tid.');';
                 if ($config['debug'] < 1) {
                     mysql_query($query);
                 } else {
                     echo $query."\n<br/>";
                 }
-                $list .= "<li><a href='http://miserend.hu/templom/".$templom['id']."'>".$templom['nev']."</a>";
-                if ($templom['ismertnev'] != '') {
-                    $list .= " (".$templom['ismertnev'].")";
+                $list .= "<li><a href='http://miserend.hu/templom/".$templom['id']."'>".$templom['nev'].'</a>';
+                if ('' != $templom['ismertnev']) {
+                    $list .= ' ('.$templom['ismertnev'].')';
                 }
-                $list .= ", ".$templom['varos'];
-                $list .= " <font size='-1'>- utolsó frissítés: ".preg_replace('/-/', '. ', $templom['frissites']).".</font>";
-                $list .= "</li>";
+                $list .= ', '.$templom['varos'];
+                $list .= " <font size='-1'>- utolsó frissítés: ".preg_replace('/-/', '. ', $templom['frissites']).'.</font>';
+                $list .= '</li>';
             }
-            $list .= "</ul>";
+            $list .= '</ul>';
 
-            //változók a levélhez
+            // változók a levélhez
 
-            if ($user['becenev'] != '') {
+            if ('' != $user['becenev']) {
                 $nev = $user['becenev'];
-            } elseif ($user['nev'] != '') {
+            } elseif ('' != $user['nev']) {
                 $nev = $user['nev'];
             } else {
                 $nev = $user['login'];
@@ -159,9 +154,9 @@ class Campaign
             $query = "
                 SELECT count(*),t.nev FROM eszrevetelek e
                         RIGHT JOIN templomok t ON t.id = e.hol_id
-                    WHERE datum > '".date('Y-m-d H:i:s', strtotime("-1 week"))."' 
-                        AND e.login = '".$user['login']."' OR e.email = '".$user['email']."' 
-                        AND ok = 'i' 
+                    WHERE datum > '".date('Y-m-d H:i:s', strtotime('-1 week'))."'
+                        AND e.login = '".$user['login']."' OR e.email = '".$user['email']."'
+                        AND ok = 'i'
                         AND orszag = 12
                         AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
                     GROUP BY hol_id
@@ -169,21 +164,20 @@ class Campaign
             $result = mysql_query($query);
             $N = mysql_num_rows($result);
 
-
             if ($O > $L) {
-                $ol = "de még";
+                $ol = 'de még';
             } else {
-                $ol = "és már csak";
+                $ol = 'és már csak';
             }
 
-            $mail = new \App\Model\Email();
+            $mail = new Model\Email();
 
-            $mail->subject = "Miserend frissítése, ".date('W').". hét";
+            $mail->subject = 'Miserend frissítése, '.date('W').'. hét';
             $text = "
                 <strong>Kedves $nev!</strong>\n
                 <p>A <a href='http://miserend.hu'>miserend.hu</a>-n a múlt héten $M magyarországi templomhoz kaptunk észrevételt. ";
-            if ($N == 0) {
-                $text .= "Reméljük, a héten te is tudsz küldeni helyesbítést.";
+            if (0 == $N) {
+                $text .= 'Reméljük, a héten te is tudsz küldeni helyesbítést.';
             } elseif ($N * 5 < $M) {
                 $text .= "Te $N észrevételt küldtél be. És pont az ilyen sok kicsi ment ilyen sokra. ";
             } else {
@@ -191,7 +185,7 @@ class Campaign
             }
             $text .= "
                 Összesen már $L templomnak vannak fél évnél frissebb adatai, $ol $O nagyon régen frissített magyarországi templom van az adatbázisunkban.</p>\n
-                <p>A következő héten a következő ".$numbers[count($templomok)]." templom miserendjének frissítésében kérjük a te segítségedet:\n
+                <p>A következő héten a következő ".$numbers[\count($templomok)]." templom miserendjének frissítésében kérjük a te segítségedet:\n
                 ".$list;
 
             $text .= <<<EOT
@@ -210,64 +204,61 @@ class Campaign
             $text .= "<p><strong>Segítségedet nagyon köszönjük!</strong></p><p>&nbsp;&nbsp;A miserend.hu önkéntes csapata</p>\n
                 <p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor visszavonhatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
             ";
-            $mail->type = "heti7templom_hetiadag";
+            $mail->type = 'heti7templom_hetiadag';
             $mail->body = $text;
             $mail->Send($user['email']);
-            /* */
         }
     }
 
-    function clearoutVolunteers()
+    public function clearoutVolunteers()
     {
         $query = "
         SELECT user.uid,
             (IF (login.count IS NULL,0,login.count) + IF (email.count IS NULL,0,email.count)) as eszrevetelek,
             IF (updates.count IS NULL,0,updates.count) as updates
-        FROM user 
+        FROM user
         LEFT JOIN (
-            SELECT count(*) as count,login 
-            FROM eszrevetelek 
-            WHERE datum > '".date('Y-m-d H:i:s', strtotime("-1 month"))."' 
+            SELECT count(*) as count,login
+            FROM eszrevetelek
+            WHERE datum > '".date('Y-m-d H:i:s', strtotime('-1 month'))."'
             GROUP BY login
-            ) login 
+            ) login
             ON login.login = user.login
         LEFT JOIN (
-            SELECT count(*) as count,email 
-            FROM eszrevetelek 
-            WHERE datum > '".date('Y-m-d H:i:s', strtotime("-1 month"))."'
-                AND login like '*vendeg*' GROUP BY email 
-            ) email 
+            SELECT count(*) as count,email
+            FROM eszrevetelek
+            WHERE datum > '".date('Y-m-d H:i:s', strtotime('-1 month'))."'
+                AND login like '*vendeg*' GROUP BY email
+            ) email
             ON email.email = user.email
         LEFT JOIN (
             SELECT count(*) as count,uid
-            FROM updates 
-            WHERE timestamp > '".date('Y-m-d H:i:s', strtotime("-1 month"))."'
+            FROM updates
+            WHERE timestamp > '".date('Y-m-d H:i:s', strtotime('-1 month'))."'
             GROUP BY uid
-            ) updates 
-            ON updates.uid = user.uid    
+            ) updates
+            ON updates.uid = user.uid
 
         WHERE volunteer = 1;";
 
         $limit = 10;
         $c = 1;
         $result = mysql_query($query);
-        $volunteer = array();
+        $volunteer = [];
         while ($volunteer = mysql_fetch_assoc($result)) {
-            if ($volunteer['updates'] > 0 and $volunteer['eszrevetelek'] == 0) {
-
+            if ($volunteer['updates'] > 0 && 0 == $volunteer['eszrevetelek']) {
                 $user = new User($volunteer['uid']);
-                if ($user->nickname != '') {
+                if ('' != $user->nickname) {
                     $nev = $user->nickname;
-                } elseif ($user->name != '') {
+                } elseif ('' != $user->name) {
                     $nev = $user->name;
                 } else {
                     $nev = $user->username;
                 }
 
+                $mail = new Model\Email();
 
-                $mail = new \App\Model\Email();
-
-                $mail->subject = "Miserend önkéntesség";
+                $mail->subject = 'Miserend önkéntesség';
 
                 $text = <<<EOD
                 <strong>Kedves $nev!</strong>\n
@@ -279,11 +270,11 @@ class Campaign
                 $text .= "<p><font size='-1'>Ezt a levelet azért kaptad, mert a <a href='http://misrend.hu'>miserend.hu</a> honlapon egyszer jelentkeztél önkéntes frissítőnék. Vállalásodat bármikor módosíthatod a <a href='http://miserend.hu/?m_id=28&m_op=add'>személyes beállításadinál</a>, vagy írhatsz az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címre. Technikai segítség szintén az <a href='mailto:eleklaszlosj@gmail.com'>eleklaszlosj@gmail.com</a> címen kérhető.</font></p>
             ";
                 $mail->body = $text;
-                $mail->type = "heti7templom_lemondas";
+                $mail->type = 'heti7templom_lemondas';
                 $mail->Send($user->email);
                 $user->presave('volunteer', 0);
                 $user->save();
-                $c++;
+                ++$c;
                 if ($c > $limit) {
                     return true;
                 }
@@ -293,7 +284,7 @@ class Campaign
         return true;
     }
 
-    function updatesCampaign()
+    public function updatesCampaign()
     {
         global $twig, $user;
 
@@ -304,8 +295,8 @@ class Campaign
 
         $query = "
                 SELECT count(*) FROM templomok t
-                    WHERE frissites < '".date('Y-m-d', strtotime("2015-12-24 -2 years"))."' 
-                        AND ok = 'i' 
+                    WHERE frissites < '".date('Y-m-d', strtotime('2015-12-24 -2 years'))."'
+                        AND ok = 'i'
                         AND orszag = 12
                         AND ( t.nev LIKE '%templom%' OR t.nev LIKE '%bazilika%' OR t.nev LIKE '%székesegyház%')
             ;";
@@ -315,44 +306,42 @@ class Campaign
 
         $W = date('W', strtotime('2015-12-24')) - date('W');
 
-        $S = (int)($O / $W / 7) + 1;
+        $S = (int) ($O / $W / 7) + 1;
 
         if ($O > $L) {
-            $ol = "de még";
+            $ol = 'de még';
         } else {
-            $ol = "és már csak";
+            $ol = 'és már csak';
         }
 
         $dobozszoveg = "<span class='alap'>Alig $S önkéntes heti hét templom miserendjének frissítésével karácsonyra naprakésszé teheti az összes magyarországi templomot. <strong>Már $C ember segít nekünk";
 
         if ($C >= $S) {
-            $dobozszoveg .= ", de segítő kézre még szükségünk van. ";
+            $dobozszoveg .= ', de segítő kézre még szükségünk van. ';
         } else {
-            $dobozszoveg .= ". ";
+            $dobozszoveg .= '. ';
         }
-        if ($user->volunteer == 1) {
-            $dobozszoveg .= "Köszönjük, hogy te is köztük vagy!";
+        if (1 == $user->volunteer) {
+            $dobozszoveg .= 'Köszönjük, hogy te is köztük vagy!';
         } else {
             $dobozszoveg .= "<a href='mailto:eleklaszlosj@gmail.com?subject=Önkéntesnek jelentkezem'>Jelentkezz te is!</a>";
         }
 
-        $dobozszoveg .= "</strong></span>";
+        $dobozszoveg .= '</strong></span>';
 
-        $variables = array(
-            'header' => array('content' => 'Hét nap, hét frissítés'),
+        $variables = [
+            'header' => ['content' => 'Hét nap, hét frissítés'],
             'content' => nl2br($dobozszoveg),
-            'settings' => array('width=100%', 'align=center', 'style="padding:1px"'),
-        );
+            'settings' => ['width=100%', 'align=center', 'style="padding:1px"'],
+        ];
 
         if ($C >= ($S * 2)) {
             return false;
         }
 
-        return array(
+        return [
             'title' => 'Hét nap, hét frissítése',
             'content' => nl2br($dobozszoveg),
-        );
+        ];
     }
-
-
 }

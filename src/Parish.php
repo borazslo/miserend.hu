@@ -1,25 +1,30 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
 class Parish
 {
-
     public function getByChurchId($id)
     {
         $result = DB::table('templomok')
             ->select('plebania', 'pleb_eml')
-            ->where('id', "=", $id)
+            ->where('id', '=', $id)
             ->limit(1)
             ->get();
-        if (!count($result)) {
+        if (!\count($result)) {
             throw new Exception("There is no church with tid = '$id' (parish).");
         }
-        $this->name = "";
+        $this->name = '';
         $this->description = $result[0]->plebania;
         $this->email = $result[0]->pleb_eml;
     }
-
 }

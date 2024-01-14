@@ -1,19 +1,26 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 class Token
 {
-    static function create($forUserId, $type): string
+    public static function create($forUserId, $type): string
     {
         global $config;
 
         if (isset($_COOKIE['token'])) {
-            \App\Model\Token::where('name', $_COOKIE['token'])->delete();
+            Model\Token::where('name', $_COOKIE['token'])->delete();
         }
 
-        $timeout = date('Y-m-d H:i:s', strtotime("+".$config['token'][$type]));
-        $token = \App\Model\Token::create([
+        $timeout = date('Y-m-d H:i:s', strtotime('+'.$config['token'][$type]));
+        $token = Model\Token::create([
             'name' => md5(uniqid(mt_rand(), true)),
             'type' => $type,
             'uid' => $forUserId,
@@ -21,23 +28,23 @@ class Token
         ]);
         $token->save();
 
-        setcookie('token', $token->name, strtotime($timeout), "/", "", false, true);  // https?
+        setcookie('token', $token->name, strtotime($timeout), '/', '', false, true);  // https?
         $_COOKIE['token'] = $token->name;
 
         return $token->name;
     }
 
-    static function delete(): void
+    public static function delete(): void
     {
         if (isset($_COOKIE['token'])) {
-            \App\Model\Token::where('name', $_COOKIE['token'])->delete();
-            setcookie('token', "", strtotime("-1 year"), "/", "", false, true);
+            Model\Token::where('name', $_COOKIE['token'])->delete();
+            setcookie('token', '', strtotime('-1 year'), '/', '', false, true);
             unset($_COOKIE['token']);
         }
     }
 
-    static function cleanOut(): void
+    public static function cleanOut(): void
     {
-        \App\Model\Token::where('timeout', '<', date('Y-m-d H:i:s'))->delete();
+        Model\Token::where('timeout', '<', date('Y-m-d H:i:s'))->delete();
     }
 }

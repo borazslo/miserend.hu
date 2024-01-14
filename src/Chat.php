@@ -1,23 +1,29 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
 class Chat
 {
-
     public $limit = 10;
     public $alert = 0;
 
-    function load()
+    public function load()
     {
         $this->loadComments();
-        $this->lastcomment = isset($this->comments[0]['datum_raw']) ? $this->comments[0]['datum_raw'] : false;
+        $this->lastcomment = $this->comments[0]['datum_raw'] ?? false;
         $this->getUsers('html');
     }
 
-    function loadComments($args = [])
+    public function loadComments($args = [])
     {
         global $user, $twig;
 
@@ -42,11 +48,10 @@ class Chat
 
         $comments = $comments->get();
         $comments = collect($comments)->map(function ($x) {
-            return (array)$x;
+            return (array) $x;
         })->toArray();
 
         foreach ($comments as $row) {
-
             $row['datum_raw'] = $row['datum'];
             if (date('Y', strtotime($row['datum'])) < date('Y')) {
                 $row['datum'] = date('Y.m.d.', strtotime($row['datum']));
@@ -66,15 +71,15 @@ class Chat
                 $row['color'] = 'red';
             }
 
-            if ($row['kinek'] != '') {
+            if ('' != $row['kinek']) {
                 if ($row['kinek'] == $user->login) {
                     $loginkiir2 = urlencode($user->login);
                 } else {
                     $loginkiir2 = urlencode($row['kinek']);
                 }
 
-                $row['jelzes'] = "<span class='response_closed link' title='Válasz csak neki' data-to='".$row['kinek']."' ><img src=img/lakat.gif align=absmiddle height='13' border=0><i> ".$row['kinek']."</i></span>: ";
-                //$row['jelzes'] .= "<a class='response_open link' title='Nyilvános válasz / említés' data-to='".$row['kinek']."'><i> ".$row['kinek']."</i></a>: ";
+                $row['jelzes'] = "<span class='response_closed link' title='Válasz csak neki' data-to='".$row['kinek']."' ><img src=img/lakat.gif align=absmiddle height='13' border=0><i> ".$row['kinek'].'</i></span>: ';
+                // $row['jelzes'] .= "<a class='response_open link' title='Nyilvános válasz / említés' data-to='".$row['kinek']."'><i> ".$row['kinek']."</i></a>: ";
             }
 
             $row['szoveg'] = preg_replace(
@@ -89,28 +94,26 @@ class Chat
                 $row['szoveg']
             );
 
-
-            $row['html'] = $twig->render('chat/chatcomment.twig', array('comment' => $row));
+            $row['html'] = $twig->render('chat/chatcomment.twig', ['comment' => $row]);
             if ($row['user'] != $user->login) {
-                $this->alert++;
+                ++$this->alert;
             }
 
             $this->comments[] = $row;
         }
 
         return $this->comments;
-
     }
 
-    function getUsers($format = false)
+    public function getUsers($format = false)
     {
         global $user;
-        $return = array();
+        $return = [];
 
         $onlineUsers = DB::table('user')
             ->select('login')
             ->where('jogok', '!=', '')
-            ->where('lastactive', '>=', date('Y-m-d H:i:s', strtotime("-5 minutes")))
+            ->where('lastactive', '>=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
             ->where('login', '<>', $user->login)
             ->orderBy('lastactive', 'DESC')
             ->get();
@@ -119,12 +122,12 @@ class Chat
             $return[] = $onlineUser->login;
         }
 
-        if ($format == 'html') {
+        if ('html' == $format) {
             foreach ($return as $k => $i) {
                 $return[$k] = '<span class="response_closed" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
             }
             $text = '<strong>Online adminok:</strong> '.implode(', ', $return);
-            if (count($return) == 0) {
+            if (0 == \count($return)) {
                 $text = '<strong><i>Nincs (más) admin online.</i></strong>';
             }
             $return = $text;
@@ -133,5 +136,4 @@ class Chat
 
         return $this->users;
     }
-
 }

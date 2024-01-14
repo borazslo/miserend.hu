@@ -1,26 +1,35 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Html\Email;
 
-class Email extends \App\Html\Html {
-
-    public function __construct($path) {
-        if(!$this->checkPermission()) {
-            throw new \Exception("Nincs jogod levélküldéshez.");
+class Email extends \App\Html\Html
+{
+    public function __construct($path)
+    {
+        if (!$this->checkPermission()) {
+            throw new \Exception('Nincs jogod levélküldéshez.');
         }
 
         $this->mail = new \App\Model\Email();
         if (isset($_REQUEST['send'])) {
             $this->send();
             $this->template = 'layout_simpliest.twig';
-            $this->body = "Köszönjük, elküldtük.";
+            $this->body = 'Köszönjük, elküldtük.';
             unset($this->mail);
-        } else {            
+        } else {
             $this->preparePage($path);
         }
     }
 
-    public function send() {
+    public function send()
+    {
         $this->mail->to = \App\Request::TextRequired('email');
         $this->mail->subject = \App\Request::TextRequired('subject');
         $this->mail->body = \App\Request::TextRequired('text');
@@ -30,21 +39,23 @@ class Email extends \App\Html\Html {
         }
     }
 
-    public function preparePage($path) {
+    public function preparePage($path)
+    {
         $id = \App\Request::Integer('id');
-        
-        if($id) {
+
+        if ($id) {
             $this->mail = \App\Model\Email::find($id);
-        }      
+        }
     }
 
-    function checkPermission() {
+    public function checkPermission()
+    {
         global $user;
         $this->user = $user;
         if (!$this->user->checkRole('"any"')) {
-            return false;   
+            return false;
         }
+
         return true;
     }
-    
 }

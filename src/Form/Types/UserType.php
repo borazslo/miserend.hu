@@ -1,8 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Form\Types;
 
-use PhpParser\Node\Expr\BinaryOp\NotEqual;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,8 +24,7 @@ class UserType extends AbstractType
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -31,8 +36,8 @@ class UserType extends AbstractType
             'constraints' => [
                 new NotBlank(message: 'A mezőt kötelező kitölteni!'),
                 new Length(max: 20),
-                new Regex(pattern: '[\w0-9]*')
-            ]
+                new Regex(pattern: '[\w0-9]*'),
+            ],
         ]);
 
         $builder->add('nickname', TextType::class, [
@@ -42,7 +47,7 @@ class UserType extends AbstractType
             'constraints' => [
                 new NotBlank(message: 'A mezőt kötelező kitölteni!'),
                 new Length(max: 1), // mennyi a max?
-            ]
+            ],
         ]);
 
         $builder->add('name', TextType::class, [
@@ -51,7 +56,7 @@ class UserType extends AbstractType
             'constraints' => [
                 new NotBlank(message: 'A mezőt kötelező kitölteni!'),
                 new Length(max: 1), // mennyi a max?
-            ]
+            ],
         ]);
 
         $builder->add('email', TextType::class, [
@@ -60,12 +65,12 @@ class UserType extends AbstractType
             'constraints' => [
                 new NotBlank(message: 'A mezőt kötelező kitölteni!'),
                 new Length(max: 1), // mennyi a max?
-            ]
+            ],
         ]);
 
         $user = $options['data'] ?? null;
 
-        if ($user === null) {
+        if (null === $user) {
             $termsUrl = $this->urlGenerator->generate('terms_and_conditions');
 
             $builder->add('terms', CheckboxType::class, [
@@ -73,7 +78,7 @@ class UserType extends AbstractType
                 'label_html' => true,
                 'constraints' => [
                     new NotBlank(message: 'A mezőt kötelező kitölteni!'),
-                ]
+                ],
             ]);
 
             $builder->add('question', TextType::class, [
@@ -81,11 +86,10 @@ class UserType extends AbstractType
                 'help' => 'Sajnos automata robotok is folyton regisztrálnak és ellenük kell ilyen kérdést feltennünk.',
                 'constraints' => [
                     new NotBlank(message: 'A mezőt kötelező kitölteni!'),
-                    new NotEqualTo(value: 'MKPK', message: '')
-                ]
+                    new NotEqualTo(value: 'MKPK', message: ''),
+                ],
             ]);
         } else {
-
             $builder->add('notifications', CheckboxType::class, [
                 'label' => 'Email értesítések',
                 'required' => false,
@@ -100,7 +104,6 @@ class UserType extends AbstractType
                     'miserend' => 'miserend',
                 ],
             ]);
-
         }
     }
 }

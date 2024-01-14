@@ -1,53 +1,61 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Html\Ajax;
 
-class AutocompleteAttributes extends Ajax {
-
-    public function __construct() {
+class AutocompleteAttributes extends Ajax
+{
+    public function __construct()
+    {
         $text = sanitize($_REQUEST['text']);
 
-        $results = array();
+        $results = [];
 
-        if ($_REQUEST['type'] == 'language') {
-            $attributes = array();
+        if ('language' == $_REQUEST['type']) {
+            $attributes = [];
             $tmp = unserialize(LANGUAGES);
             foreach ($tmp as $abbrev => $attribute) {
                 $attributes[$abbrev] = $attribute['name'];
             }
         } else {
-            $attributes = array();
+            $attributes = [];
             $tmp = unserialize(ATTRIBUTES);
             foreach ($tmp as $abbrev => $attribute) {
                 $attributes[$abbrev] = $attribute['name'];
             }
         }
 
-        $periods = array();
+        $periods = [];
         $tmp = unserialize(PERIODS);
         foreach ($tmp as $abbrev => $period) {
-            if (isset($period['description']))
-                $periods[$abbrev] = $period['description'] . " héten";
-            else
-                $periods[$abbrev] = $period['name'] . " héten";
+            if (isset($period['description'])) {
+                $periods[$abbrev] = $period['description'].' héten';
+            } else {
+                $periods[$abbrev] = $period['name'].' héten';
+            }
         }
 
         foreach ($attributes as $key => $val) {
-            if (preg_match('/^' . $text . '/i', $key) OR preg_match('/^' . $text . '/i', $val)) {
-                $results[] = array('label' => $key . " <i>(" . $val . ")</i>", 'value' => $key);
+            if (preg_match('/^'.$text.'/i', $key) || preg_match('/^'.$text.'/i', $val)) {
+                $results[] = ['label' => $key.' <i>('.$val.')</i>', 'value' => $key];
             }
         }
 
         foreach ($attributes as $key => $val) {
             if ($text == $key) {
                 foreach ($periods as $k => $v) {
-                    if ($k != '0') {
-                        $results[] = array('label' => $key . $k . " <i>(" . $val . " " . $v . ")</i>", 'value' => $key . $k);
+                    if ('0' != $k) {
+                        $results[] = ['label' => $key.$k.' <i>('.$val.' '.$v.')</i>', 'value' => $key.$k];
                     }
                 }
             }
         }
-        $this->content = json_encode(array('results' => $results));
+        $this->content = json_encode(['results' => $results]);
     }
-
 }

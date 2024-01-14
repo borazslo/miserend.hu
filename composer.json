@@ -38,7 +38,8 @@
         "symfony/var-dumper": "^7.0",
         "phpunit/phpunit": "9.*",
         "symfony/web-profiler-bundle": "^7.0",
-        "symfony/maker-bundle": "^1.52"
+        "symfony/maker-bundle": "^1.52",
+        "friendsofphp/php-cs-fixer": "^3.46"
     },
     "config": {
         "allow-plugins": {
@@ -50,6 +51,7 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        }
+        },
+        "cs":  "php-cs-fixer fix"
     }
 }

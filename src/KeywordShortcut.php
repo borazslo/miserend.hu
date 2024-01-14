@@ -1,16 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 use Illuminate\Database\Capsule\Manager as DB;
 
 class KeywordShortcut
 {
-
-    function updateAll()
+    public function updateAll()
     {
         return true;
-        //TODO:  Maximum execution time of 300 seconds exceeded in [...]/classes/keywordshortcut.php on line 34
+        // TODO:  Maximum execution time of 300 seconds exceeded in [...]/classes/keywordshortcut.php on line 34
         $this->updateNameShortcuts();
         $this->updateAdministrativeShortcuts();
         $this->updateReligiousAdministrationShortcuts();
@@ -18,9 +24,9 @@ class KeywordShortcut
         $this->updateOldStyeleShortcuts();
     }
 
-    function updateReligiousAdministrationShortcuts()
+    public function updateReligiousAdministrationShortcuts()
     {
-        $osms = \App\Model\OSM::whereHasTag('boundary', 'religious_administration')->get();
+        $osms = Model\OSM::whereHasTag('boundary', 'religious_administration')->get();
         foreach ($osms as $osm) {
             $churches = $osm->enclosed()->get();
             foreach ($churches as $church) {
@@ -33,9 +39,9 @@ class KeywordShortcut
         }
     }
 
-    function updateAdministrativeShortcuts()
+    public function updateAdministrativeShortcuts()
     {
-        $osms = \App\Model\OSM::whereHasTag('boundary', 'administrative')->get();
+        $osms = Model\OSM::whereHasTag('boundary', 'administrative')->get();
         foreach ($osms as $osm) {
             $churches = $osm->enclosed()->get();
             foreach ($churches as $church) {
@@ -48,9 +54,9 @@ class KeywordShortcut
         }
     }
 
-    function updateNameShortcuts()
+    public function updateNameShortcuts()
     {
-        $tags = \App\Model\OSMTag::whereRaw(" `name` REGEXP '^(alt_|old_){0,1}name(:|$)' ")->get();
+        $tags = Model\OSMTag::whereRaw(" `name` REGEXP '^(alt_|old_){0,1}name(:|$)' ")->get();
         foreach ($tags as $tag) {
             $churches = $tag->osm->churches()->get();
             foreach ($churches as $church) {
@@ -59,15 +65,15 @@ class KeywordShortcut
         }
     }
 
-    function updateOldStyeleShortcuts()
+    public function updateOldStyeleShortcuts()
     {
         $names = DB::table('templomok')->select('id', 'nev', 'ismertnev')->get();
         foreach ($names as $name) {
             foreach (['nev', 'ismertnev'] as $k => $v) {
                 if ($name->$v != '') {
-                    $church = \App\Model\Church::find($name->id);
+                    $church = Model\Church::find($name->id);
                     $tag = new \stdClass();
-                    $tag->id = (int)('-'.$church->id.$k);
+                    $tag->id = (int) ('-'.$church->id.$k);
                     $tag->value = $name->$v;
                     $this->addKeywordShorcut($tag, $church, 'name');
                 }
@@ -75,13 +81,12 @@ class KeywordShortcut
         }
     }
 
-    function addKeywordShorcut($tag, $church, $type)
+    public function addKeywordShorcut($tag, $church, $type)
     {
-        $keywordShortcut = \App\Model\KeywordShortcut::firstOrNew(['osmtag_id' => $tag->id]);
+        $keywordShortcut = Model\KeywordShortcut::firstOrNew(['osmtag_id' => $tag->id]);
         $keywordShortcut->church_id = $church->id;
         $keywordShortcut->type = $type;
         $keywordShortcut->value = $tag->value;
         $keywordShortcut->save();
     }
-
 }

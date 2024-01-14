@@ -1,16 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 class Jqplots
 {
-
     public $title;
     public $labels = [];
     public $data = [];
 
-
-    function __construct($id)
+    public function __construct($id)
     {
         $this->id = $id;
 
@@ -41,15 +46,13 @@ class Jqplots
                 ],
             ],
         ];
-
     }
 
-    function prepare_script()
+    public function prepare_script()
     {
-
         $return = "
-			legend['labels'] = ".json_encode($this->labels).";   
-			plot_".$this->id." = $.jqplot('".$this->id."', ".json_encode($this->data).", {
+			legend['labels'] = ".json_encode($this->labels).';
+			plot_'.$this->id." = $.jqplot('".$this->id."', ".json_encode($this->data).", {
 			// Turns on animatino for all series in this plot.
 			animate: true,
 			// Will animate plot on calls to plot1.replot({resetAxes:true})
@@ -66,8 +69,8 @@ class Jqplots
 					yaxis: 'y2axis',
 					rendererOptions: {
 						// Speed up the animation a little bit.
-						// This is a number of milliseconds.  
-						// Default for bar series is 3000.  
+						// This is a number of milliseconds.
+						// Default for bar series is 3000.
 						animation: {
 							speed: 2500
 						},
@@ -76,7 +79,7 @@ class Jqplots
 						barMargin: 0,
 						highlightMouseOver: false
 					}
-				}, 
+				},
 				{
 					rendererOptions: {
 						// speed up the animation a little bit.
@@ -92,25 +95,21 @@ class Jqplots
 				pad: 0
 			},
 			axes: {
-".$this->array2jqueryscript($this->axes, 3)."
+".$this->array2jqueryscript($this->axes, 3).'
 			} ,
 			highlighter: highlighter,
 			legend: legend,
 			grid: grid,
 		});
-		";
-
+		';
 
         $this->script = $return;
 
         return true;
-
-
     }
 
-    function prepare_html()
+    public function prepare_html()
     {
-
         $return = '<div id="'.$this->id.'" style="margin-top: 20px; margin-left: 20px; width: 100%; height: 300px; position: relative;" class="jqplot-target"></div>';
 
         $this->html = $return;
@@ -118,49 +117,46 @@ class Jqplots
         return true;
     }
 
-    function array2jqueryscript($array, $level = 0)
+    public function array2jqueryscript($array, $level = 0)
     {
         $return = '';
         $c = 0;
-        $len = count($array);
+        $len = \count($array);
         foreach ($array as $key => $value) {
-            $c++;
-            for ($i = 0; $i <= $level; $i++) {
+            ++$c;
+            for ($i = 0; $i <= $level; ++$i) {
                 $return .= '    ';
             }
-            $return .= $key.": ";
-            if (is_array($value)) {
+            $return .= $key.': ';
+            if (\is_array($value)) {
                 $return .= "{ \n";
                 $return .= $this->array2jqueryscript($value, $level + 1);
-                for ($i = 0; $i <= $level; $i++) {
+                for ($i = 0; $i <= $level; ++$i) {
                     $return .= '    ';
                 }
-                $return .= "}";
+                $return .= '}';
             } else {
-                if ($value === true) {
+                if (true === $value) {
                     $return .= 'true';
                 } else {
-                    if ($value === false) {
+                    if (false === $value) {
                         $return .= 'false';
                     } else {
-                        if (preg_match('/^\$\.jqplot/', $value) or is_numeric($value)) {
+                        if (preg_match('/^\$\.jqplot/', $value) || is_numeric($value)) {
                             $return .= $value;
                         } else {
-                            $return .= "\"".$value."\"";
+                            $return .= '"'.$value.'"';
                         }
                     }
                 }
             }
             if ($c < $len) {
-                $return .= ",";
+                $return .= ',';
             }
-
 
             $return .= "\n";
         }
 
         return $return;
-
     }
-
 }

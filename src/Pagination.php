@@ -1,22 +1,28 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App;
 
 class Pagination
 {
-
     public $take = 20;
     public $active = 0;
     public $maxOptionsToShown = 10;
 
-    function set($countResults, $url = false)
+    public function set($countResults, $url = false)
     {
-        $this->skip = (int)($this->take * $this->active);
+        $this->skip = (int) ($this->take * $this->active);
 
         $this->resultsCount = $countResults;
         $this->count = ceil($countResults / $this->take);
 
-        if ($this->count == 1) {
+        if (1 == $this->count) {
             return;
         }
 
@@ -24,7 +30,7 @@ class Pagination
             $localMin = 0;
             $localMax = $this->count - 1;
         } else {
-            if (($this->active < $this->maxOptionsToShown - 1)) {
+            if ($this->active < $this->maxOptionsToShown - 1) {
                 $localMin = 0;
                 $localMax = $this->maxOptionsToShown - 2;
                 $this->next = $this->createPaginatedUrl($localMax + 1, $url);
@@ -40,7 +46,7 @@ class Pagination
                 $this->next = $this->createPaginatedUrl($localMax + 1, $url);
             }
         }
-        for ($page = $localMin; $page <= $localMax; $page++) {
+        for ($page = $localMin; $page <= $localMax; ++$page) {
             $this->pages[$page] = $this->createPaginatedUrl($page, $url);
         }
     }
@@ -50,19 +56,18 @@ class Pagination
         return $this->qe(['page' => $page, 'take' => $this->take], $url);
     }
 
-    static function qe(array $new_params, $url = false, $overwrite = true)
+    public static function qe(array $new_params, $url = false, $overwrite = true)
     {
-        if ($url == false) {
+        if (false == $url) {
             $url = $_SERVER['REQUEST_URI'];
         }
-        parse_str(parse_url($url, PHP_URL_QUERY), $params);
+        parse_str(parse_url($url, \PHP_URL_QUERY), $params);
         if ($overwrite) {
-            $new_params = $new_params + $params;
+            $new_params += $params;
         } else {
             $new_params = $params + $new_params;
         }
 
-        return parse_url($url, PHP_URL_PATH).'?'.http_build_query($new_params);
+        return parse_url($url, \PHP_URL_PATH).'?'.http_build_query($new_params);
     }
-
 }
