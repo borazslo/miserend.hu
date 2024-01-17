@@ -15,6 +15,9 @@ class Deaconry
 {
     public $id;
 
+    private $name;
+    private $shortname;
+
     public function getByChurchId($id)
     {
         $result = DB::table('templomok')
@@ -23,7 +26,7 @@ class Deaconry
             ->limit(1)
             ->get();
         if (!\count($result)) {
-            throw new Exception("There is no church with tid = '$id' (deaconry).");
+            throw new \Exception("There is no church with tid = '$id' (deaconry).");
         }
         $this->id = $result[0]->espereskerulet;
         $this->getById($this->id);
@@ -33,17 +36,18 @@ class Deaconry
     {
         $this->id = $id;
 
-        $deocanry = DB::table('espereskerulet')->select('*')
+        $deaconry = DB::table('espereskerulet')->select('*')
             ->where('id', '=', $this->id)
             ->limit(1)
             ->get();
-        if (!\count($deocanry)) {
+
+        if (!\count($deaconry)) {
             // throw new Exception("There is no deocanry with id = '$id'");
             $this->name = '';
             $this->shortname = '';
         } else {
-            $this->name = $deocanry[0]->nev.' espereskerület';
-            $this->shortname = $deocanry[0]->nev;
+            $this->name = $deaconry[0]->nev.' espereskerület';
+            $this->shortname = $deaconry[0]->nev;
         }
     }
 }

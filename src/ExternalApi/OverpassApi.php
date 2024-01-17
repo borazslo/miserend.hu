@@ -17,7 +17,7 @@ class OverpassApi extends ExternalApi
     public $apiUrl = 'http://overpass-api.de/api/interpreter';
     public $testQuery = 'nwr["name"="Tápiószecső"];out geom;';
 
-    public function buildQuery()
+    public function buildQuery(): void
     {
         $this->rawQuery = '[out:json][timeout:'.$this->queryTimeout.'];';
         $this->rawQuery .= $this->query;

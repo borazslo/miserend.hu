@@ -9,7 +9,10 @@
 
 namespace App\Html;
 
+use App\Chat;
+use App\Message;
 use App\Twig\Extensions\WebpackCompatibilityExtension;
+use JetBrains\PhpStorm\NoReturn;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -21,35 +24,57 @@ class Html
     public $templatesPath = 'templates';
     public $extraMeta;
 
+    /**
+     * @internal
+     */
+    public $html;
+
     public function __construct()
     {
         $this->input = $_REQUEST;
         $this->initPagination();
     }
 
-    public function render()
+    protected function getContextVariables(): array
+    {
+        return (array) $this;
+    }
+
+    protected function addContextVariable(string $key, mixed $variable): void
+    {
+        $this->{$key} = $variable;
+    }
+
+    protected $user;
+
+    public function render(): void
     {
         global $user, $config;
 
-        $this->environment = $config['env'];
-        $this->githash = $this->getGitHash();
-        $this->user = $user;
+        $this->user = $user; // BC
+
+        $this->addContextVariable('environment', $config['env']);
+        $this->addContextVariable('githash', $this->getGitHash());
+        $this->addContextVariable('user', $user);
 
         $this->loadMenu();
-        if (isset($this->user->loggedin) && $this->user->loggedin && !$this->user->checkRole('miserend')) {
-            $this->mychurches = feltoltes_block();
-        }
-        if ($this->user->checkRole('"any"')) {
-            $this->chat = new \App\Chat();
-            $this->chat->load();
-            $this->chat = collect($this->chat)->toArray();
+        if (isset($user->loggedin) && $user->loggedin && !$user->checkRole('miserend')) {
+            $this->addContextVariable('mychurches', feltoltes_block());
         }
 
-        $this->messages = \App\Message::getToShow();
+        if ($user->checkRole('"any"')) {
+            $chat = new Chat();
+            $chat->load();
+            $chat = collect($chat)->toArray();
+
+            $this->addContextVariable('chat', $chat);
+        }
+
+        $this->addContextVariable('missages', Message::getToShow());
 
         $this->loadTwig();
         $this->getTemplateFile();
-        $this->html = $this->twig->render(strtolower($this->template), (array) $this);
+        $this->html = $this->twig->render(strtolower($this->template), $this->getContextVariables());
         $this->injectTime();
     }
 
@@ -139,13 +164,13 @@ class Html
         return $menuitems;
     }
 
-    public function setTitle($title)
+    public function setTitle(?string $title): void
     {
-        $this->pageTitle = $title.' | Miserend';
-        $this->title = $title;
+        $this->addContextVariable('pageTitle', $title.' | Miserend');
+        $this->addContextVariable('title', $title);
     }
 
-    public function addExtraMeta($name, $content)
+    public function addExtraMeta($name, $content): true
     {
         $this->extraMeta .= "\n<meta name='".$name."' content='".$content."'>";
 
@@ -165,6 +190,7 @@ class Html
         copyArrayToObject($array, $this);
     }
 
+    #[NoReturn]
     public function redirect($url)
     {
         // http_redirect ($url,$params,$session,$status);

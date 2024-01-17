@@ -16,16 +16,19 @@ function dbconnect()
 
     try {
         $capsule = new DB();
-        $capsule->addConnection([
+
+        $connectionConfig = [
             'driver' => 'mysql',
             'host' => $config['connection']['host'],
             'database' => $config['connection']['database'],
             'username' => $config['connection']['user'],
             'password' => $config['connection']['password'],
             'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
+            'collation' => 'utf8_general_ci',
             'prefix' => '',
-                ], 'default');
+        ];
+
+        $capsule->addConnection($connectionConfig, 'default');
         // Make this Capsule instance available globally via static methods... (optional)
         $capsule->setAsGlobal();
         $capsule->bootEloquent();

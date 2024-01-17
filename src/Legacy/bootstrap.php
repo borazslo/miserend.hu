@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-define('PROJECT_ROOT', realpath(__DIR__.'/../'));
+define('PROJECT_ROOT', realpath(__DIR__.'/../../'));
 const PATH = PROJECT_ROOT.'/';
 
 if (!@include PROJECT_ROOT.'/vendor/autoload.php') {

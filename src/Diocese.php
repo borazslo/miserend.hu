@@ -15,6 +15,10 @@ class Diocese
 {
     public $id;
 
+    private string $name;
+    private string $shortname;
+    private array $responsible;
+
     public function getByChurchId($id)
     {
         $result = DB::table('templomok')
@@ -23,7 +27,7 @@ class Diocese
             ->limit(1)
             ->get();
         if (!\count($result)) {
-            throw new Exception("There is no church with tid = '$id' (diocese).");
+            throw new \Exception("There is no church with tid = '$id' (diocese).");
         }
         $this->id = $result[0]->egyhazmegye;
         $this->getById($this->id);
@@ -33,17 +37,20 @@ class Diocese
     {
         $this->id = $id;
 
-        $diocese = DB::table('egyhazmegye')->select('*')
+        $diocese = DB::table('egyhazmegye')
+            ->select('*')
             ->where('id', '=', $this->id)
             ->limit(1)
             ->get();
+
         if (!\count($diocese)) {
-            throw new Exception("There is no diocese with id = '$id'");
+            throw new \Exception("There is no diocese with id = '$id'");
         }
+
         $this->name = $diocese[0]->nev;
         $this->shortname = $diocese[0]->nev;
-
         $this->responsible = [];
+
         if ('' != $diocese[0]->felelos) {
             $this->responsible[] = $diocese[0]->felelos;
         }

@@ -7,8 +7,9 @@
  * file that was distributed with this source code.
  */
 
-namespace App;
+namespace App\Legacy;
 
+use App\Kernel;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\UrlMatcher;

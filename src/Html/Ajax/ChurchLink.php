@@ -9,56 +9,76 @@
 
 namespace App\Html\Ajax;
 
-class ChurchLink extends Ajax
+use App\Legacy\Response\HttpResponseInterface;
+use App\Legacy\Response\HttpResponseTrait;
+use App\Model;
+use App\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class ChurchLink extends Ajax implements HttpResponseInterface
 {
+    use HttpResponseTrait;
+
+    protected function delete(): ?Response
+    {
+        $id = Request::IntegerRequired('id');
+        $link = Model\ChurchLink::find($id);
+        if (!$link) {
+            throw new \Exception('There is no ChurchLink with id: '.$id);
+        }
+        if (!$link->church) {
+            $link->delete();
+            throw new \Exception('There is no Church with id: '.$link->church_id);
+        }
+
+        if (!$link->church->WriteAccess) {
+            throw new \Exception('Hozzáférés megtagadva.');
+        }
+
+        if ($link->delete()) {
+            return new Response('ok');
+        }
+
+        return null;
+    }
+
+    protected function add(): Response
+    {
+        $church_id = Request::IntegerRequired('church_id');
+        $church = Model\Church::find($church_id);
+        if (!$church) {
+            throw new \Exception('There is no Church with id: '.$church_id);
+        }
+        if (!$church->WriteAccess) {
+            throw new \Exception('Hozzáférés megtagadva.');
+        }
+
+        $link = Model\ChurchLink::create([
+            'church_id' => $church_id,
+            'href' => Request::TextRequired('href'),
+            'title' => Request::Text('title'),
+        ]);
+        $link->save();
+
+        return new Response('<div class="church-link" data-link-id="'.$link->id.'">'.$link->html.'</div>');
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function __construct()
     {
-        $action = \App\Request::InArrayRequired('action', ['delete', 'add']);
+        $action = Request::InArrayRequired('action', ['delete', 'add']);
 
-        header('Content-Type: text/plain');
-        switch ($action) {
-            case 'delete':
-                $id = \App\Request::IntegerRequired('id');
-                $link = \App\Model\ChurchLink::find($id);
-                if (!$link) {
-                    throw new \Exception('There is no ChurchLink with id: '.$id);
-                }
-                if (!$link->church) {
-                    $link->delete();
-                    throw new \Exception('There is no Church with id: '.$link->church_id);
-                }
+        $response = match ($action) {
+            'delete' => $this->delete(),
+            'add' => $this->add(),
+        };
 
-                if (!$link->church->WriteAccess) {
-                    throw new \Exception('Hozzáférés megtagadva.');
-                }
-
-                if ($link->delete()) {
-                    echo 'ok';
-                }
-                break;
-
-            case 'add':
-                $church_id = \App\Request::IntegerRequired('church_id');
-                $church = \App\Model\Church::find($church_id);
-                if (!$church) {
-                    throw new \Exception('There is no Church with id: '.$church_id);
-                }
-                if (!$church->WriteAccess) {
-                    throw new \Exception('Hozzáférés megtagadva.');
-                }
-
-                $link = \App\Model\ChurchLink::create([
-                    'church_id' => $church_id,
-                    'href' => \App\Request::TextRequired('href'),
-                    'title' => \App\Request::Text('title'),
-                ]);
-                $link->save();
-
-                echo '<div class="church-link" data-link-id="'.$link->id.'">';
-                echo $link->html;
-                echo '</div>';
-
-                break;
+        if (null === $response) {
+            throw new \Exception('unhandled request');
         }
+
+        $this->response = $response;
     }
 }

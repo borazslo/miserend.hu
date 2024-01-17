@@ -28,7 +28,7 @@ class OpenstreetmapApi extends ExternalApi
         $this->curl_setopt(\CURLOPT_USERPWD, $this->userpwd);
     }
 
-    public function buildQuery()
+    public function buildQuery(): void
     {
         $this->rawQuery = $this->query;
     }

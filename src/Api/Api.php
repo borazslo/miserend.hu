@@ -9,6 +9,8 @@
 
 namespace App\Api;
 
+use App\Request;
+
 class Api
 {
     public $version;
@@ -17,11 +19,11 @@ class Api
 
     public function run()
     {
-        $this->version = \App\Request::IntegerRequired('v');
+        $this->version = Request::IntegerRequired('v');
         $this->validateVersionMain();
 
         $defaultDate = date('Y-m-d');
-        $this->date = \App\Request::DatewDefault('datum', $defaultDate);
+        $this->date = Request::DatewDefault('datum', $defaultDate);
     }
 
     public function validateVersionMain()

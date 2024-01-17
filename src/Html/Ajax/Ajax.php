@@ -15,6 +15,11 @@ class Ajax extends Html
 {
     public $template = 'layout_empty.twig';
 
+    /**
+     * @internal
+     */
+    public $content;
+
     public function __construct($path)
     {
         $this->content = json_encode($_REQUEST);

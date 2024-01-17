@@ -13,6 +13,11 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class User
 {
+    private ?string $username = null;
+    private ?string $name = null;
+    private ?string $nickname = null;
+    private ?string $email = null;
+
     public function __construct(
         int $uid = null,
         string $email = null,
@@ -705,5 +710,37 @@ class User
         }
 
         return true;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNickname(): ?string
+    {
+        return $this->nickname;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
     }
 }

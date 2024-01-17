@@ -9,14 +9,29 @@
 
 namespace App\Html;
 
+use App\Api\Favorites;
+use App\Api\Login;
+use App\Api\NearBy;
+use App\Api\Report;
+use App\Api\Service_times;
+use App\Api\Signup;
+use App\Api\Table;
+use App\Api\Updated;
+use App\Api\Upload;
+use App\Api\User;
+use App\Request;
+
 class Api extends Html
 {
+    private $api;
+    private $error;
+
     public function __construct()
     {
         ini_set('memory_limit', '256M');
 
         try {
-            $action = \App\Request::SimpletextRequired('action');
+            $action = Request::SimpletextRequired('action');
         } catch (\Exception $e) {
             $this->error = $e->getMessage();
         }
@@ -28,43 +43,45 @@ class Api extends Html
             switch ($action) {
                 case 'sqlite':
                     $this->redirect(DOMAIN.'/fajlok/sqlite/miserend_v'.$_REQUEST['v'].'.sqlite3');
-                    exit;
-                    break;
+
                 case 'signup':
-                    $this->api = new \App\Api\Signup();
+                    $this->api = new Signup();
                     break;
+
                 case 'login':
-                    $this->api = new \App\Api\Login();
+                    $this->api = new Login();
                     break;
+
                 case 'user':
-                    $this->api = new \App\Api\User();
+                    $this->api = new User();
                     break;
+
                 case 'favorites':
-                    $this->api = new \App\Api\Favorites();
+                    $this->api = new Favorites();
                     break;
 
                 case 'report':
-                    $this->api = \App\Api\Report::factoryCreate();
+                    $this->api = Report::factoryCreate();
                     break;
 
                 case 'updated':
-                    $this->api = new \App\Api\Updated();
+                    $this->api = new Updated();
                     break;
 
                 case 'table':
-                    $this->api = new \App\Api\Table();
+                    $this->api = new Table();
                     break;
 
                 case 'upload':
-                    $this->api = new \App\Api\Upload();
+                    $this->api = new Upload();
                     break;
 
                 case 'service_times':
-                    $this->api = new \App\Api\Service_times();
+                    $this->api = new Service_times();
                     break;
 
                 case 'nearby':
-                    $this->api = new \App\Api\NearBy();
+                    $this->api = new NearBy();
                     break;
 
                 default:
@@ -77,7 +94,7 @@ class Api extends Html
         }
     }
 
-    public function render()
+    public function render(): void
     {
         // Because of the Report::factoryCreate();
 

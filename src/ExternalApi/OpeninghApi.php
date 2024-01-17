@@ -21,7 +21,7 @@ class OpeninghApi extends ExternalApi
     ];
     public $testQuery = 'validate?value=PH';
 
-    public function buildQuery()
+    public function buildQuery(): void
     {
         foreach ($this->settings as $key => $value) {
             $this->query .= '&'.$key.'='.$value;

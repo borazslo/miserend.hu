@@ -9,19 +9,24 @@
 
 namespace App\Html;
 
+use App\ExternalApi\NominatimApi;
+use App\Legacy\Templating\TemplateContextTrait;
+use App\Model\Church;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class Map extends Html
 {
+    use TemplateContextTrait;
+
     public function __construct()
     {
         $this->setTitle('OSM Térkép');
 
         if (isset($_REQUEST['tid']) && is_numeric($_REQUEST['tid'])) {
-            $church = \App\Model\Church::find($_REQUEST['tid']);
+            $church = Church::find($_REQUEST['tid']);
 
-            $this->location = $church->location;
-            $this->church_id = $_REQUEST['tid'];
+            $this->addContextVariable('location', $church->location);
+            $this->addContextVariable('church_id', $_REQUEST['tid']);
         }
 
         if (isset($_REQUEST['map'])) {
@@ -33,28 +38,30 @@ class Map extends Html
             }
 
             if (3 == \count($parts)) {
-                $this->center = [
+                $this->addContextVariable('center', [
                     'zoom' => $parts[0],
                     'lat' => $parts[1],
                     'lon' => $parts[2],
-                ];
+                ]);
             }
 
             if (2 == \count($parts)) {
-                $this->center = [
+                $this->addContextVariable('center', [
                     'lat' => $parts[0],
                     'lon' => $parts[1],
-                ];
+                ]);
             }
         }
 
         if (isset($_REQUEST['boundary'])) {
-            $this->boundary = $_REQUEST['boundary'];
+            $this->addContextVariable('boundary', $_REQUEST['boundary']);
         }
 
         $data = $this->getGeoJsonDioceses();
-        $this->dioceseslayer = [];
-        $this->dioceseslayer['geoJson'] = json_encode($data);
+
+        $this->addContextVariable('dioceseslayer', [
+            'geoJson' => json_encode($data),
+        ]);
     }
 
     public static function getGeoJsonDioceses()
@@ -92,7 +99,7 @@ class Map extends Html
             }
             $geoJsons = [];
             foreach ($osmids as $osmid) {
-                $nominatim = new \App\ExternalApi\NominatimApi();
+                $nominatim = new NominatimApi();
                 $geoJsons[] = json_encode($nominatim->OSM2GeoJson('R', $osmid));
             }
 

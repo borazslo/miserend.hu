@@ -9,14 +9,16 @@
 
 namespace App\Html\Ajax;
 
+use App\Request;
+
 class Favorite extends Ajax
 {
     public function __construct()
     {
         global $user;
 
-        $tid = \App\Request::IntegerRequired('tid');
-        $method = \App\Request::SimpletextRequired('method');
+        $tid = Request::IntegerRequired('tid');
+        $method = Request::SimpletextRequired('method');
         echo $tid.'-'.$method;
         if ('add' == $method) {
             if (!$user->addFavorites($tid)) {

@@ -1,28 +1,37 @@
 <?php
- //apache_setenv('MISEREND_WEBAPP_ENVIRONMENT', 'development');
+
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace App;
 
 use App\Html\Html;
+use App\Legacy\Application;
+use App\Legacy\Response\HttpResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
-require_once '../src/load.php';
+require_once '../src/Legacy/bootstrap.php';
 
 try {
-    if (php_sapi_name() == "cli") {
+    if (\PHP_SAPI == 'cli') {
         if (isset($argv)) {
             foreach ($argv as $arg) {
-                $e = explode("=", $arg);
-                if (count($e) == 2) {
+                $e = explode('=', $arg);
+                if (2 == \count($e)) {
                     $_REQUEST[$e[0]] = $e[1];
-                    if ($e[0] == 'env') {
+                    if ('env' == $e[0]) {
                         configurationSetEnvironment($e[1]);
                     }
-                } else
+                } else {
                     $_REQUEST[$e[0]] = 0;
+                }
             }
         }
     }
@@ -47,7 +56,7 @@ try {
         }
     }
 
-    if (isset($matchedRoute['handler']) && $matchedRoute['handler'] === 'symfony') {
+    if (isset($matchedRoute['handler']) && 'symfony' === $matchedRoute['handler']) {
         $app->loadDotenv();
 
         $response = $app->forwardToSymfony($request);
@@ -77,34 +86,39 @@ try {
         $path = new Path('templom/' . $_REQUEST['templom']);
     }
   */
-
 } catch (\Exception $e) {
     if (isset($html)) {
         addMessage($e->getMessage(), 'danger');
     } else {
-		// Mi lenne, ha a hibaüzenetünket szeben írnánk ki?
-		$html = new Html($matchedRoute ?? []);
-		
-		$html->template = 'Exception.twig';
-		$html->errorMessage = $e->getMessage();
-		$html->errorTrace = '';
-		
+        // Mi lenne, ha a hibaüzenetünket szeben írnánk ki?
+        $html = new Html($matchedRoute ?? []);
+
+        $html->template = 'Exception.twig';
+        $html->errorMessage = $e->getMessage();
+        $html->errorTrace = '';
+
         foreach ($e->getTrace() as $trace) {
-            if (isset($trace['class']))
-                $html->errorTrace .= $trace['class'] . "::" . $trace['function'] . "()";
-            if (isset($trace['file']))
-                $html->errorTrace .= $trace['file'] . ":" . $trace['line'] . " -> " . $trace['function'] . "()";
-            $html->errorTrace .= "<br>";
+            if (isset($trace['class'])) {
+                $html->errorTrace .= $trace['class'].'::'.$trace['function'].'()';
+            }
+            if (isset($trace['file'])) {
+                $html->errorTrace .= $trace['file'].':'.$trace['line'].' -> '.$trace['function'].'()';
+            }
+            $html->errorTrace .= '<br>';
         }
-		
-		
     }
 }
 if (isset($html)) {
-    $html->render();
-    if (trim($html->html) != '') {        
-        if(isset($html->api->format) AND $html->api->format == 'json')
-            header('Content-Type: application/json');
-        echo $html->html;
+    if ($html instanceof HttpResponseInterface) {
+        $response = $html->getResponse();
+        $response->send();
+    } else {
+        $html->render();
+        if ('' != trim($html->html)) {
+            if (isset($html->api->format) && 'json' == $html->api->format) {
+                header('Content-Type: application/json');
+            }
+            echo $html->html;
+        }
     }
 }

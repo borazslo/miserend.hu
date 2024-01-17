@@ -9,6 +9,8 @@
 
 namespace App\Html\Ajax;
 
+use App\ExternalApi\NominatimApi;
+
 class BoundaryGeoJson extends Ajax
 {
     public function __construct()
@@ -19,9 +21,9 @@ class BoundaryGeoJson extends Ajax
 
         header('Content-Type: application/json');
         echo '[';
-        $osmdatas = explode(';', $_REQUEST['osm']);
-        foreach ($osmdatas as $key => $osmdata) {
-            preg_match('/(node|way|relation|N|W|R):([0-9]{1,8})$/i', $osmdata, $osm);
+        $osmData = explode(';', $_REQUEST['osm']);
+        foreach ($osmData as $key => $osmDataItem) {
+            preg_match('/(node|way|relation|N|W|R):([0-9]{1,8})$/i', $osmDataItem, $osm);
             if ('relation' == $osm[1]) {
                 $osm[1] = 'R';
             } elseif ('way' == $osm[1]) {
@@ -30,12 +32,12 @@ class BoundaryGeoJson extends Ajax
                 $osm[1] = 'N';
             }
 
-            $nominatim = new \App\externalapi\NominatimApi();
+            $nominatim = new NominatimApi();
             $geoJson = $nominatim->OSM2GeoJson($osm[1], $osm[2]);
 
             print_r(json_encode($geoJson));
 
-            if ($key + 1 < \count($osmdatas)) {
+            if ($key + 1 < \count($osmData)) {
                 echo ',';
             }
         }

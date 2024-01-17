@@ -81,9 +81,9 @@ class Remark extends Html
 
         // Belépett felhasználónál hidden email és név adat volt, de nem bízunk benne
         global $user;
-        if ('*vendeg*' != $user->username) {
-            $remark->login = $user->username;
-            $remark->email = $user->email;
+        if ('*vendeg*' != $user->getUsername()) {
+            $remark->login = $user->getUsername();
+            $remark->email = $user->getEmail();
         }
 
         $megbizhato = \App\Model\Remark::select('megbizhato')->where('email', $remark->email)->orderBy('created_at', 'desc')->limit(1)->first();

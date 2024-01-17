@@ -15,7 +15,7 @@ class Request
     {
         $value = self::get($name);
         if ('' != $value && !is_numeric($value)) {
-            throw new Exception("Required '$name' is not an Integer.");
+            throw new \Exception("Required '$name' is not an Integer.");
         }
 
         return $value;
@@ -25,7 +25,7 @@ class Request
     {
         $value = self::getRequired($name);
         if (!is_numeric($value)) {
-            throw new Exception("Required '$name' is not an Integer.");
+            throw new \Exception("Required '$name' is not an Integer.");
         }
 
         return $value;
@@ -35,7 +35,7 @@ class Request
     {
         $value = self::getwDefault($name, $default);
         if (!is_numeric($value)) {
-            throw new Exception("Required '$name' is not an Integer.");
+            throw new \Exception("Required '$name' is not an Integer.");
         }
 
         return $value;
@@ -129,40 +129,40 @@ class Request
         return date('Y-m-d', strtotime($value));
     }
 
-    public static function DatewDefault($name, $default = false)
+    public static function DatewDefault(string $name, $default = false)
     {
         $value = self::getwDefault($name, $default);
         if (false == strtotime($value)) {
-            throw new Exception("Required '$name' is not a Date.");
+            throw new \Exception("Required '$name' is not a Date.");
         }
 
         return date('Y-m-d', strtotime($value));
     }
 
-    public static function getwDefault($name, $default = false)
+    public static function getwDefault(string $name, mixed $default = false): mixed
     {
         if ($value = self::get($name)) {
             return $value;
-        } else {
-            return $default;
         }
+
+        return $default;
     }
 
-    public static function getRequired($name)
+    public static function getRequired(string $name): mixed
     {
         if (!$value = self::get($name)) {
-            throw new Exception("Required '$name' is required.");
-        } else {
-            return $value;
+            throw new \Exception("Required '$name' is required.");
         }
+
+        return $value;
     }
 
-    public static function get($name)
+    public static function get(string $name): mixed
     {
         if (isset($_REQUEST[$name])) {
             return $_REQUEST[$name];
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

@@ -9,44 +9,72 @@
 
 namespace App\Html\Ajax;
 
+use App\Legacy\Response\HttpResponseInterface;
+use App\Legacy\Response\HttpResponseTrait;
+use App\Model\KeywordShortcut;
 use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-class AutocompleteCity extends Ajax
+class AutocompleteCity extends Ajax implements HttpResponseInterface
 {
+    use HttpResponseTrait;
+
+    private $input;
+
     public function __construct()
     {
         $this->input = $_REQUEST;
-        if (!preg_match('/\*$/', $this->input['text'])) {
-            $return[] = ['label' => $_REQUEST['text'].'* <i>(Minden '.$_REQUEST['text'].'-al kezdődő)</i>', 'value' => $_REQUEST['text'].'*'];
-        }
-        if (!preg_match('/^\*(.*)\*$/', $this->input['text'])) {
-            if (preg_match('/^\*/', $this->input['text'])) {
-                $return[] = ['label' => $_REQUEST['text'].'* <i>(Minden '.$_REQUEST['text'].'-t tartalmazó)</i>', 'value' => $_REQUEST['text'].'*'];
-            } elseif (preg_match('/\*$/', $this->input['text'])) {
-                $return[] = ['label' => '*'.$_REQUEST['text'].' <i>(Minden '.$_REQUEST['text'].'-t tartalmazó)</i>', 'value' => '*'.$_REQUEST['text']];
-            } else {
-                $return[] = ['label' => '*'.$_REQUEST['text'].'* <i>(Minden '.$_REQUEST['text'].'-t tartalmazó)</i>', 'value' => '*'.$_REQUEST['text'].'*'];
+
+        $return = [];
+
+        if (mb_strlen($this->input['query']) >= 2) {
+            if (!preg_match('/\*$/', $this->input['query'])) {
+                $return[] = ['label' => $_REQUEST['query'].'* <i>(Minden '.$_REQUEST['query'].'-al kezdődő)</i>', 'value' => $_REQUEST['query'].'*'];
             }
-        }
-        if (!preg_match('/\*$/', $this->input['text'])) {
-            $this->input['text'] .= '*';
-        }
-        $keyword = preg_replace("/\*/", '%', $this->input['text']);
-        $keywordEmpty = preg_replace('/%/', '', $keyword);
-        $administratives = \App\Model\KeywordShortcut::where('type', 'administrative')->where('value', 'LIKE', $keyword)
-                        ->groupBy('value')->orderBy('value')->take(10)->get();
-        foreach ($administratives as $administrative) {
-            $label = preg_replace('/('.$keywordEmpty.')/i', '<strong>$1</strong>', $administrative->value);
-            $return[$administrative->value] = ['label' => $label, 'value' => $administrative->value];
+            if (!preg_match('/^\*(.*)\*$/', $this->input['query'])) {
+                if (preg_match('/^\*/', $this->input['query'])) {
+                    $return[] = ['label' => $_REQUEST['query'].'* <i>(Minden '.$_REQUEST['query'].'-t tartalmazó)</i>', 'value' => $_REQUEST['query'].'*'];
+                } elseif (preg_match('/\*$/', $this->input['query'])) {
+                    $return[] = ['label' => '*'.$_REQUEST['query'].' <i>(Minden '.$_REQUEST['query'].'-t tartalmazó)</i>', 'value' => '*'.$_REQUEST['query']];
+                } else {
+                    $return[] = ['label' => '*'.$_REQUEST['query'].'* <i>(Minden '.$_REQUEST['query'].'-t tartalmazó)</i>', 'value' => '*'.$_REQUEST['query'].'*'];
+                }
+            }
+            if (!preg_match('/\*$/', $this->input['query'])) {
+                $this->input['query'] .= '*';
+            }
+            $keyword = preg_replace("/\*/", '%', $this->input['query']);
+            $keywordEmpty = preg_replace('/%/', '', $keyword);
+
+            $administratives = KeywordShortcut::where('type', 'administrative')
+                ->where('value', 'LIKE', $keyword)
+                ->groupBy('value')
+                ->orderBy('value')
+                ->take(10)
+                ->get();
+
+            foreach ($administratives as $administrative) {
+                $label = preg_replace('/('.$keywordEmpty.')/i', '<strong>$1</strong>', $administrative->value);
+                $return[$administrative->value] = ['label' => $label, 'value' => $administrative->value];
+            }
+
+            $cities = DB::table('templomok')
+                ->select('varos')
+                ->where('ok', 'i')
+                ->where('varos', 'like', $keyword)
+                ->groupBy('varos')
+                ->orderBy('varos')
+                ->take(10)
+                ->get();
+
+            foreach ($cities as $city) {
+                $label = preg_replace('/('.$keywordEmpty.')/i', '<strong>$1</strong>', $city->varos);
+                $return[$city->varos] = ['label' => $label, 'value' => $city->varos];
+            }
+            ksort($return);
         }
 
-        $cities = DB::table('templomok')->select('varos')->where('ok', 'i')->where('varos', 'like', $keyword)
-                        ->groupBy('varos')->orderBy('varos')->take(10)->get();
-        foreach ($cities as $city) {
-            $label = preg_replace('/('.$keywordEmpty.')/i', '<strong>$1</strong>', $city->varos);
-            $return[$city->varos] = ['label' => $label, 'value' => $city->varos];
-        }
-        ksort($return);
-        $this->content = json_encode(['results' => $return]);
+        $this->response = new JsonResponse();
+        $this->response->setData(['results' => $return]);
     }
 }

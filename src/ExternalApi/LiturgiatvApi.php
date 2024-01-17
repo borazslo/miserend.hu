@@ -9,7 +9,7 @@
 
 namespace App\ExternalApi;
 
-https:// github.com/molnarm/zsolozsma#api
+// https://github.com/molnarm/zsolozsma#api
 
 class LiturgiatvApi extends ExternalApi
 {
@@ -28,7 +28,7 @@ class LiturgiatvApi extends ExternalApi
         return $this->jsonData;
     }
 
-    public function buildQuery()
+    public function buildQuery(): void
     {
         $this->rawQuery = $this->query.'?json';
     }

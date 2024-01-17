@@ -24,6 +24,7 @@ class WebpackCompatibilityExtension extends AbstractExtension
     }
 
     protected array $entryPointContent;
+    protected array $returnedFiles = [];
 
     protected function entryPointsWithName($name): ?array
     {
@@ -50,7 +51,12 @@ class WebpackCompatibilityExtension extends AbstractExtension
         $buffer = [];
 
         foreach ($this->entryPointsWithName($entryName)['js'] ?? [] as $entryPointPath) {
-            $buffer[] = '<script src="'.$entryPointPath.'"></script>';
+            if (isset($this->returnedFiles[$entryPointPath])) {
+                continue;
+            }
+
+            $this->returnedFiles[$entryPointPath] = true;
+            $buffer[] = '<script src="'.$entryPointPath.'" defer=""></script>';
         }
 
         return implode("\n", $buffer);

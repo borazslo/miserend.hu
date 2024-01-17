@@ -9,6 +9,7 @@
 
 namespace App\Html\Ajax;
 
+use App\Request;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class Chat extends Ajax
@@ -22,11 +23,11 @@ class Chat extends Ajax
             return;
         }
 
-        switch (\App\Request::InArrayRequired('action', ['load', 'save', 'getusers'])) {
+        switch (Request::InArrayRequired('action', ['load', 'save', 'getusers'])) {
             case 'load':
-                $date = date('Y-m-d H:i:s', strtotime(\App\Request::Text('date')));
+                $date = date('Y-m-d H:i:s', strtotime(Request::Text('date')));
                 $chat = new \App\Chat();
-                if (!\App\Request::Text('rev')) {
+                if (!Request::Text('rev')) {
                     $comments = $chat->loadComments(['last' => $date]);
                 } else {
                     $comments = $chat->loadComments(['first' => $date]);
@@ -37,7 +38,7 @@ class Chat extends Ajax
                 break;
 
             case 'save':
-                $text = \App\Request::TextRequired('text');
+                $text = Request::TextRequired('text');
                 if (preg_match('/^\$(\w+)/si', $text, $match)) {
                     $kinek = $match[1];
                     $text = preg_replace('/^(\$\w+(:*))/si', '', $text);

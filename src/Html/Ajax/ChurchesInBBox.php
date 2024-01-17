@@ -9,8 +9,15 @@
 
 namespace App\Html\Ajax;
 
-class ChurchesInBBox extends Ajax
+use App\Legacy\Response\HttpResponseInterface;
+use App\Legacy\Response\HttpResponseTrait;
+use App\Model\Church;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+class ChurchesInBBox extends Ajax implements HttpResponseInterface
 {
+    use HttpResponseTrait;
+
     public function __construct()
     {
         $bbox = explode(';', $_REQUEST['bbox']);
@@ -23,11 +30,15 @@ class ChurchesInBBox extends Ajax
             }
         }
 
-        $churchesInBBox = \App\Model\Church::inBBox(['latMin' => $bbox[0], 'lonMin' => $bbox[1], 'latMax' => $bbox[2], 'lonMax' => $bbox[3]])->get();
+        $churchesInBBox = Church::inBBox([
+            'latMin' => $bbox[0],
+            'lonMin' => $bbox[1],
+            'latMax' => $bbox[2],
+            'lonMax' => $bbox[3],
+        ])->get();
 
         $return = [];
         foreach ($churchesInBBox as $church) {
-            $church->photos;
             if (isset($church->photos[0])) {
                 $thumbnail = $church->photos[0]->smallUrl;
             } else {
@@ -44,6 +55,7 @@ class ChurchesInBBox extends Ajax
                 'lon' => $church->location->lon,
             ];
         }
-        echo json_encode($return);
+
+        $this->response = new JsonResponse($return);
     }
 }

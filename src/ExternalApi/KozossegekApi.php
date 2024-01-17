@@ -16,7 +16,7 @@ class KozossegekApi extends ExternalApi
     public $cache = '1 week'; // false or any time in strtotime() format
     public $testQuery = 'miserend/1168';
 
-    public function buildQuery()
+    public function buildQuery(): void
     {
         global $config;
         $this->rawQuery = $this->query;

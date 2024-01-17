@@ -30,7 +30,7 @@ class NominatimApi extends ExternalApi
         }
     }
 
-    public function buildQuery()
+    public function buildQuery(): void
     {
         global $config;
         $this->rawQuery = $this->query;

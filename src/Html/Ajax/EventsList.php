@@ -9,13 +9,23 @@
 
 namespace App\Html\Ajax;
 
+use App\Legacy\Response\HttpResponseInterface;
+use App\Legacy\Response\HttpResponseTrait;
 use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-class EventsList extends Ajax
+class EventsList extends Ajax implements HttpResponseInterface
 {
+    use HttpResponseTrait;
+
     public function __construct()
     {
-        $return = DB::table('events')->groupBy('name')->pluck('name');
-        $this->content = json_encode(['events' => $return]);
+        $return = DB::table('events')
+            ->groupBy('name')
+            ->pluck('name');
+
+        $this->response = new JsonResponse([
+            'events' => $return,
+        ]);
     }
 }

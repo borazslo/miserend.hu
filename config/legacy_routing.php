@@ -1,77 +1,61 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+use App\Html;
+use App\Html\Ajax;
 use App\Html\Church;
-use App\Html\Home;
-use App\Html\Map;
-use App\Html\Remark;
-use App\Html\StaticPage;
 use App\Html\User;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
-$collection->add('home', new Route(
-    path: '/',
-    defaults: [
-        '_class' => Home::class,
-    ]
-));
+$simpleLegacyRoutes = [
+    'home' => ['/', Html\Home::class],
+    'map' => ['/terkep', Html\Map::class],
+    'church_list' => ['/templom/list', Church\Catalogue::class],
+    'church_new' => ['/templom/new', Church\Edit::class],
+    'user_new' => ['/user/new', User\Edit::class],
+    'user_edit' => ['/user/edit', User\Edit::class],
+    'ajax_autocomplete_keyword' => ['/ajax/AutocompleteKeyword', Ajax\AutocompleteKeyword::class],
+    'ajax_autocomplete_city' => ['/ajax/AutocompleteCity', Ajax\AutocompleteKeyword::class],
+    'ajax_boundarygeojson' => ['/ajax/boundarygeojson', Ajax\BoundaryGeoJson::class],
+    'ajax_churchesinbbox' => ['/ajax/churchesinbbox', Ajax\ChurchesInBBox::class],
+    'ajax_churclink' => ['/ajax/churclink', Ajax\ChurchLink::class],
+    'about' => ['/impresszum', Html\StaticPage::class],
+    'gdpr' => ['/gdpr', Html\StaticPage::class],
+    'terms_and_conditions' => ['/hazirend', Html\StaticPage::class],
+];
 
-$collection->add('map', new Route(
-    path: '/terkep',
-    defaults: [
-        '_class' => Map::class,
-    ])
-);
+foreach ($simpleLegacyRoutes as $routeName => [$path, $className]) {
+    $collection->add($routeName, new Route(
+        path: $path,
+        defaults: [
+            '_class' => $className,
+        ]
+    ));
+}
 
-$collection->add('church_view', new Route(
-    path: '/templom/{church_id}',
-    defaults: [
-        '_class' => Church\Church::class,
-    ],
-    requirements: [
-        'church_id' => '\d+'
-    ]
-));
+$complexLegacyRoutes = [
+    'church_view' => ['/templom/{church_id}', Church\Church::class, ['church_id' => '\d+']],
+    'church_remarks' => ['/templom/{church_id}/eszrevetelek', Html\Remark::class, ['church_id' => '\d+']],
+];
 
-$collection->add('church_remarks', new Route(
-    path: '/templom/{church_id}/eszrevetelek',
-    defaults: [
-        '_class' => Remark::class,
-    ],
-    requirements: [
-        'church_id' => '\d+'
-    ]
-));
-
-$collection->add('church_list', new Route('/templom/list', defaults: [
-    '_class' => Church\Catalogue::class,
-]));
-
-$collection->add('church_new', new Route('/templom/new', defaults: [
-    '_class' => Church\Edit::class,
-]));
-
-$collection->add('user_new', new Route('/user/new', defaults: [
-    '_class' => User\Edit::class,
-]));
-
-$collection->add('user_edit', new Route('/user/edit', defaults: [
-    '_class' => User\Edit::class,
-]));
-
-$collection->add('about', new Route('/impresszum', defaults: [
-    '_class' => StaticPage::class,
-]));
-
-$collection->add('gdpr', new Route('/gdpr', defaults: [
-    '_class' => StaticPage::class,
-]));
-
-$collection->add('terms_and_conditions', new Route('/hazirend', defaults: [
-    '_class' => StaticPage::class,
-]));
+foreach ($complexLegacyRoutes as $routeName => [$path, $className, $requirements]) {
+    $collection->add($routeName, new Route(
+        path: $path,
+        defaults: [
+            '_class' => $className,
+        ],
+        requirements: $requirements,
+    ));
+}
 
 $symfonyRoutes = [
     'wdt' => '/_wdt/{token}',

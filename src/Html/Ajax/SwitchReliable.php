@@ -9,14 +9,17 @@
 
 namespace App\Html\Ajax;
 
+use App\Model\Remark;
+use App\Request;
+
 class SwitchReliable extends Ajax
 {
     public function __construct()
     {
-        $rid = \App\Request::IntegerRequired('rid');
-        $reliable = \App\Request::InArrayRequired('reliable', ['i', 'n', '?', 'e']);
+        $rid = Request::IntegerRequired('rid');
+        $reliable = Request::InArrayRequired('reliable', ['i', 'n', '?', 'e']);
 
-        $remark = \App\Model\Remark::find($rid);
+        $remark = Remark::find($rid);
         global $user;
         $holding = $user->getHoldingData($remark->church->id);
         if (!$holding) {

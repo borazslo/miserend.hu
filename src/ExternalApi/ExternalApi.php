@@ -9,9 +9,10 @@
 
 namespace App\ExternalApi;
 
+use App\Html\Html;
 use Illuminate\Database\Capsule\Manager as DB;
 
-class ExternalApi
+abstract class ExternalApi
 {
     public $cache = '1 week'; // false or any time in strtotime() format
     public $cacheDir = PROJECT_ROOT.'/var/tmp/';
@@ -22,12 +23,23 @@ class ExternalApi
     public $strictFormat = true; // if rawData not in XML/JSON format throw new \Exception
     private $curl_opts = [];
 
+    private bool $isTesting = false;
+    protected string $rawQuery;
+    private string $cacheFilePath;
+    private $cacheFileTime;
+    private \stdClass|array|null $jsonData;
+    private array $xmlData;
+    private $error;
+    private $rawData;
+
     public function run()
     {
         $this->runQuery();
     }
 
-    public function runQuery()
+    abstract protected function buildQuery(): void;
+
+    public function runQuery(): bool
     {
         try {
             if (!isset($this->rawQuery)) {
@@ -47,7 +59,7 @@ class ExternalApi
                 $this->saveToCache();
             }
         } catch (\Exception $e) {
-            if (true == $this->isTesting) {
+            if (true === $this->isTesting) {
                 throw new \Exception($e->getMessage());
             }
 
@@ -58,7 +70,7 @@ class ExternalApi
             if ('yml' == $this->format) {
                 $this->xmlData = [];
             }
-            $this->error = \App\Html\Html::printExceptionVerbose($e, true);
+            $this->error = Html::printExceptionVerbose($e, true);
             if ($config['debug'] > 1) {
                 echo $this->error;
             } elseif ($config['debug'] > 0) {
@@ -249,8 +261,4 @@ class ExternalApi
     {
         $this->curl_opts[$name] = $value;
     }
-}
-
-class Exception extends \Exception
-{
 }

@@ -50,7 +50,7 @@ class MapquestApi extends ExternalApi
         return $d;
     }
 
-    public function buildQuery()
+    public function buildQuery(): void
     {
         global $config;
         $this->rawQuery = $this->query;
