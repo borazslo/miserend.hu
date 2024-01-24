@@ -23,6 +23,7 @@ $simpleLegacyRoutes = [
     'church_new' => ['/templom/new', Church\Edit::class],
     'user_new' => ['/user/new', User\Edit::class],
     'user_edit' => ['/user/edit', User\Edit::class],
+    'stats' => ['/stat', Html\Stat::class],
     'ajax_autocomplete_keyword' => ['/ajax/AutocompleteKeyword', Ajax\AutocompleteKeyword::class],
     'ajax_autocomplete_city' => ['/ajax/AutocompleteCity', Ajax\AutocompleteKeyword::class],
     'ajax_boundarygeojson' => ['/ajax/boundarygeojson', Ajax\BoundaryGeoJson::class],
