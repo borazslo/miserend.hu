@@ -44,16 +44,20 @@ foreach ($simpleLegacyRoutes as $routeName => [$path, $className]) {
 }
 
 $complexLegacyRoutes = [
-    'church_view' => ['/templom/{church_id}', Church\Church::class, ['church_id' => '\d+']],
-    'church_remarks' => ['/templom/{church_id}/eszrevetelek', Html\Remark::class, ['church_id' => '\d+']],
+    'church_view' => ['/templom/{church_id}', Church\Church::class, ['church_id' => '\d+'],false],
+
+    'church_remarks_list' => ['/remark/list/{church_id}', Html\Remark::class, ['church_id' => '\d+'],['action'=>'list']],
+    'church_remarks_list_alias' => ['/templom/{church_id}/eszrevetelek', Html\Remark::class, ['church_id' => '\d+'],['action'=>'list']],
+    'church_remarks_addform' => ['/remark/addform/{church_id}', Html\Remark::class, ['church_id' => '\d+'],['action'=>'addform']],
+    'church_remarks_add' => ['/remark/add/{church_id}', Html\Remark::class, ['church_id' => '\d+'],['action'=>'add']],
 ];
 
-foreach ($complexLegacyRoutes as $routeName => [$path, $className, $requirements]) {
+  foreach ($complexLegacyRoutes as $routeName => [$path, $className, $requirements, $defaults]) {
     $collection->add($routeName, new Route(
         path: $path,
-        defaults: [
-            '_class' => $className,
-        ],
+        defaults: array_merge([
+            '_class' => $className
+        ], is_array($defaults) ? $defaults : [] ),
         requirements: $requirements,
     ));
 }
@@ -70,7 +74,6 @@ foreach ($symfonyRoutes as $routeName => $routePath) {
 }
 
 /*
-["^templom\/([0-9]{1,5})\/eszrevetelek$", "remark/list/$1"],
             ["^templom\/([0-9]{1,5})\/ujeszrevetel$", "remark/addform/$1"],
             ["^templom\/([0-9]{1,5})\/ujkep$", "uploadimage/$1"],
             ["^remark\/([0-9]{1,5})\/feedback", "email/remarkfeedback/$1"],

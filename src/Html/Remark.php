@@ -15,8 +15,8 @@ class Remark extends Html
 
     public function __construct($path)
     {
-        $this->action = $path[0];
-        $this->tid = $rid = $path[1];
+        $this->action = $path['action'];
+        $this->tid = $rid = $path['church_id'];
 
         $this->church = \App\Model\Church::find($this->tid);
         $this->disclaimer = 'Figyelem! Nem állunk közvetlen kapcsolatban a plébániákkal ezért plébániai ügyekben (pl. keresztelési okiratok, stb.) sajnos nem tudunk segíteni.';
