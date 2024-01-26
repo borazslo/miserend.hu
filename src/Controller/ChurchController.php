@@ -17,12 +17,16 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ChurchController extends AbstractController
 {
+    /**
+     * @todo kell egy 404 handler ami megjeleniti a megfelelo hibauzenetet es oldalt ha nem talalhato a templom
+     */
     #[Route(path: '/templom/{church_id}', name: 'church_view')]
     public function view(
-        #[MapEntity(id: 'church_id')]
+        #[MapEntity(expr: 'repository.findOnePublicChurch(church_id)')]
         Church $church,
     ): Response {
-        dump($church);
-        exit;
+        return $this->render('church/view.html.twig', [
+            'church' => $church,
+        ]);
     }
 }

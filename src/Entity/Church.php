@@ -9,14 +9,18 @@
 
 namespace App\Entity;
 
+use App\Repository\ChurchRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @todo slug bevezetese
+ * @todo softdelete bevezetese
+ * @todo updated at bevezetese
+ * @todo created at bevezetese
  */
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ChurchRepository::class)]
 #[ORM\Table(name: 'templomok')]
 class Church
 {
@@ -79,6 +83,22 @@ class Church
 
     #[ORM\Column(name: 'miseaktiv', type: Types::BOOLEAN)]
     private ?bool $massActive = true;
+
+    public const MODERATION_ACCEPTED = 'i';
+    public const MODERATION_AWAITING_VERIFICATION = 'f';
+    public const MODERATION_DENIED = 'n';
+
+    /**
+     * @todo ez a mezo igazabol eleg ha egy integer majd at kell alakitani
+     */
+    #[ORM\Column(name: 'ok', type: Types::STRING)]
+    private ?string $moderation = 'f';
+
+    /**
+     * @todo timestamp mukodik ezen a mezon? kell migralni?
+     */
+    #[ORM\Column(name: 'deleted_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $deletedAt;
 
     public function getId(): ?int
     {
