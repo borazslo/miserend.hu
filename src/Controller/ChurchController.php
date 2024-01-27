@@ -19,11 +19,13 @@ class ChurchController extends AbstractController
 {
     /**
      * @todo kell egy 404 handler ami megjeleniti a megfelelo hibauzenetet es oldalt ha nem talalhato a templom
+     * @todo milyen url formakat kell meg kezelni?
      */
-    #[Route(path: '/templom/{church_id}', name: 'church_view')]
+    #[Route(path: '/templom/{church_id}/{slug}', name: 'church_view')]
     public function view(
         #[MapEntity(expr: 'repository.findOnePublicChurch(church_id)')]
         Church $church,
+        ?string $slug = null,
     ): Response {
         return $this->render('church/view.html.twig', [
             'church' => $church,
