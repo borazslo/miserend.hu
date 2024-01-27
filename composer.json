@@ -27,7 +27,8 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.17",
         "symfony/security-bundle": "^7.0",
-        "symfony/mailer": "^7.0"
+        "symfony/mailer": "^7.0",
+        "symfony/expression-language": "^7.0"
     },
     "autoload": {
         "psr-4": {
