@@ -1,0 +1,21 @@
+<div class="card mb-3"
+    {%- if id is defined and id -%}
+        {{- ' id' }}="{{ id }}"
+    {%- endif -%}>
+
+    {% set _title_block = block('panel_title') ?? '' %}
+    {% if _title_block is not empty %}
+        <div class="card-header {{ panel|default(false) ? 'text-bg-'~panel }}">{{ _title_block|raw }}</div>
+    {% endif %}
+
+    <div class="card-body">
+        {% block panel_body %}{{ body|raw }}{% endblock %}
+    </div>
+
+    {% set _footer_block = block('panel_footer') ?? '' %}
+    {% if _footer_block is not empty %}
+    <div class="card-footer text-body-secondary">
+        {{ _footer_block|raw }}
+    </div>
+    {% endif %}
+</div>
