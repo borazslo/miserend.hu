@@ -23,6 +23,7 @@ class ChurchRepository extends ServiceEntityRepository
             ->setParameter('now', new \DateTime())
             ->setParameter('accepted', Church::MODERATION_ACCEPTED)
             ->setParameter('church_id', $churchId)
+            ->leftJoin('church.holder', 'holder')
             ->getQuery()->getOneOrNullResult();
     }
 

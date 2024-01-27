@@ -9,6 +9,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Interfaces\FieldModificationDateTimeInterface;
+use App\Entity\Traits\FieldModificationDateTimeTrait;
 use App\Repository\ChurchRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,8 +24,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ORM\Entity(repositoryClass: ChurchRepository::class)]
 #[ORM\Table(name: 'templomok')]
-class Church
+class Church implements FieldModificationDateTimeInterface
 {
+    use FieldModificationDateTimeTrait;
+
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue('AUTO')]
@@ -95,78 +99,94 @@ class Church
     private ?string $moderation = 'f';
 
     /**
-     * @todo timestamp mukodik ezen a mezon? kell migralni?
+     * Gondnokság.
      */
-    #[ORM\Column(name: 'deleted_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $deletedAt;
+    #[Orm\OneToOne(mappedBy: 'church', targetEntity: ChurchHolder::class)]
+    private ?ChurchHolder $holder = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     */
     public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string|null
-     */
     public function getKnownName(): ?string
     {
         return $this->knownName;
     }
 
-    /**
-     * @param string|null $knownName
-     */
     public function setKnownName(?string $knownName): void
     {
         $this->knownName = $knownName;
     }
 
-    /**
-     * @return int|null
-     */
     public function getCountry(): ?int
     {
         return $this->country;
     }
 
-    /**
-     * @param int|null $country
-     */
     public function setCountry(?int $country): void
     {
         $this->country = $country;
     }
 
-    /**
-     * @return int|null
-     */
     public function getCounty(): ?int
     {
         return $this->county;
     }
 
-    /**
-     * @param int|null $county
-     */
     public function setCounty(?int $county): void
     {
         $this->county = $county;
     }
 
+    public function getMassActive(): ?bool
+    {
+        return $this->massActive;
+    }
+
+    public function setMassActive(?bool $massActive): void
+    {
+        $this->massActive = $massActive;
+    }
+
+    public function getHolderStatus(): int
+    {
+        if (null === $this->holder) {
+            return ChurchHolder::HOLDER_STATUS_ORPHAN;
+        }
+
+        return match ($this->holder->getStatus()) {
+            ChurchHolder::STATUS_ALLOWED => ChurchHolder::HOLDER_STATUS_ALLOWED,
+            ChurchHolder::STATUS_DENIED => ChurchHolder::HOLDER_STATUS_DENIED,
+            ChurchHolder::STATUS_REVOKED => ChurchHolder::HOLDER_STATUS_REVOKED,
+            ChurchHolder::STATUS_ASKED => ChurchHolder::HOLDER_STATUS_ASKED,
+            ChurchHolder::STATUS_LEFT => ChurchHolder::HOLDER_STATUS_LEFT,
+        };
+    }
+
+    public function isAllowAskToHolder(): bool
+    {
+        // constant('\\App\\Entity\\ChurchHolder::HOLDER_STATUS_LEFT'), constant('\\App\\Entity\\ChurchHolder::HOLDER_STATUS_ORPHAN')
+        return true; // TODO fix this
+    }
+
+    public function getHolder(): ?ChurchHolder
+    {
+        return $this->holder;
+    }
+
+    public function setHolder(?ChurchHolder $holder): void
+    {
+        $this->holder = $holder;
+    }
 }
