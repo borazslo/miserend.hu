@@ -10,14 +10,16 @@
 namespace App;
 
 use App\Html\Html;
-use App\Legacy\Application;
+use App\Legacy\ContainerAwareInterface;
 use App\Legacy\Response\HttpResponseInterface;
+use App\Legacy\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-require_once '../src/Legacy/bootstrap.php';
+$app = require_once '../src/Legacy/bootstrap.php';
 
 try {
     if (\PHP_SAPI == 'cli') {
@@ -38,10 +40,10 @@ try {
 
     $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
 
-    $app = new Application();
     $app->loadRoutes();
     try {
         $matchedRoute = $app->matchRoute($request);
+        $request->attributes->add($matchedRoute);
     } catch (ResourceNotFoundException $notFoundException) {
         throw new \Exception('Az oldal nem található');
     }
@@ -49,11 +51,33 @@ try {
     if (isset($matchedRoute['_class'])) {
         $className = $matchedRoute['_class'];
 
-        if (method_exists($className, 'factory')) {
-            $html = $className::factory($matchedRoute);
-        } else {
-            $html = new $className($matchedRoute);
+        $reflection = new \ReflectionClass($className);
+
+        $container = null;
+        $html = null;
+        $user = (new Security())->getUser(); // bc
+
+        if ($reflection->implementsInterface(ServiceSubscriberInterface::class)) {
+            $container = $app->buildContainer($className::getSubscribedServices());
         }
+
+        $html = new $className($matchedRoute); // BC
+
+        if ($html instanceof ContainerAwareInterface) {
+            if (null === $container) {
+                throw new \LogicException('ContainerAwareInterface objektumoknak mindenkeppen implementalni kell a ServiceSubscriberInterface-t, hogy tudjuk mit kell osszeszedni');
+            }
+
+            $html->setContainer($container);
+        }
+    }
+
+    if (isset($matchedRoute['_method'])) {
+        $response = $html->{$matchedRoute['_method']}($request);
+
+        $response->send(false);
+
+        exit(0);
     }
 
     if (isset($matchedRoute['handler']) && 'symfony' === $matchedRoute['handler']) {
