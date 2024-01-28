@@ -12,31 +12,102 @@ namespace App\Html\User;
 use App\Html\Html;
 use App\Request;
 use App\User as AppUser;
+use Symfony\Component\HttpFoundation\Response;
 
 class Edit extends Html
 {
-    public function __construct()
+    public function registration(\Symfony\Component\HttpFoundation\Request $request): Response
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
-        $this->uid = Request::IntegerwDefault('uid', $user->uid);
+        $uid = Request::IntegerwDefault('uid', $user->getUid());
 
-        $isForm = Request::Text('submit');
-        if ($isForm) {
+        if ($request->getMethod() === 'POST') {
             if ($this->modify()) {
                 /* Ha az aktuális felhasználót frissítettük, akkor be kell töltenünk újra a felhasználót a friss adatokkal */
-                if ($this->uid == $user->uid) {
-                    $user2 = new AppUser($this->uid);
+                if ($uid == $user->getUid()) {
+                    $user2 = new AppUser($uid);
                     $user = $user2->load();
+
+                    $this->getSecurity()->replaceUser($user);
                 }
             }
+
+            // ?
+
+            exit;
         }
-        $this->preparePage();
+
+        $roles = $this->getConstants()::ROLES;
+        $vars['roles'] = [];
+        foreach ($roles as $role) {
+            $vars['roles'][$role] = $role;
+        }
+
+        // Ha folyamatban van új felszanáló szerkesztése
+        if (0 == $user->getUid() && isset($_REQUEST['edituser'])) {
+            $edituser = new AppUser();
+            foreach ($_REQUEST['edituser'] as $key => $value) {
+                $edituser->$key = $value;
+            }
+        } else {
+            $edituser = new AppUser($uid);
+        }
+
+        if (0 == $edituser->getUid() && 0 == $user->getUid() && preg_match('/\/new$/i', $_SERVER['REQUEST_URI'])) {
+            $vars['title'] = 'Regisztráció';
+            $vars['new'] = true;
+            $vars['helptext'] = true;
+        } elseif (0 == $edituser->getUid() && $user->getUid() > 0) {
+            $vars['title'] = 'Új felhasználó';
+            if (!$user->checkRole('user')) {
+                addMessage('Nincs megfelelő jogosultságod!', 'danger');
+                $vars['accessdenied'] = true;
+            }
+            $vars['new'] = true;
+        } else {
+            $vars['title'] = 'Adatok módosítása';
+            if (!$user->checkRole('user') && $user->getUid() != $edituser->getUid()) {
+                addMessage('Nincs megfelelő jogosultságod!', 'danger');
+                $vars['accessdenied'] = true;
+            } elseif (0 == $edituser->getUid() && 0 == $user->getUid()) {
+                addMessage('A személyes adatok módosításához be kell előbb lépni.', 'warning');
+                $vars['needtologin'] = true;
+            }
+            $vars['edit'] = true;
+        }
+
+        if ('*vendeg*' == $edituser->getUsername()) {
+            $edituser->setUsername(false);
+        }
+        if ('*vendég*' == $edituser->getNickname()) {
+            $edituser->setNickname(false);
+        }
+
+        if ($user->getLoggedin()) {
+            $edituser->getRemarks(6);
+        }
+
+        if ($user->checkRole('user')) {
+            $user->setIsadmin(true);
+        }
+
+        $vars['edituser'] = $edituser;
+
+        foreach ($vars as $key => $value) {
+            $this->$key = $value;
+        }
+
+        if ($user->getLoggedin()) {
+            $this->edituser->processResponsabilities();
+        }
+
+        return $this->render('user/edit.twig');
     }
 
     public function modify(): bool
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         $newuser = new AppUser(uid: $_REQUEST['edituser']['uid'] ?? false);
 
@@ -68,7 +139,7 @@ class Edit extends Html
                         // $tartalom = miserend_index();
                         $this->newusercreated = true;
                     } else {
-                        $this->uid = $newuser->uid;
+                        $uid = $newuser->uid;
                     }
 
                     return true;
@@ -80,75 +151,6 @@ class Edit extends Html
 
                 return false;
             }
-        }
-    }
-
-    public function preparePage()
-    {
-        global $user;
-        $uid = $this->uid;
-        $roles = unserialize(ROLES);
-        $vars['roles'] = [];
-        foreach ($roles as $role) {
-            $vars['roles'][$role] = $role;
-        }
-
-        // Ha folyamatban van új felszanáló szerkesztése
-        if (0 == $user->uid && isset($_REQUEST['edituser'])) {
-            $edituser = new AppUser();
-            foreach ($_REQUEST['edituser'] as $key => $value) {
-                $edituser->$key = $value;
-            }
-        } else {
-            $edituser = new AppUser($uid);
-        }
-
-        if (0 == $edituser->uid && 0 == $user->uid && preg_match('/\/new$/i', $_SERVER['REQUEST_URI'])) {
-            $vars['title'] = 'Regisztráció';
-            $vars['new'] = true;
-            $vars['helptext'] = true;
-        } elseif (0 == $edituser->uid && $user->uid > 0) {
-            $vars['title'] = 'Új felhasználó';
-            if (!$user->checkRole('user')) {
-                addMessage('Nincs megfelelő jogosultságod!', 'danger');
-                $vars['accessdenied'] = true;
-            }
-            $vars['new'] = true;
-        } else {
-            $vars['title'] = 'Adatok módosítása';
-            if (!$user->checkRole('user') && $user->uid != $edituser->uid) {
-                addMessage('Nincs megfelelő jogosultságod!', 'danger');
-                $vars['accessdenied'] = true;
-            } elseif (0 == $edituser->uid && 0 == $user->uid) {
-                addMessage('A személyes adatok módosításához be kell előbb lépni.', 'warning');
-                $vars['needtologin'] = true;
-            }
-            $vars['edit'] = true;
-        }
-
-        if ('*vendeg*' == $edituser->username) {
-            $edituser->username = false;
-        }
-        if ('*vendég*' == $edituser->nickname) {
-            $edituser->nickname = false;
-        }
-
-        if ($user->loggedin) {
-            $edituser->getRemarks(6);
-        }
-
-        if ($user->checkRole('user')) {
-            $user->isadmin = true;
-        }
-
-        $vars['edituser'] = $edituser;
-
-        foreach ($vars as $key => $value) {
-            $this->$key = $value;
-        }
-
-        if ($user->loggedin) {
-            $this->edituser->processResponsabilities();
         }
     }
 }

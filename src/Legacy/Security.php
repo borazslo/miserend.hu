@@ -18,6 +18,11 @@ class Security
         return $this->user;
     }
 
+    public function replaceUser(User $user): void
+    {
+        $this->user = $user;
+    }
+
     private function initUser(): User
     {
         return User::load();

@@ -160,6 +160,7 @@ class Application
                 ],
                 'default',
             ])
+            ->addMethodCall('setAsGlobal')
             ->addMethodCall('bootEloquent')
             ->setPublic(true);
 

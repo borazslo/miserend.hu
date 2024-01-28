@@ -9,9 +9,19 @@
 
 namespace App\Html\Church;
 
-class EditPhotos extends \App\Html\Html
+use App\Html\Html;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class EditPhotos extends Html
 {
-    public function __construct($path)
+    public function add(Request $request): Response
+    {
+        dump('todo');
+        exit;
+    }
+
+    public function legacyCode()
     {
         global $user;
 

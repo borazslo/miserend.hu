@@ -9,7 +9,9 @@
 
 namespace App\Html\User;
 
-class User extends \App\Html\Html
+use App\Html\Html;
+
+class User extends Html
 {
     public static function factory($path)
     {

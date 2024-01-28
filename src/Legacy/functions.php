@@ -10,35 +10,6 @@
 use App\User;
 use Illuminate\Database\Capsule\Manager as DB;
 
-function dbconnect()
-{
-    global $config, $capsule;
-
-    try {
-        $capsule = new DB();
-
-        $connectionConfig = [
-            'driver' => 'mysql',
-            'host' => $config['connection']['host'],
-            'database' => $config['connection']['database'],
-            'username' => $config['connection']['user'],
-            'password' => $config['connection']['password'],
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-            'prefix' => '',
-        ];
-
-        $capsule->addConnection($connectionConfig, 'default');
-        // Make this Capsule instance available globally via static methods... (optional)
-        $capsule->setAsGlobal();
-        $capsule->bootEloquent();
-        DB::statement("SET time_zone='+05:00';");
-    } catch (PDOException $e) {
-        echo $e->getMessage();
-        exit;
-    }
-}
-
 function sanitize($text)
 {
     if (is_array($text)) {

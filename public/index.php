@@ -57,17 +57,12 @@ try {
         $html = null;
         $user = (new Security())->getUser(); // bc
 
-        if ($reflection->implementsInterface(ServiceSubscriberInterface::class)) {
-            $container = $app->buildContainer($className::getSubscribedServices());
-        }
+        $container = $app->buildContainer($className::getSubscribedServices());
+        $container->get(\Illuminate\Database\Capsule\Manager::class);
 
-        $html = new $className($matchedRoute); // BC
+        $html = new $className();
 
         if ($html instanceof ContainerAwareInterface) {
-            if (null === $container) {
-                throw new \LogicException('ContainerAwareInterface objektumoknak mindenkeppen implementalni kell a ServiceSubscriberInterface-t, hogy tudjuk mit kell osszeszedni');
-            }
-
             $html->setContainer($container);
         }
     }
@@ -111,6 +106,8 @@ try {
     }
   */
 } catch (\Exception $e) {
+    dump($e);
+    exit;
     if (isset($html)) {
         addMessage($e->getMessage(), 'danger');
     } else {
