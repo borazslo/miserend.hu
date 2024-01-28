@@ -63,6 +63,8 @@ $complexLegacyRoutes = [
 }
 
 $symfonyRoutes = [
+    'church_view' => '/templom/{church_id}',
+    'church_view_slug' => '/templom/{church_id}/{slug}',
     'wdt' => '/_wdt/{token}',
     'profiler' => '/_profiler/{token}',
 ];

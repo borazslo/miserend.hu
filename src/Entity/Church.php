@@ -98,6 +98,9 @@ class Church implements FieldModificationDateTimeInterface
     #[ORM\Column(name: 'ok', type: Types::STRING)]
     private ?string $moderation = 'f';
 
+    #[ORM\Column(name: 'slug', type: Types::STRING, length: 150, nullable: true)]
+    private ?string $slug = null;
+
     /**
      * Gondnokság.
      */
@@ -157,6 +160,22 @@ class Church implements FieldModificationDateTimeInterface
     public function setMassActive(?bool $massActive): void
     {
         $this->massActive = $massActive;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param string|null $slug
+     */
+    public function setSlug(?string $slug): void
+    {
+        $this->slug = $slug;
     }
 
     public function getHolderStatus(): int

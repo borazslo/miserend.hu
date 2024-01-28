@@ -5,10 +5,13 @@ namespace App\Repository;
 use App\Entity\Church;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ChurchRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        private readonly SluggerInterface $slugger,
+        ManagerRegistry $registry)
     {
         parent::__construct($registry, Church::class);
     }
@@ -25,6 +28,16 @@ class ChurchRepository extends ServiceEntityRepository
             ->setParameter('church_id', $churchId)
             ->leftJoin('church.holder', 'holder')
             ->getQuery()->getOneOrNullResult();
+    }
+
+    public function generateSlug(Church $church, bool $save = true): void
+    {
+        $slug = $this->slugger->slug($church->getName());
+        $church->setSlug(strtolower($slug));
+
+        if ($save) {
+            $this->_em->flush();
+        }
     }
 
     public function save(Church $church, bool $save = false): void
