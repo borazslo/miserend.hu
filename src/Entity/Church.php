@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @todo slug bevezetese
  * @todo softdelete bevezetese
  * @todo updated at bevezetese
  * @todo created at bevezetese
