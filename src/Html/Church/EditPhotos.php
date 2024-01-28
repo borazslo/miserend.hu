@@ -78,7 +78,7 @@ class EditPhotos extends Html
         }
 
         global $user;
-        $this->church->log .= "\nFotók: ".$user->login.' ('.date('Y-m-d H:i:s').')';
+        $this->church->log .= "\nFotók: ".$user->getLogin().' ('.date('Y-m-d H:i:s').')';
 
         switch ($this->input['modosit']) {
             case 'n':

@@ -29,13 +29,13 @@ class Chat
 
         $this->comments = [];
 
-        $loginkiir1 = urlencode($user->login);
+        $loginkiir1 = urlencode($user->getLogin());
 
         $comments = DB::table('chat')->where(function ($query) {
             global $user;
             $query->orWhere('kinek', '')
-                ->orWhere('kinek', $user->login)
-                ->orWhere('user', $user->login);
+                ->orWhere('kinek', $user->getLogin())
+                ->orWhere('user', $user->getLogin());
         })
             ->orderBy('datum', 'DESC')
             ->limit($this->limit);
@@ -63,17 +63,17 @@ class Chat
                 $row['datum'] = date('H:i', strtotime($row['datum']));
             }
 
-            if ($row['user'] == $user->login) {
+            if ($row['user'] == $user->getLogin()) {
                 $row['color'] = '#394873';
-            } elseif ($row['kinek'] == $user->login) {
+            } elseif ($row['kinek'] == $user->getLogin()) {
                 $row['color'] = 'red';
-            } elseif (preg_match('/@'.$user->login.'([^a-zA-Z]{1}|$)/i', $row['szoveg'])) {
+            } elseif (preg_match('/@'.$user->getLogin().'([^a-zA-Z]{1}|$)/i', $row['szoveg'])) {
                 $row['color'] = 'red';
             }
 
             if ('' != $row['kinek']) {
-                if ($row['kinek'] == $user->login) {
-                    $loginkiir2 = urlencode($user->login);
+                if ($row['kinek'] == $user->getLogin()) {
+                    $loginkiir2 = urlencode($user->getLogin());
                 } else {
                     $loginkiir2 = urlencode($row['kinek']);
                 }
@@ -95,7 +95,7 @@ class Chat
             );
 
             $row['html'] = $twig->render('chat/chatcomment.twig', ['comment' => $row]);
-            if ($row['user'] != $user->login) {
+            if ($row['user'] != $user->getLogin()) {
                 ++$this->alert;
             }
 
@@ -114,7 +114,7 @@ class Chat
             ->select('login')
             ->where('jogok', '!=', '')
             ->where('lastactive', '>=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
-            ->where('login', '<>', $user->login)
+            ->where('login', '<>', $user->getLogin())
             ->orderBy('lastactive', 'DESC')
             ->get();
 

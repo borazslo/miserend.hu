@@ -55,10 +55,16 @@ try {
 
         $container = null;
         $html = null;
-        $user = (new Security())->getUser(); // bc
 
         $container = $app->buildContainer($className::getSubscribedServices());
         $container->get(\Illuminate\Database\Capsule\Manager::class);
+
+        /** @var Security $security */
+        $security = $container->get(Security::class);
+        $security->captureAuthentication();
+        $security->captureLogout();
+
+        $user = $security->getUser();
 
         $html = new $className();
 

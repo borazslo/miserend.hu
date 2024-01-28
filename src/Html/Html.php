@@ -10,15 +10,35 @@
 namespace App\Html;
 
 use App\Chat;
+use App\Legacy\ConfigProvider;
+use App\Legacy\ConstantsProvider;
+use App\Legacy\ContainerAwareInterface;
+use App\Legacy\MessageRepository;
+use App\Legacy\Security;
 use App\Message;
-use App\Twig\Extensions\WebpackCompatibilityExtension;
+use App\User;
+use Illuminate\Database\Capsule\Manager;
+use Illuminate\Database\DatabaseManager;
 use JetBrains\PhpStorm\NoReturn;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberTrait;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
-class Html
+class Html implements ContainerAwareInterface, ServiceSubscriberInterface
 {
+    use ServiceSubscriberTrait;
+
+    /**
+     * @internal
+     */
     public $template;
+
+    /**
+     * @internal
+     */
+    public $user;
+
     public $menu = [];
     // public $pageTitle = 'Miserend';
     public $templatesPath = 'templates';
@@ -29,11 +49,11 @@ class Html
      */
     public $html;
 
-    public function __construct()
-    {
-        $this->input = $_REQUEST;
-        $this->initPagination();
-    }
+    //    public function __construct()
+    //    {
+    //        $this->input = $_REQUEST;
+    //        $this->initPagination();
+    //    }
 
     protected function getContextVariables(): array
     {
@@ -45,21 +65,18 @@ class Html
         $this->{$key} = $variable;
     }
 
-    protected $user;
-
-    public function render(): void
+    private function getGlobals(): array
     {
-        global $user, $config;
+        $user = $this->getUser();
+        $variables = [
+            'environment' => $this->getConfig()['env'],
+            'githash' => $this->getGitHash(),
+            'user' => $user,
+            'menu' => $this->getMenu(),
+        ];
 
-        $this->user = $user; // BC
-
-        $this->addContextVariable('environment', $config['env']);
-        $this->addContextVariable('githash', $this->getGitHash());
-        $this->addContextVariable('user', $user);
-
-        $this->loadMenu();
-        if (isset($user->loggedin) && $user->loggedin && !$user->checkRole('miserend')) {
-            $this->addContextVariable('mychurches', feltoltes_block());
+        if ($user->getLoggedin() && !$user->checkRole('miserend')) {
+            $variables['mychurches'] = feltoltes_block();
         }
 
         if ($user->checkRole('"any"')) {
@@ -67,55 +84,101 @@ class Html
             $chat->load();
             $chat = collect($chat)->toArray();
 
-            $this->addContextVariable('chat', $chat);
+            $variables['chat'] = $chat;
         }
 
-        $this->addContextVariable('missages', Message::getToShow());
+        $variables['messages'] = $this->getMessageRepository()->getToShow();
 
-        $this->loadTwig();
-        $this->getTemplateFile();
-        $this->html = $this->twig->render(strtolower($this->template), $this->getContextVariables());
-        $this->injectTime();
+        return $variables;
     }
 
-    private Environment $twig;
-
-    private function loadTwig(): void
+    public function render(string $viewName, array $context = [], int $httpStatus = 200): Response
     {
-        $loader = new FilesystemLoader(PATH.$this->templatesPath);
-        $this->twig = new Environment($loader); // cache:
+        $context += $this->getGlobals();
 
-        $this->twig->addExtension(new WebpackCompatibilityExtension());
+        return new Response($this->renderView($viewName, $context), status: $httpStatus);
     }
 
-    public function getTemplateFile()
+    protected function renderView(string $viewName, array $context = []): string
     {
-        if (!isset($this->template)) {
-            $className = static::class;
-            $classPath = preg_replace("/\\\/i", '/', static::class);
-            $classShortPath = preg_replace('/App\/Html\//i', '', $classPath);
-            $this->template = strtolower($classShortPath).'.twig'; // TODO rename .html.twig
-        }
+        return $this->getTwig()->render($viewName, $context);
     }
 
-    public function loadMenu()
+    protected function getTwig(): Environment
     {
-        if ($this->user->checkRole("'any'")) {
-            $this->loadAdminMenu();
-        }
-        if (isset($this->user->responsible['diocese']) && \count($this->user->responsible['diocese']) > 0 && !$this->user->checkRole('miserend')) {
-            $this->loadResponsibleMenu();
-        }
-        $this->menu[] = [
-            'title' => 'Térkép',
-            'url' => '/terkep',
+        return $this->container->get(Environment::class);
+    }
+
+    protected function getUser(): ?User
+    {
+        return $this->getSecurity()->getUser() ?? $this->user;
+    }
+
+    protected function getSecurity(): Security
+    {
+        return $this->container->get(Security::class);
+    }
+
+    protected function getDatabaseManager(): DatabaseManager
+    {
+        return $this->container->get(Manager::class)->getDatabaseManager();
+    }
+
+    protected function getConfig(): array
+    {
+        return $this->container->get(ConfigProvider::class)->getConfig();
+    }
+
+    protected function getMessageRepository(): MessageRepository
+    {
+        return $this->container->get(MessageRepository::class);
+    }
+
+    protected function getConstants(): ConstantsProvider
+    {
+        return $this->container->get(ConstantsProvider::class);
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return [
+            Environment::class => Environment::class,
+            Manager::class => Manager::class,
+            ConfigProvider::class => ConfigProvider::class,
+            Security::class => Security::class,
+            MessageRepository::class => MessageRepository::class,
+            ConstantsProvider::class => ConstantsProvider::class,
         ];
     }
 
-    public function loadAdminMenu()
+    protected function getMenu(): array
     {
-        $adminmenuitems = [
-            ['title' => 'Miserend', 'url' => '/termplom/list', 'permission' => 'miserend', 'mid' => 27,
+        $user = $this->getUser();
+
+        $menu = [];
+        if ($this->getSecurity()->isGranted("'any'")) {
+            $menu = $this->getAdminMenu();
+        }
+        if (isset($user->getResponsible()['diocese']) && \count($user->getResponsible()['diocese']) > 0 && !$user->checkRole('miserend')) {
+            $menu += $this->getResponsibleMenu();
+        }
+
+        $menu[] = [
+            'title' => 'Térkép',
+            'url' => '/terkep',
+        ];
+
+        return $menu;
+    }
+
+    public function getAdminMenu(): array
+    {
+        $adminMenuItems = [
+            [
+                'title' => 'Miserend',
+                'url' => '/termplom/list',
+                'permission' => 'miserend',
+                'mid' => 27,
                 'items' => [
                     ['title' => 'teljes lista', 'url' => '/templom/list', 'permission' => ''],
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
@@ -128,31 +191,36 @@ class Html
             ],
             ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user'],
         ];
-        $adminmenuitems = $this->clearMenu($adminmenuitems);
-        $this->menu = array_merge($this->menu, $adminmenuitems);
+
+        return $this->clearMenu($adminMenuItems);
     }
 
-    public function loadResponsibleMenu()
+    public function getResponsibleMenu(): array
     {
-        $diocesemenuitems = [
-            ['title' => 'Templomok', 'url' => '/user/maintainedchurches',
+        return [
+            [
+                'title' => 'Templomok',
+                'url' => '/user/maintainedchurches',
                 'items' => [
-                    ['title' => 'módosítás', 'url' => '/user/maintainedchurches'],
+                    [
+                        'title' => 'módosítás',
+                        'url' => '/user/maintainedchurches',
+                    ],
                 ],
             ],
         ];
-        $this->menu = array_merge($this->menu, $diocesemenuitems);
     }
 
-    public function clearMenu($menuitems)
+    private function clearMenu($menuitems): array
     {
+        $user = $this->getUser();
         foreach ($menuitems as $key => $item) {
-            if (isset($item['permission']) && !$this->user->checkRole($item['permission'])) {
+            if (isset($item['permission']) && !$user->checkRole($item['permission'])) {
                 unset($menuitems[$key]);
             } else {
                 if (isset($item['items']) && \is_array($item['items'])) {
                     foreach ($item['items'] as $k => $i) {
-                        if (isset($i['permission']) && !$this->user->checkRole($i['permission'])) {
+                        if (isset($i['permission']) && !$user->checkRole($i['permission'])) {
                             unset($menuitems[$key][$k]);
                         } else {
                         }
@@ -164,10 +232,28 @@ class Html
         return $menuitems;
     }
 
-    public function setTitle(?string $title): void
+    /**
+     * @deprecated
+     * @see self::createTitleVariables()
+     */
+    public function setTitle()
     {
-        $this->addContextVariable('pageTitle', $title.' | Miserend');
-        $this->addContextVariable('title', $title);
+
+    }
+
+    /**
+     * @param string $title
+     * @return array{
+     *     pageTitle: string,
+     *     title: string
+     * }
+     */
+    protected function createTitleVariables(string $title): array
+    {
+        return [
+            'pageTitle' => $title.' | Miserend',
+            'title' => $title,
+        ];
     }
 
     public function addExtraMeta($name, $content): true
@@ -177,6 +263,7 @@ class Html
         return true;
     }
 
+    // Todo restore functionality
     public function injectTime()
     {
         global $config;

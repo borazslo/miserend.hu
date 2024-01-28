@@ -17,6 +17,30 @@ class User
     private ?string $name = null;
     private ?string $nickname = null;
     private ?string $email = null;
+    private $jogok;
+    private $uid;
+    private array $responsible = [];
+    private $loggedin;
+    private bool $isadmin = false;
+    private array $favorites = [];
+
+    private $login;
+
+    private $jelszo;
+
+    private $regDatum;
+
+    private $lastlogin;
+
+    private $lastactive;
+
+    private $notifications;
+
+    private $becenev;
+
+    private $nev;
+
+    private $volunteer;
 
     public function __construct(
         int $uid = null,
@@ -38,7 +62,7 @@ class User
 
             if ($user) {
                 foreach ($user as $key => $value) {
-                    $this->$key = $value;
+                    $this->{'set'.ucfirst($key)}($value);
                 }
                 $this->username = $user->login;
                 $this->nickname = $user->becenev;
@@ -68,7 +92,7 @@ class User
             $this->uid = 0;
             $this->username = '*vendeg*';
             $this->nickname = '*vendég*';
-            $this->responsible = false;
+            $this->responsible = [];
         }
     }
 
@@ -516,50 +540,10 @@ class User
         }
     }
 
-    public static function load(): self
-    {
-        if (!isset($_COOKIE['token'])) {
-            return new self();
-        }
-
-        $token = Model\Token::where('name', $_COOKIE['token'])->first();
-        if (!$token || !$token->isValid) {
-            App\Token::delete();
-
-            return new self();
-        }
-
-        $token->extend();
-
-        $user = new self($token->uid);
-        $user->loggedin = true;
-        $user->active();
-
-        return $user;
-    }
-
+    /** @deprecated  */
     public static function login($name, $password)
     {
-        App\Token::delete();
-        $name = sanitize($name);
-        $userRow = DB::table('user')->where('login', $name)->first();
-        if (!$userRow) {
-            throw new \Exception('There is no such user.');
-        }
-        if (!password_verify($password, $userRow->jelszo)) {
-            throw new \Exception('Invalid password.');
-        }
-
-        Token::create($userRow->uid, 'web');
-
-        DB::table('user')->where('uid', $userRow->uid)->update(['lastlogin' => date('Y-m-d H:i:s')]);
-
-        return $userRow->uid;
-    }
-
-    public static function logout()
-    {
-        App\Token::delete();
+        // api login hasznalja meg
     }
 
     public static function deleteNonActivatedUsers()
@@ -685,14 +669,6 @@ class User
             ->limit(5)
             ->get();
 
-        /*
-    global $config;
-    $config['debug'] = 2;
-    $config['mail']['debug'] = 3;
-    */
-        // printr($users2notify);
-        // $tmp = new stdClass(); $tmp->uid = 1595; $users2notify = [ $tmp ];
-
         foreach ($users2notify as $user2notify) {
             $user = new self($user2notify->uid);
             $user->getResponsabilities();
@@ -721,11 +697,27 @@ class User
     }
 
     /**
+     * @param string|null $username
+     */
+    public function setUsername(?string $username): void
+    {
+        $this->username = $username;
+    }
+
+    /**
      * @return string|null
      */
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    /**
+     * @param string|null $name
+     */
+    public function setName(?string $name): void
+    {
+        $this->name = $name;
     }
 
     /**
@@ -737,10 +729,252 @@ class User
     }
 
     /**
+     * @param string|null $nickname
+     */
+    public function setNickname(?string $nickname): void
+    {
+        $this->nickname = $nickname;
+    }
+
+    /**
      * @return string|null
      */
     public function getEmail(): ?string
     {
         return $this->email;
     }
+
+    /**
+     * @param string|null $email
+     */
+    public function setEmail(?string $email): void
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJogok()
+    {
+        return $this->jogok;
+    }
+
+    /**
+     * @param mixed $jogok
+     */
+    public function setJogok($jogok): void
+    {
+        $this->jogok = $jogok;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUid(): int
+    {
+        return $this->uid;
+    }
+
+    /**
+     * @param int $uid
+     */
+    public function setUid(int $uid): void
+    {
+        $this->uid = $uid;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResponsible(): array
+    {
+        return $this->responsible;
+    }
+
+    /**
+     * @param array $responsible
+     */
+    public function setResponsible(array $responsible): void
+    {
+        $this->responsible = $responsible;
+    }
+
+    /**
+     * @return false
+     */
+    public function getLoggedin(): bool
+    {
+        return $this->loggedin;
+    }
+
+    /**
+     * @param false $loggedin
+     */
+    public function setLoggedin(bool $loggedin): void
+    {
+        $this->loggedin = $loggedin;
+    }
+
+    /**
+     * @param bool $isadmin
+     */
+    public function setIsadmin(bool $isadmin): void
+    {
+        $this->isadmin = $isadmin;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsadmin(): bool
+    {
+        return $this->isadmin;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLogin()
+    {
+        return $this->login;
+    }
+
+    /**
+     * @param mixed $login
+     */
+    public function setLogin($login): void
+    {
+        $this->login = $login;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJelszo()
+    {
+        return $this->jelszo;
+    }
+
+    /**
+     * @param mixed $jelszo
+     */
+    public function setJelszo($jelszo): void
+    {
+        $this->jelszo = $jelszo;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRegDatum()
+    {
+        return $this->regDatum;
+    }
+
+    /**
+     * @param mixed $regDatum
+     */
+    public function setRegDatum($regDatum): void
+    {
+        $this->regDatum = $regDatum;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastlogin()
+    {
+        return $this->lastlogin;
+    }
+
+    /**
+     * @param mixed $lastlogin
+     */
+    public function setLastlogin($lastlogin): void
+    {
+        $this->lastlogin = $lastlogin;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastactive()
+    {
+        return $this->lastactive;
+    }
+
+    /**
+     * @param mixed $lastactive
+     */
+    public function setLastactive($lastactive): void
+    {
+        $this->lastactive = $lastactive;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNotifications()
+    {
+        return $this->notifications;
+    }
+
+    /**
+     * @param mixed $notifications
+     */
+    public function setNotifications($notifications): void
+    {
+        $this->notifications = $notifications;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBecenev()
+    {
+        return $this->becenev;
+    }
+
+    /**
+     * @param mixed $becenev
+     */
+    public function setBecenev($becenev): void
+    {
+        $this->becenev = $becenev;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNev()
+    {
+        return $this->nev;
+    }
+
+    /**
+     * @param mixed $nev
+     */
+    public function setNev($nev): void
+    {
+        $this->nev = $nev;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVolunteer()
+    {
+        return $this->volunteer;
+    }
+
+    /**
+     * @param mixed $volunteer
+     */
+    public function setVolunteer($volunteer): void
+    {
+        $this->volunteer = $volunteer;
+    }
+
+
 }

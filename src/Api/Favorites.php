@@ -66,7 +66,7 @@ class Favorites extends Api
 
         $favorites = [];
         $user->getFavorites();
-        foreach ($user->favorites as $favorite) {
+        foreach ($user->getFavorites() as $favorite) {
             $favorites[] = $favorite['tid'];
         }
 

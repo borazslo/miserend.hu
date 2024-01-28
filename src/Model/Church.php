@@ -9,16 +9,22 @@
 
 namespace App\Model;
 
+use App\Parish;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /*
  ALTER TABLE `miserend`.`templomok`
  ADD COLUMN `deleted_at` TIMESTAMP NULL DEFAULT NULL AFTER `updated_at`;
  */
 
-class Church extends \Illuminate\Database\Eloquent\Model
+/**
+ * @method inBBox
+ */
+class Church extends Model
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'templomok';
     protected $appends = ['fullName', 'location', 'links'];
@@ -92,7 +98,6 @@ class Church extends \Illuminate\Database\Eloquent\Model
      *  selectUpdatedMonth- ?
      *  selectUpdatedYear
      *  whereShortcutLike($keyword, $type)
-
      */
     public function scopeBoundaries($query)
     {
@@ -414,7 +419,7 @@ class Church extends \Illuminate\Database\Eloquent\Model
         if (!isset($this->religious_administration)) {
             $this->religious_administration = new \stdClass();
         }
-        $parish = new \App\Parish();
+        $parish = new Parish();
         $parish->getByChurchId($this->id);
         $this->religious_administration->parish = $parish;
     }
@@ -431,7 +436,7 @@ class Church extends \Illuminate\Database\Eloquent\Model
         }
 
         global $user;
-        if ($user->uid == $_user->uid) {
+        if ($user->getUid() == $_user->getUid()) {
             $this->readAcess = $access;
         }
 
@@ -446,16 +451,16 @@ class Church extends \Illuminate\Database\Eloquent\Model
             $access = true;
         }
 
-        if (ChurchHolder::where('church_id', $this->id)->where('user_id', $_user->uid)->where('status', 'allowed')->first()) {
+        if (ChurchHolder::where('church_id', $this->id)->where('user_id', $_user->getUid())->where('status', 'allowed')->first()) {
             $access = true;
         }
 
-        if (DB::table('egyhazmegye')->where('id', $this->egyhazmegye)->where('felelos', $_user->username)->first()) {
+        if (DB::table('egyhazmegye')->where('id', $this->egyhazmegye)->where('felelos', $_user->getUsername())->first()) {
             $access = true;
         }
 
         global $user;
-        if ($user->uid == $_user->uid) {
+        if ($user->getUid() == $_user->getUid()) {
             $this->writeAcess = $access;
         }
 
@@ -475,37 +480,6 @@ class Church extends \Illuminate\Database\Eloquent\Model
     {
         return $this->belongsToMany(Boundary::class, 'lookup_boundary_church')
                 ->withTimestamps();
-    }
-
-    public function MdownloadOSMBoundaries()
-    {
-        return;
-        $overpass = new \App\ExternalApi\OverpassApi();
-        $overpass->downloadEnclosingBoundaries($this->lat, $this->lon);
-
-        /* Elementjük az osmtags táblába az összes adatot. */
-        $overpass->saveElement();
-
-        // Detach all boundaries but those manually added (without OSM integration);
-        $this->boundaries()->where('osmid', '>', '0')->detach();
-        foreach ($overpass->jsonData->elements as $element) {
-            $boundary = Boundary::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id]);
-
-            $changed = false;
-            foreach (['boundary', 'admin_level', 'name', 'alt_name', 'denomination'] as $key) {
-                if (isset($element->tags->$key) && $element->tags->$key != $boundary->$key) {
-                    $boundary->$key = $element->tags->$key;
-                    $changed = true;
-                }
-            }
-            $changed ? $boundary->save() : false;
-
-            $this->boundaries()->attach($boundary->id);
-        }
-        $this->boundaries()->touch();
-        $this->MmigrateBoundaries();
-
-        return;
     }
 
     /*

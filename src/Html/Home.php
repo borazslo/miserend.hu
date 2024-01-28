@@ -9,26 +9,79 @@
 
 namespace App\Html;
 
-// use Illuminate\Database\DatabaseManager as DB;
-// use \Illuminate\Support\Facades\DB as DB;
-use Illuminate\Database\Capsule\Manager as DB;
+use App\Legacy\ConstantsProvider;
+use App\Legacy\UserRepository;
+use App\Model\Photo;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class Home extends Html
 {
-    public function __construct()
+    public static function getSubscribedServices(): array
     {
-        global $user, $config;
+        return parent::getSubscribedServices() + [
+            ConstantsProvider::class => ConstantsProvider::class,
+            UserRepository::class => UserRepository::class,
+        ];
+    }
 
-        $attributes = unserialize(ATTRIBUTES);
-        $languages = unserialize(LANGUAGES);
+    public function getConstantsProvider(): ConstantsProvider
+    {
+        return $this->container->get(ConstantsProvider::class);
+    }
 
+    public function getUserRepository(): UserRepository
+    {
+        return $this->container->get(UserRepository::class);
+    }
+
+    public function main(Request $request): Response
+    {
+        if (($churchId = $request->query->getInt('templom')) !== null) {
+            return new RedirectResponse('/templom/'.$churchId, 301);
+        }
+
+        $user = $this->getUser();
+
+        return $this->render('home.twig', [
+            'searchform' => $this->getSearchForm(),
+            'favorites' => $this->getFavorites(),
+            'alert' => LiturgicalDayAlert('html'),
+            'photo' => $this->getRandomPhoto(),
+        ]);
+    }
+
+    private function getFavorites(): iterable
+    {
+        $user = $this->getUser();
+        return $this->getUserRepository()->getFavorites($user);
+    }
+
+    private function getRandomPhoto()
+    {
+        $photo = Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();
+        if ($photo->church) { // TODO: Van, hogy a random képhez nem is tartozik templom. Valami régi hiba miatt.
+            $photo->church->location;
+        }
+
+        return $photo;
+    }
+
+    private function getSearchForm(): array
+    {
         $ma = date('Y-m-d');
         $holnap = date('Y-m-d', time() + 86400);
         $mikor = '8:00-19:00';
 
-        $espkers = DB::table('espereskerulet')
-                    ->select('id', 'ehm', 'nev')
-                    ->get();
+        $attributes = $this->getConstantsProvider()->getAttributes();
+        $languages = $this->getConstantsProvider()->getLanguages();
+
+        $manager = $this->getDatabaseManager();
+
+        $espkers = $manager->table('espereskerulet')
+            ->select('id', 'ehm', 'nev')
+            ->get();
 
         foreach ($espkers as $espker) {
             $espkerT[$espker->ehm][$espker->id] = $espker->nev; // code...
@@ -94,11 +147,11 @@ class Home extends Html
             ],
         ];
 
-        $egyhmegyes = DB::table('egyhazmegye')
-                    ->select('id', 'nev')
-                    ->where('ok', 'i')
-                    ->orderBy('sorrend')
-                    ->get();
+        $egyhmegyes = $manager->table('egyhazmegye')
+            ->select('id', 'nev')
+            ->where('ok', 'i')
+            ->orderBy('sorrend')
+            ->get();
 
         foreach ($egyhmegyes as $egyhmegye) {
             $searchform['ehm']['options'][$egyhmegye->id] = $egyhmegye->nev;
@@ -108,7 +161,7 @@ class Home extends Html
             $searchform['espker'][$ehm] = [
                 'name' => 'espker',
                 'id' => 'ehm'.$ehm,
-                'class' => 'keresourlap'
+                'class' => 'keresourlap',
             ];
             $searchform['espker'][$ehm]['options'][0] = 'mindegy';
             if (\is_array($espker)) {
@@ -135,7 +188,7 @@ class Home extends Html
             'id' => 'tnyelv',
             'class' => 'keresourlap',
             'options' => [
-                0 => 'bármilyen'
+                0 => 'bármilyen',
             ],
             'label' => 'ahol van adott nyelvű mise is',
             'labelAttr' => [
@@ -162,7 +215,7 @@ class Home extends Html
                 $vasarnap => 'vasárnap',
                 $ma => 'ma',
                 $holnap => 'holnap',
-                'x' => 'adott napon:'
+                'x' => 'adott napon:',
             ],
             'label' => 'Mise',
             'labelAttr' => [
@@ -184,7 +237,7 @@ class Home extends Html
                 0 => 'egész nap',
                 'de' => 'délelőtt',
                 'du' => 'délután',
-                'x' => 'adott időben:'
+                'x' => 'adott időben:',
             ],
         ];
         $searchform['mikorido'] = [
@@ -201,7 +254,7 @@ class Home extends Html
             'id' => 'nyelv',
             'class' => 'keresourlap',
             'options' => [
-                0 => 'mindegy'
+                0 => 'mindegy',
             ],
             'label' => 'nyelv',
             'labelAttr' => [
@@ -230,7 +283,7 @@ class Home extends Html
                 'checked' => true,
                 'label' => $label,
                 'labelAttr' => [
-                    'class' => 'form-check-label'. ($value === 'na' ? ' fst-italic' : ''),
+                    'class' => 'form-check-label'.('na' === $value ? ' fst-italic' : ''),
                 ],
             ];
         }
@@ -251,7 +304,7 @@ class Home extends Html
                 'checked' => true,
                 'label' => $label,
                 'labelAttr' => [
-                    'class' => 'form-check-label'. ($value === 'na' ? ' fst-italic' : ''),
+                    'class' => 'form-check-label'.('na' === $value ? ' fst-italic' : ''),
                 ],
             ];
         }
@@ -262,7 +315,7 @@ class Home extends Html
             'id' => 'ritus',
             'class' => 'keresourlap',
             'options' => [
-                0 => 'mindegy'
+                0 => 'mindegy',
             ],
             'label' => 'rítus',
             'labelAttr' => [
@@ -288,13 +341,6 @@ class Home extends Html
             ],
         ];
 
-        $this->photo = \App\Model\Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();
-        if ($this->photo->church) { // TODO: Van, hogy a random képhez nem is tartozik templom. Valami régi hiba miatt.
-            $this->photo->church->location;
-        }
-
-        $this->favorites = $user->getFavorites();
-        $this->searchform = $searchform;
-        $this->alert = LiturgicalDayAlert('html');
+        return $searchform;
     }
 }

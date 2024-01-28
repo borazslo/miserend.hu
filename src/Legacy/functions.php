@@ -1189,22 +1189,6 @@ function printr($variable)
     echo '<pre>'.print_r($variable, 1).'</pre>';
 }
 
-function configurationSetEnvironment($env)
-{
-    global $config;
-    include PROJECT_ROOT.'/config/config.php';
-    if (!array_key_exists($env, $environment)) {
-        $env = 'default';
-    }
-    $config = $environment['default'];
-    $config['env'] = $env;
-    if ('default' != $env) {
-        overrideArray($config, $environment[$env]);
-    }
-    putenv('MISEREND_WEBAPP_ENVIRONMENT='.$env);
-    dbconnect();
-}
-
 function overrideArray(&$orig, $new)
 {
     foreach ($new as $k => $n) {

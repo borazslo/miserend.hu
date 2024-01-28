@@ -10,22 +10,30 @@
 namespace App\Html\Church;
 
 use App\Html\Html;
+use App\Html\Map;
+use App\Legacy\Application;
+use App\Model;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class Church extends Html
 {
-    public function __construct($routeArguments)
+    public function view(Request $request): Response
     {
-        global $user;
+        $user = $this->getUser();
 
-        $tid = $routeArguments['church_id'] ?? null;
+        $tid = $request->attributes->getInt('church_id');
 
-        if (null === $tid) {
+        if (0 === $tid) {
             throw new \Exception('Church does not exist.');
         }
 
-        $church = \App\Model\Church::find($tid);
+
+
+        $church = Model\Church::find($tid);
         if (!$church && $user->checkRole('miserend')) {
-            $church = \App\Model\Church::withTrashed()->find($tid);
+            $church = Model\Church::withTrashed()->find($tid);
             if ($church) {
                 addMessage('Ez a templom törölve van. Nem létezik. Elhunyt. Vége.', 'danger');
             }
@@ -51,10 +59,8 @@ class Church extends Html
         if ($church->osm) {
             $church->accessibility = $church->osm->tagList;
         }
-        $church->kozossegek = $church->kozossegek;
 
-        global $_honapok;
-        $this->_honapok = $_honapok;
+        $_honapok = Application::getMonths();
 
         if ('' != $church->lat && !isset($church->location->city)) {
             $church->MdownloadOSMBoundaries();
@@ -62,67 +68,86 @@ class Church extends Html
 
         $church->MgetReligious_administration();
 
-        if (\count($church->neighbours) < 1) {
-            // $distance = new \Distance();
-            // $distance->MupdateChurch($church);
-        }
-
-        copyArrayToObject($church->toArray(), $this);
-
-        $this->church = ['remarksicon' => $church->remarksicon, 'id' => $church->id]; // A church/_adminlinks.twig számára kell ez. Bocsi.
-        $this->neighbours = $church->neighbours;
-
         if (isset($this->location->city)) {
-            $this->setTitle($this->nev.' ('.$this->location->city['name'].')');
+            $title = $this->nev.' ('.$this->location->city['name'].')';
         } else {
-            $this->setTitle($this->nev);
+            $title = $church->nev;
         }
 
-        $this->updated = str_replace('-', '.', $this->frissites).'.';
-
-        // Miseidőpontok
-        $misek = getMasses($tid);
-
+        $service_times = null;
         // Convert to OSM ServiceTimes
-        if (isset($user->isadmin) && 1 == $user->isadmin) {
+        if (1 == $user->getIsadmin()) {
             $serviceTimes = new \App\ServiceTimes();
             $serviceTimes->loadMasses($tid);
             if (!isset($serviceTimes->error)) {
-                $this->service_times = print_r(preg_replace('/;/', ";\n", $serviceTimes->string), 1)."\n".$serviceTimes->linkForDetails;
+                $service_times = print_r(preg_replace('/;/', ";\n", $serviceTimes->string), 1)."\n".$serviceTimes->linkForDetails;
             } else {
-                $this->service_times = $serviceTimes->error;
+                $service_times = $serviceTimes->error;
             }
         }
 
-        /*
-          $staticmap = "kepek/staticmaps/" . $tid . "_227x140.jpeg";
-          if (file_exists($staticmap))
-          $cim .= "<a href=\"http://www.openstreetmap.org/?mlat=$lat&mlon=$lng#map=15/$lat/$lng\" target=\"_blank\"><img src='/kepek/staticmaps/" . $tid . "_227x140.jpeg'></a>";
-          else
-          $cim .= "<br/>";
-         */
+        $favorite = $user->checkFavorite($tid);
 
-        $this->photos;
-        if (isset($this->photos[0])) {
-            $this->addExtraMeta('og:image', '/kepek/templomok/'.$tid.'/'.$this->photos[0]->fajlnev);
-        }
-
-        if ($user->checkFavorite($tid)) {
-            $this->favorite = 1;
-        }
-
-        $data = \App\Html\Map::getGeoJsonDioceses();
-        $this->dioceseslayer = [];
-        $this->dioceseslayer['geoJson'] = json_encode($data);
-
-        $this->miserend = $misek;
-        $this->alert = LiturgicalDayAlert('html');
-
-        $this->isChurchHolder = $user->getHoldingData($this->id);
+        return $this->render('church/church.twig', [
+            'title' => $title,
+            'pageTitle' => $title.' | Miserend',
+            'og_image' => isset($church->photos[0]) ? '/kepek/templomok/'.$tid.'/'.$church->photos[0]->fajlnev : null,
+            'alert' => LiturgicalDayAlert('html'),
+            'isChurchHolder' => $user->getHoldingData($church->id),
+            'church' => $church,
+            'remarksicon' => $church->remarksicon,
+            'id' => $church->id,
+            'updated' => str_replace('-', '.', $church->frissites).'.',
+            'favorite' => $favorite,
+            'dioceseslayer' => [
+                'geoJson' => json_encode(Map::getGeoJsonDioceses()),
+            ],
+            'miserend' => getMasses($tid),
+            'service_times' => $service_times,
+        ]);
     }
 
-    public static function factory($routeArguments)
+    public function inBbox(Request $request): Response
     {
-        return new self($routeArguments);
+        if (!$request->query->has('bbox')) {
+            throw new \RuntimeException('missing query parameter bbox');
+        }
+
+        $bbox = explode(';', $request->query->get('bbox'));
+        if (4 != \count($bbox)) {
+            throw new \RuntimeException('invalid bbox format');
+        }
+
+        $bbox = array_map(function ($value) {
+            return (float) $value;
+        }, $bbox);
+
+        $churchesInBBox = Model\Church::on($this->getDatabaseManager()->getConnections())->inBBox([
+            'latMin' => $bbox[0],
+            'lonMin' => $bbox[1],
+            'latMax' => $bbox[2],
+            'lonMax' => $bbox[3],
+        ])->get();
+
+        $return = [];
+        foreach ($churchesInBBox as $church) {
+            if (isset($church->photos[0])) {
+                $thumbnail = $church->photos[0]->smallUrl;
+            } else {
+                $thumbnail = false;
+            }
+
+            $return[] = [
+                'id' => $church->id,
+                'nev' => $church->nev,
+                'thumbnail' => $thumbnail,
+                'denomination' => $church->denomination,
+                'active' => $church->miseaktiv,
+                'lat' => $church->location->lat,
+                'lon' => $church->location->lon,
+            ];
+        }
+
+        return new JsonResponse($return);
     }
 }

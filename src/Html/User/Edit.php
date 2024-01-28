@@ -26,10 +26,7 @@ class Edit extends Html
             if ($this->modify()) {
                 /* Ha az aktuális felhasználót frissítettük, akkor be kell töltenünk újra a felhasználót a friss adatokkal */
                 if ($uid == $user->getUid()) {
-                    $user2 = new AppUser($uid);
-                    $user = $user2->load();
-
-                    $this->getSecurity()->replaceUser($user);
+                    $this->getSecurity()->replaceUser(new AppUser($uid));
                 }
             }
 

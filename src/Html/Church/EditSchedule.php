@@ -56,7 +56,7 @@ class EditSchedule extends \App\Html\Html
                         ->where('idoszamitas', $period)
                         ->update([
                             'torles' => $most,
-                            'torolte' => $user->login,
+                            'torolte' => $user->getLogin(),
                         ]);
             }
         }
@@ -67,7 +67,7 @@ class EditSchedule extends \App\Html\Html
                         ->where('idoszamitas', $particular)
                         ->update([
                             'torles' => $most,
-                            'torolte' => $user->login,
+                            'torolte' => $user->getLogin(),
                         ]);
             }
         }
@@ -78,7 +78,7 @@ class EditSchedule extends \App\Html\Html
                         ->where('id', $mid)
                         ->update([
                             'torles' => $most,
-                            'torolte' => $user->login,
+                            'torolte' => $user->getLogin(),
                         ]);
             }
         }
@@ -123,7 +123,7 @@ class EditSchedule extends \App\Html\Html
                                     ->where('id', $mass['id'])
                                     ->update($data);
                         } else {
-                            $data['modositotta'] = $user->login;
+                            $data['modositotta'] = $user->getLogin();
                             $data['moddatum'] = $most;
                             $data['tid'] = $mass['tid'];
 
@@ -167,7 +167,7 @@ class EditSchedule extends \App\Html\Html
                                     ->where('id', $mass['id'])
                                     ->update($data);
                         } else {
-                            $data['modositotta'] = $user->login;
+                            $data['modositotta'] = $user->getLogin();
                             $data['moddatum'] = $most;
                             $data['tid'] = $mass['tid'];
 
@@ -180,7 +180,7 @@ class EditSchedule extends \App\Html\Html
         }
         \App\Crons::generateMassTolIgTmp('tid = '.$_REQUEST['tid']);
 
-        $this->church->log .= "\nMISE_MOD: ".$user->login.' ('.date('Y-m-d H:i:s').' - ['.$_SERVER['REMOTE_ADDR'].' - '.gethostbyaddr($_SERVER['REMOTE_ADDR']).'])';
+        $this->church->log .= "\nMISE_MOD: ".$user->getLogin().' ('.date('Y-m-d H:i:s').' - ['.$_SERVER['REMOTE_ADDR'].' - '.gethostbyaddr($_SERVER['REMOTE_ADDR']).'])';
         if ('i' == $_REQUEST['update']) {
             $this->church->frissites = date('Y-m-d');
         }

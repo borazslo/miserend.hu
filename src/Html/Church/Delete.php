@@ -45,12 +45,12 @@ class Delete extends \App\Html\Html
         if ('' != $this->church2delete->adminmegj) {
             $this->church2delete->adminmegj .= "\n";
         }
-        $this->church2delete->adminmegj .= 'Törölte '.$user->login;
+        $this->church2delete->adminmegj .= 'Törölte '.$user->getLogin();
         if ($comment) {
             $this->church2delete->adminmegj .= ': '.$comment;
         }
         $this->church2delete->ok = 'n';
-        $this->church2delete->log .= "\nDel: ".$user->login.' ('.date('Y-m-d H:i:s').')';
+        $this->church2delete->log .= "\nDel: ".$user->getLogin().' ('.date('Y-m-d H:i:s').')';
         $this->church2delete->save();
 
         $this->church2delete->delete();

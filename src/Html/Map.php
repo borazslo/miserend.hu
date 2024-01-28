@@ -10,9 +10,13 @@
 namespace App\Html;
 
 use App\ExternalApi\NominatimApi;
+use App\ExternalApi\OverpassApi;
 use App\Legacy\Templating\TemplateContextTrait;
 use App\Model\Church;
+use App\Model\OSM;
 use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class Map extends Html
 {
@@ -20,74 +24,78 @@ class Map extends Html
 
     public function __construct()
     {
-        $this->setTitle('OSM Térkép');
 
-        if (isset($_REQUEST['tid']) && is_numeric($_REQUEST['tid'])) {
-            $church = Church::find($_REQUEST['tid']);
+    }
 
-            $this->addContextVariable('location', $church->location);
-            $this->addContextVariable('church_id', $_REQUEST['tid']);
+    public function leaflet(Request $request): Response
+    {
+        $data = $this->getGeoJsonDioceses();
+
+        $variables = [
+            'dioceseslayer' => [
+                'geoJson' => json_encode($data),
+            ],
+        ] + $this->createTitleVariables('OSM Térkép');
+
+        if (isset($_REQUEST['tid'])) {
+            $churchId = $request->query->getInt('tid');
+            $church = Church::on($this->getDatabaseManager()->getConnections())->find($churchId);
+
+            $variables['location'] = $church->location;
+            $variables['church_id'] = $churchId;
         }
 
-        if (isset($_REQUEST['map'])) {
-            $parts = explode('/', $_REQUEST['map']);
-            foreach ($parts as $part) {
-                if (!is_numeric($part)) {
-                    return;
-                }
-            }
+        if ($request->query->has('boundary')) {
+            $variables['boundary'] = $request->query->has('boundary');
+        }
+
+        if ($request->query->has('map')) {
+            $parts = explode('/', $request->query->get('map'));
 
             if (3 == \count($parts)) {
-                $this->addContextVariable('center', [
-                    'zoom' => $parts[0],
-                    'lat' => $parts[1],
-                    'lon' => $parts[2],
-                ]);
+                $variables['center'] = [
+                    'zoom' => (int) $parts[0],
+                    'lat' => (float) $parts[1],
+                    'lon' => (float) $parts[2],
+                ];
             }
 
             if (2 == \count($parts)) {
-                $this->addContextVariable('center', [
-                    'lat' => $parts[0],
-                    'lon' => $parts[1],
-                ]);
+                $variables['center'] = [
+                    'lat' => (float) $parts[0],
+                    'lon' => (float) $parts[1],
+                ];
             }
         }
 
-        if (isset($_REQUEST['boundary'])) {
-            $this->addContextVariable('boundary', $_REQUEST['boundary']);
-        }
-
-        $data = $this->getGeoJsonDioceses();
-
-        $this->addContextVariable('dioceseslayer', [
-            'geoJson' => json_encode($data),
-        ]);
+        return $this->render('map.twig', $variables);
     }
 
-    public static function getGeoJsonDioceses()
+    public function getGeoJsonDioceses()
     {
         if (!$jsonData = self::geoJsonDiocesesFromCache()) {
             $cacheTime = '1 week';
 
-            $results = DB::table('egyhazmegye')
+            $results = $this->getDatabaseManager()->table('egyhazmegye')
                 ->whereNotNull('osm_relation')
                 ->select('osm_relation')
                 ->pluck('osm_relation');
-            $osms = \App\Model\OSM::where('osmtype', 'relation')->whereIn('osmid', $results->toArray())->where('updated_at', '<', date('Y-m-d H:i:s', strtotime('-'.$cacheTime)));
+
+            $osms = OSM::where('osmtype', 'relation')->whereIn('osmid', $results->toArray())->where('updated_at', '<', date('Y-m-d H:i:s', strtotime('-'.$cacheTime)));
             $osmids = $osms->pluck('osmid')->toArray();
             // Ha még nem tároljuk az osm adatait VAGY már régen akkor itt az ideje
             $diff = array_diff($results->toArray(), []); // $osmids);
             if (\count($diff) > 0) {
                 foreach ($diff as $d) {
-                    $overpass = new \App\ExternalApi\OverpassApi();
-                    $overpass->query = 'relation(id:'.$d.');out tags qt center;';
+                    $overpass = new OverpassApi();
+                    $overpass->setQuery('relation(id:'.$d.');out tags qt center;');
                     $overpass->buildQuery();
                     $overpass->run();
                     $overpass->saveElement();
 
-                    $element = $overpass->jsonData->elements[0];
+                    $element = $overpass->getJsonData()->elements[0];
 
-                    $osm = \App\Model\OSM::updateOrCreate([
+                    $osm = OSM::updateOrCreate([
                         'osmid' => $element->id,
                         'osmtype' => $element->type],
                         ['lat' => $element->lat,

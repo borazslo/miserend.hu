@@ -36,16 +36,4 @@ $app->loadConfig($env);
 error_reporting($app->getConfig()['error_reporting'] ?: 0);
 define('DOMAIN', $app->getConfig()['path']['domain']);
 
-// Felhasználó
-if (isset($_REQUEST['login'])) {
-    try {
-        User::login($_REQUEST['login'], $_REQUEST['passw']);
-    } catch (Exception $ex) {
-        addMessage('Hibás név és/vagy jelszó!<br/><br/>Ha elfelejtetted a jelszavadat, <a href="/user/lostpassword">kérj ITT új jelszót</a>.', 'danger');
-    }
-}
-if (isset($_REQUEST['logout'])) {
-    User::logout();
-}
-
 return $app;

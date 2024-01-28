@@ -39,12 +39,12 @@ class User extends Api
         $user = new \App\User($token->uid);
         $user->getFavorites();
         $data = [
-            'username' => $user->username,
-            'nickname' => $user->nickname,
-            'name' => $user->name,
-            'email' => $user->email,
+            'username' => $user->getUsername(),
+            'nickname' => $user->getNickname(),
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
         ];
-        foreach ($user->favorites as $favorite) {
+        foreach ($user->getFavorites() as $favorite) {
             $data['favorites'][] = $favorite['tid'];
         }
 

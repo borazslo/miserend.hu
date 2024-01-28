@@ -53,7 +53,7 @@ class Chat extends Ajax
 
                 if (!DB::table('chat')->insert([
                         'datum' => date('Y-m-d H:i:s'),
-                        'user' => $user->login,
+                        'user' => $user->getLogin(),
                         'kinek' => $kinek,
                         'szoveg' => trim($text),
                     ])

@@ -75,7 +75,7 @@ class Edit extends \App\Html\Html
         }
 
         global $user;
-        $this->church->log .= "\nMod: ".$user->login.' ('.date('Y-m-d H:i:s').')';
+        $this->church->log .= "\nMod: ".$user->getLogin().' ('.date('Y-m-d H:i:s').')';
 
         /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt... */
         $model = $this->church;

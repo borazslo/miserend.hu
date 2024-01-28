@@ -24,11 +24,4 @@ class Token extends Model
 
         return true;
     }
-
-    public function extend()
-    {
-        global $config;
-        $this->timeout = date('Y-m-d H:i:s', strtotime('+'.$config['token'][$this->type]));
-        $this->save();
-    }
 }

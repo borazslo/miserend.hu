@@ -11,6 +11,7 @@ namespace App\Legacy;
 
 use App\Kernel;
 use App\Twig\Extensions\WebpackCompatibilityExtension;
+use App\User;
 use Illuminate\Database\Capsule\Manager as DB;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -126,7 +127,11 @@ class Application
 
     private function registerSecurity(ContainerBuilder $builder): void
     {
+        $builder->register(TokenManager::class, TokenManager::class)
+            ->setAutowired(true);
+
         $builder->register(Security::class, Security::class)
+            ->setAutowired(true)
             ->setPublic(true);
     }
 
