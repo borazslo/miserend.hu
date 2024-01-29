@@ -31,7 +31,7 @@ class RedirectEventSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onKernelRequest(RequestEvent $requestEvent)
+    public function onKernelRequest(RequestEvent $requestEvent): void
     {
         if (!$requestEvent->isMainRequest()) {
             return;
