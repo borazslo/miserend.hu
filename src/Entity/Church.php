@@ -94,7 +94,7 @@ class Church implements FieldModificationDateTimeInterface
     /**
      * @todo ez a mezo igazabol eleg ha egy integer majd at kell alakitani
      */
-    #[ORM\Column(name: 'ok', type: Types::STRING)]
+    #[ORM\Column(name: 'ok', type: Types::STRING, length: 5)]
     private ?string $moderation = 'f';
 
     #[ORM\Column(name: 'slug', type: Types::STRING, length: 150, nullable: true)]
@@ -159,6 +159,22 @@ class Church implements FieldModificationDateTimeInterface
     public function setMassActive(?bool $massActive): void
     {
         $this->massActive = $massActive;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getModeration(): ?string
+    {
+        return $this->moderation;
+    }
+
+    /**
+     * @param string|null $moderation
+     */
+    public function setModeration(?string $moderation): void
+    {
+        $this->moderation = $moderation;
     }
 
     /**

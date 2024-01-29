@@ -33,6 +33,11 @@ trait FieldModificationDateTimeTrait
         return $this->updatedAt;
     }
 
+    public function isDeleted(\DateTimeInterface $at = new \DateTimeImmutable()): bool
+    {
+        return $this->deletedAt !== null && $this->deletedAt <= $at;
+    }
+
     public function createEntity(): void
     {
         if (null === $this->createdAt) {
