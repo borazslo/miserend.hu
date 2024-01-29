@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @todo softdelete bevezetese
  * @todo updated at bevezetese
  * @todo created at bevezetese
+ * @todo slug update
  */
 #[ORM\Entity(repositoryClass: ChurchRepository::class)]
 #[ORM\Table(name: 'templomok')]
