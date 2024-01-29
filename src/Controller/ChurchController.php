@@ -126,7 +126,7 @@ class ChurchController extends AbstractController implements EventSubscriberInte
             return $this->redirectToChurchView($church);
         }
 
-        if ($slug !== null && $slug !== $church->getSlug()) {
+        if ($slug === null && $slug !== $church->getSlug()) {
             return $this->redirectToChurchView($church);
         }
 
