@@ -13,6 +13,14 @@ use App\Entity\ChurchHolder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<ChurchHolder>
+ *
+ * @method ChurchHolder|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ChurchHolder|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ChurchHolder[]    findAll()
+ * @method ChurchHolder[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
 class ChurchHolderRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)

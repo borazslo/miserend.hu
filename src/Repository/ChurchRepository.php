@@ -7,6 +7,14 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
+/**
+ * @extends ServiceEntityRepository<Church>
+ *
+ * @method Church|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Church|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Church[]    findAll()
+ * @method Church[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
 class ChurchRepository extends ServiceEntityRepository
 {
     public function __construct(
