@@ -130,6 +130,10 @@ class ChurchController extends AbstractController implements EventSubscriberInte
             return $this->redirectToChurchView($church);
         }
 
+        if ($slug !== $church->getSlug()) {
+            return $this->redirectToChurchView($church);
+        }
+
         return $this->render('church/view.html.twig', [
             'church' => $church,
         ]);
