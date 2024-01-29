@@ -38,8 +38,8 @@ class Home extends Html
 
     public function main(Request $request): Response
     {
-        if (($churchId = $request->query->getInt('templom')) !== null) {
-            return new RedirectResponse('/templom/'.$churchId, 301);
+        if ($request->query->has('templom')) {
+            return new RedirectResponse('/templom/'.$request->query->getInt('templom'), 301);
         }
 
         $user = $this->getUser();
