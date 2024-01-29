@@ -23,14 +23,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Twig\Environment;
 
 class ChurchController extends AbstractController implements EventSubscriberInterface, ServiceSubscriberInterface
 {
     public function __construct(
-        ContainerInterface $container
-    )
-    {
+        ContainerInterface $container,
+    ) {
         $this->container = $container;
     }
 
@@ -122,13 +120,13 @@ class ChurchController extends AbstractController implements EventSubscriberInte
         Church $church,
         string $slug = null,
     ): Response {
-        if (null === $slug && null === $church->getSlug()) {
+        if ($slug === null && $church->getSlug() === null) {
             $this->getRepository()->generateSlug($church);
 
             return $this->redirectToChurchView($church);
         }
 
-        if (null !== $slug && $slug !== $church->getSlug()) {
+        if ($slug !== null && $slug !== $church->getSlug()) {
             return $this->redirectToChurchView($church);
         }
 
