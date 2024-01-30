@@ -17,7 +17,6 @@ use Symfony\Component\Routing\RouteCollection;
 $collection = new RouteCollection();
 
 $simpleLegacyRoutes = [
-    'church_list' => ['/templom/list', Church\Catalogue::class],
     'church_new' => ['/templom/new', Church\Edit::class],
     'user_edit' => ['/user/edit', User\Edit::class],
     'ajax_autocomplete_keyword' => ['/ajax/AutocompleteKeyword', Ajax\AutocompleteKeyword::class],
@@ -43,7 +42,12 @@ $simpleLegacyRouteWithMethod = [
     'map' => ['/terkep', Html\Map::class, 'leaflet'],
     'ajax_churchesinbbox' => ['/ajax/churchesinbbox', Church\Church::class, 'inBbox'],
     'stats' => ['/stat', Html\Stat::class, 'stat'],
+
     'user_new' => ['/user/new', User\Edit::class, 'registration'],
+    'user_list' => ['/user/catalogue', User\Catalogue::class, 'list'],
+
+    'church_list' => ['/templom/list', Church\Catalogue::class, 'list'],
+    'church_create' => ['/church/create', Church\Create::class, 'create'],
 ];
 
 foreach ($simpleLegacyRouteWithMethod as $routeName => [$path, $className, $method]) {
@@ -63,10 +67,37 @@ $complexLegacyRoutes = [
         'list',
         ['church_id' => '\d+'],
     ],
-    'church_remarks_list_alias' => ['/templom/{church_id}/eszrevetelek', Html\Remark::class, 'list', ['church_id' => '\d+']],
-    'church_change_holder' => ['/templom/{church_id}/changeholders', Church\ChangeHolders::class, 'form', ['church_id' => '\d+']],
-    'church_remarks_add' => ['/remark/add/{church_id}', Html\Remark::class, 'postAdd', ['church_id' => '\d+']],
-    'church_image_add' => ['/templom/{church_id}/ujkep', Church\EditPhotos::class, 'add', ['church_id' => '\d+']],
+    'church_remarks_list_alias' => [
+        '/templom/{church_id}/eszrevetelek',
+        Html\Remark::class,
+        'list',
+        ['church_id' => '\d+'],
+    ],
+    'church_change_holder' => [
+        '/templom/{church_id}/changeholders',
+        Church\ChangeHolders::class,
+        'form',
+        ['church_id' => '\d+'],
+    ],
+    'church_remarks_add' => [
+        '/remark/add/{church_id}',
+        Html\Remark::class,
+        'postAdd',
+        ['church_id' => '\d+'],
+    ],
+    'church_image_add' => [
+        '/templom/{church_id}/ujkep',
+        Church\EditPhotos::class,
+        'add',
+        ['church_id' => '\d+'],
+    ],
+
+    'user_edit' => [
+        '/user/{user_id}/edit',
+        User\Edit::class,
+        'edit',
+        ['user_id' => '\d+'],
+    ],
 ];
 
 foreach ($complexLegacyRoutes as $routeName => [$path, $className, $method, $requirements]) {
