@@ -12,6 +12,7 @@ namespace App\Html\User;
 use App\Html\Html;
 use App\Request;
 use App\User as AppUser;
+use Illuminate\Database\Capsule\Manager as DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class Edit extends Html
@@ -36,7 +37,9 @@ class Edit extends Html
         }
 
         $roles = $this->getConstants()::ROLES;
-        $vars['roles'] = [];
+        $vars = [
+            'roles' => [],
+        ];
         foreach ($roles as $role) {
             $vars['roles'][$role] = $role;
         }
@@ -91,15 +94,49 @@ class Edit extends Html
 
         $vars['edituser'] = $edituser;
 
-        foreach ($vars as $key => $value) {
-            $this->$key = $value;
-        }
-
         if ($user->getLoggedin()) {
-            $this->edituser->processResponsabilities();
+            $edituser->processResponsabilities();
         }
 
-        return $this->render('user/edit.twig');
+        return $this->render('user/edit.twig', [
+            'vars' => $vars,
+        ]);
+    }
+
+    /**
+     * Admin user edit.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return Response
+     * @throws \Exception
+     */
+    public function edit(\Symfony\Component\HttpFoundation\Request $request): Response
+    {
+        $userId = $request->attributes->getInt('user_id');
+
+        if (!$this->getSecurity()->isGranted('user')) {
+            throw new \Exception('Nincs megfelelő jogosultságod!');
+        }
+
+        $editUser = DB::table('user')
+            ->select('*')
+            ->where('uid', $userId)
+            ->first();
+
+        $roles = $this->getConstants()::ROLES;
+        $vars = [
+            'title' => 'Adatok módosítása',
+            'edit' => true,
+            'edituser' => $editUser,
+            'roles' => [],
+        ];
+        foreach ($roles as $role) {
+            $vars['roles'][$role] = $role;
+        }
+
+        return $this->render('user/edit.twig', [
+            'vars' => $vars,
+        ]);
     }
 
     public function modify(): bool
