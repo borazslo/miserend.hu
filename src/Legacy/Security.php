@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Legacy;
 
 use App\User;
@@ -11,8 +18,7 @@ class Security
 
     public function __construct(
         private readonly TokenManager $tokenManager,
-    )
-    {
+    ) {
     }
 
     public function getUser(): ?User
@@ -49,35 +55,6 @@ class Security
         $user->active();
 
         return $user;
-    }
-
-    public function isGranted(string|false $role = false): bool
-    {
-        if (false === $role) {
-            return true;
-        }
-
-        if ('"any"' == $role || "'any'" == $role) {
-            if (!isset($this->jogok)) {
-                return false;
-            }
-            if ('' != trim(preg_replace('/-/i', '', $this->jogok))) {
-                return true;
-            } else {
-                return false;
-            }
-        } elseif (preg_match('/^ehm:([0-9]{1,3})$/i', $role, $match)) {
-            $isResponsible = DB::table('egyhazmegye')->where('id', $match[1])->where('felelos', $this->username)->first();
-            if ($isResponsible) {
-                return true;
-            } else {
-                return false;
-            }
-        } elseif (isset($this->jogok) && preg_match('/(^|-)'.$role.'(-|$)/i', $this->jogok)) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public function isAuthenticated(): bool
@@ -125,5 +102,37 @@ class Security
         if (isset($_REQUEST['logout'])) {
             $this->tokenManager->delete();
         }
+    }
+
+    /**
+     * User::checkRole volt, azt nézi meg, hogy egy adott jogköre van-e a felhasználónak.
+     *
+     * @param string|null $role
+     * @return bool
+     */
+    public function isGranted(string $role = null): bool
+    {
+        if ($role === null) {
+            return true;
+        }
+
+        // ehm-re kerdezunk ra
+        if (preg_match('/^ehm:([0-9]{1,3})$/i', $role, $match)) {
+            $isResponsible = DB::table('egyhazmegye')->where('id', $match[1])->where('felelos', $this->getUser()->getUsername())->first();
+
+            return (bool) $isResponsible;
+        }
+
+        $userRoles = $this->getUser()->getJogok();
+
+        if ($userRoles === null) {
+            return false;
+        }
+
+        if ($role === '"any"' || $role === "'any'") {
+            return trim(preg_replace('/-/i', '', $userRoles)) !== '';
+        }
+
+        return preg_match('/(^|-)'.$role.'(-|$)/i', $userRoles);
     }
 }
