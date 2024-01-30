@@ -15,7 +15,7 @@ use App\Legacy\ConstantsProvider;
 use App\Legacy\ContainerAwareInterface;
 use App\Legacy\MessageRepository;
 use App\Legacy\Security;
-use App\Message;
+use App\Pagination;
 use App\User;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\DatabaseManager;
@@ -55,11 +55,17 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
     //        $this->initPagination();
     //    }
 
+    /**
+     * @deprecated
+     */
     protected function getContextVariables(): array
     {
         return (array) $this;
     }
 
+    /**
+     * @deprecated
+     */
     protected function addContextVariable(string $key, mixed $variable): void
     {
         $this->{$key} = $variable;
@@ -238,11 +244,9 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
      */
     public function setTitle()
     {
-
     }
 
     /**
-     * @param string $title
      * @return array{
      *     pageTitle: string,
      *     title: string
@@ -299,15 +303,17 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
         exit;
     }
 
-    public function initPagination()
+    public function initPagination(): Pagination
     {
-        $this->pagination = new \App\Pagination();
+        $pagination = new Pagination();
         if (isset($this->input['page'])) {
-            $this->pagination->active = $this->input['page'];
+            $pagination->active = $this->input['page'];
         }
         if (isset($this->input['take'])) {
-            $this->pagination->take = $this->input['take'];
+            $pagination->take = $this->input['take'];
         }
+
+        return $pagination;
     }
 
     public function getGitHash()
@@ -321,7 +327,7 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
 
         $v = trim(file_get_contents('../git_hash')); // See: (.)git/hooks/post-checkout
         // Validate short of git_hash
-        if (7 == \strlen($v) && preg_match('/^[a-zA-Z0-9]{7}$/i', $v, $match)) {
+        if (\strlen($v) == 7 && preg_match('/^[a-zA-Z0-9]{7}$/i', $v, $match)) {
             return $v;
         }
 
