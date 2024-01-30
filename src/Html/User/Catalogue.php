@@ -9,59 +9,72 @@
 
 namespace App\Html\User;
 
+use App\Html\Html;
+use App\Pagination;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Query\Builder;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class Catalogue extends \App\Html\Html
+class Catalogue extends Html
 {
-    public function __construct()
+    /**
+     * @throws \Exception
+     */
+    public function list(Request $request): Response
     {
-        parent::__construct();
-        global $user;
-
-        if (!$user->checkRole('user')) {
+        if (!$this->getSecurity()->isGranted('user')) {
             throw new \Exception('Nincs jogosultságod megnézni a felhasználók listáját.');
         }
 
-        $this->input['kulcsszo'] = \App\Request::Text('kulcsszo');
-        $this->input['sort'] = \App\Request::TextwDefault('sort', 'lastactive desc');
-        $this->input['adminok'] = \App\Request::SimpleTextwDefault('adminok', '');
+        $query = [
+            'kulcsszo' => $request->request->get('kulcsszo'),
+            'sort' => $request->request->get('sort', 'lastactive desc'),
+            'role' => $request->request->get('adminok', ''),
+        ];
 
-        $this->pagination->take = \App\Request::IntegerwDefault('take', 50);
-        $offset = $this->pagination->take * $this->pagination->active;
-        $take = $this->pagination->take;
+        $pagination = $this->initPagination();
+        $pagination->take = $request->request->get('take', 50);
 
-        $this->buildForm();
-        $this->buildQuery();
+        $offset = $pagination->take * $pagination->active;
+        $take = $pagination->take;
 
-        $maxResults = \count($this->query->get());
+        $form = $this->buildForm($query);
+        $buildQuery = $this->buildQuery($query);
+
+        $maxResults = \count($buildQuery->get());
 
         // Data for pagination
         $params = [];
-        foreach (['kulcsszo', 'sort', 'adminok', 'take'] as $param) {
-            if (isset($_REQUEST[$param]) && '' != $_REQUEST[$param] && '0' != $_REQUEST[$param]) {
+        foreach (['kulcsszo', 'sort', 'role', 'take'] as $param) {
+            if (isset($_REQUEST[$param]) && $_REQUEST[$param] != '' && $_REQUEST[$param] != '0') {
                 $params[$param] = $_REQUEST[$param];
             }
         }
-        $params['q'] = 'user/catalogue';
-        $url = \App\Pagination::qe($params, '/?');
-        $this->pagination->set($maxResults, $url);
 
-        $this->query->orderByRaw($this->input['sort']);
-        $results = $this->query->offset($offset)->limit($take)->get();
+        $url = Pagination::qe($params, '/user/catalogue?');
+        $pagination->set($maxResults, $url);
 
-        foreach ($results as $result) {
-            if (preg_match('/^(lastlogin|lastactive|regdatum)/i', $this->input['sort'], $match)) {
-                $field = preg_replace(['/ /i', '/-/i'], ['&nbsp;', '&#8209;'], $match[1]);
-            } else {
-                $field = 'lastlogin';
-            }
+        $buildQuery->orderByRaw($query['sort']);
+        $users = $buildQuery->offset($offset)
+            ->limit($take)
+            ->get();
 
-            $this->users[$result->uid] = new \App\User($result->uid);
+        if (preg_match('/^(lastlogin|lastactive|regdatum)/i', $query['sort'], $match)) {
+            $field = preg_replace(['/ /i', '/-/i'], ['&nbsp;', '&#8209;'], $match[1]);
+        } else {
+            $field = 'lastlogin';
         }
-        $this->field = $field;
+
+        return $this->render('user/catalogue.twig', [
+            'pagination' => $pagination,
+            'field' => $field,
+            'users' => $users,
+            'form' => $form,
+        ]);
     }
 
-    public function buildForm()
+    public function buildForm(array $query): array
     {
         $sortOptions = [
             'login' => 'felhasználó név',
@@ -74,62 +87,67 @@ class Catalogue extends \App\Html\Html
             'favorites desc' => 'kedvenc templomok',
         ];
 
-        $this->form = [
+        if (!\array_key_exists($query['sort'], $sortOptions)) {
+            throw new \Exception("Sajnos '".$query['sort']."' alapján nem lehet rendezni a felhasználókat.");
+        }
+
+        $form = [
             'kulcsszo' => [
                 'name' => 'kulcsszo',
-                'value' => $this->input['kulcsszo'],
+                'value' => $query['kulcsszo'],
                 'size' => 20,
             ],
             'sort' => [
                 'label' => 'Rendezés:',
                 'name' => 'sort',
                 'options' => $sortOptions,
-                'selected' => $this->input['sort'],
+                'selected' => $query['sort'],
             ],
             'adminok' => [
                 'label' => 'Jogkör:',
                 'name' => 'adminok',
                 'options' => [
                     '' => 'Mindenki'],
-                'selected' => $this->input['adminok'],
+                'selected' => $query['role'],
             ],
         ];
 
-        $roles = unserialize(ROLES);
+        $roles = $this->getConstants()::ROLES;
+
         foreach ($roles as $role) {
-            $this->form['adminok']['options'][$role] = $role;
+            $form['adminok']['options'][$role] = $role;
         }
 
-        if (!\array_key_exists($this->input['sort'], $sortOptions)) {
-            throw new \Exception("Sajnos '".$this->input['sort']."' alapján nem lehet rendezni a felhasználókat.");
-        }
+        return $form;
     }
 
-    public function buildQuery()
+    private function buildQuery(array $query): Builder
     {
-        $query = DB::table('user')
-                ->select('user.uid');
+        $queryBuilder = DB::table('user')
+                ->select('user.*');
 
-        if (!empty($this->input['adminok'])) {
-            $query->where('jogok', 'like', '%'.$this->input['adminok'].'%');
+        if (!empty($query['role'])) {
+            $queryBuilder->where('jogok', 'like', '%'.$query['role'].'%');
         }
 
-        if ('templomok desc' == $this->input['sort']) {
-            $query->addSelect(DB::raw('count(church_holders.church_id) as templomok'))->leftJoin('church_holders', 'church_holders.user_id', '=', 'user.uid')->where('church_holders.status', 'allowed')->groupBy('uid');
+        if ($query['sort'] == 'templomok desc') {
+            $queryBuilder->addSelect(DB::raw('count(church_holders.church_id) as templomok'))->leftJoin('church_holders', 'church_holders.user_id', '=', 'user.uid')->where('church_holders.status', 'allowed')->groupBy('uid');
         }
 
-        if ('favorites desc' == $this->input['sort']) {
-            $query->addSelect(DB::raw('count(favorites.tid) as favorites'))->leftJoin('favorites', 'favorites.uid', '=', 'user.uid')->groupBy('user.uid');
+        if ($query['sort'] == 'favorites desc') {
+            $queryBuilder->addSelect(DB::raw('count(favorites.tid) as favorites'))
+                ->leftJoin('favorites', 'favorites.uid', '=', 'user.uid')
+                ->groupBy('user.uid');
         }
 
-        if (!empty($this->input['kulcsszo'])) {
-            $input = $this->input;
-            $query->where(function ($q) use ($input) {
-                $q->where('user.login', 'like', '%'.$input['kulcsszo'].'%')
-                        ->orWhere('user.nev', 'like', '%'.$input['kulcsszo'].'%')
-                        ->orWhere('user.email', 'like', '%'.$input['kulcsszo'].'%');
+        if (!empty($query['kulcsszo'])) {
+            $queryBuilder->where(function ($q) use ($query) {
+                $q->where('user.login', 'like', '%'.$query['kulcsszo'].'%')
+                        ->orWhere('user.nev', 'like', '%'.$query['kulcsszo'].'%')
+                        ->orWhere('user.email', 'like', '%'.$query['kulcsszo'].'%');
             });
         }
-        $this->query = $query;
+
+        return $queryBuilder;
     }
 }
