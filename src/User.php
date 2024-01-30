@@ -9,6 +9,7 @@
 
 namespace App;
 
+use App\Legacy\Security;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class User
@@ -17,7 +18,7 @@ class User
     private ?string $name = null;
     private ?string $nickname = null;
     private ?string $email = null;
-    private $jogok;
+    private ?string $jogok = null;
     private $uid;
     private array $responsible = [];
     private $loggedin;
@@ -96,7 +97,11 @@ class User
         }
     }
 
-    public function checkRole($role = false)
+    /**
+     * @deprecated
+     * @see Security::isGranted()
+     */
+    public function checkRole($role = false): bool
     {
         if (false == $role) {
             return true;
@@ -753,9 +758,9 @@ class User
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getJogok()
+    public function getJogok(): ?string
     {
         return $this->jogok;
     }
