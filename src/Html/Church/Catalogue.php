@@ -9,9 +9,13 @@
 
 namespace App\Html\Church;
 
+use App\Html\Html;
+use App\Pagination;
 use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class Catalogue extends \App\Html\Html
+class Catalogue extends Html
 {
     private $filterDiocese;
     private $filterDeanery;
@@ -19,18 +23,15 @@ class Catalogue extends \App\Html\Html
     private $filterStatus;
     private $orderBy;
 
-    public function __construct()
+    public function list(Request $request): Response
     {
-        parent::__construct();
-
-        global $user;
-        if (!$user->checkRole('miserend')) {
+        if (!$this->getSecurity()->isGranted('miserend')) {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');
         }
 
         $this->filterKeyword = ($this->input['church']['keyword'] ?? false);
         $this->filterDiocese = ($this->input['church']['egyhazmegye'] ?? false);
-        $this->filterDeanery = ((isset($this->input['church']['espereskerulet']) && 0 != $this->input['church']['espereskerulet']) ? $this->input['church']['espereskerulet'] : false);
+        $this->filterDeanery = ((isset($this->input['church']['espereskerulet']) && $this->input['church']['espereskerulet'] != 0) ? $this->input['church']['espereskerulet'] : false);
         $this->filterStatus = ($this->input['church']['status'] ?? false);
         $this->orderBy = ($this->input['church']['orderBy'] ?? 'updated_at DESC');
 
@@ -42,7 +43,7 @@ class Catalogue extends \App\Html\Html
             'church[orderBy]' => $this->orderBy,
         ];
         foreach ($params as $key => &$param) {
-            if ('' == $param || 0 == $param) {
+            if ($param == '' || $param == 0) {
                 unset($params[$key]);
             }
         }
@@ -50,23 +51,29 @@ class Catalogue extends \App\Html\Html
         $this->loadForm();
         $this->buildQuery();
 
-        $url = \App\Pagination::qe($params);
-        $this->pagination->set($this->search->count(), $url);
+        $pagination = $this->initPagination();
 
-        $this->churches = $this->search->skip($this->pagination->skip)->take($this->pagination->take)->get();
+        $url = Pagination::qe($params);
+        $pagination->set($this->search->count(), $url);
+
+        $churches = $this->search->skip($pagination->skip)->take($pagination->take)->get();
 
         $accessibilityOSMTags = ['wheelchair', 'wheelchair:description', 'toilets:wheelchair', 'hearing_loop', 'disabled:description'];
 
-        foreach ($this->churches as $church) {
+        foreach ($churches as $church) {
             if ($church->osm) {
                 foreach ($accessibilityOSMTags as $tag) {
-                    if (\array_key_exists($tag, $church->osm->tagList) && '' != $church->osm->tagList[$tag]) {
+                    if (\array_key_exists($tag, $church->osm->tagList) && $church->osm->tagList[$tag] != '') {
                         $church->hasAccessibilityTag = true;
                         break;
                     }
                 }
             }
         }
+
+        return $this->render('church/catalogue.twig', [
+            'pagination' => $pagination,
+        ]);
     }
 
     public function loadForm()
@@ -122,11 +129,11 @@ class Catalogue extends \App\Html\Html
         }
 
         if ($this->filterStatus) {
-            if ('Ru' == $this->filterStatus) {
+            if ($this->filterStatus == 'Ru') {
                 $search = $search->whereHas('remarks', function ($query) {
                     $query->where('allapot', 'u');
                 });
-            } elseif ('Rf' == $this->filterStatus) {
+            } elseif ($this->filterStatus == 'Rf') {
                 $search = $search->whereHas('remarks', function ($query) {
                     $query->where('allapot', 'f');
                 });
@@ -136,7 +143,7 @@ class Catalogue extends \App\Html\Html
                 $search = $search->where('ok', $this->filterStatus);
             }
 
-            if ('M0' == $this->filterStatus) {
+            if ($this->filterStatus == 'M0') {
                 $search = $search->leftJoin(
                     DB::raw('('.
                             DB::table('misek')
@@ -158,7 +165,7 @@ class Catalogue extends \App\Html\Html
                         'updated_at DESC', 'updated_at', 'frissites DESC', 'frissites',
                         'nev', 'ismertnev', 'varos'])) {
                 $search = $search->orderByRaw($this->orderBy);
-            } elseif ('remarks.created_at' == $this->orderBy) {
+            } elseif ($this->orderBy == 'remarks.created_at') {
                 $search = $search->leftJoin(
                     DB::raw('('.
                             DB::table('remarks')
