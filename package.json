@@ -9,6 +9,7 @@
     "@symfony/stimulus-bridge": "^3.2.2",
     "@symfony/webpack-encore": "^4.5.0",
     "bootstrap": "5.3.2",
+    "bootstrap-icons": "^1.11.3",
     "bootstrap5-autocomplete": "^1.1.25",
     "composer": "*",
     "file-loader": "^6.2.0",
@@ -28,7 +29,5 @@
     "dev": "encore dev",
     "watch": "encore dev --watch",
     "build": "encore production --progress"
-  },
-  "dependencies": {
   }
 }
