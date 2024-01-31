@@ -63,6 +63,10 @@ class User
 
             if ($user) {
                 foreach ($user as $key => $value) {
+                    if ($key === 'password_change_hash') {
+                        continue;
+                    }
+
                     $this->{'set'.ucfirst($key)}($value);
                 }
                 $this->username = $user->login;
