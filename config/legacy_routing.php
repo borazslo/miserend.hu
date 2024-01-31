@@ -46,6 +46,8 @@ $simpleLegacyRouteWithMethod = [
 
     'church_list' => ['/templom/list', Church\Catalogue::class, 'list'],
     'church_create' => ['/church/create', Church\Create::class, 'create'],
+    'church_favorite' => ['/church/favorite', Html\Ajax\Favorite::class, 'favorite'],
+    'ajax_church_favorite' => ['/ajax/favorite', Html\Ajax\Favorite::class, 'favorite'],
 
     'ajax_chat_load' => ['/ajax/chat/load', Html\Ajax\Chat::class, 'load'],
     'ajax_chat_send' => ['/ajax/chat/send', Html\Ajax\Chat::class, 'send'],
