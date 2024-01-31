@@ -23,9 +23,6 @@ $simpleLegacyRoutes = [
     'ajax_autocomplete_city' => ['/ajax/AutocompleteCity', Ajax\AutocompleteKeyword::class],
     'ajax_boundarygeojson' => ['/ajax/boundarygeojson', Ajax\BoundaryGeoJson::class],
     'ajax_churclink' => ['/ajax/churclink', Ajax\ChurchLink::class],
-    'about' => ['/impresszum', Html\StaticPage::class],
-    'gdpr' => ['/gdpr', Html\StaticPage::class],
-    'terms_and_conditions' => ['/hazirend', Html\StaticPage::class],
 ];
 
 foreach ($simpleLegacyRoutes as $routeName => [$path, $className]) {
@@ -52,6 +49,10 @@ $simpleLegacyRouteWithMethod = [
     'ajax_chat_load' => ['/ajax/chat/load', Html\Ajax\Chat::class, 'load'],
     'ajax_chat_send' => ['/ajax/chat/send', Html\Ajax\Chat::class, 'send'],
     'ajax_chat_users' => ['/ajax/chat/users', Html\Ajax\Chat::class, 'users'],
+
+    'about' => ['/impresszum', Html\StaticPage::class, 'staticPage'],
+    'gdpr' => ['/gdpr', Html\StaticPage::class, 'staticPage'],
+    'terms_and_conditions' => ['/hazirend', Html\StaticPage::class, 'staticPage'],
 ];
 
 foreach ($simpleLegacyRouteWithMethod as $routeName => [$path, $className, $method]) {

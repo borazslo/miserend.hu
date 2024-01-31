@@ -9,10 +9,19 @@
 
 namespace App\Html;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 class StaticPage extends Html
 {
-    public function __construct(array $routeParams)
+    public function staticPage(Request $request): Response
     {
-        $this->template = 'static_page/'.$routeParams['_route'].'.twig';
+        $templateFilename = match ($routeName = $request->attributes->get('_route')) {
+            'terms_and_conditions', 'gdpr', 'about' => 'static_page/'.$routeName.'.twig',
+            default => throw new NotFoundHttpException(),
+        };
+
+        return $this->render($templateFilename);
     }
 }
