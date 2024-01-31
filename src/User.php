@@ -12,6 +12,9 @@ namespace App;
 use App\Legacy\Security;
 use Illuminate\Database\Capsule\Manager as DB;
 
+/**
+ * @deprecated Megszunik a user wrapper.
+ */
 class User
 {
     private ?string $username = null;
