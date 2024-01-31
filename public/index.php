@@ -48,6 +48,34 @@ try {
         throw new \Exception('Az oldal nem található');
     }
 
+    if (isset($matchedRoute['handler']) && 'symfony' === $matchedRoute['handler']) {
+        $app->loadDotenv();
+
+        $response = $app->forwardToSymfony($request);
+
+        if (Kernel::VERSION_ID >= 60400) {
+            $response->send(false);
+
+            if (\function_exists('fastcgi_finish_request') && !$app->getDebug()) {
+                fastcgi_finish_request();
+            } else {
+                Response::closeOutputBuffers(0, true);
+                flush();
+            }
+        } else {
+            $response->send();
+        }
+
+        if ($app->getKernel() instanceof TerminableInterface) {
+            $app->getKernel()->terminate($request, $response);
+        }
+
+        exit(0);
+    }
+
+    // todo ez csak dev es teszt kornyezetben fusson
+    Debug::enable();
+
     if (isset($matchedRoute['_class'])) {
         $className = $matchedRoute['_class'];
 
@@ -81,36 +109,6 @@ try {
         exit(0);
     }
 
-    if (isset($matchedRoute['handler']) && 'symfony' === $matchedRoute['handler']) {
-        $app->loadDotenv();
-
-        $response = $app->forwardToSymfony($request);
-
-        if (Kernel::VERSION_ID >= 60400) {
-            $response->send(false);
-
-            if (\function_exists('fastcgi_finish_request') && !$app->getDebug()) {
-                fastcgi_finish_request();
-            } else {
-                Response::closeOutputBuffers(0, true);
-                flush();
-            }
-        } else {
-            $response->send();
-        }
-
-        if ($app->getKernel() instanceof TerminableInterface) {
-            $app->getKernel()->terminate($request, $response);
-        }
-
-        exit(0);
-    }
-
-/*
-    if ($path->url == 'home' AND isset($_REQUEST['templom'])) {
-        $path = new Path('templom/' . $_REQUEST['templom']);
-    }
-  */
 } catch (\Exception $e) {
     dump($e);
     exit;
