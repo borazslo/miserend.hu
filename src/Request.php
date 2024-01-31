@@ -9,6 +9,7 @@
 
 namespace App;
 
+/** @deprecated  */
 class Request
 {
     public static function Integer($name)

@@ -152,26 +152,6 @@ $(document).on('click','.massinfo',function(){
 
 });
 
-// favorites
-$(document).on('click','#star',function(){
-    var $this= $(this);
-
-    if($(this).hasClass('grey')) var method = 'add';
-    else var method = 'del';
-    var tid = $(this).attr("data-tid");
-
-    $.ajax({
-        type:"POST",
-        url:"/ajax/favorite",
-        data:"tid="+tid+"&method="+method,
-        success:function(response){
-            $("#star").toggleClass("grey yellow");
-            if($("#star").hasClass('grey')) $("#star").attr('title', 'Kattintásra hozzáadás a kedvencekhez.');
-            else $("#star").attr('title', 'Kattintásra törlés a kedvencek közül.');
-        },
-    });
-});
-
 
 $(document).on('click','.reliable',function(){
 

@@ -6,28 +6,18 @@ export default class extends Controller {
 
     connect() {
         this.initStatus()
-//         $(document).on('click','#star',function(){
-//             var $this= $(this);
-//
-//             if($(this).hasClass('grey')) var method = 'add';
-//             else var method = 'del';
-//             var tid = $(this).attr("data-tid");
-//
-//             $.ajax({
-//                 type:"POST",
-//                 url:"/ajax/favorite",
-//                 data:"tid="+tid+"&method="+method,
-//                 success:function(response){
-//                     $("#star").toggleClass("grey yellow");
-//                     if($("#star").hasClass('grey')) $("#star").attr('title', 'Kattintásra hozzáadás a kedvencekhez.');
-//                     else $("#star").attr('title', 'Kattintásra törlés a kedvencek közül.');
-//                 },
-//             });
-//         });
     }
 
     initStatus() {
-        this.favorite = this.element.classList.contains('favorite-status-liked')
+        this.favorite = this.element.classList.contains('text-warning')
+    }
+
+    updateIcon() {
+        if (this.favorite) {
+            this.element.classList.add('text-warning')
+        } else {
+            this.element.classList.remove('text-warning')
+        }
     }
 
     get churchId() {
@@ -51,7 +41,7 @@ export default class extends Controller {
         if (this.favorite) {
             body = {
                 method: 'del',
-                tid: this.churchId
+                'church-id': this.churchId
             }
         } else {
             body = {
@@ -85,15 +75,5 @@ export default class extends Controller {
         }
 
         this.loading = false
-    }
-
-    updateIcon() {
-        if (this.favorite) {
-            this.element.classList.add('favorite-status-liked')
-            this.element.classList.remove('favorite-status-not-liked')
-        } else {
-            this.element.classList.remove('favorite-status-liked')
-            this.element.classList.add('favorite-status-not-liked')
-        }
     }
 }

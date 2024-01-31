@@ -5,7 +5,7 @@
 {% block pageHeader %}
     <div class="page-header">
         <h2>
-            <span class="ui-icon ui-icon-star {% if favorite|default(-1) == 1 %}favorite-status-liked{% else %}favorite-status-not-liked{% endif %}"
+            <span class="bi bi-star-fill {% if favorite|default(-1) == 1 %}text-warning{% endif %}"
                   data-controller="favorite"
                   data-action="click->favorite#favoriteButtonDidClick"
                   data-church-id="{{ church.id }}">

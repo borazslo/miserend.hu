@@ -16,6 +16,7 @@ Encore
         pattern: /\.(png|jpg|jpeg|gif|svg)$/
     })
 
+    .enableSassLoader()
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()

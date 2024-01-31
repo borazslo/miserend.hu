@@ -19,7 +19,9 @@
     "jquery-ui": "1.13.2",
     "leaflet": "^1.9.4",
     "lightbox2": "2.*",
-    "requirejs": "2.1.11"
+    "requirejs": "2.1.11",
+    "sass": "^1.70.0",
+    "sass-loader": "^13.3.3"
   },
   "config": {
     "unsafe-perm": true
