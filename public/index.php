@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 $app = require_once '../src/Legacy/bootstrap.php';
 
@@ -79,11 +78,6 @@ try {
     if (isset($matchedRoute['_class'])) {
         $className = $matchedRoute['_class'];
 
-        $reflection = new \ReflectionClass($className);
-
-        $container = null;
-        $html = null;
-
         $container = $app->buildContainer($className::getSubscribedServices());
         $container->get(\Illuminate\Database\Capsule\Manager::class);
 
@@ -91,8 +85,6 @@ try {
         $security = $container->get(Security::class);
         $security->captureAuthentication();
         $security->captureLogout();
-
-        $user = $security->getUser();
 
         $html = new $className();
 
