@@ -9,6 +9,7 @@
 
 namespace App\Legacy;
 
+use App\Chat;
 use App\Kernel;
 use App\Twig\Extensions\WebpackCompatibilityExtension;
 use App\User;
@@ -180,6 +181,14 @@ class Application
             ->setPublic(true);
     }
 
+    private function registerChat(ContainerBuilder $builder): void
+    {
+        $builder->register(Chat::class, Chat::class)
+            ->setAutowired(true)
+            ->setLazy(true)
+            ->setPublic(true);
+    }
+
     public function buildContainer(array $subscribedServices): ContainerInterface
     {
         $containerBuilder = new ContainerBuilder();
@@ -187,6 +196,7 @@ class Application
         $this->registerSecurity($containerBuilder);
         $this->registerConfiguration($containerBuilder);
         $this->registerDatabase($containerBuilder);
+        $this->registerChat($containerBuilder);
         $containerBuilder->compile();
 
         return $containerBuilder;

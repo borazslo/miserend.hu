@@ -114,7 +114,9 @@
             <div class="col-md-3  col-sm-3 church-site-left-sidebar">
                 <!--{% include 'search/quicksearchform.twig' %}-->
                 {% block leftsidebar %}{% endblock %}
-                {% if chat %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
+                {% if chat %}
+                    {% include 'chat/chatbox.twig' %}
+                {% endif %}
                 {% if mychurches %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
                 {% if selfAdvertisement %}{% include "_panelselfadvertisement.twig" %}{% endif %}
             </div>

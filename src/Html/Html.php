@@ -85,12 +85,8 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
             $variables['mychurches'] = feltoltes_block();
         }
 
-        if ($user->checkRole('"any"')) {
-            $chat = new Chat();
-            $chat->load();
-            $chat = collect($chat)->toArray();
-
-            $variables['chat'] = $chat;
+        if ($security->isGranted('"any"')) {
+            $variables['chat'] = true;
         }
 
         $variables['messages'] = $this->getMessageRepository()->getToShow();
@@ -143,6 +139,11 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
     protected function getConstants(): ConstantsProvider
     {
         return $this->container->get(ConstantsProvider::class);
+    }
+
+    protected function getChat(): Chat
+    {
+        return $this->container->get(Chat::class);
     }
 
     public static function getSubscribedServices(): array

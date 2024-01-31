@@ -9,48 +9,65 @@
 
 namespace App;
 
+use App\Legacy\Security;
 use Illuminate\Database\Capsule\Manager as DB;
+use Twig\Environment;
 
 class Chat
 {
-    public $limit = 10;
-    public $alert = 0;
-
-    public function load()
+    public function __construct(
+        private readonly Security $security,
+    )
     {
-        $this->loadComments();
-        $this->lastcomment = $this->comments[0]['datum_raw'] ?? false;
-        $this->getUsers('html');
     }
 
-    public function loadComments($args = [])
+    public int $limit = 10;
+    public int $alert = 0;
+
+    /**
+     * @return array{
+     *     comments: array,
+     *     last_comment_at: int|null,
+     *     rendered_users: array,
+     * }
+     */
+    public function load(): array
     {
-        global $user, $twig;
+        $comments = $this->loadComments();
+        $lastCommentAt = $comments[0]['datum_raw'] ?? null;
+        $renderedUsers = $this->renderUsers();
 
-        $this->comments = [];
+        return [
+            'comments' => $comments,
+            'last_comment_at' => $lastCommentAt,
+            'rendered_users' => $renderedUsers,
+        ];
+    }
 
-        $loginkiir1 = urlencode($user->getLogin());
+    /** @todo sorrendezes helyreallitasa ha hasznalva van egyaltalan */
+    public function loadComments(array $args = []): array
+    {
+        $user = $this->security->getUser();
 
-        $comments = DB::table('chat')->where(function ($query) {
-            global $user;
-            $query->orWhere('kinek', '')
-                ->orWhere('kinek', $user->getLogin())
-                ->orWhere('user', $user->getLogin());
-        })
+        $commentsQueryBuilder = DB::table('chat')
+            ->orWhere('kinek', '')
+            ->orWhere('kinek', $user->getLogin())
+            ->orWhere('user', $user->getLogin())
             ->orderBy('datum', 'DESC')
             ->limit($this->limit);
+
         if (isset($args['last'])) {
-            $comments = $comments->where('datum', '>', $args['last']);
+            $commentsQueryBuilder->where('datum', '>', $args['last']);
         }
         if (isset($args['first'])) {
-            $comments = $comments->where('datum', '<', $args['first']);
+            $commentsQueryBuilder->where('datum', '<', $args['first']);
         }
 
-        $comments = $comments->get();
-        $comments = collect($comments)->map(function ($x) {
+        $comments = collect($commentsQueryBuilder->get())->map(function ($x) {
             return (array) $x;
         })->toArray();
 
+        $buffer = [];
         foreach ($comments as $row) {
             $row['datum_raw'] = $row['datum'];
             if (date('Y', strtotime($row['datum'])) < date('Y')) {
@@ -94,21 +111,24 @@ class Chat
                 $row['szoveg']
             );
 
-            $row['html'] = $twig->render('chat/chatcomment.twig', ['comment' => $row]);
             if ($row['user'] != $user->getLogin()) {
                 ++$this->alert;
             }
 
-            $this->comments[] = $row;
+            $buffer[] = $row;
         }
 
-        return $this->comments;
+        return $buffer;
     }
 
-    public function getUsers($format = false)
+    /**
+     * @param string|bool $format
+     * @return array|string
+     */
+    public function getUsers(): array
     {
-        global $user;
-        $return = [];
+        $user = $this->security->getUser();
+        $users = [];
 
         $onlineUsers = DB::table('user')
             ->select('login')
@@ -119,21 +139,23 @@ class Chat
             ->get();
 
         foreach ($onlineUsers as $onlineUser) {
-            $return[] = $onlineUser->login;
+            $users[] = $onlineUser->login;
         }
 
-        if ('html' == $format) {
-            foreach ($return as $k => $i) {
-                $return[$k] = '<span class="response_closed" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
-            }
-            $text = '<strong>Online adminok:</strong> '.implode(', ', $return);
-            if (0 == \count($return)) {
-                $text = '<strong><i>Nincs (más) admin online.</i></strong>';
-            }
-            $return = $text;
-        }
-        $this->users = $return;
+        return $users;
+    }
 
-        return $this->users;
+    public function renderUsers(): string
+    {
+        $users = $this->getUsers();
+
+        foreach ($users as $k => $i) {
+            $users[$k] = '<span class="response_closed" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
+        }
+        $text = '<strong>Online adminok:</strong> '.implode(', ', $users);
+        if (0 == \count($users)) {
+            $text = '<strong><i>Nincs (más) admin online.</i></strong>';
+        }
+        return $text;
     }
 }

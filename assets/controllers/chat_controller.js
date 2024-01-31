@@ -1,9 +1,72 @@
+import { Controller } from '@hotwired/stimulus';
+import Autocomplete from 'bootstrap5-autocomplete';
+
+export default class extends Controller {
+    static targets = ['message']
+
+    connect() {
+        this.sendInProgress = false
+        this.initEventListeners()
+    }
+
+    initEventListeners() {
+        window.addEventListener('focus', this.windowDidFocus.bind(this))
+        window.addEventListener('blur', this.windowDidBlur.bind(this))
+    }
+
+    windowDidFocus(event) {
+        console.log('focus')
+    }
+
+    windowDidBlur(event) {
+        console.log('blur')
+    }
+
+    sendButtonDidClick(event) {
+        event.preventDefault()
+
+        this.sendMessage()
+    }
+
+    async sendMessage() {
+        let message = this.messageTarget.value
+
+        if (message.length === 0) {
+            return
+        }
+
+        if (this.sendInProgress) {
+            return
+        }
+
+        this.sendInProgress = true
+
+        const response = await fetch('/ajax/chat/send', {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: "same-origin", // include, *same-origin, omit
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "follow", // manual, *follow, error
+            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data), // body data type must match "Content-Type" header
+        });
+        return response.json();
+
+        this.sendInProgress = false
+
+        console.log(message)
+    }
+}
+
+/*
 	var focus = true;
 	var loadmore = false;
 	var title = document.title;
 
  	$(document).ready(function() {
- 		
+
 
 		$(window).focus(function(){
 			focus = true;
@@ -54,7 +117,7 @@
 
 		$("body").on('click', '#chat_loadnext', function() {
 			$.post( "/ajax/chat", { action: "load", date: $( this ).prev().data("date"), rev: true }, function( data ) {
-	  			if(data.result === "loaded") {  
+	  			if(data.result === "loaded") {
 	  				var index;
 					for (index = 0; index < data.comments.length; ++index) {
 					 	$('#chat_loadnext').before(data.comments[index].html);
@@ -63,7 +126,7 @@
 	  			else {
 					$("#chat_text").html('<i>Hiba történt betöltés közben.</i>');
 	  				return false;
-	  			} 
+	  			}
 		},'json');
  		});
 
@@ -87,14 +150,14 @@
 		    }
 		}
 
-		var content_id = 'chat_text';  
+		var content_id = 'chat_text';
 
 		max = 250;
 		//binding keyup/down events on the contenteditable div
 		$('#'+content_id).keyup(function(e){ check_charcount(content_id, max, e); });
 		$('#'+content_id).keydown(function(e){ check_charcount(content_id, max, e); });
 		function check_charcount(content_id, max, e)
-		{   
+		{
 		    if(e.which != 8 && $('#'+content_id).text().length > max)
 		    {
 		       // $('#'+content_id).text($('#'+content_id).text().substring(0, max));
@@ -114,14 +177,14 @@
 		} else c++;
 	},5000);
 
-	
+
 	function chat_send() {
 		if($("#chat_text").text() != "") {
 
 			var string = $("#chat_text").html();
 			string = $('<div/>').html(string.replace(/(<br>)/ig,"\\n"));
 			string = $('<div/>').html(string.html().replace(/^(<img.*?>)/ig,"$"));
-	 		 		
+
 	 		var text = $(string).text();
 	 		$("#chat_text").html('<i>Küldés folyamatban...</i>');
 	 		$.post( "/ajax/chat", { action: "save", text: text }, function( data ) {
@@ -142,11 +205,11 @@
 	function chat_update(clear) {
 		$.post( "/ajax/chat", { action: "load", date: $("#chat_comments").data("last") }, function( data ) {
 
-	  			if(data.result === "loaded") {  
+	  			if(data.result === "loaded") {
 	  				var index;
 					for (index = 0; index < data.comments.length; ++index) {
 					    $(data.comments[index].html).hide().prependTo('#chat_comments').show('slow');
-						
+
 					}
 
 					if(data.new > 0) {
@@ -157,7 +220,7 @@
 					if(focus == false) {
 						var unread = $("#chat_comments").data('unread') + data.alert;
 						$("#chat_comments").data('unread',unread);
-					
+
 						if (unread > 0) {
 				      		setTimeout(function(){
 				        		document.title = '(' + unread + ') ' + title;
@@ -173,14 +236,15 @@
 	  			else {
 					$("#chat_text").html('<i>Hiba történt a frissítés közben.</i>');
 	  				return false;
-	  			} 
+	  			}
 		},'json');
 	}
 
 	function chat_users() {
 		$.post( "/ajax/chat", { action: "getusers" }, function( data ) {
-	  			if(data.result === "loaded") { 
+	  			if(data.result === "loaded") {
 	  				$("#chat_users").html(data.text);
 	  			}
 	  	},'json');
 	}
+ */

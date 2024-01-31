@@ -48,6 +48,10 @@ $simpleLegacyRouteWithMethod = [
 
     'church_list' => ['/templom/list', Church\Catalogue::class, 'list'],
     'church_create' => ['/church/create', Church\Create::class, 'create'],
+
+    'ajax_chat_load' => ['/ajax/chat/load', Html\Ajax\Chat::class, 'load'],
+    'ajax_chat_send' => ['/ajax/chat/send', Html\Ajax\Chat::class, 'send'],
+    'ajax_chat_users' => ['/ajax/chat/users', Html\Ajax\Chat::class, 'users'],
 ];
 
 foreach ($simpleLegacyRouteWithMethod as $routeName => [$path, $className, $method]) {
