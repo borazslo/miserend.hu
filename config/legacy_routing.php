@@ -41,6 +41,7 @@ $simpleLegacyRouteWithMethod = [
     'stats' => ['/stat', Html\Stat::class, 'stat'],
 
     'user_new' => ['/user/new', User\Edit::class, 'registration'],
+    'user_profile' => ['/user/edit', User\Edit::class, 'edit'],
     'user_list' => ['/user/catalogue', User\Catalogue::class, 'list'],
 
     'church_list' => ['/templom/list', Church\Catalogue::class, 'list'],
