@@ -14,6 +14,7 @@ use App\Legacy\Application;
 use App\Legacy\ContainerAwareInterface;
 use App\Legacy\Response\HttpResponseInterface;
 use App\Legacy\Security;
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\TerminableInterface;
@@ -127,6 +128,7 @@ try {
         }
     }
 }
+
 if (isset($html)) {
     if ($html instanceof HttpResponseInterface) {
         $response = $html->getResponse();
