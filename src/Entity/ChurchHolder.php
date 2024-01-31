@@ -9,8 +9,8 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\FieldModificationDateTimeInterface;
-use App\Entity\Traits\FieldModificationDateTimeTrait;
+use App\Entity\Interfaces\EntityModificationDateTimeInterface;
+use App\Entity\Traits\EntityModificationDateTimeTrait;
 use App\Repository\ChurchRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,9 +20,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: ChurchRepository::class)]
 #[ORM\Table(name: 'church_holders')]
-class ChurchHolder implements FieldModificationDateTimeInterface
+class ChurchHolder implements EntityModificationDateTimeInterface
 {
-    use FieldModificationDateTimeTrait;
+    use EntityModificationDateTimeTrait;
 
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]

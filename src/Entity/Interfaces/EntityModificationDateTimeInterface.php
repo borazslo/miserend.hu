@@ -2,7 +2,7 @@
 
 namespace App\Entity\Interfaces;
 
-interface FieldModificationDateTimeInterface
+interface EntityModificationDateTimeInterface
 {
     public function getCreatedAt(): ?\DateTimeImmutable;
     public function getUpdatedAt(): ?\DateTimeImmutable;

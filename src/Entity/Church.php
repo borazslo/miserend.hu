@@ -9,8 +9,8 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\FieldModificationDateTimeInterface;
-use App\Entity\Traits\FieldModificationDateTimeTrait;
+use App\Entity\Interfaces\EntityModificationDateTimeInterface;
+use App\Entity\Traits\EntityModificationDateTimeTrait;
 use App\Repository\ChurchRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,9 +24,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ORM\Entity(repositoryClass: ChurchRepository::class)]
 #[ORM\Table(name: 'templomok')]
-class Church implements FieldModificationDateTimeInterface
+class Church implements EntityModificationDateTimeInterface
 {
-    use FieldModificationDateTimeTrait;
+    use EntityModificationDateTimeTrait;
 
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]

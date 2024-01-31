@@ -12,7 +12,7 @@ namespace App\Entity\Traits;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-trait FieldModificationDateTimeTrait
+trait EntityModificationDateTimeTrait
 {
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]
     private ?\DateTimeImmutable $createdAt = null;
@@ -40,7 +40,7 @@ trait FieldModificationDateTimeTrait
 
     public function createEntity(): void
     {
-        if (null === $this->createdAt) {
+        if ($this->createdAt === null) {
             $this->createdAt = new \DateTimeImmutable();
             $this->updateEntity();
         }
@@ -53,7 +53,7 @@ trait FieldModificationDateTimeTrait
 
     public function deleteFrom(\DateTimeImmutable $from = null): void
     {
-        if (null !== $this->deletedAt) {
+        if ($this->deletedAt !== null) {
             $this->deletedAt = $from ?? new \DateTimeImmutable();
         }
     }
