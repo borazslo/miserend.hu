@@ -5,7 +5,7 @@
 {% block pageHeader %}
     <div class="page-header">
         <h2>
-            <span class="bi bi-star-fill {% if favorite|default(-1) == 1 %}text-warning{% endif %}"
+            <span class="bi bi-star-fill {% if app.user and app.user.churchFavorite(church) %}text-warning{% endif %}"
                   data-controller="favorite"
                   data-action="click->favorite#favoriteButtonDidClick"
                   data-church-id="{{ church.id }}">

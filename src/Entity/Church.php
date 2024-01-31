@@ -12,6 +12,8 @@ namespace App\Entity;
 use App\Entity\Interfaces\EntityModificationDateTimeInterface;
 use App\Entity\Traits\EntityModificationDateTimeTrait;
 use App\Repository\ChurchRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @todo updated at bevezetese
  * @todo created at bevezetese
  * @todo slug update
+ * @todo atnevezni churches-re
  */
 #[ORM\Entity(repositoryClass: ChurchRepository::class)]
 #[ORM\Table(name: 'templomok')]
@@ -28,6 +31,9 @@ class Church implements EntityModificationDateTimeInterface
 {
     use EntityModificationDateTimeTrait;
 
+    /**
+     * @TODO atnevezni church_id-ra
+     */
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\GeneratedValue('AUTO')]
@@ -106,6 +112,17 @@ class Church implements EntityModificationDateTimeInterface
      */
     #[Orm\OneToOne(mappedBy: 'church', targetEntity: ChurchHolder::class)]
     private ?ChurchHolder $holder = null;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'favorites')]
+    #[ORM\JoinTable(name: 'favorites')]
+    #[ORM\JoinColumn(name: 'church_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'uid', unique: true)]
+    private ?Collection $usersWhoFavored;
+
+    public function __construct()
+    {
+        $this->usersWhoFavored = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -223,5 +240,20 @@ class Church implements EntityModificationDateTimeInterface
     public function setHolder(?ChurchHolder $holder): void
     {
         $this->holder = $holder;
+    }
+
+    public function getUsersWhoFavored(): array
+    {
+        return $this->usersWhoFavored->toArray();
+    }
+
+    public function addUserWhoFavored(User $user): void
+    {
+        $this->usersWhoFavored[] = $user;
+    }
+
+    public function removeUserWhoFavored(User $user): void
+    {
+        $this->usersWhoFavored->removeElement($user);
     }
 }

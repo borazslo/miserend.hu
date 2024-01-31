@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -50,6 +51,21 @@ class User implements PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::STRING, length: 32, nullable: true)]
     private ?string $passwordChangeHash = null;
+
+    /**
+     * Kedvencek, owning side.
+     *
+     * @var Collection|null
+     */
+    #[ORM\ManyToMany(targetEntity: Church::class, mappedBy: 'usersWhoFavored')]
+    #[ORM\JoinTable(name: 'favorites')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'uid')]
+    #[ORM\InverseJoinColumn(name: 'church_id', referencedColumnName: 'id', unique: true)]
+    private ?Collection $favorites;
+
+    public function __construct()
+    {
+    }
 
     public function getId(): ?int
     {
@@ -198,5 +214,30 @@ class User implements PasswordAuthenticatedUserInterface
         $this->passwordChangeHash = $passwordChangeHash;
 
         return $this;
+    }
+
+    /**
+     * @return array<int, Church>
+     */
+    public function getFavorites(): array
+    {
+        return $this->favorites->toArray();
+    }
+
+    public function addFavorite(Church $church): void
+    {
+        $church->addUserWhoFavored($this);
+        $this->favorites[] = $church;
+    }
+
+    public function removeFavorite(Church $church): void
+    {
+        $church->removeUserWhoFavored($this);
+        $this->favorites->removeElement($church);
+    }
+
+    public function isChurchFavorite(Church $church): bool
+    {
+        return $this->favorites->contains($church);
     }
 }
