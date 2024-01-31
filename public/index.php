@@ -10,6 +10,7 @@
 namespace App;
 
 use App\Html\Html;
+use App\Legacy\Application;
 use App\Legacy\ContainerAwareInterface;
 use App\Legacy\Response\HttpResponseInterface;
 use App\Legacy\Security;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 $app = require_once '../src/Legacy/bootstrap.php';
+assert($app instanceof Application);
 
 try {
     if (\PHP_SAPI == 'cli') {
