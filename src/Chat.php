@@ -144,18 +144,4 @@ class Chat
 
         return $users;
     }
-
-    public function renderUsers(): string
-    {
-        $users = $this->getUsers();
-
-        foreach ($users as $k => $i) {
-            $users[$k] = '<span class="response_closed" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
-        }
-        $text = '<strong>Online adminok:</strong> '.implode(', ', $users);
-        if (0 == \count($users)) {
-            $text = '<strong><i>Nincs (más) admin online.</i></strong>';
-        }
-        return $text;
-    }
 }
