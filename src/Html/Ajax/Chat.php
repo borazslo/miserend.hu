@@ -106,8 +106,7 @@ class Chat extends Ajax
             'szoveg' => $message,
         ];
 
-        $insertResult = !DB::table('chat')->insert($fields);
-
+        $insertResult = DB::table('chat')->insert($fields);
         if (!$insertResult) {
             return $this->errorResponse('Hiba történt: nem sikerült menteni az üzenetet!', Response::HTTP_INTERNAL_SERVER_ERROR);
         }

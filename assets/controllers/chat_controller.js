@@ -15,17 +15,39 @@ export default class extends Controller {
     }
 
     windowDidFocus(event) {
-        console.log('focus')
+        // console.log('focus')
     }
 
     windowDidBlur(event) {
-        console.log('blur')
+        // console.log('blur')
     }
 
     sendButtonDidClick(event) {
         event.preventDefault()
 
         this.sendMessage()
+    }
+
+    parseMessage(rawMessage) {
+        // formatum: $recipient: message
+
+        let match = rawMessage.match(/^\$(\w+):?(.*)$/)
+        if (match) {
+            return {
+                recipient: match[1],
+                message: match[2].trim(),
+            }
+        }
+
+        match = rawMessage.match(/^(.*)$/)
+
+        return {
+            message: match[1].trim(),
+        }
+    }
+
+    resetMessage() {
+        this.messageTarget.value = '' // recipient kezelese
     }
 
     async sendMessage() {
@@ -39,24 +61,41 @@ export default class extends Controller {
             return
         }
 
+        let payload = this.parseMessage(message)
+
+        if (payload.message.length === 0) {
+            return
+        }
+
         this.sendInProgress = true
 
-        const response = await fetch('/ajax/chat/send', {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: "same-origin", // include, *same-origin, omit
-            headers: {
-                "Content-Type": "application/json",
-            },
-            redirect: "follow", // manual, *follow, error
-            referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: JSON.stringify(data), // body data type must match "Content-Type" header
-        });
-        return response.json();
+        try {
+            const response = await fetch('/ajax/chat/send', {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: "same-origin", // include, *same-origin, omit
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                redirect: "follow", // manual, *follow, error
+                referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify({payload: payload}), // body data type must match "Content-Type" header
+            });
+
+            let responseObject = await response.json();
+
+            if (responseObject.code !== 200) {
+                // hiba
+            } else {
+                this.resetMessage()
+            }
+
+        } catch (error) {
+            // hiba kiirasa?
+        }
+
 
         this.sendInProgress = false
-
-        console.log(message)
     }
 }
 
