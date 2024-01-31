@@ -15,7 +15,7 @@ class EventsCatalogue extends Html
 {
     public function __construct($path)
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         if (!$user->checkRole('miserend')) {
             throw new \Exception('Nincs jogosultságod megnézni az események listáját.');

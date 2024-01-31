@@ -16,7 +16,7 @@ class System extends Html
         parent::__construct();
         $this->setTitle('System');
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         if (!$user->isadmin) {
             addMessage('Hozzáférés megtagadva!', 'danger');

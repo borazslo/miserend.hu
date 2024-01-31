@@ -213,14 +213,14 @@ class Church extends Model
 
     public function getReadAccessAttribute($value)
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         return $this->checkReadAccess($user);
     }
 
     public function getWriteAccessAttribute($value)
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         return $this->checkWriteAccess($user);
     }
@@ -435,7 +435,7 @@ class Church extends Model
             $access = true;
         }
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if ($user->getUid() == $_user->getUid()) {
             $this->readAcess = $access;
         }
@@ -459,7 +459,7 @@ class Church extends Model
             $access = true;
         }
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if ($user->getUid() == $_user->getUid()) {
             $this->writeAcess = $access;
         }

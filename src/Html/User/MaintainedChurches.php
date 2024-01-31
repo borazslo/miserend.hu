@@ -16,7 +16,7 @@ class MaintainedChurches extends \App\Html\Html
         $this->setTitle('Módosítható templomok és miserendek');
         $this->title = 'Módosítható templomok és miserendek';
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if (!\is_array($user->responsible['church'])) {
             addMessage('Nincs olyan templom, amit módosíthatnál.', 'info');
 

@@ -37,7 +37,7 @@ class EditSchedule extends \App\Html\Html
 
     public function modify()
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         $most = date('Y-m-d H:i:s');
 

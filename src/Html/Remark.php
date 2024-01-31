@@ -20,7 +20,7 @@ class Remark extends Html
 
     public function add(Request $request): Response
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $config = $this->getConfig();
 
         $churchId = $request->attributes->getInt('church_id');
@@ -103,7 +103,7 @@ switch ($this->action) {
             }
         }
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if (!$this->church->writeAccess) {
             addMessage('Hiányzó jogosultság. Elnézést.', 'danger');
 

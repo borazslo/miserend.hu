@@ -50,7 +50,7 @@ class ChangeHolders extends Html
             $data['description'] = $description;
         }
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if ($user->getUid() == $where['user_id'] && 'asked' == $data['status']) {
             if ('needed' == $confirmation) {
                 $churchHolder = ChurchHolder::where('user_id', $where['user_id'])->where('church_id', $where['church_id'])->first();

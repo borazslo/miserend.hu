@@ -20,7 +20,7 @@ class SwitchReliable extends Ajax
         $reliable = Request::InArrayRequired('reliable', ['i', 'n', '?', 'e']);
 
         $remark = Remark::find($rid);
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $holding = $user->getHoldingData($remark->church->id);
         if (!$holding) {
             $holding = 'denied';

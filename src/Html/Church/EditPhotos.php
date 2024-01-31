@@ -23,7 +23,7 @@ class EditPhotos extends Html
 
     public function legacyCode()
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         $this->input = $_REQUEST;
         $this->tid = $path[0];
@@ -77,7 +77,7 @@ class EditPhotos extends Html
             }
         }
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $this->church->log .= "\nFotók: ".$user->getLogin().' ('.date('Y-m-d H:i:s').')';
 
         switch ($this->input['modosit']) {

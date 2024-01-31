@@ -37,7 +37,7 @@ class RemarkFeedback extends Email
             $type = \App\Request::Text('type');
         }
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $this->user = $user;
         if ($type) {
             $this->mail->render('remarkfeedback_'.$type, (array) $this);

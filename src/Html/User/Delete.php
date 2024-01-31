@@ -9,7 +9,9 @@
 
 namespace App\Html\User;
 
-class Delete extends \App\Html\Html
+use App\Html\Html;
+
+class Delete extends Html
 {
     public function __construct()
     {
@@ -36,7 +38,7 @@ class Delete extends \App\Html\Html
 
     public function delete()
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if (!$user->checkRole('user')) {
             throw new \Exception('Hiányzó jogosultság miatt nem lehetséges a törlése!');
         }

@@ -15,7 +15,7 @@ class DioceseCatalogue extends Html
 {
     public function __construct($path)
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         if (!$user->checkRole('miserend')) {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');

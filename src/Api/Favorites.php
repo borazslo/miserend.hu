@@ -50,7 +50,7 @@ class Favorites extends Api
         }
 
         // TODO: delete global somehow
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $user = new \App\User($token->uid);
 
         if (isset($this->input['remove'])) {

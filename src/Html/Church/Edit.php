@@ -13,7 +13,7 @@ class Edit extends \App\Html\Html
 {
     public function __construct($path)
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         $this->input = $_REQUEST;
         $this->tid = $path[0];
@@ -74,7 +74,7 @@ class Edit extends \App\Html\Html
             $this->church->osm->upload();
         }
 
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $this->church->log .= "\nMod: ".$user->getLogin().' ('.date('Y-m-d H:i:s').')';
 
         /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt... */
@@ -106,7 +106,7 @@ class Edit extends \App\Html\Html
 
     public function preparePage()
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if ($user->checkRole('miserend')) {
             $this->addFormNewHolder();
         }

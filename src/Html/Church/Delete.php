@@ -13,7 +13,7 @@ class Delete extends \App\Html\Html
 {
     public function __construct($path)
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
         if (!$user->checkRole('miserend')) {
             throw new \Exception('Nincs jogosultságod a templomot törölni.');
         }
@@ -39,7 +39,7 @@ class Delete extends \App\Html\Html
 
     public function delete()
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         $comment = \App\Request::Text('comment');
         if ('' != $this->church2delete->adminmegj) {

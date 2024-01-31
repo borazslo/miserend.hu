@@ -15,7 +15,7 @@ class Favorite extends Ajax
 {
     public function __construct()
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
 
         $tid = Request::IntegerRequired('tid');
         $method = Request::SimpletextRequired('method');

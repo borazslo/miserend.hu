@@ -35,7 +35,7 @@ class User extends Api
         }
 
         // TODO: delete global somehow
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $user = new \App\User($token->uid);
         $user->getFavorites();
         $data = [

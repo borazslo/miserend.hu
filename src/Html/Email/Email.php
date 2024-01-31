@@ -50,7 +50,7 @@ class Email extends \App\Html\Html
 
     public function checkPermission()
     {
-        global $user;
+        $user = $this->getSecurity()->getUser();
         $this->user = $user;
         if (!$this->user->checkRole('"any"')) {
             return false;
