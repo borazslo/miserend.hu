@@ -73,7 +73,8 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
 
     private function getGlobals(): array
     {
-        $user = $this->getUser();
+        $security = $this->getSecurity();
+        $user = $security->getUser();
         $variables = [
             'environment' => $this->getConfig()['env'],
             'githash' => $this->getGitHash(),
@@ -81,7 +82,7 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
             'menu' => $this->getMenu(),
         ];
 
-        if ($user->getLoggedin() && !$user->checkRole('miserend')) {
+        if ($user->getLoggedin() && !$security->isGranted('miserend')) {
             $variables['mychurches'] = feltoltes_block();
         }
 
@@ -160,13 +161,14 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
 
     protected function getMenu(): array
     {
-        $user = $this->getUser();
+        $security = $this->getSecurity();
+        $user = $security->getUser();
 
         $menu = [];
-        if ($this->getSecurity()->isGranted("'any'")) {
+        if ($security->isGranted("'any'")) {
             $menu = $this->getAdminMenu();
         }
-        if (isset($user->getResponsible()['diocese']) && \count($user->getResponsible()['diocese']) > 0 && !$user->checkRole('miserend')) {
+        if (isset($user->getResponsible()['diocese']) && \count($user->getResponsible()['diocese']) > 0 && !$security->isGranted('miserend')) {
             $menu += $this->getResponsibleMenu();
         }
 
