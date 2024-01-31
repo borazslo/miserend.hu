@@ -19,9 +19,4 @@ class Ajax extends Html
      * @internal
      */
     public $content;
-
-    public function __construct($path)
-    {
-        $this->content = json_encode($_REQUEST);
-    }
 }
