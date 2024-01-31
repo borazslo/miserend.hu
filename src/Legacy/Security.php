@@ -38,14 +38,14 @@ class Security
     private function initUser(): User
     {
         if (!isset($_COOKIE['token'])) {
-            return new self();
+            return new User();
         }
 
         $token = $this->tokenManager->findToken($_COOKIE['token']);
         if (!$token || !$token->isValid) {
             $this->tokenManager->delete();
 
-            return new self();
+            return new User();
         }
 
         $this->tokenManager->extend($token);
