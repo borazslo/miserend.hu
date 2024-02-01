@@ -113,6 +113,12 @@ class Church implements EntityModificationDateTimeInterface
     #[ORM\Column(name: 'osmtype', type: Types::STRING, length: 9, nullable: true)]
     private ?string $osmType = null;
 
+    #[ORM\Column(name: 'lat', type: Types::DECIMAL, precision: 11, scale: 7, nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(name: 'lon', type: Types::DECIMAL, precision: 11, scale: 7, nullable: true)]
+    private ?float $longitude = null;
+
     /**
      * Gondnokság.
      */
@@ -500,5 +506,53 @@ class Church implements EntityModificationDateTimeInterface
         }
 
         return sprintf('https://www.openstreetmap.org/%s/%s', $this->osmType, $this->osmId);
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    /**
+     * @param float|null $latitude
+     */
+    public function setLatitude(?float $latitude): void
+    {
+        $this->latitude = $latitude;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    /**
+     * @param float|null $longitude
+     */
+    public function setLongitude(?float $longitude): void
+    {
+        $this->longitude = $longitude;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRemark(): ?string
+    {
+        return $this->remark;
+    }
+
+    /**
+     * @param string|null $remark
+     */
+    public function setRemark(?string $remark): void
+    {
+        $this->remark = $remark;
     }
 }

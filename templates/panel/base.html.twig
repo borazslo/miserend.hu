@@ -3,7 +3,7 @@
         {{- ' id' }}="{{ id }}"
     {%- endif -%}>
 
-    {% set _title_block = block('panel_title') ?? '' %}
+    {% set _title_block = block('panel_title') ?? _title_block|default('') %}
     {% if _title_block is not empty %}
         <div class="card-header {{ panel|default(false) ? 'text-bg-'~panel }}">{{ _title_block|raw }}</div>
     {% endif %}

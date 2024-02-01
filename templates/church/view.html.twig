@@ -76,16 +76,23 @@
 
 
 {% block rightsidebar %}
-{#    {% include "church/_panellocation.twig" %}#}
-{#    {% include 'church/_panelcontact.twig' %}#}
-    {% if megjegyzes|default(false) %}
-        {% include "panel.twig" with {title:'Jó tudni','body': megjegyzes } %}
+    {% include 'church/panels/location.html.twig' %}
+
+{#    {% include 'church/panels/contact.html.twig' %}#}
+
+    {% if church.remark %}
+        {% include 'panel/base.html.twig' with {'_title_block': 'Jó tudni', 'body': church.remark } %}
     {% endif %}
+
     {% if neighbours|default({})|length > 1 %}
         {% include 'church/_panelneighbours.twig' %}
     {% endif %}
-    {% if kozossegek|default({})|length > 1 %}
-        {% include 'church/_panelkozossegek.twig' %}
+
+    {% set commnities = fetch_communities(church) %}
+
+    {% if commnities is not null and commnities.communities|length > 0 %}
+        {% include 'church/panels/communities.html.twig' %}
     {% endif %}
+
 {#    {% include 'church/_panelfacebookpageplugin.twig' %}#}
 {% endblock %}
