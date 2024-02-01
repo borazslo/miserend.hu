@@ -8,31 +8,27 @@
 
 
 {% block panel_body %}
-    <p class=alapkizart>
+    <p class="alapkizart">
         Ha észrevételed van a templommal vagy a miserenddel kapcsolatban, írd meg nekünk!
         {% if church.allowAskToHolder and app.user %}
             Vagy akár vállalhatod, hogy karbantartod ennek a templomnak az adatait.
         {% endif %}
     </p>
-    <div align=center>
-        <a href="/templom/{{ church.id }}/ujeszrevetel" class=link>
-            <font color=#8D317C size='+1'><b>Észrevétel beküldése</b></font>
-        </a>
-    </div>
+    <p class="text-center fs-5 fw-bold">
+        <a href="/templom/{{ church.id }}/ujeszrevetel" class="link" style="color: #8D317C">
+            Észrevétel beküldése
+        </a><br />
     {% if church.allowAskToHolder %}
-    <div align=center>
-        <a href="/templom/{{ church.id }}/changeholders?access=asked&confirmation=needed">
-            <font color=#8D317C size='+1' class=""><b>Gondnokság vállalása</b></font>
-        </a>
-    </div>    
+        <a href="/templom/{{ church.id }}/changeholders?access=asked&confirmation=needed" style="color: #8D317C">
+            Gondnokság vállalása
+        </a><br />
     {% elseif church.holderStatus == constant('\\App\\Entity\\ChurchHolder::HOLDER_STATUS_ASKED') %}
-        <div align=center>        
-            <font color=#8D317C size='+1' class="grey"><b>(Jelentkezésed elbírálás alatt van.)</b></font>
-        </div>
+        <p style="color: #8D317C" class="text-center grey">
+            (Jelentkezésed elbírálás alatt van.)
+        </p><br />
     {% endif %}
-    <div align=center>
-        <a href="/templom/{{ church.id }}/ujkep" class=link>
-            <font color=#8D317C size=''><b>Új kép beküldése</b></font>
+        <a href="/templom/{{ church.id }}/ujkep" class="link" style="color: #8D317C">
+            Új kép beküldése
         </a>
-    </div>
+    </p>
 {% endblock %}
