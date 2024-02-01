@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
+
 {% set title = church.name %}
+
 
 {% block pageHeader %}
     <div class="page-header">
@@ -56,19 +58,22 @@
     {% endif %}
 {% endblock %}
 
-{% set selfAdvertisement = true %}
+
 {% block left_sidebar %}
+    {% set show_self_advertistment_panel = true %}
+
     {% if church.holderStatus != constant('\\App\\Entity\\ChurchHolder::HOLDER_STATUS_ALLOWED') %}
         {% include 'church/panels/asking_remark.html.twig' %}
     {% endif %}
 
-    {% include 'announcment.twig' ignore missing %}
-
-    {% if location|default(false) and location.osm is not null %}
-        {% include 'church/_panelaccessibility.twig'  %}
+    {% if church.osmId is not null and church.osmType is not null %}
+        {{ render(controller('\\App\\Controller\\ChurchController::accessibility', {church: church})) }}
     {% endif %}
 
+    {{ parent() }}
+
 {% endblock %}
+
 
 {% block rightsidebar %}
 {#    {% include "church/_panellocation.twig" %}#}

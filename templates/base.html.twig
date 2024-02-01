@@ -139,13 +139,14 @@
                 </div>
                 <div class="col">
                     <p>Fejlesztés: <a href="https://github.com/borazslo/miserend.hu">GitHub</a>
-                        {%- if githash -%}
+                        {%- if git_version -%}
                             {{ ' - ' -}}
-                            <small>verzió: <a href="https://github.com/borazslo/miserend.hu/commit/{{ githash }}">
-                                    {{- githash[0:7] -}}
+                            <small>verzió: <a href="https://github.com/borazslo/miserend.hu/commit/{{ git_version }}">
+                                    {{- git_version[0:7] -}}
                                 </a></small>
                         {% endif -%}
-                        | <a href="/impresszum">Impresszum</a> | <a href="/stat">Statisztika és adatok</a>
+                        {{ ' |  ' -}}
+                        <a href="/impresszum">Impresszum</a> | <a href="/stat">Statisztika és adatok</a>
                     </p>
 
                     <p class="mobilapps">

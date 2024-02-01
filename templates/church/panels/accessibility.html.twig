@@ -1,0 +1,54 @@
+{% extends 'panel/base.html.twig' %}
+{% set panel = 'primary' %}
+
+
+{% block panel_title %}
+	<i class="bi bi-person-wheelchair"></i> Akadálymentesség
+{% endblock %}
+
+
+{% block panel_body %}
+	{% if accessibility.wheelchair == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_YES') %}
+		<p><strong>Teljesen</strong> akadálymentes: A bejáratnál, a templomtérben és a helyiségekben sincsenek lépcsők.</p>		
+	{% elseif accessibility.wheelchair == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_LIMITED') %}
+		<p><strong>Részben</strong> akadálymentes: A bejáratnak maximum egy lépcsőfoka van, vagy van elérhető rámpa. A templomtér és a legfontosabb helyiségek lépcső nélküliek.</p>
+	{% elseif accessibility.wheelchair == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_NO') %}
+		<p><strong>Egyáltalán nem</strong> akadálymentes. (Például a bejáratnál egy vagy több lépcső van, a templomtér és fontosabb helyiségek nem hozzáférhetőek.)</p>
+	{% endif %}
+
+	{% if accessibility.toiletsWheelchair == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_YES') %}
+		<p><strong>A mosdó kerekesszékkel is elérhető.</strong></p>
+	{% elseif accessibility.toiletsWheelchair == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_NO') %}
+		<p>Nincs mosdó, vagy kerekesszékkel nem elérhető.</p>
+	{% endif %}		
+	
+	{% if accessibility.wheelchairDescription %}
+		<p><strong>{{ accessibility.wheelchairDescription }}</strong></p>
+	{% endif %}
+	
+	{% if accessibility.hearingLoop == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_YES') %}
+		<p><strong>Hallást segítő indukciós hurok elérhető.</strong></p>
+	{% elseif accessibility.hearingLoop == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_LIMITED') %}
+		<p>Hallást segítő indukciós hurok elérhetőm de tenni kell érte, hogy működjön / hozzáférjenek.</p>
+	{% elseif accessibility.hearingLoop == constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_NO') %}
+		<p>Nincs indukciós hurok a helyszínen.</p>
+	{% endif %}	
+	
+	{% if accessibility.disabledDescription %}
+		<p>További információ: <strong>{{ accessibility.disabledDescription }}</strong></p>
+	{% endif %}
+
+	{% set na_value = constant('\\App\\Components\\AccessibilityHelper::ACCESSIBILITY_VALUE_NA') %}
+
+	{% if not (accessibility.wheelchair != na_value
+		or accessibility.hearingLoop != na_value
+		or accessibility.toiletsWheelchair != na_value
+		or accessibility.disabledDescription is not null) %}
+		<p>Ha van információja az akadálymentességről: tolókocsival hozzáférhetőségről, akadálymentes mosdóról, indukciós hurokról, vagy bármi más akadálymentességről (vagy azok hiányáról), akkor kérjük <a href="javascript:OpenNewWindow('/templom/{{ church.id }}/ujeszrevetel',450,530);" class=link>észrevétel beküldésével</a> jelezze nekünk! Köszönjük!</p>
+	{% endif %}
+{% endblock %}
+
+
+{% block panel_footer %}
+    <small>© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> közreműködők.</small>
+{% endblock %}

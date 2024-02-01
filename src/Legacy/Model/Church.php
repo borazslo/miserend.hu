@@ -10,6 +10,7 @@
 namespace App\Legacy\Model;
 
 use App\Legacy\Parish;
+use App\Legacy\Services\ExternalApi\KozossegekApi;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -391,7 +392,7 @@ class Church extends Model
 
     public function getKozossegekAttribute($value)
     {
-        $api = new \App\Legacy\Services\ExternalApi\KozossegekApi();
+        $api = new KozossegekApi();
         $api->query = 'miserend/'.$this->id;
         $api->run();
         if (isset($api->jsonData->data) > 0) {

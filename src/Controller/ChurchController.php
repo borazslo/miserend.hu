@@ -9,9 +9,11 @@
 
 namespace App\Controller;
 
+use App\Components\AccessibilityHelper;
 use App\Entity\Church;
 use App\Entity\User;
 use App\Repository\ChurchRepository;
+use App\Repository\OsmTagRepository;
 use App\Repository\PhotoRepository;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -144,7 +146,7 @@ class ChurchController extends AbstractController implements EventSubscriberInte
 
     public function randomChurch(PhotoRepository $repository): Response
     {
-        return $this->render('church/random_church.html.twig', [
+        return $this->render('church/panels/random_church.html.twig', [
             'photo' => $repository->findRandomPhoto(),
         ]);
     }
@@ -155,7 +157,15 @@ class ChurchController extends AbstractController implements EventSubscriberInte
     )
     {
         return $this->render('church/favorites.html.twig', [
-            'favorites' => $this->getRepository()->findMostFavorite(),
+            'favorites' => $user === null ? $this->getRepository()->findMostFavorite() : $user->getFavorites(),
+        ]);
+    }
+
+    public function accessibility(Church $church, OsmTagRepository $tagRepository): Response
+    {
+        return $this->render('church/panels/accessibility.html.twig', [
+            'church' => $church,
+            'accessibility' => new AccessibilityHelper($tagRepository->findTagsWithChurch($church, true)),
         ]);
     }
 }
