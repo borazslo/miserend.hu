@@ -150,18 +150,7 @@
         </form>
     </div>
 
-    <div id="favorites" style="margin-top:12px">
-        <h3>Kedvenc templomok</h3>
-        {% if user.uid < 1 %}
-            <p class="alap"><i>Bejelentkezett felhasználóink megjelelölhetnek templomokat kedvencként.</i></p>
-        {% endif %}
-        {% if favorites|length > 0 %}
-            <ul>
-                {% for key, item in favorites %}<li class="link">{{ item.li|raw }}</li>{% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+    {{ render(controller('\\App\\Controller\\ChurchController::favorites')) }}
 
-    <br><br><br>
     {% include 'panel/nea.html.twig' %}
 {%  endblock %}

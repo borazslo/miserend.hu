@@ -1,0 +1,21 @@
+<div id="favorites" class="mt-5">
+    <h3>Kedvenc templomok</h3>
+
+    {% if app.user is null %}
+        <p class="alap"><i>Bejelentkezett felhasználóink megjelelölhetnek templomokat kedvencként.</i></p>
+    {% endif %}
+
+    {% set favorite_to_list = app.user is null ? favorites : app.user.favorites %}
+    {% if favorite_to_list > 0 %}
+    <ul class="list-unstyled">
+        {% for church in  favorite_to_list %}
+            <li class="link">
+                <a href="{{ path('church_view', {church_id: church.id, slug: church.slug}) }}" class="li">
+                    {{- church.name -}}
+                    {{ church.knownName ? (' ('~ church.knownName ~')') : '' -}}
+                </a>, {{ church.city }}
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>

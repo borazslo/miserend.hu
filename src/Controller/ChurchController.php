@@ -10,6 +10,7 @@
 namespace App\Controller;
 
 use App\Entity\Church;
+use App\Entity\User;
 use App\Repository\ChurchRepository;
 use App\Repository\PhotoRepository;
 use Psr\Container\ContainerInterface;
@@ -23,6 +24,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ChurchController extends AbstractController implements EventSubscriberInterface, ServiceSubscriberInterface
@@ -144,6 +146,16 @@ class ChurchController extends AbstractController implements EventSubscriberInte
     {
         return $this->render('church/random_church.html.twig', [
             'photo' => $repository->findRandomPhoto(),
+        ]);
+    }
+
+    public function favorites(
+        #[CurrentUser]
+        User $user = null,
+    )
+    {
+        return $this->render('church/favorites.html.twig', [
+            'favorites' => $this->getRepository()->findMostFavorite(),
         ]);
     }
 }

@@ -38,6 +38,29 @@ class ChurchRepository extends ServiceEntityRepository
             ->getQuery()->getOneOrNullResult();
     }
 
+    /**
+     * @param int $amount
+     * @return array<int, Church>
+     */
+    public function findMostFavorite(int $amount = 10): array
+    {
+        $churches = $this->createQueryBuilder('church')
+            ->select('church as church_entity, COUNT(church.id) as total')
+            ->join('church.usersWhoFavored', 'users')
+            ->orderBy('total', 'DESC')
+            ->groupBy('users.id')
+            ->setMaxResults($amount)
+            ->getQuery()->getResult();
+
+        if (count($churches) === 0) {
+            return [];
+        }
+
+        return array_map(function ($row) {
+            return $row['church_entity'];
+        }, $churches);
+    }
+
     public function generateSlug(Church $church, bool $save = true): void
     {
         $slug = $this->slugger->slug($church->getName());

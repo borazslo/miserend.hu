@@ -1,4 +1,4 @@
-<div class="card mb-3"
+<div class="card mb-3 {{ card_class|default('') }}"
     {%- if id is defined and id -%}
         {{- ' id' }}="{{ id }}"
     {%- endif -%}>
