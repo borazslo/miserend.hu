@@ -1,13 +1,13 @@
-{% extends 'panel.twig' %}
+{% extends 'panel/base.html.twig' %}
 {% set panel = 'success' %}
 
 
-{% block title -%}
+{% block panel_title -%}
     Már mobiltelefonra is
 {%- endblock %}
 
 
-{% block body %}
+{% block panel_body %}
     <div class="text-center">
         {% if random(3) > 1 %}
             <a href="https://play.google.com/store/apps/details?id=com.frama.miserend.hu"

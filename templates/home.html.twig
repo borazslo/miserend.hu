@@ -1,8 +1,10 @@
-{% extends "layout.html.twig" %}
-{% set selfAdvertisement = true %}
-{% set pageTitle = 'Miserend' %}
+{% extends 'base.html.twig' %}
+{% set show_self_advertistment_panel = true %}
 
-{% import "forms.twig" as forms %}
+
+{% block page_title %}
+    Miserend
+{% endblock %}
 
 
 {% block extraHead %}
@@ -31,14 +33,17 @@
 {% endblock %}
 
 
-{% block leftsidebar %}
+{% block left_sidebar %}
     {{ render(controller('\\App\\Controller\\ChurchController::randomChurch')) }}
+
+    {{ parent() }}
 {% endblock %}
 
 
 {% block content %}
 {#    {% include 'announcment.twig' ignore missing %}#}
-    
+    {% import "forms.twig" as forms %}
+
     {{ alert|default('')|raw }}
 
     <div class="miseurlap">

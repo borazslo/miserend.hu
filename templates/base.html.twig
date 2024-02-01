@@ -48,10 +48,6 @@
     {% endblock %}
     <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
 
-
-    {#        <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"> #}
-    {#        <link href="/css/bootstrap.min.css" rel="stylesheet"> #}
-
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
     {% endblock %}
@@ -59,26 +55,6 @@
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
     {% endblock %}
-
-    {#        <link href="/css/jquery-ui.min.css" rel="stylesheet"> #}
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-
-    {#        <script src="/node_modules/@popperjs/core/dist/umd/popper.js"></script> #}
-
-    {#        <link rel="stylesheet" href="/node_modules/jquery-ui/dist/themes/smoothness/jquery-ui.min.css" /> #}
-    {#        <script src="/node_modules/jquery/dist/jquery.min.js"></script> #}
-    {#        <script src="/node_modules/jquery-ui/dist/jquery-ui.min.js"></script> #}
-
-    {#        <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script> #}
-
-    {#        <script src="/js/somethingidontknow.js"></script> #}
 
     {% block extra_head %}
     {% endblock %}
@@ -119,10 +95,15 @@
     <div class="container">
         <div class="row church-site-sidebar-holder">
             <div class="col-md-3  col-sm-3 church-site-left-sidebar">
-                {% block left_sidebar %}{% endblock %}
-                {% if chat|default(false) %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
-                {% if mychurches|default(false) %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
-                {% if selfAdvertisement|default(true) %}{% include "_panelselfadvertisement.twig" %}{% endif %}
+                {% block left_sidebar %}
+                    {% if chat|default(false) %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
+                    {% if mychurches|default(false) %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
+
+                    {% if show_self_advertistment_panel|default(true) %}
+                        {% include 'panel/selfadvertisement.html.twig' %}
+                    {% endif %}
+
+                {% endblock %}
             </div>
             <div class="col-md-{% if columns2|default(false) %}9{% else %}6{% endif %} col-sm-6 church-site-main-content">
                 {% block pageHeader %}
@@ -157,12 +138,16 @@
                     <img src="{{ asset('static/images/logo-feher.png') }}" loading="lazy"/>
                 </div>
                 <div class="col">
-                    <!--<p>Mindent megteszünk az adatok pontossága érdekében, azonban így is előfordulhatnak eltérések! Biztos információért kérjük érdeklődj a konkrét plébánián!</p>-->
                     <p>Fejlesztés: <a href="https://github.com/borazslo/miserend.hu">GitHub</a>
-                        {% if git_version %}- <small>verzió:
-                            <a href="https://github.com/borazslo/miserend.hu/commit/{{ git_version }}">
-                                {{ git_version }}</a></small>{% endif %}
-                        | <a href="/impresszum">Impresszum</a> | <a href="/stat">Statisztika és adatok</a></p>
+                        {%- if githash -%}
+                            {{ ' - ' -}}
+                            <small>verzió: <a href="https://github.com/borazslo/miserend.hu/commit/{{ githash }}">
+                                    {{- githash[0:7] -}}
+                                </a></small>
+                        {% endif -%}
+                        | <a href="/impresszum">Impresszum</a> | <a href="/stat">Statisztika és adatok</a>
+                    </p>
+
                     <p class="mobilapps">
                         <a href="https://geo.itunes.apple.com/us/app/miserend/id967827488?mt=8"
                            onclick="ga('send', 'event', 'Advertisment', 'itunes.apple.com', 'liladoboz-kep')">
@@ -177,6 +162,7 @@
         </div>
     </div>
 {% endblock %}
+
 <script language="JavaScript" type="text/javascript">
     var trackOutboundLink = function (url) {
         ga('send', 'event', 'outbound', 'click', url, {
