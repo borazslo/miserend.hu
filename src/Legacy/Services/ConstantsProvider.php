@@ -130,6 +130,14 @@ class ConstantsProvider
         ];
     }
 
+    /**
+     * @return array<string, array{
+     *     abbrev: string,
+     *     name: string,
+     *     file: string,
+     *     description: string,
+     * }>
+     */
     public function getLanguages(): array
     {
         $nyelv = [
@@ -157,6 +165,18 @@ class ConstantsProvider
             ];
         }
         return $nyelv;
+    }
+
+    public function getLanguageChoices(): array
+    {
+        $languages = $this->getLanguages();
+
+        $buffer = [];
+        foreach ($languages as $locale => $languageMeta) {
+            $buffer[$languageMeta['name']] = $locale;
+        }
+
+        return $buffer;
     }
 
     public function getAttributes(): array
