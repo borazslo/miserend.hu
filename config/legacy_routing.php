@@ -40,7 +40,7 @@ $simpleLegacyRouteWithMethod = [
     'ajax_churchesinbbox' => ['/ajax/churchesinbbox', Church\Church::class, 'inBbox'],
     'stats' => ['/stat', Html\Stat::class, 'stat'],
 
-    'user_new' => ['/user/new', User\Edit::class, 'registration'],
+//    'user_new' => ['/user/new', User\Edit::class, 'registration'], => symfony
     'user_profile' => ['/user/edit', User\Edit::class, 'edit'],
     'user_list' => ['/user/catalogue', User\Catalogue::class, 'list'],
 
@@ -135,6 +135,9 @@ $symfonyRoutes = [
     'profiler' => '/_profiler/{token}',
     'app_login' => '/bejelentkezes',
     'app_logout' => '/kijelentkezes',
+    'user_profile' => '/profil',
+    'user_new' => '/user/new',
+    'user_registration' => '/regisztracio',
 ];
 
 foreach ($symfonyRoutes as $routeName => $routePath) {
