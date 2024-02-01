@@ -133,6 +133,8 @@ $symfonyRoutes = [
     'church_view' => '/templom/{church_id}',
     'wdt' => '/_wdt/{token}',
     'profiler' => '/_profiler/{token}',
+    'app_login' => '/bejelentkezes',
+    'app_logout' => '/kijelentkezes',
 ];
 
 foreach ($symfonyRoutes as $routeName => $routePath) {

@@ -17,8 +17,13 @@ class UserRepository
         return $this->database->getDatabaseManager();
     }
 
+    /**
+     * @deprecated
+     */
     public function getFavorites(User $user): iterable
     {
+        return [];
+
         if ($user->getUid() > 0) {
             $favorites = Favorite::where('uid', $user->getUid())
                 ->get()

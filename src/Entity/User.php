@@ -6,10 +6,12 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements PasswordAuthenticatedUserInterface
+class User implements PasswordAuthenticatedUserInterface, UserInterface, EquatableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -239,5 +241,23 @@ class User implements PasswordAuthenticatedUserInterface
     public function isChurchFavorite(Church $church): bool
     {
         return $this->favorites->contains($church);
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        return $this->getId() === $user->getId();
     }
 }
