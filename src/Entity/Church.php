@@ -169,6 +169,14 @@ class Church implements EntityModificationDateTimeInterface
         $this->county = $county;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
     public function getMassActive(): ?bool
     {
         return $this->massActive;

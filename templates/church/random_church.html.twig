@@ -5,6 +5,6 @@
 {% block panel_body %}
     <figure class="figure">
         <img src="{{ constant('DOMAIN') }}/kepek/templomok/{{ photo.church.id }}/{{ photo.filename }}" class="img-responsive" loading="lazy" />
-        <figcaption class="figure-caption text-end"><a href="/templom/{{ photo.church.id }}">{{ photo.church.name }} ({{ photo.church.location.city.name ?? '' }})</a></figcaption>
+        <figcaption class="figure-caption text-end"><a href="{{ path('church_view', {church_id: photo.church.id, slug: photo.church.slug}) }}">{{ photo.church.name }} ({{ photo.church.city }})</a></figcaption>
     </figure>
 {% endblock %}
