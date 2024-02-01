@@ -11,8 +11,8 @@ namespace App\Legacy\Services\ExternalApi;
 
 // http://wiki.openstreetmap.org/wiki/Overpass_API#Introduction
 
-use App\Model\OSM;
-use App\Model\OSMTag;
+use App\Legacy\Model\OSM;
+use App\Legacy\Model\OSMTag;
 
 class OverpassApi extends ExternalApi
 {

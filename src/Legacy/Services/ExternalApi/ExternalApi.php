@@ -9,7 +9,7 @@
 
 namespace App\Legacy\Services\ExternalApi;
 
-use App\Html\Html;
+use App\Legacy\Html\Html;
 use App\Legacy\Services\ConfigProvider;
 use Illuminate\Database\Capsule\Manager as DB;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;

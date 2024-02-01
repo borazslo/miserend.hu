@@ -17,8 +17,6 @@ if (!@include PROJECT_ROOT.'/vendor/autoload.php') {
 }
 
 use App\Legacy\Application;
-use App\User;
-use Illuminate\Database\Capsule\Manager as DB;
 
 date_default_timezone_set('Europe/Budapest');
 

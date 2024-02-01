@@ -9,7 +9,7 @@
 
 namespace App\Legacy\Html\Church;
 
-use App\Html\Html;
+use App\Legacy\Html\Html;
 use App\Legacy\Html\Map;
 use App\Model;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,9 +30,9 @@ class Church extends Html
 
 
 
-        $church = Model\Church::find($tid);
+        $church = \App\Legacy\Model\Church::find($tid);
         if (!$church && $user->checkRole('miserend')) {
-            $church = Model\Church::withTrashed()->find($tid);
+            $church = \App\Legacy\Model\Church::withTrashed()->find($tid);
             if ($church) {
                 addMessage('Ez a templom törölve van. Nem létezik. Elhunyt. Vége.', 'danger');
             }
@@ -76,7 +76,7 @@ class Church extends Html
         $service_times = null;
         // Convert to OSM ServiceTimes
         if (1 == $user->getIsadmin()) {
-            $serviceTimes = new \App\ServiceTimes();
+            $serviceTimes = new \App\Legacy\ServiceTimes();
             $serviceTimes->loadMasses($tid);
             if (!isset($serviceTimes->error)) {
                 $service_times = print_r(preg_replace('/;/', ";\n", $serviceTimes->string), 1)."\n".$serviceTimes->linkForDetails;
@@ -121,7 +121,7 @@ class Church extends Html
             return (float) $value;
         }, $bbox);
 
-        $churchesInBBox = Model\Church::on($this->getDatabaseManager()->getConnections())->inBBox([
+        $churchesInBBox = \App\Legacy\Model\Church::on($this->getDatabaseManager()->getConnections())->inBBox([
             'latMin' => $bbox[0],
             'lonMin' => $bbox[1],
             'latMax' => $bbox[2],

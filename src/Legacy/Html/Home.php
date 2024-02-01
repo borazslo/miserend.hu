@@ -10,10 +10,9 @@
 namespace App\Legacy\Html;
 
 use App\Entity\User;
-use App\Html\Html;
+use App\Legacy\Model\Photo;
 use App\Legacy\Services\ConstantsProvider;
 use App\Legacy\Services\UserRepository;
-use App\Model\Photo;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

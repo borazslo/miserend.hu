@@ -2,8 +2,8 @@
 
 namespace App\Legacy\Services;
 
-use App\Model\Favorite;
-use App\User;
+use App\Legacy\Model\Favorite;
+use App\Legacy\User;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class UserRepository

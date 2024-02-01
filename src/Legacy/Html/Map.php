@@ -9,12 +9,11 @@
 
 namespace App\Legacy\Html;
 
-use App\Html\Html;
+use App\Legacy\Model\Church;
+use App\Legacy\Model\OSM;
 use App\Legacy\Services\ExternalApi\NominatimApi;
 use App\Legacy\Services\ExternalApi\OverpassApi;
 use App\Legacy\Templating\TemplateContextTrait;
-use App\Model\Church;
-use App\Model\OSM;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

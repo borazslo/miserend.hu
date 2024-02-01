@@ -9,7 +9,6 @@
 
 namespace App\Legacy\Html\Ajax;
 
-use App\Html\Ajax\Ajax;
 use Illuminate\Database\Capsule\Manager as DB;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\JsonResponse;

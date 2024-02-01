@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-use App\User;
+use App\Legacy\User;
 use Illuminate\Database\Capsule\Manager as DB;
 
 function sanitize($text)
@@ -1031,7 +1031,7 @@ function widget_miserend($args)
 {
     global $twig, $config;
     $tid = $args['tid'];
-    $vars = App\Model\Church::find($tid)->toArray();
+    $vars = \App\Legacy\Model\Church::find($tid)->toArray();
     if ([] == $vars) {
         $html = 'Nincs ilyen templom.';
     } else {
@@ -1065,7 +1065,7 @@ function feltoltes_block()
     foreach ($allowed as $church) {
         $ids[] = $church->church_id;
     }
-    $churches = App\Model\Church::whereIn('id', $ids)->get();
+    $churches = \App\Legacy\Model\Church::whereIn('id', $ids)->get();
 
     if (0 == count($churches)) {
         return;
@@ -1095,7 +1095,7 @@ function feltoltes_block()
 
 function addMessage($text, $severity = false)
 {
-    return App\Message::add($text, $severity);
+    return \App\Legacy\Message::add($text, $severity);
 }
 
 function copyArrayToObject($array, &$object)

@@ -9,7 +9,6 @@
 
 namespace App\Legacy\Html\Ajax;
 
-use App\Html\Ajax\Ajax;
 use App\Legacy\Services\ExternalApi\NominatimApi;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
