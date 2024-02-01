@@ -9,7 +9,7 @@
 
 namespace App;
 
-use App\Legacy\MessageRepository;
+use App\Legacy\Services\MessageRepository;
 
 class Message
 {

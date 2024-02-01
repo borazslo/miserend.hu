@@ -7,13 +7,16 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Html\Ajax;
+namespace App\Legacy\Html\Ajax;
 
+use App\Html\Ajax\Ajax;
 use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Autoconfigure(lazy: true, autowire: true)]
 class Chat extends Ajax
 {
     protected function forbiddenResponse(): JsonResponse
@@ -45,7 +48,7 @@ class Chat extends Ajax
 
     public function load(Request $request): JsonResponse
     {
-        if (!$this->getSecurity()->isGranted("'any'")) {
+        if (!$this->getSecurity()->isGranted('ROLE_USER')) {
             return $this->forbiddenResponse();
         }
 
@@ -101,7 +104,7 @@ class Chat extends Ajax
 
         $fields = [
             'datum' => date('Y-m-d H:i:s'),
-            'user' => $security->getUser()->getLogin(),
+            'user' => $security->getUser()->getUsername(),
             'kinek' => $recipient,
             'szoveg' => $message,
         ];

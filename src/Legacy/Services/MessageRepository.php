@@ -7,14 +7,13 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Legacy;
+namespace App\Legacy\Services;
 
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseManager;
 
 class MessageRepository
 {
-    public function __construct(private readonly DB $database)
+    public function __construct(/*private readonly DB $database*/)
     {
     }
 

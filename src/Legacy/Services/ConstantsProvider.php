@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Legacy;
+namespace App\Legacy\Services;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(autowire: true)]
 class ConstantsProvider
 {
     public const ROLES = ['miserend', 'user'];
 
-    public function __construct(private readonly DB $database)
+    public function __construct(/*private readonly DB $database*/)
     {
     }
 

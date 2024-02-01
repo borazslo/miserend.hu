@@ -458,18 +458,29 @@ class User
         DB::table('user')->where('uid', $this->uid)->update(['lastactive' => date('Y-m-d H:i:s')]);
     }
 
-    public function getFavorites()
+    /**
+     * Felhasznalo kedvenc templomoinak id-jait szedi le. Ha nincs belepve senki, akkor a 10 legnebszerubb templomot szedi le.
+     *
+     * @deprecated
+     *
+     * @return array<int, int>
+     */
+    public function getFavorites(): array
     {
         $favorites = [];
 
         if ($this->uid > 0) {
-            $favorites = Model\Favorite::where('uid', $this->uid)->get()->sortBy(function ($favorite) {
-                return $favorite->church->nev;
-            });
+            $favorites = Model\Favorite::where('uid', $this->uid)
+                ->get()
+                ->sortBy(function ($favorite) {
+                    return $favorite->church->nev;
+                });
         } else {
-            $favorites = Model\Favorite::groupBy('tid')->select('tid', DB::raw('count(*) as total'))->orderBy('total', 'DESC')->limit(
-                10
-            )->get();
+            $favorites = Model\Favorite::groupBy('tid')
+                ->select('tid', DB::raw('count(*) as total'))
+                ->orderBy('total', 'DESC')
+                ->limit(10)
+                ->get();
         }
 
         foreach ($favorites as $favorite) {

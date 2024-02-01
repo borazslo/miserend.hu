@@ -9,7 +9,7 @@
 
 namespace App\Html;
 
-use App\Legacy\ConstantsProvider;
+use App\Legacy\Services\ConstantsProvider;
 use App\Legacy\UserRepository;
 use App\Model\Photo;
 use Symfony\Component\HttpFoundation\RedirectResponse;

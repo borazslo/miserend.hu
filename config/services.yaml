@@ -29,5 +29,21 @@ services:
     App\Form\:
         resource: '../src/Form'
 
+    App\Components\:
+        resource: '../src/Components'
+
+    App\Legacy\Html\:
+        autoconfigure: true
+        autowire: true
+        resource: '../src/Legacy/Html'
+
+    App\Legacy\Services\:
+        autoconfigure: true
+        autowire: true
+        resource: '../src/Legacy/Services'
+
+    Illuminate\Database\Capsule\Manager:
+        factory: ['App\Legacy\Services\DatabaseManagerFactory', 'factory']
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

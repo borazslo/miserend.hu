@@ -10,16 +10,16 @@
 namespace App\Html;
 
 use App\Chat;
-use App\Legacy\ConfigProvider;
-use App\Legacy\ConstantsProvider;
 use App\Legacy\ContainerAwareInterface;
-use App\Legacy\MessageRepository;
-use App\Legacy\Security;
+use App\Legacy\Services\ConfigProvider;
+use App\Legacy\Services\ConstantsProvider;
+use App\Legacy\Services\MessageRepository;
 use App\Pagination;
 use App\User;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\DatabaseManager;
 use JetBrains\PhpStorm\NoReturn;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
@@ -48,12 +48,6 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
      * @internal
      */
     public $html;
-
-    //    public function __construct()
-    //    {
-    //        $this->input = $_REQUEST;
-    //        $this->initPagination();
-    //    }
 
     /**
      * @deprecated
@@ -112,7 +106,7 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
         return $this->container->get(Environment::class);
     }
 
-    protected function getUser(): ?User
+    protected function getUser(): ?\App\Entity\User
     {
         return $this->getSecurity()->getUser() ?? $this->user;
     }
