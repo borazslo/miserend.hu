@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace App\ExternalApi;
+namespace App\Legacy\Services\ExternalApi;
 
 class KozossegekApi extends ExternalApi
 {
@@ -18,7 +18,6 @@ class KozossegekApi extends ExternalApi
 
     public function buildQuery(): void
     {
-        global $config;
         $this->rawQuery = $this->query;
     }
 }

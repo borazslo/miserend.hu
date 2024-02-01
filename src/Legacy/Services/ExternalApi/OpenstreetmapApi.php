@@ -7,19 +7,32 @@
  * file that was distributed with this source code.
  */
 
-namespace App\ExternalApi;
+namespace App\Legacy\Services\ExternalApi;
 
 // https://wiki.openstreetmap.org/wiki/API_v0.6
 
+use App\ExternalApi\Exception;
+use App\Legacy\Services\ConfigProvider;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+#[Autoconfigure]
 class OpenstreetmapApi extends ExternalApi
 {
     public $name = 'openstreetmap';
     public $format = 'xml';
     public $testQuery = 'user/gpx_files';
 
-    public function __construct()
+    public function __construct(
+        #[Autowire(param: 'kernel.project_dir')]
+        private readonly string $projectDir,
+        ConfigProvider $configProvider,
+    )
     {
-        global $config;
+        parent::__construct($this->projectDir, $configProvider);
+
+        $config = $configProvider->getConfig();
+
         if (false == $config['openstreetmap']) {
             throw new Exception('OpenStreetMap API is disabled or undefined!');
         }

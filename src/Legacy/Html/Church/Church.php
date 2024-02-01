@@ -7,11 +7,10 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Html\Church;
+namespace App\Legacy\Html\Church;
 
 use App\Html\Html;
-use App\Html\Map;
-use App\Legacy\Application;
+use App\Legacy\Html\Map;
 use App\Model;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

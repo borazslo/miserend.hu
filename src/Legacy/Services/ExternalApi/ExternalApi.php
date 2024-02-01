@@ -7,15 +7,19 @@
  * file that was distributed with this source code.
  */
 
-namespace App\ExternalApi;
+namespace App\Legacy\Services\ExternalApi;
 
 use App\Html\Html;
+use App\Legacy\Services\ConfigProvider;
 use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+#[Autoconfigure]
 abstract class ExternalApi
 {
     public $cache = '1 week'; // false or any time in strtotime() format
-    public $cacheDir = PROJECT_ROOT.'/var/tmp/';
+    public $cacheDir;
     public $queryTimeout = 30;
     public $query;
     public $name = 'external';
@@ -27,10 +31,21 @@ abstract class ExternalApi
     protected string $rawQuery;
     private string $cacheFilePath;
     private $cacheFileTime;
-    private \stdClass|array|null $jsonData;
+    protected \stdClass|array|null $jsonData;
     private array $xmlData;
     private $error;
     private $rawData;
+
+    protected $queryFilter;
+
+    public function __construct(
+        #[Autowire(param: 'kernel.project_dir')]
+        private readonly string $projectDir,
+        protected readonly ConfigProvider $configProvider,
+    )
+    {
+        $this->cacheDir = $this->projectDir.'/var/tmp/';
+    }
 
     public function run()
     {
@@ -63,7 +78,7 @@ abstract class ExternalApi
                 throw new \Exception($e->getMessage());
             }
 
-            global $config;
+            $config = $this->configProvider->getConfig();
             if ('json' == $this->format) {
                 $this->jsonData = [];
             }
@@ -260,5 +275,21 @@ abstract class ExternalApi
     public function curl_setopt($name, $value)
     {
         $this->curl_opts[$name] = $value;
+    }
+
+    /**
+     * @param mixed $query
+     */
+    public function setQuery($query): void
+    {
+        $this->query = $query;
+    }
+
+    /**
+     * @return array|\stdClass|null
+     */
+    public function getJsonData(): array|\stdClass|null
+    {
+        return $this->jsonData;
     }
 }

@@ -15,7 +15,7 @@ class Josm extends Html
     {
         if (isset($_REQUEST['update'])) {
             set_time_limit('300');
-            $cache = new \App\ExternalApi\OverpassApi();
+            $cache = new \App\Legacy\Services\ExternalApi\OverpassApi();
             $cache->cache = '1 sec';
             $cache->clearOldCache();
 
@@ -29,7 +29,7 @@ class Josm extends Html
         $this->cron = \App\Model\Cron::where('class', '\App\OSM')
                 ->where('function', 'checkUrlMiserend')->first();
 
-        $overpass = new \App\ExternalApi\OverpassApi();
+        $overpass = new \App\Legacy\Services\ExternalApi\OverpassApi();
         $overpass->downloadUrlMiserend();
         if (!$overpass->jsonData->elements) {
             throw new \Exception('Missing Json Elements from OverpassApi Query');

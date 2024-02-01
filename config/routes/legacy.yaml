@@ -65,7 +65,7 @@ ajax_churchesinbbox:
   path: /ajax/churchesinbbox
   controller: App\Components\LegacyBridge
   defaults:
-    _legacy_class: App\Legacy\Html\Church
+    _legacy_class: App\Legacy\Html\Church\Church
     _legacy_method: inBbox
 
 stats:

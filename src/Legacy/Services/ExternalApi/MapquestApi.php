@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace App\ExternalApi;
+namespace App\Legacy\Services\ExternalApi;
 
 // https://developer.mapquest.com/
 
@@ -18,7 +18,7 @@ class MapquestApi extends ExternalApi
 
     public function distance($pointFrom, $pointTo)
     {
-        global $config;
+        $config = $this->configProvider->getConfig();
 
         if (!$config['mapquest']['appkey'] || '***' == $config['mapquest']['appkey']) {
             throw new \Exception('Missing mapquest appkey.');
@@ -52,7 +52,7 @@ class MapquestApi extends ExternalApi
 
     public function buildQuery(): void
     {
-        global $config;
+        $config = $this->configProvider->getConfig();
         $this->rawQuery = $this->query;
         $this->rawQuery .= '&key='.$config['mapquest']['appkey'];
     }

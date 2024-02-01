@@ -29,7 +29,7 @@ class Favorite extends Model
     public function getLiAttribute($value)
     {
         $return = "<a class='link' href='/templom/".$this->tid."'>".$this->church->nev;
-        if ('' != $this->church->ismertnev) {
+        if ($this->church->ismertnev != '') {
             $return .= ' ('.$this->church->ismertnev.')';
         }
         $return .= '</a>, '.$this->church->varos;

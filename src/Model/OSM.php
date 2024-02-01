@@ -142,7 +142,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
     /* Update all tags from OSM's Overpass API */
     public function updateFromOverpass()
     {
-        $overpass = new \App\ExternalApi\OverpassApi();
+        $overpass = new \App\Legacy\Services\ExternalApi\OverpassApi();
         // $overpass->cache = false; // We need the fresh data
         $overpass->query = $this->osmtype.'(id:'.$this->osmid.');out tags qt center;';
         $overpass->run();
@@ -196,7 +196,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
         // $this->osmid = "4332337979";
 
         // Get the exact data we need to change
-        $osm = new \App\ExternalApi\OpenstreetmapApi();
+        $osm = new \App\Legacy\Services\ExternalApi\OpenstreetmapApi();
         $osm->cache = false;
         $osm->query = $this->osmtype.'/'.$this->osmid;
         if (!$osm->run()) {
@@ -241,7 +241,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
         if (true == $update) {
             // Open empty changeset
             // TODO: created_by és comment és egyebek
-            $osm = new \App\ExternalApi\OpenstreetmapApi();
+            $osm = new \App\Legacy\Services\ExternalApi\OpenstreetmapApi();
             $osm->cache = false;
             $changeset = $osm->prepareNewChangeset();
             $osm->curl_setopt(\CURLOPT_USERPWD, $osm->userpwd);
@@ -257,7 +257,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
 
             $xmlString = str_replace($remove, '', $xmlString); // Sajnos kell ez.
 
-            $osm = new \App\ExternalApi\OpenstreetmapApi();
+            $osm = new \App\Legacy\Services\ExternalApi\OpenstreetmapApi();
             $osm->cache = false;
             $osm->query = $this->osmtype.'/'.$this->osmid;
             $osm->curl_setopt(\CURLOPT_USERPWD, $osm->userpwd);
@@ -268,7 +268,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
             $versionID = (int) $osm->rawData;
 
             // Close changeset
-            $osm = new \App\ExternalApi\OpenstreetmapApi();
+            $osm = new \App\Legacy\Services\ExternalApi\OpenstreetmapApi();
             $osm->cache = false;
             $osm->curl_setopt(\CURLOPT_USERPWD, $osm->userpwd);
             $osm->query = 'changeset/'.$changesetID.'/close';

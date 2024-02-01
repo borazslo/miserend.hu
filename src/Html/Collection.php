@@ -9,6 +9,7 @@
 
 namespace App\Html;
 
+use App\Legacy\Html\Map;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class Collection extends Html

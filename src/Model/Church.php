@@ -163,7 +163,7 @@ class Church extends Model
      */
     public function getLiturgiatvAttribute($value)
     {
-        $litapi = new \App\ExternalApi\LiturgiatvApi();
+        $litapi = new \App\Legacy\Services\ExternalApi\LiturgiatvApi();
         $datas = $litapi->getByChurch($this->id);
         foreach ($datas as $key => $data) {
             if (!isset($data->duration)) {
@@ -391,7 +391,7 @@ class Church extends Model
 
     public function getKozossegekAttribute($value)
     {
-        $api = new \App\ExternalApi\KozossegekApi();
+        $api = new \App\Legacy\Services\ExternalApi\KozossegekApi();
         $api->query = 'miserend/'.$this->id;
         $api->run();
         if (isset($api->jsonData->data) > 0) {

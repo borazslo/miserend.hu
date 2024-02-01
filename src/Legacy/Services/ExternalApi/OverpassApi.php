@@ -7,9 +7,12 @@
  * file that was distributed with this source code.
  */
 
-namespace App\ExternalApi;
+namespace App\Legacy\Services\ExternalApi;
 
 // http://wiki.openstreetmap.org/wiki/Overpass_API#Introduction
+
+use App\Model\OSM;
+use App\Model\OSMTag;
 
 class OverpassApi extends ExternalApi
 {
@@ -67,7 +70,7 @@ class OverpassApi extends ExternalApi
     /* Innen már nem csak OverpassApi */
     public function deleteUrlMiserend()
     {
-        $tes = \App\Model\Osm::all()->filter(function ($model) {
+        $tes = Osm::all()->filter(function ($model) {
             return ($model->tags()->where('name', 'url:miserend')->first()) ? true : false;
         });
         foreach ($tes as $t) {
@@ -83,7 +86,7 @@ class OverpassApi extends ExternalApi
         $this->saveChurchOsmRelation();
     }
 
-    public function updateEnclosing(\App\Model\OSM $osm)
+    public function updateEnclosing(OSM $osm)
     {
         $this->downloadEnclosingBoundaries($osm->lat, $osm->lon);
         $this->saveElement();
@@ -92,7 +95,7 @@ class OverpassApi extends ExternalApi
 
     public function saveChurchOsmRelation()
     {
-        $osmElements = \App\Model\Osm::whereHas('tags', function ($query) {
+        $osmElements = Osm::whereHas('tags', function ($query) {
             $query->where('name', 'url:miserend');
         });
         foreach ($osmElements->get() as $element) {
@@ -105,10 +108,10 @@ class OverpassApi extends ExternalApi
         }
     }
 
-    public function saveOsmEnclosingRelation(\App\Model\OSM $osm)
+    public function saveOsmEnclosingRelation(OSM $osm)
     {
         foreach ($this->jsonData->elements as $element) {
-            $osmElement = \App\Model\OSM::where('osmid', $element->id)->where('osmtype', $element->type)->first();
+            $osmElement = OSM::where('osmid', $element->id)->where('osmtype', $element->type)->first();
             $sync[] = $osmElement->id;
         }
         $osm->enclosing()->sync($sync);
@@ -116,7 +119,7 @@ class OverpassApi extends ExternalApi
 
     public function saveElement()
     {
-        if (!$this->jsonData->elements) {
+        if (!isset($this->jsonData->elements)) {
             throw new \Exception('Missing Json Elements from OverpassApi Query');
         }
         $now = date('Y-m-d H:i:s', time());
@@ -129,7 +132,7 @@ class OverpassApi extends ExternalApi
                 $element->lon = $element->center->lon;
             }
 
-            $check = \App\Model\OSMTag::where('osmtype', $element->type)
+            $check = OSMTag::where('osmtype', $element->type)
                     ->where('osmid', $element->id)
                     ->where('updated_at', '>', $now)
                     ->first();
@@ -137,12 +140,12 @@ class OverpassApi extends ExternalApi
             // if(!$check) {
             foreach ($element->tags as $name => $value) {
                 // echo $element->type."-".$element->id."-".$name."<br/>";
-                $tag = \App\Model\OSMTag::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id, 'name' => $name]);
+                $tag = OSMTag::firstOrNew(['osmtype' => $element->type, 'osmid' => $element->id, 'name' => $name]);
                 $tag->value = $value;
                 $tag->save();
                 $tag->touch();
             }
-            $tags = \App\Model\OSMTag::where('osmtype', $element->type)
+            $tags = OSMTag::where('osmtype', $element->type)
                     ->where('osmid', $element->id)
                     ->where('updated_at', '<', $now)->get();
             foreach ($tags as $tag) {
@@ -151,4 +154,6 @@ class OverpassApi extends ExternalApi
             // }
         }
     }
+
+
 }

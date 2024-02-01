@@ -89,7 +89,7 @@ class Distance
                 $pointTo = ['lat' => $churchTo->location->lat, 'lon' => $churchTo->location->lon];
                 $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
                 if ($rawDistance < $maxDistance && $rawDistance > 0) {
-                    $mapquest = new ExternalApi\MapquestApi();
+                    $mapquest = new Legacy\Services\ExternalApi\MapquestApi();
                     $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
                     if (-2 == $mapquestDistance) {
                         return;
@@ -143,7 +143,7 @@ class Distance
                     $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
 
                     if ($rawDistance < $maxDistance && $rawDistance > 0) {
-                        $mapquest = new ExternalApi\MapquestApi();
+                        $mapquest = new Legacy\Services\ExternalApi\MapquestApi();
                         $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
                         if (-2 == $mapquestDistance) {
                             return;

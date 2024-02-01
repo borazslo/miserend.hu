@@ -264,7 +264,7 @@ class ServiceTimes
     {
         $exp = urlencode(str_replace("\n", '', $string));
 
-        $openingh = new ExternalApi\OpeninghApi();
+        $openingh = new Legacy\Services\ExternalApi\OpeninghApi();
 
         try {
             $openingh->validate($string);

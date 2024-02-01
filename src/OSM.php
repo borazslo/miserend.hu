@@ -53,7 +53,7 @@ class OSM
 
     public function checkUrlMiserend()
     {
-        $overpass = new ExternalApi\OverpassApi();
+        $overpass = new Legacy\Services\ExternalApi\OverpassApi();
         $overpass->downloadUrlMiserend();
 
         /*

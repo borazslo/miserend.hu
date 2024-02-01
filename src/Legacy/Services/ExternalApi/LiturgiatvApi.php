@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace App\ExternalApi;
+namespace App\Legacy\Services\ExternalApi;
 
 // https://github.com/molnarm/zsolozsma#api
 

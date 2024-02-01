@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace App\ExternalApi;
+namespace App\Legacy\Services\ExternalApi;
 
 // https://operations.osmfoundation.org/policies/nominatim/
 
@@ -32,7 +32,6 @@ class NominatimApi extends ExternalApi
 
     public function buildQuery(): void
     {
-        global $config;
         $this->rawQuery = $this->query;
     }
 }

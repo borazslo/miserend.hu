@@ -7,14 +7,15 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Html;
+namespace App\Legacy\Html;
 
-use App\ExternalApi\NominatimApi;
-use App\ExternalApi\OverpassApi;
+use App\Html\Html;
+use App\Legacy\Services\ExternalApi\NominatimApi;
+use App\Legacy\Services\ExternalApi\OverpassApi;
 use App\Legacy\Templating\TemplateContextTrait;
 use App\Model\Church;
 use App\Model\OSM;
-use Illuminate\Database\Capsule\Manager as DB;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,9 +23,19 @@ class Map extends Html
 {
     use TemplateContextTrait;
 
-    public function __construct()
+    public function __construct(
+        #[Autowire(param: 'kernel.project_dir')]
+        private readonly string $projectDir,
+    )
     {
+    }
 
+    public static function getSubscribedServices(): array
+    {
+        return parent::getSubscribedServices() + [
+            OverpassApi::class => OverpassApi::class,
+            NominatimApi::class => NominatimApi::class,
+        ];
     }
 
     public function leaflet(Request $request): Response
@@ -73,7 +84,7 @@ class Map extends Html
 
     public function getGeoJsonDioceses()
     {
-        if (!$jsonData = self::geoJsonDiocesesFromCache()) {
+        if (!$jsonData = $this->geoJsonDiocesesFromCache()) {
             $cacheTime = '1 week';
 
             $results = $this->getDatabaseManager()->table('egyhazmegye')
@@ -87,7 +98,7 @@ class Map extends Html
             $diff = array_diff($results->toArray(), []); // $osmids);
             if (\count($diff) > 0) {
                 foreach ($diff as $d) {
-                    $overpass = new OverpassApi();
+                    $overpass = $this->container->get(OverpassApi::class);
                     $overpass->setQuery('relation(id:'.$d.');out tags qt center;');
                     $overpass->buildQuery();
                     $overpass->run();
@@ -107,7 +118,7 @@ class Map extends Html
             }
             $geoJsons = [];
             foreach ($osmids as $osmid) {
-                $nominatim = new NominatimApi();
+                $nominatim = $this->container->get(NominatimApi::class);
                 $geoJsons[] = json_encode($nominatim->OSM2GeoJson('R', $osmid));
             }
 
@@ -117,7 +128,7 @@ class Map extends Html
                 $json = '['.implode(',', $geoJsons).']';
             }
 
-            $cacheDir = PROJECT_ROOT.'/var/tmp/'; // Vigyázz! Egyezzen: geoJsonDiocesesFromCache();
+            $cacheDir = $this->projectDir.'/var/tmp/'; // Vigyázz! Egyezzen: geoJsonDiocesesFromCache();
             $cacheFilePath = $cacheDir.'GeojsonDioceses';  // Vigyázz! Egyezzen: geoJsonDiocesesFromCache();
             if (!file_put_contents($cacheFilePath, $json)) {
                 throw new \Exception('We could not save the cacheFile to '.$cacheFilePath);
@@ -129,9 +140,9 @@ class Map extends Html
         }
     }
 
-    public static function geoJsonDiocesesFromCache()
+    public function geoJsonDiocesesFromCache()
     {
-        $cacheDir = PROJECT_ROOT.'/var/tmp/';
+        $cacheDir = $this->projectDir.'/var/tmp/';
         $cacheFilePath = $cacheDir.'GeojsonDioceses';
         $cacheTime = '1 sec'; // Ez hiába rövid, ha az externalApi cache-e hosszú
         if (file_exists($cacheFilePath)) {
