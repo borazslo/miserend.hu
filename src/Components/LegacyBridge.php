@@ -5,6 +5,7 @@ namespace App\Components;
 use App\Components\LegacyBridge\AjaxServicesTrait;
 use App\Components\LegacyBridge\BaseServicesTrait;
 use App\Components\LegacyBridge\ChurchServicesTrait;
+use App\Legacy\Services\ConfigProvider;
 use Illuminate\Database\Capsule\Manager;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -34,6 +35,9 @@ class LegacyBridge implements ServiceSubscriberInterface
             throw new ServiceNotFoundException($class);
         }
 
+        // init legacy stuffs
+        define('DOMAIN', $this->configProvider()->getConfig()['path']['domain']);
+
         $object = $this->container->get($class);
         return $object->{$method}($request);
     }
@@ -42,5 +46,11 @@ class LegacyBridge implements ServiceSubscriberInterface
     private function databaseManager(): Manager
     {
         return $this->container->get(Manager::class);
+    }
+
+    #[SubscribedService(key: ConfigProvider::class)]
+    private function configProvider(): ConfigProvider
+    {
+        return $this->container->get(ConfigProvider::class);
     }
 }

@@ -60,6 +60,7 @@ class Home extends Html
         return $user->getFavorites();
     }
 
+    /** @deprecated  */
     private function getRandomPhoto()
     {
         $photo = Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();

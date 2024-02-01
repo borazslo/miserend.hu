@@ -32,10 +32,7 @@
 
 
 {% block leftsidebar %}
-    {# TODO restore #}
-{#    {% if photo|default(false) %}#}
-{#        {% include 'random_church.twig' %}#}
-{#    {% endif %}#}
+    {{ render(controller('\\App\\Controller\\ChurchController::randomChurch')) }}
 {% endblock %}
 
 

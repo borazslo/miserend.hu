@@ -1,0 +1,10 @@
+{% extends 'panel/base.html.twig' %}
+{% set panel = 'default' %}
+
+
+{% block panel_body %}
+    <figure class="figure">
+        <img src="{{ constant('DOMAIN') }}/kepek/templomok/{{ photo.church.id }}/{{ photo.filename }}" class="img-responsive" loading="lazy" />
+        <figcaption class="figure-caption text-end"><a href="/templom/{{ photo.church.id }}">{{ photo.church.name }} ({{ photo.church.location.city.name ?? '' }})</a></figcaption>
+    </figure>
+{% endblock %}

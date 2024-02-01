@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -56,8 +63,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
 
     /**
      * Kedvencek, owning side.
-     *
-     * @var Collection|null
      */
     #[ORM\ManyToMany(targetEntity: Church::class, mappedBy: 'usersWhoFavored')]
     #[ORM\JoinTable(name: 'favorites')]
@@ -254,7 +259,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
 
     public function isEqualTo(UserInterface $user): bool
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof self) {
             return false;
         }
 

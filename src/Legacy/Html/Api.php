@@ -94,14 +94,14 @@ class Api extends Html
         }
     }
 
-    public function render(): void
+    public function render(string $viewName, array $context = [], int $httpStatus = 200): \Symfony\Component\HttpFoundation\Response
     {
         // Because of the Report::factoryCreate();
 
         if (!isset($this->api)) {
             $this->html = json_encode(['error' => 1, 'text' => $this->error]);
 
-            return;
+            exit;
         } elseif (isset($this->error)) {
             $this->api->return = ['error' => '1', 'text' => $this->error];
         }
@@ -115,6 +115,7 @@ class Api extends Html
         } else {
             $this->$renderfunction();
         }
+        exit;
     }
 
     public function renderText()

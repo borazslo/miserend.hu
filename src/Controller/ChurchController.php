@@ -11,6 +11,7 @@ namespace App\Controller;
 
 use App\Entity\Church;
 use App\Repository\ChurchRepository;
+use App\Repository\PhotoRepository;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -136,6 +137,13 @@ class ChurchController extends AbstractController implements EventSubscriberInte
 
         return $this->render('church/view.html.twig', [
             'church' => $church,
+        ]);
+    }
+
+    public function randomChurch(PhotoRepository $repository): Response
+    {
+        return $this->render('church/random_church.html.twig', [
+            'photo' => $repository->findRandomPhoto(),
         ]);
     }
 }
