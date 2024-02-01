@@ -1,12 +1,11 @@
- {% extends "remark.twig" %}
+{% extends "remark.twig" %}
 
 {% set title = "Észrevétel beküldése" %}
 {% set pageDescription = "Javítások, változások bejelentése a templom adataival, miserenddel, kapcsolódó információkkal (szentségimádás, rózsafűzér, hittan, stb.) kapcsolatban." %}
 
- {% block content %}
-<div>  
-    <form method=post action="/remark/add/{{ church.id }}">
-        <input type=hidden name=tid value='{{ church.id }}'>
+{% block content %}
+<div>
+    <form method="post" action="/templom/{{ tid }}/ujeszrevetel">
         {% if not user.loggedin %}
             <span class=alap>Nevem: </span>
             <input type=text size=40 name=nev class="form-control" ><br/>
@@ -14,14 +13,16 @@
             <input type=text size=40 name=email class="form-control" > * <strong>kötelező</strong><br/>
             <br/><span class=alap>Észrevételeim a templom adataihoz: </span><br>
         {% else %}
-            <input type=hidden size=40 name=nev value='{{ user.nev }}'>
+            <input type=hidden size=40 name=nev value="{{ user.nev }}">
             <input type=hidden size=40 name=email value='{{ user.email }}'>
         {% endif %}
             <textarea name=leiras class='form-control' rows=5></textarea><br/>
-            <button type=submit class="form-control">Elküld</button></td></tr></table></form>
+            <button type=submit class="form-control">Elküld</button>
+    </form>
 
-  {% if disclaimer %}
-      <br/><div class="alert alert-warning" >{{ disclaimer|raw }}</div>
-  {% endif %}
+{% if disclaimer %}
+    <br/>
+    <div class="alert alert-warning" >{{ disclaimer|raw }}</div>
+{% endif %}
 </div>
 {% endblock %}

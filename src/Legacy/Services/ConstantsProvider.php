@@ -10,7 +10,7 @@ class ConstantsProvider
 {
     public const ROLES = ['miserend', 'user'];
 
-    public function __construct(/*private readonly DB $database*/)
+    public function __construct(private readonly DB $database)
     {
     }
 

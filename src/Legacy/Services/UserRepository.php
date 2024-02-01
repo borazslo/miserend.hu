@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Legacy;
+namespace App\Legacy\Services;
 
 use App\Model\Favorite;
 use App\User;

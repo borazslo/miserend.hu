@@ -1,6 +1,6 @@
 
  <div class="accordion accordion-flush" id="periods">
-    {% for key,idoszak in miserend.periods %}
+    {% for key,idoszak in miserend.periods|default({}) %}
       <div class="accordion-item">
           <h2 class="accordion-header" >
               <button class="panel-title accordion-button {% if idoszak.current %}{% else %}collapsed{% endif %}"  data-bs-toggle="collapse" data-bs-target="#collapsePeriod{{ key }}" aria-expanded="{% if idoszak.current %}true{% else %}false{% endif %}" aria-controls="collapsePeriod{{ key }}">                    
@@ -49,7 +49,7 @@
   </div>
 
    <div class="accordion accordion-flush" id="particulars">
-     {% for key,idoszak in miserend.particulars %}
+     {% for key,idoszak in miserend.particulars|default({}) %}
     <div class="accordion-item">
         <h4 class="accordion-header">
 			<button class="panel-title accordion-button {% if idoszak.now %}{% else %}collapsed{% endif %}"  data-bs-toggle="collapse" data-bs-target="#collapseParticular{{ key }}" aria-expanded="{% if idoszak.now %}true{% else %}false{% endif %}" aria-controls="collapseParticular{{ key }}">                                
@@ -58,7 +58,7 @@
         </h4>
         <div id="collapseParticular{{ key }}" class="accordion-collapse collapse  {% if idoszak.now %}show{% endif %}" data-bs-parent="#particulars">
 
-    {% for nap in idoszak.napok %}
+    {% for nap in idoszak.napok|default({}) %}
       {% for key, mise in nap.misek %}
 
       <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
@@ -89,7 +89,7 @@
     {% endfor %}
   </div>
 
-  {% if user.isadmin %}
+  {% if app.user and user.isadmin %}
     <div>      
       <pre>
         <strong>OSM service_times kompatibilis mód:</strong>

@@ -3,7 +3,16 @@
 		<input class="form-control" data-chat-target="message" />
 		<div><a id="chat_submit" class="form-control btn btn-primary" data-action="click->chat#sendButtonDidClick">Elküldés</a></div>
 		<div id='chat_users' class='panel-body kicsi'>
-			chat.rendered_users|raw
+
+			foreach ($users as $k => $i) {
+			$users[$k] = '<span class="response_closed" data-to="'.$i.'" style="background-color: rgba(0,0,0,0.15);">'.$i.'</span>';
+			}
+			$text = '<strong>Online adminok:</strong> '.implode(', ', $users);
+			if (0 == \count($users)) {
+			$text = '<strong><i>Nincs (más) admin online.</i></strong>';
+			}
+			return $text;
+
 		</div>
 		<div id='chat_comments' class="panel-body" data-last="{{ chat.last_comment_at }}" data-unread="0" style="max-height:400px;width:100%;overflow:auto;margin-top:4px;">
 			for comment in chat.comments

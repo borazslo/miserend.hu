@@ -7,10 +7,12 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Html;
+namespace App\Legacy\Html;
 
+use App\Entity\User;
+use App\Html\Html;
 use App\Legacy\Services\ConstantsProvider;
-use App\Legacy\UserRepository;
+use App\Legacy\Services\UserRepository;
 use App\Model\Photo;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,18 +46,19 @@ class Home extends Html
 
         $user = $this->getUser();
 
-        return $this->render('home.twig', [
+        return $this->render('home.html.twig', [
             'searchform' => $this->getSearchForm(),
             'favorites' => $this->getFavorites(),
-            'alert' => LiturgicalDayAlert('html'),
+            'alert' => \LiturgicalDayAlert('html'),
             'photo' => $this->getRandomPhoto(),
         ]);
     }
 
     private function getFavorites(): iterable
     {
-        $user = $this->getUser();
-        return $this->getUserRepository()->getFavorites($user);
+        $user = $this->getSecurity()->getUser();
+        assert($user instanceof User);
+        return $user->getFavorites();
     }
 
     private function getRandomPhoto()

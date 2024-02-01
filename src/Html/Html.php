@@ -76,11 +76,11 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
             'menu' => $this->getMenu(),
         ];
 
-        if ($user->getLoggedin() && !$security->isGranted('miserend')) {
+        if ($user && !$security->isGranted('miserend')) {
             $variables['mychurches'] = feltoltes_block();
         }
 
-        if ($security->isGranted('"any"')) {
+        if ($security->isGranted('ROLE_USER')) {
             $variables['chat'] = true;
         }
 
@@ -155,6 +155,8 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
 
     protected function getMenu(): array
     {
+        return []; // todo restore
+
         $security = $this->getSecurity();
         $user = $security->getUser();
 

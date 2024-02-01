@@ -9,11 +9,12 @@
 
 namespace App\Legacy\Services;
 
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\DatabaseManager;
 
 class MessageRepository
 {
-    public function __construct(/*private readonly DB $database*/)
+    public function __construct(private readonly Manager $database)
     {
     }
 

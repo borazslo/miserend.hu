@@ -1052,7 +1052,9 @@ function widget_miserend($args)
 
 function feltoltes_block()
 {
-    global $user;
+    return []; // TODO restore
+
+    $user = $this->getSecurity()->getUser();
 
     if (!isset($user->responsibilities['church']['allowed'])) {
         return false;
@@ -1143,24 +1145,6 @@ function callPageFake($uri, $post, $phpinput = [])
     stream_wrapper_restore('php');
 
     return $page;
-}
-
-spl_autoload_register(function ($class) {
-    $classpath = PATH.'/classes/'.str_replace('\\', '/', strtolower($class)).'.php';
-    if ($file = file_exists_ci($classpath)) {
-        require_once $file;
-    }
-});
-
-if (!function_exists('env')) {
-    function env($name, $default = false)
-    {
-        if (!getenv($name)) {
-            return $default;
-        } else {
-            return getenv($name);
-        }
-    }
 }
 
 function file_exists_ci($fileName)

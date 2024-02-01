@@ -1,4 +1,4 @@
-{% extends "layout.twig" %}
+{% extends "layout.html.twig" %}
 {% set selfAdvertisement = true %}
 {% set pageTitle = 'Miserend' %}
 
@@ -23,10 +23,26 @@
 {%  endblock %}
 
 
+{% block javascripts %}
+    {{ parent() }}
+
+    {{ encore_entry_script_tags('home') }}
+
+{% endblock %}
+
+
+{% block leftsidebar %}
+    {# TODO restore #}
+{#    {% if photo|default(false) %}#}
+{#        {% include 'random_church.twig' %}#}
+{#    {% endif %}#}
+{% endblock %}
+
+
 {% block content %}
-    {% include 'announcment.twig' ignore missing %}
+{#    {% include 'announcment.twig' ignore missing %}#}
     
-    {{ alert|raw }}
+    {{ alert|default('')|raw }}
 
     <div class="miseurlap">
         <form method="get" action="/templom" name="kereses" id="kereses" class="form-group" data-controller="search">
@@ -150,20 +166,5 @@
     </div>
 
     <br><br><br>
-	{% include '_panelnea.twig' %}
+{#	{% include '_panelnea.twig' %}#}
 {%  endblock %}
-
-
-{% block javascripts %}
-    {{ parent() }}
-
-    {{ encore_entry_script_tags('home') }}
-
-{% endblock %}
-
-
-{% block leftsidebar %}
-    {% if photo %}
-        {% include 'random_church.twig' %}
-    {% endif %}
-{% endblock %}

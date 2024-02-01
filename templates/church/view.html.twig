@@ -38,7 +38,7 @@
     <h5><b>Frissítve:</b> {{ church.updatedAt|date('Y-m-d H:i') }}</h5>
 
     {% if church.massActive %}
-        {% include "church/_schedule.twig" %}
+{#        {% include "church/_schedule.twig" %}#}
     {% else %}
         <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
     {% endif %}

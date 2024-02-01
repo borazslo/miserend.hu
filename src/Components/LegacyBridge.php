@@ -27,8 +27,14 @@ class LegacyBridge implements ServiceSubscriberInterface
         return $object->{$method}($request);
     }
 
+    #[SubscribedService(key: Html\Home::class)]
+    private function homeView(): Html\Home
+    {
+        return $this->container->get(Html\Home::class);
+    }
+
     #[SubscribedService(key: Html\Ajax\Chat::class)]
-    private function ajaxChat(): Html\Ajax\Chat
+    private function ajaxChatView(): Html\Ajax\Chat
     {
         return $this->container->get(Html\Ajax\Chat::class);
     }

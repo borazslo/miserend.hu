@@ -15,11 +15,16 @@
 {% endblock %}
 
 {% block content %}
-<div style="width:100%-10px;background-color:#ffffff;padding:5">  
-  <h2>Köszönjük!</h2>
-  <strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong></br>
-  <input type='button' value='Ablak bezárása' onclick='self.close()'>
+<div style="width: calc(100% - 10px); background-color: #ffffff; padding: 5px">
+	<h2>Köszönjük!</h2>
+	<strong>A megjegyzést elmentettük és igyekszünk mihamarabb feldolgozni!</strong>
+	<br />
+	<input type="button" value="Ablak bezárása" onclick="self.close()" />
   
-  {% if debug < 1 %}<script language=Javascript>setTimeout(function(){self.close();},3000);</script>{% endif %}
+	{% if debug < 1 %}
+		<script>
+			setTimeout(function(){self.close();},3000);
+		</script>
+	{% endif %}
 </div>
 {% endblock %}
