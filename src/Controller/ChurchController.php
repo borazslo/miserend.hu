@@ -154,8 +154,7 @@ class ChurchController extends AbstractController implements EventSubscriberInte
     public function favorites(
         #[CurrentUser]
         User $user = null,
-    )
-    {
+    ) {
         return $this->render('church/favorites.html.twig', [
             'favorites' => $user === null ? $this->getRepository()->findMostFavorite() : $user->getFavorites(),
         ]);
