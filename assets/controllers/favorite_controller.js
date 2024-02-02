@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus';
-import Autocomplete from 'bootstrap5-autocomplete';
 
 export default class extends Controller {
     loading = false
@@ -37,30 +36,21 @@ export default class extends Controller {
 
         this.loading = true
 
-        let body
+        const body = new FormData();
+        body.set("church", this.churchId);
         if (this.favorite) {
-            body = {
-                method: 'del',
-                'church-id': this.churchId
-            }
+            body.set('method', 'del');
         } else {
-            body = {
-                method: 'add',
-                'church-id': this.churchId
-            }
+            body.set('method', 'add');
         }
 
         try {
-            let response = await fetch('/ajax/favorite', {
+            let response = await fetch('/api/v1/church/favorite', {
                 method: 'POST',
                 cache: 'no-cache',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 redirect: "follow",
                 referrerPolicy: "no-referrer",
-                body: JSON.stringify(body),
+                body: body,
             })
 
             let responseObject = await response.json()
