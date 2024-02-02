@@ -91,7 +91,6 @@ class Church extends Html
             'title' => $title,
             'pageTitle' => $title.' | Miserend',
             'og_image' => isset($church->photos[0]) ? '/kepek/templomok/'.$tid.'/'.$church->photos[0]->fajlnev : null,
-            'alert' => LiturgicalDayAlert('html'),
             'isChurchHolder' => $user->getHoldingData($church->id),
             'church' => $church,
             'remarksicon' => $church->remarksicon,

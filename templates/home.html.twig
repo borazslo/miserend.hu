@@ -44,7 +44,7 @@
 {#    {% include 'announcment.twig' ignore missing %}#}
     {% import "forms.twig" as forms %}
 
-    {{ alert|default('')|raw }}
+    {{ render(controller('\\App\\Controller\\LiturgicalDayController')) }}
 
     <div class="miseurlap">
         {{ render(controller('\\App\\Controller\\SearchController::search')) }}

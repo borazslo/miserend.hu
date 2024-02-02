@@ -113,6 +113,7 @@ function LirugicalDay($datum = false)
     }
 }
 
+/** @deprecated  */
 function LiturgicalDayAlert($html = false, $date = false)
 {
     if (false == $date) {

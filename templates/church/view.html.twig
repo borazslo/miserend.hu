@@ -31,7 +31,7 @@
 
 
 {% block content %}
-    {{ alert|default('')|raw }}
+    {{ render(controller('\\App\\Controller\\LiturgicalDayController')) }}
 
     {% if liturgiatv|default(false) is not empty %}
         {% include 'church/_panelliturgiatv.twig' %}
