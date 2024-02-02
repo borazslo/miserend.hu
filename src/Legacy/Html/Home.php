@@ -9,8 +9,6 @@
 
 namespace App\Legacy\Html;
 
-use App\Entity\User;
-use App\Legacy\Model\Photo;
 use App\Legacy\Services\ConstantsProvider;
 use App\Legacy\Services\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -47,27 +45,9 @@ class Home extends Html
 
         return $this->render('home.html.twig', [
             'searchform' => [],
-            'favorites' => $this->getFavorites(),
-            'alert' => \LiturgicalDayAlert('html'),
-            'photo' => $this->getRandomPhoto(),
+            'favorites' => [],
+            'alert' => '',
+            'photo' => [],
         ]);
-    }
-
-    private function getFavorites(): iterable
-    {
-        $user = $this->getSecurity()->getUser();
-        assert($user instanceof User);
-        return $user->getFavorites();
-    }
-
-    /** @deprecated  */
-    private function getRandomPhoto()
-    {
-        $photo = Photo::big()->vertical()->where('flag', 'i')->orderbyRaw('RAND()')->first();
-        if ($photo->church) { // TODO: Van, hogy a random képhez nem is tartozik templom. Valami régi hiba miatt.
-            $photo->church->location;
-        }
-
-        return $photo;
     }
 }
