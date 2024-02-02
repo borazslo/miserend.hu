@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Components\ApiClients;
 
 use App\Components\ApiClients\Response\CommunitiesResponse;
@@ -14,8 +21,7 @@ class CommunitiesApiClient
         private readonly CacheInterface $cache,
         private readonly HttpClientInterface $httpClient,
         private readonly int $defaultCacheLength = 604_800,
-    )
-    {
+    ) {
     }
 
     public function getCommunityInfoWithChurch(Church $church): ?CommunitiesResponse
@@ -25,7 +31,7 @@ class CommunitiesApiClient
 
     public function getCommunityInfoWithChurchId(int $churchId): ?CommunitiesResponse
     {
-        assert($churchId > 0);
+        \assert($churchId > 0);
 
         $jsonString = $this->cache->get($this->getCacheKey($churchId), function (ItemInterface $item) use ($churchId) {
             $item->expiresAfter($this->defaultCacheLength);
@@ -47,34 +53,4 @@ class CommunitiesApiClient
     {
         return sprintf('communities-%d', $churchId);
     }
-
-// https://kozossegek.hu/api/v1/miserend/3669
-
-    // 3669
-//    public function getKozossegekAttribute($value)
-//    {
-//        $api = new KozossegekApi();
-//        $api->query = 'miserend/'.$this->id;
-//        $api->run();
-//        if (isset($api->jsonData->data) > 0) {
-//            return $api->jsonData->data;
-//        } else {
-//            return false;
-//        }
-//    }
 }
-
-/*
-
-class KozossegekApi extends ExternalApi
-{
-    public $name = 'kozossegek';
-    public $apiUrl = 'https://kozossegek.hu/api/v1/';
-    public $cache = '1 week'; // false or any time in strtotime() format
-    public $testQuery = 'miserend/1168';
-
-    public function buildQuery(): void
-    {
-        $this->rawQuery = $this->query;
-    }
-}*/
