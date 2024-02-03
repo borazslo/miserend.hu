@@ -94,41 +94,8 @@
     </div>
     <div class="container">
         <div class="row church-site-sidebar-holder">
-            <div class="col-md-3  col-sm-3 church-site-left-sidebar">
-                {% block left_sidebar %}
-                    {% if chat|default(false) %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
-                    {% if mychurches|default(false) %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}
-
-                    {% if show_self_advertistment_panel|default(true) %}
-                        {% include 'panel/selfadvertisement.html.twig' %}
-                    {% endif %}
-
-                {% endblock %}
-            </div>
-            <div class="col-md-{% if columns2|default(false) %}9{% else %}6{% endif %} col-sm-6 church-site-main-content">
-                {% block pageHeader %}
-                    <div class="page-header">
-                        <h2>{{ title|raw }}</h2>
-                    </div>
-                {% endblock %}
-
-                {% block messages %}
-                    {% if messages|default([])|length > 0 %}
-                        <div id="messages" style="margin-bottom:6px">
-                            {% for message in messages %}
-                                {% include 'message.twig' with message %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                {% endblock %}
-                {% block content %}{% endblock %}
-                <br/>
-            </div>
-            {% if columns2|default(false) %}{% else %}
-                <div class="col-md-3 col-sm-3 church-site-right-sidebar">
-                    {% block rightsidebar %}{% endblock %}
-                </div>
-            {% endif %}
+            {% block container_col %}
+            {% endblock %}
         </div>
     </div>
     <div class="footer">

@@ -1,0 +1,14 @@
+{% extends 'layout_2col.html.twig' %}
+
+
+{% block container_col_attr -%}
+    col-md-6
+{%- endblock %}
+
+
+{% block container_col %}
+    {{ parent() }}
+    <div class="col-md-3 col-sm-3 church-site-right-sidebar">
+        {% block right_sidebar %}{% endblock %}
+    </div>
+{% endblock %}
