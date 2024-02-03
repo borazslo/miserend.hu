@@ -54,13 +54,6 @@ home:
     _legacy_class: App\Legacy\Html\Home
     _legacy_method: main
 
-map:
-  path: /terkep
-  controller: App\Components\LegacyBridge
-  defaults:
-    _legacy_class: App\Legacy\Html\Map
-    _legacy_method: leaflet
-
 ajax_churchesinbbox:
   path: /ajax/churchesinbbox
   controller: App\Components\LegacyBridge

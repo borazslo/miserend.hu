@@ -1,11 +1,30 @@
-<div id="mapid" data-controller="map-leaflet"
-    {%- if center is defined -%}
-        {{ ' data-center-point' }}="{{ center.lat }}x{{ center.lon }}x{{ center.zoom }}"
-    {%- endif -%}
+{% extends 'map/base.html.twig' %}
+
+
+{% block content %}
+
+    {# todo kitenni stilusba #}
+    <style>
+        #mapid  {
+            position: absolute;
+            width:100%;
+            height:100%;
+            left:0;
+            top:0;
+        }
+    </style>
+
+    {% set args = {} %}
+    {% if church is defined and church is not null %}
+        {% set args = args|merge({church:church, center: {lat: church.latitude, lon: church.longitude, zoom: 13}}) %}
+    {% endif %}
+    {% if center is defined %}
+        {% set args = args|merge({center: center}) %}
+    {% endif %}
     {% if boundary is defined %}
-        {{ ' data-boundary' }}="{{ boundary }}"
+        {% set args = args|merge({boundary: boundary}) %}
     {% endif %}
-    {% if church.id is defined %}
-        {{ ' data-church-id' }}="{{ church.id }}"
-    {% endif %}
-></div>
+
+    {% include 'map/leaflet_widget.html.twig' with args only %}
+
+{% endblock %}
