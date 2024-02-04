@@ -7,17 +7,10 @@ use Symfony\Contracts\Service\Attribute\SubscribedService;
 
 trait UserServicesTrait
 {
-    #[SubscribedService(key: Html\Church\Church::class)]
-    private function churchChurchView(): Html\Church\Church
+
+    #[SubscribedService(key: Html\User\Catalogue::class)]
+    private function userCatalogue(): Html\User\Catalogue
     {
-        return $this->container->get(Html\Church\Church::class);
+        return $this->container->get(Html\User\Catalogue::class);
     }
-
-    #[SubscribedService(key: Html\Church\Catalogue::class)]
-    private function churchAdminList(): Html\Church\Catalogue
-    {
-        return $this->container->get(Html\Church\Catalogue::class);
-    }
-
-
 }

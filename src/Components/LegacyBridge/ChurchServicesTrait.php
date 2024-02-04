@@ -18,6 +18,4 @@ trait ChurchServicesTrait
     {
         return $this->container->get(Html\Church\Catalogue::class);
     }
-
-
 }
