@@ -73,7 +73,7 @@ class Chat extends Ajax
     public function send(Request $request): JsonResponse
     {
         $security = $this->getSecurity();
-        if (!$security->isGranted("'any'")) {
+        if (!$security->isGranted('ROLE_USER')) {
             return $this->forbiddenResponse();
         }
 
@@ -121,7 +121,7 @@ class Chat extends Ajax
 
     public function users(Request $request): JsonResponse
     {
-        if (!$this->getSecurity()->isGranted("'any'")) {
+        if (!$this->getSecurity()->isGranted('ROLE_USER')) {
             return $this->forbiddenResponse();
         }
 

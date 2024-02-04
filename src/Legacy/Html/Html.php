@@ -75,7 +75,7 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
             'menu' => $this->getMenu(),
         ];
 
-        if ($user && !$security->isGranted('miserend')) {
+        if ($user && !$security->isGranted('ROLE_CHURCH_ADMIN')) {
             $variables['mychurches'] = feltoltes_block();
         }
 
@@ -157,7 +157,7 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
         return []; // todo restore
 
         $menu = [];
-        if (isset($user->getResponsible()['diocese']) && \count($user->getResponsible()['diocese']) > 0 && !$security->isGranted('miserend')) {
+        if (isset($user->getResponsible()['diocese']) && \count($user->getResponsible()['diocese']) > 0 && !$security->isGranted('ROLE_CHURCH_ADMIN')) {
             $menu += $this->getResponsibleMenu();
         }
 

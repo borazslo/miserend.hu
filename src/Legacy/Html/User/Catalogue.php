@@ -23,7 +23,7 @@ class Catalogue extends Html
      */
     public function list(Request $request): Response
     {
-        if (!$this->getSecurity()->isGranted('user')) {
+        if (!$this->getSecurity()->isGranted('ROLE_USER_ADMIN')) {
             throw new \Exception('Nincs jogosultságod megnézni a felhasználók listáját.');
         }
 

@@ -25,7 +25,7 @@ class Catalogue extends Html
 
     public function list(Request $request): Response
     {
-        if (!$this->getSecurity()->isGranted('miserend')) {
+        if (!$this->getSecurity()->isGranted('ROLE_CHURCH_ADMIN')) {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');
         }
 

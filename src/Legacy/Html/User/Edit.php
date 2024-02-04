@@ -114,7 +114,7 @@ class Edit extends Html
     {
         $userId = $request->attributes->getInt('user_id');
 
-        if (!$this->getSecurity()->isGranted('user')) {
+        if (!$this->getSecurity()->isGranted('ROLE_USER_ADMIN')) {
             throw new \Exception('Nincs megfelelő jogosultságod!');
         }
 

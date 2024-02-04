@@ -17,7 +17,7 @@ class Favorite extends Ajax
 {
     public function favorite(Request $request): Response
     {
-        if (!$this->getSecurity()->isGranted('"any"')) {
+        if (!$this->getSecurity()->isGranted('ROLE_USER')) {
             return new JsonResponse([
                 'status' => 'failed',
                 'message' => 'A kedvencek közé mentéshez be kell jelentkezni.',

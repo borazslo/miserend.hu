@@ -13,4 +13,11 @@ trait ChurchServicesTrait
         return $this->container->get(Html\Church\Church::class);
     }
 
+    #[SubscribedService(key: Html\Church\Catalogue::class)]
+    private function churchAdminList(): Html\Church\Catalogue
+    {
+        return $this->container->get(Html\Church\Catalogue::class);
+    }
+
+
 }

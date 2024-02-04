@@ -18,7 +18,7 @@ class Create extends Html
 {
     public function create(Request $request): Response
     {
-        if (!$this->getSecurity()->isGranted('miserend')) {
+        if (!$this->getSecurity()->isGranted('ROLE_CHURCH_ADMIN')) {
             throw new \Exception('Nincs jogosultságod a templomot létrehozni.');
         }
 
