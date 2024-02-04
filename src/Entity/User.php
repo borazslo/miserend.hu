@@ -31,7 +31,11 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
     #[ORM\Column(name: 'jelszo', type: Types::STRING, length: 255, nullable: true)]
     private ?string $password = null;
 
-    #[ORM\Column(name: 'jogok', type: Types::SIMPLE_ARRAY, length: 200)]
+    /** @deprecated */
+    #[ORM\Column(name: 'jogok', type: Types::STRING, length: 200)]
+    private string $jogok = '';
+
+    #[ORM\Column(name: 'roles', type: Types::SIMPLE_ARRAY)]
     private array $roles = ['ROLE_USER'];
 
     #[ORM\Column(name: 'regdatum', type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
@@ -113,6 +117,17 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
         $this->roles = $roles;
 
         return $this;
+    }
+
+    /**
+     * @deprecated
+     * @see self::getRoles()
+     *
+     * @return string
+     */
+    public function getJogok(): string
+    {
+        return $this->jogok;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable

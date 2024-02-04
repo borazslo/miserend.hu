@@ -32,6 +32,29 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function migrateOldRolesToNew(User $user): void
+    {
+        $newRoles = ['ROLE_USER'];
+        $oldRoles = explode('-', $user->getJogok());
+        if (\in_array('miserend', $oldRoles)) {
+            $newRoles[] = 'ROLE_CHURCH_ADMIN';
+        }
+
+        if (\in_array('user', $oldRoles)) {
+            $newRoles[] = 'ROLE_USER_ADMIN';
+        }
+
+        $user->setRoles($newRoles);
+    }
+
+    public function initPasswordChange(User $user, bool $save = false): void
+    {
+        $randomizer = new Randomizer();
+        $passwordChangeHash = bin2hex($randomizer->getBytes(16));
+
+        $user->setPasswordChangeHash($passwordChangeHash);
+    }
+
     public function save(User $user, bool $flush = false): void
     {
         $user->setCreatedAt(new \DateTimeImmutable());
@@ -45,13 +68,5 @@ class UserRepository extends ServiceEntityRepository
     public function flush(): void
     {
         $this->_em->flush();
-    }
-
-    public function initPasswordChange(User $user, bool $save = false): void
-    {
-        $randomizer = new Randomizer();
-        $passwordChangeHash = bin2hex($randomizer->getBytes(16));
-
-        $user->setPasswordChangeHash($passwordChangeHash);
     }
 }
