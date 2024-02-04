@@ -47,7 +47,9 @@
         "phpunit/phpunit": "9.*",
         "symfony/web-profiler-bundle": "^7.0",
         "symfony/maker-bundle": "^1.52",
-        "friendsofphp/php-cs-fixer": "^3.46"
+        "friendsofphp/php-cs-fixer": "^3.46",
+        "symfony/stopwatch": "^7.0",
+        "symfony/debug-bundle": "^7.0"
     },
     "config": {
         "allow-plugins": {
