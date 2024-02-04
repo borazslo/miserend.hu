@@ -156,13 +156,7 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
     {
         return []; // todo restore
 
-        $security = $this->getSecurity();
-        $user = $security->getUser();
-
         $menu = [];
-        if ($security->isGranted("'any'")) {
-            $menu = $this->getAdminMenu();
-        }
         if (isset($user->getResponsible()['diocese']) && \count($user->getResponsible()['diocese']) > 0 && !$security->isGranted('miserend')) {
             $menu += $this->getResponsibleMenu();
         }
@@ -173,30 +167,6 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
         ];
 
         return $menu;
-    }
-
-    public function getAdminMenu(): array
-    {
-        $adminMenuItems = [
-            [
-                'title' => 'Miserend',
-                'url' => '/termplom/list',
-                'permission' => 'miserend',
-                'mid' => 27,
-                'items' => [
-                    ['title' => 'teljes lista', 'url' => '/templom/list', 'permission' => ''],
-                    ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
-                    ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
-                    ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
-                    ['title' => 'egészség', 'url' => '/health', 'permission' => 'miserend'],
-                    ['title' => 'API tesztelés', 'url' => '/apitest', 'permission' => 'miserend'],
-                    ['title' => 'OSM kapcsolat', 'url' => '/josm', 'permission' => 'miserend'],
-                ],
-            ],
-            ['title' => 'Felhasználók', 'url' => '/user/catalogue', 'permission' => 'user'],
-        ];
-
-        return $this->clearMenu($adminMenuItems);
     }
 
     public function getResponsibleMenu(): array
@@ -213,27 +183,6 @@ class Html implements ContainerAwareInterface, ServiceSubscriberInterface
                 ],
             ],
         ];
-    }
-
-    private function clearMenu($menuitems): array
-    {
-        $user = $this->getUser();
-        foreach ($menuitems as $key => $item) {
-            if (isset($item['permission']) && !$user->checkRole($item['permission'])) {
-                unset($menuitems[$key]);
-            } else {
-                if (isset($item['items']) && \is_array($item['items'])) {
-                    foreach ($item['items'] as $k => $i) {
-                        if (isset($i['permission']) && !$user->checkRole($i['permission'])) {
-                            unset($menuitems[$key][$k]);
-                        } else {
-                        }
-                    }
-                }
-            }
-        }
-
-        return $menuitems;
     }
 
     /**

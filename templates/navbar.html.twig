@@ -9,6 +9,27 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('map_main') }}">Térkép</a>
                 </li>
+                {% if is_granted('ROLE_CHURCH_ADMIN') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="/termplom/list" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Miserend
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/templom/list" class="dropdown-item">Teljes lista</a></li>
+                            <li><a href="/egyhazmegye/list" class="dropdown-item">Egyházmegyei lista</a></li>
+                            <li><a href="/eventscatalogue" class="dropdown-item">Kifejezések és dátumok</a></li>
+                            <li><a href="/stat" class="dropdown-item">Statisztika</a></li>
+                            <li><a href="/health" class="dropdown-item">Egészség</a></li>
+                            <li><a href="/apitest" class="dropdown-item">API tesztelés</a></li>
+                            <li><a href="/josm" class="dropdown-item">OSM kapcsolat</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+                {% if is_granted('ROLE_USER_ADMIN') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/catalogue">Felhasználók</a>
+                    </li>
+                {% endif %}
 
                 {% if menu|default(false) %}
                     {% for items in menu %}
