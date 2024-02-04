@@ -5,6 +5,7 @@ namespace App\Components;
 use App\Components\LegacyBridge\AjaxServicesTrait;
 use App\Components\LegacyBridge\BaseServicesTrait;
 use App\Components\LegacyBridge\ChurchServicesTrait;
+use App\Components\LegacyBridge\UserServicesTrait;
 use App\Legacy\Services\ConfigProvider;
 use Illuminate\Database\Capsule\Manager;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -22,6 +23,7 @@ class LegacyBridge implements ServiceSubscriberInterface
     use BaseServicesTrait;
     use AjaxServicesTrait;
     use ChurchServicesTrait;
+    use UserServicesTrait;
 
     public function __invoke(Request $request): Response
     {
