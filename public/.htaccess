@@ -32,6 +32,7 @@
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^([^?]*)$ /index.php?q=$1 [NC,L,QSA]
+
+    FallbackResource /index.php
 
 </IfModule>
