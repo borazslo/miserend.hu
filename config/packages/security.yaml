@@ -12,8 +12,10 @@ security:
         users_in_memory: { memory: null }
 
     role_hierarchy:
-        ROLE_ADMIN:       ROLE_USER
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_USER_ADMIN:       ROLE_USER
+        ROLE_CHURCH_ADMIN:     ROLE_USER
+        ROLE_ADMIN:            [ROLE_CHURCH_ADMIN, ROLE_USER_ADMIN, ROLE_USER]
+        ROLE_SUPER_ADMIN:      [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     firewalls:
         dev:
