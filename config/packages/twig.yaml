@@ -1,9 +1,6 @@
 twig:
+    file_name_pattern: '*.twig'
     default_path: '%kernel.project_dir%/templates'
-    strict_variables: true
-    globals:
-        environment: "%kernel.environment%"
-        git_version: "%env(MISEREND_GIT_VERSION)%"
 
 when@test:
     twig:
