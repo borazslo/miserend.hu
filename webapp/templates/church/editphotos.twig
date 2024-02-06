@@ -1,0 +1,120 @@
+{% extends "layout.twig" %}
+
+{% set columns2 = true  %}
+
+{% import "forms.twig" as forms %}
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>            
+            Fotók kezelése: {{ church.nev }}
+			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+            {% if church.ismertnev != ''  %}
+                <br/>
+                <small>
+                    &nbsp;<span class="hidden-xs hidden-sm">
+                        ({{ church.ismertnev|raw }})
+                    </span>
+                </small>
+            {% endif %}
+        </h2>
+    </div>
+{%  endblock %}
+
+
+{% block content %}
+		 		
+		<p>A misézőhelyhez tartozó fényképek kezelése lehetséges itt. 
+		A képekre kattintva megnézhetjük azokat nagyobb méretebn. 
+		A kiemelt képek közül kerül ki a borítókép.
+		Ha egy képnek nagyobb súlyt adunk, akkor a sorrendben lennebb kerül az albumban.
+		A törlésre jelölünk ki egy képet, akkor az oldal mentése után visszavonhatatlanul törlődik a kép.
+		</p>
+		<p>Új képet a templom oldaláról az <a href="javascript:OpenNewWindow('/templom/{{ church.id }}/ujkep',450,530);" class=link>
+            <font color=#8D317C size=''><b>Új kép beküldése</b></font></a> pontra kattintva lehet feltölteni.</p>
+		
+		
+
+    <FORM ENCTYPE='multipart/form-data' method=post>
+        <input type=hidden name=church[id] value={{ church.id }}>
+			
+		{% for photo in church.photos %}
+			<div class="row" id="photo-{{ photo.id }}">
+				<div class="col-sm-4">
+				  <a href="{{ constant('DOMAIN') }}{{ photo.url }}" data-lightbox="templomkepek-{{ church.id }}" >
+						<img src="{{ constant('DOMAIN')}}{{ photo.url }}">
+					</a>
+				</div>
+				<div  class="col-sm-8">
+					<input type="hidden" name="photos[{{ photo.id }}][id]" value="{{ photo.id }}">
+								
+					<div class="form-group form-horizontal input-group-sm form-check">                
+						<label class="col-sm-4 form-check-label text-end" for="photos_{{ photo.id }}_kiemeles">kiemelt</label>
+						<div class="col-sm-8">														
+							<input type="hidden" name="photos[{{ photo.id }}][flag]" value='n' class="form-control">
+							<input type="checkbox" name="photos[{{ photo.id }}][flag]" value="i" {% if  photo.flag == 'i' %}checked{% endif %} id="photos_{{ photo.id }}_kiemeles" class="form-check-input">
+							<small>A kiemelt képek közül kerül ki a borítókép.</small>
+						</div>                
+					</div>      
+					<div class="form-group form-horizontal input-group-sm">                
+						<label class="col-sm-4 control-label form-check-label label-sm">méret</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" placeholder="{{ photo.width }}px X {{ photo.height }}px" readonly>
+						</div>                
+					</div>	
+					
+					<div class="form-group form-horizontal input-group-sm">                
+						<label class="col-sm-4 control-label">súly</label>
+						<div class="col-sm-8">
+							<input name="photos[{{ photo.id }}][weight]" size="2" value="{{ photo.weight }}" type="text" class="form-check-inline input-xsmall form-control" placeholder="Súly egész számban" style="width:4em">
+							<small>Minél nagyobb a szám annál lejjebb kerül a listában.</small>
+						</div>                
+					</div>
+					<div class="form-group form-horizontal input-group-sm">                
+						<label class="col-sm-4 control-label labe-sm">a kép címe</label>
+						<div class="col-sm-8">
+							<input name="photos[{{ photo.id }}][title]" value="{{ photo.title }}" type="text" class="form-control" placeholder="A kép címe">
+						</div>                
+					</div>
+					<div class="form-group form-horizontal input-group-sm ">                
+						<label class="col-sm-4 form-check-label text-end" for="photos_{{ photo.id }}_torles" >törlése</label>
+						<div class="col-sm-8">
+							<input type="checkbox" name="photos[{{ photo.id }}][delete]" id="photos_{{ photo.id }}_torles" value="1" class="form-check-input">
+						</div>  
+					</div>    
+										
+				</div>
+				<div class="text-success"><hr class=" border-2"></div>
+			</div>
+		{% endfor %}
+
+					
+          <table>        
+            <tr>
+                <td>
+                    <div align=right><input type=submit name='submit' value=Mehet class=urlap>&nbsp;</div>
+                </td>
+                <td>					
+                    <input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span><br/>
+                    <input type=radio name=modosit value=m class=urlap><span class=alap> és tovább a miserendre</span><br/>
+                    <input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span><br/>
+                    <input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </form> 
+
+
+<link rel="stylesheet" href="/node_modules/lightbox2/dist/css/lightbox.min.css" />
+<script src="/node_modules/lightbox2/dist/js/lightbox.min.js"></script>
+
+<script>
+    lightbox.option({
+      'resizeDuration': 200,
+      'wrapAround': true
+    })
+</script>
+
+
+{% endblock %}

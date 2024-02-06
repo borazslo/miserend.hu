@@ -196,7 +196,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
     
     public function getJelzesAttribute() {
-            $jelzes = $this->remarksStatus['html'];
+            $jelzes = ""; //$this->remarksStatus['html'];
 
             if ($this->miseaktiv == 1) {
                 $countMasses = DB::table('misek')->where('tid', $this->id)->where('torles', '0000-00-00 00:00:00')->count();
@@ -224,7 +224,21 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 $jelzes .= '<span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" style="color:grey" title="OSM adat hiányzik még"></span>';
             return $jelzes;
     }
-    
+
+      public function getRemarksiconAttribute() {
+			
+		 $allapotok = \Eloquent\Remark::where('church_id',$this->id)->groupBy('allapot')->pluck('allapot')->toArray();            
+            if (in_array('u', $allapotok))
+				$remarksicon = "ICONS_REMARKS_NEW";                
+            elseif (in_array('f', $allapotok))
+				$remarksicon = "ICONS_REMARKS_PROCESSING";
+            elseif (count($allapotok) > 0)
+				$remarksicon = "ICONS_REMARKS_ALLDONE";
+			else
+				$remarksicon = "ICONS_REMARKS_NO";
+			return $remarksicon;
+    }
+	
     function getFullNameAttribute($value) {
         $return = $this->nev;
         if (!empty($this->ismertnev)) {
@@ -273,11 +287,12 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 'id'=>$this->osmid,
                 'url' => 'https://www.openstreetmap.org/'.$this->osmtype.'/'.$this->osmid
                  );
-        } else {
-            $location->access = $this->megkozelites;
+        } else {            
             $location->address = $this->cim;
         }
-
+		if($this->megkozelites != '')
+			$location->access = $this->megkozelites;
+		
         /* Address addr:steet, addr:housenumber */
         $tags = collect(\Eloquent\OSMTag::where('osmtype',$this->osmtype)
                 ->where('osmid',$this->osmid)

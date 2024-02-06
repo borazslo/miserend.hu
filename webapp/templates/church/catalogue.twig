@@ -46,10 +46,11 @@
     <table class="table table-hover table-condensed table-striped">
         <tr>
             <th class="col-md-1"></th>
-            <th class="col-md-7">Misézőhely neve (és városa)</th>
-            <th class="col-md-1"><i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése"></i></th>
-            <th class="col-md-1"><i class="{{ ICONS_CHURCH_EDIT }}" title="Templom szerkesztése"></i></th>
+            <th class="col-md-6">Misézőhely neve (és városa)</th>
+			<th class="col-md-1"><i class="{{ ICONS_REMARKS_NEW }}" title="Észrevételek kezelése"></i></th>			
+            <th class="col-md-1"><i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése"></i></th>            
             <th class="col-md-1"><i class="{{ ICONS_CHURCH_SEE }}" title="Templom lapjának megtekintése"></i></th>
+			<th class="col-md-1"><i class="{{ ICONS_CHURCH_EDIT }}" title="Templom szerkesztése"></i></th>
             <th class="col-md-1"><i class="{{ ICONS_DELETE }}" title="Templom és miserendje törlése"></i></th>
         </tr>
         {% for church in churches %}
@@ -67,14 +68,18 @@
                         <strong>{{ church.nev }}</strong> ({{ church.varos }})
                     </a>
                 </td>
-                <td>
-                    <a href="/templom/{{ church.id }}/editschedule">
-                        <i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése..."></i>
-                    </a>
-                </td>
+				<td>
+					<a href="javascript:OpenScrollWindow('/templom/{{ church.id }}/eszrevetelek',550,500);">
+						<i class='{{ _context[church.remarksicon] }}' style='font-size:medium'  	title='Észrevételek kezelése'></i></a>
+					</td>                
                 <td>
                     <a href="/templom/{{ church.id }}/edit">
                         <i class="{{ ICONS_CHURCH_EDIT }}" title="A templom adatainak szerkesztése."></i>
+                    </a>
+                </td>
+				<td>
+                    <a href="/templom/{{ church.id }}/editschedule">
+                        <i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése..."></i>
                     </a>
                 </td>
                 <td>

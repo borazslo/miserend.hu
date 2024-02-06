@@ -166,7 +166,8 @@ class OSM extends \Illuminate\Database\Eloquent\Model {
 		$osm = new \ExternalApi\OpenstreetmapApi();
 		$osm->cache = false;
 		$osm->query = $this->osmtype."/".$this->osmid;
-		$osm->run();
+		if(!$osm->run()) return false;
+		
 		$xmlData = $osm->xmlData;
 				
 		

@@ -53,7 +53,10 @@ class Church extends \Html\Html {
            // $distance->MupdateChurch($church);
         }        
   
+								
         copyArrayToObject($church->toArray(), $this);
+				
+		$this->church = ['remarksicon' => $church->remarksicon, 'id' => $church->id]; // A church/_adminlinks.twig számára kell ez. Bocsi.
         $this->neighbours = $church->neighbours;
         
         
@@ -66,20 +69,18 @@ class Church extends \Html\Html {
 
         //Miseidőpontok
         $misek = getMasses($tid);
-                
-        if ($this->writeAcess)  {
-            $nev = " <a href='/templom/$tid/edit'><i class='fa fa-edit blue' style='font-size:medium'  title='Szerkesztés/módosítás'></i></a> "
-                    . "<a href='/templom/$tid/editschedule' ><i class='blue far fa-clock ' style='font-size:medium' title='mise módosítása'></i></a>";
-            
-            $allapotok = \Eloquent\Remark::where('church_id',$tid)->groupBy('allapot')->pluck('allapot')->toArray();            
-            if (in_array('u', $allapotok))
-                $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
-            elseif (in_array('f', $allapotok))
-                $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
-            elseif (count($allapotok) > 0)
-                $nev.=" <a href=\"javascript:OpenScrollWindow('/templom/$tid/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";
-            $this->nev .= $nev;
+
+        //Convert to OSM ServiceTimes
+        if(isset($user->isadmin) AND $user->isadmin == 1)  {
+            $serviceTimes = new \ServiceTimes();
+            $serviceTimes->loadMasses($tid);
+			if(!isset($serviceTimes->error))
+				$this->service_times = print_r(preg_replace('/;/',";\n",$serviceTimes->string),1)."\n".$serviceTimes->linkForDetails;
+			else 
+				$this->service_times	= $serviceTimes->error;
         }
+                
+       
 
         /*
           $staticmap = "kepek/staticmaps/" . $tid . "_227x140.jpeg";

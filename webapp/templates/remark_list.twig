@@ -22,10 +22,10 @@
                         <div class='form-group '>
                             <label for='my_dropdown'>Állapot</label>
                             <select name='state' class='form-control input-sm' id='my_dropdown'>
-				<option value=''>-----</option>
-                                {% if remark.allapot != 'u' %}<option value="u">új</option>{% endif %}
-                                {% if remark.allapot != 'f' %}<option value="f">folyamatban</option>{% endif %}
-                                {% if remark.allapot != 'j' %}<option value="j">lezárva/javítva</option>{% endif %}
+								<option value=''>-----</option>
+                                <option value="u" {{ remark.allapot == 'u' ? ' selected ' }}>új</option>
+                                <option value="f" {{ remark.allapot == 'f' ? ' selected ' }}>folyamatban</option>
+                                <option value="j">{{ remark.allapot == 'j' ? ' selected ' }}lezárva/javítva</option>
                             </select>
                         </div>
                         {% if remark.allapot != 'j' %}
@@ -43,15 +43,14 @@
     		{% if remark.email %}
 
 				<div class="dropdown" style="float:left;margin-right:3px">
-				  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="line-height:10px">
-					<span class="ui-icon ui-icon-mail-closed" style="color:#B51A7E;float:left"></span>&nbsp;
-					<span class="caret"></span>
+				  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{ remark.id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="line-height:10px">
+					<span class="ui-icon ui-icon-mail-closed" style="color:#B51A7E;float:left"></span>
 				  </button>
-				  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-				      <li><a href="/remark/{{ remark.id }}/feedback"  class="alap"><span class="ui-icon ui-icon-mail-closed" style="float:left;margin-right:3px;color:#B51A7E"></span> {{ remark.email }}...</a></li>
-				      <li><a href="/remark/{{ remark.id }}/feedback?type=koszonet" class="alap"><span class="ui-icon ui-icon-heart" style="float:left;margin-right:3px;color:#ff0000"></span> Köszönet írása...</a></li>
-				      <li><a href="/remark/{{ remark.id }}/feedback?type=plebaniara" class="alap"><span class="ui-icon ui-icon-arrowreturnthick-1-w" style="float:left;margin-right:3px" class="grey"></span> Plébániára irányítás...</a></li>
-				      <li><a href="/remark/{{ remark.id }}/feedback?type=android"><span class="ui-icon ui-icon-alert" style="float:left;margin-right:3px" class="lightgrey"></span> Frissítés androidon...</a></li>
+				  <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ remark.id }}">
+				      <li><a href="/remark/{{ remark.id }}/feedback"  class="alap dropdown-item"><span class="ui-icon ui-icon-mail-closed" style="float:left;margin-right:3px;color:#B51A7E"></span> {{ remark.email }}...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=koszonet" class="alap dropdown-item"><span class="ui-icon ui-icon-heart" style="float:left;margin-right:3px;color:#ff0000"></span> Köszönet írása...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=plebaniara" class="alap dropdown-item"><span class="ui-icon ui-icon-arrowreturnthick-1-w" style="float:left;margin-right:3px" class="grey"></span> Plébániára irányítás...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=android" class="alap dropdown-item"><span class="ui-icon ui-icon-alert" style="float:left;margin-right:3px" class="lightgrey"></span> Frissítés androidon...</a></li>
 				  </ul>
 				</div>
     		{% else %}

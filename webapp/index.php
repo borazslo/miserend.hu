@@ -1,5 +1,5 @@
 <?php
- apache_setenv('MISEREND_WEBAPP_ENVIRONMENT', 'development');
+ //apache_setenv('MISEREND_WEBAPP_ENVIRONMENT', 'development');
 include("load.php");
 
 try {
@@ -26,6 +26,8 @@ try {
     }
 
     $class = $path->className;
+	if(!$class) throw new Exception('Az oldal nem található');
+		
     if (method_exists($path->className, 'factory')) {
         $html = $class::factory($path->arguments);
     } else {
@@ -35,12 +37,30 @@ try {
     if (isset($html)) {
         addMessage($e->getMessage(), 'danger');
     } else {
-        \Html\Html::printExceptionVerbose($e);
+	
+		// Mi lenne, ha a hibaüzenetünket szeben írnánk ki?
+		$html = new \Html\Html($path->arguments);
+		
+		$html->template = 'Exception.twig';
+		$html->errorMessage = $e->getMessage();
+		$html->errorTrace = '';
+		
+        foreach ($e->getTrace() as $trace) {
+            if (isset($trace['class']))
+                $html->errorTrace .= $trace['class'] . "::" . $trace['function'] . "()";
+            if (isset($trace['file']))
+                $html->errorTrace .= $trace['file'] . ":" . $trace['line'] . " -> " . $trace['function'] . "()";
+            $html->errorTrace .= "<br>";
+        }
+		
+		
     }
 }
 if (isset($html)) {
     $html->render();
-    if (trim($html->html) != '') {
+    if (trim($html->html) != '') {        
+        if(isset($html->api->format) AND $html->api->format == 'json')
+            header('Content-Type: application/json');
         echo $html->html;
     }
 }

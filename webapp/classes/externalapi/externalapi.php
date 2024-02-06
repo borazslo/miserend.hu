@@ -11,8 +11,10 @@ class ExternalApi {
     public $queryTimeout = 30;
     public $query;
     public $name = 'external';
-	public $format = 'json';
+	public $format = 'json'; // enum('json','xml')
+	public $strictFormat = true; // if rawData not in XML/JSON format throw new \Exception
 	private $curl_opts = [];
+	
 
     function run() {
         $this->runQuery();
@@ -40,6 +42,9 @@ class ExternalApi {
             
             
         } catch(\Exception $e){
+			if($this->isTesting == true)
+				throw new \Exception($e->getMessage());
+				
             global $config;
             if($this->format == 'json' ) $this->jsonData = [];
 			if($this->format == 'yml' ) $this->xmlData = [];
@@ -110,32 +115,36 @@ class ExternalApi {
         $this->rawData = curl_exec($ch);
     
         $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE ); 
+		if(curl_error($ch)) {
+			$this->error = [curl_errno($ch), curl_error($ch)];		
+			throw new \Exception($this->error[1]." (curl)");
+		}
         
         $this->saveStat();
-        		
-        switch ($this->responseCode) {
-            case '200':
-				if($this->format == 'json' ) {
-					$this->jsonData = json_decode($this->rawData);
-					if ($this->jsonData === null ) {            					
-						throw new \Exception("External API return data is not a valid JSON: " . $this->rawData );
-					}
-				} else if ($this->format == 'xml') {					
-					$this->xmlData = @simplexml_load_string($this->rawData);					
-					if ($this->xmlData == false ) {            					
-						throw new \Exception("External API return data is not a valid XML: " . $this->rawData );
-					}
-				}
-                break;
-               
-            case '404':
-                $this->Response404();
-                break;
-                
-            default:
-                throw new \Exception("External API returned bad http response code: " . $this->responseCode. "\n<br>" . curl_error($ch));
-                break;
-        }        
+        
+		if($this->format == 'json' ) {
+			$this->jsonData = json_decode($this->rawData);
+			if ($this->jsonData === null ) {
+				if($this->strictFormat)
+					throw new \Exception("External API return data is not a valid JSON! \n<br/> ResponseCode: " . $this->responseCode . " \n<br/> Response: ". $this->rawData );
+				else
+					$this->jsonData = json_decode("[]");
+			}
+		}
+		else if($this->format == 'xml' ) {
+			$this->xmlData = @simplexml_load_string($this->rawData);
+			if ($this->xmlData === null ) {
+				if($this->strictFormat)
+					throw new \Exception("External API return data is not a valid XML! \n<br/> ResponseCode: " . $this->responseCode . " <br/>\n Response: ". $this->rawData );
+				else
+					$this->xmlData = false;
+			}
+		}
+		
+		
+		if(!in_array($this->responseCode,[200,404]))				
+			throw new \Exception("External API returned bad http response code: " . $this->responseCode. "\n<br/> Response: ". $this->rawData);
+        
     }
 
     function clearOldCache() {
@@ -159,12 +168,14 @@ class ExternalApi {
        
     function saveStat() {
         
-        $query = DB::table('stats_externalapi')->where('url',$this->apiUrl.$this->rawQuery)->where('date',date('Y-m-d'));
+        $url = $this->apiUrl.$this->rawQuery;
+        $url = ( strlen($url) > 255 ) ? substr($url, 0, 252).'...' : $url;
+        $query = DB::table('stats_externalapi')->where('url',$url)->where('date',date('Y-m-d'));
         if($current = $query->first()) {   
-            if($current->rawdata != $this->rawData ) $diff = $current->diff + 1; else $diff = $current->diff;
+            if($current->rawdata != $this->rawData ) $diff = $current->diff + 1; else $diff = $current->diff;            
             $echo = $query->update([
                         'name' => $this->name,
-                        'url' => $this->apiUrl.$this->rawQuery,                    
+                        'url' => $url ,                    
                         'date' => date('Y-m-d'),                
                         'responsecode' => $this->responseCode,
                         'rawdata' => $this->rawData,
@@ -175,7 +186,7 @@ class ExternalApi {
             DB::table('stats_externalapi')->insert(
                 [
                     'name' => $this->name,
-                    'url' => $this->apiUrl.$this->rawQuery,                    
+                    'url' => $url,                    
                     'date' => date('Y-m-d'),                
                     'responsecode' => $this->responseCode,
                     'rawdata' => $this->rawData,
@@ -186,9 +197,32 @@ class ExternalApi {
         }
     }
     
-    function Response404() {
-        throw new \Exception("External API returned 404 = Not Found.");
-    }
+	
+	function test() {
+	
+		$return = true;
+		$this->isTesting = true;
+		
+		$cache = $this->cache;
+		$this->cache = false;
+		
+		try {
+			if(!isset($this->testQuery)) 
+				throw new \Exception("Hiányzik a testQuery, így nem tudjuk ellenőrizni.");
+			
+			$this->query = $this->testQuery;
+			
+			$this->run();			
+		
+		}
+		catch (\Exception $e) {
+			$return = $e->getMessage();
+		}
+				
+		$this->cache = $cache;
+		$this->isTesting = false;
+		return $return;	
+	}
 	
 	function curl_setopt($name, $value) {
 		$this->curl_opts[$name] = $value;

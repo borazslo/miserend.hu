@@ -20,7 +20,10 @@
                     title="A kedvencek közé mentéshez be kell jelentkezni.">                    
                 </span>
             {% endif %}
-            {{ nev|raw }}
+            {{ nev }}
+			{% if writeAcess == true %}
+				<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+			{% endif %}
             {% if ismertnev != ''  %}
                 <br/>
                 <small>

@@ -1,15 +1,14 @@
- <div class="panel-group" id="periods">
+
+ <div class="accordion accordion-flush" id="periods">
     {% for key,idoszak in miserend.periods %}
-      <div class="panel panel-default">
-          <div class="panel-heading visible-lg-block visible-md-block">
-              <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#periods" href="#collapsePeriod{{ key }}">
-                      <span class="glyphicon glyphicon-plus"></span> {{ idoszak.nev }}</a> 
-                      <span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span>
-              </h4>
-          </div>
-          <div id="collapsePeriod{{ key }}" class="panel-collapse collapse {% if idoszak.current %}in{% endif %}">
-              <div class="panel-body">
+      <div class="accordion-item">
+          <h2 class="accordion-header" >
+              <button class="panel-title accordion-button {% if idoszak.current %}{% else %}collapsed{% endif %}"  data-bs-toggle="collapse" data-bs-target="#collapsePeriod{{ key }}" aria-expanded="{% if idoszak.current %}true{% else %}false{% endif %}" aria-controls="collapsePeriod{{ key }}">                    
+                      <strong>{{ idoszak.nev }} <span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></strong>
+              </button>
+          </h2>
+          <div id="collapsePeriod{{ key }}" class="accordion-collapse collapse  {% if idoszak.current %}show{% endif %}" data-bs-parent="#periods">
+              <div class="accordion-body">
                     {% for nap in idoszak.napok %}
 
                       <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
@@ -49,17 +48,15 @@
     {% endfor %}
   </div>
 
-   <div class="panel-group" id="particulars">
+   <div class="accordion accordion-flush" id="particulars">
      {% for key,idoszak in miserend.particulars %}
-    <div class="panel panel-default">
-        <div class="panel-heading visible-lg-block visible-md-block">
-            <h4 class="panel-title">
-                  <a data-toggle="collapse" data-parent="#particulars" href="#collapseParticular{{ key }}">
-                    <span class="glyphicon glyphicon-plus"></span> {{ idoszak.nev }}</a> 
-                    <span class="alap" style="font-size:11px">({{ idoszak.datumtol }})</span>
-            </h4>
-        </div>
-        <div id="collapseParticular{{ key }}" class="panel-collapse collapse {% if idoszak.now %}in{% endif %}">
+    <div class="accordion-item">
+        <h4 class="accordion-header">
+			<button class="panel-title accordion-button {% if idoszak.now %}{% else %}collapsed{% endif %}"  data-bs-toggle="collapse" data-bs-target="#collapseParticular{{ key }}" aria-expanded="{% if idoszak.now %}true{% else %}false{% endif %}" aria-controls="collapseParticular{{ key }}">                                
+				<strong>{{ idoszak.nev }}</a> <span class="alap" style="font-size:11px">({{ idoszak.datumtol }})</span></strong>
+            </button>
+        </h4>
+        <div id="collapseParticular{{ key }}" class="accordion-collapse collapse  {% if idoszak.now %}show{% endif %}" data-bs-parent="#particulars">
 
     {% for nap in idoszak.napok %}
       {% for key, mise in nap.misek %}
@@ -91,6 +88,14 @@
     </div>
     {% endfor %}
   </div>
+
+  {% if user.isadmin %}
+    <div>      
+      <pre>
+        <strong>OSM service_times kompatibilis mód:</strong>
+        {{ service_times|raw }}
+      </pre></div>
+  {% endif %}
 
 {% macro info(img,text) %}
     <img src="/img/{{ img }}" class="massinfo" width=14 title='{{ text }}' height=14 align=absmiddle style="margin-top:0px;margin-left:1px">

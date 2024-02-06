@@ -59,7 +59,7 @@ class Sqlite extends Api {
 
     function getDatabaseToArray() {
         if (!isset($this->sqlite)) {
-            throw nex \Exception('There is no Sqlite connection to make it an array.');
+            throw new \Exception('There is no Sqlite connection to make it an array.');
         }
         $array = [];
         $tables = $this->sqlite->table('sqlite_master')->select('name')->get();
@@ -222,7 +222,8 @@ class Sqlite extends Api {
             $insert['geocim'] = $church->geoaddress;
             $insert['lng'] = $church->location->lon;
             $insert['lat'] = $church->location->lat;
-            $insert['megkozelites'] = $church->location->access;
+            $insert['megkozelites'] = isset($church->location->access) ? $church->location->access : false;
+			
 
             if ($this->version > 2) {
                 if (in_array($church->egyhazmegye, array(18, 17))) { //Görög egyházmegyék kódja
@@ -341,6 +342,8 @@ class Sqlite extends Api {
     }
 
     function checkSqliteFile() {
+		$tables = $return = false;
+	
         if(!isset($this->sqliteFilePath)) {
             $this->setFilePath();
         }
@@ -349,7 +352,12 @@ class Sqlite extends Api {
         }
         $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFilePath);
         try{
-            $this->sqlite->table('sqlite_master')->select('name')->get();
+			$tables = $this->sqlite->table('sqlite_master')->select('name')->get();
+			
+			foreach($tables as $table) {
+				$return[$table->name] = $this->sqlite->table($table->name)->count();				
+			}
+
         } catch (\Illuminate\Database\QueryException $e) {            
             global $config;
             $mailHeader = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=UTF-8' . "\r\n";
@@ -361,7 +369,7 @@ class Sqlite extends Api {
 
             return false;
         }
-        return true;
+        return $return;
     }
 
     function cron() {

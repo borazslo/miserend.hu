@@ -7,6 +7,7 @@ A miserend.hu teljes forrása elavult mintaadatokkal.
 - [Docker](https://docs.docker.com/engine/install/) telepítése a számítógépre.
 - A projekt root könyvtárában futtatni kell ezt: `docker-compose up`
   - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
+  - Windows környezetben a miserend konténer kiakad, hogy a `exec ./docker/entrypoint_miserend.sh: no such file or directory`. Megoldás az entrypoind_miserend.sh átalakítása, hogy unix sorvégeket (LF) használjon windows sorvégrek helyett (CRLF)
 - Egyes beállításokat, pl. portokat, az `.env.example` fájl tartalmának átmásolásával az `.env` fájlban lehet módosítani. 
   - Ha a docker up hibát generál, mondván hogy egy port már foglalt, akkor ez lehet a megoldás. Egyébiránt opcionális.
   - `MISEREND_WEBAPP_ENVIRONMENT`= development | staging | production
