@@ -1,0 +1,17 @@
+{% extends 'panel.twig' %}
+{% import "forms.twig" as forms %}
+{% set title = '' %}
+
+
+{% block body %}
+	<center>
+	<p>
+		<strong>A misézőhelyek akadálymentességére vonatkozó információk a <a href="https://72tanitvany.hu/" target="_blank">Hetvenkét Tanítvány Mozgalom</a> együttműködésével, és a Magyarország Kormánya és a Miniszterelnökség támogatásával kerülnek feltüntetésre.</strong>		
+		<!--<br/>Támogatási cél: A Hetvenkét Tanítvány Mozgalom működése és szakmai programjai.
+		<br/>Pályázati azonosító: NEAE-KP-1-2021/1-000114.
+		<br/>Támogatási összeg: 15.000.000 Ft-->
+	</p>	
+	<img src="{{ asset('static/images/NEA_ME_BGA_kicsi.png') }}">
+	</center>
+	
+{% endblock %}

@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.8"
 
 services:
   mysql:
@@ -24,6 +24,7 @@ services:
       inner:
         aliases:
           - mysql
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: pma
@@ -35,14 +36,15 @@ services:
       PMA_ARBITRARY: 1
     restart: always
     ports:
-      - ${PHPMYADMIN_PORT:-8081}:80
+      - ${MISEREND_PHPMYADMIN_PORT:-8081}:80
     networks:
       inner:
         aliases:
           - pma
+
   mailcatcher:
     image: dockage/mailcatcher
-    container_name: mailcatcher
+    container_name: miserend-mailcatcher
     ports:
     - 1025:1025
     - 1080:1080
@@ -51,6 +53,16 @@ services:
       inner:
         aliases:
           - mailcatcher
+
+  miserend-build:
+    container_name: miserend-build
+    build:
+      dockerfile: docker/Dockerfile.build.miserend
+    volumes:
+      - .:/miserend
+    environment:
+      MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
+
   miserend:
     container_name: miserend
     build:
@@ -58,7 +70,7 @@ services:
     volumes:
       - .:/miserend
       - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
-      - images:/app/kepek
+      - images:/miserend/public/kepek
     ports:
       - "${MISEREND_PORT:-8000}:8000"
     environment:
@@ -67,6 +79,10 @@ services:
       inner:
         aliases:
           - miserend
+    depends_on:
+      - mysql
+      - mailcatcher
+
 networks:
   inner:
     driver: bridge

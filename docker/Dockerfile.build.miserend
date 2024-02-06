@@ -1,0 +1,20 @@
+FROM php:8.2-cli
+
+WORKDIR /miserend
+
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+RUN apt-get update && apt-get upgrade -y -o DPkg::Options::=--force-confold
+
+# Base dependencies
+RUN apt-get install -y curl git build-essential zlib1g-dev libzip-dev unzip
+
+RUN docker-php-ext-install mysqli pdo pdo_mysql zip
+
+# node js
+RUN cd /opt && curl --silent -o node.tar.xz https://nodejs.org/dist/latest-v16.x/$(curl --silent https://nodejs.org/dist/latest-v16.x/SHASUMS256.txt | grep node-.*-linux-x64.tar.xz | awk '{ print $2 }') && tar xf node.tar.xz && rm node.tar.xz
+RUN cd /opt && ln -s /opt/node-v* /opt/node
+RUN ln -s /opt/node/bin/npm /usr/local/bin/npm
+RUN ln -s /opt/node/bin/node /usr/local/bin/node
+
+ENTRYPOINT ["./bin/build.sh"]
