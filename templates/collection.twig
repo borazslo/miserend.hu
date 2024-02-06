@@ -1,4 +1,4 @@
-{% extends 'layout.twig' %}
+{% extends 'layout_3col.html.twig' %}
 
 
 {% block content %}
@@ -19,6 +19,6 @@
 {% endblock %}
 
 
-{% block rightsidebar %}   
+{% block right_sidebar %}
         {% include "panel.twig" with {title:'OSM adatok','body': '<div id="messages"><i>A térképen lévő jelekre kattintás után.</i></div>' } %}        
 {% endblock %}

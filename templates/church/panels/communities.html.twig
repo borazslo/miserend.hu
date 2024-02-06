@@ -1,0 +1,27 @@
+{% extends 'panel/base.html.twig' %}
+{% set panel = 'primary' %}
+
+
+{% block panel_title -%}
+    Közösségek a helyszínen
+{%- endblock %}
+
+
+{% block panel_body %}
+    {% for community in commnities.communities ?? [] %}
+        {% if loop.first %}
+        <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
+        {% endif %}
+            <li>
+                <a href="{{ community.url }}" target="_blank">{{ community.name }}</a>
+            </li>
+        {% if loop.last %}
+            </ul>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+
+{% block panel_footer %}
+    <small>További információk és csatlakozási lehetőség a <a href="https://kozossegek.hu" target="_blank">közösségek.hu</a> partnerünknél.</small>
+{% endblock %}

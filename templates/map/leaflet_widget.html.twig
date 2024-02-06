@@ -1,0 +1,11 @@
+<div id="mapid" data-controller="map-leaflet"
+{%- if center is defined -%}
+{{ ' data-center-point' }}="{{ center.lat }}x{{ center.lon }}x{{ center.zoom }}"
+{%- endif -%}
+    {% if boundary is defined %}
+        {{ ' data-boundary' }}="{{ boundary }}"
+    {% endif %}
+    {% if church is defined %}
+        {{ ' data-church-id' }}="{{ church.id }}"
+    {% endif %}
+></div>

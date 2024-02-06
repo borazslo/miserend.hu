@@ -1,4 +1,4 @@
-{% extends "layout.twig" %}
+{% extends 'layout_3col.html.twig' %}
 
 {% import "forms.twig" as forms %}
 
@@ -383,7 +383,7 @@
     </div> 
 {% endblock %}
 
-{% block rightsidebar %}    
+{% block right_sidebar %}
     {% include 'church/_panelholders.twig' %}
 	{% if church.osm and user.isadmin %}
         {% include 'church/_panelosm.twig' %}

@@ -16,14 +16,19 @@ Encore
         pattern: /\.(png|jpg|jpeg|gif|svg)$/
     })
 
+    .enableSassLoader()
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
     .enableSourceMaps(true)
     .enableVersioning(!Encore.isDevServer())
+    .enableStimulusBridge('./assets/controllers.json')
     .autoProvidejQuery()
     .addEntry('app', './assets/js/app.js')
     .addEntry('home', './assets/js/home.js')
+    .autoProvideVariables({
+        '$.fn.autocomplete': 'jquery-ui'
+    })
 ;
 
 if (Encore.isDevServer()) {

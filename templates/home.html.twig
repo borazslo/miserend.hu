@@ -1,0 +1,56 @@
+{% extends 'layout_3col.html.twig' %}
+{% set show_self_advertistment_panel = true %}
+
+
+{% block page_title %}
+    Miserend
+{% endblock %}
+
+
+{% block extraHead %}
+    <style>
+        .block:after{
+            clear: both;
+            content: "";
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h1>Miserend <small class="hidden-xs hidden-sm text-secondary fs-3">és templom keresés</small></h1>
+    </div>
+{%  endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {{ encore_entry_script_tags('home') }}
+
+{% endblock %}
+
+
+{% block left_sidebar %}
+    {{ render(controller('\\App\\Controller\\ChurchController::randomChurch')) }}
+
+    {{ parent() }}
+{% endblock %}
+
+
+{% block content %}
+{#    {% include 'announcment.twig' ignore missing %}#}
+    {% import "forms.twig" as forms %}
+
+    {{ render(controller('\\App\\Controller\\LiturgicalDayController')) }}
+
+    <div class="miseurlap">
+        {{ render(controller('\\App\\Controller\\SearchController::search')) }}
+    </div>
+
+    {{ render(controller('\\App\\Controller\\ChurchController::favorites')) }}
+
+    {% include 'panel/nea.html.twig' %}
+{%  endblock %}

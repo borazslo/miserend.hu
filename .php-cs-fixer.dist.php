@@ -35,6 +35,10 @@ return (new PhpCsFixer\Config())
         'get_class_to_class_keyword' => true,
         'nullable_type_declaration' => true,
         'trailing_comma_in_multiline' => ['elements' => ['arrays', 'match', 'parameters']],
+        'yoda_style' => [
+            'identical' => false,
+            'equal' => false,
+        ],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

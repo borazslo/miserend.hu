@@ -1,0 +1,25 @@
+{% extends 'panel/base.html.twig' %}
+{% set panel = 'success' %}
+
+
+{% block panel_title -%}
+    <i class="bi bi-phone"></i> Már mobiltelefonra is
+{%- endblock %}
+
+
+{% block panel_body %}
+    <div class="text-center">
+        {% if random(3) > 1 %}
+            <a href="https://play.google.com/store/apps/details?id=com.frama.miserend.hu"
+               onclick="ga('send', 'event', 'Advertisment', 'play.google.com', 'liladoboz-kep')">
+                <img alt="Töltd le a Google Play-ről" src="{{ asset('static/images/app_store_images/google.svg') }}" style="max-width: 8rem;">
+            </a>
+        {% else %}
+            <a href="https://geo.itunes.apple.com/us/app/miserend/id967827488?mt=8"
+               style="display:inline-block;overflow:hidden; width: 170px;"
+               onclick="ga('send', 'event', 'Advertisment', 'itunes.apple.com', 'liladoboz-kep')">
+                <img src="{{ asset('static/images/app_store_images/apple.svg') }}" alt="Töltsd le az App Store-ból" style="max-width: 8rem;">
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}

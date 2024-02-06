@@ -1,6 +1,10 @@
 {% extends 'panel.twig' %}
 
-{% set title = 'Felelősök' %}
+
+{% block title -%}
+    Felelősök
+{%- endblock %}
+
 
 {% block body %}     
     {% if user.isadmin %}
@@ -228,6 +232,4 @@
     
   } );
   </script>
-
-    
 {%  endblock %}

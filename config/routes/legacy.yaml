@@ -1,0 +1,212 @@
+ajax_chat_load:
+  path: /ajax/chat/load
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: \App\Legacy\Html\Ajax\Chat
+    _legacy_method: load
+
+church_new:
+  path: /templom/new
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Church\Edit
+    _legacy_method: newChurch
+
+user_edit_profile:
+  path: /user/edit
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\User\Edit
+    _legacy_method: editUser
+
+ajax_autocomplete_keyword:
+  path: /ajax/AutocompleteKeyword
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\AutocompleteKeyword
+    _legacy_method: keyword
+
+ajax_autocomplete_city:
+  path: /ajax/AutocompleteCity
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\AutocompleteKeyword
+    _legacy_method: city
+
+ajax_boundarygeojson:
+  path: /ajax/boundarygeojson
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\BoundaryGeoJson
+    _legacy_method: main
+
+ajax_churclink:
+  path: /ajax/churclink
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\ChurchLink
+    _legacy_method: main
+
+home:
+  path: /
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Home
+    _legacy_method: main
+
+ajax_churchesinbbox:
+  path: /ajax/churchesinbbox
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Church\Church
+    _legacy_method: inBbox
+
+stats:
+  path: /stat
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Stat
+    _legacy_method: stat
+
+user_profile:
+  path: /user/edit
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\User\Edit
+    _legacy_method: edit
+
+user_list:
+  path: /user/catalogue
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\User\Catalogue
+    _legacy_method: list
+
+church_list:
+  path: /templom/list
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Church\Catalogue
+    _legacy_method: list
+
+church_create:
+  path: /church/create
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Church\Create
+    _legacy_method: create
+
+church_favorite:
+  path: /church/favorite
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\Favorite
+    _legacy_method: favorite
+
+ajax_church_favorite:
+  path: /ajax/favorite
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\Favorite
+    _legacy_method: favorite
+
+ajax_chat_send:
+  path: /ajax/chat/send
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\Chat
+    _legacy_method: send
+
+ajax_chat_users:
+  path: /ajax/chat/users
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Ajax\Chat
+    _legacy_method: users
+
+about:
+  path: /impresszum
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\StaticPage
+    _legacy_method: staticPage
+
+gdpr:
+  path: /gdpr
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\StaticPage
+    _legacy_method: staticPage
+
+terms_and_conditions:
+  path: /hazirend
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\StaticPage
+    _legacy_method: staticPage
+
+church_remarks_list:
+  path: /remark/list/{church_id}
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Remark
+    _legacy_method: list
+  requirements:
+    church_id: \d+
+
+church_remarks_list_alias:
+  path: /templom/{church_id}/eszrevetelek
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Remark
+    _legacy_method: list
+  requirements:
+    church_id: '\d+'
+
+church_change_holder:
+  path: /templom/{church_id}/changeholders
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Church\ChangeHolders
+    _legacy_method: form
+  requirements:
+    church_id: '\d+'
+
+church_remarks_add:
+  path: /remark/add/{church_id}
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Remark
+    _legacy_method: postAdd
+  requirements:
+    church_id: '\d+'
+
+church_image_add:
+  path: /templom/{church_id}/ujkep
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Church\EditPhotos
+    _legacy_method: add
+  requirements:
+    church_id: '\d+'
+
+user_edit:
+  path: /user/{user_id}/edit
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\User\Edit
+    _legacy_method: edit
+  requirements:
+    user_id: '\d+'
+
+church_remarks_new:
+  path: /templom/{church_id}/ujeszrevetel
+  controller: App\Components\LegacyBridge
+  defaults:
+    _legacy_class: App\Legacy\Html\Remark
+    _legacy_method: add
+  requirements:
+    church_id: '\d+'
+  methods:
+    - GET
+    - POST

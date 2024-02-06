@@ -1,0 +1,15 @@
+{% extends "base.html.twig" %}
+
+
+{% block page_title %}
+    OSM Térkép | Miserend
+{% endblock %}
+
+
+{% block body %}
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+        <div id="osmedit" style="position:absolute;bottom:15px;left:5px"></div>
+    </div>
+{% endblock %}

@@ -1,0 +1,79 @@
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('map_main') }}">Térkép</a>
+                </li>
+                {% if is_granted('ROLE_CHURCH_ADMIN') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="/termplom/list" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Miserend
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/templom/list" class="dropdown-item">Teljes lista</a></li>
+                            <li><a href="/egyhazmegye/list" class="dropdown-item">Egyházmegyei lista</a></li>
+                            <li><a href="/eventscatalogue" class="dropdown-item">Kifejezések és dátumok</a></li>
+                            <li><a href="/stat" class="dropdown-item">Statisztika</a></li>
+                            <li><a href="/health" class="dropdown-item">Egészség</a></li>
+                            <li><a href="/apitest" class="dropdown-item">API tesztelés</a></li>
+                            <li><a href="/josm" class="dropdown-item">OSM kapcsolat</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+                {% if is_granted('ROLE_USER_ADMIN') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/catalogue">Felhasználók</a>
+                    </li>
+                {% endif %}
+
+                {% if menu|default(false) %}
+                    {% for items in menu %}
+                        {% if items.items|length %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="{{ items.url }}" role="button" data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    {{ items.title }}
+                                </a>
+                                <ul class="dropdown-menu">
+                                    {% if items.items %}
+                                        {% for item in items.items %}
+                                            <li><a class="dropdown-item" href="{{ item.url }}">{{ item.title }}</a></li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ items.url }}">{{ items.title }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+
+            {% if app.user %}
+                <div class="d-flex" role="search">
+                    <a class="btn btn-primary" href="{{ path('user_profile') }}">Saját adatok</a>
+                    <a class="btn btn-primary ms-2" href="{{ path('app_logout') }}" id="quit">Kilépés</a>
+                </div>
+            {% else %}
+                <form class="d-flex" role="search" method="POSt" action="{{ path('app_login') }}">
+                    <div class="form-group me-1">
+                        <input type="text" class="form-control" name="_username" placeholder="Név" size="10" autocomplete="username" />
+                    </div>
+                    <div class="form-group me-1">
+                        <input type="password" class="form-control" name="_password" placeholder="Jelszó" size="10" autocomplete="current-password" />
+                    </div>
+                    <input type="hidden" name="_target_path" value="{{ app.request.pathInfo }}">
+                    <button type="submit" class="btn btn-light me-1">Belépés</button>
+                    <a href="/user/new" class="btn btn-light">Regisztrálás</a>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</nav>

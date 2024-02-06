@@ -1,7 +1,11 @@
 {% extends 'panel.twig' %}
-
-{% set title = 'Kapcsolat - elérhetőség' %}
 {% set panel = 'primary' %}
+
+
+{% block title -%}
+    Kapcsolat - elérhetőség
+{%- endblock %}
+
 
 {% block body %}
     <div style="overflow: hidden;o-text-overflow: ellipsis;text-overflow: ellipsis;">        
@@ -20,6 +24,7 @@
         {% endif %}
     </div>    
 {% endblock %}
+
 
 {% macro osmlink(osm,title = false) %}
     <a target="_blank" href="http://www.openstreetmap.org/{{ osm.osmtype }}/{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>

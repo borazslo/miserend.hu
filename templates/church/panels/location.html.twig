@@ -1,0 +1,73 @@
+{% extends 'panel/base.html.twig' %}
+{% set id = 'panel-map' %}
+{% set panel = 'primary' %}
+
+
+{% block panel_title %}
+    {% if church.latitude %}
+        Elhelyezkedés&nbsp;<a href="https://www.google.com/maps/dir//{{ church.latitude }},{{ church.longitude }}" target="_blank" class="text-white"><i class="bi bi-signpost-split-fill" title="Útvonaltervezés a Google Maps segítségével."></i></a>
+    {% else %}
+        Elhelyezkedés
+    {% endif %}
+{% endblock %}
+
+
+{% block panel_body %}
+    {% if church.latitude %}
+        <style>
+            #mapid { 
+                height:260px;
+            }
+        </style>
+        {% include 'map/leaflet.html.twig' %}
+    {% endif %}
+
+    <div id="maptext">
+    {% if is_granted('ROLE_ADMIN') %}
+        <span class="alap">
+{#        {% for loc in [location.country, location.county, location.city, location.district] %}#}
+{#            <a href="/collection/{{ loc.osmtype }}:{{ loc.osmid }}">{{ loc.name }}</a><br/>#}
+{#        {% endfor %}#}
+        </span><br/>
+    {% else %}
+        <span class="alap">
+{#            {% if location.country and location.country.name != 'Magyarország' %}{{ location.country.name }} <br/>{% endif %}#}
+{#            {% if location.county and location.county.name != location.country.name  %} {{ location.county.name }}<br/>{% endif %}#}
+{#            {% if location.city %}{{ location.city.name }}{% endif %}{% if location.district %}, {{ location.district.name }}{% endif %}<br/>#}
+{#            {% if location.address %}{{ location.address }}{% endif %}#}
+        </span><br/>
+    {% endif %}
+        
+{#    {% if location.osm is not null %}#}
+{#        <span class=alap>            #}
+{#            <i>Térkép: </i>#}
+{#            <u><a target="_blank" href="{{ location.osm.url }}">#}
+{#                    {{ location.lat|number_format(5, '.') }}, {{ location.lon|number_format(5, '.') }}#}
+{#            </a></u>#}
+{#            &nbsp;<a href="https://www.google.com/maps/dir//{{ location.lat }},{{ location.lon }}" target="_blank"><i class="{{ ICONS_MAP_DIRECTION }}" title="Útvonaltervezés a Google Maps segítségével."></i></a>#}
+{#            {% if user.isadmin %}&nbsp;<a href="https://www.openstreetmap.org/edit?editor=id&{{ location.osm.type }}={{ location.osm.id }}#map=19/{{ location.lat }}/{{ location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}"title="OSM szerkesztése..."></i></a>{% endif %}#}
+{#        </span>#}
+{#    {% elseif location.lat %}#}
+{#        <span class=alap>#}
+{#            <i>Térkép: </i>#}
+{#            <u><a target="_blank" href="https://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.lon }}#map=19/{{ location.lat }}/{{ location.lon }}">#}
+{#                    {{ location.lat|number_format(5, '.') }}, {{ location.lon|number_format(5, '.') }}#}
+{#                </a></u>#}
+{#                &nbsp;<a href="https://www.google.com/maps/dir//{{ location.lat }},{{ location.lon }}" target="_blank"><i class="{{ ICONS_MAP_DIRECTION }}" title="Útvonaltervezés a Google Maps segítségével."></i></a>#}
+{#            {% if user.isadmin %}&nbsp;<a href="https://www.openstreetmap.org/edit?editor=id#map=19/{{ location.lat }}/{{ location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..."></i></a>{% endif %}                    #}
+{#        </span>#}
+{#    {% else %}#}
+{#        <span class=alap>#}
+{#            <strong>Segíts megtalálni a térképen!</strong>#}
+{#        </span>        #}
+{#    {% endif %}#}
+{#    <br/>#}
+{#    {% if location.access %}{{ location.access|raw|nl2br }}  {% endif %}   #}
+    </div>
+{% endblock %}    
+
+
+{% macro osmlink(osm,title = false) %}
+    <!--<a href="/collection/{{ osm.osmtype }}:{{ osm.osmid }}" title="{{ title }}">{{ osm.name }}</a>-->
+    <a href="{{ osm.url }}" title="{{ title }}" target="_blank">{{ osm.name }}</a>
+{% endmacro %}

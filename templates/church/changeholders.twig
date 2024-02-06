@@ -1,4 +1,4 @@
-{% extends "layout.twig" %}
+{% extends 'layout_3col.html.twig' %}
 
 {% set title = 'Gondnokság vállalása' %}
 
@@ -14,29 +14,29 @@
         <p><strong>Ha vállalod a gondoksággal járó felelősséget, akkor kattints lenn a „Kérés küldése” gombra.</strong></p>    
     
         <FORM ENCTYPE='multipart/form-data' action="/templom/{{ holder.church_id }}/changeholders" method=post>
-        <table class="table table-striped align-middle">
-            <tr>
-                <td>Templom:</td>
-                <td>
-                    <a href="/templom/{{ holder.church.id }}/edit" title='{{ holder.church.ismertnev }}'><strong>{{ holder.church.nev }}</strong> ({{ holder.church.varos }})
-                </td>
-            </tr>
-            <tr>
-                <td>Felhasználó:</td>
-                <td>
-                    <input type="hidden" name="uid" value="{{ holder.user_id }}">
-                    <a href="/user/{{ holder.user.uid }}/edit" ><strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }})
-                </td>
-            </tr>            
-            <tr>
-                <td class="align-middle">Kapcsolat a templommal:</td>
-                <td>
-                    <input type="text" class="form-control" name="description" placeholder="pl.: kántor vagyok / saját közösségem" value="{{ holder.description }}">
-                </td>
-            </tr>                    
-        </table>
-                <input type="hidden" name="access" value="asked">
-                <input type=submit name='submit' value="Kérés küldése" class="form-control">
+            <table class="table table-striped align-middle">
+                <tr>
+                    <td>Templom:</td>
+                    <td>
+                        <a href="/templom/{{ holder.church.id }}/edit" title='{{ holder.church.ismertnev }}'><strong>{{ holder.church.nev }}</strong> ({{ holder.church.varos }})
+                    </td>
+                </tr>
+                <tr>
+                    <td>Felhasználó:</td>
+                    <td>
+                        <input type="hidden" name="uid" value="{{ holder.user_id }}">
+                        <a href="/user/{{ holder.user.uid }}/edit" ><strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }})
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-middle">Kapcsolat a templommal:</td>
+                    <td>
+                        <input type="text" class="form-control" name="description" placeholder="pl.: kántor vagyok / saját közösségem" value="{{ holder.description }}">
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="access" value="asked">
+            <input type=submit name='submit' value="Kérés küldése" class="form-control">
         </form>
     {% else %}
         <div class="jumbotron" style="text-align: center" >

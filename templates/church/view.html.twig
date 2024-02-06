@@ -1,0 +1,98 @@
+{% extends 'layout_3col.html.twig' %}
+
+
+{% set title = church.name %}
+
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>
+            <span class="bi bi-star-fill {% if app.user and app.user.churchFavorite(church) %}text-warning{% endif %}"
+                  data-controller="favorite"
+                  data-action="click->favorite#favoriteButtonDidClick"
+                  data-church-id="{{ church.id }}">
+            </span>
+
+            {{ church.name }}
+            {% if writeAcess|default(false) %}
+                <div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+            {% endif %}
+            {% if church.knownName %}
+                <br/>
+                <small>
+                    <span class="hidden-xs hidden-sm">
+                        ({{ church.knownName }})
+                    </span>
+                </small>
+            {% endif %}
+        </h2>
+    </div>
+{%  endblock %}
+
+
+{% block content %}
+    {{ render(controller('\\App\\Controller\\LiturgicalDayController')) }}
+
+    {% if liturgiatv|default(false) is not empty %}
+        {% include 'church/_panelliturgiatv.twig' %}
+    {% endif %}
+
+    <h5><b>Frissítve:</b> {{ church.updatedAt|date('Y-m-d H:i') }}</h5>
+
+    {% if church.massActive %}
+{#        {% include "church/_schedule.twig" %}#}
+    {% else %}
+        <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
+    {% endif %}
+
+    {% if misemegj|default(false) %}
+        {% include "panel.twig" with {title:'Kapcsolódó információk','body': misemegj|raw|nl2br } %}
+    {% endif %}
+
+    {% if photos|default({})|length > 0 %}
+        {% include "church/_photoslide.twig" %}
+    {% endif %}
+
+    {% if leiras|default(false) %}
+        {% include "panel.twig" with {title:'Bemutatkozás','body': leiras } %}
+    {% endif %}
+{% endblock %}
+
+
+{% block left_sidebar %}
+    {% set show_self_advertistment_panel = true %}
+
+    {% if church.holderStatus != constant('\\App\\Entity\\ChurchHolder::HOLDER_STATUS_ALLOWED') %}
+        {% include 'church/panels/asking_remark.html.twig' %}
+    {% endif %}
+
+    {% if church.osmId is not null and church.osmType is not null %}
+        {{ render(controller('\\App\\Controller\\ChurchController::accessibility', {church: church})) }}
+    {% endif %}
+
+    {{ parent() }}
+
+{% endblock %}
+
+
+{% block right_sidebar %}
+    {% include 'church/panels/location.html.twig' %}
+
+{#    {% include 'church/panels/contact.html.twig' %}#}
+
+    {% if church.remark %}
+        {% include 'panel/base.html.twig' with {'_title_block': 'Jó tudni', 'body': church.remark } %}
+    {% endif %}
+
+    {% if neighbours|default({})|length > 1 %}
+        {% include 'church/_panelneighbours.twig' %}
+    {% endif %}
+
+    {% set commnities = fetch_communities(church) %}
+
+    {% if commnities is not null and commnities.communities|length > 0 %}
+        {% include 'church/panels/communities.html.twig' %}
+    {% endif %}
+
+{#    {% include 'church/_panelfacebookpageplugin.twig' %}#}
+{% endblock %}

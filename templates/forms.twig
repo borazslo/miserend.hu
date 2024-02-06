@@ -1,27 +1,67 @@
-{% macro input(array) %}
-    {% if array.label %}<span class=alap> {{array.label|raw}}:</span>{% endif %}
-    
-    <input 
-    {% if array.id %} id="{{array.id}}" {% endif %}
-    {% if array.checked %} checked {% endif %}
-    class="input-sm {% if array.type != 'checkbox' %}form-control{% endif %} {{ array.class }}" type="{{ array.type|default('text') }}" style="{{ array.style }}" name="{{ array.name }}" value="{{ array.value|e }}"
-     size="{{ array.size|default(12) }}"
-    {% if array.placeholder %} placeholder="{{array.placeholder}}" {% endif %}
-     />
+{% macro attr(attr) -%}
+	{% for attr_name, attr_value in attr|default({}) -%}
+		{{- ' '~attr_name }}="{{ attr_value }}"
+	{%- endfor -%}
+{% endmacro %}
+
+{% macro label(field) %}
+	{% if field.label is not null %}
+		{% set attr = field.labelAttr|default({}) %}
+
+		{% if field.id|default(false) %}
+			{% set attr = attr|merge({for: field.id}) %}
+		{% endif %}
+
+		<label {{ _self.attr(attr) }}>{{ field.label }}</label>
+	{% endif %}
+{% endmacro %}
+
+{% macro input(field, attr_to_override = {}) %}
+	{% set attr = field.attr|default({}) %}
+
+    {% if field.id is defined and field.id %}
+    	{% set attr = attr|merge({'id': field.id}) %}
+    {% endif %}
+
+    {% if field.checked is defined and field.checked %}
+    	{% set attr = attr|merge({'checked': "checked"}) %}
+    {% endif %}
+
+	{% set class_attr_value = '' %}
+	{% if field.type != 'checkbox' %}
+    	{% set class_attr_value = 'form-control-sm form-control' %}
+    {% endif %}
+
+    {% if field.class is defined and field.class %}
+    	{% set class_attr_value = class_attr_value~' '~field.class %}
+    {% endif %}
+
+    {% if field.placeholder is defined and field.placeholder %}
+    	{% set attr = attr|merge({'placeholder': field.placeholder}) %}
+    {% endif %}
+
+    {% set attr = attr|merge({
+    	'class': class_attr_value,
+    	'type': field.type|default('text'),
+    	'style': field.style,
+    	'name': field.name,
+    	'value': field.value|e,
+    	'size': field.size|default(12),
+    	})|merge(attr_to_override) %}
+
+    <input {{ _self.attr(attr) }} />
     
     {% if array.labelback %} <span class=alap> {{array.labelback|raw}}</span>{% endif %}
 {% endmacro %}
 
-{% macro select(array) %}
-    {% if array.label %}<span class=alap> {{array.label|raw}} </span>{% endif %}
-	
+{% macro select(array, attr_to_override = {}) %}
     <select name="{{ array.name }}"
     {% if array.id %} id="{{array.id}}" {% endif %}
     {% if array.data %} data="{{array.data}}" {% endif %}
     {% if array.disabled %} disabled="{{array.disabled}}" {% endif %}
     {% if array.onChange %} onChange="{{array.onChange|raw}}" {% endif %}
     {% if array.style %} style="{{array.style}}" {% endif %}
-    class="form-select form-control-lg {{ array.class }}" 
+    class="form-select form-select-sm {{ array.class }}" {{ _self.attr(attr_to_override) }}
 	>
 		{% for key, option in array.options %}
 			<option value="{{ key }}" 
@@ -59,8 +99,8 @@
 		<input 
 			class="form-check-input" 
 			type="radio" 
-			name="{{ array.name }}" 
-			id="{{ array.id }}_{{ counter }}" 
+			name="{{ array.name }}"
+			id="{{ array.id }}_{{ counter }}"
 			value="{{ value }}" 
 			{% if array.selected == value %}checked{% endif %}
 		   >
