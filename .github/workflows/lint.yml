@@ -27,4 +27,4 @@ jobs:
             ${{ github.repository }}-8.2-phpcsfixer-
       - name: Run PHP-CS-Fixer
         # Using cs2pr settings, see: https://github.com/shivammathur/setup-php#tools-with-checkstyle-support
-        run: 'php-cs-fixer fix --dry-run --diff'
+        run: 'php-cs-fixer fix --dry-run --show-progress=none --diff'
