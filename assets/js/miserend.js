@@ -44,18 +44,6 @@ $(document).ready(function() {
         return false;
     });
 
-
-    $(document).on('click', '#quit', function () {
-        console.log('click');
-        var form = $('<form  method="post">' +
-            '<input type="hidden" name="logout" value="true" />' +
-            '</form>');
-        $('body').append(form);
-        form.submit();
-        return false;
-    });
-
-
     $(document).on('click','.javitva',function(){
         console.log('ok');
         //event.preventDefault();
