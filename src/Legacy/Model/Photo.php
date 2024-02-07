@@ -83,7 +83,7 @@ class Photo extends \Illuminate\Database\Eloquent\Model
                 $src_img = @ImagecreateFromJpeg($file);
                 $this->height = @imagesy($src_img);  // original height
                 $this->width = @imagesx($src_img);  // original width
-                if ('' != $this->height && '' != $this->width) {
+                if ($this->height != '' && $this->width != '') {
                     $this->save();
 
                     return true;
@@ -102,7 +102,7 @@ class Photo extends \Illuminate\Database\Eloquent\Model
 
     public function uploadFile($inputFile)
     {
-        if (\UPLOAD_ERR_OK != $inputFile['error']) {
+        if ($inputFile['error'] != \UPLOAD_ERR_OK) {
             throw new \Exception("There is no correct \$_FILES['FileInput'].");
         }
         if (!isset($this->church_id)) {

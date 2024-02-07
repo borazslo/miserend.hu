@@ -112,7 +112,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
 
     public function scopeWhereHasTag($query, $name, $arg2, $arg3 = false)
     {
-        if (false == $arg2) {
+        if ($arg2 == false) {
             $value = $arg2;
             $operator = '=';
         } else {
@@ -182,7 +182,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
     public function upload()
     {
         global $config;
-        if (false == $config['openstreetmap']) {
+        if ($config['openstreetmap'] == false) {
             addMessage('Az OpenStreetMap API nincs bekapcsolva. Így az esetleges OSM adat változásokat nem töltöttük fel.', 'warning');
 
             return;
@@ -223,13 +223,13 @@ class OSM extends \Illuminate\Database\Eloquent\Model
                         $tag[0]->attributes()->v = $tags[$field]['value'];
                         $update = true;
 
-                        if ('' == $tag[0]->attributes()->v) {
+                        if ($tag[0]->attributes()->v == '') {
                             // az unset meg remove nem működik :(
                             $remove[] = $tag[0]->asXML();
                         }
                     }
                 // Ha nem létezik korábbról ÉS van azért valami értéke
-                } elseif ('' != $tags[$field]['value']) {
+                } elseif ($tags[$field]['value'] != '') {
                     $tag[0] = $element->addChild('tag');
                     $tag[0]->addAttribute('k', $field);
                     $tag[0]->addAttribute('v', $tags[$field]['value']);
@@ -238,7 +238,7 @@ class OSM extends \Illuminate\Database\Eloquent\Model
             }
         }
 
-        if (true == $update) {
+        if ($update == true) {
             // Open empty changeset
             // TODO: created_by és comment és egyebek
             $osm = new \App\Legacy\Services\ExternalApi\OpenstreetmapApi();

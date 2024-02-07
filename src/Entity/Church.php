@@ -122,7 +122,7 @@ class Church implements EntityModificationDateTimeInterface
     /**
      * Gondnokság.
      */
-    #[Orm\OneToOne(mappedBy: 'church', targetEntity: ChurchHolder::class)]
+    #[ORM\OneToOne(mappedBy: 'church', targetEntity: ChurchHolder::class)]
     private ?ChurchHolder $holder = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'favorites')]
@@ -316,10 +316,8 @@ class Church implements EntityModificationDateTimeInterface
      * <field name="lat" type="decimal" column="lat" precision="11" scale="7" nullable="true"/>
      * <field name="lon" type="decimal" column="lon" precision="10" scale="7" nullable="true"/>
      * </entity>
-     * </doctrine-mapping>
- *
+     * </doctrine-mapping>.
      */
-
     public function __construct()
     {
         $this->usersWhoFavored = new ArrayCollection();
@@ -371,9 +369,6 @@ class Church implements EntityModificationDateTimeInterface
         $this->county = $county;
     }
 
-    /**
-     * @return string|null
-     */
     public function getCity(): ?string
     {
         return $this->city;
@@ -389,33 +384,21 @@ class Church implements EntityModificationDateTimeInterface
         $this->massActive = $massActive;
     }
 
-    /**
-     * @return string|null
-     */
     public function getModeration(): ?string
     {
         return $this->moderation;
     }
 
-    /**
-     * @param string|null $moderation
-     */
     public function setModeration(?string $moderation): void
     {
         $this->moderation = $moderation;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    /**
-     * @param string|null $slug
-     */
     public function setSlug(?string $slug): void
     {
         $this->slug = $slug;
@@ -423,7 +406,7 @@ class Church implements EntityModificationDateTimeInterface
 
     public function getHolderStatus(): int
     {
-        if (null === $this->holder) {
+        if ($this->holder === null) {
             return ChurchHolder::HOLDER_STATUS_ORPHAN;
         }
 
@@ -467,33 +450,21 @@ class Church implements EntityModificationDateTimeInterface
         $this->usersWhoFavored->removeElement($user);
     }
 
-    /**
-     * @return string|null
-     */
     public function getOsmId(): ?string
     {
         return $this->osmId;
     }
 
-    /**
-     * @param string|null $osmId
-     */
     public function setOsmId(?string $osmId): void
     {
         $this->osmId = $osmId;
     }
 
-    /**
-     * @return string|null
-     */
     public function getOsmType(): ?string
     {
         return $this->osmType;
     }
 
-    /**
-     * @param string|null $osmType
-     */
     public function setOsmType(?string $osmType): void
     {
         $this->osmType = $osmType;
@@ -508,49 +479,31 @@ class Church implements EntityModificationDateTimeInterface
         return sprintf('https://www.openstreetmap.org/%s/%s', $this->osmType, $this->osmId);
     }
 
-    /**
-     * @return float|null
-     */
     public function getLatitude(): ?float
     {
         return $this->latitude;
     }
 
-    /**
-     * @param float|null $latitude
-     */
     public function setLatitude(?float $latitude): void
     {
         $this->latitude = $latitude;
     }
 
-    /**
-     * @return float|null
-     */
     public function getLongitude(): ?float
     {
         return $this->longitude;
     }
 
-    /**
-     * @param float|null $longitude
-     */
     public function setLongitude(?float $longitude): void
     {
         $this->longitude = $longitude;
     }
 
-    /**
-     * @return string|null
-     */
     public function getRemark(): ?string
     {
         return $this->remark;
     }
 
-    /**
-     * @param string|null $remark
-     */
     public function setRemark(?string $remark): void
     {
         $this->remark = $remark;

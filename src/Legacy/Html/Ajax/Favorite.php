@@ -40,7 +40,7 @@ class Favorite extends Ajax
             ], status: Response::HTTP_BAD_REQUEST);
         }
 
-        settype($churchId, 'integer');
+        $churchId = (int) $churchId;
 
         $user = $this->getSecurity()->getUser();
 

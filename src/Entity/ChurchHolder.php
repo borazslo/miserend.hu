@@ -64,73 +64,46 @@ class ChurchHolder implements EntityModificationDateTimeInterface
     #[ORM\Column(name: 'status', type: Types::STRING, length: 32, nullable: false, options: ['default' => self::STATUS_ASKED])]
     private ?string $status;
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return User|null
-     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    /**
-     * @param User|null $user
-     */
     public function setUser(?User $user): void
     {
         $this->user = $user;
     }
 
-    /**
-     * @return Church|null
-     */
     public function getChurch(): ?Church
     {
         return $this->church;
     }
 
-    /**
-     * @param Church|null $church
-     */
     public function setChurch(?Church $church): void
     {
         $this->church = $church;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @param string|null $description
-     */
     public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * @return string|null
-     */
     public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    /**
-     * @param string|null $status
-     */
     public function setStatus(?string $status): void
     {
         $this->status = $status;

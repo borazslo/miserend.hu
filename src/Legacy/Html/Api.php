@@ -44,6 +44,7 @@ class Api extends Html
                 case 'sqlite':
                     $this->redirect(DOMAIN.'/fajlok/sqlite/miserend_v'.$_REQUEST['v'].'.sqlite3');
 
+                    // no break
                 case 'signup':
                     $this->api = new Signup();
                     break;

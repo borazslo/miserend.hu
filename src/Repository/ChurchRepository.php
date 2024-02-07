@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Repository;
 
 use App\Entity\Church;
@@ -39,7 +46,6 @@ class ChurchRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param int $amount
      * @return array<int, Church>
      */
     public function findMostFavorite(int $amount = 10): array
@@ -52,7 +58,7 @@ class ChurchRepository extends ServiceEntityRepository
             ->setMaxResults($amount)
             ->getQuery()->getResult();
 
-        if (count($churches) === 0) {
+        if (\count($churches) === 0) {
             return [];
         }
 

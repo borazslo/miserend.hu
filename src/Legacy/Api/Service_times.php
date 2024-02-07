@@ -25,7 +25,7 @@ class Service_times extends Api
 
             $syntax = 'horariosdemisa';
 
-            if ('horariosdemisa' == $syntax) {
+            if ($syntax == 'horariosdemisa') {
                 $return = [
                     'church_id' => $church->id,
                     'name' => $church->nev,

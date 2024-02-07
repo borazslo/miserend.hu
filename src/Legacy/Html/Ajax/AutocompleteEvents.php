@@ -16,7 +16,7 @@ class AutocompleteEvents extends Ajax
     public function __construct()
     {
         $text = \App\Legacy\Request::Text('text');
-        if ('' == $text || preg_match('/^[0-9]{1}/i', $text)) {
+        if ($text == '' || preg_match('/^[0-9]{1}/i', $text)) {
             $return[] = ['label' => '<i>hónap és nap (hh-nn)</i>', 'value' => date('m-d')];
             $return[] = ['label' => '<i>pontos dátum (éééé-hh-nn)</i>', 'value' => date('Y-m-d')];
             $return[] = ['label' => '<i>vagy megfelelő kifejezés</i>', 'value' => ''];

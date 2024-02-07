@@ -20,7 +20,7 @@ class Delete extends Html
         $this->input['uid'] = \App\Legacy\Request::IntegerRequired('uid');
 
         $this->user2delete = new \App\Legacy\User($this->input['uid']);
-        if (0 == $this->user2delete->uid) {
+        if ($this->user2delete->uid == 0) {
             addMessage('Nincs ilyen felhasználó!', danger);
 
             return;

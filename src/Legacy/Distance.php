@@ -9,8 +9,6 @@
 
 namespace App\Legacy;
 
-use App\Legacy;
-
 class Distance
 {
     public function __construct()
@@ -25,11 +23,11 @@ class Distance
     public function update($church_id = false, $limit = false)
     {
         $counter = 0;
-        if (!is_numeric($limit) || false == $limit) {
+        if (!is_numeric($limit) || $limit == false) {
             $limit = 120;
         }
 
-        $query = Legacy\Model\Church::has('osms')->take($limit)->orderBy('updated_at', 'desc');
+        $query = Model\Church::has('osms')->take($limit)->orderBy('updated_at', 'desc');
         if ($church_id) {
             if (\is_array($church_id)) {
                 $query = $query->whereIn('id', $church_id);
@@ -52,7 +50,7 @@ class Distance
     { // maxDistance in meter
         set_time_limit('600');
         $counter = 0;
-        if ('' == $churchFrom->location->lat || '' == $churchFrom->location->lon) {
+        if ($churchFrom->location->lat == '' || $churchFrom->location->lon == '') {
             return false;
         }
 
@@ -62,7 +60,7 @@ class Distance
 
         for ($i = 1; $i < 10; ++$i) {
             $bbox = $this->getBBox($point, $maxDistance);
-            $churchesInBBox = Legacy\Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id)->get();
+            $churchesInBBox = Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id)->get();
             if (\count($churchesInBBox) > 12) {
                 break;
             }
@@ -71,15 +69,15 @@ class Distance
 
         $highestDistance = 0;
         foreach ($churchesInBBox as $churchTo) {
-            $processingDistance = Legacy\Model\Distance::findOrNew(
+            $processingDistance = Model\Distance::findOrNew(
                 ['fromLat' => $churchFrom->lat, 'fromLon' => $churchFrom->lon, 'toLat' => $churchTo->lat, 'toLon' => $churchTo->lon]
             )->first();
-            $processingDistance = Legacy\Model\Distance::where('fromLat', $churchFrom->lat)
+            $processingDistance = Model\Distance::where('fromLat', $churchFrom->lat)
                 ->where('fromLon', $churchFrom->lon)
                 ->where('toLat', $churchTo->lat)
                 ->where('toLon', $churchTo->lon)->first();
             if (!$processingDistance) {
-                $processingDistance = new Legacy\Model\Distance();
+                $processingDistance = new Model\Distance();
                 $processingDistance->fromLat = $churchFrom->lat;
                 $processingDistance->fromLon = $churchFrom->lon;
                 $processingDistance->toLat = $churchTo->lat;
@@ -91,9 +89,9 @@ class Distance
                 $pointTo = ['lat' => $churchTo->location->lat, 'lon' => $churchTo->location->lon];
                 $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
                 if ($rawDistance < $maxDistance && $rawDistance > 0) {
-                    $mapquest = new Legacy\Services\ExternalApi\MapquestApi();
+                    $mapquest = new Services\ExternalApi\MapquestApi();
                     $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
-                    if (-2 == $mapquestDistance) {
+                    if ($mapquestDistance == -2) {
                         return;
                     } elseif ($mapquestDistance > 0) {
                         $processingDistance->distance = $mapquestDistance;
@@ -120,18 +118,18 @@ class Distance
 
             // TODO: duplicated code
             $bbox = $this->getBBox($point, $highestDistance);
-            $churchesInBBox = Legacy\Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id);
+            $churchesInBBox = Model\Church::inBBox($bbox)->where('id', '!=', $churchFrom->id);
 
             foreach ($churchesInBBox as $churchTo) {
-                $processingDistance = Legacy\Model\Distance::findOrNew(
+                $processingDistance = Model\Distance::findOrNew(
                     ['fromLat' => $churchFrom->lat, 'fromLon' => $churchFrom->lon, 'toLat' => $churchTo->lat, 'toLon' => $churchTo->lon]
                 )->first();
-                $processingDistance = Legacy\Model\Distance::where('fromLat', $churchFrom->lat)
+                $processingDistance = Model\Distance::where('fromLat', $churchFrom->lat)
                     ->where('fromLon', $churchFrom->lon)
                     ->where('toLat', $churchTo->lat)
                     ->where('toLon', $churchTo->lon)->first();
                 if (!$processingDistance) {
-                    $processingDistance = new Legacy\Model\Distance();
+                    $processingDistance = new Model\Distance();
                     $processingDistance->fromLat = $churchFrom->lat;
                     $processingDistance->fromLon = $churchFrom->lon;
                     $processingDistance->toLat = $churchTo->lat;
@@ -145,9 +143,9 @@ class Distance
                     $rawDistance = $this->getRawDistance($pointFrom, $pointTo);
 
                     if ($rawDistance < $maxDistance && $rawDistance > 0) {
-                        $mapquest = new Legacy\Services\ExternalApi\MapquestApi();
+                        $mapquest = new Services\ExternalApi\MapquestApi();
                         $mapquestDistance = $mapquest->distance($pointFrom, $pointTo);
-                        if (-2 == $mapquestDistance) {
+                        if ($mapquestDistance == -2) {
                             return;
                         } elseif ($mapquestDistance > 0) {
                             $processingDistance->distance = $mapquestDistance;
@@ -219,7 +217,7 @@ class Distance
         if (!isset($point['lat']) || !isset($point['lon'])) {
             return false;
         }
-        if ('' == $point['lat'] || '' == $point['lon']) {
+        if ($point['lat'] == '' || $point['lon'] == '') {
             return false;
         }
         if (!is_numeric($point['lat']) || !is_numeric($point['lon'])) {

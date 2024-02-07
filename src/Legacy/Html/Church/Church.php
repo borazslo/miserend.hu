@@ -11,7 +11,6 @@ namespace App\Legacy\Html\Church;
 
 use App\Legacy\Html\Html;
 use App\Legacy\Html\Map;
-use App\Model;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,11 +23,9 @@ class Church extends Html
 
         $tid = $request->attributes->getInt('church_id');
 
-        if (0 === $tid) {
+        if ($tid === 0) {
             throw new \Exception('Church does not exist.');
         }
-
-
 
         $church = \App\Legacy\Model\Church::find($tid);
         if (!$church && $user->checkRole('miserend')) {
@@ -47,9 +44,9 @@ class Church extends Html
             throw new \Exception("Read access denied to church tid = '$tid'");
         }
 
-        if ('n' == $church->ok) {
+        if ($church->ok == 'n') {
             addMessage('Ez a templom le van tiltva! Csak adminisztrátorok számára látható ez az oldal.', 'warning');
-        } elseif ('f' == $church->ok) {
+        } elseif ($church->ok == 'f') {
             addMessage('Ez a templom áttekintésre vár. Csak adminisztrátorok számára látható ez az oldal.', 'warning');
         }
 
@@ -61,7 +58,7 @@ class Church extends Html
 
         $_honapok = Application::getMonths();
 
-        if ('' != $church->lat && !isset($church->location->city)) {
+        if ($church->lat != '' && !isset($church->location->city)) {
             $church->MdownloadOSMBoundaries();
         }
 
@@ -75,7 +72,7 @@ class Church extends Html
 
         $service_times = null;
         // Convert to OSM ServiceTimes
-        if (1 == $user->getIsadmin()) {
+        if ($user->getIsadmin() == 1) {
             $serviceTimes = new \App\Legacy\ServiceTimes();
             $serviceTimes->loadMasses($tid);
             if (!isset($serviceTimes->error)) {
@@ -112,7 +109,7 @@ class Church extends Html
         }
 
         $bbox = explode(';', $request->query->get('bbox'));
-        if (4 != \count($bbox)) {
+        if (\count($bbox) != 4) {
             throw new \RuntimeException('invalid bbox format');
         }
 

@@ -10,7 +10,6 @@
 namespace App\Legacy;
 
 use App\Exception;
-use App\Legacy;
 use Illuminate\Database\Capsule\Manager as DB;
 
 /**
@@ -65,11 +64,11 @@ class ServiceTimes
                 $d = 'Mo-Su';
             }
             if (isset($row->nap2)) {
-                if ('pt' == $row->nap2) {
+                if ($row->nap2 == 'pt') {
                     $d = 'week 1-53/2 '.$d;
-                } elseif ('ps' == $row->nap2) {
+                } elseif ($row->nap2 == 'ps') {
                     $d = 'week 2-53/2 '.$d;
-                } elseif (0 != $row->nap2) {
+                } elseif ($row->nap2 != 0) {
                     $d .= '['.$row->nap2.']';
                 }
             }
@@ -114,7 +113,7 @@ class ServiceTimes
                         ) : $nextConstrained = false;
 
                         // First always!
-                        if (0 == $k) {
+                        if ($k == 0) {
                             if (!$currentConstrained) {
                                 $dayPattern .= $day;
                             } else {
@@ -132,11 +131,11 @@ class ServiceTimes
                             if ($k < \count($days)) {
                                 if ($lastConstrained) {
                                     if ($currentConstrained && $lastConstrained[1] == $currentConstrained[1]) {
-                                        if ($lastConstrained[2] + 1 == $currentConstrained[2]
+                                        if ($currentConstrained[2] == $lastConstrained[2] + 1
                                             && isset($nextConstrained[2])
-                                            && $currentConstrained[2] + 1 == $nextConstrained[2]) {
+                                            && $nextConstrained[2] == $currentConstrained[2] + 1) {
                                         } else {
-                                            if ($lastConstrained[2] + 1 == $currentConstrained[2]) {
+                                            if ($currentConstrained[2] == $lastConstrained[2] + 1) {
                                                 $dayPattern .= '-'.$currentConstrained[2];
                                             } else {
                                                 $dayPattern .= ','.$currentConstrained[2];
@@ -147,7 +146,7 @@ class ServiceTimes
                                             $dayPattern .= ']';
                                         }
                                     } else {
-                                        if (']' != substr($dayPattern, -1)) {
+                                        if (substr($dayPattern, -1) != ']') {
                                             $dayPattern .= ']';
                                         }   // Kár hogy ez kell. Nem tudo mikor és miért kell. Lásd: 1120 vs 1037
                                         $dayPattern .= ',';
@@ -197,7 +196,7 @@ class ServiceTimes
         global $milyen, $nyelv;
         $string = '';
         foreach ($schedule as $key => $periodss) {
-            if (1 == \count($schedule) && '01-01' == $periodss['tmp_datumtol'] && '12-31' == $periodss['tmp_datumig']) {
+            if (\count($schedule) == 1 && $periodss['tmp_datumtol'] == '01-01' && $periodss['tmp_datumig'] == '12-31') {
             } else {
                 if ($periodss['tmp_datumtol'] == $periodss['tmp_datumig']) {
                     $string .= date('M d', strtotime('2023-'.$periodss['tmp_datumtol'])).': ';
@@ -251,7 +250,7 @@ class ServiceTimes
         }
         $string = preg_replace('/(\;(| ))$/', '', $string);
 
-        if (isset($args['skipvalidation']) && (true == $args['skipvalidation'] || 1 == $args['skipvalidation']) || \in_array(
+        if (isset($args['skipvalidation']) && ($args['skipvalidation'] == true || $args['skipvalidation'] == 1) || \in_array(
             'skipvalidation',
             $args
         )) {
@@ -266,7 +265,7 @@ class ServiceTimes
     {
         $exp = urlencode(str_replace("\n", '', $string));
 
-        $openingh = new Legacy\Services\ExternalApi\OpeninghApi();
+        $openingh = new Services\ExternalApi\OpeninghApi();
 
         try {
             $openingh->validate($string);

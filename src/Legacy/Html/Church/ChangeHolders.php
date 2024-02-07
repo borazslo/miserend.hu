@@ -46,13 +46,13 @@ class ChangeHolders extends Html
 
         $data['status'] = Request::InArrayRequired('access', ['allowed', 'denied', 'revoked', 'asked']);
         $description = Request::Text('description');
-        if ('' != $description) {
+        if ($description != '') {
             $data['description'] = $description;
         }
 
         $user = $this->getSecurity()->getUser();
-        if ($user->getUid() == $where['user_id'] && 'asked' == $data['status']) {
-            if ('needed' == $confirmation) {
+        if ($user->getUid() == $where['user_id'] && $data['status'] == 'asked') {
+            if ($confirmation == 'needed') {
                 $churchHolder = ChurchHolder::where('user_id', $where['user_id'])->where('church_id', $where['church_id'])->first();
                 if (!$churchHolder) {
                     $churchHolder = new ChurchHolder(array_merge($where, $data));

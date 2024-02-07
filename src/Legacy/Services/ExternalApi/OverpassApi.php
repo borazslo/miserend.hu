@@ -70,7 +70,7 @@ class OverpassApi extends ExternalApi
     /* Innen már nem csak OverpassApi */
     public function deleteUrlMiserend()
     {
-        $tes = Osm::all()->filter(function ($model) {
+        $tes = OSM::all()->filter(function ($model) {
             return ($model->tags()->where('name', 'url:miserend')->first()) ? true : false;
         });
         foreach ($tes as $t) {
@@ -95,7 +95,7 @@ class OverpassApi extends ExternalApi
 
     public function saveChurchOsmRelation()
     {
-        $osmElements = Osm::whereHas('tags', function ($query) {
+        $osmElements = OSM::whereHas('tags', function ($query) {
             $query->where('name', 'url:miserend');
         });
         foreach ($osmElements->get() as $element) {
@@ -154,6 +154,4 @@ class OverpassApi extends ExternalApi
             // }
         }
     }
-
-
 }

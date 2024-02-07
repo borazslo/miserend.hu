@@ -52,7 +52,7 @@ class Sqlite extends Api
         try {
             $this->sqlite = DB::connection($name);
         } catch (\InvalidArgumentException $e) {
-            if (false == $file) {
+            if ($file == false) {
                 throw new \Exception("Sqlite connection '$name' does not exists and there is no file for it to open.");
             }
             if (!file_exists($file)) {
@@ -313,7 +313,7 @@ class Sqlite extends Api
                     $insert['telnyar'] = 't';
                 } elseif (preg_match('/^(ny$|nyár)/i', $mass->idoszamitas)) {
                     $insert['telnyar'] = 'ny';
-                } elseif ('egész évben' == $mass->idoszamitas) {
+                } elseif ($mass->idoszamitas == 'egész évben') {
                     $insert['telnyar'] = 'ny';
                     $extraInsert = $insert;
                     $extraInsert['telnyar'] = 't';

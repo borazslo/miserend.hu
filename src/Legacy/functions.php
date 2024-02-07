@@ -27,10 +27,10 @@ function sanitize($text)
 
 function checkUsername($username)
 {
-    if ('' == $username) {
+    if ($username == '') {
         return false;
     }
-    if ('*vendeg*' == $username) {
+    if ($username == '*vendeg*') {
         return false;
     }
     if (strlen($username) > 20) {
@@ -83,7 +83,7 @@ function LirugicalDay($datum = false)
     }
 
     $file = 'fajlok/igenaptar/'.$datum.'.xml';
-    if (file_exists($file) && 0 == $config['debug']) {
+    if (file_exists($file) && $config['debug'] == 0) {
         $xmlstr = file_get_contents($file);
     } else {
         $source = 'http://breviar.kbs.sk/cgi-bin/l.cgi?qt=pxml&d='.substr($datum, 8, 2).'&m='.substr($datum, 5, 2).'&r='.substr($datum, 0, 4).'&j=hu';
@@ -99,9 +99,9 @@ function LirugicalDay($datum = false)
         }
     }
 
-    if ('' != $xmlstr) {
+    if ($xmlstr != '') {
         $xmlcont = @simplexml_load_string($xmlstr);
-        if ('' != $xmlcont) {
+        if ($xmlcont != '') {
             $xmlcont = new SimpleXMLElement($xmlstr);
 
             return $xmlcont->CalendarDay;
@@ -116,19 +116,19 @@ function LirugicalDay($datum = false)
 /** @deprecated  */
 function LiturgicalDayAlert($html = false, $date = false)
 {
-    if (false == $date) {
+    if ($date == false) {
         $date = date('Y-m-d');
     }
     $alert = false;
     $day = LirugicalDay($date);
-    if (false != $day && isset($day->Celebration)) {
-        if ($day->Celebration->LiturgicalCelebrationLevel <= 4 && 7 != date('N', strtotime($date))) {
+    if ($day != false && isset($day->Celebration)) {
+        if ($day->Celebration->LiturgicalCelebrationLevel <= 4 && date('N', strtotime($date)) != 7) {
             $text = 'Ma van <strong>'.$day->Celebration->LiturgicalCelebrationName.'</strong>';
             if (preg_match('/ünnep$/i', $day->Celebration->LiturgicalCelebrationType)) {
                 $text .= ' '.$day->Celebration->LiturgicalCelebrationType.'e';
             }
 
-            if (false == $html) {
+            if ($html == false) {
                 return true;
             } else {
                 global $twig;
@@ -138,7 +138,7 @@ function LiturgicalDayAlert($html = false, $date = false)
         }
     }
 
-    if (false == $html) {
+    if ($html == false) {
         return false;
     } else {
         return '';
@@ -170,7 +170,7 @@ function checkDateBetween($date, $start, $end)
 
 function event2Date($event, $year = false)
 {
-    if (false == $year) {
+    if ($year == false) {
         $year = date('Y');
     }
 
@@ -178,7 +178,7 @@ function event2Date($event, $year = false)
         return $match[3].'-'.$match[5];
     }
     if (preg_match('/^([0-9]{2})(\.|-)([0-9]{2})(\.|)(( \-| \+)[0-9]{1,3}|$)/i', $event, $match)) {
-        if ('' != $match[5]) {
+        if ($match[5] != '') {
             $extra = $match[5].' days';
         } else {
             $extra = false;
@@ -207,7 +207,7 @@ function event2Date($event, $year = false)
 
 function getMasses($tid, $date = false)
 {
-    if (false == $date || '' == $date) {
+    if ($date == false || $date == '') {
         $date = date('Y-m-d');
     }
 
@@ -240,7 +240,7 @@ function getMasses($tid, $date = false)
 
         if (checkDateBetween($date, $datumtol, $datumig)) {
             $tmp['now'] = true;
-            if (false == $currentExists) {
+            if ($currentExists == false) {
                 $tmp['current'] = true;
                 $currentExists = true;
             }
@@ -261,7 +261,7 @@ function getMasses($tid, $date = false)
 
         foreach ($results2 as $row2) {
             $row2 = (array) $row2;
-            if ('' != $row2['milyen']) {
+            if ($row2['milyen'] != '') {
                 $row2['attr'] = decodeMassAttr($row2['milyen']);
             } else {
                 $row2['attr'] = [];
@@ -271,7 +271,7 @@ function getMasses($tid, $date = false)
             $ido = (int) substr($row2['ido'], 0, 2);
             $row2['ido'] = $ido.':'.substr($row2['ido'], 3, 2);
             $row2['nap2_raw'] = $row2['nap2'];
-            if ('' != $row2['nap2']) {
+            if ($row2['nap2'] != '') {
                 $row2['nap2'] = '('.$nap2options[$row2['nap2']].')';
             }
 
@@ -345,14 +345,14 @@ function decodeMassAttr($text)
                 $tmp2 .= ' és ';
             }
         }
-        if (count($attribute['values']) > 0 && '' != $tmp2) {
+        if (count($attribute['values']) > 0 && $tmp2 != '') {
             $tmp2 .= ' héten';
         }
 
-        if ('' != $tmp1) {
+        if ($tmp1 != '') {
             $return[$abbrev]['name'] .= ' '.$tmp1;
         }
-        if ('' != $tmp2 && isset($attribute['description'])) {
+        if ($tmp2 != '' && isset($attribute['description'])) {
             $return[$abbrev]['description'] .= ' '.$tmp2;
         }
     }
@@ -383,9 +383,9 @@ function cleanMassAttr($text)
         preg_match('/^('.implode('|', $milyen).')('.implode('|', $periods).'|)$/', $attr, $match);
         if (count($match) < 1) {
             // unset($attrs[$k]);
-        } elseif ('0' == $match[2]) {
+        } elseif ($match[2] == '0') {
             $attrs[$k] = $match[1];
-        } elseif ('' != $match[2]) {
+        } elseif ($match[2] != '') {
             if (in_array($match[1], $attrs)) {
                 unset($attrs[$k]);
             }
@@ -400,7 +400,7 @@ function formMass($pkey, $mkey, $mass = false, $group = false)
 {
     global $twig;
 
-    if (false == $mass) {
+    if ($mass == false) {
         $mass = [
             'id' => 'new',
             'napid' => 7,
@@ -409,12 +409,12 @@ function formMass($pkey, $mkey, $mass = false, $group = false)
             'milyen' => '',
             'megjegyzes' => '',
         ];
-        if ('particular' == $group) {
+        if ($group == 'particular') {
             $mass['napid'] = 0;
         }
     }
 
-    if (false == $group) {
+    if ($group == false) {
         $group = 'period';
     }
 
@@ -472,12 +472,12 @@ function formPeriod($pkey, $period = false, $group = false)
 {
     global $twig;
 
-    if (false == $group) {
+    if ($group == false) {
         $group = 'period';
     }
 
     $c = 0;
-    if (false == $period) {
+    if ($period == false) {
         $groups = ['particular' => 'különleges miserend', 'period' => ' időszak'];
         $period = [
             'nev' => 'új '.$groups[$group],
@@ -509,7 +509,7 @@ function formPeriod($pkey, $period = false, $group = false)
         ],
     ];
 
-    if ('period' == $group) {
+    if ($group == 'period') {
         $form['from2'] = [
             'name' => $group.'['.$pkey.'][from2]',
             'style' => 'display:inline;width:unset',
@@ -522,7 +522,7 @@ function formPeriod($pkey, $period = false, $group = false)
             'options' => [
                 0 => '≤',
                 '-1' => '<']];
-    } elseif ('particular' == $group) {
+    } elseif ($group == 'particular') {
         $form['from2'] = [
             'name' => $group.'['.$pkey.'][from2]',
             'options' => [
@@ -563,7 +563,7 @@ function formPeriod($pkey, $period = false, $group = false)
                 ++$c;
                 $form['napok'][] = formMass($pkey, $c, $mass, $group);
             }
-        } elseif ('new' == $day) {
+        } elseif ($day == 'new') {
             $form['napok'][] = formMass($pkey, $dkey, false, $group);
         }
     }
@@ -581,8 +581,8 @@ function searchChurches($args, $offset = 0, $limit = 20)
         'offset' => $offset,
         'limit' => $limit];
 
-    if (isset($args['hely']) && '' != $args['hely']) {
-        if ('' == $args['tavolsag']) {
+    if (isset($args['hely']) && $args['hely'] != '') {
+        if ($args['tavolsag'] == '') {
             $args['tavolsag'] = 1;
         }
 
@@ -606,7 +606,7 @@ function searchChurches($args, $offset = 0, $limit = 20)
     $search->where('ok', 'i');
 
     // keyword
-    if (isset($args['kulcsszo']) && '' != $args['kulcsszo']) {
+    if (isset($args['kulcsszo']) && $args['kulcsszo'] != '') {
         $subwhere = [];
         if (preg_match('(\*|\?)', $args['kulcsszo'])) {
             $regexp = preg_replace('/\*/i', '.*', $args['kulcsszo']);
@@ -622,8 +622,8 @@ function searchChurches($args, $offset = 0, $limit = 20)
     }
 
     // varos
-    if (isset($args['varos']) && '' != $args['varos']) {
-        if ('Budapest' == $args['varos']) {
+    if (isset($args['varos']) && $args['varos'] != '') {
+        if ($args['varos'] == 'Budapest') {
             $args['varos'] = 'Budapest*';
         }
 
@@ -637,8 +637,8 @@ function searchChurches($args, $offset = 0, $limit = 20)
     }
 
     // tnyelv
-    if (isset($args['tnyelv']) && '0' != $args['tnyelv']) {
-        if ('h' == $args['tnyelv']) {
+    if (isset($args['tnyelv']) && $args['tnyelv'] != '0') {
+        if ($args['tnyelv'] == 'h') {
             $args['tnyelv'] = 'hu|h';
         }
 
@@ -647,17 +647,17 @@ function searchChurches($args, $offset = 0, $limit = 20)
     }
 
     // gorog only
-    if (isset($args['gorog']) && 'gorog' == $args['gorog']) {
+    if (isset($args['gorog']) && $args['gorog'] == 'gorog') {
         $search->whereIn('egyhazmegye', [17, 18, 34]);
     }
 
     // egyhazmegye
-    if (isset($args['ehm']) && 0 != $args['ehm']) {
+    if (isset($args['ehm']) && $args['ehm'] != 0) {
         $search->where('egyhazmegye', $args['ehm']);
     }
 
     // espereskerulet
-    if (isset($args['espker']) && 0 != $args['espker']) {
+    if (isset($args['espker']) && $args['espker'] != 0) {
         $search->where('espereskerulet', $args['espker']);
     }
 
@@ -683,7 +683,7 @@ function searchChurches($args, $offset = 0, $limit = 20)
                 // acos(sin(:lat)*sin(radians(Lat)) + cos(:lat)*cos(radians(Lat))*cos(radians(Lon)-:lon)) * :R < :rad
                 $d = acos(sin(deg2rad($lat)) * sin(deg2rad($row['lat'])) + cos(deg2rad($lat)) * cos(deg2rad($row['lat'])) * cos(deg2rad($row['lon']) - deg2rad($lon))) * $R;
                 if ($d <= $rad) {
-                    if (true == $config['mapquest']['useitforsearch']) {
+                    if ($config['mapquest']['useitforsearch'] == true) {
                         $d = mapquestDistance(['lat' => $lat, 'lng' => $lon], ['lat' => $row['lat'], 'lng' => $row['lon']]);
                         if ($d <= $rad) {
                             $return['results'][] = $row;
@@ -712,7 +712,7 @@ function searchChurchesWhere($args)
 {
     $where = [];
 
-    if (isset($args['hely']) && '' != $args['hely']) {
+    if (isset($args['hely']) && $args['hely'] != '') {
         $latlng = $args['hely_geocode'];
         $lat = $latlng['lat']; // latitude of centre of bounding circle in degrees
         $lon = $latlng['lng']; // longitude of centre of bounding circle in degrees
@@ -743,8 +743,8 @@ function searchMasses($args, $offset = 0, $limit = 20)
     // templomok
     if (isset($args['templom']) && is_numeric($args['templom'])) {
         $where[] = ' m.tid = '.$args['templom'];
-    } elseif ('' != $args['varos'] || '' != $args['kulcsszo'] || '' != $args['egyhazmegye'] || 'gorog' == $args['gorog'] || '' != $args['hely'] || '0' != $args['tnyelv']) {
-        if ('Budapest' == $args['varos']) {
+    } elseif ($args['varos'] != '' || $args['kulcsszo'] != '' || $args['egyhazmegye'] != '' || $args['gorog'] == 'gorog' || $args['hely'] != '' || $args['tnyelv'] != '0') {
+        if ($args['varos'] == 'Budapest') {
             $args['varos'] = 'Budapest*';
         }
 
@@ -764,11 +764,11 @@ function searchMasses($args, $offset = 0, $limit = 20)
         }
         $where[] = ' m.tid IN ('.implode(',', $tids).')';
     }
-    if ('gorog' == $args['gorog']) {
+    if ($args['gorog'] == 'gorog') {
         $where[] = 'egyhazmegye IN (17,18,34)';
     }
     // milyen nap
-    if ('x' == $args['mikor']) {
+    if ($args['mikor'] == 'x') {
         $args['mikor'] = $args['mikordatum'];
     }
     $where[] = "m.nap IN ('".date('N', strtotime($args['mikor']))."',0)";
@@ -790,11 +790,11 @@ function searchMasses($args, $offset = 0, $limit = 20)
     $where[] = "( m.nap2 IN ('','0','".$hanyadikM."','".$hanyadikP."','".$parossag."') OR m.nap2 IS NULL)";
 
     // milyen órákban
-    if ('de' == $args['mikor2']) {
+    if ($args['mikor2'] == 'de') {
         $where[] = " m.ido < '12:00:01' AND m.ido > '00:00:01' ";
-    } elseif ('du' == $args['mikor2']) {
+    } elseif ($args['mikor2'] == 'du') {
         $where[] = " m.ido > '11:59:59'";
-    } elseif ('x' == $args['mikor2']) {
+    } elseif ($args['mikor2'] == 'x') {
         $idok = explode('-', $args['mikorido']);
         $where[] = " m.ido >= '".$idok[0].":00'";
         $where[] = " m.ido <= '".$idok[1].":00'";
@@ -803,12 +803,12 @@ function searchMasses($args, $offset = 0, $limit = 20)
     // LANGUAGES
     $languages = unserialize(LANGUAGES);
     foreach ($languages as $abbrev => $attribute) {
-        if ('h' != $attribute['abbrev']) {
+        if ($attribute['abbrev'] != 'h') {
             $nothu[] = $abbrev;
         }
     }
-    if ('0' != $args['nyelv'] && '' != $args['nyelv']) {
-        if ('h' == $args['nyelv']) {
+    if ($args['nyelv'] != '0' && $args['nyelv'] != '') {
+        if ($args['nyelv'] == 'h') {
             $where[] = "( m.nyelv REGEXP '(^|,)(".$args['nyelv'].')([0]{0,1}|'.$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' OR
                 templomok.orszag = 12 AND m.nyelv NOT REGEXP '(^|,)(".implode('|', $nothu).')([0]{0,1}|'.$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' )";
         } else {
@@ -822,7 +822,7 @@ function searchMasses($args, $offset = 0, $limit = 20)
     // age group (checkbox)
     if (isset($args['kor'])) {
         foreach ($attributes as $abbrev => $attribute) {
-            if ('age' == $attribute['group']) {
+            if ($attribute['group'] == 'age') {
                 $ages[] = $abbrev;
             }
         }
@@ -830,7 +830,7 @@ function searchMasses($args, $offset = 0, $limit = 20)
         foreach ($args['kor'] as $kor) {
             if (in_array($kor, $ages)) {
                 $wherekor[] = " m.milyen REGEXP '(^|,)(".$kor.')([0]{0,1}|'.$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' ";
-            } elseif ('na' == $kor) {
+            } elseif ($kor == 'na') {
                 $wherekor[] = " m.milyen NOT REGEXP '(^|,)(".implode('|', $ages).')([0]{0,1}|'.$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' ";
             }
         }
@@ -840,7 +840,7 @@ function searchMasses($args, $offset = 0, $limit = 20)
     // music group (chekbox)
     if (isset($args['zene'])) {
         foreach ($attributes as $abbrev => $attribute) {
-            if ('music' == $attribute['group']) {
+            if ($attribute['group'] == 'music') {
                 $musics[] = $abbrev;
             }
         }
@@ -848,7 +848,7 @@ function searchMasses($args, $offset = 0, $limit = 20)
         foreach ($args['zene'] as $zene) {
             if (in_array($zene, $musics)) {
                 $wherezene[] = " m.milyen REGEXP '(^|,)(".$zene.')([0]{0,1}|'.$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' ";
-            } elseif ('na' == $zene) {
+            } elseif ($zene == 'na') {
                 $wherezene[] = " m.milyen NOT REGEXP '(^|,)(".implode('|', $musics).')([0]{0,1}|'.$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' ";
             }
         }
@@ -856,18 +856,18 @@ function searchMasses($args, $offset = 0, $limit = 20)
     }
 
     // rite group (select)
-    if ('0' != $args['ritus']) {
-        if ('gor' == $args['ritus']) {
+    if ($args['ritus'] != '0') {
+        if ($args['ritus'] == 'gor') {
             foreach ($attributes as $abbrev => $attribute) {
-                if ('liturgy' == $attribute['group'] && true == $attribute['isitmass'] && 'gor' != $attribute['abbrev']) {
+                if ($attribute['group'] == 'liturgy' && $attribute['isitmass'] == true && $attribute['abbrev'] != 'gor') {
                     $notgor[] = $abbrev;
                 }
             }
             $where[] = "( m.milyen REGEXP '(^|,)(gor)([0]{0,1}|".$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' OR
                         ( egyhazmegye IN (17,18,34) AND m.milyen NOT REGEXP '(^|,)(".implode('|', $notgor).')([0]{0,1}|'.$hanyadikP.'|'.$hanyadikM.'|'.$parossag.")(,|$)' ) )";
-        } elseif ('rom' == $args['ritus']) {
+        } elseif ($args['ritus'] == 'rom') {
             foreach ($attributes as $abbrev => $attribute) {
-                if ('liturgy' == $attribute['group'] && true == $attribute['isitmass'] && 'rom' != $attribute['abbrev']) {
+                if ($attribute['group'] == 'liturgy' && $attribute['isitmass'] == true && $attribute['abbrev'] != 'rom') {
                     $notrom[] = $abbrev;
                 }
             }
@@ -881,7 +881,7 @@ function searchMasses($args, $offset = 0, $limit = 20)
     // liturgy (not mass) group (checkbox/radio)
     $not = $only = [];
     foreach ($attributes as $abbrev => $attribute) {
-        if ('liturgy' == $attribute['group'] && false == $attribute['isitmass']) {
+        if ($attribute['group'] == 'liturgy' && $attribute['isitmass'] == false) {
             $not[$abbrev] = $abbrev;
         }
     }
@@ -957,7 +957,7 @@ function searchMasses($args, $offset = 0, $limit = 20)
         foreach ($periods as $period) {
             $m = array_shift(array_values($period));
             $w = $m['weight'];
-            if ('' == $w) {
+            if ($w == '') {
                 $w = 0;
             }
             if ($w >= $weight) {
@@ -976,14 +976,14 @@ function searchMasses($args, $offset = 0, $limit = 20)
 function getWeekInMonth($date, $order = '+')
 {
     $num = 0;
-    if ('+' == $order) {
+    if ($order == '+') {
         for ($i = 0; $i < 6; ++$i) {
             if (date('m', strtotime($date)) == date('m', strtotime($date.' -'.$i.' week'))) {
                 ++$num;
             }
         }
     }
-    if ('-' == $order) {
+    if ($order == '-') {
         for ($i = 0; $i < 6; ++$i) {
             if (date('m', strtotime($date)) == date('m', strtotime($date.' +'.$i.' week'))) {
                 --$num;
@@ -1001,16 +1001,16 @@ function generateMassTmp($where = false)
     $results = DB::table('misek')
             ->select('id', 'tol', 'ig')
             ->where('torles', '0000-00-00 00:00:00');
-    if (false != $where) {
+    if ($where != false) {
         $results = $results->whereRaw($where);
     }
     $results = $results->get();
     foreach ($results as $row) {
-        if ('' == $row->tol) {
+        if ($row->tol == '') {
             $row->tol = '01-01';
         }
         $row->tmp_datumtol = event2Date($row->tol);
-        if ('' == $row->ig) {
+        if ($row->ig == '') {
             $row->ig = '12-31';
         }
         $row->tmp_datumig = event2Date($row->ig);
@@ -1032,13 +1032,13 @@ function widget_miserend($args)
 {
     global $twig, $config;
     $tid = $args['tid'];
-    $vars = \App\Legacy\Model\Church::find($tid)->toArray();
-    if ([] == $vars) {
+    $vars = App\Legacy\Model\Church::find($tid)->toArray();
+    if ($vars == []) {
         $html = 'Nincs ilyen templom.';
     } else {
         $vars['miserend'] = getMasses($tid);
 
-        if ('off' == $args['misemegj']) {
+        if ($args['misemegj'] == 'off') {
             unset($vars['misemegj']);
         }
         $html = $twig->render('widget_massschedule.twig', $vars);
@@ -1066,20 +1066,20 @@ function feltoltes_block()
     foreach ($allowed as $church) {
         $ids[] = $church->church_id;
     }
-    $churches = \App\Legacy\Model\Church::whereIn('id', $ids)->get();
+    $churches = App\Legacy\Model\Church::whereIn('id', $ids)->get();
 
-    if (0 == count($churches)) {
+    if (count($churches) == 0) {
         return;
     }
 
     $kod_tartalom = '<ul>';
     foreach ($churches as $church) {
         $jelzes = '';
-        if ('u' == $church->eszrevetel) {
+        if ($church->eszrevetel == 'u') {
             $jelzes .= "<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='Új észrevételt írtak hozzá!' align=absmiddle border=0></a> ";
-        } elseif ('i' == $church->eszrevetel) {
+        } elseif ($church->eszrevetel == 'i') {
             $jelzes .= "<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='Észrevételek!' align=absmiddle border=0></a> ";
-        } elseif ('f' == $church->eszrevetel) {
+        } elseif ($church->eszrevetel == 'f') {
             $jelzes .= "<a href=\"javascript:OpenScrollWindow('/templom/".$church->id."/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='Észrevétel javítása folyamatban!' align=absmiddle border=0></a> ";
         } else {
             $jelzes = '';
@@ -1096,7 +1096,7 @@ function feltoltes_block()
 
 function addMessage($text, $severity = false)
 {
-    return \App\Legacy\Message::add($text, $severity);
+    return App\Legacy\Message::add($text, $severity);
 }
 
 function copyArrayToObject($array, &$object)

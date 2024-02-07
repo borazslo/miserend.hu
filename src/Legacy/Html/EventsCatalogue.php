@@ -115,7 +115,7 @@ class EventsCatalogue extends Html
         foreach ($form['events'] as $name => $years) {
             foreach ($years as $year => $input) {
                 if (isset($input['id'])) {
-                    if ('' != $input['input']) {
+                    if ($input['input'] != '') {
                         $date = date('Y-m-d', strtotime($input['input']));
                     } else {
                         $date = '';
@@ -126,11 +126,11 @@ class EventsCatalogue extends Html
                                 'date' => $date,
                             ]);
                 } else {
-                    if ('' != $input['input']) {
-                        if ('new' == $name) {
+                    if ($input['input'] != '') {
+                        if ($name == 'new') {
                             $name = sanitize($form['new']);
                         }
-                        if ('new' != $name || '' != $form['new']) {
+                        if ($name != 'new' || $form['new'] != '') {
                             DB::table('events')
                                     ->insert([
                                         'name' => $name,

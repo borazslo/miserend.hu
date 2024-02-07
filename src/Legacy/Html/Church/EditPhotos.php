@@ -58,12 +58,12 @@ class EditPhotos extends Html
             foreach ($this->input['photos'] as $modPhoto) {
                 $origPhoto = \App\Legacy\Model\Photo::find($modPhoto['id']);
                 if ($origPhoto) {
-                    if ('i' == $modPhoto['flag']) {
+                    if ($modPhoto['flag'] == 'i') {
                         $origPhoto->flag = 'i';
                     } else {
                         $origPhoto->flag = 'n';
                     }
-                    if ('' == $modPhoto['weight'] || is_numeric((int) $modPhoto['weight'])) {
+                    if ($modPhoto['weight'] == '' || is_numeric((int) $modPhoto['weight'])) {
                         $origPhoto->weight = $modPhoto['weight'];
                     } else {
                         $origPhoto->order = 0;

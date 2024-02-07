@@ -33,7 +33,7 @@ class Signup extends Api
         $validFields = ['username', 'email', 'password', 'nickname', 'name'];
         $fieldsToSubmit = [];
         foreach ($validFields as $field) {
-            if ($this->input[$field] && '' != $this->input[$field]) {
+            if ($this->input[$field] && $this->input[$field] != '') {
                 $fieldsToSubmit[$field] = $this->input[$field];
             }
         }

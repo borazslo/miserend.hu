@@ -19,7 +19,7 @@ class SearchResultsMasses extends Html
 
         $mikor = $_REQUEST['mikor'];
         $mikordatum = $_REQUEST['mikordatum'];
-        if ('x' != $mikor) {
+        if ($mikor != 'x') {
             $mikordatum = $mikor;
         }
 
@@ -60,11 +60,11 @@ class SearchResultsMasses extends Html
         $nyelvekT = ['h' => 'magyar', 'en' => 'angol', 'de' => 'német', 'it' => 'olasz', 'va' => 'latin', 'gr' => 'görög', 'sk' => 'szlovák', 'hr' => 'horvát', 'pl' => 'lengyel', 'si' => 'szlovén', 'ro' => 'román', 'fr' => 'francia', 'es' => 'spanyol'];
 
         $tartalom .= "\n<span class=kiscim>Keresési paraméterek:</span><br><span class=alap>";
-        if (isset($_REQUEST['kulcsszo']) && '' != $_REQUEST['kulcsszo']) {
+        if (isset($_REQUEST['kulcsszo']) && $_REQUEST['kulcsszo'] != '') {
             $tartalom .= '<img src=/img/negyzet_lila.gif align=absmidle> Kulcsszó: '.$_REQUEST['kulcsszo'].'<br/>';
             $leptet_urlap .= "<input type=hidden name=kulcsszo value='".$_REQUEST['kulcsszo']."'>";
         }
-        if (isset($_REQUEST['hely']) && '' != $_REQUEST['hely']) {
+        if (isset($_REQUEST['hely']) && $_REQUEST['hely'] != '') {
             $_REQUEST['hely_geocode'] = mapquestGeocode($_REQUEST['hely']);
             $tartalom .= '<img src=/img/negyzet_lila.gif align=absmidle> '.$_REQUEST['hely'].' + '.$_REQUEST['tavolsag']." km<br/><img src='".$_REQUEST['hely_geocode']['mapUrl']."'><br/>";
             $leptet_urlap .= "<input type=hidden name=hely value='".$_REQUEST['hely']."'>";
@@ -76,11 +76,11 @@ class SearchResultsMasses extends Html
             $tartalom .= "<img src=/img/negyzet_lila.gif align=absmidle> $varos településen<br/>";
             $leptet_urlap .= "<input type=hidden name=varos value='$varos'>";
         }
-        if (isset($_REQUEST['gorog']) && 'gorog' == $_REQUEST['gorog']) {
+        if (isset($_REQUEST['gorog']) && $_REQUEST['gorog'] == 'gorog') {
             $tartalom .= '<br><img src=/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.';
             $leptet_urlap .= "<input type=hidden name=gorog value='gorog'>";
         }
-        if (isset($_REQUEST['tnyelv']) && '0' != $_REQUEST['tnyelv']) {
+        if (isset($_REQUEST['tnyelv']) && $_REQUEST['tnyelv'] != '0') {
             $tartalom .= "<br><img src=/img/negyzet_lila.gif align=absmidle>Amelyik templomban van '".$_REQUEST['tnyelv']."' nyelvű mise.<br/>";
         }
         $leptet_urlap .= "<input type=hidden name=tnyelv value='".$_REQUEST['tnyelv']."'>";
@@ -116,13 +116,13 @@ class SearchResultsMasses extends Html
             $leptet_urlap .= "<input type=hidden name=mikordatum value='$mikordatum'>";
         }
         $tartalom .= ' ';
-        if ('de' == $mikor2) {
+        if ($mikor2 == 'de') {
             $tartalom .= 'délelőtt,';
             $leptet_urlap .= "<input type=hidden name=mikor2 value='de'>";
-        } elseif ('du' == $mikor2) {
+        } elseif ($mikor2 == 'du') {
             $tartalom .= 'délután,';
             $leptet_urlap .= "<input type=hidden name=mikor2 value='du'>";
-        } elseif ('x' == $mikor2) {
+        } elseif ($mikor2 == 'x') {
             $tartalom .= $mikorido;
             $leptet_urlap .= "<input type=hidden name=mikor2 value='x'>";
             $leptet_urlap .= "<input type=hidden name=mikorido value='$mikorido'>";
@@ -200,7 +200,7 @@ class SearchResultsMasses extends Html
             }
         }
 
-        if (0 == $mennyi) {
+        if ($mennyi == 0) {
             $tartalom .= '<br/><span class=alap><strong>Sajnos nincs találat</strong></span>';
         // $tartalom.='<span class=alap>Elnézést kérünk, a kereső technikai hiba miatt nem üzemel. Javításán már dolgozunk.</span>';
         } else {
@@ -214,7 +214,7 @@ class SearchResultsMasses extends Html
 
                 $tartalom .= $ertek.'<br> &nbsp; &nbsp; &nbsp;';
 
-                if ('x' == $_REQUEST['mikor']) {
+                if ($_REQUEST['mikor'] == 'x') {
                     $_REQUEST['mikor'] = $_REQUEST['mikordatum'];
                 }
                 // $masses = getMasses($result['tid'],$_REQUEST['mikordatum']);
@@ -234,7 +234,7 @@ class SearchResultsMasses extends Html
     					<span class="massfullinfo" style="display:none">'.$milyen['description'].'</span>';
                     }
 
-                    if ('' != $mass['megjegyzes']) {
+                    if ($mass['megjegyzes'] != '') {
                         $tartalom .= '<img src="/img/info2.gif" class="massinfo" width=14 title="'.$milyen['megjegyzes'].'"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
 					<span class="massfullinfo" style="display:none">'.$mass['megjegyzes'].'</span>';
                     }

@@ -55,16 +55,16 @@ class Crons
         $results = DB::table('misek')
             ->select('id', 'tol', 'ig')
             ->where('torles', '0000-00-00 00:00:00');
-        if (false != $where) {
+        if ($where != false) {
             $results = $results->whereRaw($where);
         }
         $results = $results->get();
         foreach ($results as $row) {
-            if ('' == $row->tol) {
+            if ($row->tol == '') {
                 $row->tol = '01-01';
             }
             $row->tmp_datumtol = event2Date($row->tol);
-            if ('' == $row->ig) {
+            if ($row->ig == '') {
                 $row->ig = '12-31';
             }
             $row->tmp_datumig = event2Date($row->ig);

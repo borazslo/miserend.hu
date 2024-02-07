@@ -22,7 +22,7 @@ class Pagination
         $this->resultsCount = $countResults;
         $this->count = ceil($countResults / $this->take);
 
-        if (1 == $this->count) {
+        if ($this->count == 1) {
             return;
         }
 
@@ -58,7 +58,7 @@ class Pagination
 
     public static function qe(array $new_params, $url = false, $overwrite = true)
     {
-        if (false == $url) {
+        if ($url == false) {
             $url = $_SERVER['REQUEST_URI'];
         }
         parse_str(parse_url($url, \PHP_URL_QUERY), $params);

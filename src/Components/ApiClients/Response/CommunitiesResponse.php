@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Components\ApiClients\Response;
 
 use App\Components\ApiClients\Exceptions\InvalidJsonSyntaxException;
@@ -41,41 +48,26 @@ class CommunitiesResponse
         return $object;
     }
 
-    /**
-     * @return string|null
-     */
     public function getInstituteName(): ?string
     {
         return $this->instituteName;
     }
 
-    /**
-     * @return string|null
-     */
     public function getInstituteUrl(): ?string
     {
         return $this->instituteUrl;
     }
 
-    /**
-     * @return string|null
-     */
     public function getAddress(): ?string
     {
         return $this->address;
     }
 
-    /**
-     * @return string|null
-     */
     public function getCity(): ?string
     {
         return $this->city;
     }
 
-    /**
-     * @return array
-     */
     public function getCommunities(): array
     {
         return $this->communities;

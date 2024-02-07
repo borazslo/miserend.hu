@@ -126,7 +126,7 @@ class ChurchController extends AbstractController implements EventSubscriberInte
     public function view(
         #[MapEntity(expr: 'repository.findOnePublicChurch(church_id)')]
         Church $church,
-        string $slug = null,
+        ?string $slug = null,
     ): Response {
         if ($slug === null && $church->getSlug() === null) {
             $this->getRepository()->generateSlug($church);
@@ -156,7 +156,7 @@ class ChurchController extends AbstractController implements EventSubscriberInte
 
     public function favorites(
         #[CurrentUser]
-        User $user = null,
+        ?User $user = null,
     ) {
         return $this->render('church/favorites.html.twig', [
             'favorites' => $user === null ? $this->getRepository()->findMostFavorite() : $user->getFavorites(),
@@ -178,8 +178,7 @@ class ChurchController extends AbstractController implements EventSubscriberInte
         #[CurrentUser]
         User $user,
         UserRepository $repository,
-    ): Response
-    {
+    ): Response {
         if ($method === 'add') {
             $user->addFavorite($church);
         } else {

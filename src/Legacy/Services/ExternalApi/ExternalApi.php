@@ -42,8 +42,7 @@ abstract class ExternalApi
         #[Autowire(param: 'kernel.project_dir')]
         private readonly string $projectDir,
         protected readonly ConfigProvider $configProvider,
-    )
-    {
+    ) {
         $this->cacheDir = $this->projectDir.'/var/tmp/';
     }
 
@@ -74,15 +73,15 @@ abstract class ExternalApi
                 $this->saveToCache();
             }
         } catch (\Exception $e) {
-            if (true === $this->isTesting) {
+            if ($this->isTesting === true) {
                 throw new \Exception($e->getMessage());
             }
 
             $config = $this->configProvider->getConfig();
-            if ('json' == $this->format) {
+            if ($this->format == 'json') {
                 $this->jsonData = [];
             }
-            if ('yml' == $this->format) {
+            if ($this->format == 'yml') {
                 $this->xmlData = [];
             }
             $this->error = Html::printExceptionVerbose($e, true);
@@ -104,16 +103,16 @@ abstract class ExternalApi
             $this->cacheFileTime = date('Y-m-d H:i:s', filemtime($this->cacheFilePath));
             if (filemtime($this->cacheFilePath) > strtotime('-'.$this->cache)) {
                 $this->rawData = file_get_contents($this->cacheFilePath);
-                if ('json' == $this->format) {
+                if ($this->format == 'json') {
                     $this->jsonData = json_decode($this->rawData);
-                    if (null === $this->jsonData) {
+                    if ($this->jsonData === null) {
                         throw new \Exception("External API data has been loaded from cache but data is not a valid JSON!\n".$this->rawData);
                     } else {
                         return true;
                     }
-                } elseif ('xml' == $this->format) {
+                } elseif ($this->format == 'xml') {
                     $this->xmlData = @simplexml_load_string($this->rawData);
-                    if (false == $this->xmlData) {
+                    if ($this->xmlData == false) {
                         throw new \Exception("External API data has been loaded from cache but data is not a valid XML!\n".$this->rawData);
                     } else {
                         return true;
@@ -165,18 +164,18 @@ abstract class ExternalApi
 
         $this->saveStat();
 
-        if ('json' == $this->format) {
+        if ($this->format == 'json') {
             $this->jsonData = json_decode($this->rawData);
-            if (null === $this->jsonData) {
+            if ($this->jsonData === null) {
                 if ($this->strictFormat) {
                     throw new \Exception("External API return data is not a valid JSON! \n<br/> ResponseCode: ".$this->responseCode." \n<br/> Response: ".$this->rawData);
                 } else {
                     $this->jsonData = json_decode('[]');
                 }
             }
-        } elseif ('xml' == $this->format) {
+        } elseif ($this->format == 'xml') {
             $this->xmlData = @simplexml_load_string($this->rawData);
-            if (null === $this->xmlData) {
+            if ($this->xmlData === null) {
                 if ($this->strictFormat) {
                     throw new \Exception("External API return data is not a valid XML! \n<br/> ResponseCode: ".$this->responseCode." <br/>\n Response: ".$this->rawData);
                 } else {
@@ -277,17 +276,11 @@ abstract class ExternalApi
         $this->curl_opts[$name] = $value;
     }
 
-    /**
-     * @param mixed $query
-     */
     public function setQuery($query): void
     {
         $this->query = $query;
     }
 
-    /**
-     * @return array|\stdClass|null
-     */
     public function getJsonData(): array|\stdClass|null
     {
         return $this->jsonData;

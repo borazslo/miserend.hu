@@ -51,7 +51,7 @@ trait EntityModificationDateTimeTrait
         $this->updatedAt = new \DateTimeImmutable();
     }
 
-    public function deleteFrom(\DateTimeImmutable $from = null): void
+    public function deleteFrom(?\DateTimeImmutable $from = null): void
     {
         if ($this->deletedAt !== null) {
             $this->deletedAt = $from ?? new \DateTimeImmutable();

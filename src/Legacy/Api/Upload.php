@@ -61,7 +61,7 @@ class Upload extends Api
 
             $data = base64_decode($data);
 
-            if (false === $data) {
+            if ($data === false) {
                 throw new \Exception('base64_decode failed');
             }
 

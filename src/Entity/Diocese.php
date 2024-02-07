@@ -55,105 +55,66 @@ class Diocese
     #[ORM\Column(name: 'osmRelation', type: Types::INTEGER, nullable: true)]
     private ?string $osmId = null;
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     */
     public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string|null
-     */
     public function getRecordOrder(): ?string
     {
         return $this->recordOrder;
     }
 
-    /**
-     * @param string|null $recordOrder
-     */
     public function setRecordOrder(?string $recordOrder): void
     {
         $this->recordOrder = $recordOrder;
     }
 
-    /**
-     * @return string|null
-     */
     public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    /**
-     * @param string|null $status
-     */
     public function setStatus(?string $status): void
     {
         $this->status = $status;
     }
 
-    /**
-     * @return string|null
-     */
     public function getResponsible(): ?string
     {
         return $this->responsible;
     }
 
-    /**
-     * @param string|null $responsible
-     */
     public function setResponsible(?string $responsible): void
     {
         $this->responsible = $responsible;
     }
 
-    /**
-     * @return string|null
-     */
     public function getContactEmail(): ?string
     {
         return $this->contactEmail;
     }
 
-    /**
-     * @param string|null $contactEmail
-     */
     public function setContactEmail(?string $contactEmail): void
     {
         $this->contactEmail = $contactEmail;
     }
 
-    /**
-     * @return string|null
-     */
     public function getOsmId(): ?string
     {
         return $this->osmId;
     }
 
-    /**
-     * @param string|null $osmId
-     */
     public function setOsmId(?string $osmId): void
     {
         $this->osmId = $osmId;
