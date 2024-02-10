@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Components\ApiClients\Response;
 
 class Community
@@ -7,7 +14,7 @@ class Community
     private ?string $name = null;
     private ?string $ageGroup = null;
     private ?string $description = null;
-    private ?string $tags = null;
+    private array $tags = [];
     private ?string $url = null;
 
     public static function initWithArray(array $response): self
@@ -15,7 +22,7 @@ class Community
         $object = new self();
 
         $object->name = $response['name'] ?? null;
-        $object->ageGroup = $response['age_group '] ?? null; // BUG space in key
+        $object->ageGroup = $response['age_group'] ?? null;
         $object->description = $response['description'] ?? null;
         // $object->tags = $response['tags'] ?? null; // broken
         $object->url = $response['link'] ?? null;
@@ -23,35 +30,31 @@ class Community
         return $object;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @return string|null
-     */
     public function getAgeGroup(): ?string
     {
         return $this->ageGroup;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUrl(): ?string
     {
         return $this->url;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getTags(): array
+    {
+        return $this->tags;
     }
 }

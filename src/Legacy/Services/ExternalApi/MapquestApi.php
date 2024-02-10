@@ -20,7 +20,7 @@ class MapquestApi extends ExternalApi
     {
         $config = $this->configProvider->getConfig();
 
-        if (!$config['mapquest']['appkey'] || '***' == $config['mapquest']['appkey']) {
+        if (!$config['mapquest']['appkey'] || $config['mapquest']['appkey'] == '***') {
             throw new \Exception('Missing mapquest appkey.');
         }
 
@@ -39,7 +39,7 @@ class MapquestApi extends ExternalApi
 
         $mapquest = $this->jsonData;
         if (isset($mapquest->route->routeError->errorCode)) {
-            if (602 == $mapquest->info->statuscode) {
+            if ($mapquest->info->statuscode == 602) {
                 return -1;
             } elseif ($mapquest->route->routeError->errorCode > 0) {
                 return -2;

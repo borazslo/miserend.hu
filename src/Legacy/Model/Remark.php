@@ -51,7 +51,7 @@ class Remark extends \Illuminate\Database\Eloquent\Model
     public function appendComment($text)
     {
         $user = $this->getSecurity()->getUser();
-        if ('' != $text) {
+        if ($text != '') {
             $newline = "\n<img src='/img/edit.gif' align='absmiddle' title='".$user->username.' ('.date('Y-m-d H:i:s').")'>".$text;
             $this->adminmegj .= $newline;
         }

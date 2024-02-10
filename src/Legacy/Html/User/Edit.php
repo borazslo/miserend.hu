@@ -45,7 +45,7 @@ class Edit extends Html
         }
 
         // Ha folyamatban van új felszanáló szerkesztése
-        if (0 == $user->getUid() && isset($_REQUEST['edituser'])) {
+        if ($user->getUid() == 0 && isset($_REQUEST['edituser'])) {
             $edituser = new AppUser();
             foreach ($_REQUEST['edituser'] as $key => $value) {
                 $edituser->$key = $value;
@@ -54,11 +54,11 @@ class Edit extends Html
             $edituser = new AppUser($uid);
         }
 
-        if (0 == $edituser->getUid() && 0 == $user->getUid() && preg_match('/\/new$/i', $_SERVER['REQUEST_URI'])) {
+        if ($edituser->getUid() == 0 && $user->getUid() == 0 && preg_match('/\/new$/i', $_SERVER['REQUEST_URI'])) {
             $vars['title'] = 'Regisztráció';
             $vars['new'] = true;
             $vars['helptext'] = true;
-        } elseif (0 == $edituser->getUid() && $user->getUid() > 0) {
+        } elseif ($edituser->getUid() == 0 && $user->getUid() > 0) {
             $vars['title'] = 'Új felhasználó';
             if (!$user->checkRole('user')) {
                 addMessage('Nincs megfelelő jogosultságod!', 'danger');
@@ -70,17 +70,17 @@ class Edit extends Html
             if (!$user->checkRole('user') && $user->getUid() != $edituser->getUid()) {
                 addMessage('Nincs megfelelő jogosultságod!', 'danger');
                 $vars['accessdenied'] = true;
-            } elseif (0 == $edituser->getUid() && 0 == $user->getUid()) {
+            } elseif ($edituser->getUid() == 0 && $user->getUid() == 0) {
                 addMessage('A személyes adatok módosításához be kell előbb lépni.', 'warning');
                 $vars['needtologin'] = true;
             }
             $vars['edit'] = true;
         }
 
-        if ('*vendeg*' == $edituser->getUsername()) {
+        if ($edituser->getUsername() == '*vendeg*') {
             $edituser->setUsername(false);
         }
-        if ('*vendég*' == $edituser->getNickname()) {
+        if ($edituser->getNickname() == '*vendég*') {
             $edituser->setNickname(false);
         }
 
@@ -106,8 +106,6 @@ class Edit extends Html
     /**
      * Admin user edit.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return Response
      * @throws \Exception
      */
     public function edit(\Symfony\Component\HttpFoundation\Request $request): Response
@@ -145,11 +143,11 @@ class Edit extends Html
 
         $newuser = new AppUser(uid: $_REQUEST['edituser']['uid'] ?? false);
 
-        if ((!isset($_REQUEST['terms']) || 1 != $_REQUEST['terms']) && 0 == $newuser->uid && 0 == $user->uid) {
+        if ((!isset($_REQUEST['terms']) || $_REQUEST['terms'] != 1) && $newuser->uid == 0 && $user->uid == 0) {
             addMessage('El kell fogadni a <i>Házirendet és szabályzatot</i>!', 'danger');
 
             return false;
-        } elseif ((!isset($_REQUEST['robot']) || 'MKPK' != $_REQUEST['robot']) && 0 == $newuser->uid && 0 == $user->uid) {
+        } elseif ((!isset($_REQUEST['robot']) || $_REQUEST['robot'] != 'MKPK') && $newuser->uid == 0 && $user->uid == 0) {
             addMessage('Sajnos, ha nem válaszol az MKPK-val kapcsolatos kérdésre, akkor önt robotnak nézzük és nem regisztrálhat!', 'danger');
 
             return false;

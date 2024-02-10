@@ -27,13 +27,12 @@ class OpenstreetmapApi extends ExternalApi
         #[Autowire(param: 'kernel.project_dir')]
         private readonly string $projectDir,
         ConfigProvider $configProvider,
-    )
-    {
+    ) {
         parent::__construct($this->projectDir, $configProvider);
 
         $config = $configProvider->getConfig();
 
-        if (false == $config['openstreetmap']) {
+        if ($config['openstreetmap'] == false) {
             throw new Exception('OpenStreetMap API is disabled or undefined!');
         }
         $this->apiUrl = $config['openstreetmap']['apiurl'].'/api/0.6/'; // dev and prod is different

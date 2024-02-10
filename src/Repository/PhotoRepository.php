@@ -9,9 +9,7 @@
 
 namespace App\Repository;
 
-use App\Entity\ChurchHolder;
 use App\Entity\Photo;
-use App\Entity\Template;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

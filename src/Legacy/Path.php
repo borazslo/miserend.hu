@@ -30,13 +30,13 @@ class Path
         array_unshift($path, 'html');
         for ($i = \count($path) - 1; $i >= 0; --$i) {
             $file = implode('/', $path).'/'.$path[$i];
-            if (file_exists(PATH.'classes/'.$file.'.php') && 'html/html' != $file) {
+            if (file_exists(PATH.'classes/'.$file.'.php') && $file != 'html/html') {
                 $this->className = '\\'.preg_replace("/\//", '\\', $file);
 
                 return;
             }
             $file = implode('/', $path);
-            if (file_exists(PATH.'classes/'.$file.'.php') && 'html/html' != $file) {
+            if (file_exists(PATH.'classes/'.$file.'.php') && $file != 'html/html') {
                 $this->className = '\\'.preg_replace("/\//", '\\', $file);
 
                 return;

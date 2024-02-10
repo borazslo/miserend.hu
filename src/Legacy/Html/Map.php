@@ -25,8 +25,7 @@ class Map extends Html
     public function __construct(
         #[Autowire(param: 'kernel.project_dir')]
         private readonly string $projectDir,
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedServices(): array
@@ -62,7 +61,7 @@ class Map extends Html
         if ($request->query->has('map')) {
             $parts = explode('/', $request->query->get('map'));
 
-            if (3 == \count($parts)) {
+            if (\count($parts) == 3) {
                 $variables['center'] = [
                     'zoom' => (int) $parts[0],
                     'lat' => (float) $parts[1],
@@ -70,7 +69,7 @@ class Map extends Html
                 ];
             }
 
-            if (2 == \count($parts)) {
+            if (\count($parts) == 2) {
                 $variables['center'] = [
                     'lat' => (float) $parts[0],
                     'lon' => (float) $parts[1],

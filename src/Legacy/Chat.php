@@ -15,8 +15,7 @@ class Chat
 {
     public function __construct(
         private readonly Security $security,
-    )
-    {
+    ) {
     }
 
     public int $limit = 10;
@@ -86,7 +85,7 @@ class Chat
                 $row['color'] = 'red';
             }
 
-            if ('' != $row['kinek']) {
+            if ($row['kinek'] != '') {
                 if ($row['kinek'] == $user->getLogin()) {
                     $loginkiir2 = urlencode($user->getLogin());
                 } else {
@@ -121,6 +120,7 @@ class Chat
 
     /**
      * @param string|bool $format
+     *
      * @return array|string
      */
     public function getUsers(): array

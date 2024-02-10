@@ -25,8 +25,7 @@ class ChurchMassSearchType extends AbstractType
 {
     public function __construct(
         private readonly ConstantsProvider $constantsProvider,
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

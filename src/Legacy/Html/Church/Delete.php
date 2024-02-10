@@ -21,7 +21,7 @@ class Delete extends \App\Legacy\Html\Html
         $this->input['tid'] = $path[0];
 
         $this->church2delete = \App\Legacy\Model\Church::find($this->input['tid']);
-        if (0 == $this->church2delete->id) {
+        if ($this->church2delete->id == 0) {
             addMessage('Nincs ilyen templom!', danger);
 
             return;
@@ -42,7 +42,7 @@ class Delete extends \App\Legacy\Html\Html
         $user = $this->getSecurity()->getUser();
 
         $comment = \App\Legacy\Request::Text('comment');
-        if ('' != $this->church2delete->adminmegj) {
+        if ($this->church2delete->adminmegj != '') {
             $this->church2delete->adminmegj .= "\n";
         }
         $this->church2delete->adminmegj .= 'Törölte '.$user->getLogin();

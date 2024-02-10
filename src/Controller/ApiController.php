@@ -14,7 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/api/v1')]
 class ApiController extends AbstractController
@@ -23,8 +22,7 @@ class ApiController extends AbstractController
     public function churchFavorite(
         #[MapRequestPayload]
         ChurchFavoriteDto $churchFavorite,
-    ): Response
-    {
+    ): Response {
         return $this->forward(ChurchController::class.'::changeFavorite', path: [
             'church' => $churchFavorite->church,
             'method' => $churchFavorite->method,

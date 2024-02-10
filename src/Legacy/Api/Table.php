@@ -36,7 +36,7 @@ class Table extends Api
 
     public function validateInput()
     {
-        if (!\is_array($this->input['columns']) || [] === $this->input['columns']) {
+        if (!\is_array($this->input['columns']) || $this->input['columns'] === []) {
             throw new \Exception("JSON input 'columns' should be a list/array.");
         }
         foreach ($this->input['columns'] as $column) {
@@ -85,7 +85,7 @@ class Table extends Api
                 break;
         }
 
-        if ('text' == $this->format) {
+        if ($this->format == 'text') {
             $this->format = 'csv';
         }
 

@@ -80,10 +80,10 @@ class Photo extends \Illuminate\Database\Eloquent\Model
 
         if (file_exists($file)) {
             if (preg_match('/(jpg|jpeg)$/i', $file)) {
-                $src_img = @ImagecreateFromJpeg($file);
+                $src_img = @imagecreatefromjpeg($file);
                 $this->height = @imagesy($src_img);  // original height
                 $this->width = @imagesx($src_img);  // original width
-                if ('' != $this->height && '' != $this->width) {
+                if ($this->height != '' && $this->width != '') {
                     $this->save();
 
                     return true;
@@ -102,7 +102,7 @@ class Photo extends \Illuminate\Database\Eloquent\Model
 
     public function uploadFile($inputFile)
     {
-        if (\UPLOAD_ERR_OK != $inputFile['error']) {
+        if ($inputFile['error'] != \UPLOAD_ERR_OK) {
             throw new \Exception("There is no correct \$_FILES['FileInput'].");
         }
         if (!isset($this->church_id)) {
@@ -166,7 +166,7 @@ class Photo extends \Illuminate\Database\Eloquent\Model
             $max = 120;
         }// maximum size of 1 side of the picture.
 
-        $src_img = ImagecreateFromJpeg($forras);
+        $src_img = imagecreatefromjpeg($forras);
 
         $oh = imagesy($src_img);  // original height
         $ow = imagesx($src_img);  // original width
@@ -186,6 +186,6 @@ class Photo extends \Illuminate\Database\Eloquent\Model
 
         /* ImageCopyResized($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img)); */
         imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $new_w, $new_h, imagesx($src_img), imagesy($src_img));
-        ImageJpeg($dst_img, "$kimenet");
+        imagejpeg($dst_img, "$kimenet");
     }
 }

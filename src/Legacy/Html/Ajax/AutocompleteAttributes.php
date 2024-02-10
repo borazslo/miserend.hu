@@ -17,7 +17,7 @@ class AutocompleteAttributes extends Ajax
 
         $results = [];
 
-        if ('language' == $_REQUEST['type']) {
+        if ($_REQUEST['type'] == 'language') {
             $attributes = [];
             $tmp = unserialize(LANGUAGES);
             foreach ($tmp as $abbrev => $attribute) {
@@ -50,7 +50,7 @@ class AutocompleteAttributes extends Ajax
         foreach ($attributes as $key => $val) {
             if ($text == $key) {
                 foreach ($periods as $k => $v) {
-                    if ('0' != $k) {
+                    if ($k != '0') {
                         $results[] = ['label' => $key.$k.' <i>('.$val.' '.$v.')</i>', 'value' => $key.$k];
                     }
                 }

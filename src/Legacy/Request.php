@@ -17,7 +17,7 @@ class Request
     public static function Integer($name)
     {
         $value = self::get($name);
-        if ('' != $value && !is_numeric($value)) {
+        if ($value != '' && !is_numeric($value)) {
             throw new \Exception("Required '$name' is not an Integer.");
         }
 
@@ -95,7 +95,7 @@ class Request
     public static function Simpletext($name)
     {
         $value = self::get($name);
-        if ('' != $value && !preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
+        if ($value != '' && !preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
             throw new Exception("Variable '$name' is not a SimpleText.");
         }
 
@@ -105,7 +105,7 @@ class Request
     public static function SimpletextwDefault($name, $default = false)
     {
         $value = self::getwDefault($name, $default);
-        if ('' != $value && !preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
+        if ($value != '' && !preg_match('/^[0-9a-zA-Z_-]+$/i', $value)) {
             throw new Exception("Variable '$name' is not a SimpleText.");
         }
 
@@ -125,7 +125,7 @@ class Request
     public static function DateRequired($name)
     {
         $value = self::getRequired($name);
-        if (false == strtotime($value)) {
+        if (strtotime($value) == false) {
             throw new Exception("Required '$name' is not a Date.");
         }
 
@@ -135,7 +135,7 @@ class Request
     public static function DatewDefault(string $name, $default = false)
     {
         $value = self::getwDefault($name, $default);
-        if (false == strtotime($value)) {
+        if (strtotime($value) == false) {
             throw new \Exception("Required '$name' is not a Date.");
         }
 

@@ -3,6 +3,7 @@ version
 git_hash
 node_modules
 vendor
+config/config.php
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -31,3 +32,8 @@ yarn-error.log
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 /public/static
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###

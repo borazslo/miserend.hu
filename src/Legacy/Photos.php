@@ -9,8 +9,6 @@
 
 namespace App\Legacy;
 
-use App\Legacy;
-
 class Photos
 {
     /**
@@ -18,7 +16,7 @@ class Photos
      */
     public function cron()
     {
-        $photos = Legacy\Model\Photo::whereNull('width')
+        $photos = Model\Photo::whereNull('width')
             ->orWhereNull('height')
             ->orWhere('width', 0)
             ->orWhere('height', 0)

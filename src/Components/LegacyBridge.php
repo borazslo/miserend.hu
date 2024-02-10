@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Components;
 
 use App\Components\LegacyBridge\AjaxServicesTrait;
@@ -19,10 +26,10 @@ use Symfony\Contracts\Service\ServiceSubscriberTrait;
 #[Autoconfigure(public: true)]
 class LegacyBridge implements ServiceSubscriberInterface
 {
-    use ServiceSubscriberTrait;
-    use BaseServicesTrait;
     use AjaxServicesTrait;
+    use BaseServicesTrait;
     use ChurchServicesTrait;
+    use ServiceSubscriberTrait;
     use UserServicesTrait;
 
     public function __invoke(Request $request): Response
@@ -38,9 +45,10 @@ class LegacyBridge implements ServiceSubscriberInterface
         }
 
         // init legacy stuffs
-        define('DOMAIN', $this->configProvider()->getConfig()['path']['domain']);
+        \define('DOMAIN', $this->configProvider()->getConfig()['path']['domain']);
 
         $object = $this->container->get($class);
+
         return $object->{$method}($request);
     }
 

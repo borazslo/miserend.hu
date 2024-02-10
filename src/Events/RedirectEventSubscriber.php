@@ -40,13 +40,14 @@ class RedirectEventSubscriber implements EventSubscriberInterface
         $request = $requestEvent->getRequest();
         $routeName = $request->attributes->get('_route');
 
-        if ('main' === $routeName && $request->query->has('templom')) {
+        if ($routeName === 'main' && $request->query->has('templom')) {
             $churchViewUrl = $this->urlGenerator->generate('church_view', [
                 'church_id' => $request->query->getInt('templom'),
                 'slug' => null,
             ]);
 
             $requestEvent->setResponse(new RedirectResponse($churchViewUrl, status: 301));
+
             return;
         }
     }

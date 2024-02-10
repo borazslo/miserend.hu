@@ -14,7 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * OSM tag-ek
+ * OSM tag-ek.
  */
 #[ORM\Entity(repositoryClass: OsmTagRepository::class)]
 #[ORM\Table(name: 'osmtags')]
@@ -41,93 +41,60 @@ class OsmTag
     #[ORM\Column(name: 'value', type: Types::STRING, length: 255, nullable: true)]
     private ?string $value = null;
 
-    # [ORM\ManyToOne(targetEntity: Church::class, inversedBy: 'osmTags')]
-    # [ORM\JoinColumn(name: 'church_id', nullable: true)]
+    // [ORM\ManyToOne(targetEntity: Church::class, inversedBy: 'osmTags')]
+    // [ORM\JoinColumn(name: 'church_id', nullable: true)]
     // private ?Church $church = null;
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getOsmType(): ?string
     {
         return $this->osmType;
     }
 
-    /**
-     * @param string|null $osmType
-     */
     public function setOsmType(?string $osmType): void
     {
         $this->osmType = $osmType;
     }
 
-    /**
-     * @return string|null
-     */
     public function getOsmId(): ?string
     {
         return $this->osmId;
     }
 
-    /**
-     * @param string|null $osmId
-     */
     public function setOsmId(?string $osmId): void
     {
         $this->osmId = $osmId;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     */
     public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string|null
-     */
     public function getValue(): ?string
     {
         return $this->value;
     }
 
-    /**
-     * @param string|null $value
-     */
     public function setValue(?string $value): void
     {
         $this->value = $value;
     }
 
-    /**
-     * @return Church|null
-     */
     public function getChurch(): ?Church
     {
         return $this->church;
     }
 
-    /**
-     * @param Church|null $church
-     */
     public function setChurch(?Church $church): void
     {
         $this->church = $church;

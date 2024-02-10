@@ -1,19 +1,25 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Components;
 
 use App\Entity\OsmTag;
 
 /**
- * OSM Taglist alapján segít behatárolni az accessibility lehetőségeket
+ * OSM Taglist alapján segít behatárolni az accessibility lehetőségeket.
  */
 class AccessibilityHelper
 {
     public function __construct(
         /** @var $tagList array<string, OsmTag> */
         private array $tagList,
-    )
-    {
+    ) {
     }
 
     public const ACCESSIBILITY_VALUE_NA = 0;

@@ -52,7 +52,7 @@ class MessageRepository
             ->where('sid', session_id())
             ->get();
 
-        if (0 === \count($rawMessages)) {
+        if (\count($rawMessages) === 0) {
             return [];
         }
 

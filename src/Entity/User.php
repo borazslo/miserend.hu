@@ -122,8 +122,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
     /**
      * @deprecated
      * @see self::getRoles()
-     *
-     * @return string
      */
     public function getJogok(): string
     {

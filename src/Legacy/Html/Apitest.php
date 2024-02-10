@@ -26,7 +26,7 @@ class Apitest extends Html
             echo 'Kérés:<pre>';
 
             $json = $_REQUEST['json'];
-            if ('' != $json) {
+            if ($json != '') {
                 $json = json_decode($json);
                 if (!$json) {
                     echo "Hibás JSON data!<br/>\n";
@@ -36,7 +36,7 @@ class Apitest extends Html
                 $json = new Object();
             }
 
-            if ('' != $_FILES['fileToUpload']['tmp_name']) {
+            if ($_FILES['fileToUpload']['tmp_name'] != '') {
                 $imagedata = file_get_contents($_FILES['fileToUpload']['tmp_name']);
                 // alternatively specify an URL, if PHP settings allow
                 $json->photo = base64_encode($imagedata);

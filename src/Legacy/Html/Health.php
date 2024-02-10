@@ -55,7 +55,7 @@ class Health extends Html
                 $tmp .= '('.$filemtime.') ';
             }
 
-            if ('success' == $alert) {
+            if ($alert == 'success') {
                 foreach ($tables as $name => $count) {
                     $tables[$name] = $name.': '.$count;
                 }
@@ -92,7 +92,7 @@ class Health extends Html
                 $this->externalapis[$apiToTest]['apiUrl'] = $externalapi->apiUrl;
                 $this->externalapis[$apiToTest]['testQuery'] = $externalapi->rawQuery;
 
-                if (true !== $testresult) {
+                if ($testresult !== true) {
                     throw new \Exception($testresult);
                 }
 

@@ -9,7 +9,6 @@
 
 namespace App\Legacy;
 
-use App\Legacy;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class KeywordShortcut
@@ -27,7 +26,7 @@ class KeywordShortcut
 
     public function updateReligiousAdministrationShortcuts()
     {
-        $osms = Legacy\Model\OSM::whereHasTag('boundary', 'religious_administration')->get();
+        $osms = Model\OSM::whereHasTag('boundary', 'religious_administration')->get();
         foreach ($osms as $osm) {
             $churches = $osm->enclosed()->get();
             foreach ($churches as $church) {
@@ -42,7 +41,7 @@ class KeywordShortcut
 
     public function updateAdministrativeShortcuts()
     {
-        $osms = Legacy\Model\OSM::whereHasTag('boundary', 'administrative')->get();
+        $osms = Model\OSM::whereHasTag('boundary', 'administrative')->get();
         foreach ($osms as $osm) {
             $churches = $osm->enclosed()->get();
             foreach ($churches as $church) {
@@ -57,7 +56,7 @@ class KeywordShortcut
 
     public function updateNameShortcuts()
     {
-        $tags = Legacy\Model\OSMTag::whereRaw(" `name` REGEXP '^(alt_|old_){0,1}name(:|$)' ")->get();
+        $tags = Model\OSMTag::whereRaw(" `name` REGEXP '^(alt_|old_){0,1}name(:|$)' ")->get();
         foreach ($tags as $tag) {
             $churches = $tag->osm->churches()->get();
             foreach ($churches as $church) {
@@ -72,7 +71,7 @@ class KeywordShortcut
         foreach ($names as $name) {
             foreach (['nev', 'ismertnev'] as $k => $v) {
                 if ($name->$v != '') {
-                    $church = Legacy\Model\Church::find($name->id);
+                    $church = Model\Church::find($name->id);
                     $tag = new \stdClass();
                     $tag->id = (int) ('-'.$church->id.$k);
                     $tag->value = $name->$v;
@@ -84,7 +83,7 @@ class KeywordShortcut
 
     public function addKeywordShorcut($tag, $church, $type)
     {
-        $keywordShortcut = Legacy\Model\KeywordShortcut::firstOrNew(['osmtag_id' => $tag->id]);
+        $keywordShortcut = Model\KeywordShortcut::firstOrNew(['osmtag_id' => $tag->id]);
         $keywordShortcut->church_id = $church->id;
         $keywordShortcut->type = $type;
         $keywordShortcut->value = $tag->value;
