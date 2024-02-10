@@ -26,7 +26,12 @@ composer install
 #    --no-dev \
 #    --prefer-dist || exit $?
 
-# TODO install symfony/console
+if [ "$(command -v git &> /dev/null)" ] && [ -d .git ]
+then
+  cat .env.local | sed "s/MISEREND_GIT_VERSION.*/MISEREND_GIT_VERSION=$(git rev-parse --short HEAD 2> /dev/null)/" > /tmp/symfony.env.local
+  mv /tmp/symfony.env.local .env.local
+fi
+
 # bin/console cache:clear || exit $?
 # bin/console cache:warmup || exit $?
 
