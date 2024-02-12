@@ -29,6 +29,11 @@ $primary: $miserend-primary-color;
 @import "bootstrap/scss/navbar";
 @import "bootstrap/scss/card";
 @import "bootstrap/scss/buttons";
+@import "bootstrap/scss/forms/labels";
+@import "bootstrap/scss/forms/form-check";
+@import "bootstrap/scss/forms/form-text";
+@import "bootstrap/scss/forms/validation";
+@import "bootstrap/scss/forms/floating-labels";
 @import "bootstrap/scss/images";
 
 // api
