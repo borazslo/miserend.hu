@@ -27,20 +27,19 @@ class UserController extends AbstractController
     public function profile(
         #[CurrentUser]
         User $user,
-        Request $request,
     ): Response {
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // save
-        }
-
-        return $this->render('user/edit.twig', [
+        return $this->render('user/view.html.twig', [
             'user' => $user,
-            'edit' => true,
-            'form' => $form->createView(),
         ]);
+    }
+
+    #[Route(path: '/profil/kedvencek', name: 'user_favorites', methods: ['GET', 'DELETE'])]
+    public function userFavorites(
+        #[CurrentUser]
+        User $user,
+    ): Response {
+        dump($user);
+        return new Response('<html><body></body></html>');
     }
 
     #[Route(path: '/user/new', name: 'user_new', methods: ['GET'])]

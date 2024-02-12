@@ -1,0 +1,112 @@
+{% extends 'layout_3col.html.twig' %}
+{% set title = 'Saját adatok' %}
+
+
+{% block right_sidebar %}
+	<div class="panel-group" id="accordion">
+		<div class="panel panel-default">
+			<div class="panel-heading visible-lg-block visible-md-block">
+				<h4 class="panel-title">További információk</h4>
+			</div>
+			<div id="collapseOne" class="panel-collapse">
+				<table class="table small">
+					<tr><td>Regisztráció:<td><td>{{ user.createdAt|date('Y-m-d H:i:s') }}</td></tr>
+					<tr><td>Utolsó belépés:<td><td>{{ user.lastLoginAt|date('Y-m-d H:i:s') }}</td></tr>
+					<tr><td>Utolsó aktivitás:<td><td>{{ user.lastActiveAt|date('Y-m-d H:i:s') }}</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	{#		{% if edituser.remarksCount > 0 %}#}
+	{#		<div class="panel-group" id="accordion">#}
+	{#		    <div class="panel panel-default">#}
+	{#		        <div class="panel-heading visible-lg-block visible-md-block">#}
+	{#		            <h4 class="panel-title">Észrevételezett templomai: {{ edituser.remarks|length }}</h4>#}
+	{#		        </div>#}
+	{#	            <ul class="list-group">#}
+	{#	                {% for remark in edituser.remarks %}#}
+	{#	                	<li class="list-group-item">#}
+	{#	                		<a href="/templom/{{ remark.church.id }}">{{ remark.church.nev }}</a> ({{ remark.church.varos }}) {%if remark.total > 1 %}({{ remark.total }}){%  endif %}<br/>#}
+	{#	                		{{ remark.datum }} {% if user.isadmin %}<a href="{{ remark.marker.url }}">{% endif %}{{ remark.marker.html|raw }}{% if user.isadmin %}</a>{% endif %}#}
+	{#	            		</li>#}
+	{#	                {% endfor %}#}
+	{#	                {% if edituser.remarksCount - (edituser.remarks)|length  > 0 %}#}
+	{#	                <li class="list-group-item">És további {{ edituser.remarksCount - (edituser.remarks)|length }} ...</li>#}
+	{#	                {% endif %}#}
+	{#	            </ul>            #}
+	{#		    </div>#}
+	{#		</div>#}
+	{#		{% endif %}#}
+
+
+	{#		{% if edituser.responsible.church|length > 0 %}#}
+	{#		<div class="panel-group" id="accordion">#}
+	{#		    <div class="panel panel-default">#}
+	{#		        <div class="panel-heading visible-lg-block visible-md-block">#}
+	{#		            <h4 class="panel-title">Felelősségi körei: {{ edituser.responsible.church|length }}</h4>#}
+	{#		        </div>#}
+	{#	            <ul class="list-group">#}
+	{#	                {% for key, church in edituser.responsible.church %}#}
+	{#	                	<li class="list-group-item">#}
+	{#	                		<a href="/templom/{{ church.id }}">{{ church.nev }}</a> ({{ church.varos }})	                		#}
+	{#	            		</li>#}
+	{#	                {% endfor %}#}
+	{#	                {% if edituser.remarksCount - (edituser.remarks)|length  > 0 %}#}
+	{#	                <li class="list-group-item">És további {{ edituser.remarksCount - (edituser.remarks)|length }} ...</li>#}
+	{#	                {% endif %}#}
+	{#	            </ul>            #}
+	{#		    </div>#}
+	{#		</div>#}
+	{#		{% endif %}#}
+
+	{% if user.favorites|length > 0 %}
+		<div class="panel-group mt-3">
+			<div class="card">
+				<div class="card-header visible-lg-block visible-md-block">
+					<h5 class="mb-0">Kedvenc templomai: {{ user.favorites|length }}</h5>
+				</div>
+				<ul class="card-body">
+					{% for key, favorite in user.favorites %}
+						<li class="list-group-item">
+							<a href="{{ path('church_view', {church_id: favorite.id, slug: favorite.slug}) }}">{{ favorite.name }}</a> ({{ favorite.city }})
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+	<dl class="row">
+		<dt class="col-sm-4">Felhasználói név</dt>
+		<dd class="col-sm-8">{{ user.username }}</dd>
+
+		<dt class="col-sm-4">Becenév, megszólítás</dt>
+		<dd class="col-sm-8">{{ user.nickname }}</dd>
+
+		<dt class="col-sm-4">Név</dt>
+		<dd class="col-sm-8">{{ user.fullName }}</dd>
+
+		<dt class="col-sm-4">Email</dt>
+		<dd class="col-sm-8">{{ user.email }}</dd>
+
+		<dt class="col-sm-4">Önkéntes</dt>
+		<dd class="col-sm-8">{{ user.volunteer ? 'igen' : 'nem' }}</dd>
+
+		<dt class="col-sm-4">Email értesítések</dt>
+		<dd class="col-sm-8">{{ user.notifications ? 'bekapcsolva' : '-' }}</dd>
+
+		{% if user.roles|length > 1 %}
+
+			<dt class="col-sm-4">Jogosultságok</dt>
+			<dd class="col-sm-8">
+				<ul>
+					{%- for role in user.roles -%}
+						<li>{{ 'roles.%s'|format(role)|trans -}}</li>
+					{%- endfor -%}
+				</ul>
+			</dd>
+		{% endif %}
+{% endblock %}

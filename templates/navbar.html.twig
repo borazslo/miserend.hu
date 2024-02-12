@@ -58,8 +58,8 @@
 
             {% if app.user %}
                 <div class="d-flex" role="search">
-                    <a class="btn btn-primary" href="{{ path('user_profile') }}">Saját adatok</a>
-                    <a class="btn btn-primary ms-2" href="{{ path('app_logout') }}">Kilépés</a>
+                    <a class="btn btn-light" href="{{ path('user_profile') }}">Saját adatok</a>
+                    <a class="btn btn-light ms-2" href="{{ path('app_logout') }}">Kilépés</a>
                 </div>
             {% else %}
                 <form class="d-flex" role="search" method="POSt" action="{{ path('app_login') }}">
