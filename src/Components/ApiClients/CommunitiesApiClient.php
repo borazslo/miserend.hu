@@ -9,8 +9,12 @@
 
 namespace App\Components\ApiClients;
 
+use App\Components\ApiClients\Exceptions\ContentUnavailableException;
 use App\Components\ApiClients\Response\CommunitiesResponse;
 use App\Entity\Church;
+use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -33,13 +37,22 @@ class CommunitiesApiClient
     {
         \assert($churchId > 0);
 
-        $jsonString = $this->cache->get($this->getCacheKey($churchId), function (ItemInterface $item) use ($churchId) {
-            $item->expiresAfter($this->defaultCacheLength);
+        try {
+            $jsonString = $this->cache->get($this->getCacheKey($churchId), function (ItemInterface $item) use ($churchId) {
+                $item->expiresAfter($this->defaultCacheLength);
 
-            $response = $this->httpClient->request('GET', $this->getEndpointUrl($churchId));
+                $response = $this->httpClient->request('GET', $this->getEndpointUrl($churchId), [
+                    'timeout' => 1,
+                ]);
 
-            return $response->getContent();
-        });
+                return $response->getContent();
+            });
+        } catch (ServerException|ClientException $exception) {
+            $statusCode = $exception->getResponse()->getStatusCode();
+            throw new ContentUnavailableException(sprintf('Content unavailable. Response status: %d', $statusCode));
+        } catch (TransportException $exception) {
+            throw new ContentUnavailableException(sprintf('Content unavailable. Transport error message: "%s"', $exception->getMessage()));
+        }
 
         return CommunitiesResponse::initWithJsonString($jsonString);
     }

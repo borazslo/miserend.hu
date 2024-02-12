@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Twig\Extension;
+namespace App\Components\ApiClients\Twig\Extension;
 
-use App\Twig\Runtime\CommunitiesExtensionRuntime;
+use App\Components\ApiClients\Twig\Runtime\CommunitiesExtensionRuntime;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

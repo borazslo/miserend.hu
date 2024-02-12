@@ -68,6 +68,9 @@ class CommunitiesResponse
         return $this->city;
     }
 
+    /**
+     * @return array<Community>
+     */
     public function getCommunities(): array
     {
         return $this->communities;

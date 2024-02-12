@@ -1,0 +1,39 @@
+{
+  "institute": {
+    "miserend_id": 2413,
+    "name": "Institution name",
+    "url": "https:\/\/kozossegek.hu\/templom\/slug",
+    "city": "city of institution",
+    "address": "address of institution"
+  },
+  "data": [
+    {
+      "name": "Community #1",
+      "age_group": "tinédzser, fiatal felnőtt",
+      "description": "<p>description #1</p>",
+      "tags": ", , ",
+      "link": "https:\/\/kozossegek.hu\/kozosseg\/slug-99"
+    },
+    {
+      "name": "Community #2",
+      "age_group": "fiatal felnőtt, középkorú",
+      "description": "description #2",
+      "tags": ", , , ",
+      "link": "https:\/\/kozossegek.hu\/kozosseg\/slug-10000"
+    },
+    {
+      "name": "Community #3",
+      "age_group": "középkorú, nyugdíjas",
+      "description": "description #3",
+      "tags": ", , ",
+      "link": "https:\/\/kozossegek.hu\/kozosseg\/slug-0"
+    },
+    {
+      "name": "Community #4",
+      "age_group": "középkorú",
+      "description": "description #4",
+      "tags": ", , , ",
+      "link": "https:\/\/kozossegek.hu\/kozosseg\/slug-123456"
+    }
+  ]
+}
