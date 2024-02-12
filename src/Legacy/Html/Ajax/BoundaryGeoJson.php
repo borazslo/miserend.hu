@@ -37,11 +37,11 @@ class BoundaryGeoJson extends Ajax
         $osmData = explode(';', $osm);
         foreach ($osmData as $key => $osmDataItem) {
             preg_match('/(node|way|relation|N|W|R):([0-9]{1,8})$/i', $osmDataItem, $osm);
-            if ('relation' == $osm[1]) {
+            if ($osm[1] == 'relation') {
                 $osm[1] = 'R';
-            } elseif ('way' == $osm[1]) {
+            } elseif ($osm[1] == 'way') {
                 $osm[1] = 'W';
-            } elseif ('node' == $osm[1]) {
+            } elseif ($osm[1] == 'node') {
                 $osm[1] = 'N';
             }
 

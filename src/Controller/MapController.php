@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the Miserend App.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Controller;
 
 use App\Entity\Church;
@@ -15,15 +22,14 @@ class MapController extends AbstractController
     public function main(
         Request $request,
         #[MapQueryParameter(name: 'tid', resolver: QueryParameterEntityResolver::class)]
-        Church $church = null,
-    )
-    {
+        ?Church $church = null,
+    ) {
         $center = null;
         // TODO MapQueryParameter/+resolver terkep coord hoz legacy sorrend tamogatasa
         if ($request->query->has('map')) {
             $parts = explode('/', $request->query->get('map'));
 
-            if (3 == \count($parts)) {
+            if (\count($parts) == 3) {
                 $center = [
                     'center' => [
                         'zoom' => (int) $parts[0],
@@ -33,7 +39,7 @@ class MapController extends AbstractController
                 ];
             }
 
-            if (2 == \count($parts)) {
+            if (\count($parts) == 2) {
                 $center = [
                     'center' => [
                         'lat' => (float) $parts[0],

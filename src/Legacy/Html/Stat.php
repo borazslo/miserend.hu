@@ -120,7 +120,7 @@ class Stat extends Html
                 $tmp[$count->count] = 1;
             }
         }
-        if (count($tmp) > 0) {
+        if (\count($tmp) > 0) {
             foreach ($tmp as $k => $v) {
                 $s4['data'][] = [$k, $v];
             }
@@ -177,7 +177,7 @@ class Stat extends Html
             ->groupBy('lastactive_year')
             ->get();
         foreach ($results as $result) {
-            if (0 == $result->lastactive_year) {
+            if ($result->lastactive_year == 0) {
                 $stat['early'] = $result->count;
             } else {
                 $stat['data'][0][] = [(int) $result->lastactive_year, (int) $result->count];
@@ -258,9 +258,9 @@ class Stat extends Html
             $g = round($minColor[1] + (($maxColor[1] - $minColor[1]) / ($maxYear - 2) * ($result->yearago - 2)));
             $b = round($minColor[2] + (($maxColor[2] - $minColor[2]) / ($maxYear - 2) * ($result->yearago - 2)));
 
-            if (0 == $result->yearago) {
+            if ($result->yearago == 0) {
                 $results[$k]->rgb = [0, 255, 0];
-            } elseif (1 == $result->yearago) {
+            } elseif ($result->yearago == 1) {
                 $results[$k]->rgb = [255, 255, 0];
             } else {
                 $results[$k]->rgb = [$r, $g, $b];

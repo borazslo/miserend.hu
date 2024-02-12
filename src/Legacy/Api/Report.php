@@ -34,13 +34,13 @@ class Report extends Api
         if (!\in_array($this->input['pid'], [0, 1, 2])) {
             throw new \Exception("Wrong format of 'pid' in JSON input.");
         }
-        if (2 === $this->input['pid'] && !isset($this->input['text'])) {
+        if ($this->input['pid'] === 2 && !isset($this->input['text'])) {
             throw new \Exception("In the case of 'pid=2' the 'text' field required in JSON input.");
         }
-        if ($this->version > 3 && (!isset($this->input['dbdate']) || false == strtotime($this->input['dbdate']))) {
+        if ($this->version > 3 && (!isset($this->input['dbdate']) || strtotime($this->input['dbdate']) == false)) {
             throw new \Exception("Field 'dbdate' is required after API version 3 in JSON input.");
         }
-        if (isset($this->input['timestamp']) && false == strtotime($this->input['timestamp'])) {
+        if (isset($this->input['timestamp']) && strtotime($this->input['timestamp']) == false) {
             throw new \Exception("Wrong format of 'timestamps' in JSON input.");
         }
     }

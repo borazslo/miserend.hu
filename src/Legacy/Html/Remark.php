@@ -10,7 +10,6 @@
 namespace App\Legacy\Html;
 
 use App\Legacy\Model\Church;
-use App\Model;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -34,12 +33,12 @@ class Remark extends Html
             $remark->email = $request->request->get('email');
             $remark->nev = $request->request->get('nev');
 
-            if ('' == $remark->nev) {
+            if ($remark->nev == '') {
                 $remark->nev = $remark->email;
             }
 
             // Belépett felhasználónál hidden email és név adat volt, de nem bízunk benne
-            if ('*vendeg*' != $user->getUsername()) {
+            if ($user->getUsername() != '*vendeg*') {
                 $remark->login = $user->getUsername();
                 $remark->email = $user->getEmail();
             }
@@ -87,7 +86,7 @@ switch ($this->action) {
         $this->template = ;
         break;
 }*/
-        if ('modify' == \App\Legacy\Request::Simpletext('remark')) {
+        if (\App\Legacy\Request::Simpletext('remark') == 'modify') {
             $rid = \App\Legacy\Request::IntegerRequired('rid');
             $remark = \App\Legacy\Model\Remark::find($rid);
 

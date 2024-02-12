@@ -14,7 +14,7 @@ class LostPassword extends \App\Legacy\Html\Html
     public function __construct()
     {
         $this->input['lostPassword'] = \App\Legacy\Request::simpleText('lostPassword');
-        if ('sendMeMyPassword' == $this->input['lostPassword']) {
+        if ($this->input['lostPassword'] == 'sendMeMyPassword') {
             $this->input['data'] = \App\Legacy\Request::TextRequired('data');
 
             if ($this->recoverUser()) {

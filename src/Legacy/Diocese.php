@@ -51,7 +51,7 @@ class Diocese
         $this->shortname = $diocese[0]->nev;
         $this->responsible = [];
 
-        if ('' != $diocese[0]->felelos) {
+        if ($diocese[0]->felelos != '') {
             $this->responsible[] = $diocese[0]->felelos;
         }
     }

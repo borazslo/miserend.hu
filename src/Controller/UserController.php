@@ -24,8 +24,7 @@ class UserController extends AbstractController
         #[CurrentUser]
         User $user,
         Request $request,
-    ): Response
-    {
+    ): Response {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 

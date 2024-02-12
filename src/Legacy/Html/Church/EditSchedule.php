@@ -93,11 +93,11 @@ class EditSchedule extends \App\Legacy\Html\Html
                         $mass['weight'] = $period['weight'];
                         $mass['tol'] = sanitize($period['from']);
 
-                        if (0 != $period['from2']) {
+                        if ($period['from2'] != 0) {
                             $mass['tol'] .= ' '.$period['from2'];
                         }
                         $mass['ig'] = sanitize($period['to']);
-                        if (0 != $period['to2']) {
+                        if ($period['to2'] != 0) {
                             $mass['ig'] .= ' '.$period['to2'];
                         }
 
@@ -117,7 +117,7 @@ class EditSchedule extends \App\Legacy\Html\Html
                             'megjegyzes' => $mass['megjegyzes'],
                         ];
 
-                        if ('new' != $mass['id']) {
+                        if ($mass['id'] != 'new') {
                             DB::table('misek')
                                     ->where('tid', $mass['tid'])
                                     ->where('id', $mass['id'])
@@ -142,7 +142,7 @@ class EditSchedule extends \App\Legacy\Html\Html
                         $mass['idoszamitas'] = sanitize($particular['name']);
                         $mass['weight'] = $particular['weight'];
                         $mass['tol'] = sanitize($particular['from']);
-                        if (0 != $particular['from2']) {
+                        if ($particular['from2'] != 0) {
                             $mass['tol'] .= ' '.$particular['from2'];
                         }
                         $mass['ig'] = $mass['tol'];
@@ -161,7 +161,7 @@ class EditSchedule extends \App\Legacy\Html\Html
                               'megjegyzes' => $mass['megjegyzes'],
                           ];
 
-                        if ('new' != $mass['id']) {
+                        if ($mass['id'] != 'new') {
                             DB::table('misek')
                                     ->where('tid', $mass['tid'])
                                     ->where('id', $mass['id'])
@@ -181,7 +181,7 @@ class EditSchedule extends \App\Legacy\Html\Html
         \App\Legacy\Crons::generateMassTolIgTmp('tid = '.$_REQUEST['tid']);
 
         $this->church->log .= "\nMISE_MOD: ".$user->getLogin().' ('.date('Y-m-d H:i:s').' - ['.$_SERVER['REMOTE_ADDR'].' - '.gethostbyaddr($_SERVER['REMOTE_ADDR']).'])';
-        if ('i' == $_REQUEST['update']) {
+        if ($_REQUEST['update'] == 'i') {
             $this->church->frissites = date('Y-m-d');
         }
         $this->church->misemegj = preg_replace('/<br\/>/i', "\n", $_REQUEST['misemegj']);
@@ -198,11 +198,11 @@ class EditSchedule extends \App\Legacy\Html\Html
         $model->save();
 
         $modosit = $_REQUEST['modosit'];
-        if ('i' == $modosit) {
+        if ($modosit == 'i') {
             return;
-        } elseif ('m' == $modosit) {
+        } elseif ($modosit == 'm') {
             $this->redirect('/templom/'.$this->tid.'/edit');
-        } elseif ('t' == $modosit) {
+        } elseif ($modosit == 't') {
             $this->redirect('/templom/'.$this->tid);
         } else {
             $this->redirect('/templom/catalogue');
@@ -220,7 +220,7 @@ class EditSchedule extends \App\Legacy\Html\Html
         $this->jelzes = $this->church->remarksStatus;
 
         // miseaktív
-        if (1 == $this->church->miseaktiv) {
+        if ($this->church->miseaktiv == 1) {
             $this->active['yes'] = ' checked ';
         } else {
             $this->active['no'] = ' checked ';

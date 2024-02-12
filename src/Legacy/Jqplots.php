@@ -136,10 +136,10 @@ class Jqplots
                 }
                 $return .= '}';
             } else {
-                if (true === $value) {
+                if ($value === true) {
                     $return .= 'true';
                 } else {
-                    if (false === $value) {
+                    if ($value === false) {
                         $return .= 'false';
                     } else {
                         if (preg_match('/^\$\.jqplot/', $value) || is_numeric($value)) {

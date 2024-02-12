@@ -230,20 +230,20 @@ class Church extends Model
     {
         $jelzes = ''; // $this->remarksStatus['html'];
 
-        if (1 == $this->miseaktiv) {
+        if ($this->miseaktiv == 1) {
             $countMasses = DB::table('misek')->where('tid', $this->id)->where('torles', '0000-00-00 00:00:00')->count();
             if ($countMasses < 1) {
                 $jelzes .= ' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
             }
         }
 
-        if ('n' == $this->ok) {
+        if ($this->ok == 'n') {
             $jelzes .= " <i class='fa fa-ban fa-lg' title='Nem engedélyezett!' style='color:red'></i> ";
-        } elseif ('f' == $this->ok) {
+        } elseif ($this->ok == 'f') {
             $jelzes .= " <img src=/img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
         }
 
-        if ('i' == $this->ok && 1 == $this->miseaktiv) {
+        if ($this->ok == 'i' && $this->miseaktiv == 1) {
             $updatedTime = strtotime($this->frissites);
             if ($updatedTime < strtotime('-10 years')) {
                 $jelzes .= " <i class='fa fa-exclamation-triangle fa-lg' title='Több mint 10 éves adatok!' style='color:red'></i> ";
@@ -254,7 +254,7 @@ class Church extends Model
         if ($this->lat <= 0 || $this->lon <= 0) {
             $jelzes .= '<span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" style="color:red" title="Nincsen koordináta!"></span>';
         }
-        if ('' == $this->osmid || '' == $this->osmtype) {
+        if ($this->osmid == '' || $this->osmtype == '') {
             $jelzes .= '<span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" style="color:grey" title="OSM adat hiányzik még"></span>';
         }
 
@@ -301,15 +301,15 @@ class Church extends Model
             $return['text'] = 'Nincsenek észrevételek';
             $return['html'] = "<i class='fa fa-gift fa-lg' style='color:#D3D3D3'  title='".$return['text']."'></i>";
             $return['mark'] = false;
-        } elseif ('u' == $remark->allapot) {
+        } elseif ($remark->allapot == 'u') {
             $return['text'] = 'Új észrevételt írtak hozzá!';
             $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag.gif title='".$return['text']."' align=absmiddle border=0></a> ";
             $return['mark'] = 'u';
-        } elseif ('f' == $remark->allapot) {
+        } elseif ($remark->allapot == 'f') {
             $return['text'] = 'Észrevétel javítása folyamatban!';
             $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomagf.gif title='".$return['text']."' align=absmiddle border=0></a> ";
             $return['mark'] = 'f';
-        } elseif ('j' == $remark->allapot) {
+        } elseif ($remark->allapot == 'j') {
             $return['text'] = 'Észrevételek';
             $return['html'] = "<a href=\"javascript:OpenScrollWindow('/templom/$this->id/eszrevetelek',550,500);\"><img src=/img/csomag1.gif title='".$return['text']."' align=absmiddle border=0></a> ";
             $return['mark'] = 'j';
@@ -333,7 +333,7 @@ class Church extends Model
         } else {
             $location->address = $this->cim;
         }
-        if ('' != $this->megkozelites) {
+        if ($this->megkozelites != '') {
             $location->access = $this->megkozelites;
         }
 
@@ -376,7 +376,7 @@ class Church extends Model
 
     public function getOsmAttribute($value)
     {
-        if (false == $this->osmid || false == $this->osmtype) {
+        if ($this->osmid == false || $this->osmtype == false) {
             return false;
         }
 
@@ -428,7 +428,7 @@ class Church extends Model
     public function checkReadAccess($_user)
     {
         $access = false;
-        if ('i' == $this->ok) {
+        if ($this->ok == 'i') {
             $access = true;
         }
 
@@ -497,7 +497,7 @@ class Church extends Model
                 ->where('denomination', 'LIKE', '%_catholic')
                 ->where('admin_level', 6)
                 ->get()->toArray();
-        if ([] == $tmp) {
+        if ($tmp == []) {
             $boundary = Boundary::firstOrNew(['boundary' => 'religious_administration', 'denomination' => $this->denomination, 'admin_level' => 6, 'name' => $_egyhazmegyek[$this->egyhazmegye]->nev]);
             $boundary->save();
             $this->boundaries()->attach($boundary->id);
@@ -509,7 +509,7 @@ class Church extends Model
                 ->where('denomination', 'LIKE', '%_catholic')
                 ->where('admin_level', 7)
                 ->get()->toArray();
-        if ([] == $tmp) {
+        if ($tmp == []) {
             $boundary = Boundary::firstOrNew(['boundary' => 'religious_administration', 'denomination' => $this->denomination, 'admin_level' => 7, 'name' => $_espereskeruletek[$this->espereskerulet]->nev]);
             $boundary->save();
             $this->boundaries()->attach($boundary->id);
@@ -520,7 +520,7 @@ class Church extends Model
                 ->where('boundary', 'administrative')
                 ->where('admin_level', 2)
                 ->get()->toArray();
-        if ([] == $tmp) {
+        if ($tmp == []) {
             $boundary = Boundary::firstOrNew(['boundary' => 'administrative', 'admin_level' => 2, 'name' => $_orszagok[$this->orszag]->nev]);
             $boundary->save();
             $this->boundaries()->attach($boundary->id);
@@ -531,7 +531,7 @@ class Church extends Model
                 ->where('boundary', 'administrative')
                 ->where('admin_level', 6)
                 ->get()->toArray();
-        if ([] == $tmp) {
+        if ($tmp == []) {
             if (isset($_megyek[$this->megye])) {
                 $boundary = Boundary::firstOrNew(['boundary' => 'administrative', 'admin_level' => 6, 'name' => $_megyek[$this->megye]->nev.' megye']);
                 $boundary->save();
@@ -544,7 +544,7 @@ class Church extends Model
                 ->where('boundary', 'administrative')
                 ->where('admin_level', 8)
                 ->get()->toArray();
-        if ([] == $tmp) {
+        if ($tmp == []) {
             $boundary = Boundary::firstOrNew(['boundary' => 'administrative', 'admin_level' => 8, 'name' => $this->varos]);
             $boundary->save();
             $this->boundaries()->attach($boundary->id);

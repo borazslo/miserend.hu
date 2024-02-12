@@ -54,7 +54,7 @@ class SearchResultsChurches extends Html
         // Data for pagination
         $params = [];
         foreach (['varos', 'tavolsag', 'hely', 'kulcsszo', 'gorog', 'tnyelv', 'espker', 'ehm'] as $param) {
-            if (isset($_REQUEST[$param]) && '' != $_REQUEST[$param] && '0' != $_REQUEST[$param]) {
+            if (isset($_REQUEST[$param]) && $_REQUEST[$param] != '' && $_REQUEST[$param] != '0') {
                 $params[$param] = $_REQUEST[$param];
             }
         }
@@ -67,7 +67,7 @@ class SearchResultsChurches extends Html
             addMessage('A keresés nem hozott eredményt', 'info');
 
             return;
-        } elseif (1 == $resultsCount) {
+        } elseif ($resultsCount == 1) {
             $url = '/templom/'.$results['results'][0]['id'];
             $event = ['Search', 'fast', $_REQUEST['varos'].$_REQUEST['kulcsszo'].$_REQUEST['e']];
             $this->redirectWithAnalyticsEvent($url, $event);

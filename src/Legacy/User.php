@@ -10,11 +10,10 @@
 namespace App\Legacy;
 
 use App\Exception;
-use App\Legacy;
 use Illuminate\Database\Capsule\Manager as DB;
 
 /**
- * @deprecated Megszunik a user wrapper.
+ * @deprecated megszunik a user wrapper
  */
 class User
 {
@@ -48,17 +47,17 @@ class User
     private $volunteer;
 
     public function __construct(
-        int $uid = null,
-        string $email = null,
-        string $login = null,
+        ?int $uid = null,
+        ?string $email = null,
+        ?string $login = null,
     ) {
-        if (null !== $uid) {
+        if ($uid !== null) {
             $user = DB::table('user')
                 ->select('*');
 
-            if (null !== $email) {
+            if ($email !== null) {
                 $user = $user->where('email', $email);
-            } elseif (null !== $login) {
+            } elseif ($login !== null) {
                 $user = $user->where('login', $login);
             } else {
                 $user = $user->where('uid', $uid);
@@ -78,7 +77,7 @@ class User
                 $this->name = $user->nev;
                 $this->roles = explode('-', trim($this->jogok, " \t\n\r\0\x0B-"));
                 foreach ($this->roles as $k => $v) {
-                    if ('' == $v) {
+                    if ($v == '') {
                         unset($this->roles[$k]);
                     }
                 }
@@ -96,7 +95,7 @@ class User
             }
         }
         // Lássuk a vendégeket
-        if (!isset($uid) || !is_numeric($uid) || 0 == $uid) {
+        if (!isset($uid) || !is_numeric($uid) || $uid == 0) {
             $this->loggedin = false;
             $this->uid = 0;
             $this->username = '*vendeg*';
@@ -111,15 +110,15 @@ class User
      */
     public function checkRole($role = false): bool
     {
-        if (false == $role) {
+        if ($role == false) {
             return true;
         }
 
-        if ('"any"' == $role || "'any'" == $role) {
+        if ($role == '"any"' || $role == "'any'") {
             if (!isset($this->jogok)) {
                 return false;
             }
-            if ('' != trim(preg_replace('/-/i', '', $this->jogok))) {
+            if (trim(preg_replace('/-/i', '', $this->jogok)) != '') {
                 return true;
             } else {
                 return false;
@@ -140,7 +139,7 @@ class User
 
     public function getHoldingData($church_id)
     {
-        $holding = Legacy\Model\ChurchHolder::where('user_id', $this->uid)->where('church_id', $church_id)->orderBy('updated_at', 'desc')->first();
+        $holding = Model\ChurchHolder::where('user_id', $this->uid)->where('church_id', $church_id)->orderBy('updated_at', 'desc')->first();
         if ($holding) {
             $holding->setAppends([]);
         }
@@ -164,9 +163,9 @@ class User
                 $this->responsible['diocese'][] = $result->id;
             }
 
-            $this->responsibilities['church'] = Legacy\Model\ChurchHolder::where('user_id', $this->uid)->get()->groupBy('status');
+            $this->responsibilities['church'] = Model\ChurchHolder::where('user_id', $this->uid)->get()->groupBy('status');
 
-            $this->responsible['church'] = Legacy\Model\ChurchHolder::where('user_id', $this->uid)->where('status', 'allowed')->get()->Pluck(
+            $this->responsible['church'] = Model\ChurchHolder::where('user_id', $this->uid)->where('status', 'allowed')->get()->Pluck(
                 'church_id'
             )->toArray();
         }
@@ -180,21 +179,21 @@ class User
 
         $tmp = [];
         foreach ($this->responsible['church'] as $church) {
-            $tmp[$church] = Legacy\Model\Church::find($church);
+            $tmp[$church] = Model\Church::find($church);
         }
         $this->responsible['church'] = $tmp;
     }
 
     public function getRemarks($limit = false, $ago = false)
     {
-        if (false == $limit || !is_numeric($limit)) {
+        if ($limit == false || !is_numeric($limit)) {
             $limit = 5;
         }
 
-        $query = Legacy\Model\Remark::select('*', DB::raw('count(*) as total'))->where(function ($q) {
+        $query = Model\Remark::select('*', DB::raw('count(*) as total'))->where(function ($q) {
             $q->where('login', $this->username)->orWhere('email', $this->email);
         });
-        if (false != $ago) {
+        if ($ago != false) {
             $query = $query->where('datum', '>', date('Y-m-d H:i:s', strtotime('-'.$ago)));
         }
 
@@ -210,7 +209,7 @@ class User
     {
         $return = true;
 
-        if (isset($vars['uid']) && !is_numeric($vars['uid']) && '' != $vars['uid']) {
+        if (isset($vars['uid']) && !is_numeric($vars['uid']) && $vars['uid'] != '') {
             addMessage('Nincs ilyen felhasználónk!', 'danger');
 
             return false;
@@ -236,8 +235,8 @@ class User
             }
         }
 
-        if (isset($vars['uid']) && ('' != $vars['password1'] || '' != $vars['password2'])) {
-            if ($vars['password1'] != $vars['password2'] || '' == $vars['password1']) {
+        if (isset($vars['uid']) && ($vars['password1'] != '' || $vars['password2'] != '')) {
+            if ($vars['password1'] != $vars['password2'] || $vars['password1'] == '') {
                 addMessage('A két jelszó nem egyezik meg egymással', 'danger');
                 $return = false;
             } else {
@@ -248,7 +247,7 @@ class User
             }
         }
 
-        if (false == $return) {
+        if ($return == false) {
             return false;
         }
 
@@ -266,7 +265,7 @@ class User
                 addMessage('A felhasználót sikeresen létrehoztuk.', 'success');
 
                 $this->newpwd = $pwd;
-                $email = new Legacy\Model\Email();
+                $email = new Model\Email();
                 $email->render('user_welcome', $this);
                 if ($email->send($this->email)) {
                     addMessage('Elküldtük az emailt az új regisztrációról.', 'success');
@@ -290,16 +289,16 @@ class User
         // TODO: elrontja ...
         // if($this->$key == $val) return true;
         // TODO: szóljon vissza a kötelező
-        if ('' == $val && \in_array($key, ['username', 'login', 'email'])) {
+        if ($val == '' && \in_array($key, ['username', 'login', 'email'])) {
             return false;
         }
 
-        if ('uid' == $key) {
+        if ($key == 'uid') {
             if ($this->uid != $val) {
                 return false;
             }
         } elseif (\in_array($key, ['username', 'login'])) {
-            if (0 == $this->uid) {
+            if ($this->uid == 0) {
                 if (!checkUsername($val)) {
                     return false;
                 }
@@ -309,7 +308,7 @@ class User
             }
         } elseif (\in_array($key, ['jelszo', 'password'])) {
             $this->presaved['jelszo'] = password_hash($val, \PASSWORD_BCRYPT);
-        } elseif ('roles' == $key || 'jogok' == $key) {
+        } elseif ($key == 'roles' || $key == 'jogok') {
             if (!\is_array($val)) {
                 $val = [$val];
             }
@@ -321,12 +320,12 @@ class User
             }
             $jogok = array_unique($jogok);
             $this->presaved['jogok'] = implode('-', $jogok);
-        } elseif ('nickname' == $key || 'becenev' == $key) {
+        } elseif ($key == 'nickname' || $key == 'becenev') {
             $this->presaved['becenev'] = sanitize($val);
-        } elseif ('name' == $key || 'nev' == $key) {
+        } elseif ($key == 'name' || $key == 'nev') {
             $this->presaved['nev'] = sanitize($val);
-        } elseif ('volunteer' == $key) {
-            if ('' == $val) {
+        } elseif ($key == 'volunteer') {
+            if ($val == '') {
                 $this->presaved[$key] = 0;
             } elseif (\in_array($val, [0, 1])) {
                 $this->presaved[$key] = $val;
@@ -341,7 +340,7 @@ class User
             } else {
                 return false;
             }
-        } elseif ('email' == $key) {
+        } elseif ($key == 'email') {
             if (!filter_var($val, \FILTER_VALIDATE_EMAIL)) {
                 return false;
             }
@@ -349,7 +348,7 @@ class User
                 return false;
             }
             $this->presaved[$key] = $val;
-        } elseif ('notifications' == $key) {
+        } elseif ($key == 'notifications') {
             if (!\in_array($val, [0, 1])) {
                 return false;
             }
@@ -374,7 +373,7 @@ class User
             }
         }
 
-        if (0 == $this->uid && isset($this->presaved['login'])) {
+        if ($this->uid == 0 && isset($this->presaved['login'])) {
             try {
                 $this->uid = DB::table('user')->insertGetId($this->presaved);
             } catch (Exception $e) {
@@ -413,12 +412,12 @@ class User
 
     public function delete()
     {
-        if (0 == $this->uid) {
+        if ($this->uid == 0) {
             return false;
         }
 
-        Legacy\Model\ChurchHolder::where('user_id', $this->uid)->delete();
-        Legacy\Model\Favorite::where('uid', $this->uid)->delete();
+        Model\ChurchHolder::where('user_id', $this->uid)->delete();
+        Model\Favorite::where('uid', $this->uid)->delete();
 
         DB::table('user')->where('uid', $this->uid)->delete();
 
@@ -471,13 +470,13 @@ class User
         $favorites = [];
 
         if ($this->uid > 0) {
-            $favorites = Legacy\Model\Favorite::where('uid', $this->uid)
+            $favorites = Model\Favorite::where('uid', $this->uid)
                 ->get()
                 ->sortBy(function ($favorite) {
                     return $favorite->church->nev;
                 });
         } else {
-            $favorites = Legacy\Model\Favorite::groupBy('tid')
+            $favorites = Model\Favorite::groupBy('tid')
                 ->select('tid', DB::raw('count(*) as total'))
                 ->orderBy('total', 'DESC')
                 ->limit(10)
@@ -516,10 +515,10 @@ class User
             }
         }
         foreach ($tids as $key => $tid) {
-            if (!Legacy\Model\Church::find($tid)) {
+            if (!Model\Church::find($tid)) {
                 unset($tids[$key]);
             } else {
-                $favorite = new Legacy\Model\Favorite();
+                $favorite = new Model\Favorite();
                 $favorite->uid = $this->uid;
                 $favorite->tid = $tid;
                 $favorite->save();
@@ -540,7 +539,7 @@ class User
             }
         }
         try {
-            $query = Legacy\Model\Favorite::where('uid', $this->uid)->whereIn('tid', $tids)->delete();
+            $query = Model\Favorite::where('uid', $this->uid)->whereIn('tid', $tids)->delete();
 
             return true;
         } catch (Exception $ex) {
@@ -602,7 +601,7 @@ class User
         foreach ($results as $result) {
             $ids2delete[] = $result->uid;
 
-            $email = new Legacy\Model\Email();
+            $email = new Model\Email();
             $email->to = $result->email;
             $email->render('user_youhavebeendeleted', $result);
             // $email->addToQueue();
@@ -638,7 +637,7 @@ class User
             // Van olyan emlékztetőnk ami a sorban várakozik
             // vagy nincs egy hete hogy küldtünk neki értesítőt
             if (isset($lastEmail) && (
-                'queued' == $lastEmail->status
+                $lastEmail->status == 'queued'
                 || strtotime($lastEmail->updated_at) > strtotime($lastEmailDiff)
             )) {
                 // Nincs mit tenni
@@ -646,7 +645,7 @@ class User
                 // Nincs még korábbi értesítő, vagy az már öregebb mint egy hét
                 $user->inactiveDays = abs(round((time() - strtotime($user->regdatum)) / 86400));
 
-                $email = new Legacy\Model\Email();
+                $email = new Model\Email();
                 $email->to = $user->email;
                 $email->render('user_pleaseactivate', $user);
                 // $email->addToQueue();
@@ -698,11 +697,11 @@ class User
             $user->getResponsabilities();
 
             foreach ($user->responsible['church'] as $key => $churchID) {
-                $user->responsible['church'][$churchID] = Legacy\Model\Church::find($churchID);
+                $user->responsible['church'][$churchID] = Model\Church::find($churchID);
                 unset($user->responsible['church'][$key]);
             }
 
-            $email = new Legacy\Model\Email();
+            $email = new Model\Email();
             $email->to = $user->email;
             $email->render('user_pleaseupdate', $user);
             // $email->addToQueue();
@@ -712,113 +711,71 @@ class User
         return true;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUsername(): ?string
     {
         return $this->username;
     }
 
-    /**
-     * @param string|null $username
-     */
     public function setUsername(?string $username): void
     {
         $this->username = $username;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     */
     public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string|null
-     */
     public function getNickname(): ?string
     {
         return $this->nickname;
     }
 
-    /**
-     * @param string|null $nickname
-     */
     public function setNickname(?string $nickname): void
     {
         $this->nickname = $nickname;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    /**
-     * @param string|null $email
-     */
     public function setEmail(?string $email): void
     {
         $this->email = $email;
     }
 
-    /**
-     * @return string|null
-     */
     public function getJogok(): ?string
     {
         return $this->jogok;
     }
 
-    /**
-     * @param mixed $jogok
-     */
     public function setJogok($jogok): void
     {
         $this->jogok = $jogok;
     }
 
-    /**
-     * @return int
-     */
     public function getUid(): int
     {
         return $this->uid;
     }
 
-    /**
-     * @param int $uid
-     */
     public function setUid(int $uid): void
     {
         $this->uid = $uid;
     }
 
-    /**
-     * @return array
-     */
     public function getResponsible(): array
     {
         return $this->responsible;
     }
 
-    /**
-     * @param array $responsible
-     */
     public function setResponsible(array $responsible): void
     {
         $this->responsible = $responsible;
@@ -840,165 +797,103 @@ class User
         $this->loggedin = $loggedin;
     }
 
-    /**
-     * @param bool $isadmin
-     */
     public function setIsadmin(bool $isadmin): void
     {
         $this->isadmin = $isadmin;
     }
 
-    /**
-     * @return bool
-     */
     public function getIsadmin(): bool
     {
         return $this->isadmin;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLogin()
     {
         return $this->login;
     }
 
-    /**
-     * @param mixed $login
-     */
     public function setLogin($login): void
     {
         $this->login = $login;
     }
 
-    /**
-     * @return mixed
-     */
     public function getJelszo()
     {
         return $this->jelszo;
     }
 
-    /**
-     * @param mixed $jelszo
-     */
     public function setJelszo($jelszo): void
     {
         $this->jelszo = $jelszo;
     }
 
-    /**
-     * @return mixed
-     */
     public function getRegDatum()
     {
         return $this->regDatum;
     }
 
-    /**
-     * @param mixed $regDatum
-     */
     public function setRegDatum($regDatum): void
     {
         $this->regDatum = $regDatum;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLastlogin()
     {
         return $this->lastlogin;
     }
 
-    /**
-     * @param mixed $lastlogin
-     */
     public function setLastlogin($lastlogin): void
     {
         $this->lastlogin = $lastlogin;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLastactive()
     {
         return $this->lastactive;
     }
 
-    /**
-     * @param mixed $lastactive
-     */
     public function setLastactive($lastactive): void
     {
         $this->lastactive = $lastactive;
     }
 
-    /**
-     * @return mixed
-     */
     public function getNotifications()
     {
         return $this->notifications;
     }
 
-    /**
-     * @param mixed $notifications
-     */
     public function setNotifications($notifications): void
     {
         $this->notifications = $notifications;
     }
 
-    /**
-     * @return mixed
-     */
     public function getBecenev()
     {
         return $this->becenev;
     }
 
-    /**
-     * @param mixed $becenev
-     */
     public function setBecenev($becenev): void
     {
         $this->becenev = $becenev;
     }
 
-    /**
-     * @return mixed
-     */
     public function getNev()
     {
         return $this->nev;
     }
 
-    /**
-     * @param mixed $nev
-     */
     public function setNev($nev): void
     {
         $this->nev = $nev;
     }
 
-    /**
-     * @return mixed
-     */
     public function getVolunteer()
     {
         return $this->volunteer;
     }
 
-    /**
-     * @param mixed $volunteer
-     */
     public function setVolunteer($volunteer): void
     {
         $this->volunteer = $volunteer;
     }
-
-
 }

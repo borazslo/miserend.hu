@@ -40,17 +40,17 @@ class Email extends \Illuminate\Database\Eloquent\Model
         $this->debug = $config['mail']['debug'];
         $this->debugger = $config['mail']['debugger'];
 
-        if (1 == $this->debug) {
+        if ($this->debug == 1) {
             $this->header .= 'Bcc: '.$this->debugger."\r\n";
-        } elseif (2 == $this->debug) {
+        } elseif ($this->debug == 2) {
             $this->body .= ".<br/>\n<i>Originally to: ".print_r($this->to, 1).'</i>';
             $this->to = $this->debugger;
         }
 
         if (isset($this->subject) && isset($this->body) && isset($this->to)) {
-            if (3 == $this->debug) {
+            if ($this->debug == 3) {
                 print_r($this);
-            } elseif (5 == $this->debug) {
+            } elseif ($this->debug == 5) {
                 // black hole
             } else {
                 $mail = new PHPMailer(true);
@@ -59,7 +59,7 @@ class Email extends \Illuminate\Database\Eloquent\Model
                 $mail->CharSet = 'UTF-8';
 
                 // FOR PROD: sendmail
-                if ('production' == $config['env']) {
+                if ($config['env'] == 'production') {
                     $mail->isSendmail();
                 } else {
                     // FOR DEV: to mailcatcher

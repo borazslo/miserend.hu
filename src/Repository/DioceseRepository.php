@@ -30,7 +30,7 @@ class DioceseRepository extends ServiceEntityRepository
         parent::__construct($registry, Diocese::class);
     }
 
-    public function createAllRecordQueryBuilder(string $alias = 'diocese', string $indexBy = null): QueryBuilder
+    public function createAllRecordQueryBuilder(string $alias = 'diocese', ?string $indexBy = null): QueryBuilder
     {
         return $this->createQueryBuilder($alias, $indexBy)
             ->select('partial diocese.{id, name}')

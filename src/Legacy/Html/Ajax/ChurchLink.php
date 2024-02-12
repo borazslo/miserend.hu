@@ -12,7 +12,6 @@ namespace App\Legacy\Html\Ajax;
 use App\Legacy\Request;
 use App\Legacy\Response\HttpResponseInterface;
 use App\Legacy\Response\HttpResponseTrait;
-use App\Model;
 use Symfony\Component\HttpFoundation\Response;
 
 class ChurchLink extends Ajax implements HttpResponseInterface
@@ -75,7 +74,7 @@ class ChurchLink extends Ajax implements HttpResponseInterface
             'add' => $this->add(),
         };
 
-        if (null === $response) {
+        if ($response === null) {
             throw new \Exception('unhandled request');
         }
 

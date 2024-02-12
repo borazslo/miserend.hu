@@ -10,7 +10,6 @@
 namespace App\Legacy;
 
 use App\Exception;
-use App\Legacy;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class OSM
@@ -22,7 +21,7 @@ class OSM
 
     public function checkBoundaries($limit = 50)
     {
-        $churches = Legacy\Model\Church::where('ok', 'i')->where('lat', '<>', '')
+        $churches = Model\Church::where('ok', 'i')->where('lat', '<>', '')
             ->doesntHave('boundaries')
             ->orderByRaw('RAND()')
             ->take($limit)
@@ -38,7 +37,7 @@ class OSM
                 ->get();
             $churches = [];
             foreach ($results as $result) {
-                $churches[] = Legacy\Model\Church::find($result->church_id);
+                $churches[] = Model\Church::find($result->church_id);
             }
         }
 
@@ -55,7 +54,7 @@ class OSM
 
     public function checkUrlMiserend()
     {
-        $overpass = new Legacy\Services\ExternalApi\OverpassApi();
+        $overpass = new Services\ExternalApi\OverpassApi();
         $overpass->downloadUrlMiserend();
 
         /*
@@ -80,7 +79,7 @@ class OSM
                  */
                 // printr($element);
             } else {
-                $church = Legacy\Model\Church::find($match[2]);
+                $church = Model\Church::find($match[2]);
                 if ($church) {
                     $this->saveOSM2Church($church, $element);
                 }

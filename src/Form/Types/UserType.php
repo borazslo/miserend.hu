@@ -70,7 +70,7 @@ class UserType extends AbstractType
 
         $user = $options['data'] ?? null;
 
-        if (null === $user) {
+        if ($user === null) {
             $termsUrl = $this->urlGenerator->generate('terms_and_conditions');
 
             $builder->add('terms', CheckboxType::class, [

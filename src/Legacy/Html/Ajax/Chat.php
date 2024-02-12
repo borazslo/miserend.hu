@@ -33,7 +33,7 @@ class Chat extends Ajax
         return $this->jsonResponse([], $errorMessage, $statusCode);
     }
 
-    protected function jsonResponse(array $payload, string $errorMessage = null, int $statusCode = Response::HTTP_OK): JsonResponse
+    protected function jsonResponse(array $payload, ?string $errorMessage = null, int $statusCode = Response::HTTP_OK): JsonResponse
     {
         $jsonContent = [
             'code' => $statusCode,

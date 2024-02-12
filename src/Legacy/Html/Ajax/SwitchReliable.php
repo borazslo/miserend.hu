@@ -27,7 +27,7 @@ class SwitchReliable extends Ajax
         } else {
             $holding = $holding->status;
         }
-        if (!$user->checkRole('miserend') && 'allowed' != $holding && !$user->checkRole('ehm:'.$remark->church->egyhazmegye)) {
+        if (!$user->checkRole('miserend') && $holding != 'allowed' && !$user->checkRole('ehm:'.$remark->church->egyhazmegye)) {
             throw new \Exception('Hiányzó jogosultság.');
         }
         $remark->megbizhato = $reliable;

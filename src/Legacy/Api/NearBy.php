@@ -54,7 +54,7 @@ class NearBy extends Api
             foreach ($masses['churches'][$church->id]['masses'] as $key => $mise) {
                 $misek[$key]['idopont'] = date('Y-m-d').' '.$mise['ido'];
                 $info = trim($mise['milyen'].' '.$mise['megjegyzes'].' '.$mise['nyelv']);
-                if ('' != $info) {
+                if ($info != '') {
                     $misek[$key]['informacio'] = $info;
                 }
             }

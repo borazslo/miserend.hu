@@ -40,13 +40,13 @@ class ChurchHolder extends Model
         $this->append('church')->get();
         $emails = [];
 
-        if ('asked' == $this->status) {
+        if ($this->status == 'asked') {
             /* Miserend Adminok */
             $admins = DB::table('user')->where('jogok', 'LIKE', '%miserend%')->where('notifications', 1)->get();
             foreach ($admins as $admin) {
                 $emails[$admin->email] = [$this->status.'_admin', $admin];
             }
-        } elseif ('allowed' == $this->status) {
+        } elseif ($this->status == 'allowed') {
             $emails[$this->user->email] = [$this->status.'_user', $this->user];
         }
 
