@@ -1,13 +1,13 @@
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 WORKDIR /miserend
 
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
 # Install php stuff
 RUN apt-get update --fix-missing
-# TODO remove git and unzip?
-RUN apt-get install git unzip -y
  
-RUN docker-php-ext-install mysqli pdo pdo_mysql && a2enmod rewrite
+RUN install-php-extensions mysqli pdo pdo_mysql gd intl imagick && a2enmod rewrite
 
 # Settings
 RUN service apache2 restart
