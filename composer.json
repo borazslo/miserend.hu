@@ -3,6 +3,7 @@
     "description": "Miserend.hu web application",
     "require": {
         "ext-curl": "*",
+        "ext-gd": "*",
         "beberlei/doctrineextensions": "^1.3",
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "3.3.0",
