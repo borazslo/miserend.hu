@@ -106,7 +106,7 @@
                 </div>
                 <div class="col">
                     <p>Fejlesztés: <a href="https://github.com/borazslo/miserend.hu">GitHub</a>
-                        {%- if git_version -%}
+                        {%- if git_version != 'DEV' -%}
                             {{ ' - ' -}}
                             <small>verzió: <a href="https://github.com/borazslo/miserend.hu/commit/{{ git_version }}">
                                     {{- git_version[0:7] -}}

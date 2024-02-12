@@ -1,6 +1,11 @@
+parameters:
+    env(MISEREND_GIT_VERSION): DEV
+
 twig:
     file_name_pattern: '*.twig'
     default_path: '%kernel.project_dir%/templates'
+    globals:
+        git_version: "%env(resolve:MISEREND_GIT_VERSION)%"
 
 when@test:
     twig:
