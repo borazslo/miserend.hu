@@ -13,15 +13,18 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+#[UniqueEntity(fields: ['email'], message: 'Ilyen email címmel már van felhasználó!')]
+#[UniqueEntity(fields: ['username'], message: 'Ilyen felhasználói névvel már van felhasználó!')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements PasswordAuthenticatedUserInterface, UserInterface, EquatableInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue('AUTO')]
     #[ORM\Column(name: 'uid', type: Types::INTEGER)]
     private ?int $id = null;
 
@@ -62,8 +65,11 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
     #[ORM\Column(name: 'volunteer', type: Types::BOOLEAN)]
     private ?bool $volunteer = false;
 
-    #[ORM\Column(type: Types::STRING, length: 32, nullable: true)]
+    #[ORM\Column(name: 'password_change_hash', type: Types::STRING, length: 32, nullable: true)]
     private ?string $passwordChangeHash = null;
+
+    #[ORM\Column(name: 'password_change_deadline', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $passwordChangeDeadline = null;
 
     /**
      * Kedvencek, owning side.
@@ -234,6 +240,16 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
         $this->passwordChangeHash = $passwordChangeHash;
 
         return $this;
+    }
+
+    public function getPasswordChangeDeadline(): ?\DateTimeImmutable
+    {
+        return $this->passwordChangeDeadline;
+    }
+
+    public function setPasswordChangeDeadline(?\DateTimeImmutable $passwordChangeDeadline): void
+    {
+        $this->passwordChangeDeadline = $passwordChangeDeadline;
     }
 
     /**

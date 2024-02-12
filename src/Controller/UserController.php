@@ -11,9 +11,13 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\Types\UserType;
+use App\Repository\UserRepository;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -46,18 +50,48 @@ class UserController extends AbstractController
     }
 
     #[Route(path: '/regisztracio', name: 'user_registration', methods: ['GET', 'POST'])]
-    public function create(Request $request): Response
+    public function create(Request $request, UserRepository $repository, MailerInterface $mailer): Response
     {
-        $form = $this->createForm(UserType::class);
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // save
+            $repository->initPasswordChange($user);
+
+            $repository->save($user, true);
+
+            $email = new TemplatedEmail();
+            $email->subject('Miserend - Regisztráció');
+            $email->htmlTemplate('emails/user_welcome.html.twig');
+            $email->context([
+                'user' => $user,
+            ]);
+            $email->to($user->getEmail());
+            $email->from(new Address('info@miserend.hu', 'Miserend.hu'));
+
+            $mailer->send($email);
+
+            return $this->render('messages/base.html.twig', [
+                'message' => 'Sikeres regisztráció!',
+                'additional_message' => 'Elküldtük az emailt belépéshez szükséges tudnivalókról.',
+            ]);
         }
 
-        return $this->render('user/edit.twig', [
-            'edit' => false,
+        return $this->render('user/registration.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route(path: '/felhasznalo/{hash}/uj_jelszo', name: 'user_change_password')]
+    public function changePassword(User $user): Response
+    {
+        exit;
+    }
+
+    #[Route(path: '/user/lostpassword', name: 'user_ask_new_password', methods: ['GET', 'POST'])]
+    public function beginPasswordChange(Request $request): Request
+    {
+        exit;
     }
 }

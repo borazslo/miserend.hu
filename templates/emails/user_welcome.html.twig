@@ -1,0 +1,21 @@
+{% set name = user.username %}
+{% if user.nickname %}
+    {% set name = user.nickname %}
+{% elseif user.fullName %}
+    {% set name = user.fullName %}
+{% endif %}
+<p>
+    Kedves {{ name }}!
+</p>
+<p>
+    Köszöntünk a <a href="https://miserend.hu">Miserend.hu</a> felhasználói között!
+</p>
+<p>
+    {% set url = url('user_change_password', {hash: user.passwordChangeHash}) %}
+    A belépéshez szükséges jelszavadat az alább oldalon tudod beállítani: <a href="{{ url }}">{{ url }}</a><br />
+    A jelszó beállításra 48 órád van, ezt követően új jelszó kérésével tudsz csak jelszót beállítani.<br />
+    Amennyiben a regisztrációt követően nem lépsz be 30 napig, a felhasználódat töröljük.
+</p>
+-- <br/>
+Miserend.hu<br/>
+https://miserend.hu

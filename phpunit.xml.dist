@@ -18,9 +18,12 @@
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>tests</directory>
+        <testsuite name="unit">
             <directory>./src/Components/*/Tests/</directory>
+        </testsuite>
+
+        <testsuite name="application">
+            <directory>tests/ApplicationTests</directory>
         </testsuite>
     </testsuites>
 
@@ -35,5 +38,6 @@
     </listeners>
 
     <extensions>
+        <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
     </extensions>
 </phpunit>
