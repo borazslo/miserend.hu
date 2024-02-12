@@ -44,7 +44,7 @@ class FavoriteController extends AbstractController
     }
 
     #[IsGranted(attribute: 'ROLE_USER')]
-    #[Route(path: '/profil/kedvencek', name: 'user_favorite_change', methods: ['POST', 'DELETE'])]
+    #[Route(path: '/profil/kedvenc/{church}', name: 'user_favorite_change', options: ['expose' => true], methods: ['POST', 'DELETE'])]
     public function changeFavorite(
         Request $request,
         UserRepository $repository,

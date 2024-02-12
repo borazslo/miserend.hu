@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import Routing from 'fos-router';
 
 export default class extends Controller {
     static targets = ['churchRow']
@@ -79,18 +80,17 @@ export default class extends Controller {
 
         this.loading = true
 
-        const body = new FormData();
-        body.set("church", churchId);
-
         let success = false
 
         try {
-            let response = await fetch('/profil/kedvencek', {
+            let url = Routing.generate('user_favorite_change', {
+                church: churchId
+            })
+            let response = await fetch(url, {
                 method: method,
                 cache: 'no-cache',
                 redirect: "follow",
                 referrerPolicy: "no-referrer",
-                body: body,
             })
 
             let responseObject = await response.json()
