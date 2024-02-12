@@ -1,0 +1,16 @@
+{% extends 'layout_3col.html.twig' %}
+{% set title = 'Regisztráció' %}
+
+{% block content %}
+
+	<div class="mb-5">
+		{{ form_start(form) }}
+		{{ form_widget(form) }}
+
+		<div class="">
+			<button class="btn btn-primary" type="submit">Regisztráció</button>
+		</div>
+
+		{{ form_rest(form) }}
+	</div>
+{% endblock %}

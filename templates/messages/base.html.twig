@@ -1,0 +1,15 @@
+{% extends 'layout_3col.html.twig' %}
+{% set title = '' %}
+
+{% block left_sidebar %}
+{% endblock %}
+
+{% block content %}
+    <div style="min-height: 30rem;" class="d-flex align-items-center">
+        <div>
+            <h3>{{ message }}</h3>
+
+            <p>{{ additional_message|nl2br }}</p>
+        </div>
+    </div>
+{% endblock %}

@@ -47,12 +47,17 @@ class UserRepository extends ServiceEntityRepository
         $user->setRoles($newRoles);
     }
 
-    public function initPasswordChange(User $user, bool $save = false): void
+    public function initPasswordChange(User $user, int $deadlineInDays = 2, bool $save = false): void
     {
         $randomizer = new Randomizer();
         $passwordChangeHash = bin2hex($randomizer->getBytes(16));
 
         $user->setPasswordChangeHash($passwordChangeHash);
+        $user->setPasswordChangeDeadline(new \DateTimeImmutable($deadlineInDays * 3600 * 24));
+
+        if ($save) {
+            $this->_em->flush();
+        }
     }
 
     public function save(User $user, bool $flush = false): void
