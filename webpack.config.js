@@ -1,4 +1,5 @@
 const Encore = require('@symfony/webpack-encore');
+const FosRouting = require('fos-router/webpack/FosRouting');
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -32,6 +33,7 @@ Encore
     .autoProvideVariables({
         '$.fn.autocomplete': 'jquery-ui'
     })
+    .addPlugin(new FosRouting())
 ;
 
 if (Encore.isDevServer()) {

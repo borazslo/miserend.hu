@@ -8,6 +8,7 @@
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "3.3.0",
         "doctrine/orm": "^2.17",
+        "friendsofsymfony/jsrouting-bundle": "^3.5",
         "illuminate/database": "10.*",
         "phpmailer/phpmailer": "^6.8.0",
         "symfony/console": "^7.0",
