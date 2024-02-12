@@ -154,15 +154,6 @@ class ChurchController extends AbstractController implements EventSubscriberInte
         ]);
     }
 
-    public function favorites(
-        #[CurrentUser]
-        ?User $user = null,
-    ) {
-        return $this->render('church/favorites.html.twig', [
-            'favorites' => $user === null ? $this->getRepository()->findMostFavorite() : $user->getFavorites(),
-        ]);
-    }
-
     public function accessibility(Church $church, OsmTagRepository $tagRepository): Response
     {
         return $this->render('church/panels/accessibility.html.twig', [
@@ -171,22 +162,4 @@ class ChurchController extends AbstractController implements EventSubscriberInte
         ]);
     }
 
-    #[IsGranted(attribute: 'ROLE_USER')]
-    public function changeFavorite(
-        Church $church,
-        string $method,
-        #[CurrentUser]
-        User $user,
-        UserRepository $repository,
-    ): Response {
-        if ($method === 'add') {
-            $user->addFavorite($church);
-        } else {
-            $user->removeFavorite($church);
-        }
-
-        $repository->flush();
-
-        return new JsonResponse('OK');
-    }
 }

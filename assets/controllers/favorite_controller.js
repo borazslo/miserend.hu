@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
+    static targets = ['churchRow']
     loading = false
 
     connect() {
@@ -29,7 +30,49 @@ export default class extends Controller {
         this.toggle()
     }
 
+    favoriteDeleteButtonDidClick(event) {
+        event.preventDefault()
+
+        this.removeFavorite(event.params.churchId)
+    }
+
     async toggle() {
+        let method = 'POST'
+        if (this.favorite) {
+            method = 'DELETE'
+        }
+
+        let success = await this.request(method, this.churchId)
+
+        console.log(success)
+
+        if (success) {
+            this.favorite = !this.favorite
+            this.updateIcon()
+        }
+    }
+
+    async removeFavorite(churchId) {
+        let success = await this.request('DELETE', churchId)
+
+        if (success) {
+            this.removeFavoriteChurchRow(churchId)
+        }
+    }
+
+    removeFavoriteChurch(churchId) {
+        churchId *= 1
+
+        for (let row of this.churchRowTargets) {
+            if ((row.dataset.churchId*1) === churchId) {
+                row.remove()
+                break
+            }
+        }
+
+    }
+
+    async request(method, churchId) {
         if (this.loading) {
             return
         }
@@ -37,16 +80,13 @@ export default class extends Controller {
         this.loading = true
 
         const body = new FormData();
-        body.set("church", this.churchId);
-        if (this.favorite) {
-            body.set('method', 'del');
-        } else {
-            body.set('method', 'add');
-        }
+        body.set("church", churchId);
+
+        let success = false
 
         try {
-            let response = await fetch('/api/v1/church/favorite', {
-                method: 'POST',
+            let response = await fetch('/profil/kedvencek', {
+                method: method,
                 cache: 'no-cache',
                 redirect: "follow",
                 referrerPolicy: "no-referrer",
@@ -55,15 +95,13 @@ export default class extends Controller {
 
             let responseObject = await response.json()
 
-
-            if (responseObject === 'OK') {
-                this.favorite = !this.favorite
-                this.updateIcon()
-            }
+            success = responseObject === 'OK'
 
         } catch (e) {
         }
 
         this.loading = false
+
+        return success
     }
 }

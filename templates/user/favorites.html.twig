@@ -1,0 +1,24 @@
+{% extends 'layout_3col.html.twig' %}
+{% set title = 'Saját kedvenc templomok' %}
+
+{% block content %}
+    {% if favorites|length > 0 %}
+        <p>
+            Itt tudod eltávolítani a kedvenc templomaidat.
+        </p>
+        <ul class="list-group" {{ stimulus_controller('favorite') }}>
+            {% for church in favorites %}
+                <li class="list-group-item d-flex justify-content-between align-items-start align-items-stretch" {{ stimulus_target('favorite', 'churchRow') }} data-church-id="{{ church.id }}">
+                    <p class="p-0 m-0">
+                        <a href="{{ path('church_view', {church_id: church.id, slug: church.slug}) }}" class="align-middle">{{ church.name }}</a> <span class="align-middle">({{ church.city }})</span>
+                    </p>
+                    <a href="{{ path('user_favorite_change') }}" {{ stimulus_action('favorite', 'favoriteDeleteButtonDidClick', 'click', parameters={'church_id': church.id}) }} class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i></a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div>
+            Nincsenek kedvenc templomaid. A templomok adatlapján tudod a templomokat kedvencnek jelölni!
+        </div>
+    {% endif %}
+{% endblock %}

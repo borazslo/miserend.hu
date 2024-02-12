@@ -33,15 +33,6 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/profil/kedvencek', name: 'user_favorites', methods: ['GET', 'DELETE'])]
-    public function userFavorites(
-        #[CurrentUser]
-        User $user,
-    ): Response {
-        dump($user);
-        return new Response('<html><body></body></html>');
-    }
-
     #[Route(path: '/user/new', name: 'user_new', methods: ['GET'])]
     public function legacyRegistration(Request $request): Response
     {
