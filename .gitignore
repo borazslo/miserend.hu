@@ -3,6 +3,7 @@ version
 git_hash
 node_modules
 vendor
+config/config.php
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
