@@ -1,15 +1,17 @@
-FROM php:8.2-cli
+FROM php:8.3-cli
 
 WORKDIR /miserend
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN apt-get update && apt-get upgrade -y -o DPkg::Options::=--force-confold
 
 # Base dependencies
-RUN apt-get install -y curl git build-essential zlib1g-dev libzip-dev unzip
+RUN apt-get install -y curl git build-essential
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql zip
+# php extensions
+RUN install-php-extensions mysqli pdo pdo_mysql zip
 
 # node js
 RUN cd /opt && curl --silent -o node.tar.xz https://nodejs.org/dist/latest-v16.x/$(curl --silent https://nodejs.org/dist/latest-v16.x/SHASUMS256.txt | grep node-.*-linux-x64.tar.xz | awk '{ print $2 }') && tar xf node.tar.xz && rm node.tar.xz
