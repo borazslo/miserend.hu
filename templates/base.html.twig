@@ -18,8 +18,7 @@
 {% set ICONS_REMARKS_PROCESSING = 'fa fa-envelope-open-text' %}
 {% set ICONS_REMARKS_NEW = 'fa fa-envelope' %}
 
-
-<html lang="hu">
+<html lang="hu" class="h-100">
 <head>
     {% if app.environment != 'production' %}
         <meta name="robots" content="noindex,nofollow">{% endif %}
@@ -59,7 +58,7 @@
     {% block extra_head %}
     {% endblock %}
 </head>
-<body>
+<body class="h-100 d-flex flex-column">
 {% block body %}
     <script>
         (function (i, s, o, g, r, a, m) {
@@ -98,7 +97,7 @@
             {% endblock %}
         </div>
     </div>
-    <div class="footer">
+    <div class="footer mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col col-md-3 col-sm-3">
