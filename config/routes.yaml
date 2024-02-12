@@ -4,6 +4,20 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-#terms_and_conditions:
-#    path:          /hazirend
-#    controller:    Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+terms_and_conditions:
+    path:          /hazirend
+    controller:    Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template: static_page/terms_and_conditions.twig
+
+about:
+    path:          /impresszum
+    controller:    Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template: static_page/about.twig
+
+gdpr:
+    path:          /gdpr
+    controller:    Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template:  static_page/gdpr.twig
