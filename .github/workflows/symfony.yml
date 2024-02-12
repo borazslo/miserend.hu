@@ -16,6 +16,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+          node-version: 20
 
       - uses: actions/checkout@v3
 
@@ -33,6 +34,17 @@ jobs:
 
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install packages
+        run: npm i
+
+      - name: Build assets
+        run: npm run build
 
       - name: Create Database
         run: |
