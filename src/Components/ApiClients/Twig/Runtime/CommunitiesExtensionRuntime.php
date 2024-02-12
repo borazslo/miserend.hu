@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Twig\Runtime;
+namespace App\Components\ApiClients\Twig\Runtime;
 
 use App\Components\ApiClients\CommunitiesApiClient;
 use App\Components\ApiClients\Response\CommunitiesResponse;
@@ -23,10 +23,15 @@ class CommunitiesExtensionRuntime implements RuntimeExtensionInterface
 
     public function fetchCommunities(Church|int $church): ?CommunitiesResponse
     {
-        if (\is_int($church)) {
-            return $this->client->getCommunityInfoWithChurchId($church);
+        try {
+            if (\is_int($church)) {
+                return $this->client->getCommunityInfoWithChurchId($church);
+            }
+
+            return $this->client->getCommunityInfoWithChurch($church);
+        } catch (\Exception $exception) {
         }
 
-        return $this->client->getCommunityInfoWithChurch($church);
+        return null;
     }
 }
