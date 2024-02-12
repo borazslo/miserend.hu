@@ -43,13 +43,14 @@
         ]
     },
     "require-dev": {
-        "symfony/var-dumper": "^7.0",
-        "phpunit/phpunit": "9.*",
-        "symfony/web-profiler-bundle": "^7.0",
-        "symfony/maker-bundle": "^1.52",
         "friendsofphp/php-cs-fixer": "^3.46",
+        "phpunit/phpunit": "9.*",
+        "symfony/debug-bundle": "^7.0",
+        "symfony/maker-bundle": "^1.52",
+        "symfony/phpunit-bridge": "^7.0",
         "symfony/stopwatch": "^7.0",
-        "symfony/debug-bundle": "^7.0"
+        "symfony/var-dumper": "^7.0",
+        "symfony/web-profiler-bundle": "^7.0"
     },
     "config": {
         "allow-plugins": {
@@ -64,9 +65,11 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "pre-commit": [
-            "@cs-fix"
+            "@cs-fix",
+            "@test"
         ],
         "cs-fix":  "php-cs-fixer fix",
-        "cs-fix-diff":  "php-cs-fixer fix --dry-run --diff"
+        "cs-fix-diff":  "php-cs-fixer fix --dry-run --diff",
+        "test": "phpunit"
     }
 }
