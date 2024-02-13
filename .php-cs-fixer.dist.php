@@ -45,6 +45,7 @@ return (new PhpCsFixer\Config())
     ->setFinder(
         (new PhpCsFixer\Finder())
             ->in(__DIR__.'/src')
+            ->exclude(['Legacy'])
             ->append([__FILE__])
     )
     ->setCacheFile('.php-cs-fixer.cache')
