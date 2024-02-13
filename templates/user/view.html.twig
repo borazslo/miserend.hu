@@ -66,13 +66,19 @@
 				<div class="card-header visible-lg-block visible-md-block">
 					<h5 class="mb-0">Kedvenc templomai: {{ user.favorites|length }}</h5>
 				</div>
-				<ul class="card-body">
-					{% for key, favorite in user.favorites %}
-						<li class="list-group-item">
-							<a href="{{ path('church_view', {church_id: favorite.id, slug: favorite.slug}) }}">{{ favorite.name }}</a> ({{ favorite.city }})
-						</li>
-					{% endfor %}
-				</ul>
+				<div class="card-body">
+					<ul class="p-0 mb-3">
+						{% for key, favorite in user.favorites[0:2] %}
+							<li class="list-group-item">
+								<a href="{{ path('church_view', {church_id: favorite.id, slug: favorite.slug}) }}">{{ favorite.name }}</a> ({{ favorite.city }})
+							</li>
+						{% endfor %}
+					</ul>
+
+					{% if user.favorites|length > 2 %}
+						<a href="{{ path('user_favorites') }}">További kedvencek</a>
+					{% endif %}
+				</div>
 			</div>
 		</div>
 	{% endif %}

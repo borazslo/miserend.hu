@@ -127,8 +127,8 @@ class Church implements EntityModificationDateTimeInterface
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'favorites')]
     #[ORM\JoinTable(name: 'favorites')]
-    #[ORM\JoinColumn(name: 'church_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'uid', unique: true)]
+    #[ORM\JoinColumn(name: 'church_id', referencedColumnName: 'id', unique: true)]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'uid')]
     private ?Collection $usersWhoFavored;
 
     #[ORM\OneToMany(mappedBy: 'church', targetEntity: OsmTag::class)]

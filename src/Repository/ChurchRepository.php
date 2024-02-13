@@ -10,6 +10,7 @@
 namespace App\Repository;
 
 use App\Entity\Church;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -75,6 +76,20 @@ class ChurchRepository extends ServiceEntityRepository
         if ($save) {
             $this->_em->flush();
         }
+    }
+
+    /**
+     * @param User $user
+     * @return array<Church>
+     */
+    public function findFavoriteChurches(User $user): array
+    {
+        return $this->createQueryBuilder('church')
+            ->join('church.usersWhoFavored', 'user')
+            ->where('user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('church.name')
+            ->getQuery()->getResult();
     }
 
     public function save(Church $church, bool $save = false): void

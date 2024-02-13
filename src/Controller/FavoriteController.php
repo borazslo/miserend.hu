@@ -25,11 +25,12 @@ class FavoriteController extends AbstractController
 {
     #[Route(path: '/profil/kedvencek', name: 'user_favorites', methods: 'GET')]
     public function userFavorites(
+        ChurchRepository $repository,
         #[CurrentUser]
         User $user,
     ): Response {
         return $this->render('user/favorites.html.twig', [
-            'favorites' => $user->getFavorites(),
+            'favorites' => $repository->findFavoriteChurches($user),
         ]);
     }
 
@@ -48,6 +49,7 @@ class FavoriteController extends AbstractController
     public function changeFavorite(
         Request $request,
         UserRepository $repository,
+        ChurchRepository $churchRepository,
         Church $church,
         #[CurrentUser]
         User $user,
@@ -60,6 +62,15 @@ class FavoriteController extends AbstractController
 
         $repository->flush();
 
-        return new JsonResponse('OK');
+        if ($request->headers->get('Turbo-Frame') === 'list-favorite') {
+            return $this->render('user/favorites.html.twig', [
+                'favorites' => $churchRepository->findFavoriteChurches($user),
+            ]);
+        }
+
+        return $this->forward(ChurchController::class.'::view', [
+            'church' => $church,
+            'slug' => $church->getSlug(),
+        ]);
     }
 }

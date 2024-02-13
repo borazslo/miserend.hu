@@ -72,12 +72,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
     private ?\DateTimeImmutable $passwordChangeDeadline = null;
 
     /**
-     * Kedvencek, owning side.
+     * Kedvencek.
      */
     #[ORM\ManyToMany(targetEntity: Church::class, mappedBy: 'usersWhoFavored')]
     #[ORM\JoinTable(name: 'favorites')]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'uid')]
-    #[ORM\InverseJoinColumn(name: 'church_id', referencedColumnName: 'id', unique: true)]
+    #[ORM\JoinColumn(name: 'church_id', referencedColumnName: 'id', unique: true)]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'uid')]
     private ?Collection $favorites;
 
     public function __construct()

@@ -30,8 +30,8 @@ final class Version20240131233452 extends AbstractMigration
         $this->addSql('ALTER TABLE favorites CHANGE uid user_id INT NOT NULL');
         $this->addSql('ALTER TABLE favorites ADD CONSTRAINT FK_E46960F552596C31 FOREIGN KEY (church_id) REFERENCES templomok (id)');
         $this->addSql('ALTER TABLE favorites ADD CONSTRAINT FK_E46960F5539B0606 FOREIGN KEY (user_id) REFERENCES user (uid)');
-        $this->addSql('CREATE INDEX IDX_E46960F552596C31 ON favorites (church_id)');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_E46960F5539B0606 ON favorites (user_id)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_E46960F5C1538FD4 ON favorites (church_id)');
+        $this->addSql('CREATE INDEX IDX_E46960F5A76ED395 ON favorites (user_id)');
         $this->addSql('ALTER TABLE favorites ADD PRIMARY KEY (church_id, user_id)');
     }
 
