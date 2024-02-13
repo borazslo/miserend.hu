@@ -23,23 +23,37 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class UserController extends AbstractController
 {
-    #[Route(path: '/profil', name: 'user_profile', methods: ['GET', 'POST'])]
+    #[Route(path: '/profil', name: 'user_profile', methods: 'GET')]
     public function profile(
         #[CurrentUser]
         User $user,
+    ): Response {
+        return $this->render('user/view.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
+    #[Route(path: '/profil/szerkesztes', name: 'user_profile_edit', methods: ['GET', 'POST'])]
+    public function profileEdit(
         Request $request,
+        UserRepository $repository,
+        #[CurrentUser]
+        User $user,
     ): Response {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
+        dump($form->isSubmitted() && $form->isValid());
+
         if ($form->isSubmitted() && $form->isValid()) {
-            // save
+            $repository->flush();
+
+            return $this->redirectToRoute('user_profile');
         }
 
-        return $this->render('user/edit.twig', [
+        return $this->render('user/edit.html.twig', [
             'user' => $user,
-            'edit' => true,
-            'form' => $form->createView(),
+            'form' => $form,
         ]);
     }
 

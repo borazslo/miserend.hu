@@ -1,2 +1,10 @@
 Bad credentials.: Hibás felhasználónév vagy jelszó!
 The presented password cannot be empty.: Jelszó mezőt kötelező kitölteni!
+
+roles:
+  ROLE_USER: Egyszerű felhasználó
+  ROLE_CHURCH_ADMIN: Templom admin
+  ROLE_USER_ADMIN: Felhasználó admin
+  ROLE_ADMIN: Weboldal admin
+  ROLE_SUPER_ADMIN: Szent Péter
+  ROLE_ALLOWED_TO_SWITCH: Felhasználót megszemélyesíthet

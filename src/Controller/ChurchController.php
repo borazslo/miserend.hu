@@ -11,16 +11,13 @@ namespace App\Controller;
 
 use App\Components\AccessibilityHelper;
 use App\Entity\Church;
-use App\Entity\User;
 use App\Repository\ChurchRepository;
 use App\Repository\OsmTagRepository;
 use App\Repository\PhotoRepository;
-use App\Repository\UserRepository;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -28,8 +25,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ChurchController extends AbstractController implements EventSubscriberInterface, ServiceSubscriberInterface
@@ -154,39 +149,11 @@ class ChurchController extends AbstractController implements EventSubscriberInte
         ]);
     }
 
-    public function favorites(
-        #[CurrentUser]
-        ?User $user = null,
-    ) {
-        return $this->render('church/favorites.html.twig', [
-            'favorites' => $user === null ? $this->getRepository()->findMostFavorite() : $user->getFavorites(),
-        ]);
-    }
-
     public function accessibility(Church $church, OsmTagRepository $tagRepository): Response
     {
         return $this->render('church/panels/accessibility.html.twig', [
             'church' => $church,
             'accessibility' => new AccessibilityHelper($tagRepository->findTagsWithChurch($church, true)),
         ]);
-    }
-
-    #[IsGranted(attribute: 'ROLE_USER')]
-    public function changeFavorite(
-        Church $church,
-        string $method,
-        #[CurrentUser]
-        User $user,
-        UserRepository $repository,
-    ): Response {
-        if ($method === 'add') {
-            $user->addFavorite($church);
-        } else {
-            $user->removeFavorite($church);
-        }
-
-        $repository->flush();
-
-        return new JsonResponse('OK');
     }
 }

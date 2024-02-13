@@ -24,6 +24,7 @@ return (new PhpCsFixer\Config())
         '@PHPUnit75Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
+        'void_return' => true,
         'protected_to_private' => false,
         'native_constant_invocation' => ['strict' => false],
         'no_superfluous_phpdoc_tags' => [
@@ -44,6 +45,7 @@ return (new PhpCsFixer\Config())
     ->setFinder(
         (new PhpCsFixer\Finder())
             ->in(__DIR__.'/src')
+            ->exclude(['Legacy'])
             ->append([__FILE__])
     )
     ->setCacheFile('.php-cs-fixer.cache')

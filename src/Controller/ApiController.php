@@ -23,7 +23,7 @@ class ApiController extends AbstractController
         #[MapRequestPayload]
         ChurchFavoriteDto $churchFavorite,
     ): Response {
-        return $this->forward(ChurchController::class.'::changeFavorite', path: [
+        return $this->forward(FavoriteController::class.'::changeFavorite', path: [
             'church' => $churchFavorite->church,
             'method' => $churchFavorite->method,
         ]);

@@ -1,0 +1,14 @@
+{% extends 'layout_3col.html.twig' %}
+{% set title = 'Saját adatok szerkesztése' %}
+
+
+{% block content %}
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+
+    <div class="mb-3">
+        <button class="btn btn-primary" type="submit">Adatok módosítása</button>
+    </div>
+
+    {{ form_rest(form) }}
+{% endblock %}

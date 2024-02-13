@@ -2,15 +2,12 @@
 {% set title = 'Regisztráció' %}
 
 {% block content %}
+	{{ form_start(form) }}
+	{{ form_widget(form) }}
 
-	<div class="mb-5">
-		{{ form_start(form) }}
-		{{ form_widget(form) }}
-
-		<div class="">
-			<button class="btn btn-primary" type="submit">Regisztráció</button>
-		</div>
-
-		{{ form_rest(form) }}
+	<div class="mb-3">
+		<button class="btn btn-primary" type="submit">Regisztráció</button>
 	</div>
+
+	{{ form_rest(form) }}
 {% endblock %}

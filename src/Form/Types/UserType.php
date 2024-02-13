@@ -9,11 +9,15 @@
 
 namespace App\Form\Types;
 
+use App\Entity\User;
+use App\Form\ChoiceLoaders\RoleChoiceLoader;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\Length;
@@ -24,7 +28,13 @@ class UserType extends AbstractType
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly RoleChoiceLoader $roleChoiceLoader,
     ) {
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefault('data_class', User::class);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -64,7 +74,7 @@ class UserType extends AbstractType
 
         $builder->add('email', TextType::class, [
             'label' => 'Email',
-            'help' => 'A regisztrációhoz szükséges egy valós emailcím! Erre a címre küldjük ki az ideiglenes jelszót. Elküldés előtt kérjük ellenőrizd!',
+            'help' => 'A fiókodhoz szükséges egy valós emailcím! Erre a címre néha küldünk fontos levelet. Elküldés előtt kérjük ellenőrizd!',
             'required' => false,
             'constraints' => [
                 new NotBlank(message: 'A mezőt kötelező kitölteni!'),
@@ -73,6 +83,8 @@ class UserType extends AbstractType
         ]);
 
         $user = $options['data'];
+        \assert($user === null || $user instanceof User);
+
         if ($user->getId() === null) {
             $termsUrl = $this->urlGenerator->generate('terms_and_conditions');
 
@@ -103,13 +115,12 @@ class UserType extends AbstractType
                 'help' => 'Leginkább a felelőssségi köreidbe tartozó templomokhoz érkező észrevételekről küldünk üzeneteket.',
             ]);
 
-            $builder->add('notifications', ChoiceType::class, [
+            $builder->add('roles', ChoiceType::class, [
                 'label' => 'Jogosultságok',
                 'required' => false,
-                'choices' => [
-                    'user' => 'user',
-                    'miserend' => 'miserend',
-                ],
+                'multiple' => true,
+                'expanded' => true,
+                'choice_loader' => ChoiceList::loader($this, $this->roleChoiceLoader, $user->getRoles()),
             ]);
         }
     }
