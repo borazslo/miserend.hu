@@ -19,7 +19,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class CommunitiesExtensionRuntimeTest extends TestCase
 {
-    public function testError()
+    public function testError(): void
     {
         $cache = new NullAdapter();
         $httpClient = new MockHttpClient([
