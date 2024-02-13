@@ -79,7 +79,6 @@ class ChurchRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param User $user
      * @return array<Church>
      */
     public function findFavoriteChurches(User $user): array
