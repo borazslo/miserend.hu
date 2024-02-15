@@ -1,6 +1,8 @@
 miserend.hu
 ========
 
+[![Coverage Status][master coverage image]][master coverage]
+
 A miserend.hu teljes forrása elavult mintaadatokkal.
 
 ## Telepítés
@@ -34,4 +36,6 @@ A [docker-compose.yml](docker-compose.yml) a következő konténereket építi f
 ## Néhány vegyes gondolat
   - a master branch kerül ki a staging környezetbe (staging.miserend.hu), de még nem automatikusan
   - a production branch kerül ki az éles honlapra
-	
+
+  [master coverage image]: https://codecov.io/gh/borazslo/miserend.hu/branch/master/graph/badge.svg
+  [master coverage]: https://codecov.io/gh/borazslo/miserend.hu/branch/master
