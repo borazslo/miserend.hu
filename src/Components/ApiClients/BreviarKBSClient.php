@@ -9,6 +9,10 @@
 
 namespace App\Components\ApiClients;
 
+use App\Components\ApiClients\Exceptions\ContentUnavailableException;
+use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -32,25 +36,32 @@ class BreviarKBSClient
 
     public function fetchCalendarAt(\DateTime $date): array
     {
-        $rawContent = $this->cache->get('kbs-breviar-'.$date->format('Y-m-d'), function (ItemInterface $item) use ($date) {
-            $item->expiresAfter(3600 * 24);
+        try {
+            $rawContent = $this->cache->get('kbs-breviar-'.$date->format('Y-m-d'), function (ItemInterface $item) use ($date) {
+                $item->expiresAfter(3600 * 24);
 
-            $url = $this->getEndpointUrl().'?'.http_build_query([
-                    'qt' => 'pxml',
-                    'r' => $date->format('Y'),
-                    'm' => $date->format('m'),
-                    'd' => $date->format('d'),
-                    'j' => 'hu',
+                $url = $this->getEndpointUrl().'?'.http_build_query([
+                        'qt' => 'pxml',
+                        'r' => $date->format('Y'),
+                        'm' => $date->format('m'),
+                        'd' => $date->format('d'),
+                        'j' => 'hu',
+                    ]);
+
+                $response = $this->httpClient->request('GET', $url, [
+                    'timeout' => 2,
                 ]);
 
-            $response = $this->httpClient->request('GET', $url, [
-                'timeout' => 1,
-            ]);
+                return $response->getContent();
+            });
 
-            return $response->getContent();
-        });
-
-        return $this->xmlEncoder->decode($rawContent, 'xml');
+            return $this->xmlEncoder->decode($rawContent, 'xml');
+        } catch (ServerException|ClientException $exception) {
+            $statusCode = $exception->getResponse()->getStatusCode();
+            throw new ContentUnavailableException(sprintf('Content unavailable. Response status: %d', $statusCode));
+        } catch (TransportException $exception) {
+            throw new ContentUnavailableException(sprintf('Content unavailable. Transport error message: "%s"', $exception->getMessage()));
+        }
     }
 
     private function getEndpointUrl(): string

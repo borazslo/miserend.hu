@@ -10,6 +10,7 @@
 namespace App\Controller;
 
 use App\Components\ApiClients\BreviarKBSClient;
+use App\Components\ApiClients\Exceptions\ContentUnavailableException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,8 +25,12 @@ class LiturgicalDayController extends AbstractController
             return new Response('');
         }
 
-        $calendar = $client->fetchCalendarAt($date);
-        $level = isset($calendar['CalendarDay']['Celebration']['LiturgicalCelebrationLevel']) ? ((int) $calendar['CalendarDay']['Celebration']['LiturgicalCelebrationLevel']) : null;
+        try {
+            $calendar = $client->fetchCalendarAt($date);
+            $level = isset($calendar['CalendarDay']['Celebration']['LiturgicalCelebrationLevel']) ? ((int) $calendar['CalendarDay']['Celebration']['LiturgicalCelebrationLevel']) : null;
+        } catch (ContentUnavailableException $exception) {
+            $level = null;
+        }
 
         if ($level === null || $level > 4) {
             return new Response('');
