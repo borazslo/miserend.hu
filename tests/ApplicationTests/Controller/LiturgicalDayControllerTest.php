@@ -49,7 +49,7 @@ class LiturgicalDayControllerTest extends WebTestCase
     {
         $httpClient = new MockHttpClient([]);
         $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
-        $response = $this->controller->__invoke($breviarClient, new \DateTime('2024-02-18 12:00:00 +0000'));
+        $response = $this->controller->__invoke($breviarClient, new \DateTime('2024-02-18'));
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('', $response->getContent());
     }
@@ -60,6 +60,22 @@ class LiturgicalDayControllerTest extends WebTestCase
             $this->assertSame('GET', $method);
 
             return new MockResponse([new TransportException('Error at transport level')]);
+        });
+        $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
+        $response = $this->controller->__invoke($breviarClient);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('', $response->getContent());
+    }
+
+    public function testStatusCode500()
+    {
+        $httpClient = new MockHttpClient(function ($method, $url, $options): MockResponse {
+            $this->assertSame('GET', $method);
+
+            return new MockResponse('', [
+                'http_code' => 500,
+            ]);
         });
         $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
         $response = $this->controller->__invoke($breviarClient);
