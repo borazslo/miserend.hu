@@ -22,13 +22,16 @@ class LiturgicalDayControllerTest extends WebTestCase
         $this->cache = new NullAdapter();
     }
 
-    public function testRegistrationPageLoad(): void
+    /**
+     * @dataProvider contentChecksDataProvider
+     */
+    public function testContentChecks(string $responseContentFile, string $expectedHtmlContentFile): void
     {
-        $callback = function ($method, $url, $options): MockResponse {
+        $callback = function ($method, $url, $options) use ($responseContentFile): MockResponse {
             $this->assertSame('GET', $method);
             $this->assertSame('https://breviar.kbs.sk/cgi-bin/l.cgi?qt=pxml&r=2024&m=02&d=14&j=hu', $url);
 
-            return new MockResponse(file_get_contents(__DIR__.'/../Fixtures/breviar_fq_cinerum_response.xml'), [
+            return new MockResponse(file_get_contents($responseContentFile), [
                 'http_code' => 200,
                 'headers' => [
                     'content-type' => 'text/xml',
@@ -41,8 +44,20 @@ class LiturgicalDayControllerTest extends WebTestCase
 
         $response = $this->controller->__invoke($breviarClient, new \DateTime('2024-02-14'));
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/breviar_fq_cinerum_html.txt', $response->getContent());
+        $this->assertStringEqualsFile($expectedHtmlContentFile, $response->getContent());
+    }
+
+    public static function contentChecksDataProvider(): \Generator
+    {
+        yield [
+            __DIR__.'/../Fixtures/breviar_fq_cinerum_response.xml',
+            __DIR__.'/../Fixtures/breviar_fq_cinerum_html.txt',
+        ];
+
+        yield [
+            __DIR__.'/../Fixtures/breviar_nativitatis_response.xml',
+            __DIR__.'/../Fixtures/breviar_nativitatis_html.txt',
+        ];
     }
 
     public function testSundayContent()
