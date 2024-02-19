@@ -10,6 +10,7 @@ on:
     paths:
       - .github/workflows/database-migration.yml
       - .ci/github/db-migration-tests.env.local
+      - .ci/github/phpunit/db_migration_tests.xml
       - .docker/mysql/scheme.sql
       - .docker/mysql/data.sql
       - tests/DatabaseMigrationTests/*
@@ -21,6 +22,7 @@ on:
     paths:
       - .github/workflows/database-migration.yml
       - .ci/github/db-migration-tests.env.local
+      - .ci/github/phpunit/db_migration_tests.xml
       - .docker/mysql/scheme.sql
       - .docker/mysql/data.sql
       - tests/DatabaseMigrationTests/*
@@ -90,4 +92,4 @@ jobs:
       - name: Execute Database Migration tests
         env:
           DATABASE_URL: mysql://root@127.0.0.1:3306/miserend_migration_test?serverVersion=${{ matrix.mysql-version }}&charset=utf8
-        run: vendor/bin/phpunit --testsuite db_migration
+        run: vendor/bin/phpunit -c .ci/github/phpunit/db_migration_tests.xml --testsuite db_migration
