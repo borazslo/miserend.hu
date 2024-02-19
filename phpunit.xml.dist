@@ -23,6 +23,10 @@
         <testsuite name="application">
             <directory>tests/ApplicationTests</directory>
         </testsuite>
+
+        <testsuite name="db_migration">
+            <directory>tests/DatabaseMigrationTests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage processUncoveredFiles="true">

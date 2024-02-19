@@ -1,0 +1,95 @@
+name: Database Migration Tests
+
+on:
+  workflow_run:
+    workflows:
+      - Symfony Tests
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/database-migration.yml
+      - .ci/github/db-migration-tests.env.local
+      - .ci/github/phpunit/db_migration_tests.xml
+      - .docker/mysql/scheme.sql
+      - .docker/mysql/data.sql
+      - tests/DatabaseMigrationTests/*
+      - migrations/*
+
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/database-migration.yml
+      - .ci/github/db-migration-tests.env.local
+      - .ci/github/phpunit/db_migration_tests.xml
+      - .docker/mysql/scheme.sql
+      - .docker/mysql/data.sql
+      - tests/DatabaseMigrationTests/*
+      - migrations/*
+
+permissions:
+  contents: read
+
+jobs:
+  phpunit-mysql:
+    name: Database Migration Tests ${{ matrix.mysql-version }}
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        php-version:
+          - 8.3
+        mysql-version:
+          - 5.7
+          - 8.0
+
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql-version }}
+
+        options: >-
+          --health-cmd "mysqladmin ping --silent"
+          -e MYSQL_ALLOW_EMPTY_PASSWORD=yes
+          -e MYSQL_DATABASE=miserend_migration_test
+
+        ports:
+          - 3306:3306
+
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+
+      - uses: actions/checkout@v3
+
+      - name: Copy .env.test.local
+        run: php -r "file_exists('.ci/github/db-migration-tests.env.local') || copy('.ci/github/db-migration-tests.env.local', '.env.test.local');"
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Init scheme and data
+        run: |
+          cat .docker/mysql/scheme.sql | mysql -u root -h 127.0.0.1 -D miserend_migration_test 
+          cat .docker/mysql/data.sql | mysql -u root -h 127.0.0.1 -D miserend_migration_test 
+
+      - name: Run migration scripts
+        env:
+          DATABASE_SUFFIX: ''
+          DATABASE_URL: mysql://root@127.0.0.1:3306/miserend_migration_test?serverVersion=${{ matrix.mysql-version }}&charset=utf8
+        run: bin/console -e test doctrine:migration:migrate -n -q
+
+      - name: Execute Database Migration tests
+        env:
+          DATABASE_URL: mysql://root@127.0.0.1:3306/miserend_migration_test?serverVersion=${{ matrix.mysql-version }}&charset=utf8
+        run: vendor/bin/phpunit -c .ci/github/phpunit/db_migration_tests.xml --testsuite db_migration

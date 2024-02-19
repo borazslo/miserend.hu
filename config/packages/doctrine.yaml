@@ -1,3 +1,6 @@
+parameters:
+    env(DATABASE_SUFFIX): '_test%env(default::TEST_TOKEN)%'
+
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
@@ -31,7 +34,7 @@ when@test:
             connections:
                 default:
                     # "TEST_TOKEN" is typically set by ParaTest
-                    dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+                    dbname_suffix: '%env(resolve:DATABASE_SUFFIX)%'
                     use_savepoints: true
 
 when@prod:
