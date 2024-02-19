@@ -83,6 +83,7 @@ jobs:
 
       - name: Run migration scripts
         env:
+          DATABASE_SUFFIX: ''
           DATABASE_URL: mysql://root@127.0.0.1:3306/miserend_migration_test?serverVersion=${{ matrix.mysql-version }}&charset=utf8
         run: bin/console -e test doctrine:migration:migrate -n -q
 
