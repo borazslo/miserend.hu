@@ -15,7 +15,7 @@ services:
       MYSQL_ROOT_PASSWORD: pw
       MYSQL_DATABASE: miserend
       MYSQL_USER: user
-      MYSQL_PASSWORD: pw           
+      MYSQL_PASSWORD: pw
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","user","-ppw"]
       timeout: 5s
