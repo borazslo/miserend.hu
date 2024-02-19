@@ -33,20 +33,20 @@ final class Version20240204060332 extends AbstractMigration implements ServiceSu
     {
         // this down() migration is auto-generated, please modify it to your needs
     }
-
-    public function postUp(Schema $schema): void
-    {
-        $repository = $this->getUserRepository();
-        foreach ($repository->findAll() as $user) {
-            $repository->migrateOldRolesToNew($user);
-        }
-
-        $repository->flush();
-    }
-
-    #[SubscribedService]
-    public function getUserRepository(): UserRepository
-    {
-        return $this->container->get(__METHOD__);
-    }
+// TODO meg kell varni ami ez jo lesz: https://github.com/doctrine/DoctrineMigrationsBundle/issues/521
+//    public function postUp(Schema $schema): void
+//    {
+//        $repository = $this->getUserRepository();
+//        foreach ($repository->findAll() as $user) {
+//            $repository->migrateOldRolesToNew($user);
+//        }
+//
+//        $repository->flush();
+//    }
+//
+//    #[SubscribedService]
+//    public function getUserRepository(): UserRepository
+//    {
+//        return $this->container->get(__METHOD__);
+//    }
 }
