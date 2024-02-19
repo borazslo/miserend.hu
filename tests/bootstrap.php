@@ -21,12 +21,16 @@ $_ENV['APP_ENV'],
 __DIR__
 ));
 
-passthru(sprintf('APP_ENV=%s php "%s/../bin/console" doctrine:database:create -q',
-    $_ENV['APP_ENV'],
-    __DIR__
-));
+$skipDatabaseCreate = (bool) ($_ENV['SKIP_DB_CREATE'] ?? false);
 
-passthru(sprintf('APP_ENV=%s php "%s/../bin/console" doctrine:schema:create -q',
-    $_ENV['APP_ENV'],
-    __DIR__
-));
+if ($skipDatabaseCreate === false) {
+    passthru(sprintf('APP_ENV=%s php "%s/../bin/console" doctrine:database:create -q',
+        $_ENV['APP_ENV'],
+        __DIR__
+    ));
+
+    passthru(sprintf('APP_ENV=%s php "%s/../bin/console" doctrine:schema:create -q',
+        $_ENV['APP_ENV'],
+        __DIR__
+    ));
+}
