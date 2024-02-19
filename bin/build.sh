@@ -35,6 +35,8 @@ fi
 # bin/console cache:clear || exit $?
 # bin/console cache:warmup || exit $?
 
+bin/console doctrine:migrations:migrate -n || exit $?
+
 # asset
 
 rm -rf public/static
