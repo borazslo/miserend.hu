@@ -1,6 +1,6 @@
 <div class="alert alert-warning" role="alert">
     Ma van <strong>{{ calendar.CalendarDay.Celebration.LiturgicalCelebrationName }}</strong>
-    {% set celebration_type = calendar.CalendarDay.Celebration.LiturgicalCelebrationType['#'] %}
+    {%- set celebration_type = calendar.CalendarDay.Celebration.LiturgicalCelebrationType['#'] -%}
     {%- if celebration_type matches '/ünnep$/i' %}{{ ' '~celebration_type~'e' }}{% endif -%}
     , ezért lehet, hogy különleges (a vasárnapihoz hasonló) miserend van életben.
 </div>

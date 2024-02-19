@@ -1,0 +1,3 @@
+<div class="alert alert-warning" role="alert">
+    Ma van <strong>Hamvazószerda</strong>, ezért lehet, hogy különleges (a vasárnapihoz hasonló) miserend van életben.
+</div>
