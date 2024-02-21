@@ -60,8 +60,8 @@ class MapController extends AbstractController
         }*/
     }
 
-    /** @todo http request legyen + client */
-    public function getGeoJsonDioceses()
+    /* @todo http request legyen + client */
+    /*public function getGeoJsonDioceses()
     {
         if (!$jsonData = $this->geoJsonDiocesesFromCache()) {
             $cacheTime = '1 week';
@@ -117,7 +117,7 @@ class MapController extends AbstractController
         } else {
             return $jsonData;
         }
-    }
+    }*/
 
     /*
      * public function geoJsonDiocesesFromCache()
