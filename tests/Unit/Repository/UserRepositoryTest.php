@@ -26,4 +26,26 @@ class UserRepositoryTest extends TestCase
         $this->assertNotNull($user->getPasswordChangeDeadline());
         $this->assertSame('2023-06-04T06:15:20+00:00', $user->getPasswordChangeDeadline()->format('c'));
     }
+
+    public function testRoleMigrator()
+    {
+        $clock = new MockClock();
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $repository = new UserRepository($clock, $managerRegistryMock);
+
+        $user = new User();
+        $user->setJogok('miserend');
+        $repository->migrateOldRolesToNew($user);
+        $this->assertSame(['ROLE_USER', 'ROLE_CHURCH_ADMIN'], $user->getRoles());
+
+        $user = new User();
+        $user->setJogok('user');
+        $repository->migrateOldRolesToNew($user);
+        $this->assertSame(['ROLE_USER', 'ROLE_USER_ADMIN'], $user->getRoles());
+
+        $user = new User();
+        $user->setJogok('miserend-user');
+        $repository->migrateOldRolesToNew($user);
+        $this->assertSame(['ROLE_USER', 'ROLE_CHURCH_ADMIN', 'ROLE_USER_ADMIN'], $user->getRoles());
+    }
 }

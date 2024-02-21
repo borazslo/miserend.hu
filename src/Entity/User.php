@@ -294,4 +294,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
 
         return $this->getId() === $user->getId();
     }
+
+    /**
+     * @deprecated
+     */
+    public function setJogok(string $jogok): void
+    {
+        $this->jogok = $jogok;
+    }
 }
