@@ -28,16 +28,16 @@ class LiturgicalDayController extends AbstractController
         try {
             $calendar = $client->fetchCalendarAt($date);
             $level = isset($calendar['CalendarDay']['Celebration']['LiturgicalCelebrationLevel']) ? ((int) $calendar['CalendarDay']['Celebration']['LiturgicalCelebrationLevel']) : null;
-        } catch (ContentUnavailableException $exception) {
-            $level = null;
-        }
 
-        if ($level === null || $level > 4) {
+            if ($level === null || $level > 4) {
+                return new Response('');
+            }
+
+            return $this->render('alerts/liturgical_day.html.twig', [
+                'calendar' => $calendar,
+            ]);
+        } catch (ContentUnavailableException $exception) {
             return new Response('');
         }
-
-        return $this->render('alerts/liturgical_day.html.twig', [
-            'calendar' => $calendar,
-        ]);
     }
 }

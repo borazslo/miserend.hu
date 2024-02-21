@@ -1,0 +1,18 @@
+parameters:
+    level: 1
+    paths:
+        - src
+        - tests
+
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
+    doctrine:
+        objectManagerLoader: tests/StaticAnalysis/object-manager.php
+
+    excludePaths:
+        - src/Legacy/*
+
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon

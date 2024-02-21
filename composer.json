@@ -56,6 +56,9 @@
     "require-dev": {
         "dama/doctrine-test-bundle": "^8.0",
         "friendsofphp/php-cs-fixer": "^3.46",
+        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan-doctrine": "^1.3",
+        "phpstan/phpstan-symfony": "^1.3",
         "phpunit/phpunit": "9.*",
         "symfony/browser-kit": "^7.0",
         "symfony/debug-bundle": "^7.0",
@@ -89,6 +92,10 @@
         ],
         "test-unit": "phpunit --testsuite unit",
         "test-app": "phpunit --testsuite application",
-        "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html var/coverage"
+        "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html var/coverage",
+        "analysis": [
+            "phpstan"
+        ],
+        "phpstan": "phpstan analyse --memory-limit 1G"
     }
 }

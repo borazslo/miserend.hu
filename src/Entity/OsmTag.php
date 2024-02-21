@@ -89,16 +89,16 @@ class OsmTag
     {
         $this->value = $value;
     }
+    /*
+        public function getChurch(): ?Church
+        {
+            return $this->church;
+        }
 
-    public function getChurch(): ?Church
-    {
-        return $this->church;
-    }
-
-    public function setChurch(?Church $church): void
-    {
-        $this->church = $church;
-    }
+        public function setChurch(?Church $church): void
+        {
+            $this->church = $church;
+        }*/
 }
 /*
  * <?xml version="1.0" encoding="utf-8"?>
