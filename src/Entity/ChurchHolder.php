@@ -51,6 +51,7 @@ class ChurchHolder implements EntityModificationDateTimeInterface
     public const STATUS_DENIED = 'denied';
     public const STATUS_REVOKED = 'revoked';
 
+    public const HOLDER_STATUS_NA = -1;
     public const HOLDER_STATUS_ORPHAN = 0;
     public const HOLDER_STATUS_ALLOWED = 1;
     public const HOLDER_STATUS_DENIED = 2;
@@ -62,7 +63,7 @@ class ChurchHolder implements EntityModificationDateTimeInterface
      * @todo ez nem inkabb egy integer?
      */
     #[ORM\Column(name: 'status', type: Types::STRING, length: 32, nullable: false, options: ['default' => self::STATUS_ASKED])]
-    private ?string $status;
+    private string $status = self::STATUS_ASKED;
 
     public function getId(): ?int
     {
@@ -99,12 +100,12 @@ class ChurchHolder implements EntityModificationDateTimeInterface
         $this->description = $description;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    public function setStatus(?string $status): void
+    public function setStatus(string $status): void
     {
         $this->status = $status;
     }

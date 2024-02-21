@@ -416,6 +416,7 @@ class Church implements EntityModificationDateTimeInterface
             ChurchHolder::STATUS_REVOKED => ChurchHolder::HOLDER_STATUS_REVOKED,
             ChurchHolder::STATUS_ASKED => ChurchHolder::HOLDER_STATUS_ASKED,
             ChurchHolder::STATUS_LEFT => ChurchHolder::HOLDER_STATUS_LEFT,
+            default => ChurchHolder::HOLDER_STATUS_NA,
         };
     }
 
