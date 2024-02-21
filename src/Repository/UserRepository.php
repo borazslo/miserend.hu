@@ -12,8 +12,9 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Clock\ClockInterface;
 use Random\Randomizer;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Clock\DatePoint;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -26,7 +27,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserRepository extends ServiceEntityRepository
 {
     public function __construct(
-        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly ClockInterface $clock,
         ManagerRegistry $registry,
     ) {
         parent::__construct($registry, User::class);
@@ -52,8 +53,10 @@ class UserRepository extends ServiceEntityRepository
         $randomizer = new Randomizer();
         $passwordChangeHash = bin2hex($randomizer->getBytes(16));
 
+        $relativeDate = new DatePoint(sprintf('+%d seconds', $deadlineInDays * 3600 * 24), reference: $this->clock->now());
+
         $user->setPasswordChangeHash($passwordChangeHash);
-        $user->setPasswordChangeDeadline(new \DateTimeImmutable($deadlineInDays * 3600 * 24));
+        $user->setPasswordChangeDeadline($relativeDate);
 
         if ($save) {
             $this->_em->flush();
