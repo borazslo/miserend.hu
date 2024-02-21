@@ -27,7 +27,7 @@ class UserRepositoryTest extends TestCase
         $this->assertSame('2023-06-04T06:15:20+00:00', $user->getPasswordChangeDeadline()->format('c'));
     }
 
-    public function testRoleMigrator()
+    public function testRoleMigrator(): void
     {
         $clock = new MockClock();
         $managerRegistryMock = $this->createMock(ManagerRegistry::class);

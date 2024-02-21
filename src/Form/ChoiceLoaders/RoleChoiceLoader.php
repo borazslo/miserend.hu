@@ -48,6 +48,11 @@ class RoleChoiceLoader implements ChoiceLoaderInterface
         return $user;
     }
 
+    /**
+     * @param array<string> $roles
+     *
+     * @return array<string>
+     */
     private function choiceForRoles(array $roles): array
     {
         $buffer = [];

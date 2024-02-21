@@ -29,6 +29,15 @@ class OsmTagRepository extends ServiceEntityRepository
         parent::__construct($registry, OsmTag::class);
     }
 
+    /**
+     * @return array{
+     *     "wheelchair"?: OsmTag,
+     *     "toilets:wheelchair"?: OsmTag,
+     *     "hearing_loop"?: OsmTag,
+     *     "wheelchair:description"?: OsmTag,
+     *     "disabled:description"?: OsmTag,
+     * }|array<OsmTag>
+     */
     public function findTagsWithChurch(Church $church, bool $nameAsKey = false): array
     {
         /** @var array<int, OsmTag> $tags */

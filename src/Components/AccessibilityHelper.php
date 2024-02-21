@@ -17,8 +17,8 @@ use App\Entity\OsmTag;
 class AccessibilityHelper
 {
     public function __construct(
-        /** @var $tagList array<string, OsmTag> */
-        private array $tagList,
+        /** @var array<string, OsmTag> $tagList */
+        private readonly array $tagList,
     ) {
     }
 

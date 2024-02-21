@@ -125,12 +125,18 @@ class Church implements EntityModificationDateTimeInterface
     #[ORM\OneToOne(mappedBy: 'church', targetEntity: ChurchHolder::class)]
     private ?ChurchHolder $holder = null;
 
+    /**
+     * @var Collection<int, User>
+     */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'favorites')]
     #[ORM\JoinTable(name: 'favorites')]
     #[ORM\JoinColumn(name: 'church_id', referencedColumnName: 'id', unique: true)]
     #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'uid')]
     private ?Collection $usersWhoFavored;
 
+    /**
+     * @var Collection<int, OsmTag>
+     */
     #[ORM\OneToMany(mappedBy: 'church', targetEntity: OsmTag::class)]
     #[ORM\JoinTable(name: 'osmtags')]
     private ?Collection $osmTags = null;
@@ -436,6 +442,9 @@ class Church implements EntityModificationDateTimeInterface
         $this->holder = $holder;
     }
 
+    /**
+     * @return array<User>
+     */
     public function getUsersWhoFavored(): array
     {
         return $this->usersWhoFavored->toArray();
