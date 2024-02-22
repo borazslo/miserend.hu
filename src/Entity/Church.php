@@ -94,9 +94,9 @@ class Church implements EntityModificationDateTimeInterface
     #[ORM\Column(name: 'miseaktiv', type: Types::BOOLEAN)]
     private ?bool $massActive = true;
 
-    public const MODERATION_ACCEPTED = 'i';
-    public const MODERATION_AWAITING_VERIFICATION = 'f';
-    public const MODERATION_DENIED = 'n';
+    public const string MODERATION_ACCEPTED = 'i';
+    public const string MODERATION_AWAITING_VERIFICATION = 'f';
+    public const string MODERATION_DENIED = 'n';
 
     /**
      * @todo ez a mezo igazabol eleg ha egy integer majd at kell alakitani

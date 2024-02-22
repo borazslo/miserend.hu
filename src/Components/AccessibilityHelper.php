@@ -22,10 +22,10 @@ class AccessibilityHelper
     ) {
     }
 
-    public const ACCESSIBILITY_VALUE_NA = 0;
-    public const ACCESSIBILITY_VALUE_YES = 1;
-    public const ACCESSIBILITY_VALUE_LIMITED = 2;
-    public const ACCESSIBILITY_VALUE_NO = 3;
+    public const int ACCESSIBILITY_VALUE_NA = 0;
+    public const int ACCESSIBILITY_VALUE_YES = 1;
+    public const int ACCESSIBILITY_VALUE_LIMITED = 2;
+    public const int ACCESSIBILITY_VALUE_NO = 3;
 
     public function getWheelchair(): int
     {
