@@ -137,15 +137,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
         return $this;
     }
 
-    /**
-     * @deprecated
-     * @see self::getRoles()
-     */
-    public function getJogok(): string
-    {
-        return $this->jogok;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -309,6 +300,16 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
 
     /**
      * @deprecated
+     * @see self::getRoles()
+     */
+    public function getJogok(): string
+    {
+        return $this->jogok;
+    }
+
+    /**
+     * @deprecated
+     * @see self::setRoles()
      */
     public function setJogok(string $jogok): void
     {
