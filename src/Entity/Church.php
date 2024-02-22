@@ -139,7 +139,7 @@ class Church implements EntityModificationDateTimeInterface
      */
     #[ORM\OneToMany(mappedBy: 'church', targetEntity: OsmTag::class)]
     #[ORM\JoinTable(name: 'osmtags')]
-    private ?Collection $osmTags = null;
+    private ?Collection $osmTags;
 
     /**
      * <?xml version="1.0" encoding="utf-8"?>
