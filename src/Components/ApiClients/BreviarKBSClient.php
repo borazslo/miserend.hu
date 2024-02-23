@@ -10,6 +10,7 @@
 namespace App\Components\ApiClients;
 
 use App\Components\ApiClients\Exceptions\ContentUnavailableException;
+use App\Components\ApiClients\Response\BreviarResponse;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -29,7 +30,7 @@ class BreviarKBSClient
         $this->xmlEncoder = new XmlEncoder();
     }
 
-    public function fetchCalendar(): array
+    public function fetchCalendar(): BreviarResponse
     {
         return $this->fetchCalendarAt(new \DateTime());
     }
@@ -38,7 +39,7 @@ class BreviarKBSClient
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function fetchCalendarAt(\DateTimeInterface $date): array
+    public function fetchCalendarAt(\DateTimeInterface $date): BreviarResponse
     {
         try {
             $rawContent = $this->cache->get('kbs-breviar-'.$date->format('Y-m-d'), function (ItemInterface $item) use ($date) {
@@ -59,7 +60,13 @@ class BreviarKBSClient
                 return $response->getContent();
             });
 
-            return $this->xmlEncoder->decode($rawContent, 'xml');
+            $decodedRawArray = $this->xmlEncoder->decode($rawContent, 'xml');
+
+            if ($decodedRawArray === false) {
+                throw new ContentUnavailableException('XmlDecode failed.');
+            }
+
+            return BreviarResponse::initWithArray($decodedRawArray);
         } catch (ServerException|ClientException $exception) {
             $statusCode = $exception->getResponse()->getStatusCode();
             throw new ContentUnavailableException(sprintf('Content unavailable. Response status: %d', $statusCode));

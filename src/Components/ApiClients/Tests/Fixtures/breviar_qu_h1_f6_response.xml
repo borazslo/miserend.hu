@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LHData>
+
+<CalendarDay>
+<DateISO>2024-02-23</DateISO>
+<DateDay>23</DateDay>
+<DateMonth>2</DateMonth>
+<DateYear>2024</DateYear>
+<DayOfYear>54</DayOfYear>
+<DayOfWeek Id="5">péntek</DayOfWeek>
+<Celebration Id="0">
+<Id>0</Id>
+<StringTitle><span class="bold">Péntek, nagyböjti idő, 1. hét</span><br/>
+<span class="small">1. zsoltáros hét</span></StringTitle>
+<LiturgicalYearLetter>B</LiturgicalYearLetter>
+<LiturgicalWeek>1</LiturgicalWeek>
+<LiturgicalWeekOfPsalter>1</LiturgicalWeekOfPsalter>
+<LiturgicalSeason Id="6">nagyböjti idő</LiturgicalSeason>
+<LiturgicalCelebrationType Id="0">féria</LiturgicalCelebrationType>
+<LiturgicalCelebrationTypeLocal/>
+<LiturgicalCelebrationLevel>9</LiturgicalCelebrationLevel>
+<LiturgicalCelebrationRequired>1</LiturgicalCelebrationRequired>
+<LiturgicalCelebrationName/>
+<LiturgicalCelebrationColor Id="4">lila</LiturgicalCelebrationColor>
+<LiturgicalReadingsId>1P5</LiturgicalReadingsId>
+</Celebration>
+<Celebration Id="1">
+<Id>1</Id>
+<StringTitle><span class="bold">Szent Polikárp püspök és vértanú</span> <br/>
+<span class="redtitle">megemlékezésül</span></StringTitle>
+<br/>
+<StringCommunia><span class="redsubtitle"> Vértanú férfi, <br/>
+vagy lelkipásztorok – püspökök közös zsolozsmája.</span>
+</StringCommunia>
+<LiturgicalYearLetter>B</LiturgicalYearLetter>
+<LiturgicalWeek>1</LiturgicalWeek>
+<LiturgicalWeekOfPsalter>1</LiturgicalWeekOfPsalter>
+<LiturgicalSeason Id="6">nagyböjti idő</LiturgicalSeason>
+<LiturgicalCelebrationType Id="4">tetszés szerinti emléknap</LiturgicalCelebrationType>
+<LiturgicalCelebrationTypeLocal/>
+<LiturgicalCelebrationLevel>12</LiturgicalCelebrationLevel>
+<LiturgicalCelebrationRequired>1</LiturgicalCelebrationRequired>
+<LiturgicalCelebrationCommunia Id="6">vértanú férfi</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="2">lelkipásztorok – püspökök</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationName>Szent Polikárp püspök és vértanú</LiturgicalCelebrationName>
+<LiturgicalCelebrationColor Id="1"/>
+<LiturgicalReadingsId>23.2.</LiturgicalReadingsId>
+</Celebration>
+<StringVolume>I</StringVolume>
+</CalendarDay>
+
+<Options>
+<Opt0Special Value="533175" Name="o0" ForceName="of0" Text="a liturgikus naptár beállításai">
+<BitOpt0VerseNumbers Id="1" ForceName="of0v" Text="a versek száma">1</BitOpt0VerseNumbers>
+<BitOpt0References Id="2" ForceName="of0r" Text="Bibliai hivatkozások a szentiras.hu oldalon">1</BitOpt0References>
+<BitOpt0Readings Id="4" ForceName="of0cit" Text="liturgikus olvasmányok">1</BitOpt0Readings>
+<BitOpt0EpiphanyOnSunday Id="8" ForceName="of0zjvne" Text="Urunk megjelenése (Vízkereszt) megünneplése vasárnap, január 2. és 8. között">0</BitOpt0EpiphanyOnSunday>
+<BitOpt0AssumptionOnSunday Id="16" ForceName="of0nanne" Text="Urunk mennybemenetelét vasárnap ünnepelni">1</BitOpt0AssumptionOnSunday>
+<BitOpt0CorpusChristiOnSunday Id="32" ForceName="of0tkne" Text="Krisztus Szent Teste és Vére ünnepe vasárnapra téve">1</BitOpt0CorpusChristiOnSunday>
+<BitOpt0ForceNormalFontWeight Id="64" ForceName="of0fn" Text="normál betűtípus használata (félkövér helyett)">0</BitOpt0ForceNormalFontWeight>
+<BitOpt0ButtonsOrder Id="128" ForceName="of0bo" Text="a fejlécben a dátumválasztó gombok legyenek az imaóra választó gombok után">1</BitOpt0ButtonsOrder>
+<BitOpt0VoiceOutput Id="256" ForceName="of0bf" Text="csak szöveg a hangkimenethez">0</BitOpt0VoiceOutput>
+<BitOpt0Footnotes Id="512" ForceName="of0ff" Text="jegyzetek, lábjegyzetek">1</BitOpt0Footnotes>
+<BitOpt0TransparentNav Id="1024" ForceName="of0tn" Text="navigációs nyilak mutatása (jobb oldalon)">0</BitOpt0TransparentNav>
+<BitOpt0PsalmsFullText Id="2048" ForceName="of0zft" Text="a zsoltárok kihagyott részeit">0</BitOpt0PsalmsFullText>
+<BitOpt0ReferencesBibleDotCom Id="4096" ForceName="of0bc" Text="Bibliai hivatkozások a bible.com oldalon">0</BitOpt0ReferencesBibleDotCom>
+<BitOpt0ItalicsConditional Id="8192" ForceName="of0ic" Text="néhány szöveg (elizálva) dőlt betűvel">1</BitOpt0ItalicsConditional>
+<BitOpt0PrintedEdition Id="16384" ForceName="of0pe" Text="">0</BitOpt0PrintedEdition>
+<BitOpt0UseTwoYearsCycle Id="32768" ForceName="of0u2rc" Text="">0</BitOpt0UseTwoYearsCycle>
+<BitOpt0TwoYearsCycleId Id="65536" ForceName="of02rcid" Text="">0</BitOpt0TwoYearsCycleId>
+<BitOpt0AlternativeReadings Id="131072" ForceName="of02rcid" Text="">0</BitOpt0AlternativeReadings>
+<BitOpt0TransparentNavLeft Id="262144" ForceName="of0ltn" Text="navigációs nyilak a bal oldalon">0</BitOpt0TransparentNavLeft>
+<BitOpt0NavigationMenu Id="524288" ForceName="of0sn" Text="navigációs nyilak a bal oldalon">1</BitOpt0NavigationMenu>
+</Opt0Special>
+<Opt1PrayerPortions Value="5376" Name="o1" ForceName="of1" Text="egyéb választási lehetőségek:">
+<BitOpt1TeDeum Id="1" ForceName="of1t" Text="Téged, Isten, dicsérünk… himnusz">0</BitOpt1TeDeum>
+<BitOpt1Rubrics Id="2" ForceName="of1r" Text="rubrikák">0</BitOpt1Rubrics>
+<BitOpt1Canticles Id="4" ForceName="of1c" Text="evangéliumi kantikumok (Benedictus, Magnificat, Nunc dimittis)">0</BitOpt1Canticles>
+<BitOpt1GloryPrayer Id="8" ForceName="of1s" Text="Dicsőség az Atyának">0</BitOpt1GloryPrayer>
+<BitOpt1OurFatherPrayer Id="16" ForceName="of1o" Text="az Úr imádsága (Miatyánk)">0</BitOpt1OurFatherPrayer>
+<BitOpt1SupplPsalmodyDuringDay Id="32" ForceName="of1dps" Text="vegye a napközi imaórákban a kiegészítő zsoltárokat">0</BitOpt1SupplPsalmodyDuringDay>
+<BitOpt1VigilAfterReadings Id="64" ForceName="of1v" Text="hosszabb vigíliás ünneplés Olvasmányos imaórával">0</BitOpt1VigilAfterReadings>
+<BitOpt1MemoriesTakeFromCommunia Id="128" ForceName="of1spspc" Text="emléknapon vegye a jelzett részeket a közös részből">0</BitOpt1MemoriesTakeFromCommunia>
+<BitOpt1FullResponses Id="256" ForceName="of1pr" Text="a válaszos énekek teljes szövege">1</BitOpt1FullResponses>
+<BitOpt1InvitatoryUsePsalm95 Id="512" ForceName="of1z95" Text="a 23., 66. illetve a 99.  zsoltár helyett legyen a 94.">0</BitOpt1InvitatoryUsePsalm95>
+<BitOpt1Repeat Id="1024" ForceName="of1prz" Text="minden fohász után ismételje a választ">1</BitOpt1Repeat>
+<BitOpt1HideDescription Id="2048" ForceName="of1sp" Text="ne mutassa a leírást a szentről az imaórában">0</BitOpt1HideDescription>
+<BitOpt1ShowCommuniaDescription Id="4096" ForceName="of1zspc" Text="mutassa meg, hogy a közös részek honnan lettek véve a szentek zsolozsmájához">1</BitOpt1ShowCommuniaDescription>
+<BitOpt1UseVespShortenPrayers Id="8192" ForceName="of1vkp" Text="Esti dicséretben használja a függelékből a rövidebb, közbenjáró fohászokat">0</BitOpt1UseVespShortenPrayers>
+<BitOpt1PsalmsDuringDayPsalt3Weeks Id="16384" ForceName="of1ps3" Text="a napközi imaórákban vegye az aktuális, az előző és a következő heti zsoltározást">0</BitOpt1PsalmsDuringDayPsalt3Weeks>
+<BitOpt1PrayerConclusions Id="32768" ForceName="of1zm" Text="befejezést">0</BitOpt1PrayerConclusions>
+<BitOpt1OverrideCelebrationLevel Id="65536" ForceName="of1oss" Text="magasabb fokú ünneplést venni">0</BitOpt1OverrideCelebrationLevel>
+<BitOpt1CelebrationLevelForOverride Id="131072" ForceName="of1sss" Text="mint főünnepet venni">0</BitOpt1CelebrationLevelForOverride>
+<BitOpt1ComplineMaryAnt Id="262144" ForceName="of1cma" Text="hu_text">0</BitOpt1ComplineMaryAnt>
+<BitOpt1IntroPaterNoster Id="524288" ForceName="of1zou" Text="bevezető a Miatyánkhoz">0</BitOpt1IntroPaterNoster>
+</Opt1PrayerPortions>
+<Opt2Export Value="29432" Name="o2" ForceName="of2" Text="az oldalak megjelenítésének lehetőségei:">
+<BitOpt2ISOFormat Id="1" ForceName="of2id" Text="a dátum ISO 8601 formátumban (ÉÉÉÉ-HH-NN) jelenjen meg">0</BitOpt2ISOFormat>
+<BitOpt2FirstVespersButton Id="2" ForceName="of2pv" Text="vasárnapok és főünnepek esetén az I. Esti dicséret gombja az ünneplés napján jelenjen meg">0</BitOpt2FirstVespersButton>
+<BitOpt2FontFamily Id="4" ForceName="of2ff" Text="talp nélküli betűk használata">0</BitOpt2FontFamily>
+<BitOpt2FontNameChooser Id="8" ForceName="of2fc" Text="betűtípus kiválasztása">1</BitOpt2FontNameChooser>
+<BitOpt2FontSizeChooser Id="16" ForceName="of2fs" Text="betűméret">1</BitOpt2FontSizeChooser>
+<BitOpt2Navigation Id="32" ForceName="of2nav" Text="a navigáció mutatása az imaszövegben">1</BitOpt2Navigation>
+<BitOpt2TextWrap Id="64" ForceName="of2tw" Text="hosszú sorok tördelése, mint a nyomtatott kiadásban (versrészek)">1</BitOpt2TextWrap>
+<BitOpt2ButtonsCondensed Id="128" ForceName="of2btnu" Text="az imaórák gombjainak gazdaságos elhelyezése">1</BitOpt2ButtonsCondensed>
+<BitOpt2NightMode Id="256" ForceName="of2nr" Text="éjszakai mód">0</BitOpt2NightMode>
+<BitOpt2OptionsWithinPrayer Id="512" ForceName="of2rm" Text="mutassa meg az imák szövegében a különböző lehetőségeket">1</BitOpt2OptionsWithinPrayer>
+<BitOpt2HideNavigationButtons Id="1024" ForceName="of2hnb" Text="">0</BitOpt2HideNavigationButtons>
+<BitOpt2HideCalendar Id="2048" ForceName="of2hk" Text="">0</BitOpt2HideCalendar>
+<BitOpt2HideOptionsPart1 Id="4096" ForceName="of2ho1" Text="">1</BitOpt2HideOptionsPart1>
+<BitOpt2HideOptionsPart2 Id="8192" ForceName="of2ho2" Text="">1</BitOpt2HideOptionsPart2>
+<BitOpt2Alternatives Id="16384" ForceName="of2a" Text="lehetőségek">1</BitOpt2Alternatives>
+<BitOpt2ShowDefaultCalendar Id="32768" ForceName="of2sdc" Text="kijelölni az ünnepeket a nemzeti naptárban">0</BitOpt2ShowDefaultCalendar>
+<BitOpt2RoundedCorners Id="65536" ForceName="of2sdc" Text="lekerekített sarok">0</BitOpt2RoundedCorners>
+</Opt2Export>
+<Opt3Communia Value="0" Name="o3" ForceName="of3" Text="a közös részből"/>
+<Opt5Alternatives Value="0" Name="o5" ForceName="of5" Text="lehetőségek">
+<BitOpt5HymnCompl Id="1" ForceName="of5hk" Text="Immár a nap leáldozott/Krisztus, tündöklő nappalunk">0</BitOpt5HymnCompl>
+<BitOpt5HymnRead Id="2" ForceName="of5hpc" Text="himnusz I. [Amikor az imaórát éjszaka vagy kora hajnalban mondják]/himnusz II. [Amikor az imaórát a nap nem reggeli órájában végzik]">0</BitOpt5HymnRead>
+<BitOpt5Hymn9h Id="4" ForceName="of5hpred" Text="Most jöjj, Szentlélek, szállj közénk/Idők rendjét megtartva most">0</BitOpt5Hymn9h>
+<BitOpt5Hymn12h Id="8" ForceName="of5hna" Text="Urunk, felséges Istenünk/Dicsérjük dallal az Urat">0</BitOpt5Hymn12h>
+<BitOpt5Hymn15h Id="16" ForceName="of5hpo" Text="Világfenntartó Istenünk/Háromszor három óra már">0</BitOpt5Hymn15h>
+<BitOpt5Psalm122or129 Id="32" ForceName="of5ps29" Text="a 121. helyett vehető a 128. zsoltár">0</BitOpt5Psalm122or129>
+<BitOpt5Psalm127or131 Id="64" ForceName="of5ps71" Text="a 126. helyett vehető a 130. zsoltár">0</BitOpt5Psalm127or131>
+<BitOpt5Psalm126or129 Id="128" ForceName="of5ps69" Text="a 125. helyett vehető a 128. zsoltár">0</BitOpt5Psalm126or129>
+<BitOpt5HymnTPRead Id="256" ForceName="of5vnpc" Text="Urunknak áldott napja ez/Örvendj, ég, messzi csillagok">0</BitOpt5HymnTPRead>
+<BitOpt5HymnTPLaud Id="512" ForceName="of5vnhrch" Text="Rózsálló hajnalfény ragyog/Az új Sionnak kórusa">0</BitOpt5HymnTPLaud>
+<BitOpt5HymnTPVesp Id="1024" ForceName="of5vnv" Text="Ím, vár a Bárány asztala/Örök Királyunk, szent Urunk">0</BitOpt5HymnTPVesp>
+<BitOpt5Hymn1Vesp Id="2048" ForceName="of5h1v" Text="I. Esti dicséret himnusza/Olvasmányos imaóra himnusza [napközben]">0</BitOpt5Hymn1Vesp>
+<BitOpt5AshWednPsalmody Id="4096" ForceName="of5psps" Text="Hamvazószerdán vegye a zsoltározást a 4. zsoltáros hét szerdájáról/Hamvazószerdán vegye a zsoltározást a 3. zsoltáros hét péntekjéről">0</BitOpt5AshWednPsalmody>
+<BitOpt5CZhymnsAlt Id="8192" ForceName="of5czh" Text="/">0</BitOpt5CZhymnsAlt>
+<BitOpt5OffDefPsalm146or150 Id="16384" ForceName="of5ofps60" Text="a 145. helyett vehető a 150. zsoltár">0</BitOpt5OffDefPsalm146or150>
+<BitOpt5ConclusionPriestDiacon Id="32768" ForceName="of5zkd" Text="ha az imaórát pap vagy diakónus vezeti">0</BitOpt5ConclusionPriestDiacon>
+<BitOpt5InvitatoryAnt Id="65536" ForceName="of5i(deprecated)" Text="másik antifóna">0</BitOpt5InvitatoryAnt>
+<BitOpt5PerAnnum34Hymns Id="131072" ForceName="of5pa34h" Text="az évközi idő 34. hetében vehető himnusz">0</BitOpt5PerAnnum34Hymns>
+<BitOpt5ComplOctaves Id="262144" ForceName="of5ko" Text="befejező imaóra I. e. d. után/befejező imaóra II. e. d. után">0</BitOpt5ComplOctaves>
+<BitOpt5MaundyThursPsalmody Id="524288" ForceName="of5zsps" Text="Nagycsütörtök vegye a zsoltározást a 2. zsoltáros hét csütörtökjáról/Nagycsütörtök vegye a zsoltározást a 3. zsoltáros hét péntekjéről">0</BitOpt5MaundyThursPsalmody>
+</Opt5Alternatives>
+<Opt6AlternativesMultivalue Value="0" Name="o6" ForceName="of6" Text="lehetőségek">
+<PlaceOpt6HymnusMulti Id="1" ForceName="of6h" Text="más himnusz">0</PlaceOpt6HymnusMulti>
+<PlaceOpt6Reading2Multi Id="100" ForceName="of6c2" Text="más olvasmány">0</PlaceOpt6Reading2Multi>
+<PlaceOpt6Reading1Multi Id="1000" ForceName="of6c1" Text="más olvasmány">0</PlaceOpt6Reading1Multi>
+<PlaceOpt6AntiphoneMulti Id="10000" ForceName="of6a" Text="másik antifóna">0</PlaceOpt6AntiphoneMulti>
+<PlaceOpt6CollectaMulti Id="100000" ForceName="of6m" Text="más könyörgés">0</PlaceOpt6CollectaMulti>
+<PlaceOpt6PrecesMulti Id="1000000" ForceName="of6p" Text="más fohászok">0</PlaceOpt6PrecesMulti>
+<PlaceOpt6ShortReadingRespMulti Id="1000000000" ForceName="of6kcr" Text="más olvasmány és válaszos ének">0</PlaceOpt6ShortReadingRespMulti>
+<PlaceOpt6ShortRespMulti Id="100000000" ForceName="of6kr" Text="más válaszos ének">0</PlaceOpt6ShortRespMulti>
+<PlaceOpt6PsalmMulti Id="10" ForceName="of6ps" Text="másik zsoltár">0</PlaceOpt6PsalmMulti>
+<PlaceOpt6ComplMariaAntMulti Id="10000000" ForceName="of6cma" Text="másik Mária-antifóna">0</PlaceOpt6ComplMariaAntMulti>
+</Opt6AlternativesMultivalue>
+</Options>
+
+<SupportedLanguages Name="j">
+<Language Id="0" Value="sk">Szlovák</Language>
+<Language Id="1" Value="cz">Czeh</Language>
+<Language Id="3" Value="la">Latin</Language>
+<Language Id="5" Value="c2">Czeh/OP</Language>
+<Language Id="6" Value="hu">Magyar</Language>
+<Language Id="9" Value="is">Izlandi</Language>
+</SupportedLanguages>
+
+<SupportedValues>
+<LiturgicalCalendarValues Name="k">
+<LiturgicalCalendar Id="6">általános [Magyarország]</LiturgicalCalendar>
+<LiturgicalCalendar Id="18" Value="huofm">ferences szentek és ünnepek zsolozsmája</LiturgicalCalendar>
+<LiturgicalCalendar Id="20" Value="husvd">verbiták zsolozsmája</LiturgicalCalendar>
+<LiturgicalCalendar Id="25" Value="husj">jezsuiták zsolozsmája (SJ)</LiturgicalCalendar>
+<LiturgicalCalendar Id="31" Value="husdb">szalézi zsolozsma</LiturgicalCalendar>
+</LiturgicalCalendarValues>
+
+<LiturgicalYearLetterValues Name="lr">
+<LiturgicalYearLetter Id="0" Value="A">A</LiturgicalYearLetter>
+<LiturgicalYearLetter Id="1" Value="B">B</LiturgicalYearLetter>
+<LiturgicalYearLetter Id="2" Value="C">C</LiturgicalYearLetter>
+</LiturgicalYearLetterValues>
+
+<LiturgicalSeasonValues Name="lo">
+<LiturgicalSeason Id="0" Value="adventi idő I (dec. 16-ig)">adventi idő</LiturgicalSeason>
+<LiturgicalSeason Id="1" Value="adventi idő II (dec. 16 után)">adventi idő</LiturgicalSeason>
+<LiturgicalSeason Id="2" Value="karácsony nyolcada">karácsony nyolcada</LiturgicalSeason>
+<LiturgicalSeason Id="3" Value="karácsonyi idő I (Urunk megjelenéséig)">karácsonyi idő</LiturgicalSeason>
+<LiturgicalSeason Id="4" Value="karácsonyi idő II (Urunk megjelenése után)">karácsonyi idő</LiturgicalSeason>
+<LiturgicalSeason Id="5" Value="évközi idő">évközi idő</LiturgicalSeason>
+<LiturgicalSeason Id="6" Value="nagyböjti idő I (Virágvasárnapig)">nagyböjti idő</LiturgicalSeason>
+<LiturgicalSeason Id="7" Value="nagyböjti idő II (Nagyhét)">nagyhét</LiturgicalSeason>
+<LiturgicalSeason Id="8" Value="szent három nap">szent három nap</LiturgicalSeason>
+<LiturgicalSeason Id="9" Value="húsvét nyolcada">húsvét nyolcada</LiturgicalSeason>
+<LiturgicalSeason Id="10" Value="húsvéti idő I (Urunk mennybemeneteléig)">húsvéti idő</LiturgicalSeason>
+<LiturgicalSeason Id="11" Value="húsvéti idő II (Urunk mennybemenetele után)">húsvéti idő</LiturgicalSeason>
+</LiturgicalSeasonValues>
+
+<LiturgicalCelebrationCommuniaValues Name="of3">
+<LiturgicalCelebrationCommunia Id="0"/>
+<LiturgicalCelebrationCommunia Id="1">lelkipásztorok – papok</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="2">lelkipásztorok – püspökök</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="3">lelkipásztorok – pápa</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="4">egyháztanítók</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="5">apostolok</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="6">vértanú férfi</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="7">több vértanú</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="8">Szűz Mária</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="9">szerzetes</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="10">szent férfiak</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="11">szüzek</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="12">apáca</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="13">szent asszonyok</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="14">több lelkipásztor</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="15">vértanú nő</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="16">nevelő asszonyok</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="17">nevelő férfiak</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="18">jótékonykodó asszonyok</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="19">jótékonykodó férfiak</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="20">több szent asszony</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="21">több szent férfi</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="22">több szűz</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="23">templomszentelés</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="24">halottakért</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="25">házas szent asszonyok</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="26">házas szent férfiak</LiturgicalCelebrationCommunia>
+<LiturgicalCelebrationCommunia Id="27">mindent sajátból</LiturgicalCelebrationCommunia>
+</LiturgicalCelebrationCommuniaValues>
+
+<LiturgicalCelebrationTypeValues>
+<LiturgicalCelebrationType Id="0">féria</LiturgicalCelebrationType>
+<LiturgicalCelebrationType Id="1">főünnep</LiturgicalCelebrationType>
+<LiturgicalCelebrationType Id="2">ünnep</LiturgicalCelebrationType>
+<LiturgicalCelebrationType Id="3">emléknap</LiturgicalCelebrationType>
+<LiturgicalCelebrationType Id="4">tetszés szerinti emléknap</LiturgicalCelebrationType>
+<LiturgicalCelebrationType Id="5">saját szöveg</LiturgicalCelebrationType>
+</LiturgicalCelebrationTypeValues>
+
+<LiturgicalCelebrationColorValues>
+<LiturgicalCelebrationColor Id="1">piros</LiturgicalCelebrationColor>
+<LiturgicalCelebrationColor Id="2">fehér</LiturgicalCelebrationColor>
+<LiturgicalCelebrationColor Id="3">zöld</LiturgicalCelebrationColor>
+<LiturgicalCelebrationColor Id="4">lila</LiturgicalCelebrationColor>
+<LiturgicalCelebrationColor Id="5">rózsaszín</LiturgicalCelebrationColor>
+<LiturgicalCelebrationColor Id="6">fekete</LiturgicalCelebrationColor>
+</LiturgicalCelebrationColorValues>
+
+</SupportedValues>
+
+<Info>
+<Copyright>(c) 1999-2024 Juraj Vidéky</Copyright>
+<Address>videky@breviar.sk</Address>
+<Generated>2024-02-23</Generated>
+<BuildDate>2024-02-22</BuildDate>
+</Info>
+
+</LHData>

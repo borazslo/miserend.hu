@@ -50,12 +50,12 @@ class LiturgicalDayControllerTest extends WebTestCase
     public static function contentChecksDataProvider(): \Generator
     {
         yield [
-            __DIR__.'/../Fixtures/breviar_fq_cinerum_response.xml',
+            __DIR__.'/../../../src/Components/ApiClients/Tests/Fixtures/breviar_fq_cinerum_response.xml',
             __DIR__.'/../Fixtures/breviar_fq_cinerum_html.txt',
         ];
 
         yield [
-            __DIR__.'/../Fixtures/breviar_nativitatis_response.xml',
+            __DIR__.'/../../../src/Components/ApiClients/Tests/Fixtures/breviar_nativitatis_response.xml',
             __DIR__.'/../Fixtures/breviar_nativitatis_html.txt',
         ];
     }
