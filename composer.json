@@ -82,7 +82,8 @@
         },
         "pre-commit": [
             "@cs-fix",
-            "@test"
+            "@test",
+            "@analysis"
         ],
         "cs-fix":  "php-cs-fixer fix",
         "cs-fix-diff":  "php-cs-fixer fix --dry-run --diff",
@@ -94,8 +95,8 @@
         "test-app": "phpunit --testsuite application",
         "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html var/coverage",
         "analysis": [
-            "phpstan"
+            "@phpstan"
         ],
-        "phpstan": "phpstan analyse --memory-limit 1G"
+        "phpstan": "phpstan analyse --memory-limit=1G"
     }
 }
