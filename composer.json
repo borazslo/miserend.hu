@@ -82,7 +82,8 @@
         },
         "pre-commit": [
             "@cs-fix",
-            "@test"
+            "@test",
+            "@analysis"
         ],
         "cs-fix":  "php-cs-fixer fix",
         "cs-fix-diff":  "php-cs-fixer fix --dry-run --diff",
