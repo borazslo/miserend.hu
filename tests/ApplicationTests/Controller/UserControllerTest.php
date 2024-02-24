@@ -20,6 +20,9 @@ class UserControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    /**
+     * @return array<string, string>
+     */
     private static function getValidRegistrationFormData(): array
     {
         return [

@@ -45,24 +45,25 @@ class ChurchHolder implements EntityModificationDateTimeInterface
      * @todo ez integer is lehet
      * @todo uj nevezek a holder status
      */
-    public const STATUS_LEFT = 'left';
-    public const STATUS_ASKED = 'asked';
-    public const STATUS_ALLOWED = 'allowed';
-    public const STATUS_DENIED = 'denied';
-    public const STATUS_REVOKED = 'revoked';
+    public const string STATUS_LEFT = 'left';
+    public const string STATUS_ASKED = 'asked';
+    public const string STATUS_ALLOWED = 'allowed';
+    public const string STATUS_DENIED = 'denied';
+    public const string STATUS_REVOKED = 'revoked';
 
-    public const HOLDER_STATUS_ORPHAN = 0;
-    public const HOLDER_STATUS_ALLOWED = 1;
-    public const HOLDER_STATUS_DENIED = 2;
-    public const HOLDER_STATUS_REVOKED = 3;
-    public const HOLDER_STATUS_ASKED = 4;
-    public const HOLDER_STATUS_LEFT = 5; // todo left az orphan? mikor left?
+    public const int HOLDER_STATUS_NA = -1;
+    public const int HOLDER_STATUS_ORPHAN = 0;
+    public const int HOLDER_STATUS_ALLOWED = 1;
+    public const int HOLDER_STATUS_DENIED = 2;
+    public const int HOLDER_STATUS_REVOKED = 3;
+    public const int HOLDER_STATUS_ASKED = 4;
+    public const int HOLDER_STATUS_LEFT = 5; // todo left az orphan? mikor left?
 
     /**
      * @todo ez nem inkabb egy integer?
      */
     #[ORM\Column(name: 'status', type: Types::STRING, length: 32, nullable: false, options: ['default' => self::STATUS_ASKED])]
-    private ?string $status;
+    private string $status = self::STATUS_ASKED;
 
     public function getId(): ?int
     {
@@ -99,12 +100,12 @@ class ChurchHolder implements EntityModificationDateTimeInterface
         $this->description = $description;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    public function setStatus(?string $status): void
+    public function setStatus(string $status): void
     {
         $this->status = $status;
     }

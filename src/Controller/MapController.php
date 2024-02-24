@@ -13,6 +13,7 @@ use App\Entity\Church;
 use App\Request\QueryParameterEntityResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -23,7 +24,7 @@ class MapController extends AbstractController
         Request $request,
         #[MapQueryParameter(name: 'tid', resolver: QueryParameterEntityResolver::class)]
         ?Church $church = null,
-    ) {
+    ): Response {
         $center = null;
         // TODO MapQueryParameter/+resolver terkep coord hoz legacy sorrend tamogatasa
         if ($request->query->has('map')) {

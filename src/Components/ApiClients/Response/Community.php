@@ -14,9 +14,22 @@ class Community
     private ?string $name = null;
     private ?string $ageGroup = null;
     private ?string $description = null;
+
+    /**
+     * @var array<string>
+     */
     private array $tags = [];
     private ?string $url = null;
 
+    /**
+     * @param array{
+     *       "name"?: string,
+     *       "age_group"?: string,
+     *       "description"?: string,
+     *       "tags"?: string,
+     *       "link"?: string,
+     *   } $response
+     */
     public static function initWithArray(array $response): self
     {
         $object = new self();

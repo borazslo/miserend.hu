@@ -18,6 +18,7 @@
     <testsuites>
         <testsuite name="unit">
             <directory>./src/Components/*/Tests/</directory>
+            <directory>./tests/Unit/</directory>
         </testsuite>
 
         <testsuite name="application">

@@ -22,6 +22,9 @@ class QueryParameterEntityResolver implements ValueResolverInterface
     ) {
     }
 
+    /**
+     * @return iterable<object>
+     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $attributes = $argument->getAttributesOfType(MapQueryParameter::class);
@@ -34,6 +37,8 @@ class QueryParameterEntityResolver implements ValueResolverInterface
         }
 
         $entityId = $request->query->getInt($attributes[0]->name);
+
+        /** @var class-string $entityClass */
         $entityClass = $argument->getType();
         $findMethod = $attributes[0]->options['method'] ?? 'find';
 

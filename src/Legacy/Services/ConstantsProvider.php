@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 #[Autoconfigure(autowire: true)]
 class ConstantsProvider
 {
-    public const ROLES = ['miserend', 'user'];
+    public const array ROLES = ['miserend', 'user'];
 
     public function __construct(private readonly DB $database)
     {

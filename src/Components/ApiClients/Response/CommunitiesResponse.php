@@ -21,6 +21,9 @@ class CommunitiesResponse
 
     private ?string $address = null;
 
+    /**
+     * @var array<Community>
+     */
     private array $communities = [];
 
     public static function initWithJsonString(string $response): self
@@ -32,6 +35,25 @@ class CommunitiesResponse
         return self::initWithArray(json_decode($response, true));
     }
 
+    /**
+     * @template TData of array{
+     *     "name": string,
+     *     "age_group": string,
+     *     "description": string,
+     *     "tags": string,
+     *     "link": string,
+     * }
+     *
+     * @param array{
+     *     "institute"?: array{
+     *         "name"?: string,
+     *         "url"?: string,
+     *         "city"?: string,
+     *         "address"?: string,
+     *     },
+     *     "data"?: array<int, TData>
+     * } $response
+     */
     public static function initWithArray(array $response): self
     {
         $object = new self();

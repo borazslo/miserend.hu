@@ -94,8 +94,8 @@
         "test-app": "phpunit --testsuite application",
         "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html var/coverage",
         "analysis": [
-            "phpstan"
+            "@phpstan"
         ],
-        "phpstan": "phpstan analyse --memory-limit 1G"
+        "phpstan": "phpstan analyse --memory-limit=1G"
     }
 }

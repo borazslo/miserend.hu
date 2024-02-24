@@ -17,15 +17,15 @@ use App\Entity\OsmTag;
 class AccessibilityHelper
 {
     public function __construct(
-        /** @var $tagList array<string, OsmTag> */
-        private array $tagList,
+        /** @var array<string, OsmTag> $tagList */
+        private readonly array $tagList,
     ) {
     }
 
-    public const ACCESSIBILITY_VALUE_NA = 0;
-    public const ACCESSIBILITY_VALUE_YES = 1;
-    public const ACCESSIBILITY_VALUE_LIMITED = 2;
-    public const ACCESSIBILITY_VALUE_NO = 3;
+    public const int ACCESSIBILITY_VALUE_NA = 0;
+    public const int ACCESSIBILITY_VALUE_YES = 1;
+    public const int ACCESSIBILITY_VALUE_LIMITED = 2;
+    public const int ACCESSIBILITY_VALUE_NO = 3;
 
     public function getWheelchair(): int
     {

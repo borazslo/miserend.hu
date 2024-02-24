@@ -37,7 +37,7 @@ class FavoriteController extends AbstractController
         ChurchRepository $repository,
         #[CurrentUser]
         ?User $user = null,
-    ) {
+    ): Response {
         return $this->render('church/favorites.html.twig', [
             'favorites' => $user === null ? $repository->findMostFavorite() : $user->getFavorites(),
         ]);

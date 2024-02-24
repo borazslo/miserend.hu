@@ -10,6 +10,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,6 +39,9 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
     #[ORM\Column(name: 'jogok', type: Types::STRING, length: 200)]
     private string $jogok = '';
 
+    /**
+     * @var string[]
+     */
     #[ORM\Column(name: 'roles', type: Types::SIMPLE_ARRAY)]
     private array $roles = ['ROLE_USER'];
 
@@ -73,6 +77,8 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
 
     /**
      * Kedvencek.
+     *
+     * @var Collection<int, Church>
      */
     #[ORM\ManyToMany(targetEntity: Church::class, mappedBy: 'usersWhoFavored')]
     #[ORM\JoinTable(name: 'favorites')]
@@ -82,6 +88,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
 
     public function __construct()
     {
+        $this->favorites = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,20 +125,16 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
         return $this->roles;
     }
 
+    /**
+     * @param array<string> $roles
+     *
+     * @return $this
+     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
 
         return $this;
-    }
-
-    /**
-     * @deprecated
-     * @see self::getRoles()
-     */
-    public function getJogok(): string
-    {
-        return $this->jogok;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
@@ -293,5 +296,23 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface, Equatab
         }
 
         return $this->getId() === $user->getId();
+    }
+
+    /**
+     * @deprecated
+     * @see self::getRoles()
+     */
+    public function getJogok(): string
+    {
+        return $this->jogok;
+    }
+
+    /**
+     * @deprecated
+     * @see self::setRoles()
+     */
+    public function setJogok(string $jogok): void
+    {
+        $this->jogok = $jogok;
     }
 }

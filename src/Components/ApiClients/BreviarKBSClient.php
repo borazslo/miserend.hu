@@ -34,7 +34,11 @@ class BreviarKBSClient
         return $this->fetchCalendarAt(new \DateTime());
     }
 
-    public function fetchCalendarAt(\DateTime $date): array
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function fetchCalendarAt(\DateTimeInterface $date): array
     {
         try {
             $rawContent = $this->cache->get('kbs-breviar-'.$date->format('Y-m-d'), function (ItemInterface $item) use ($date) {

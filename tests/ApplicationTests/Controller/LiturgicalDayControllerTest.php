@@ -12,8 +12,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class LiturgicalDayControllerTest extends WebTestCase
 {
-    private $controller;
-    private $cache;
+    private LiturgicalDayController $controller;
+    private NullAdapter $cache;
 
     protected function setUp(): void
     {
@@ -60,7 +60,7 @@ class LiturgicalDayControllerTest extends WebTestCase
         ];
     }
 
-    public function testSundayContent()
+    public function testSundayContent(): void
     {
         $httpClient = new MockHttpClient([]);
         $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
@@ -83,7 +83,7 @@ class LiturgicalDayControllerTest extends WebTestCase
         $this->assertSame('', $response->getContent());
     }
 
-    public function testStatusCode500()
+    public function testStatusCode500(): void
     {
         $httpClient = new MockHttpClient(function ($method, $url, $options): MockResponse {
             $this->assertSame('GET', $method);
