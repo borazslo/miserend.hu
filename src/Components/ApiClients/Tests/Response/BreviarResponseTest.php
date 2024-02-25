@@ -25,7 +25,7 @@ class BreviarResponseTest extends TestCase
     public function testInitWithArray(): void
     {
         $decoded = $this->encoder->decode(file_get_contents(__DIR__.'/../Fixtures/breviar_qu_h1_f6_response.xml'), 'xml');
-        $this->assertIsString($decoded);
+        $this->assertIsArray($decoded);
 
         $response = BreviarResponse::initWithArray($decoded);
 
@@ -49,7 +49,7 @@ class BreviarResponseTest extends TestCase
     public function testIniWithArrayWithSingleCelebration(): void
     {
         $decoded = $this->encoder->decode(file_get_contents(__DIR__.'/../Fixtures/breviar_fq_cinerum_response.xml'), 'xml');
-        $this->assertIsString($decoded);
+        $this->assertIsArray($decoded);
 
         $response = BreviarResponse::initWithArray($decoded);
 
