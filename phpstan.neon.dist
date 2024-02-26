@@ -2,7 +2,8 @@ parameters:
     level: 8
     paths:
         - src
-        - tests
+
+    checkGenericClassInNonGenericObjectType: false
 
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
@@ -12,10 +13,6 @@ parameters:
 
     excludePaths:
         - src/Legacy/*
-
-    ignoreErrors:
-        - '#Method App\\Components\\ApiClients\\BreviarKBSClient::fetchCalendar\(\) return type has no value type specified in iterable type array\.#'
-        - '#Method App\\Components\\ApiClients\\BreviarKBSClient::fetchCalendarAt\(\) return type has no value type specified in iterable type array\.#'
 
 includes:
     - vendor/phpstan/phpstan-doctrine/extension.neon

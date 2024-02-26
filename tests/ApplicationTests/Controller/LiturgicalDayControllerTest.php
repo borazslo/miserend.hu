@@ -42,7 +42,7 @@ class LiturgicalDayControllerTest extends WebTestCase
 
         $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
 
-        $response = $this->controller->__invoke($breviarClient, new \DateTime('2024-02-14'));
+        $response = $this->controller->__invoke($breviarClient, new \DateTimeImmutable('2024-02-14'));
 
         $this->assertStringEqualsFile($expectedHtmlContentFile, $response->getContent());
     }
@@ -50,12 +50,12 @@ class LiturgicalDayControllerTest extends WebTestCase
     public static function contentChecksDataProvider(): \Generator
     {
         yield [
-            __DIR__.'/../Fixtures/breviar_fq_cinerum_response.xml',
+            __DIR__.'/../../../src/Components/ApiClients/Tests/Fixtures/breviar_fq_cinerum_response.xml',
             __DIR__.'/../Fixtures/breviar_fq_cinerum_html.txt',
         ];
 
         yield [
-            __DIR__.'/../Fixtures/breviar_nativitatis_response.xml',
+            __DIR__.'/../../../src/Components/ApiClients/Tests/Fixtures/breviar_nativitatis_response.xml',
             __DIR__.'/../Fixtures/breviar_nativitatis_html.txt',
         ];
     }
@@ -64,7 +64,7 @@ class LiturgicalDayControllerTest extends WebTestCase
     {
         $httpClient = new MockHttpClient([]);
         $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
-        $response = $this->controller->__invoke($breviarClient, new \DateTime('2024-02-18'));
+        $response = $this->controller->__invoke($breviarClient, new \DateTimeImmutable('2024-02-18'));
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('', $response->getContent());
     }
