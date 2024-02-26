@@ -9,31 +9,10 @@
 
 namespace App\Components\ApiClients\Response;
 
+use App\Components\ApiClients\Exceptions\UnexpectedTypeException;
+
 /**
- * @template TCelebration of array{
- *      "@Id": int,
- *      Id: string,
- *      StringTitle: mixed,
- *      LiturgicalYearLetter: string,
- *      LiturgicalWeek: string,
- *      LiturgicalWeekOfPsalter: string,
- *      LiturgicalSeason: array{
- *          "@Id": int,
- *          "#": string,
- *      },
- *      "LiturgicalCelebrationType": array{
- *          "@Id": int,
- *          "#": string,
- *      },
- *      "LiturgicalCelebrationTypeLocal": string,
- *      "LiturgicalCelebrationLevel": string,
- *      "LiturgicalCelebrationRequired": "string",
- *      "LiturgicalCelebrationName": array{
- *          "@Id": int,
- *          "#": string,
- *      },
- *      "LiturgicalReadingsId": string,
- *  }
+ * @phpstan-import-type CelebrationType from BreviarResponse
  */
 class Celebration
 {
@@ -62,26 +41,40 @@ class Celebration
     private string $readingsId;
 
     /**
-     * @param TCelebration $celebration
+     * @param CelebrationType $celebration
      */
     public static function initWithArray(array $celebration): self
     {
         $instance = new self();
 
         $instance->yearLetter = $celebration['LiturgicalYearLetter'];
-        $instance->week = filter_var($celebration['LiturgicalWeek'], \FILTER_VALIDATE_INT);
-        $instance->weekOfPsalter = filter_var($celebration['LiturgicalWeekOfPsalter'], \FILTER_VALIDATE_INT);
+        $instance->week = self::filterInteger($celebration['LiturgicalWeek']);
+        $instance->weekOfPsalter = self::filterInteger($celebration['LiturgicalWeekOfPsalter']);
         $instance->seasonId = (int) $celebration['LiturgicalSeason']['@Id'];
         $instance->type = (int) $celebration['LiturgicalCelebrationType']['@Id'];
         $instance->typeString = $celebration['LiturgicalCelebrationType']['#'];
         $instance->typeLocal = !empty($celebration['LiturgicalCelebrationTypeLocal']) ? $celebration['LiturgicalCelebrationTypeLocal'] : null;
-        $instance->level = filter_var($celebration['LiturgicalCelebrationLevel'], \FILTER_VALIDATE_INT);
-        $instance->required = filter_var($celebration['LiturgicalCelebrationRequired'], \FILTER_VALIDATE_BOOLEAN);
-        $instance->name = !empty($celebration['LiturgicalCelebrationName']) ? $celebration['LiturgicalCelebrationName'] : null;
+        $instance->level = self::filterInteger($celebration['LiturgicalCelebrationLevel']);
+        $instance->required = self::filterBoolean($celebration['LiturgicalCelebrationRequired']);
+        $instance->name = \strlen($celebration['LiturgicalCelebrationName']) > 0 ? $celebration['LiturgicalCelebrationName'] : null;
         $instance->colorId = $celebration['LiturgicalCelebrationColor']['@Id'];
         $instance->readingsId = $celebration['LiturgicalReadingsId'];
 
         return $instance;
+    }
+
+    private static function filterInteger(string $value): int
+    {
+        if (($filtered = filter_var($value, \FILTER_VALIDATE_INT)) === false) {
+            throw UnexpectedTypeException::unexpectedType('int', $filtered);
+        }
+
+        return $filtered;
+    }
+
+    private static function filterBoolean(string $value): bool
+    {
+        return filter_var($value, \FILTER_VALIDATE_BOOLEAN);
     }
 
     public function getYearLetter(): string

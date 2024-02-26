@@ -42,7 +42,7 @@ class LiturgicalDayControllerTest extends WebTestCase
 
         $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
 
-        $response = $this->controller->__invoke($breviarClient, new \DateTime('2024-02-14'));
+        $response = $this->controller->__invoke($breviarClient, new \DateTimeImmutable('2024-02-14'));
 
         $this->assertStringEqualsFile($expectedHtmlContentFile, $response->getContent());
     }
@@ -64,7 +64,7 @@ class LiturgicalDayControllerTest extends WebTestCase
     {
         $httpClient = new MockHttpClient([]);
         $breviarClient = new BreviarKBSClient($this->cache, $httpClient);
-        $response = $this->controller->__invoke($breviarClient, new \DateTime('2024-02-18'));
+        $response = $this->controller->__invoke($breviarClient, new \DateTimeImmutable('2024-02-18'));
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('', $response->getContent());
     }

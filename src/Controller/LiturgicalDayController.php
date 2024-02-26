@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LiturgicalDayController extends AbstractController
 {
-    public function __invoke(BreviarKBSClient $client, ?\DateTimeInterface $date = null): Response
+    public function __invoke(BreviarKBSClient $client, ?\DateTimeImmutable $date = null): Response
     {
-        $date = $date ?? new \DateTime();
+        $date = $date ?? new \DateTimeImmutable();
 
         $dayOfTheWeek = (int) $date->format('N');
         if ($dayOfTheWeek === 7) {

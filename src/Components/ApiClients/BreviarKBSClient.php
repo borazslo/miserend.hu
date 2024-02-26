@@ -30,16 +30,20 @@ class BreviarKBSClient
         $this->xmlEncoder = new XmlEncoder();
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
     public function fetchCalendar(): BreviarResponse
     {
-        return $this->fetchCalendarAt(new \DateTime());
+        return $this->fetchCalendarAt(new \DateTimeImmutable());
     }
 
     /**
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function fetchCalendarAt(\DateTimeInterface $date): BreviarResponse
+    public function fetchCalendarAt(\DateTimeImmutable $date): BreviarResponse
     {
         try {
             $rawContent = $this->cache->get('kbs-breviar-'.$date->format('Y-m-d'), function (ItemInterface $item) use ($date) {
