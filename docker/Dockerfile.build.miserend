@@ -12,6 +12,7 @@ RUN apt-get install -y curl git build-essential
 
 # php extensions
 RUN install-php-extensions mysqli pdo pdo_mysql zip
+RUN install-php-extensions gd
 
 # node js
 RUN cd /opt && curl --silent -o node.tar.xz https://nodejs.org/dist/latest-v20.x/$(curl --silent https://nodejs.org/dist/latest-v20.x/SHASUMS256.txt | grep node-.*-linux-x64.tar.xz | awk '{ print $2 }') && tar xf node.tar.xz && rm node.tar.xz
