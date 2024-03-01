@@ -62,6 +62,10 @@ services:
       - .:/miserend
     environment:
       MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
+    networks:
+      inner:
+        aliases:
+          - build
 
   miserend:
     container_name: miserend
