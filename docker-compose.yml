@@ -12,10 +12,10 @@ services:
       - ./docker/mysql:/docker-entrypoint-initdb.d    
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: pw
-      MYSQL_DATABASE: miserend
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pw
+      MYSQL_ROOT_PASSWORD: ${MISEREND_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE:  ${MISEREND_MYSQL_DATABASE}
+      MYSQL_USER:  ${MISEREND_MYSQL_USER}
+      MYSQL_PASSWORD:  ${MISEREND_MYSQL_PASSWORD}
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","user","-ppw"]
       timeout: 5s
