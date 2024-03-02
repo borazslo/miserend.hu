@@ -9,10 +9,10 @@
 
 $environment['default'] = [
     'connection' => [
-        'host' => env('MYSQL_MISEREND_HOST', 'mysql'),
-        'user' => env('MYSQL_MISEREND_USER', 'root'),
-        'password' => env('MYSQL_MISEREND_PASSWORD', '********'),
-        'database' => env('MYSQL_MISEREND_DATABASE', 'miserend'),
+        'host' => 'mysql',
+        'user' => $_ENV['MISEREND_MYSQL_USER'],
+        'password' => $_ENV['MISEREND_MYSQL_PASSWORD'],
+        'database' => $_ENV['MISEREND_MYSQL_DATABASE'],
     ],
     'path' => [
         'domain' => 'https://miserend.hu',
