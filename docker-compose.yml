@@ -81,6 +81,9 @@ services:
       - "${MISEREND_PORT:-8000}:8000"
     environment:
         MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
+        MISEREND_MYSQL_DATABASE:  ${MISEREND_MYSQL_DATABASE}
+        MISEREND_MYSQL_USER:  ${MISEREND_MYSQL_USER}
+        MISEREND_MYSQL_PASSWORD:  ${MISEREND_MYSQL_PASSWORD}
     networks:
       inner:
         aliases:
@@ -88,7 +91,7 @@ services:
     depends_on:
       - mysql
       - mailcatcher
-      - build
+      - miserend-build
 
 networks:
   inner:
