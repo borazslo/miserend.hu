@@ -29,13 +29,13 @@ CREATE TABLE `boundaries` (
   `denomination` varchar(50) DEFAULT NULL,
   `osmtype` varchar(9) DEFAULT NULL,
   `osmid` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `chat` (
   `id` int(11) NOT NULL,
-  `datum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `datum` datetime,
   `user` varchar(20) NOT NULL DEFAULT '',
   `kinek` varchar(20) NOT NULL DEFAULT '',
   `szoveg` tinytext NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE `church_holders` (
   `description` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `status` enum('asked','allowed','denied','revoked') COLLATE utf8_bin NOT NULL DEFAULT 'asked',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp,
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -70,11 +70,11 @@ CREATE TABLE `crons` (
   `frequency` varchar(45) NOT NULL,
   `from` varchar(45) DEFAULT NULL COMMENT 'strtotime',
   `until` varchar(45) DEFAULT NULL COMMENT 'strtotime',
-  `deadline_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `deadline_at` timestamp,
   `attempts` int(2) DEFAULT '0',
-  `lastsuccess_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_At` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `lastsuccess_at` timestamp,
+  `created_at` timestamp,
+  `updated_At` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `distances` (
@@ -84,9 +84,9 @@ CREATE TABLE `distances` (
   `toLat` decimal(11,7) NOT NULL,
   `toLon` decimal(11,7) NOT NULL,
   `distance` float NOT NULL,
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp,
   `toupdate` int(11) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `egyhazmegye` (
@@ -108,7 +108,7 @@ CREATE TABLE `emails` (
   `subject` varchar(255) NOT NULL,
   `body` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp,
   `status` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -129,8 +129,8 @@ CREATE TABLE `favorites` (
   `id` int(10) UNSIGNED NOT NULL,
   `uid` int(11) NOT NULL,
   `tid` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `igenaptar` (
@@ -156,12 +156,12 @@ CREATE TABLE `keyword_shortcuts` (
   `osmtag_id` int(11) NOT NULL,
   `type` varchar(30) NOT NULL,
   `value` varchar(200) NOT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `lnaptar` (
-  `datum` date NOT NULL DEFAULT '0000-00-00',
+  `datum` date,
   `ige` int(5) NOT NULL DEFAULT '0',
   `szent` int(5) NOT NULL DEFAULT '0',
   `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'lila'
@@ -171,16 +171,16 @@ CREATE TABLE `lookup_boundary_church` (
   `id` int(11) NOT NULL,
   `boundary_id` int(11) NOT NULL,
   `church_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `lookup_church_osm` (
   `id` int(11) NOT NULL,
   `church_id` int(11) NOT NULL,
   `osm_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `lookup_osm_enclosed` (
@@ -188,7 +188,7 @@ CREATE TABLE `lookup_osm_enclosed` (
   `osm_id` int(11) NOT NULL,
   `enclosing_id` int(11) NOT NULL,
   `created_at` varchar(45) DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `megye` (
@@ -224,8 +224,8 @@ CREATE TABLE `misek` (
   `milyen` varchar(50) NOT NULL DEFAULT '',
   `megjegyzes` text NOT NULL,
   `modositotta` varchar(20) NOT NULL DEFAULT '',
-  `moddatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `torles` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `moddatum` datetime,
+  `torles` datetime,
   `torolte` varchar(20) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -273,8 +273,8 @@ CREATE TABLE `osm` (
   `osmtype` varchar(9) NOT NULL,
   `lon` decimal(10,8) DEFAULT NULL,
   `lat` decimal(11,8) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `osmtags` (
@@ -283,8 +283,8 @@ CREATE TABLE `osmtags` (
   `osmid` varchar(11) NOT NULL,
   `name` varchar(45) NOT NULL,
   `value` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `osm_tags` (
@@ -303,8 +303,8 @@ CREATE TABLE `photos` (
   `flag` enum('i','n') NOT NULL DEFAULT 'i',
   `height` int(11) DEFAULT NULL,
   `width` int(11) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `remarks` (
@@ -316,12 +316,12 @@ CREATE TABLE `remarks` (
   `church_id` int(11) NOT NULL DEFAULT '0',
   `allapot` enum('u','f','j') NOT NULL DEFAULT 'u',
   `admin` varchar(20) NOT NULL DEFAULT '',
-  `admindatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `admindatum` datetime,
   `leiras` text NOT NULL,
   `adminmegj` text,
   `log` text,
-  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `stats_externalapi` (
@@ -365,19 +365,19 @@ CREATE TABLE `templomok` (
   `miseaktiv` int(11) DEFAULT '1',
   `misemegj` text NOT NULL,
   `bucsu` text NOT NULL,
-  `frissites` date NOT NULL DEFAULT '0000-00-00',
+  `frissites` date,
   `kontakt` varchar(250) NOT NULL DEFAULT '',
   `kontaktmail` varchar(70) NOT NULL DEFAULT '',
   `adminmegj` text NOT NULL,
   `letrehozta` varchar(20) NOT NULL DEFAULT '',
   `megbizhato` enum('i','n') NOT NULL DEFAULT 'n',
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` timestamp,
   `modositotta` varchar(20) NOT NULL DEFAULT '',
-  `moddatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `moddatum` datetime,
   `log` text NOT NULL,
   `ok` enum('i','n','f') NOT NULL DEFAULT 'i',
   `eszrevetel` enum('i','n','f') NOT NULL DEFAULT 'n',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` timestamp,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `osmid` varchar(11) DEFAULT NULL,
   `osmtype` varchar(9) DEFAULT NULL,
@@ -391,12 +391,12 @@ CREATE TABLE `tokens` (
   `name` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `uid` int(11) DEFAULT NULL,
   `timeout` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `created_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00'
+  `created_at` timestamp,
+  `updated_at` timestamp
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `unnepnaptar` (
-  `datum` date NOT NULL DEFAULT '0000-00-00',
+  `datum` date,
   `unnep` varchar(50) NOT NULL DEFAULT '',
   `szabadnap` enum('i','n') NOT NULL DEFAULT 'i',
   `mise` enum('v','n','u') NOT NULL DEFAULT 'u',
@@ -415,8 +415,8 @@ CREATE TABLE `user` (
   `login` varchar(20) NOT NULL DEFAULT '',
   `jelszo` varchar(255) NOT NULL DEFAULT '',
   `jogok` varchar(200) NOT NULL DEFAULT '',
-  `regdatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `lastlogin` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `regdatum` datetime,
+  `lastlogin` datetime,
   `lastactive` datetime DEFAULT NULL,
   `email` varchar(100) NOT NULL DEFAULT '',
   `notifications` int(1) DEFAULT '1',
