@@ -3,6 +3,7 @@
 namespace Html;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Carbon\Carbon;
 
 class Health extends Html {
 
@@ -104,7 +105,18 @@ class Health extends Html {
 			if(array_key_exists($result->name."api", $this->externalapis))
 				 $this->externalapis[$result->name."api"]['stat'] = $result->count; 							 								 
 		}
+		
+
        		
+		// Health of Mailing
+		$this->emails = DB::table('emails')
+			->select('type', 'status', DB::raw('COUNT(*) as total'))
+			->where('created_at', '>=', Carbon::now()->subDays(30))
+			->groupBy('type', 'status')
+			->orderBy('updated_at','DESC')
+			->get();
+
+		
 		return;
 			
     }

@@ -70,6 +70,25 @@
 			</tr>
 		{% endfor %}
 	</table>
+
+	<h3 id="externalapis">Levelezőrendszer egésztése</h3>
+
+	<p><i>Az elmúlt 30 napban elküldött levelek statisztikája</i></p>
+	<table class="table table-hover table-condensed table-striped">
+		<tr>
+			<th >type</th>
+			<th >status</th>
+			<th >total</th>
+		</tr>
+		{% for email in emails %}
+			<tr>
+				<td>{{ email.type }}</td>
+				<td>{{ email.status }}</td>
+				<td>{{ email.total }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+
 	
 
 {% endblock%}
