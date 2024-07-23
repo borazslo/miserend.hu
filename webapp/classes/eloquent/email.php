@@ -82,7 +82,7 @@ class Email extends \Illuminate\Database\Eloquent\Model {
 		
         $this->header = 'MIME-Version: 1.0' . "\r\n";
         $this->header .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-        $this->header .= 'From: ' . $config['mail']['sender'] . "\r\n";        
+        $this->header .= 'From: ' . $config['mail']['sender'][0] . "\r\n";        
     }
     
     function render($twigfile, $array) {
@@ -121,7 +121,7 @@ class Email extends \Illuminate\Database\Eloquent\Model {
 			}
 		}
 		
-		$mailer->setFrom('info@miserend.hu', 'Miserend.hu');		
+		$mailer->setFrom($config['mail']['sender'][0],$config['mail']['sender'][1]);		
 		
 		return $mailer;
 	}

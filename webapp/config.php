@@ -29,7 +29,7 @@ $environment['default'] = [
 		'SMTPSecure' => false
 	],		
     'mail' => [
-        'sender' => 'miserend.hu <info@miserend.hu>',
+        'sender' => ['info@miserend.hu','miserend.hu'],
         'debug' => 0, /* 0,1,2,3,5 */
         'debugger' => 'eleklaszlosj@gmail.com'
     ],
