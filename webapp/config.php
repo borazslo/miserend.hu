@@ -22,6 +22,12 @@ $environment['default'] = [
         'web' => "2 weeks",
 		'API' => "15 minutes"
     ],
+	'smtp' => [
+		'Host' => 'mailcatcher',
+		'Port' => 1025,
+		'SMTPAuth' => false,
+		'SMTPSecure' => false
+	],		
     'mail' => [
         'sender' => 'miserend.hu <info@miserend.hu>',
         'debug' => 0, /* 0,1,2,3,5 */

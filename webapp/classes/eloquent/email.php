@@ -24,11 +24,6 @@ class Email extends \Illuminate\Database\Eloquent\Model {
                         
         $this->status = 'sending';
         $this->save();
-        /* mail() code */
-        
-        global $config;
-        $this->debug = $config['mail']['debug'];
-        $this->debugger = $config['mail']['debugger'];
         
         if ($this->debug == 1) {
             $this->header .= 'Bcc: ' . $this->debugger . "\r\n";
@@ -44,43 +39,24 @@ class Email extends \Illuminate\Database\Eloquent\Model {
                 // black hole
             } else {
 			
-			$mail = new PHPMailer(true);
+				$mail = createMailer(); 
 
-			//$mail->SMTPDebug = SMTP::DEBUG_SERVER;
-			$mail->CharSet = "UTF-8";
-		
-			//FOR PROD: sendmail
-			if($config['env'] == 'production') {
-				$mail->isSendmail();
-			} else {
-			//FOR DEV: to mailcatcher
-				$mail->isSMTP();
-				$mail->Host = 'mailcatcher';
-				$mail->Port = 1025;
-				$mail->SMTPAuth = false;
-				$mail->SMTPSecure = false;
-			}
-			
-			//Recipients
-			$mail->setFrom('info@miserend.hu', 'Miserend.hu');
-			//$mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
-			$mail->addAddress($this->to);               //Name is optional
-			//$mail->addReplyTo('info@example.com', 'Information');
-			//$mail->addCC('cc@example.com');
-			//$mail->addBCC('bcc@example.com');
+				//$mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
+				$mail->addAddress($this->to);               //Name is optional
+				//$mail->addReplyTo('info@example.com', 'Information');
+				//$mail->addCC('cc@example.com');
+				//$mail->addBCC('bcc@example.com');
 
-			//Attachments
-			//$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-			//$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+				//Attachments
+				//$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+				//$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
 
-			//Content
-			$mail->isHTML(true);                                  //Set email format to HTML
-			$mail->Subject = $this->subject;
-			$mail->Body    = $this->body;
-			//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-			
-			
-			//if (!mail($this->to, $this->subject, $this->body, $this->header)) {
+				//Content
+				$mail->isHTML(true);                                  //Set email format to HTML
+				$mail->Subject = $this->subject;
+				$mail->Body    = $this->body;
+				//$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+						
                 if (!$mail->send()) {
                     addMessage('Valami hiba történt az email elküldése közben.', 'danger');
                     $this->status = "error";
@@ -101,6 +77,9 @@ class Email extends \Illuminate\Database\Eloquent\Model {
     function __construct() {   
         global $config;
         
+        $this->debug = $config['mail']['debug'];
+        $this->debugger = $config['mail']['debugger'];
+		
         $this->header = 'MIME-Version: 1.0' . "\r\n";
         $this->header .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
         $this->header .= 'From: ' . $config['mail']['sender'] . "\r\n";        
@@ -127,5 +106,46 @@ class Email extends \Illuminate\Database\Eloquent\Model {
                 
         return true;
     }
+	
+	function createMailer() {
+		$mailer = new PHPMailer(true);
+		
+		//$mail->SMTPDebug = SMTP::DEBUG_SERVER;
+		$mailer->CharSet = "UTF-8";
+		$mailer->isSMTP();
+		
+		global $config;
+		if( isset($config['smtp']) ) {
+			foreach($config['smtp'] as $key => $value ) {
+				$mailer->$key = $value;
+			}
+		}
+		
+		$mailer->setFrom('info@miserend.hu', 'Miserend.hu');		
+		
+		return $mailer;
+	}
+	
+	function test() {
+	
+		$mailer = $this->createMailer();
+		try {
+			$connection = $mailer->SmtpConnect();
+		} catch(Exception $error) {
+			return "PHPMailer Failed to connect : " . $error;
+		}
+		
+		$mailer->addAddress($this->debugger);               
+		$mailer->isHTML(false);                                  
+		$mailer->Subject = 'miserend.hu - egészség ellenőrzés';
+		$mailer->Body    = 'Hát ez most kiment. Kitette?';
+		
+		if(!$mailer->send()) {
+			return "Valami hiba történt teszt email kiküldése közben.";
+		}
+			
+		return "OK";
+	
+	}
     
 }

@@ -106,8 +106,6 @@ class Health extends Html {
 				 $this->externalapis[$result->name."api"]['stat'] = $result->count; 							 								 
 		}
 		
-
-       		
 		// Health of Mailing
 		$this->emails = DB::table('emails')
 			->select('type', 'status', DB::raw('COUNT(*) as total'))
@@ -116,8 +114,12 @@ class Health extends Html {
 			->orderBy('updated_at','DESC')
 			->get();
 
+		$this->mailing = $config['smtp'];
+		$this->mailing['debug'] = $config['mail']['debug'];
 		
-		return;
+		$email = new \Eloquent\Email();
+		$this->mailing['testresult'] = $email->test();
 			
+		return;		
     }
 }

@@ -71,24 +71,39 @@
 		{% endfor %}
 	</table>
 
-	<h3 id="externalapis">Levelezőrendszer egésztése</h3>
-
-	<p><i>Az elmúlt 30 napban elküldött levelek statisztikája</i></p>
-	<table class="table table-hover table-condensed table-striped">
-		<tr>
-			<th >type</th>
-			<th >status</th>
-			<th >total</th>
-		</tr>
-		{% for email in emails %}
-			<tr>
-				<td>{{ email.type }}</td>
-				<td>{{ email.status }}</td>
-				<td>{{ email.total }}</td>
-			</tr>
-		{% endfor %}
-	</table>
-
+	<h3 id="externalapis">Levelezőrendszer egészsége</h3>
 	
+	<table class="table table-hover table-condensed table-striped">
+			<tr>
+				<td>Host:Port</td><td>{{ mailing.Host }}:{{ mailing.Port }}</td>
+			</tr>
+			<tr>
+				<td>debug level</td><td>{{ mailing.debug }}</td>
+			</tr>
+			<tr>				
+				<td>Teszt eredmény</td>
+				<td class="{% if mailing.testresult != 'OK' %}table-danger{% endif%}">{{ mailing.testresult }}</td>
+			</tr>
+	</table>
+	
+	{% if emails|length > 0 %}
+		<p><i>Az elmúlt 30 napban elküldött levelek statisztikája:</i></p>
+		<table class="table table-hover table-condensed table-striped">
+			<tr>
+				<th >type</th>
+				<th >status</th>
+				<th >total</th>
+			</tr>
+			{% for email in emails %}
+				<tr>
+					<td>{{ email.type }}</td>
+					<td>{{ email.status }}</td>
+					<td>{{ email.total }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<div class="alert alert-danger">Az elmúlt 30 napban nem volt kiküldött email.</div>
+	{% endif %}
 
 {% endblock%}
