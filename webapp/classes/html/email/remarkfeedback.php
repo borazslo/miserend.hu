@@ -33,7 +33,7 @@ class RemarkFeedback extends Email {
         if ($type) {            
             $this->mail->render('remarkfeedback_' . $type, (array) $this );
         } else {
-            $this->mail->render('remarkfeedback' . $type, (array) $this );            
+            $this->mail->render('remarkfeedback' , (array) $this );            
         }
         
     }
@@ -43,6 +43,12 @@ class RemarkFeedback extends Email {
         
         $this->remark->appendComment("email küldve: " . $this->mail->type." (".$this->mail->id.")");
         $this->remark->save();
+		
+		addMessage("Visszajelzés a visszajelzésre sikeresen elküldve.", "success");
+			
+		$this->redirect('/templom/'.$this->remark->church_id.'/eszrevetelek');
+
+		return true;
     }
     
     function checkPermission() {

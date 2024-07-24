@@ -39,7 +39,7 @@ class Email extends \Illuminate\Database\Eloquent\Model {
                 // black hole
             } else {
 			
-				$mail = createMailer(); 
+				$mail = $this->createMailer(); 
 
 				//$mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
 				$mail->addAddress($this->to);               //Name is optional
