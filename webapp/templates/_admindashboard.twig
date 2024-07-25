@@ -1,0 +1,48 @@
+	{% if "miserend" in user.roles %}
+		<div id="dashboard" style="margin-top:12px">		
+			<!-- <h3>Miserend adminisztrátorok számára</h3> -->
+			
+			
+			{% if admindashboard.holders %}
+			<h4>Gondnokságot vállalók</h4>
+			{% set statuses = {
+                                    'allowed': 'Engedélyezve',
+                                    'denied': 'Elutasítva',
+                                    'asked': 'Kérve',
+                                    'revoked': 'Visszavonva',
+                                    'left': 'Visszalépve'
+                            } %}
+			{% if admindashboard.holders|length > 0 %}
+				<i>Az előző belépesed óta történt valamennyi változás, valamint a korábbi még függőben lévő kérések.</i>
+				<table class="table table-hover table-condensed table-striped">
+					<tr>
+						<th>felhasználó</th>
+						<th>templom</th>
+						<th>kapcsolat a templommal</th>
+						<th>állapot</th>
+					</tr>
+					{% for holder in admindashboard.holders %}
+						<tr>
+							<td>
+								{% if "user" in user.roles %}<a href="/user/{{ holder.user.uid }}/edit">{% endif %}
+									<strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }})
+								</a>
+							</td>
+							<td>
+								<a href="/templom/{{ holder.church.id }}/edit">
+									{{ holder.church.nev }} ({{ holder.church.varos }})
+								</a>
+							</td>
+							<td>{{ holder.description }}</td>
+							<td>{{ statuses[holder.status] }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% else %}
+			 <i>Nincs intézendő ügy a gondnokság terén, se változás legutóbbi belépésed óta.</i>
+			{% endif %}
+			
+			
+			{% endif %}			
+		</div>
+	{% endif %}

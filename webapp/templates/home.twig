@@ -4,6 +4,10 @@
 
 {% set pageTitle = 'Miserend' %}
 
+{% if "miserend" in user.roles %}
+		{% set columns2 = true  %}		
+{% endif %}
+
 
 {% block extraHead %}
     <style>
@@ -165,9 +169,15 @@
             <ul>
                 {% for key, item in favorites %}<li class="link">{{ item.li|raw }}</li>{% endfor %}
             </ul>
-        {% endif %}
+        {% elseif user.uid > 0 %}
+			<i>Nincs kedvencnek megjelölt templom.</i>
+		{% endif %}
     </div>
 
+	{% if "miserend" in user.roles %}
+		{% include '_admindashboard.twig' %}
+	{% endif %}
+	
 	  <script src="/node_modules/jquery-ui/ui/i18n/datepicker-hu.js"></script>
     <script>
 	$( function() {    

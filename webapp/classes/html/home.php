@@ -234,6 +234,16 @@ class Home extends Html {
         $this->favorites = $user->getFavorites();
         $this->searchform = $searchform;
         $this->alert = LiturgicalDayAlert('html');
+		
+		// Adminok számára "dashboard"
+		if ( $user->checkrole('miserend') ) {
+		
+			$this->admindashboard = [];
+		
+			$this->admindashboard['holders'] = \Eloquent\ChurchHolder::where('updated_at', '>', $user->lastlogin)
+                             ->orWhere('status', 'asked')
+                             ->get();
+		}
         
     }
 
