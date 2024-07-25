@@ -59,6 +59,10 @@ class Api extends Html {
                 case 'nearby':
                     $this->api = new \Api\NearBy();
                     break;   					
+
+                case 'database':
+                    $this->api = new \Api\Database();
+                    break;   
 					
                 default:
                     throw new \Exception("API action '$action' is not supported.");
