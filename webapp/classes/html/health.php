@@ -63,7 +63,7 @@ class Health extends Html {
 		$this->cronjobs = \Eloquent\Cron::orderBy('deadline_at','DESC')->get()->toArray();
 		
 		// Health of ExternalApis
-		$apisToTest = ['liturgiatvapi','kozossegekapi','mapquestapi','openinghapi','openstreetmapapi','overpassapi'];		
+		$apisToTest = ['breviarskapi','liturgiatvapi','kozossegekapi','mapquestapi','openinghapi','openstreetmapapi','overpassapi'];		
 		foreach($apisToTest as $apiToTest) {
 			$this->externalapis[$apiToTest] = ['name' => $apiToTest, 'stat' => 0];
 			

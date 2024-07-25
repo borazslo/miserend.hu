@@ -151,7 +151,7 @@ class SearchResultsMasses extends Html {
             $leptet_urlap.="<input type=hidden name=ige value='yes'>";
         }
 
-        $tartalom.="</span><br/>" . LiturgicalDayAlert('html', $mikordatum);
+        $tartalom.="</span><br/>" . $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert($mikordatum);
 
         if (!empty($_REQUEST['leptet']))
             $visszalink = "?";

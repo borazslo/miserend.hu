@@ -104,7 +104,7 @@ class Church extends \Html\Html {
         $this->dioceseslayer['geoJson'] = json_encode($data);        
         
         $this->miserend = $misek;
-        $this->alert = LiturgicalDayAlert('html');
+		$this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
         
         $this->isChurchHolder = $user->getHoldingData($this->id);                
 		
