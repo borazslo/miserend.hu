@@ -764,7 +764,7 @@ var events = new Array();
 function validate_language(str) {
   if(str == '') return true;
 
-  /*LANGUAGES*/ var languages = ['h','en','fr','gr','hr','va','pl','de','it','ro','es','sk','si','uk']; /*/LANGUAGES*/
+  /*LANGUAGES*/ var languages = ['h','en','fr','gr','hr','va','pl','de','it','pt','ro','es','sk','si','uk']; /*/LANGUAGES*/
   /*PERIODS*/ var periods = ['0','1','2','3','4','5','-1','ps','pt']; /*/PERIODS*/
 
   var re = "^(((" + languages.join('|') + ")(" + periods.join('|') + "|)(,|))+)$" ;

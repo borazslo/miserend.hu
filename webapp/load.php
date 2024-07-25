@@ -162,6 +162,7 @@ $nyelv = array(
     'pl' => 'lengyel',
     'de' => 'német',
     'it' => 'olasz',
+	'pt' => 'portugál',
     'ro' => 'román',
     'es' => 'spanyol',
     'sk' => 'szlovák',
