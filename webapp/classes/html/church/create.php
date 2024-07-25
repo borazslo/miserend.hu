@@ -20,16 +20,26 @@ class Create extends \Html\Html {
         $church->frissites = date('Y-m-d');
         $church->moddatum = date('Y-m-d');
         $church->egyhazmegye = 1;
+        // General error: 1364 Field '...' doesn't have a default value
+        $church->megkozelites = '';
+        $church->plebania = '';
+        $church->leiras = '';
+        $church->megjegyzes = '';
+        $church->misemegj = '';
+        $church->bucsu = '';
+        $church->adminmegj = '';
+        $church->log = '';
+
+
         $church->save();
         $church->nev = "Új misézőhely - ".$church->id;
         $church->save();
-        
+
         $this->content = "Létrehozás sikeres: <br/><a href='/templom/".$church->id."/edit'>".$church->nev."</a>";
 
         $this->redirect("/templom/".$church->id."/edit");
-     
-     
+
+
     }
 
 }
-
