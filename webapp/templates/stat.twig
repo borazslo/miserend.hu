@@ -58,6 +58,7 @@
 		<th class="col-md-2">count</th>
 		<th >distinct</th>
 		<th class="col-md-1">sql</th>
+		<th class="col-md-2">oberpass</th>
 	</tr>
 	{% for osmtag in osmtags %}
 	<tr>
@@ -66,6 +67,13 @@
 		<td>{{ osmtag.dist }}{% if osmtag.dist == 1 %} ({{ osmtag.value }}){% endif %}
 		</td>
 		<td><span onClick="alert('SELECT templomok.osmtype, templomok.osmid, templomok.id as church_id, osmtags.name, osmtags.value FROM miserend.osmtags LEFT JOIN templomok ON ( templomok.osmid =  osmtags.osmid AND templomok.osmtype = osmtags.osmtype ) WHERE   templomok.id IS NOT NULL AND   value <> \'\'  AND   name = \'{{ osmtag.name }}\'   ORDER BY name')">query</span></td>
+		<td><a href="{{ osmtag.overpassturbo }}">overpass</a></td>
+		
+		
+		
+		
+
+		
 	</tr>
 	{% endfor %}
 	</table>

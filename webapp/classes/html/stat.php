@@ -231,7 +231,9 @@ class Stat extends Html {
 			->orderBy('dist','desc')
 			->orderBy('name')
 			->get();
-		
+		foreach($osmtags as $k => $osmtag) {
+			$osmtags[$k]->overpassturbo = "http://overpass-turbo.eu/?Q=". urlencode('	[out:json][timeout:25];nwr["url:miserend"]["'.$osmtag->name.'"];out geom;')."&R";
+		}
 		$this->osmtags = $osmtags;
 		
 		
