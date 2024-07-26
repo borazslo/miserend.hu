@@ -71,8 +71,8 @@ class EditOsm extends \Html\Html {
 		}
 		
 		// Összeállítjuk az OSM tagokat amiket menteni szeretnénk
-		$osmtagsToSave = $this->prepareUpdatedOsmtags();
-		if(!$osmtagsToSave) {
+		$this->osmtagsToSave = $this->prepareUpdatedOsmtags();
+		if(!$this->osmtagsToSave) {
 			addMessage('Nem volt változtatás, így nem volt mint elmenteni.','info');
 			return;
 		}
@@ -84,6 +84,7 @@ class EditOsm extends \Html\Html {
 		$changeSetID = $osmapi->changesetCreate();
 		// Upload OSM entity XML		
 		$versionID = $osmapi->putEntity($changeSetID, $this->input['osmtype'], $this->osmEntity);
+	
 		// Close Changeset
 		$osmapi->changesetClose($changeSetID);
 
@@ -423,11 +424,11 @@ class EditOsm extends \Html\Html {
 	
 	function prepareOSMEntityXml() {
 		$this->osmEntity;
-		$this->osmtags;
+		$this->osmtagsToSave;
 		
 		unset($this->osmEntity->{$this->input['osmtype']}->tag);
 		
-		foreach ($this->osmtags as $k => $v) {
+		foreach ($this->osmtagsToSave as $k => $v) {
 			$newTag = $this->osmEntity->{$this->input['osmtype']}->addChild('tag');
 			$newTag->addAttribute('k', $k);
 			$newTag->addAttribute('v', $v);
