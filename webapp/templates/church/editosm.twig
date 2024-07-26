@@ -1,0 +1,121 @@
+{% extends "layout.twig" %}
+
+{% import "forms.twig" as forms %}
+
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>            
+            OSM szerkesztése: {{ church.nev }}
+			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+            {% if church.ismertnev != ''  %}
+                <br/>
+                <small>
+                    &nbsp;<span class="hidden-xs hidden-sm">
+                        ({{ church.ismertnev|raw }})
+                    </span>
+                </small>
+            {% endif %}
+        </h2>
+    </div>
+{%  endblock %}
+
+{% block content %}
+	<div class="alert alert-info">Misézőhelyeink össze vannak kötve a nyilvános OpenStreetMap adatbázissal. Ezen az oldalon az ebben az adatbázisban fellelhető adatokat kezelhetjük és módosíthatjuk.</div>
+	<div class="alert alert-info">Részletesebb adatszerkesztési lehetőségekért lépj be valamelyik OSM szerkesztőbe saját névvel és ottan tedd, mit tenni akarsz.</div>
+    <FORM ENCTYPE='multipart/form-data' method=post>
+        <input type=hidden name=church[id] value={{ church.id }}>
+		<input type=hidden name=osmid value={{ church.osmid }}>
+		<input type=hidden name=osmtype value={{ church.osmtype }}>
+        <style>
+            td {
+                padding: 5px;                
+            }
+            tr {
+                vertical-align: top;
+            }
+        </style>
+        <table cellpadding=4">            
+           
+		   {% for section in form %}	
+				<tr>
+					<th colspan="3">
+						{{ section.title }}
+					</th>
+				</tr>
+				<tr>
+					<td colspan="3">
+						{{ section.description }}
+					</td>
+				</td>
+		   
+			   {% for item in section.inputs %}
+					<tr>
+						<td bgcolor=#ECE5C8 class=kiscim align=right>{{ item['title'] }}:</td>
+						<td bgcolor=#ECE5C8>
+							{% if item['type'] == 'input' %}
+								{{ forms.input(item) }}
+							 {% else %}
+							 juj
+							 
+							 {% endif %}
+							
+						</td>
+						<td>{{ _self.helplink(1, ICONS_INFO ) }}</td>
+					</tr>
+					{{ _self.helptr(1,help) }}
+				{% endfor %}
+			
+			{% endfor %}
+						
+            <tr>
+			
+                <td>
+                    <div align=right><input type=submit name='submit' value=Mehet class=urlap>&nbsp;</div>
+                </td>
+                <td>					
+                    <input type=radio name=modosit value=i class=urlap checked><span class=alap> és újra módosít</span><br/>
+                    <input type=radio name=modosit value=m class=urlap><span class=alap> és tovább a miserendre</span><br/>
+                    <input type=radio name=modosit value=n class=urlap><span class=alap> és vissza a listába</span><br/>
+                    <input type=radio name=modosit value=t class=urlap><span class=alap> és vissza a templom oldalára</span>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </form>                
+    <script language="javascript" type="text/javascript" src="/vendor/tinymce/tinymce/tinymce.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/js/tiny_mce_init.js"></script>
+    
+    
+    <script>
+  $( function() {
+		  
+  
+    
+      
+   
+    $( ".info" ).on( "click", function() { 
+        console.log($( this ).data('id'));
+               $('#help' + $( this ).data('id') ).toggle(600);
+    });
+ 
+    $( ".church-link-add" ).on( "click", function() {
+      newLinkDialog.dialog( "open" );
+    });
+    
+   
+  } );
+  </script>
+
+{% endblock %}
+
+{% block rightsidebar %}    
+{% endblock %}
+
+{% macro helplink(id, icon) %}
+    <span title="Súgó" class="grey {{ icon }} info" aria-hidden="true" data-id="{{ id }}"></span>
+{% endmacro %}
+
+{% macro helptr(id, help) %}
+    <tr style="display:none" id="help{{ id }}"><td colspan="3">{{ help[id]|raw }}</td></tr>
+{% endmacro %}

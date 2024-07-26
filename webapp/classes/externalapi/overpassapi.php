@@ -40,6 +40,15 @@ class OverpassApi extends \ExternalApi\ExternalApi {
                 . "out body qt center;";
         $this->buildQuery();
     }
+	
+	function buildOneEntityQuery($type, $id) {
+		$this->query = "("
+                . $type . "(id:" . $id . ");"
+				. ");"
+                . "out body qt center;";
+        $this->buildQuery();
+	
+	}
 
     function downloadEnclosingBoundaries($lat, $lon) {
         $this->buildEnclosingBoundariesQuery($lat, $lon);

@@ -15,8 +15,7 @@ $environment['default'] = [
         'useitforsearch' => false
     ],
 	'openstreetmap' => [
-		'user:pwd' => 'user:password',
-		'apiurl' => 'https://api.openstreetmap.org/'	
+		'apiUrl' => 'https://api.openstreetmap.org/'	
     ],	
     'token' => [
         'web' => "2 weeks",
@@ -54,8 +53,11 @@ $environment['staging'] = [
         'domain' => 'http://staging.miserend.hu'
     ],
 	'openstreetmap' => [
-		'user:pwd' => 'devuser:devpassword',
-		'apiurl' => 'https://master.apis.dev.openstreetmap.org/'	
+		'client_id' => '',
+		'client_secret' => '',
+		'application_code' => '',		
+		'access_token' => '',
+		'apiUrl' => 'https://master.apis.dev.openstreetmap.org/'	
     ],	
 	
 	

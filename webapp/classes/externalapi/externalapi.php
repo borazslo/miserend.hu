@@ -48,7 +48,7 @@ class ExternalApi {
 				
             global $config;
             if($this->format == 'json' ) $this->jsonData = [];
-			if($this->format == 'yml' ) $this->xmlData = [];
+			if($this->format == 'xml' ) $this->xmlData = [];
             $this->error = \Html\Html::printExceptionVerbose($e,true);
             if($config['debug'] > 1) echo $this->error;
             elseif($config['debug'] > 0) addMessage($this->error,'warning');
@@ -95,6 +95,8 @@ class ExternalApi {
 
     function downloadData() {        
         $header = array("cache-control: no-cache","Content-Type: application/".$this->format);
+		if(isset($this->headerAuthorization))
+			$header[] = $this->headerAuthorization;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,$this->apiUrl . $this->rawQuery);
 		//echo $this->apiUrl . $this->rawQuery."\n";
