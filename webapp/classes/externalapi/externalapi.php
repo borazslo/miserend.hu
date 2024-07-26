@@ -21,6 +21,7 @@ class ExternalApi {
     }
 
     function runQuery() {
+		if(isset($this->rawData)) unset($this->rawData);
         try {
         
             if (!isset($this->rawQuery)) {
@@ -42,7 +43,7 @@ class ExternalApi {
             
             
         } catch(\Exception $e){
-			if($this->isTesting == true)
+			if(isset($this->isTesting) and $this->isTesting == true)
 				throw new \Exception($e->getMessage());
 				
             global $config;
