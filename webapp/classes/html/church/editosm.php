@@ -47,12 +47,10 @@ class EditOsm extends \Html\Html {
             $this->modify();
 		   
 		    // Újra letöltjük az OSM-ről az adatokat, hogy a frissek legyenek meg.
-			$this->loadOSMDataWithOSM();
-			// Előkészítjük a FORM-ot, hogy megtaláljuk, mik a mezők amiket okés változtatni
+			$this->loadOSMDataWithOSM();			
 			$this->prepareForm();
         }
-		
-        $this->preparePage();
+		        
     }
 
     function modify() {
@@ -91,7 +89,7 @@ class EditOsm extends \Html\Html {
 		if($versionID > 0)
 			addMessage ('Közvelenül OSM adatokat is módosítottunk. Nagyon izgalmas. <a href="'.$messageurl.'">changeset/'.$changesetID.'</a>','success');
 		
-
+		// Hova is térjünk vissza
         switch ($this->input['modosit']) {
             case 'n':
                 $this->redirect("/church/catalogue");
@@ -110,120 +108,7 @@ class EditOsm extends \Html\Html {
         }
     }
 
-    function preparePage() {
-		
-		// A form
-		
-		
-		return;
-		
-		$this->form['miseaktiv'] = array(
-            'name' => 'church[miseaktiv]',
-			'id' => 'miseaktiv',
-			'type' => 'radio',
-            'options' => array(
-                '1' => 'Van rendszeresen mise',
-                '0' => 'Nincs rendszeresen mise'
-            ),
-            'selected' => $this->church->miseaktiv
-        );
-		
-		$this->form['ok'] = array(
-            'name' => 'church[ok]',
-            'options' => array(
-                'i' => 'megjelenhet',
-                'f' => 'áttekintésre vár',
-                'n' => 'letiltva'
-            ),
-            'selected' => $this->church->ok
-        );
-
-		$this->form['frissites'] = array(
-            'type' => 'checkbox',
-            'name' => "church[frissites]",
-            'value' => date('Y-m-d'),
-            'checked' => false,
-            'labelback' => 'Frissítsük a dátumot! (Utoljára frissítve: ' . date('Y.m.d.', strtotime($this->church->frissites)).')'
-        );
-		
-		
-		## OSM informations 
-		if($this->church->osm) {
-		
-		# Disabilities
-		# https://wiki.openstreetmap.org/wiki/Disabilitydescription
-		# https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
-		
-		// https://wiki.openstreetmap.org/wiki/Key:wheelchair
-		$this->form['osm']['wheelchair'] = array(
-            'name' => 'church[osm][wheelchair]',
-			'label' => 'Kerekesszékkel hozzáférhetőség:',
-            'options' => array(
-				'' => 'Nincs információ',
-                'yes' => 'Akadálymentes',
-                'limited' => 'Részben akadálymentes',				
-                'no' => 'Egyáltalán nem akadálymentes'
-            )
-        );
-		if(array_key_exists("wheelchair",$this->church->osm->tagList)) 
-				$this->form['osm']['wheelchair']['selected'] = $this->church->osm->tagList["wheelchair"];
-		
-		// https://wiki.openstreetmap.org/wiki/Key:wheelchair:description
-		$this->form['osm']['wheelchair:description'] = [
-			'name' => 'church[osm][wheelchair:description]',
-			'label' => 'Kiegészítés, ha szükséges'
-			];
-		if(array_key_exists("wheelchair:description",$this->church->osm->tagList)) 
-				$this->form['osm']['wheelchair:description']['value'] = $this->church->osm->tagList["wheelchair:description"];
-				
-		// https://wiki.openstreetmap.org/wiki/Key:toilets:wheelchair
-		$this->form['osm']['toilets:wheelchair'] = array(
-            'name' => 'church[osm][toilets:wheelchair]',
-			'label' => 'Akadálymentes mosdó:',
-            'options' => array(
-                '' => 'Nincs információ vagy nincs mosdó',
-                'yes' => 'Kerekesszékkel hozzáférhető a mosdó',
-                'no' => 'Kerekesszékkel nem hozzáférhető a mosdó'
-            )
-		);
-		if(array_key_exists("toilets:wheelchair",$this->church->osm->tagList)) 
-				$this->form['osm']['toilets:wheelchair']['selected'] = $this->church->osm->tagList["toilets:wheelchair"];
-				
-		// https://wiki.openstreetmap.org/wiki/Proposed_features/Hearing_loop		
-		$this->form['osm']['hearing_loop'] = array(
-            'name' => 'church[osm][hearing_loop]',
-			'label' => 'Hallást segítő indukciós hurok:',
-            'options' => array(
-                '' => 'Nincs információ',
-				'no' => 'Nincs indukciós hurok',
-				'limited' => 'Van indukciós hurok, de tenni kell érte, hogy működjön',				
-				'yes' => 'Van indukciós hurok'                
-            )
-		);
-		if(array_key_exists("hearing_loop",$this->church->osm->tagList)) 
-				$this->form['osm']['hearing_loop']['selected'] = $this->church->osm->tagList["hearing_loop"];				
-				
-		// https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
-		$this->form['osm']['disabled:description'] = [
-			'name' => 'church[osm][disabled:description]',
-			'label' => 'További leírás bármilyen akadálymentesség kapcsán' 
-			];
-		if(array_key_exists("disabled:description",$this->church->osm->tagList)) 
-				$this->form['osm']['disabled:description']['value'] = $this->church->osm->tagList["disabled:description"];		
-		}
-		// END of OSM informations
-				
-				
-        $this->title = $this->church->fullName;
-		
-        
-        for($i = 1; $i < 60; $i++) {
-            $help = new \Help($i);
-            if($help)
-                $this->help[$i] = $help->html;
-        }
-    }
-
+    
    function loadOSMDataWithOverpass() {
    
 		// Elszállunk, hanincs OSM összekötettetés
@@ -287,81 +172,197 @@ class EditOsm extends \Html\Html {
    
 		$osmtags = $this->osmtags;
 		
-		$this->form[0] = [
+		$this->form[] = [
 			'title' => 'Elnevezés',
 			'description' => 'Nem kötelező mindet kitölteni, de határon túli misézőhelyeknél figyeljünk erre!',
-			'inputs' => []
+			'inputs' => [
+				'name' => [
+					'title' => 'Név (a helyi nyelven)'
+				],
+				'name:hu' => [
+					'title' => 'Név magyarul (ha a helyi nyelv nem magyar)'
+				],
+				'alt_name' => [
+					'title' => 'Közismert név (a helyi nyelven)'
+				],
+				'alt_name:hu' => [
+					'title' => 'Közismert név (ha a helyi nyelv nem magyar)'
+				],
+				'old_name' => [
+					'title' => 'Régi elnevezés (helyi nyelven)'
+				],
+			]
 		];
-		$form = &$this->form[0]['inputs'];
-		$form['name'] = array(
-			'title' => 'Név (a helyi nyelven)',
-			'type' => 'input',
-            'name' => 'osm[name]',
-			'value' => isset($osmtags->{"name"}) ? $osmtags->{"name"} : ""
-        );
-		$form['name:hu'] = array(
-			'title' => 'Név magyarul (ha a helyi nyelv nem magyar)',
-			'type' => 'input',
-            'name' => 'osm[name:hu]',
-			'value' => isset($osmtags->{"name:hu"}) ? $osmtags->{"name:hu"} : ""
-        );		
-		$form['alt_name'] = array(
-			'title' => 'Közismert név (a helyi nyelven)',
-			'type' => 'input',
-            'name' => 'osm[alt_name]',
-			'value' => isset($osmtags->{"alt_name"}) ? $osmtags->{"alt_name"} : ""
-        );	
-		$form['alt_name:hu'] = array(
-			'title' => 'Közismert név (ha a helyi nyelv nem magyar)',
-			'type' => 'input',
-            'name' => 'osm[alt_name:hu]',
-			'value' => isset($osmtags->{"alt_name:hu"}) ? $osmtags->{"alt_name:hu"} : ""
-        );	
-		$form['old_name'] = array(
-			'title' => 'Régi elnevezés (helyi nyelven)',
-			'type' => 'input',
-            'name' => 'osm[old_name]',
-			'value' => isset($osmtags->{"old_name"}) ? $osmtags->{"old_name"} : ""
-        );
+			
 		
-		$this->form[1] = [
+		$this->form[] = [
+		# https://wiki.openstreetmap.org/wiki/Disabilitydescription
+		# https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
+			'title' => 'Akadálymentesség',
+			'inputs' => [
+				'wheelchair' => [
+					'title' => 'Kerekesszékkel hozzáférhetőség',
+					'options' => array(
+						'' => 'Nincs információ',
+						'yes' => 'Akadálymentes',
+						'limited' => 'Részben akadálymentes',				
+						'no' => 'Egyáltalán nem akadálymentes'
+					)					
+				],
+				'wheelchair:description' => [
+					'title' => 'Kiegészítés, ha szükséges'
+				],
+				'toilets:wheelchair' => [
+					'title' => 'Akadálymentes mosdó',
+					'options' => array(
+						'' => 'Nincs információ vagy nincs mosdó',
+						'yes' => 'Kerekesszékkel hozzáférhető a mosdó',
+						'no' => 'Kerekesszékkel nem hozzáférhető a mosdó'
+					)
+				],
+				'hearing_loop' => [
+					'title' => 'Hallást segítő indukciós hurok',
+					'options' => array(
+						'' => 'Nincs információ',
+						'no' => 'Nincs indukciós hurok',
+						'limited' => 'Van indukciós hurok, de tenni kell érte, hogy működjön',				
+						'yes' => 'Van indukciós hurok'                
+					)
+				],
+				# https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
+				'disabled:description' => [
+					'title' => 'További leírás bármilyen akadálymentesség kapcsán'
+				]
+			]
+		];
+		
+		
+		$this->form[] = [
 			'title' => 'Elhelyezkedés',
 			'description' => 'A cím adatoknál kifejezetten a templom adataira vagyunk kiváncsiak és nem a plébániáéra.',
-			'inputs' => []
+			'inputs' => [
+				'addr:country' => [
+					'title' => 'Ország rövidítése (ha nem Magyarország)',
+					'help' => 'Magyarország esetében nem kell kitölteni a magyar OSM szerkesztési hagyományoknak megfelelően. De minden más országban két betűs kód való ide.'
+				],
+				'addr:postcode' => [
+					'title' => 'Irányítószám'
+				],
+				'addr:city' => [
+					'title' => 'Település'
+				],
+				'addr:street' => [
+					'title' => 'Közterület (utca/stb.)'
+				],
+				'addr:housenumber' => [
+					'title' => 'Házszám'
+				],
+				'addr:postbox' => [
+					'title' => 'Postafiók'
+				],
+				'addr:conscriptionnumber' => [
+					'title' => 'Helyrajziszám'
+				]
+				
+			]
 		];
-		$form = &$this->form[1]['inputs'];
-		$form['addr:country'] = array(
-			'title' => 'Ország rövidítése (ha nem Magyarország)',
-			'type' => 'input',
-            'name' => 'osm[addr:country]',
-			'value' => isset($osmtags->{"addr:country"}) ? $osmtags->{"addr:country"} : ""
-        );			
-		$form['addr:postcode'] = array(
-			'title' => 'Irányítószám',
-			'type' => 'input',
-            'name' => 'osm[addr:postcode]',
-			'value' => isset($osmtags->{"addr:postcode"}) ? $osmtags->{"addr:postcode"} : ""
-        );	
-		$form['addr:city'] = array(
-			'title' => 'Település',
-			'type' => 'input',
-            'name' => 'osm[addr:city]',
-			'value' => isset($osmtags->{"addr:city"}) ? $osmtags->{"addr:city"} : ""
-        );	
-		$form['addr:street'] = array(
-			'title' => 'Közterület (utca/stb.)',
-			'type' => 'input',
-            'name' => 'osm[addr:street]',
-			'value' => isset($osmtags->{"addr:street"}) ? $osmtags->{"addr:street"} : ""
-        );	
-		$form['addr:housenumber'] = array(
-			'title' => 'Házszám',
-			'type' => 'input',
-            'name' => 'osm[addr:housenumber]',
-			'value' => isset($osmtags->{"addr:housenumber"}) ? $osmtags->{"addr:housenumber"} : ""
-        );	
 		
+		$this->form[] = [
+			'title' => 'Egyházigazgatási beosztás',
+			'description' => 'A cím adatoknál kifejezetten a templom adataira vagyunk kiváncsiak és nem a plébániáéra.',
+			'inputs' => [
+				'amenity' => [
+					'title' => 'Elsődleges címke (mindig place_of_worship)',
+					'help' => 'Minden hely, ahol szentmisék vannak, azok vallási helyek, ezért szükséges, hogy az elsődleges címke (amenity) mindig vallási hely (place_of_worship) kell legyen.'
+				],
+				'religion' => [
+					'title' => 'Vallás (mindig christian)',
+					'help' => 'Minden helyünk keresztény. Pont.'
+				],
+				'denomination' => [
+					'title' => 'Felekezet',
+					'help' => 'Bár a görögkatolikus és a római katolikus az nem két külön felekezet, de az OSM története miatt ezek felekezetek. Ha itt más van, akkor bizony gond van.'
+				],
+				'operator' => [
+					'title' => 'Üzemeltető (szerzetesrend)'
+				],
+				'diocese' => [
+					'title' => 'Egyházmegye (opcionális)',
+					'help' => 'Csak akkor kell kitölteni, hogy ha a terület alapján nem tudjuk meghatározni az egyházmegyét, vagy ha valami miatt mégsem ahhoz az egyházmegyéhez tartozik: pl. a katonai ordinariátus templom mint egy enklávé.'					
+				],
+				'deanery' => [
+					'title' => 'Espereskerület (opcionális)',
+					'help' => 'Csak akkor kell kitölteni, hogy ha a terület alapján nem tudjuk meghatározni az esperekerületet, mert nincs feltérképezve. Még.'
+				],
+				'parish' => [
+					'title' => 'Plébánia (ajánlott)',
+					'help' => 'Egy-két esetben a térképen be van jelölve egy plébánia határa és akkor nem kell kitölteni ezt. De a legtöbb esetben ide kel a plébánia nevét pontosan beírni.'
+				]
+				
+			]
+		];		
+		
+		$this->form[] = [
+			'title' => 'Kapcsolattartási adatok',
+			'description' => 'Itt azokat az adatokat gyűjtjük, amik segítenek elérni ezt a helyet. Vagyis itt meg lehet adni olyan telefonszámot és címet, ami nem a templomé magáé, hanem pl. a helyi plébániájé. <br/>
+			Egyéb social media cucc megadható az openstreetmap saját szerkesztői felületén.',
+			'inputs' => [
+				'phone' => [
+					'title' => 'Telefonszám',
+					'help' => 'Nyilvánosan elérhető telefonszám. Mobiltelenfonszámot csak az éritett személyes jóváhagyásával adjunk meg itt!<br/>Legyen benne az országhívü: +36 30 1231212'
+				],
+				'email' => [
+					'title' => 'Email cím'
+				],
+				'website' => [
+					'title' => 'Honlap'
+				],
+				'facebook' => [
+					'title' => 'Facebook oldal'
+				],
+				'youtube' => [
+					'title' => 'Youtube felhasználó/csatorna'
+				]							
+			]
+		];
+		
+		$this->form[] = [
+			'title' => 'Levelezési cím',
+			'description' => 'Ide lehet megadni a plébánia elérhetőségét például, ahol a leveleket tudják fogadni.',
+			'inputs' => [
+				'contact:country' => [
+					'title' => 'Ország rövidítése (ha nem Magyarország)',
+					'help' => 'Magyarország esetében nem kell kitölteni a magyar OSM szerkesztési hagyományoknak megfelelően. De minden más országban két betűs kód való ide.'
+				],
+				'contact:postcode' => [
+					'title' => 'Irányítószám'
+				],
+				'contact:city' => [
+					'title' => 'Település'
+				],
+				'contact:street' => [
+					'title' => 'Közterület (utca/stb.)'
+				],
+				'contact:housenumber' => [
+					'title' => 'Házszám'
+				]								
+			]
+		];
    
+		foreach( $this->form as $sid => $section) {
+			foreach( $section['inputs'] as $key => $input ) {
+				if ( !isset($input['name'])) {
+					$this->form[$sid]['inputs'][$key]['name'] = "osm[".$key."]";
+				}
+				if ( !isset($input['value'])) {
+					$this->form[$sid]['inputs'][$key]['value'] = isset($osmtags->{$key}) ? $osmtags->{$key} : "";
+				}
+				if ( !isset($input['type'])) {
+					$this->form[$sid]['inputs'][$key]['type'] = "input";
+				}
+			}
+		}
+		
    }
    
    function findValidKeys() {

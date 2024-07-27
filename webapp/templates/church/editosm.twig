@@ -27,46 +27,33 @@
         <input type=hidden name=church[id] value={{ church.id }}>
 		<input type=hidden name=osmid value={{ church.osmid }}>
 		<input type=hidden name=osmtype value={{ church.osmtype }}>
-        <style>
-            td {
-                padding: 5px;                
-            }
-            tr {
-                vertical-align: top;
-            }
-        </style>
-        <table cellpadding=4">            
-           
-		   {% for section in form %}	
-				<tr>
-					<th colspan="3">
-						{{ section.title }}
-					</th>
-				</tr>
-				<tr>
-					<td colspan="3">
-						{{ section.description }}
-					</td>
-				</td>
-		   
-			   {% for item in section.inputs %}
-					<tr>
-						<td bgcolor=#ECE5C8 class=kiscim align=right>{{ item['title'] }}:</td>
-						<td bgcolor=#ECE5C8>
-							{% if item['type'] == 'input' %}
-								{{ forms.input(item) }}
-							 {% else %}
-							 juj
-							 
-							 {% endif %}
-							
-						</td>
-						<td>{{ _self.helplink(1, ICONS_INFO ) }}</td>
-					</tr>
-					{{ _self.helptr(1,help) }}
-				{% endfor %}
+      		
+		{% for section in form %}	
+
+			<h4>{{ section.title }}</h4>
+			<p>{{ section.description }}</h4>
 			
+			<table class="table table-hover table-condensed table-striped" >			
+			<tbody>
+			{% for key, item in section.inputs %}
+				<tr>
+					<td class="strong kiscim" align="right">{{ item['title'] }}:</td>
+					<td >
+						{% if item['type'] == 'input' %}
+							{{ forms.input(item) }}
+						{% else %}
+						 juj
+						 
+						{% endif %}						
+					</td>
+					<td>{% if item.help %}{{ _self.helplink(key|replace({':': '_'}), ICONS_INFO ) }}{% endif %}</td>
+				</tr>
+				{% if item.help %}{{ _self.helptr(key|replace({':': '_'}),item.help) }}{% endif %}
 			{% endfor %}
+			</tbody>
+			</table>
+			
+		{% endfor %}
 						
             <tr>
 			
@@ -117,5 +104,6 @@
 {% endmacro %}
 
 {% macro helptr(id, help) %}
-    <tr style="display:none" id="help{{ id }}"><td colspan="3">{{ help[id]|raw }}</td></tr>
+    <tr style="display:none" id="help{{ id }}"><td colspan="3"><i>{{ help|raw }}</i></td></tr>
+	<tr style="display:none" ></tr>
 {% endmacro %}
