@@ -33,8 +33,14 @@ class EditOsm extends \Html\Html {
 			return;
 		}
 
-				
+		
+		// Letöltjük a legfrissebb saját OSM adatait
 		$this->loadOSMDataWithOSM();
+	
+		// Letöltjük azt is, hogy milyen területi egység része ez a cucc
+		global $twig;
+		$overpassapi = new \ExternalApi\OverpassApi();
+		$this->administration = $overpassapi->loadEnclosingBoundaries($this->church['lat'],$this->church['lon']);
 		
 		// Előkészítjük a FORM-ot, hogy megtaláljuk, mik a mezők amiket okés változtatni
 		$this->prepareForm();
@@ -50,7 +56,7 @@ class EditOsm extends \Html\Html {
 			$this->loadOSMDataWithOSM();			
 			$this->prepareForm();
         }
-		        
+		 		
     }
 
     function modify() {
@@ -172,7 +178,7 @@ class EditOsm extends \Html\Html {
    
 		$osmtags = $this->osmtags;
 		
-		$this->form[] = [
+		$this->form['name'] = [
 			'title' => 'Elnevezés',
 			'description' => 'Nem kötelező mindet kitölteni, de határon túli misézőhelyeknél figyeljünk erre!',
 			'inputs' => [
@@ -191,11 +197,15 @@ class EditOsm extends \Html\Html {
 				'old_name' => [
 					'title' => 'Régi elnevezés (helyi nyelven)'
 				],
+				'official_name' => [
+					'title' => 'Hivatalos elnevezés (ha az eltér)',
+					'help' => 'Olykor nem hajlandó a világ elfogadni névnek a hivatalos nevet, ezért létezik ez a hivatalos név mező. Lehetőség szerint ez legyen üres.'
+				],
 			]
 		];
 			
 		
-		$this->form[] = [
+		$this->form['disabilites'] = [
 		# https://wiki.openstreetmap.org/wiki/Disabilitydescription
 		# https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
 			'title' => 'Akadálymentesség',
@@ -237,9 +247,8 @@ class EditOsm extends \Html\Html {
 		];
 		
 		
-		$this->form[] = [
-			'title' => 'Elhelyezkedés',
-			'description' => 'A cím adatoknál kifejezetten a templom adataira vagyunk kiváncsiak és nem a plébániáéra.',
+		$this->form['location'] = [
+			'title' => 'Elhelyezkedés',			
 			'inputs' => [
 				'addr:country' => [
 					'title' => 'Ország rövidítése (ha nem Magyarország)',
@@ -267,9 +276,8 @@ class EditOsm extends \Html\Html {
 			]
 		];
 		
-		$this->form[] = [
-			'title' => 'Egyházigazgatási beosztás',
-			'description' => 'A cím adatoknál kifejezetten a templom adataira vagyunk kiváncsiak és nem a plébániáéra.',
+		$this->form['religious_administration'] = [
+			'title' => 'Egyházigazgatási beosztás',			
 			'inputs' => [
 				'amenity' => [
 					'title' => 'Elsődleges címke (mindig place_of_worship)',
@@ -302,7 +310,7 @@ class EditOsm extends \Html\Html {
 			]
 		];		
 		
-		$this->form[] = [
+		$this->form['contact'] = [
 			'title' => 'Kapcsolattartási adatok',
 			'description' => 'Itt azokat az adatokat gyűjtjük, amik segítenek elérni ezt a helyet. Vagyis itt meg lehet adni olyan telefonszámot és címet, ami nem a templomé magáé, hanem pl. a helyi plébániájé. <br/>
 			Egyéb social media cucc megadható az openstreetmap saját szerkesztői felületén.',
@@ -326,7 +334,7 @@ class EditOsm extends \Html\Html {
 			]
 		];
 		
-		$this->form[] = [
+		$this->form['mail'] = [
 			'title' => 'Levelezési cím',
 			'description' => 'Ide lehet megadni a plébánia elérhetőségét például, ahol a leveleket tudják fogadni.',
 			'inputs' => [
@@ -359,6 +367,10 @@ class EditOsm extends \Html\Html {
 				}
 				if ( !isset($input['type'])) {
 					$this->form[$sid]['inputs'][$key]['type'] = "input";
+				}
+				
+				if ( !isset($input['id'])) {
+					$this->form[$sid]['inputs'][$key]['id'] = $key;
 				}
 			}
 		}

@@ -28,16 +28,21 @@
 		<input type=hidden name=osmid value={{ church.osmid }}>
 		<input type=hidden name=osmtype value={{ church.osmtype }}>
       		
-		{% for section in form %}	
+		{% for id, section in form %}	
 
 			<h4>{{ section.title }}</h4>
-			<p>{{ section.description }}</h4>
+			{% if block("section_" ~ id) is defined %}
+				{{ block( "section_" ~ id )|raw }}
+			{% else %}
+				<p>{{ section.description|raw }}</p>
+			{% endif %}
+			
 			
 			<table class="table table-hover table-condensed table-striped" >			
 			<tbody>
 			{% for key, item in section.inputs %}
 				<tr>
-					<td class="strong kiscim" align="right">{{ item['title'] }}:</td>
+					<td class="align-middle" align="right">{{ item['title'] }}:</td>
 					<td >
 						{% if item['type'] == 'input' %}
 							{{ forms.input(item) }}
@@ -76,10 +81,7 @@
     
     <script>
   $( function() {
-		  
-  
-    
-      
+		    	
    
     $( ".info" ).on( "click", function() { 
         console.log($( this ).data('id'));
@@ -95,6 +97,29 @@
   </script>
 
 {% endblock %}
+
+{% block section_religious_administration %}
+	<p>A misézőhely egyházigazgatási területi beosztását megpróbáljuk térkép alapján beállítani. Az alábbi részekhez így csak akkor kell hozzányúlni, hogy ha nem sikerült megtalálnunk az egyházmegyét, espereskerületet, plébániát. Vagy ha valamiért nem a területileg illetékes egyházmegyéhez/espereskerülethez tartozik a misézőhely például a Katonai Ordinariátus egyféle enklévájaként.</p>
+	A következő területi beosztást találtuk meg:
+	<ul>
+	{% for adm in administration[ osmtags.denomination ~ '_administration'] %}
+		<li><strong>{{ adm.name }}</strong></li>
+	{% endfor %}
+	</ul>
+{% endblock %}
+
+
+{% block section_location %}
+	<p>Itt kifejezetten a templomnak az adataira vagyunk kíváncsiak (és nem pl. a helyi plébániáéra).</p>
+	A területi elhelyezkedése alapján azért megtaláltunk már így is némi információt:
+	<ul>
+	{% for adm in administration[ 'administration'] %}
+		<li><strong>{{ adm.name }}</strong></li>
+	{% endfor %}
+	</ul>
+
+{% endblock %}
+
 
 {% block rightsidebar %}    
 {% endblock %}

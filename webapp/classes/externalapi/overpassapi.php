@@ -55,6 +55,35 @@ class OverpassApi extends \ExternalApi\ExternalApi {
         $this->run();
     }
 
+	function loadEnclosingBoundaries($lat,$lon) {
+		$this->downloadEnclosingBoundaries($lat,$lon);
+		
+		$return = [];
+		if(isset($this->jsonData->elements)) {
+			foreach($this->jsonData->elements as $element) {
+			
+				if($element->tags->boundary == 'administrative' ) {
+					$return['administration'][ $element->tags->admin_level ] = (array) $element->tags;
+				
+				}
+				elseif($element->tags->boundary == 'religious_administration' ) {
+							
+					$return[$element->tags->denomination . '_administration'][ $element->tags->admin_level ] = (array) $element->tags;				
+				}										
+			}				
+		}
+		
+		// Sorbarendezzük admin_level szerint
+		foreach($return as $type => $levels) {
+			ksort($levels);
+			$return[$type] = $levels;
+		}
+		
+		return $return;
+		
+	
+	}
+	
     function downloadUrlMiserend() {
         $this->buildSimpleQuery("['url:miserend']");
         $this->run();
