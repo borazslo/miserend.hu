@@ -42,6 +42,11 @@ class EditOsm extends \Html\Html {
 		$overpassapi = new \ExternalApi\OverpassApi();
 		$this->administration = $overpassapi->loadEnclosingBoundaries($this->church['lat'],$this->church['lon']);
 		
+		// Letöltjük a teljes listát az OSM-ről, hogy az autocomplete boldogan üzemelhessen
+		$overpassapi->downloadUrlMiserend();
+		$this->autocomplete = $this->prepareAutocomplete($overpassapi->jsonData);
+		
+				
 		// Előkészítjük a FORM-ot, hogy megtaláljuk, mik a mezők amiket okés változtatni
 		$this->prepareForm();
 		$this->findValidKeys();
@@ -180,6 +185,7 @@ class EditOsm extends \Html\Html {
 		
 		$this->form['name'] = [
 			'title' => 'Elnevezés',
+			
 			'description' => 'Nem kötelező mindet kitölteni, de határon túli misézőhelyeknél figyeljünk erre!',
 			'inputs' => [
 				'name' => [
@@ -285,11 +291,19 @@ class EditOsm extends \Html\Html {
 				],
 				'religion' => [
 					'title' => 'Vallás (mindig christian)',
-					'help' => 'Minden helyünk keresztény. Pont.'
+					'help' => 'Minden helyünk keresztény. Pont.',
+					'options' => [ 
+						'christian' => 'keresztény' 
+					]
+					
 				],
 				'denomination' => [
 					'title' => 'Felekezet',
-					'help' => 'Bár a görögkatolikus és a római katolikus az nem két külön felekezet, de az OSM története miatt ezek felekezetek. Ha itt más van, akkor bizony gond van.'
+					'help' => 'Bár a görögkatolikus és a római katolikus az nem két külön felekezet, de az OSM története miatt ezek felekezetek. Ha itt más van, akkor bizony gond van.',
+					'options' => [
+						'roman_catholic' => 'római katolikus',
+						'greek_catholic' => 'görögkatolikus'
+					]
 				],
 				'operator' => [
 					'title' => 'Üzemeltető (szerzetesrend)'
@@ -375,6 +389,37 @@ class EditOsm extends \Html\Html {
    
 		foreach( $this->form as $sid => $section) {
 			foreach( $section['inputs'] as $key => $input ) {
+				if ( isset($input['options']) )  {
+					$array = $input['options'];
+					if ( array_keys($array) !== range(0, count($array) - 1)) {
+						$map = [];
+						foreach ( $input['options'] as $value => $label ) {
+							
+							if( isset($this->autocomplete[$key][$value]) ) 
+								$label = $label . " (".$value.", ".$this->autocomplete[$key][$value]." db)";
+							else
+								$label = $label . " (".$value.")";
+						
+							$map[] = [ 'label' => $label, 'value' => $value ];
+						}
+						$this->form[$sid]['inputs'][$key]['options'] = $map;
+					   // Associative array
+					   //echo 'Associative array';
+					} else {
+					   // sequential array
+					   echo 'Sequential array';
+					   var_dump($input['options']);
+					}								
+				} else if ( array_key_exists($key, $this->autocomplete) ) {
+					
+					foreach($this->autocomplete[$key] as $value => $count) {
+						$this->form[$sid]['inputs'][$key]['options'][] = [
+							'value' => $value,
+							'label' => $value." (".$count." db)"
+						];
+					}					
+				}
+				
 				if ( !isset($input['name'])) {
 					$this->form[$sid]['inputs'][$key]['name'] = "osm[".$key."]";
 				}
@@ -466,5 +511,23 @@ class EditOsm extends \Html\Html {
 		return true;			
 	}
 	
-   
+    function prepareAutocomplete($jsonOSMData) {
+		$return = [];
+		foreach($jsonOSMData->elements as $element) {
+			foreach($element->tags as $key => $value) {
+				if(!isset($return[$key])) $return[$key] = [];
+				if(!isset($return[$key][$value])) $return[$key][$value] = 0;
+				$return[$key][$value]++;
+			}		
+		}
+		foreach($return as $key => $list) {
+			ksort($list);
+			$return[$key] = $list; //array_values(array_unique($list));
+		}
+
+		return $return;
+		
+	
+	
+	}
 }

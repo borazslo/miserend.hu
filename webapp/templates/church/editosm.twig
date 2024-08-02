@@ -2,6 +2,7 @@
 
 {% import "forms.twig" as forms %}
 
+{% set columns2 = true  %}
 
 {% block pageHeader %}
     <div class="page-header">
@@ -21,12 +22,16 @@
 {%  endblock %}
 
 {% block content %}
+
 	<div class="alert alert-info">Misézőhelyeink össze vannak kötve a nyilvános OpenStreetMap adatbázissal. Ezen az oldalon az ebben az adatbázisban fellelhető adatokat kezelhetjük és módosíthatjuk.</div>
-	<div class="alert alert-info">Részletesebb adatszerkesztési lehetőségekért lépj be valamelyik OSM szerkesztőbe saját névvel és ottan tedd, mit tenni akarsz.</div>
+	
     <FORM ENCTYPE='multipart/form-data' method=post>
         <input type=hidden name=church[id] value={{ church.id }}>
 		<input type=hidden name=osmid value={{ church.osmid }}>
 		<input type=hidden name=osmtype value={{ church.osmtype }}>
+		
+			
+		
       		
 		{% for id, section in form %}	
 
@@ -42,7 +47,7 @@
 			<tbody>
 			{% for key, item in section.inputs %}
 				<tr>
-					<td class="align-middle" align="right">{{ item['title'] }}:</td>
+					<td class="align-middle col-md-3" align="right">{{ item['title'] }}:</td>
 					<td >
 						{% if item['type'] == 'input' %}
 							{{ forms.input(item) }}
@@ -77,16 +82,14 @@
             </tr>
         </table>
     </form>                
-    <script language="javascript" type="text/javascript" src="/vendor/tinymce/tinymce/tinymce.min.js"></script>
-    <script language="javascript" type="text/javascript" src="/js/tiny_mce_init.js"></script>
     
+	<div class="alert alert-info">Részletesebb adatszerkesztési lehetőségekért lépj be valamelyik OSM szerkesztőbe saját névvel és ottan tedd, mit tenni akarsz.</div>
     
     <script>
   $( function() {
 		    	
    
-    $( ".info" ).on( "click", function() { 
-        console.log($( this ).data('id'));
+    $( ".info" ).on( "click", function() {         
                $('#help' + $( this ).data('id') ).toggle(600);
     });
  
@@ -97,6 +100,71 @@
    
   } );
   </script>
+  
+
+  <style>
+   .autocomplete-button {
+            margin-left: 5px;
+            cursor: pointer;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+ </style>
+	
+ <script>
+ $(document).ready(function(){
+  	
+	var options = {
+	 {% for id, section in form %}
+      {% for key, item in section.inputs %}
+		{% if item.options %}
+			"{{ key }}" :  
+				{{ item.options|json_encode(constant('JSON_PRETTY_PRINT') b-and constant('JSON_NUMERIC_CHECK') )|raw }} ,
+        {% endif %}        
+      {% endfor %}
+    {% endfor %}
+	};
+ 
+	
+	$(".form-control").each(function(){
+		var id = $(this).attr('id');
+		
+		if(options[id]) {
+			$(this)
+				
+				.autocomplete({
+					delay: 0,
+					minLength: 0,
+					source: options[id]
+				});
+				
+			// Add button after the input
+			var button = $('<a class="autocomplete-button">&#9660;</a>');
+			$(this).closest('td').next("td").prepend(button);
+
+			// Attach click event to the button
+			
+			
+			button.click(function() {
+                    // Trigger the autocomplete search
+					$('#' + id.replace(/:/g, '\\:') ).autocomplete("search", "");
+                });
+			
+			
+			
+			
+		}
+	});
+ 
+ 
+ } );
+ </script>
+  
 
 {% endblock %}
 
