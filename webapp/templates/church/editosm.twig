@@ -46,6 +46,8 @@
 					<td >
 						{% if item['type'] == 'input' %}
 							{{ forms.input(item) }}
+						{% elseif item['type'] == 'textarea' %}
+							{{ forms.textarea(item) }}							
 						{% else %}
 						 juj
 						 

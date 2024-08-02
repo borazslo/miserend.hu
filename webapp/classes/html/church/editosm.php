@@ -310,6 +310,22 @@ class EditOsm extends \Html\Html {
 			]
 		];		
 		
+		$this->form['fyi'] = [
+			'title' => 'Információk',			
+			'inputs' => [
+				'description' => [
+					'title' => 'Leírás (max. 255 karakter)',
+					'type' => 'textarea',
+					'help' => 'A templomról, stílusáról, történetéről lehet itt írni. Maximum 255 karakterben!'
+				],
+				'note' => [
+					'title' => 'Megjegyzés (más térképszerkesztőknek)',
+					'type' => 'textarea',
+					'help' => 'Az Open Street Map-en munkálkodó más önkéntesek számára lehet itt nyilvános üzenetet "küldeni". Maximum 255 karakterben.'
+				]
+			]
+		];
+		
 		$this->form['contact'] = [
 			'title' => 'Kapcsolattartási adatok',
 			'description' => 'Itt azokat az adatokat gyűjtjük, amik segítenek elérni ezt a helyet. Vagyis itt meg lehet adni olyan telefonszámot és címet, ami nem a templomé magáé, hanem pl. a helyi plébániájé. <br/>
