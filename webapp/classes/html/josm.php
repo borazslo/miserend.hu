@@ -18,7 +18,7 @@ class Josm extends Html {
             $job->run();                       
         }
 
-        $this->setTitle('JOSM összeköttetés');
+        $this->setTitle('OSM összeköttetés');
         $this->template = 'josm.twig';        
         
         $this->cron = \Eloquent\Cron::where('class','\OSM')
@@ -31,6 +31,27 @@ class Josm extends Html {
             throw new Exception("Missing Json Elements from OverpassApi Query");
         }
 
+		$urlmiserends = [];
+		foreach($overpass->jsonData->elements as $element) {
+			preg_match("/(\/|=)([0-9]{1,})(\/|)$/i",$element->tags->{'url:miserend'},$match);
+			if(!isset($match[2])) {
+				// Ezt igazából megvizsgálja a checkOsmElements tehát nem kell ide.
+			} else {
+				if(!isset($urlmiserends[$match[2]])) $urlmiserends[$match[2]] = [];
+				$urlmiserends[$match[2]][] = $element;		
+			}
+		}
+		
+		$this->multipleOSMids = [];
+		foreach ($urlmiserends as $church_id => $id) {
+			if(count($id) > 1) {
+				$this->multipleOSMids[] = [
+					'church' => \Eloquent\Church::find($church_id),
+					'OSMids' => $id
+				];
+			}
+		}		
+		
         list($goodIDs, $this->osmWBadChurch) = $this->checkOsmElements($overpass->jsonData->elements);
         $this->countOsmData = count($overpass->jsonData->elements);
         
@@ -52,6 +73,9 @@ class Josm extends Html {
         $this->churchesWBad = \Eloquent\Church::where('ok','i')
                 ->whereNotIn('id',$goodIDs)
                 ->get();
+				
+				
+		
                
     }
 
@@ -92,7 +116,7 @@ class Josm extends Html {
                 $element->lon = $element->center->lon;
             }
             
-            preg_match('/miserend\.hu\/\?{0,1}templom(\/|=)([0-9]{1,5})/i', $element->tags->{'url:miserend'}, $match);
+            preg_match('/miserend\.hu\/\?{0,1}templom(\/|=)([0-9]{1,5})(\/|)$/i', $element->tags->{'url:miserend'}, $match);
             if(!isset($match[2])) {                
                 $osmWBadTag[] = $element;
             } else {

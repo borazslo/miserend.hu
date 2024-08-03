@@ -7,15 +7,19 @@
 <span class="small">Ekkor futott utoljára a <a href="?update">{{ cron.class }}::{{ cron.function }}</a>: {{ cron.lastsuccess_at }}.</span><br/><br/>
 
 <span class"alap">Az Open Street Map térkép-adatbázisban {{ countOsmData }} elemet találtunk, aminek van 
-      <i>url:miserend</i> címkéje. Ebből {{ osmWBadChurch|length }} elemnek az <i>url:miserend</i> értéke 
-    valamilyen módon hibás. <br/>A templomok között akad {{ churchesWNoOsm|length }} templom, aminek nincs OSM adata.
-    Illetve {{ churchesWBadOsm|length }} templomnak van OSM adata megadva, de mégsem találtunk megfelelő OSM elemet.
-    (Összesen {{ churchesWBad|length }} templommal van gond OSM szempontjából.)</span>
+      <i>url:miserend</i> címkéje.
+		<ul>
+			<li>Ebből {{ osmWBadChurch|length }} elemnek az <i>url:miserend</i> értéke valamilyen módon hibás.</li>
+			<li>A templomok között akad {{ churchesWNoOsm|length }} templom, aminek nincs OSM adata.</li>		
+			<li>Illetve {{ churchesWBadOsm|length }} templomnak van OSM adata megadva, de mégsem találtunk megfelelő OSM elemet.</li>			
+			<li>Valamint {{ multipleOSMids|length  }} esetben az OSM-ben több helyen / entitásnál szerepel azonos 'url:miserend', ami hát nagy gond.</li>
+		</ul>
+    (Összesen {{ churchesWBad|length + multipleOSMids|length}} templommal van gond OSM szempontjából.)</span>
     
     
 {% if osmWBadChurch|length %}        
-<h2 data-toggle="collapse" data-target="#osmWBadChurch">OSM adatok</h2>
-<p>Sajnos {{ osmWBadChurch|length}} olyan OSM elem van, amikben bár szerepel az <i>url:miserend</i> kulcs, mégsincsenek összekapcsolódva a templomainkkal.</p>
+<h2 data-toggle="collapse" data-target="#osmWBadChurch">OSM adatok hibás url:miserend adattal</h2>
+<p>Sajnos {{ osmWBadChurch|length}} olyan OSM elem van, amikben bár szerepel az <i>url:miserend</i> kulcs, de mégsem találtunk hozzá templomot. Talán hibás a formátum, vagy az adott azonosítójú templom (már) nem létezik.</p>
 <div id="osmWBadChurch" class="collapse in">
     <table class="table table-hover table-condensed table-striped">
         <tr>
@@ -36,20 +40,47 @@
                 </td>
                 <td><a href="https://www.openstreetmap.org/edit?editor=id&{{ osm.type }}={{ osm.id }}#map=19/{{ osm.lat }}/{{ osm.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..."></i></a></td>
                  <td><a href="https://www.openstreetmap.org/{{ osm.type }}/{{ osm.id }}#map=19/{{ osm.lat }}/{{ osm.lon }}" target="_blank"><i class="{{ ICONS_MAP_SEE }}" title="OSM megtekintése..."></i></a></td>                 
-                <td></td>
-                <td></td>
+
             </tr>            
         {% endfor %}        
     </table>
 </div>
 {% endif %}
 
+{% if multipleOSMids|length %}        
+<h2 data-toggle="collapse" data-target="#multipleOSMids">OSM adatok hibás url:miserend adattal</h2>
+<p>Sajnos {{ multipleOSMids|length}} templom van aminek az url-je több OSM elemnél is szerepel, így nem tudhatjuk melyik adatai is érvényesek a templomunkra.</p>
+<div id="multipleOSMids" class="collapse in">
+    <table class="table table-hover table-condensed table-striped">
+
+        {% for church in multipleOSMids %}
+		<tr>			
+			<th colspan="3">{{ church.church.nev }} {% if church.church.ismertnev %}({{ church.church.ismertnev}}){% endif %}</th>
+			<th><a href="/templom/{{ church.church.id }}"><i class="{{ ICONS_CHURCH_SEE }}" title="Templom megtekintése..."></i></a></th>
+			<th><a href="/templom/{{ church.church.id }}/edit"><i class="{{ ICONS_CHURCH_EDIT }}" title="Templom szerkesztése..."></i></a>                   
+			</th>                    
+		</tr>
+			{% for osm in church.OSMids %}
+				<tr>
+					<td><a href='http://www.openstreetmap.org/{{ osm.type }}/{{ osm.id }}' target='_blank'>{{ osm.type }}/{{ osm.id }}</a></td> 
+					<td colspan="2">
+						{{ attribute(osm.tags, 'name') }}
+					</td>
+					<td><a href="https://www.openstreetmap.org/edit?editor=id&{{ osm.type }}={{ osm.id }}#map=19/{{ osm.lat }}/{{ osm.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..."></i></a></td>
+					 <td><a href="https://www.openstreetmap.org/{{ osm.type }}/{{ osm.id }}#map=19/{{ osm.lat }}/{{ osm.lon }}" target="_blank"><i class="{{ ICONS_MAP_SEE }}" title="OSM megtekintése..."></i></a></td>                 
+
+				</tr>            
+			{% endfor %}
+		{% endfor %}        
+    </table>
+</div>
+{% endif %}
 
 {% if churchesWBadOsm|length %}        
 
-<h2 data-toggle="collapse" data-target="#churchesWBadOsm">Templomok OSM adatok nélkül</h2>
+<h2 data-toggle="collapse" data-target="#churchesWBadOsm">Templomok ahol az OSM adatok hiábsak</h2>
 <p>Sajnos {{ churchesWBadOsm|length}} olyan használatban lévő miséző hely van, aminek bár van OSM adata megadva, 
-    az OSM adatbázisából mégis csak hiányzik az <i>url:miserend</i></p>
+    az OSM adatbázisából mégis csak hiányzik (vagy hibás) az <i>url:miserend</i></p>
 <div id="churchesWBadOsm" class="collapse in">
     <table class="table table-hover table-condensed table-striped">
 		<tr>

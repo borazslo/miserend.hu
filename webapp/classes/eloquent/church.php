@@ -42,10 +42,12 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 	
 		$church = parent::__call($method, $parameters);
 		
-		// Amikor leszóhívunk az adatbázisból egy templomot, akkor rögtön feltöltjük teljesen a tulajdonságaival
-        if ($method == 'find') {			
-			$church->loadAttributes();
-        } 
+		if($church) {
+			// Amikor leszóhívunk az adatbázisból egy templomot, akkor rögtön feltöltjük teljesen a tulajdonságaival
+			if ($method == 'find') {			
+				$church->loadAttributes();
+			} 
+		}
 
         return $church;
         }   
