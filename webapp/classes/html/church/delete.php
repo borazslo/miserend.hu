@@ -38,6 +38,14 @@ class Delete extends \Html\Html {
             $this->church2delete->adminmegj .= ": ".$comment;        
         $this->church2delete->ok = 'n';
         $this->church2delete->log .= "\nDel: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
+		
+		// Mivel mindenféle egyedi attribútumot adtunk hozzá a $church objecthez az attributes táblából, ezért mentéshez és törléshez el kell távolítani a fura cuccokat.
+		foreach ($this->church2delete->getAttributes() as $key => $value) {
+        if(!in_array($key, array_keys($this->church2delete->getOriginal())))
+            unset($this->church2delete->$key);
+        }
+        
+		
         $this->church2delete->save();
                 
         $this->church2delete->delete();
