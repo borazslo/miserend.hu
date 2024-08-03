@@ -58,16 +58,43 @@
 		<th class="col-md-2">count</th>
 		<th >distinct</th>
 		<th class="col-md-1">sql</th>
-		<th class="col-md-2">oberpass</th>
 	</tr>
+	{% set count = 0 %}
 	{% for osmtag in osmtags %}
+		{% set count = count + 1 %}
 	<tr>
 		<td><a href="https://taginfo.openstreetmap.org/keys/{{ osmtag.name }}">{{ osmtag.name }}</a></td>
-		<td>{{ osmtag.count }}{% if osmtag.count == 1 %} (<a href="/templom/{{ osmtag.church_id }}/edit">{{ osmtag.church_id }}</a>){% endif %}</td>
-		<td>{{ osmtag.dist }}{% if osmtag.dist == 1 %} ({{ osmtag.value }}){% endif %}
+		<td>{{ osmtag.count }}</td>
+		<td>
+			{% if osmtag.dist == 1 %} 
+				{% set value = (osmtag.values)|first %}
+				{% if value.churches|length > 1 %}
+					<a href="{{ value.overpassturbo }}" target="_blank">
+				{% else %}
+					{% set church = (value.churches)|first %}
+					<a href="https://openstreetmap.org/{{ church.osmtype }}/{{ church.osmid }}" target="_blank"> {{church.nev }}
+				{% endif %}
+				{{ value.value }}</a>
+																	
+			{% else %}
+				(<a href="#" onclick="return false;"><span data-bs-toggle="collapse" data-bs-target="#collapse{{ count }}" aria-expanded="false" aria-controls="collapse{{ count }}">{{ osmtag.dist }}</span></a>)
+				<br/>
+				<div class="collapse collapse-horizontal" id="collapse{{ count }}">
+				{% for value in osmtag.values %}
+					{% if value.churches|length > 1 %}
+						<a href="{{ value.overpassturbo }}" target="_blank">
+					{% else %}
+						{% set church = (value.churches)|first %}
+						<a href="https://openstreetmap.org/{{ church.osmtype }}/{{ church.osmid }}" target="_blank"> {{church.nev }}
+					{% endif %}
+					{{ value.value }}</a> ({{ value.churches|length }})<br/>
+				{% endfor %}
+				</div>
+			{% endif %}  
+		
 		</td>
-		<td><span onClick="alert('SELECT templomok.osmtype, templomok.osmid, templomok.id as church_id, osmtags.name, osmtags.value FROM miserend.osmtags LEFT JOIN templomok ON ( templomok.osmid =  osmtags.osmid AND templomok.osmtype = osmtags.osmtype ) WHERE   templomok.id IS NOT NULL AND   value <> \'\'  AND   name = \'{{ osmtag.name }}\'   ORDER BY name')">query</span></td>
 		<td><a href="{{ osmtag.overpassturbo }}">overpass</a></td>
+		
 		
 		
 		

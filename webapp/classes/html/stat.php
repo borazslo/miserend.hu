@@ -211,31 +211,46 @@ class Stat extends Html {
 		
 		
 		/* OSM tag variácók */
-		$osmtags = DB::table('attributes')
-			->select([
-				DB::raw("count(*) as count"),
-				DB::raw("count(distinct attributes.value) as dist"),
-				DB::raw("templomok.id as church_id"),
-				"attributes.*","attributes.key as name"
-			])
-			->join('templomok', function($join)
-                         {
-                             $join->on('templomok.id', '=', 'attributes.church_id');                             
-                         })
-			->where('value','<>','')
+		$attributes = DB::table('attributes')
+			->select('attributes.*','templomok.osmtype', 'templomok.osmid')
+			->join('templomok','templomok.id', '=', 'attributes.church_id')
 			->where('fromOSM',1)
-			->whereNotNull('templomok.id')
-			->groupBy('attributes.key')
-			->orderBy('count','desc')
-			->orderBy('dist','desc')
 			->orderBy('key')
+			->orderBy('value')
+			->orderBy('church_id')
 			->get();
-		foreach($osmtags as $k => $osmtag) {
-			$osmtags[$k]->overpassturbo = "http://overpass-turbo.eu/?Q=". urlencode('	[out:json][timeout:25];nwr["url:miserend"]["'.$osmtag->key.'"];out geom;')."&R";
+			
+		$osmtags = [];
+		foreach($attributes as $item) {
+			if(!isset($osmtags[$item->key])) {
+				$osmtags[$item->key] = [
+					'count' => 0,
+					'dist' => 0,
+					'name' => $item->key,
+					'overpassturbo' => "http://overpass-turbo.eu/?Q=". urlencode('	[out:json][timeout:25];nwr["url:miserend"]["'.$item->key.'"];out geom;')."&R",
+					'values' => []
+				];
+			}
+	
+			$osmtags[$item->key]['count']++;
+			
+			if(!array_key_exists($item->value, $osmtags[$item->key]['values']) ) {
+				$osmtags[$item->key]['values'][$item->value] = [
+					'value' =>  $item->value,
+					'overpassturbo' => "http://overpass-turbo.eu/?Q=". urlencode('	[out:json][timeout:25];nwr["url:miserend"]["'.$item->key.'"="'.$item->value.'"];out geom;')."&R",
+					'churches' => []
+					
+				];
+				$osmtags[$item->key]['dist']++;
+			}
+			$osmtags[$item->key]['values'][$item->value]['churches'][] = $item;	
+				
+			
 		}
+		//printr($osmtags);
+		
 		$this->osmtags = $osmtags;
-		
-		
+				
 		
     }
 }
