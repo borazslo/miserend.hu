@@ -16,6 +16,39 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     protected $table = 'templomok';
     protected $appends = array('fullName','location','links');
 
+	protected $attributesCache = null;
+	
+	
+	public function attributes()
+    {
+        return $this->hasMany(Attribute::class);
+    }
+	
+	public function loadAttributes()
+    {
+        $attributes = $this->attributes()->get()->pluck('value', 'key')->toArray();
+        foreach ($attributes as $key => $value) {
+			if(!isset($this->$key))
+				$this->setAttribute($key, $value);
+			else {
+				// throw new \Exception("The attribute '".$key."' has already existed.");
+			}
+
+        }
+    }
+
+	public function __call($method, $parameters)
+    {
+	
+		$church = parent::__call($method, $parameters);
+		
+		// Amikor leszóhívunk az adatbázisból egy templomot, akkor rögtön feltöltjük teljesen a tulajdonságaival
+        if ($method == 'find') {			
+			$church->loadAttributes();
+        } 
+
+        return $church;
+        }   
     public function photos() {
         return $this->hasMany('\Eloquent\Photo')->ordered();
     }

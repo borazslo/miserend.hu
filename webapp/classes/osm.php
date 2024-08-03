@@ -76,6 +76,31 @@ class OSM {
     }
     
     function saveOSM2Church($church, $element) {
+			
+			// Ha valamiért nincs church.id, akkor inkább elszállunk, minthogy mindent töröljünk és megkavarjunk.
+			if(!isset($church->id)) {
+				return false;
+			}
+	
+			// Először töröljük az OSM-ből vett adatot, hogy ne maradjon benne olyan ami az újban már nincs
+			\Eloquent\Attribute::where('church_id', $church->id)
+				->where('fromOSM', 1)
+				->delete();
+			// Az OSM tags elmentése az Attribute táblába.
+			foreach($element->tags as $key => $value) {
+				\Eloquent\Attribute::updateOrCreate(
+					[
+						'church_id' => $church->id,
+						'key' => $key
+					],			
+					[
+						'value' => $value,
+						'fromOSM' => 1
+					]
+				);
+			}
+			
+			// Az osm azonosítók és koordináták elmentése 
             if (isset($element->center->lat)) {
             $element->lat = $element->center->lat;
             }
@@ -85,22 +110,33 @@ class OSM {
             
             $changed = false;
             
-            /* TODO: Megnézhetnénk, hogy lat, lon, name (name:hu) egyezik-e. *
-            $keys = [['lon','lon'],['lat','lat'],['type','osmtype'],['id','osmid']];
-            foreach ($keys as $key) {
-                if( $element->{$key[0]} == $church->{$key[1]} ) echo "ok ";
-                echo $element->{$key[0]}." vs ".$church->{$key[1]}."<br/>";
+			
+			// Ha a templomnál még nincs megadva az OSM azonosító, akkor jól megadjuk. És a koordinátákat is jól felülírjuk.
+			if( $church->osmid == '' OR $church->osmtype == '' ) {				
+                
+				$church->osmtype = $element->type;           
+                $church->osmid = $element->id;    
+				$church->lon = $element->lon;           
+                $church->lat = $element->lat;           
+				$changed = true;
             }
-            */
-            
-            if($element->id != $church->osmid OR $element->type != $church->osmtype) {
-                $church->osmtype = $element->type;           
-                $church->osmid = $element->id;           
+            /* TODO: biztosan fejetlenül átkütjük? Ha az OSM-ben az url:miserend máshova kerül, máris változik az átkötés. */			
+            if( (int) $element->id != (int) $church->osmid OR $element->type != $church->osmtype ) {
+				/*
+				echo "Változás van az OSM azonosítóban!<br/>\n".
+					"'".$church->osmtype.":".$church->osmid."' megváltozik erre: '".$element->type.":".$element->id."'";
                 $changed = true;
+				$church->osmtype = $element->type;           
+                $church->osmid = $element->id;    
+				*/
             }
             
-            /* TODO: biztosan fejetlenül átmentjük a koordinátákat? */
-            if($element->lat != $church->lat OR $element->lon != $church->lon) {
+            /* Ha biztosan ugyan az az OSM azonosító, de mégis más a koordináta akkor átmentjük aokat az adaokat */
+            if(
+				( $element->id == $church->osmid AND $element->type == $church->osmtype )
+				AND 
+				( $element->lat != $church->lat OR $element->lon != $church->lon )
+			) {
                 $church->lon = $element->lon;           
                 $church->lat = $element->lat;           
                 $changed = true;

@@ -97,8 +97,31 @@ class EditOsm extends \Html\Html {
 		// Close Changeset
 		$osmapi->changesetClose($changeSetID);
 
-		if($versionID > 0)
+		// Siker
+		if($versionID > 0) {
+			// Mentüsk el az adatokat a saját attribute adattáblánkba is.
+			
+			// Először töröljük az OSM-ből vett adatot, hogy ne maradjon benne olyan ami az újban már nincs
+			\Eloquent\Attribute::where('church_id', $this->church['id'])
+				->where('fromOSM', 1)
+				->delete();
+			// Az OSM tags elmentése az Attribute táblába.
+			foreach($this->osmtagsToSave as $key => $value) {
+				\Eloquent\Attribute::updateOrCreate(
+					[
+						'church_id' => $this->church['id'],
+						'key' => $key
+					],			
+					[
+						'value' => $value,
+						'fromOSM' => 1
+					]
+				);
+			}			
+						
 			addMessage ('Közvelenül OSM adatokat is módosítottunk. Nagyon izgalmas. <a href="'.$messageurl.'">changeset/'.$changesetID.'</a>','success');
+			
+		}
 		
 		// Hova is térjünk vissza
         switch ($this->input['modosit']) {
@@ -464,7 +487,7 @@ class EditOsm extends \Html\Html {
 			// Ha be van küldve az érvényes cucc
 			if( isset($this->input['osm'][$key]) ) {
 				// Ha ez a kulcs nincs az eredeti OSM-ben ÉS most sem kapott értéket
-				if ( $this->input['osm'][$key] == '' AND !isset($this->osmtags->$key)) {
+				if ( trim($this->input['osm'][$key]) == '' AND !isset($this->osmtags->$key)) {
 					// semmit nem teszünk
 				}
 				// Ha ez a kulcs nincs az eredeti OSM-ben DE most kap értéket
