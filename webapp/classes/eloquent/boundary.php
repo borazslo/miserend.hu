@@ -12,12 +12,5 @@ class Boundary extends \Illuminate\Database\Eloquent\Model {
         return 'https://www.openstreetmap.org/'.$this->osmtype.'/'.$this->osmid;
     }
     
-    public function location() {
-        $location = \Eloquent\OSM::
-                    where('osmtype',$this->osmtype)
-                    ->where('osmid',$this->osmid)
-                    ->first();       
-        return $location;
-    }
 }
 

@@ -98,11 +98,7 @@ class Church extends \Html\Html {
         if ($user->checkFavorite($tid)) {
             $this->favorite = 1;
         }
-
-        $data = \Html\Map::getGeoJsonDioceses();                
-        $this->dioceseslayer = [];
-        $this->dioceseslayer['geoJson'] = json_encode($data);        
-        
+                
         $this->miserend = $misek;
 		$this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
         

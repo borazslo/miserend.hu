@@ -99,16 +99,15 @@ class Stat extends Html {
 		* Templomok ahol van Accessibility adat
 		*/
 		$accessibilityOSMTags = ['wheelchair', 'wheelchair:description','toilets:wheelchair','hearing_loop','disabled:description'];
-		$results = DB::table('osmtags')
-			->select('osmtags.*','templomok.id as church_id')
+		$results = DB::table('attributes')
+			->select('attributes.*','templomok.id as church_id','attributes.key as name')
 			->join('templomok',function($join)
                          {
-                             $join->on('templomok.osmid', '=', 'osmtags.osmid');
-                             $join->on('templomok.osmtype','=','osmtags.osmtype');                           
+                             $join->on('templomok.id', '=', 'attributes.church_id');
                          })
 			->whereNotNull('templomok.id')
-			->whereIn('osmtags.name',$accessibilityOSMTags)
-			->where('osmtags.value','<>','')			
+			->whereIn('attributes.key',$accessibilityOSMTags)
+			->where('attributes.value','<>','')			
 			->get();
 			
 		$this->accessibility['churches'] = [];
@@ -212,27 +211,27 @@ class Stat extends Html {
 		
 		
 		/* OSM tag variácók */
-		$osmtags = DB::table('osmtags')
+		$osmtags = DB::table('attributes')
 			->select([
 				DB::raw("count(*) as count"),
-				DB::raw("count(distinct osmtags.value) as dist"),
+				DB::raw("count(distinct attributes.value) as dist"),
 				DB::raw("templomok.id as church_id"),
-				"osmtags.*"
+				"attributes.*","attributes.key as name"
 			])
 			->join('templomok', function($join)
                          {
-                             $join->on('templomok.osmid', '=', 'osmtags.osmid');
-                             $join->on('templomok.osmtype','>=','osmtags.osmtype');
+                             $join->on('templomok.id', '=', 'attributes.church_id');                             
                          })
 			->where('value','<>','')
+			->where('fromOSM',1)
 			->whereNotNull('templomok.id')
-			->groupBy('osmtags.name')
+			->groupBy('attributes.key')
 			->orderBy('count','desc')
 			->orderBy('dist','desc')
-			->orderBy('name')
+			->orderBy('key')
 			->get();
 		foreach($osmtags as $k => $osmtag) {
-			$osmtags[$k]->overpassturbo = "http://overpass-turbo.eu/?Q=". urlencode('	[out:json][timeout:25];nwr["url:miserend"]["'.$osmtag->name.'"];out geom;')."&R";
+			$osmtags[$k]->overpassturbo = "http://overpass-turbo.eu/?Q=". urlencode('	[out:json][timeout:25];nwr["url:miserend"]["'.$osmtag->key.'"];out geom;')."&R";
 		}
 		$this->osmtags = $osmtags;
 		

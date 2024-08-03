@@ -22,11 +22,11 @@ class Database extends Api {
 		$this->tabels_to_truncate = ['chat', 'church_holders', 'favorites', 'emails', 'remarks', 'user'];
 		// Automatikusan töltődnek, ezért elég üresen. Bár van hogy lassan töltődnek...
 		$this->tabels_to_truncate = array_merge($this->tabels_to_truncate,
-		['boundaries', 'distances', 'keyword_shortcuts', 'lookup_boundary_church', 'lookup_church_osm', 'lookup_osm_enclosed', 'messages', 'osm', 'osmtags', 'stats_externalapi', 'tokens']);
+		['boundaries', 'distances', 'lookup_boundary_church', 'messages', 'osm', 'osmtags', 'stats_externalapi', 'tokens']);
 						
 		// Vannak táblák, amikre már rég nincsen szükség. Ha véletlen nem lenne törölve.
 		// Később törlendő innen		
-		$this->tabels_to_omit = ['events', 'igenaptar', 'lnaptar', 'modulok', 'nevnaptar', 'oldalkeret', 'szentek', 'unnepnaptar', 'updates', 'osm_tags'];
+		$this->tabels_to_omit = ['events', 'igenaptar', 'lnaptar', 'modulok', 'nevnaptar', 'oldalkeret', 'szentek', 'unnepnaptar', 'updates', 'osm_tags', 'osmtags', 'osm', 'lookup_osm_enclosed', 'lookup_church_osm'];
 				
 		// Van egy-két mező, amiben érzékeny adat lehet, ezért nem szabad lementeni
 		$this->columns_to_omit = [

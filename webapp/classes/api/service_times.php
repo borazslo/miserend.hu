@@ -15,6 +15,9 @@ class Service_times extends Api {
         $churches = \Eloquent\Church::limit(10000)->get();
 		set_time_limit('600');
         foreach($churches as $church ) {
+			
+			$church->loadAttributes();
+		
             $serviceTimes = new \ServiceTimes();
             $serviceTimes->loadMasses($church->id,['skipvalidation']);
             
@@ -30,7 +33,7 @@ class Service_times extends Api {
 					'phone' => false,
 					'email' => $church->pleb_eml,
 					'url' => false,
-					'location' => [$church->osm->lat,$church->osm->lon],
+					'location' => [$church->location->lat,$church->location->lon],
 					'service_times' => $serviceTimes->string,
 					'confessions' => false,
 					'adoration' => false,
@@ -41,25 +44,18 @@ class Service_times extends Api {
 				if(count($church->links) > 1) {
 					foreach($church->links as $link)
 						$return['url'][] = $link->href;
-				} else 
-					$return['url'] = $church->links[0]->href;
+				} elseif ( isset($church->link[0]) ) {
+					$return['url'] = $church->links[0]->href;					
+				}
 				
-				if(isset($church->osm->taglist)) {
-					if(array_key_exists('name:en', $church->osm->taglist))
-						$return['name'] .= ' / '.$church->osm->taglist['name:en'];
-					
-					if(array_key_exists('contact:phone', $church->osm->taglist))
-						$return['phone'] = $church->osm->taglist['contact:phone'];
-					else if(array_key_exists('phone', $church->osm->taglist))
-						$return['phone'] = $church->osm->taglist['phone'];
-					
-					if(array_key_exists('contact:email', $church->osm->taglist))
-						$return['email'] = $church->osm->taglist['contact:email'];
-					else if(array_key_exists('email', $church->osm->taglist))
-						$return['email'] = $church->osm->taglist['email'];
-				}	
-				//printr($church);
-				
+				// Mivel ez egy nemzetközi oldalra megy ki, ezért a "nev" helyett az angol ill. eredeti nevét használjuk a helynek
+				if(isset($church->{"name"})) {
+					$return['name'] = $church->{"name"};
+					if(isset($church->{"name:en"}) AND $church->{"name:en"} != $church->{"name"} )	{
+						$return['name'] .= ' / '.$church->{"name:en"};
+					}
+				}
+						
 				$return['additional_information'] = 'Source: https://miserend.hu/templom/'.$church->id;
 				
 				$this->return[] = $return;

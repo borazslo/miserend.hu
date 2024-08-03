@@ -45,28 +45,6 @@ class Edit extends \Html\Html {
         }
 
 		
-		if(isset($this->input['church']['osm'])) {
-			$allowedOSMFields = ['wheelchair', 'wheelchair:description','toilets:wheelchair','toilets','hearing_loop','disabled:description'];		
-			foreach($allowedOSMFields as $field) {
-				if (array_key_exists($field, $this->input['church']['osm'])) {
-					//echo $field." = ".$this->input['church']['osm'][$field];
-					
-					$args = [
-						'osmtype' => $this->church->osmtype, 
-						'osmid' => $this->church->osmid,
-						'name' => $field 
-						];				
-					$osmtag = \Eloquent\OSMTag::firstOrNew($args);
-					$osmtag->value = $this->input['church']['osm'][$field];
-					$osmtag->save();
-
-				}
-			
-			}
-			/* save OSM fields */
-			$this->church->osm->upload();
-		}
-		
        
         global $user;
         $this->church->log .= "\nMod: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
@@ -107,11 +85,7 @@ class Edit extends \Html\Html {
 
         $this->addFormAdministrative();
         $this->addFormReligiousAdministration();
-		
-		$this->church->osm;
-		if($this->church->osm) $this->church->osm->updateFromOverpass();
-
-		
+				
 		$this->form['misemegj'] = array(
 			'class' => 'tinymce',
             'name' => 'church[misemegj]',
@@ -147,74 +121,6 @@ class Edit extends \Html\Html {
             'checked' => false,
             'labelback' => 'Frissítsük a dátumot! (Utoljára frissítve: ' . date('Y.m.d.', strtotime($this->church->frissites)).')'
         );
-		
-		
-		## OSM informations 
-		if($this->church->osm) {
-		
-		# Disabilities
-		# https://wiki.openstreetmap.org/wiki/Disabilitydescription
-		# https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
-		
-		// https://wiki.openstreetmap.org/wiki/Key:wheelchair
-		$this->form['osm']['wheelchair'] = array(
-            'name' => 'church[osm][wheelchair]',
-			'label' => 'Kerekesszékkel hozzáférhetőség:',
-            'options' => array(
-				'' => 'Nincs információ',
-                'yes' => 'Akadálymentes',
-                'limited' => 'Részben akadálymentes',				
-                'no' => 'Egyáltalán nem akadálymentes'
-            )
-        );
-		if(array_key_exists("wheelchair",$this->church->osm->tagList)) 
-				$this->form['osm']['wheelchair']['selected'] = $this->church->osm->tagList["wheelchair"];
-		
-		// https://wiki.openstreetmap.org/wiki/Key:wheelchair:description
-		$this->form['osm']['wheelchair:description'] = [
-			'name' => 'church[osm][wheelchair:description]',
-			'label' => 'Kiegészítés, ha szükséges'
-			];
-		if(array_key_exists("wheelchair:description",$this->church->osm->tagList)) 
-				$this->form['osm']['wheelchair:description']['value'] = $this->church->osm->tagList["wheelchair:description"];
-				
-		// https://wiki.openstreetmap.org/wiki/Key:toilets:wheelchair
-		$this->form['osm']['toilets:wheelchair'] = array(
-            'name' => 'church[osm][toilets:wheelchair]',
-			'label' => 'Akadálymentes mosdó:',
-            'options' => array(
-                '' => 'Nincs információ vagy nincs mosdó',
-                'yes' => 'Kerekesszékkel hozzáférhető a mosdó',
-                'no' => 'Kerekesszékkel nem hozzáférhető a mosdó'
-            )
-		);
-		if(array_key_exists("toilets:wheelchair",$this->church->osm->tagList)) 
-				$this->form['osm']['toilets:wheelchair']['selected'] = $this->church->osm->tagList["toilets:wheelchair"];
-				
-		// https://wiki.openstreetmap.org/wiki/Proposed_features/Hearing_loop		
-		$this->form['osm']['hearing_loop'] = array(
-            'name' => 'church[osm][hearing_loop]',
-			'label' => 'Hallást segítő indukciós hurok:',
-            'options' => array(
-                '' => 'Nincs információ',
-				'no' => 'Nincs indukciós hurok',
-				'limited' => 'Van indukciós hurok, de tenni kell érte, hogy működjön',				
-				'yes' => 'Van indukciós hurok'                
-            )
-		);
-		if(array_key_exists("hearing_loop",$this->church->osm->tagList)) 
-				$this->form['osm']['hearing_loop']['selected'] = $this->church->osm->tagList["hearing_loop"];				
-				
-		// https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
-		$this->form['osm']['disabled:description'] = [
-			'name' => 'church[osm][disabled:description]',
-			'label' => 'További leírás bármilyen akadálymentesség kapcsán' 
-			];
-		if(array_key_exists("disabled:description",$this->church->osm->tagList)) 
-				$this->form['osm']['disabled:description']['value'] = $this->church->osm->tagList["disabled:description"];		
-		}
-		// END of OSM informations
-				
 				
         $this->title = $this->church->fullName;
 		

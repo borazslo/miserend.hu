@@ -173,7 +173,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * fullName
      * remarksSatus
      * location
-	 * osm
 	 * kozossegek
      */
     public function getLiturgiatvAttribute($value) {
@@ -320,25 +319,24 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 'id'=>$this->osmid,
                 'url' => 'https://www.openstreetmap.org/'.$this->osmtype.'/'.$this->osmid
                  );
+				 
+			$location->address = false;	 
+			//if(isset($this->{'addr:postcode'}))
+			//	 $location->address = $this->{'addr:postcode'}." ";
+			//if(isset($this->{'addr:city'}))
+			//	 $location->address .= $this->{'addr:city'}. " ";
+			if(isset($this->{'addr:street'}))
+				 $location->address .= $this->{'addr:street'}. " ";	 
+			if(isset($this->{'addr:housenumber'}))
+				 $location->address .= " ".$this->{'addr:housenumber'}.".";	 
+				 
+				 
         } else {            
             $location->address = $this->cim;
         }
 		if($this->megkozelites != '')
 			$location->access = $this->megkozelites;
 		
-        /* Address addr:steet, addr:housenumber */
-        $tags = collect(\Eloquent\OSMTag::where('osmtype',$this->osmtype)
-                ->where('osmid',$this->osmid)
-                ->whereIn('name',['addr:street','addr:housenumber'])
-                ->orderBy('name','DESC')
-                ->get())->keyBy('name');
-        if(count($tags) > 0) {
-            $location->address = '';
-            foreach($tags as $tag) {
-                $location->address .= $tag->value." ";
-            }
-        }
-        
         /* Adminisrative Boundaries(Country,County, City, District) */
         $boundaries = $this->boundaries()
                 ->where('boundary','administrative')
@@ -353,17 +351,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 
         return $location;
     }
-
-	function getOsmAttribute($value) {	
-		if($this->osmid == false OR $this->osmtype == false ) return false;
-		
-		$osm = \Eloquent\OSM::where('osmtype',$this->osmtype)
-                ->where('osmid',$this->osmid)                
-                ->first();
-		if(!$osm) $osm = new \Eloquent\OSM(['osmid'=>$this->osmid, 'osmtype' => $this->osmtype]);
-		
-		return $osm;				
-	}
+	
 	
 	public function getKozossegekAttribute($value) {
 		$api = new \ExternalApi\KozossegekApi();		
@@ -447,10 +435,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return;
         $overpass = new \ExternalApi\OverpassApi();
         $overpass->downloadEnclosingBoundaries($this->lat, $this->lon);
-        
-        /* Elementjük az osmtags táblába az összes adatot. */
-        $overpass->saveElement(); 
-
+                
         //Detach all boundaries but those manually added (without OSM integration);                    
         $this->boundaries()->where('osmid','>','0')->detach();
         foreach($overpass->jsonData->elements as $element) {
@@ -554,8 +539,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         
         //Nem elegáns:
         DB::table('lookup_boundary_church')->where('church_id',$this->id)->delete();
-        DB::table('lookup_church_osm')->where('church_id',$this->id)->delete();
-        
+                
         DB::table('misek')->where('tid',$this->tid)->delete();
         
         $this->remarks()->delete();

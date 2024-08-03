@@ -46,13 +46,7 @@ class OSM {
     function checkUrlMiserend() {
         $overpass = new \ExternalApi\OverpassApi();
         $overpass->downloadUrlMiserend();
-        
-        /*
-         * Ezzel nem élünk, de az adatbázisban jól mutathat az adatbázisban
-         * az osm és osmtags táblák, a lookup nélkül.
-         */
-        $overpass->saveElement(); 
-        
+                
          if (!$overpass->jsonData->elements) {
             throw new Exception("Missing Json Elements from OverpassApi Query");
         }
