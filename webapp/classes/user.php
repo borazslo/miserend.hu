@@ -566,6 +566,47 @@ class User {
 		return true;
 	}
 	
+	static function sendInactivityNotification() {
+		$lastEmailDiff = '-3 week';
+		$inactivityPeriod = '-5 years';
+	
+		$users2notify = DB::table('user')
+			->where('lastlogin', '<', date('Y-m-d H:i:s',strtotime( $inactivityPeriod )) )			
+			->orderByRaw("RAND()")
+			->limit(5)			
+			->get();
+			
+
+		foreach($users2notify as $user) {					
+			$lastEmail = DB::table('emails')
+				->where('type','user_pleaselogin')
+				->where('to',$user->email)
+				->whereIn('status',['queued','sent'])				
+				->orderBy('updated_at','desc')				
+				->first();
+					
+			// Van olyan emlékztetőnk ami a sorban várakozik
+			// vagy nincs egy hete hogy küldtünk neki értesítőt
+			if (isset($lastEmail) AND (
+					$lastEmail->status == 'queued' OR 
+					strtotime($lastEmail->updated_at) > strtotime($lastEmailDiff)
+					) ) {
+				// Nincs mit tenni
+			} else {
+			
+				// Nincs még korábbi értesítő, vagy az már öregebb mint egy hét			
+				$user->inactiveDays = abs( round ( ( time() - strtotime($user->lastlogin)) / 86400 ) );
+				
+				$email = new \Eloquent\Email();
+				$email->to = $user->email;
+				$email->render('user_pleaselogin',$user);			
+				// $email->addToQueue();
+				$email->send();
+			}
+		}
+		
+		return true;
+	}
 		static function sendUpdateNotification() {
 	
 
