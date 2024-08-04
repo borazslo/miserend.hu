@@ -3,35 +3,155 @@
 {% set columns2 = true %}
 
     {% block content %}
-        <p>Ezen az oldalon az API-val lehet kísérletezni a megfelelő url és a json kulcs-érték párosok megadásával. Az API-ról itt olvashatsz bővebben:
-            <a href="https://github.com/borazslo/miserend.hu/wiki/API">https://github.com/borazslo/miserend.hu/wiki/API</a></p>
-        <form  method="post" action="apitest" id="idOfForm" class="form" target="myIframe" enctype = "multipart/form-data">
-    <table class="table">
-        <tr>
-            <td>Url</td>
-            <td><input type="text" name="url" class="form-control" id="url" value="/api/v4/templomok"></td>                
-        </tr>
-        <tr>
-            <td>Json data</td>
-            <td><textarea name='json' class="form-control" rows="6">{ 
-"columns" : 
- ["nev", "id"] 
-}</textarea></td>
-        </tr>       
-        <tr>
-            <td>File</td>
-            <td><input type="file" name="fileToUpload"  id="fileToUpload"></td>                
-        </tr>
-        <tr>
-            <td colspan="2">
-                <button class="form-control">Gyerünk!</button>
-            </td>
-        </tr>
-    </table>
-</form>
-        <br/><br/>
-        <h4>Az API válasza:</h4>
-     <iframe  src="" name="myIframe" id="myIframe" style="width:100%;height:100%;min-height: 500px">
-       <p>iframes are not supported by your browser.</p>
-     </iframe>
+	<style>
+		#loading {
+			display: none;			
+		}
+
+		.flashing {
+			animation: flashing 1s infinite;
+		}
+
+		@keyframes flashing {
+			0% { opacity: 1; }
+			50% { opacity: 0; }
+			100% { opacity: 1; }
+		}
+	</style>
+	
+	<p>Ezen az oldalon az API-val lehet kísérletezni a megfelelő url és a json kulcs-érték párosok megadásával. Az API-ról itt olvashatsz bővebben:
+    <a href="https://github.com/borazslo/miserend.hu/wiki/API">https://github.com/borazslo/miserend.hu/wiki/API</a></p>
+    
+	<form id="ajaxForm" class="form" enctype="multipart/form-data">
+		<table class="table">
+			<tr>
+				 <td><label for="exampleSelect">Examples:</label></td>
+				 <td>
+					<select id="exampleSelect">
+					<option value="">Select an example</option>
+					</select>
+				 </td>			
+			</tr>
+		
+		
+			<tr>
+				<td><label for="url">URL:</label></td>
+				<td><input type="text" name="url" class="form-control" required id="url"></td>                
+			</tr>
+			<tr>
+				<td><label for="jsonPayload">JSON Payload:</label></td>
+				<td><textarea name='jsonPayload' id="jsonPayload" class="form-control" rows="6" required></textarea></td>
+			</tr>       
+			<!--<tr>
+				<td>File</td>
+				<td><input type="file" name="fileToUpload"  id="fileToUpload"></td>                
+			</tr>-->
+			<tr>
+				<td colspan="2">
+					<button class="form-control">Gyerünk!</button>
+				</td>
+			</tr>
+		</table>
+	</form>
+	    
+    
+    <div class="alert" id="loading"></div>
+	
+    <div id="response"></div>
+
+    <script>
+        $(document).ready(function() {
+			// Example list
+			{# Get the current date and subtract one week #}
+			{% set one_week_ago = date().modify('-1 week') %}
+
+
+
+            var examples = [
+                {url: '/api/v4/templomok', jsonPayload: '{ "columns" : ["nev", "id"] }'},
+                {url: '/api/v4/nearby', jsonPayload: '{"lat": 47.47880, "lon": 19.07609 }'},
+                {url: '/api/v4/updated/{{ one_week_ago|date('Y-m-d') }}', jsonPayload: '{}'}
+            ];
+
+            // Populate the select input with examples
+            examples.forEach(function(example, index) {
+                $('#exampleSelect').append(new Option(example.url, index));
+            });
+
+            // Handle select change
+            $('#exampleSelect').on('change', function() {
+                var selectedIndex = $(this).val();
+                if (selectedIndex) {
+                    var selectedExample = examples[selectedIndex];
+                    $('#url').val(selectedExample.url);
+                    $('#jsonPayload').val(selectedExample.jsonPayload);
+                } else {
+                    $('#url').val('');
+                    $('#jsonPayload').val('');
+                }
+            });
+		
+		
+            $('#ajaxForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent form submission
+				
+				$('#response').html('');
+				$('#loading').removeClass('alert-info alert-danger alert-success');
+				
+
+                // Get the values from the inputs
+                const url = $('#url').val();
+                const jsonPayload = $('#jsonPayload').val();
+
+                // Validate the JSON payload
+                try {
+                    var payload = JSON.parse(jsonPayload);
+                } catch (e) {
+					$('#loading').show();
+                    $('#loading').html('Invalid JSON');
+					$('#loading').addClass('alert-danger');
+                    return;
+                }
+
+                // Show loading indicator
+				$('#loading').html('<div class="flashing">Loading...</div>');
+                $('#loading').show();
+				
+				$('#loading').addClass('alert-info');
+
+                // Send AJAX request
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(response) {
+                        $('#loading').hide();
+                        $('#response').html('<pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    },
+                    error: function(xhr, status, error) {
+                        $('#loading').removeClass('aler-info');
+						$('#loading').addClass('alert-danger');
+
+                        // Log the full error to the console
+                        console.error("AJAX request failed:", {
+                            status: xhr.status,
+                            statusText: xhr.statusText,
+                            responseText: xhr.responseText
+                        });
+
+                        // Display a summarized error message to the user
+                        $('#loading').html(`                            
+                                Error: ${xhr.status} ${xhr.statusText}<br>
+                                Please check the console for more details.
+                        `);
+                    }
+                });
+            });
+        });
+    </script>
+	
+	
+	
+        
     {% endblock%}
