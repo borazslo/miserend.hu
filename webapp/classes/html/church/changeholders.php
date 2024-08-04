@@ -26,7 +26,7 @@ class ChangeHolders extends \Html\Html {
             }            
         }
         
-        $data['status'] = \Request::InArrayRequired('access', ['allowed','denied','revoked','asked']);                
+        $data['status'] = \Request::InArrayRequired('access', ['allowed','denied','revoked','asked','toDelete']);                
         $description = \Request::Text('description');
         if($description != '') {
             $data['description'] = $description;
@@ -51,9 +51,13 @@ class ChangeHolders extends \Html\Html {
             }
         
         } else if($user->checkRole('miserend')) {
-            
-           $churchHolder = \Eloquent\ChurchHolder::updateOrCreate($where,$data);
-           $churchHolder->sendEmails();
+           
+			if ( $data['status'] == 'toDelete') {
+				$churchHolder = \Eloquent\ChurchHolder::where('user_id',$where['user_id'])->where('church_id',$where['church_id'])->first()->delete();
+			} else {
+				$churchHolder = \Eloquent\ChurchHolder::updateOrCreate($where,$data);
+				$churchHolder->sendEmails();
+			}
            addMessage('A változtatást sikeresen elmentettük.', 'info');
            return $this->redirect('/templom/'.$where['church_id'].'/edit');
             

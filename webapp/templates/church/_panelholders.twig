@@ -39,13 +39,14 @@
                                 {% if status in ['allowed'] %}
                                     <i class="{{ ICONS_GRANT_ACCESS}} green" title="A felhasználó tudja szerkeszteni a templom adatait."></i>
                                 {% else %}
-                                    <a href="/church/{{ church.id }}/changeholders?uid={{ holder.user.uid }}&access=allowed"><i class="{{ ICONS_GRANT_ACCESS}} grey" title="Az engedélyezéshey kattints ide."></i></a>
+                                    <a href="/church/{{ church.id }}/changeholders?uid={{ holder.user.uid }}&access=allowed"><i class="{{ ICONS_GRANT_ACCESS}} grey" title="Az engedélyezéshez kattints ide."></i></a>
                                 {% endif %}
                                 {% if status in ['denied','revoked','left']  %}
-                                    <i class="{{ ICONS_DENY_ACCESS}} red" title="A felhasználó nem szerkesztheti a templom adatait."></i>
+                                    <i class="{{ ICONS_DENY_ACCESS}} red" title="A felhasználó nem szerkesztheti a templom adatait És nem is kérheti újra ehhez a jogot."></i>
                                 {% else %}
-                                    <a href="/church/{{ church.id }}/changeholders?uid={{ holder.user.uid }}&access={% if status == 'asked' %}denied{% else %}revoked{% endif %}"><i class="{{ ICONS_DENY_ACCESS}} grey" title="A letiltáshoz kattints ide."></i></a>
+                                    <a href="/church/{{ church.id }}/changeholders?uid={{ holder.user.uid }}&access={% if status == 'asked' %}denied{% else %}revoked{% endif %}"><i class="{{ ICONS_DENY_ACCESS}} grey" title="A letiltáshoz kattints ide, így nem is kérheti többé a jogot a szerkesztéshez."></i></a>
                                 {% endif %}
+									<a href="/church/{{ church.id }}/changeholders?uid={{ holder.user.uid }}&access=toDelete"><i class="{{ ICONS_DELETE_ACCESS}} grey" title="A felelős (kérés) törlése. Ez után tiszta lappal indulunk."></i></a>
 
                             </div>
                         </td>
@@ -80,12 +81,12 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        a {{ forms.select(form.holder_uid) }}
+                        {{ forms.select(form.holder_uid) }}
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        b {{ forms.input(form.holder_decription) }}
+                        {{ forms.input(form.holder_decription) }}
                     </td>
                 </tr>
                 <tr>
