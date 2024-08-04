@@ -42,11 +42,13 @@ class NearBy extends Api {
 		foreach($churches as $church) {
 			$masses = searchMasses(['templom'=>$church->id, 'mikor' => date('Y-m-d')] );
 			$misek = [];
-			foreach($masses['churches'][$church->id]['masses'] as $key => $mise) {
-				$misek[$key]['idopont'] = date('Y-m-d')." ".$mise['ido'];
-				$info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
-				if($info != '') $misek[$key]['informacio'] = $info;
-				
+			
+			if(isset($masses['churches'][$church->id])) {
+				foreach($masses['churches'][$church->id]['masses'] as $key => $mise) {
+					$misek[$key]['idopont'] = date('Y-m-d')." ".$mise['ido'];
+					$info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
+					if($info != '') $misek[$key]['informacio'] = $info;
+			}	
 				
 			}
 			$this->return['templomok'][] = [
