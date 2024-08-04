@@ -58,9 +58,19 @@ try {
 }
 if (isset($html)) {
     $html->render();
-    if (trim($html->html) != '') {        
+    if (trim($html->html) != '') {  
+		//Az API esetén a CORS policy megengedő kell legyen.
+		if(isset($html->api)) {			
+			header("Access-Control-Allow-Origin: *");
+			header('Access-Control-Allow-Credentials: true');
+			header('Access-Control-Max-Age: 86400');    // cache for 1 day
+			header("HTTP/1.1 200 OK");
+			header("Access-Control-Allow-Methods: GET, POST, OPTIONS");         		
+			header("Access-Control-Allow-Headers: Content-Type");
+		}
         if(isset($html->api->format) AND $html->api->format == 'json')
             header('Content-Type: application/json');
+			
         echo $html->html;
     }
 }
