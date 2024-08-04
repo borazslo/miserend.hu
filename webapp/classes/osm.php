@@ -135,7 +135,16 @@ class OSM {
                 $church->lat = $element->lat;           
                 $changed = true;
             }            
-            $changed ? $church->save() : false;                    
+            if($changed) {
+				// Mivel mindenféle egyedi attribútumot adtunk hozzá a $church objecthez az attributes táblából, ezért mentéshez és törléshez el kell távolítani a fura cuccokat.
+				foreach ($church->getAttributes() as $key => $value) {
+				if(!in_array($key, array_keys($church->getOriginal())))
+					unset($church->$key);
+				}
+				$church->save();
+			} else {
+				false;                    
+			}
     }
 
 }
