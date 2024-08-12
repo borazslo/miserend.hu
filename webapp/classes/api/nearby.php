@@ -58,6 +58,8 @@ class NearBy extends Api {
 				'varos' => $church->varos,
 				'tavolsag' => (int) $church->distance,
 				'misek' => $misek
+				'lat' => $church->lat,
+				'lon' => $church->lon
 			];
 		}
         //$this->return['lat'] = $this->input['lat'];
