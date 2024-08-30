@@ -234,7 +234,7 @@ class EditOsm extends \Html\Html {
 		];
 			
 		
-		$this->form['disabilites'] = [
+		$this->form['accessibility'] = [
 		# https://wiki.openstreetmap.org/wiki/Disabilitydescription
 		# https://wiki.openstreetmap.org/wiki/How_to_map_for_the_needs_of_people_with_disabilities
 			'title' => 'Akadálymentesség',

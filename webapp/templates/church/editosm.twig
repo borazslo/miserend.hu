@@ -35,7 +35,7 @@
       		
 		{% for id, section in form %}	
 
-			<h4>{{ section.title }}</h4>
+			<h4 id="{{ id }}">{{ section.title }}</h4>
 			{% if block("section_" ~ id) is defined %}
 				{{ block( "section_" ~ id )|raw }}
 			{% else %}
