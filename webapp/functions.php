@@ -643,7 +643,14 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     //templomok
     if (isset($args['templom']) AND is_numeric($args['templom'])) {
         $where[] = ' m.tid = ' . $args['templom'];
-    } elseif ($args['varos'] != '' OR $args['kulcsszo'] != '' OR $args['egyhazmegye'] != '' OR $args['gorog'] == 'gorog' OR $args['hely'] != '' OR $args['tnyelv'] != '0') {
+    } elseif (
+			$args['varos'] != '' OR 
+			$args['kulcsszo'] != '' OR 
+			( isset($args['egyhazmegye']) and $args['egyhazmegye'] != '' ) OR 
+			( isset($args['gorog']) and $args['gorog'] == 'gorog' ) OR 
+			( isset($args['hely']) and $args['hely'] != '' ) OR 
+			$args['tnyelv'] != '0'
+		) {
         if ($args['varos'] == 'Budapest')
             $args['varos'] = 'Budapest*';
 
@@ -659,7 +666,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
                 $tids[] = $r['id'];
         $where[] = " m.tid IN (" . implode(",", $tids) . ")";
     }
-    if ($args['gorog'] == 'gorog') {
+    if (isset($args['gorog']) and $args['gorog'] == 'gorog') {
         $where[] = "egyhazmegye IN (17,18,34)";
     }
     //milyen nap
@@ -768,7 +775,10 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     //liturgy (not mass) group (checkbox/radio)
     $not = $only = array();
     foreach ($attributes as $abbrev => $attribute) {
-        if ($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == false) {
+        if (
+				$attribute['group'] == 'liturgy' AND 
+				( !array_key_exists('isitmass',$attribute) OR $attribute['isitmass'] == false )
+			) {
             $not[$abbrev] = $abbrev;
         }
     }

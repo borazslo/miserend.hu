@@ -19,38 +19,37 @@ class SearchResultsMasses extends Html {
         $mikorido = $_REQUEST['mikorido'];
         $varos = $_REQUEST['varos'];
         $ehm = $_REQUEST['ehm'];
-        $espkerT = $_REQUEST['espkerT'];
+        $espkerT = isset($_REQUEST['espkerT']) ? $_REQUEST['espkerT'] : false;
         $nyelv = $_REQUEST['nyelv'];
         $zene = $_REQUEST['zene'];
         $kor = $_REQUEST['kor'];
         $ritus = $_REQUEST['ritus'];
-        $ige = $_REQUEST['ige'];
+        $ige = isset($_REQUEST['ige']) ? $_REQUEST['ige'] : false;
 
 
-        $min = $_REQUEST['min'];
-        if (!isset($min))
-            $min = 0;
-        $leptet = $_REQUEST['leptet'];
-        if (!isset($leptet))
-            $leptet = 25;
-
+        $min = isset($_REQUEST['min']) ? $_REQUEST['min'] : 0;       
+		$leptet = isset($_REQUEST['leptet']) ? $_REQUEST['leptet'] : 25;		
+        
         $ma = date('Y-m-d');
         $holnap = date('Y-m-d', (time() + 86400));
       
         if ($ehm > 0) {
             $ehmnev = DB::table('egyhazmegye')->where('id',$ehm)->pluck('nev')[0];            
+			
+			if ($espkerT != false and $espkerT[$ehm] > 0) {
+				$espkernev = DB::table('espereskerulet')->where('id',$espkerT[$ehm])->pluck('nev')[0];            
+			}	
         }
-                
-        if ($espkerT[$ehm] > 0) {
-            $espkernev = DB::table('espereskerulet')->where('id',$espkerT[$ehm])->pluck('nev')[0];            
-        }
+            
+        
                 
         $zeneT = array('g' => 'gitáros', 'o' => 'orgonás', 'cs' => 'csendes', 'na' => 'meghátorazatlan');
         $korT = array('csal' => 'családos', 'd' => 'diák', 'ifi' => 'ifjúsági', 'na' => 'meghátorazatlan');
         $ritusT = array('gor' => 'görögkatolikus', 'rom' => 'római katolikus', 'regi' => 'régi rítusú');
         $nyelvekT = array('h' => 'magyar', 'en' => 'angol', 'de' => 'német', 'it' => 'olasz', 'va' => 'latin', 'gr' => 'görög', 'sk' => 'szlovák', 'hr' => 'horvát', 'pl' => 'lengyel', 'si' => 'szlovén', 'ro' => 'román', 'fr' => 'francia', 'es' => 'spanyol');
 
-        $tartalom.="\n<span class=kiscim>Keresési paraméterek:</span><br><span class=alap>";
+		$leptet_urlap = '';
+        $tartalom ="\n<span class=kiscim>Keresési paraméterek:</span><br><span class=alap>";
         if (isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {
             $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> Kulcsszó: " . $_REQUEST['kulcsszo'] . "<br/>";
             $leptet_urlap.="<input type=hidden name=kulcsszo value='" . $_REQUEST['kulcsszo'] . "'>";
@@ -167,6 +166,7 @@ class SearchResultsMasses extends Html {
         if ($prev < 0)
             $prev = 0;
         $veg = $mennyi;
+		$leptetprev = '';
         if ($min > 0) {
             $leptetprev.="\n<form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
             $leptetprev.=$leptet_urlap;
@@ -178,6 +178,7 @@ class SearchResultsMasses extends Html {
 
             $next = $min + $leptet;
 
+			$leptetnext = '';
             if ($mennyi > $min + $leptet) {
                 $leptetnext.="\n<form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
                 $leptetnext.=$leptet_urlap;
@@ -199,6 +200,7 @@ class SearchResultsMasses extends Html {
                 $tartalom .= "<img src=/img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
 				<a href='/templom/" . $result['tid'] . "' class=felsomenulink><b>" . $result['nev'] . "</b> <font color=#8D317C>(" . $result['varos'] . ")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">" . $result['ismertnev'] . "</span>";
                 
+				if(!isset($ertek)) $ertek = ''; // TODO: valószínűleg soha semmilyen körülmények között nincs már $ertek. 
                 $tartalom.=$ertek . '<br> &nbsp; &nbsp; &nbsp;';
 
                 if ($_REQUEST['mikor'] == 'x')
@@ -219,7 +221,7 @@ class SearchResultsMasses extends Html {
     					<span class="massfullinfo" style="display:none">' . $milyen['description'] . '</span>';
 
                     if ($mass['megjegyzes'] != '')
-                        $tartalom.= '<img src="/img/info2.gif" class="massinfo" width=14 title="' . $milyen['megjegyzes'] . '"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
+                        $tartalom.= '<img src="/img/info2.gif" class="massinfo" width=14 title="' . $mass['megjegyzes'] . '"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
 					<span class="massfullinfo" style="display:none">' . $mass['megjegyzes'] . '</span>';
                 }
                 //$tartalom .= print_r($masses,1);
