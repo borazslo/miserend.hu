@@ -57,7 +57,7 @@ class NearBy extends Api {
 				'ismertnev' => $church->ismertnev,
 				'varos' => $church->varos,
 				'tavolsag' => (int) $church->distance,
-				'misek' => $misek
+				'misek' => $misek,
 				'lat' => $church->lat,
 				'lon' => $church->lon
 			];
