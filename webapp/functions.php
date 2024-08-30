@@ -692,22 +692,24 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     $where[] = "( m.nap2 IN ('','0','" . $hanyadikM . "','" . $hanyadikP . "','" . $parossag . "') OR m.nap2 IS NULL)";
 
     //milyen órákban
-    if ($args['mikor2'] == 'de')
-        $where[] = " m.ido < '12:00:01' AND m.ido > '00:00:01' ";
-    elseif ($args['mikor2'] == 'du')
-        $where[] = " m.ido > '11:59:59'";
-    elseif ($args['mikor2'] == 'x') {
-        $idok = explode('-', $args['mikorido']);
-        $where[] = " m.ido >= '" . $idok[0] . ":00'";
-        $where[] = " m.ido <= '" . $idok[1] . ":00'";
-    }
+	if(isset($args['mikor2'])) {
+		if ($args['mikor2'] == 'de')
+			$where[] = " m.ido < '12:00:01' AND m.ido > '00:00:01' ";
+		elseif ($args['mikor2'] == 'du')
+			$where[] = " m.ido > '11:59:59'";
+		elseif ($args['mikor2'] == 'x') {
+			$idok = explode('-', $args['mikorido']);
+			$where[] = " m.ido >= '" . $idok[0] . ":00'";
+			$where[] = " m.ido <= '" . $idok[1] . ":00'";
+		}
+	}
 
     //LANGUAGES
     $languages = unserialize(LANGUAGES);
     foreach ($languages as $abbrev => $attribute)
         if ($attribute['abbrev'] != 'h')
             $nothu[] = $abbrev;
-    if ($args['nyelv'] != '0' AND $args['nyelv'] != '') {
+    if (isset($args['nyelv']) and $args['nyelv'] != '0' AND $args['nyelv'] != '') {
         if ($args['nyelv'] == 'h') {
             $where[] = "( m.nyelv REGEXP '(^|,)(" . $args['nyelv'] . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' OR 
                 templomok.orszag = 12 AND m.nyelv NOT REGEXP '(^|,)(" . implode("|", $nothu) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' )";
@@ -754,7 +756,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     }
 
     //rite group (select)
-    if ($args['ritus'] != '0') {
+    if (isset($args['ritus']) and $args['ritus'] != '0') {
         if ($args['ritus'] == 'gor') {
             foreach ($attributes as $abbrev => $attribute)
                 if ($attribute['group'] == 'liturgy' AND $attribute['isitmass'] == true AND $attribute['abbrev'] != 'gor')
