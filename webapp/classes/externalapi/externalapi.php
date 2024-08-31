@@ -64,15 +64,26 @@ class ExternalApi {
                 $this->rawData = file_get_contents($this->cacheFilePath);
 				if($this->format == 'json' ) {
 					$this->jsonData = json_decode($this->rawData);
-					if ($this->jsonData === null) {
-						throw new \Exception("External API data has been loaded from cache but data is not a valid JSON!\n".$this->rawData);
+					
+					if ($this->jsonData === null) {						
+						if($this->strictFormat)
+							throw new \Exception("External API data has been loaded from cache but data is not a valid JSON!\n".$this->rawData);
+						else {
+							$this->jsonData = json_decode("[]");
+							return true;
+						}
 					} else {
 						return true;
 					}
 				} elseif($this->format == 'xml' ) {
 					$this->xmlData = @simplexml_load_string($this->rawData);					
 					if ($this->xmlData == false) {
-						throw new \Exception("External API data has been loaded from cache but data is not a valid XML!\n".$this->rawData);
+						if($this->strictFormat)
+							throw new \Exception("External API data has been loaded from cache but data is not a valid XML!\n".$this->rawData);
+						else {
+							$this->xmlData = false;
+							return true;
+						}
 					} else {
 						return true;
 					}
