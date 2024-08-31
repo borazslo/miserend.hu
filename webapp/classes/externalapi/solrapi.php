@@ -118,7 +118,7 @@ class SolrApi extends \ExternalApi\ExternalApi {
 			$solr->createCollection('churches');
 		}
 		
-		$churches = \Eloquent\Church::where('ok', 'i')->where('varos','LIKE','%Budapest%')->limit(200000)->get()->toArray();
+		$churches = \Eloquent\Church::where('ok', 'i')->get()->toArray();
 		
 		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
 		foreach($churches as $c => $church) {
