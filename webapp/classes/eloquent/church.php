@@ -359,8 +359,17 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 		$api = new \ExternalApi\KozossegekApi();		
 		$api->query = "miserend/".$this->id;
 		$api->run();
-		if(isset($api->jsonData->data) > 0 )
+		if(isset($api->jsonData->data) > 0 ) {
+			foreach($api->jsonData->data as $key => $data) {
+				if(isset($data->age_group) ) {
+					$api->jsonData->data[$key]->age_group = array_filter( explode(", ", $data->age_group), 'strlen' );
+				}
+				if(isset($data->tags)) {
+					$api->jsonData->data[$key]->tags = array_filter( explode(", ", $data->tags), 'strlen' ); 
+				}
+			}
 			return $api->jsonData->data;
+		}
 		else
 			return false;			
 	}

@@ -7,14 +7,21 @@
 
 {% block body %}
     {% if kozossegek|length > 1 %}
-        <ul style="-webkit-padding-start: 20px;-webkit-margin-before: 0em;">
-            {% for kozosseg in kozossegek %}
-					<li>
-						<a href="{{ kozosseg.link }}" target="_blank">{{ kozosseg.name }}</a>
-						
-					</li>
-            {% endfor %}            
-        </ul>
+        
+		{% for kozosseg in kozossegek %}
+			<h5><strong><a href="{{ kozosseg.link }}" target="_blank">{{ kozosseg.name }}</a></strong></h5>
+			{% for age_group in kozosseg.age_group %}		
+				<a href="https://kozossegek.hu/kozossegek?korosztaly={{ age_group|replace({' ':'_','á':'a','ő':'o','é':'e','ü':'u','ű':'u','ú':'u','í':'i','ö':'o'}) }}" target="_blank">{{ age_group}}</a>{% if loop.last == false  %}, {% endif%}
+			{% endfor %}            
+			<br/>
+			{% for tag in kozosseg.tags %}		
+				<a href="https://kozossegek.hu/kozossegek?tags={{ tag|replace({' ':'_','á':'a','ő':'o','é':'e','ü':'u','ű':'u','ú':'u','í':'i','ö':'o'}) }}" target="_blank">{{ tag }}</a>{% if loop.last == false  %}, {% endif%}
+			{% endfor %}            
+
+		{% endfor %}            
+        
+	{% else %}
+		Biztosan vannak itt is különféle közösségek amikhez akár lehet csatlakozni is, de ezekről sajnos nem tudunk. A <a href="https://kozossegek.hu/kozosseg-regisztracio" target="_blank">közösségek.hu</a> oldalon lehet jelezni közösségek meglétét.
     {% endif %}    
 {% endblock %}    
 

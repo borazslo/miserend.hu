@@ -55,6 +55,8 @@
     {% if misemegj %}
         {% include "panel.twig" with {title:'Kapcsolódó információk','body': misemegj|raw|nl2br } %}    
     {% endif %}
+	
+	{% include 'church/_panelkozossegek.twig' %}
 
     {% if photos|length > 0 %}
         {% include "church/_photoslide.twig" %}
@@ -84,11 +86,10 @@
     {% if megjegyzes %}
         {% include "panel.twig" with {title:'Jó tudni','body': megjegyzes } %}
     {% endif %}
+		
     {% if neighbours|length > 1 %}
         {% include 'church/_panelneighbours.twig' %}
     {% endif %}    
-	{% if kozossegek|length > 1 %}
-        {% include 'church/_panelkozossegek.twig' %}
-    {% endif %}    
+    
 	{% include 'church/_panelfacebookpageplugin.twig' %}
 {% endblock %}
