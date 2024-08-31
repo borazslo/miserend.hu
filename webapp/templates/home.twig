@@ -159,6 +159,9 @@
         </form>
     </div>
 	
+	{% if "miserend" in user.roles %}
+		{% include '_admindashboard.twig' %}
+	{% endif %}
 
     <div id="favorites" style="margin-top:12px">
         <h3>Kedvenc templomok</h3>
@@ -173,10 +176,46 @@
 			<i>Nincs kedvencnek megjelölt templom.</i>
 		{% endif %}
     </div>
+	
+	<div id="nearby" style="display:none"></div>
+	<script>
+		if (navigator.geolocation) {
+			
+			navigator.geolocation.getCurrentPosition(function(position) {
 
-	{% if "miserend" in user.roles %}
-		{% include '_admindashboard.twig' %}
-	{% endif %}
+				$.ajax({
+					url: '/api/v4/nearby',
+					type: "POST",
+					dataType: "json",
+					data: JSON.stringify( {'lat': position.coords.latitude, 'lon': position.coords.longitude } ),
+					contentType: "application/json",
+					 success: function(data) {
+						if(data.error == 0) {
+							$('#nearby').show();
+							$('#nearby').append('<h3>Közeli templomok</h3>');
+							if(data.templomok.length == 0) {
+								$('#nearby').append('<p><i>Nem találtunk közeli templomokat.</i></p>');
+							} else {
+								$('#nearby').append('<ul>');
+								for (let i = 0; i < data.templomok.length; i++) {
+									if(data.templomok[i].tavolsag < 1000) {
+										var distance = ( Math.round(data.templomok[i].tavolsag /100)*100 ) + " m";
+									} else {
+										var distance = ( Math.round(data.templomok[i].tavolsag / 100)/10 ) + " km";
+									}
+								
+									$('#nearby > ul').append('<li><a href="/templom/' + data.templomok[i].id + '">' + data.templomok[i].nev + ' (' + data.templomok[i].ismertnev + ')</a>, ' + data.templomok[i].varos + ' - ' + distance + '</li>');
+									// console.log(data.templomok[i]);
+								}								
+								$('#nearby').append('</ul>');
+							}
+						}
+					}
+				}); 
+				
+			});  
+		}
+	</script>
 	
 	  <script src="/node_modules/jquery-ui/ui/i18n/datepicker-hu.js"></script>
     <script>
