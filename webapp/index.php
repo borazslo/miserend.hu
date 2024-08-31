@@ -68,9 +68,11 @@ if (isset($html)) {
 			header("Access-Control-Allow-Methods: GET, POST, OPTIONS");         		
 			header("Access-Control-Allow-Headers: Content-Type");
 		}
-        if(isset($html->api->format) AND $html->api->format == 'json')
+        if(
+			( isset($html->api->format) AND $html->api->format == 'json' ) OR 
+			( isset($html->format) AND $html->format == 'json' ) 
+		  )
             header('Content-Type: application/json');
-			
         echo $html->html;
     }
 }

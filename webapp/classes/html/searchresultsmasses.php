@@ -173,12 +173,12 @@ class SearchResultsMasses extends Html {
             $leptetprev.="<input type=hidden name=min value=$prev>";
             $leptetprev.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
         }
+		$leptetnext = '';
         if ($mennyi > $leptet) {
             $veg = $min + $leptet;
 
             $next = $min + $leptet;
-
-			$leptetnext = '';
+			
             if ($mennyi > $min + $leptet) {
                 $leptetnext.="\n<form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
                 $leptetnext.=$leptet_urlap;

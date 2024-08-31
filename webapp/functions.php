@@ -504,18 +504,29 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 	
 	// keyword
 	if (isset($args['kulcsszo']) AND $args['kulcsszo'] != '') {
-        $subwhere = array();
-        if (preg_match('(\*|\?)', $args['kulcsszo'])) {
-            $regexp = preg_replace('/\*/i', '.*', $args['kulcsszo']);
-            $regexp = preg_replace('/\?/i', '.{1}', $regexp);
-            $text = " REGEXP '" . $regexp . "'";
-        } else {
-            $text = " LIKE '%" . $args['kulcsszo'] . "%'";
-        }
-        foreach (array('nev', 'ismertnev', 'varos', 'cim', 'megkozelites', 'plebania', 'templomok.megjegyzes', 'misemegj') as $column) {
-            $subwhere[] = $column . $text;
-        }
-        $search->whereRaw(" (" . implode(' OR ', $subwhere) . ") ");
+	
+		
+		//A Solr motorral keresünk itt már
+		$solr = new \ExternalApi\SolrApi();
+		$response = $solr->search($args['kulcsszo'],["rows" => 100000]);
+		//Ha működik a solr kereső, akkor komolyan vesszük
+		if($response) {
+			$ids = [];
+			foreach($response->docs as $doc) {
+				$ids[] = $doc->id;		
+			}		
+			// Ha van találat, akkor az azonosítókat összegyűjtve visszük tovább még a keresét.
+			if(count($ids) > 0) {
+				$search->whereIn('id',$ids);
+			} else {
+			// Ha nincs találat, akkor el kell rontani a fő keresésünket. Pedig szebb lenni valami return false vagy hasonló
+				$search->where('nev','nem adunk keresési eredményt hiszen a kulcsszóra nem találtunk semmit');			
+			}
+		} else {
+		//Ha nem működik a solr kereső, akkor is dolgozzunk azért valami egyszerűbbet
+			addMessage('Sajnos csak az egyszerűsített keresőmotor működik jelenleg. Elnézést kérünk.','warning');
+			$search->where('nev', 'LIKE', '%'.$args['kulcsszo'].'%');
+		}
     }
 	
 	// varos
