@@ -118,7 +118,15 @@ class SolrApi extends \ExternalApi\ExternalApi {
 			$solr->createCollection('churches');
 		}
 		
-		$churches = \Eloquent\Church::where('ok', 'i')->limit(200000)->get()->toArray();
+		$churches = \Eloquent\Church::where('ok', 'i')->where('varos','LIKE','%Budapest%')->limit(200000)->get()->toArray();
+		
+		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
+		foreach($churches as $c => $church) {
+			preg_match('/^Budapest (.*?)\. kerület$/',$church['varos'],$match);
+			if($match) {
+				$churches[$c]['varos'] = [ $church['varos'], 'Budapest '.array_search($match[1], $romai).'. kerület' ];
+			}
+		}
 		
 		if(!$solr->truncateCollection('churches'))
 			return false;
