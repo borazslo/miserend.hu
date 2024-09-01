@@ -89,8 +89,16 @@ class EditOsm extends \Html\Html {
 		 $this->prepareOSMEntityXml();
 		
 		$osmapi = new \ExternalApi\OpenstreetmapApi();
-		// Open ChangeSet
-		$changeSetID = $osmapi->changesetCreate();
+				
+		// Open ChangeSet		
+		$this->githash = $this->getGitHash();
+		global $user;
+		$tags = [
+			'created_by' => 'miserend.hu '.$this->getGitHash(),
+			'comment' => 'Changes by a user of miserend.hu called '.$user->login
+		];
+		$changeSetID = $osmapi->changesetCreate($tags);
+		
 		// Upload OSM entity XML		
 		$versionID = $osmapi->putEntity($changeSetID, $this->input['osmtype'], $this->osmEntity);
 	

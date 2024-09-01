@@ -46,15 +46,18 @@ class OpenstreetmapApi extends \ExternalApi\ExternalApi {
         $this->rawQuery = $this->query;        
     }
 	
-	function prepareNewChangeset() {
+	function prepareNewChangeset($tags = []) {
+
+		if(!isset($tags['created_by'])) $tags['created_by'] = 'miserend.hu';
+		if(!isset($tags['comment'])) $tags['comment'] = 'Changes were made based on miserend.hu\'s users\' experiences.';
+		
 		$changeset = new \SimpleXMLElement("<osm></osm>");
 		$changeset->addChild('changeset');
-		$tag = $changeset->changeset->addChild('tag');
-		$tag->addAttribute('k','created_by');
-		$tag->addAttribute('v','miserend.hu');
-		$tag = $changeset->changeset->addChild('tag');
-		$tag->addAttribute('k','comment');
-		$tag->addAttribute('v','Changes made based on miserend.hu\'s users\' experiences.');
+		foreach($tags as $key => $value) {			
+			$child = $changeset->changeset->addChild('tag');
+			$child->addAttribute('k',$key);
+			$child->addAttribute('v',$value);
+		}
 		
 		//echo $changeset->asXML();
 		return $changeset;		
@@ -80,8 +83,8 @@ class OpenstreetmapApi extends \ExternalApi\ExternalApi {
 		
 	}
 
-	function changesetCreate() {	
-		$changeset = $this->prepareNewChangeset();		
+	function changesetCreate($tags = []) {	
+		$changeset = $this->prepareNewChangeset($tags);		
 		$this->query = $this->rawQuery = "/api/0.6/changeset/create";
 		$this->format = 'text';
 		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"PUT");		 	

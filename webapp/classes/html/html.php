@@ -174,7 +174,7 @@ class Html {
 
         $v = trim(file_get_contents('../git_hash')); // See: (.)git/hooks/post-checkout
         //Validate short of git_hash
-        if(strlen($v) == 7 AND preg_match('/^[a-zA-Z0-9]{7}$/i',$v,$match) ) { 
+        if( preg_match('/^[a-zA-Z0-9]{7,8}$/i',$v,$match) ) { 
             return $v;
         }
         return false;
