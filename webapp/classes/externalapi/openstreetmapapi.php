@@ -51,7 +51,7 @@ class OpenstreetmapApi extends \ExternalApi\ExternalApi {
 		$changeset->addChild('changeset');
 		$tag = $changeset->changeset->addChild('tag');
 		$tag->addAttribute('k','created_by');
-		$tag->addAttribute('v','borazslo');
+		$tag->addAttribute('v','miserend.hu');
 		$tag = $changeset->changeset->addChild('tag');
 		$tag->addAttribute('k','comment');
 		$tag->addAttribute('v','Changes made based on miserend.hu\'s users\' experiences.');

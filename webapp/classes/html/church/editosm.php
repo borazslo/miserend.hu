@@ -352,12 +352,10 @@ class EditOsm extends \Html\Html {
 			'inputs' => [
 				'description' => [
 					'title' => 'Leírás (max. 255 karakter)',
-					'type' => 'textarea',
 					'help' => 'A templomról, stílusáról, történetéről lehet itt írni. Maximum 255 karakterben!'
 				],
 				'note' => [
 					'title' => 'Megjegyzés (más térképszerkesztőknek)',
-					'type' => 'textarea',
 					'help' => 'Az Open Street Map-en munkálkodó más önkéntesek számára lehet itt nyilvános üzenetet "küldeni". Maximum 255 karakterben.'
 				]
 			]
