@@ -33,7 +33,15 @@ class Church extends \Html\Html {
 
         $church->photos = $church->photos()->get();
 		
-		if($church->osm) $church->accessibility = $church->osm->tagList;
+		foreach(['wheelchair','toilets:wheelchair','wheelchair:description','hearing_loop','disabled:description'] as $k=>$accessibility) {			
+			if(isset($church->$accessibility)) {
+					if(!isset($church->accessibility)) $church->accessibility = [];
+					$tmp = $church->accessibility;
+					$tmp[$accessibility] = $church->$accessibility;
+					$church->accessibility = $tmp;
+			}
+		}
+				
 		$church->kozossegek = $church->kozossegek;
 				   
 		global $_honapok;
