@@ -568,6 +568,7 @@ class User {
 	
 	static function sendInactivityNotification() {
 		$lastEmailDiff = '-3 week';
+        $deleteafterEmail = '-6 week';
 		$inactivityPeriod = '-5 years';
 	
 		$users2notify = DB::table('user')
@@ -592,7 +593,33 @@ class User {
 					strtotime($lastEmail->updated_at) > strtotime($lastEmailDiff)
 					) ) {
 				// Nincs mit tenni
-			} else {
+                    }   
+            // Már régen küldtünk emailt, itt az ideje törölni.        
+            elseif( isset($lastEmail) AND 
+                    $lastEmail->status == 'sent' AND 
+                    strtotime($lastEmail->updated_at) < strtotime($deleteafterEmail) )
+                 {
+
+                    $ids2delete = [];
+                    foreach($users2notify as $result) {
+                        $ids2delete[] = $result->uid;
+                        
+                        $email = new \Eloquent\Email();
+                        $email->to = $result->email;
+                        $email->render('user_youhavebeendeleted',$result);			
+                        // $email->addToQueue();
+                        $email->send();
+                        
+                    }
+
+                    $count = DB::table('user')->whereIN('uid',$ids2delete)->delete();
+                    
+                    if($count != count($ids2delete)) {
+                                addMessage('Nem sikerül mindenkit törölni.', 'error');
+                                echo "Nem sikerült mindenkit aki még nem lépett be törölni! ".print_r($ids2delete,1)." ";
+                    }
+
+            } else {
 			
 				// Nincs még korábbi értesítő, vagy az már öregebb mint egy hét			
 				$user->inactiveDays = abs( round ( ( time() - strtotime($user->lastlogin)) / 86400 ) );
