@@ -251,6 +251,25 @@ class Stat extends Html {
 		
 		$this->osmtags = $osmtags;
 				
+		/* nearBy.log  */
+		$this->stats['nearbylog'] = [];
+		$filePath = '../nearby.log';
+		if (file_exists($filePath)) {
+			$file = fopen($filePath, 'r');
+			if ($file) {
+				while (($line = fgetcsv($file)) !== false) {
+					if (count($line) > 1) {
+						$this->stats['nearbylog'][] = [ $line[1], $line[2] ];
+					}
+				}
+				fclose($file);
+			} else { 
+				error_log("Failed to open file: $filePath");
+			}
+		} else { 
+			error_log("File does not exist: $filePath");
+		}
+
+	}
 		
-    }
 }

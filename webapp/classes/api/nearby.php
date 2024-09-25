@@ -106,8 +106,8 @@ class NearBy extends Api {
 		$logFile = '../nearby.log';
 		if (!file_exists($logFile)) {
 			return [
-				'line_count' => 0,
-				'file_size' => 0
+				'line_count' => 'N/A',
+				'file_size' => 'file does not exist'
 			];
 		}
 
