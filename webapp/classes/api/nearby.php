@@ -89,7 +89,7 @@ class NearBy extends Api {
 			return;
 		}
 
-		$oneMonthAgo = strtotime('-1 sec');
+		$oneMonthAgo = strtotime('-1 month');
 		$firstLineTimestamp = strtotime(explode(',', $lines[0])[0]);
 
 		if ($firstLineTimestamp < $oneMonthAgo) {
