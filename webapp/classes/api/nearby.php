@@ -8,7 +8,6 @@ class NearBy extends Api {
 
     public $format = 'json'; //or text
 	public $requiredFields = array('lat','lon');
-
         
     public function validateVersion() {
         if ($this->version < 4) {
@@ -64,10 +63,60 @@ class NearBy extends Api {
 		}
         //$this->return['lat'] = $this->input['lat'];
 
-		
-		
+		$hasNearbyChurch = false;
+		foreach ($this->return['templomok'] as $templom) {
+			if ($templom['tavolsag'] < 50) {
+				$hasNearbyChurch = true;
+				break;
+			}
+		}
+		$logFile = '../nearby.log';
+		if (file_exists($logFile)) {
+			file_put_contents($logFile, date('Y-m-d H:i:s') . "," . $this->input['lat'] . "," . $this->input['lon'] . "," . ($hasNearbyChurch ? 'true' : 'false') . PHP_EOL, FILE_APPEND);
+		}
+				
         return;
     }
     
+	public static function cleanOldLogs() {
+		$logFile = '../nearby.log';
+		if (!file_exists($logFile)) {
+			return;
+		}
+
+		$lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		if (empty($lines)) {
+			return;
+		}
+
+		$oneMonthAgo = strtotime('-1 sec');
+		$firstLineTimestamp = strtotime(explode(',', $lines[0])[0]);
+
+		if ($firstLineTimestamp < $oneMonthAgo) {
+			$newLines = array_filter($lines, function($line) use ($oneMonthAgo) {
+				$timestamp = strtotime(explode(',', $line)[0]);
+				return $timestamp >= $oneMonthAgo;
+			});
+
+			file_put_contents($logFile, implode(PHP_EOL, $newLines) . PHP_EOL);
+		}
+	}
   
+	static function getLogFileInfo() {
+		$logFile = '../nearby.log';
+		if (!file_exists($logFile)) {
+			return [
+				'line_count' => 0,
+				'file_size' => 0
+			];
+		}
+
+		$lineCount = count(file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
+		$fileSize = filesize($logFile);
+
+		return [
+			'line_count' => $lineCount,
+			'file_size' => $fileSize
+		];
+	}
 }

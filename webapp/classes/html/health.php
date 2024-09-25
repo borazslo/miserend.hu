@@ -58,7 +58,12 @@ class Health extends Html {
 		$this->infos[] = ["sqlite files",implode("<br/>",$results)];
 		$results = [] ;
 
+		// Health of nearby log
+		$loginfo = \Api\NearBy::getLogFileInfo();		
+		$this->infos[] = ['nearby.log mérete',round($loginfo['file_size']/1024,2)." KB"];
+		$this->infos[] = ['nearby.log hossza', $loginfo['line_count']." sor"];
 		
+
 		// Health of CronJobs
 		$this->cronjobs = \Eloquent\Cron::orderBy('deadline_at','DESC')->get()->toArray();
 		

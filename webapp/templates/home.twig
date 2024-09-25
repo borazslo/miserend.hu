@@ -21,8 +21,8 @@
 {% endblock %}
 
 {% block pageHeader %}
-    <div class="page-header">
-        <h1>Miserend<small><span class="hidden-xs hidden-sm"> és templom keresés</span></small></h1>
+    <div class="page-header hidden-xs">
+        <h1>Miserend<small><span class="hidden-sm"> és templom keresés</span></small></h1>
     </div>
 {%  endblock %}
 
@@ -35,6 +35,19 @@
 
     <div class="miseurlap">
         <form method=get action="index.php" name="kereses" id="kereses" class="form-group">
+
+	    <div class="d-flex justify-content-center">
+		<h1>
+            <div class="btn-group" role="group" aria-label="Search Options">
+                <input type="radio" class="btn-check" name="q" id="searchtemplom" value="SearchResultsChurches" checked>
+                <label class="btn btn-outline-primary" for="searchtemplom">Templom</label>
+
+                <input type="radio" class="btn-check" name="q" id="searchmise" value="SearchResultsMasses">
+                <label class="btn btn-outline-primary" for="searchmise">Mise</label>
+            </div>
+			keresés
+			<h1>
+        </div>
 
             <div id="form_church"  style="margin-top:12px;">
                 <div class="form-group row">
