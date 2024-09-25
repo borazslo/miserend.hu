@@ -492,6 +492,9 @@ class EditOsm extends \Html\Html {
 		
 			// Ha be van küldve az érvényes cucc
 			if( isset($this->input['osm'][$key]) ) {
+				// Ha a kulcs értékének kezdete  'Nincs információ', akkor azt tudju, hogy igazából '' akar lenni.
+				$this->input['osm'][$key] = preg_replace('/^Nincs információ.*$/i','',$this->input['osm'][$key]);
+
 				// Ha ez a kulcs nincs az eredeti OSM-ben ÉS most sem kapott értéket
 				if ( trim($this->input['osm'][$key]) == '' AND !isset($this->osmtags->$key)) {
 					// semmit nem teszünk
