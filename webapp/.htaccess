@@ -27,6 +27,7 @@
     RewriteRule ^api/v([0-9]{1,4})/upload(/|)$ /index.php?q=api&action=upload&v=$1 [NC,QSA]
     RewriteRule ^api/v([0-9]{1,4})/service_times(/|)$ /index.php?q=api&action=service_times&v=$1 [NC,QSA]
 	RewriteRule ^api/v([0-9]{1,4})/nearby(/|)$ /index.php?q=api&action=nearby&v=$1 [NC,QSA]
+    RewriteRule ^api/v([0-9]{1,4})/church(/|)$ /index.php?q=api&action=church&v=$1 [NC,QSA]
 	RewriteRule ^api/v([0-9]{1,4})/database(/|)$ /index.php?q=api&action=database&v=$1 [NC,QSA]
 
     RewriteRule ^api/ https://github.com/borazslo/miserend.hu/wiki/API [NC]

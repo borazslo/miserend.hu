@@ -60,6 +60,10 @@ class Api extends Html {
                     $this->api = new \Api\NearBy();
                     break;   					
 
+                case 'church':
+                    $this->api = new \Api\Church();
+                    break;   					
+
                 case 'database':
                     $this->api = new \Api\Database();
                     break;   
