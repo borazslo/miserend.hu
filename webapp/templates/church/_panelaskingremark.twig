@@ -18,7 +18,7 @@
     </div>
     {% if ( not isChurchHolder or isChurchHolder.status == 'left' )  %}
     <div align=center>
-        <a href="/templom/{{ id }}/changeholders/?uid={{ user.uid }}&access=asked&confirmation=needed">
+        <a href="/templom/{{ id }}/changeholders?uid={{ user.uid }}&access=asked&confirmation=needed">
             <font color=#8D317C size='+1' class=""><b>Gondnokság vállalása</b></font>
         </a>
     </div>    
