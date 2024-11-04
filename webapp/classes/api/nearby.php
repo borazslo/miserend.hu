@@ -70,9 +70,22 @@ class NearBy extends Api {
 				break;
 			}
 		}
+
+		$hasMassRightNow = false;
+		foreach ($this->return['templomok'] as $templom) {
+			foreach ($templom['misek'] as $mise) {
+				if (strtotime($mise['idopont']) < time() + 80 * 60 && strtotime($mise['idopont']) > time() - 15 * 60) {
+					$hasMassRightNow = true;
+					break 2;
+				}
+			}
+		}
+
+		$userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? str_replace(',', ';', $_SERVER['HTTP_USER_AGENT']) : 'Unknown';
+
 		$logFile = '../nearby.log';
-		if (file_exists($logFile)) {
-			file_put_contents($logFile, date('Y-m-d H:i:s') . "," . $this->input['lat'] . "," . $this->input['lon'] . "," . ($hasNearbyChurch ? 'true' : 'false') . PHP_EOL, FILE_APPEND);
+		if (file_exists($logFile)) {			
+			file_put_contents($logFile, date('Y-m-d H:i:s') . "," . $this->input['lat'] . "," . $this->input['lon'] . "," . ($hasNearbyChurch ? 'true' : 'false') . "," . ($hasMassRightNow ? 'true' : 'false') . "," . $userAgent . PHP_EOL, FILE_APPEND);
 		}
 				
         return;
