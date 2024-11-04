@@ -253,6 +253,7 @@ class Stat extends Html {
 				
 		/* nearBy.log  */
 		$this->stats['nearbylog'] = [];
+		$this->stats['massrightnowlog'] = [];
 		$filePath = '../nearby.log';
 		if (file_exists($filePath)) {
 			$file = fopen($filePath, 'r');
@@ -260,6 +261,9 @@ class Stat extends Html {
 				while (($line = fgetcsv($file)) !== false) {
 					if (count($line) > 1) {
 						$this->stats['nearbylog'][] = [ $line[1], $line[2] ];
+						if (isset($line[4]) && $line[4] === 'true') {
+							$this->stats['massrightnowlog'][] = [ $line[1], $line[2] ];
+						}
 					}
 				}
 				fclose($file);

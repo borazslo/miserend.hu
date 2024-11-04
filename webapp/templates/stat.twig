@@ -20,6 +20,7 @@
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <style>
         #map { width: 100%; height: 400px; }
+        #map-massrightnow { width: 100%; height: 400px; }
         body { font: 16px/1.4 "Helvetica Neue", Arial, sans-serif; }
         .ghbtns { position: relative; top: 4px; margin-left: 5px; }
     </style>
@@ -31,11 +32,13 @@
 {% block content %}
 
     {% if user.isadmin %}
+    
     <h3>Helyadatok</h3>
-    <p>Az API/NearBy az elmúlt időben {{ stats.nearbylog|length }} db helyadatot gyűjtött. </p>
-    <div id="map"></div>
     <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
-
+    
+    <h5>Minden helyadat</h5>
+    <p>Az API/NearBy az elmúlt időben {{ stats.nearbylog|length }} db helyadatot gyűjtött. </p>
+    <div id="map"></div>    
     <script>
 
         var map = L.map('map').setView([47.1625, 19.5033], 7);
@@ -43,13 +46,34 @@
             attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
 
-
         var nearbyLogPoints = {{ stats.nearbylog|json_encode()|raw }};
         var heat = L.heatLayer(nearbyLogPoints, {
-                radius: 50
+                radius: 50,
+                blur: 15
+            
                 }).addTo(map);
 
     </script>
+
+    <h5>Mise alatt és után</h5>
+    <p>Az API/MassRightNow az elmúlt időben {{ stats.massrightnowlog|length }} db helyadatot gyűjtött. </p>
+    <div id="map-massrightnow"></div>    
+    <script>
+
+        var mapMassRightNow = L.map('map-massrightnow').setView([47.1625, 19.5033], 7);
+        var tilesMassRightNow = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(mapMassRightNow);
+
+        var massRightNowLogPoints = {{ stats.massrightnowlog|json_encode()|raw }};
+        var heatMassRightNow = L.heatLayer(massRightNowLogPoints, {
+            radius: 20,
+            maxZoom: 0.15,
+            blur: 20,
+            max: 10.0
+            }).addTo(mapMassRightNow);
+
+        </script>
     {% endif %}
 
 
