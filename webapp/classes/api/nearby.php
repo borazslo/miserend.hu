@@ -74,7 +74,7 @@ class NearBy extends Api {
 		$hasMassRightNow = false;
 		foreach ($this->return['templomok'] as $templom) {
 			foreach ($templom['misek'] as $mise) {
-				if (strtotime($mise['idopont']) < time() + 80 * 60 && strtotime($mise['idopont']) > time() - 15 * 60) {
+				if ($templom['tavolsag'] < 100 && strtotime($mise['idopont']) < time() + 80 * 60 && strtotime($mise['idopont']) > time() - 15 * 60) {
 					$hasMassRightNow = true;
 					break 2;
 				}
