@@ -1,0 +1,29 @@
+{% extends 'panel.twig' %}
+
+{% set title = 'Szentségimádások a következő időben' %}
+
+{% set footer = true %}
+
+
+{% block body %}
+    {% if adorations|length > 1 %}
+        
+		{% for adoration in adorations %}
+            <h5><strong>{{ adoration.date }}</strong> {{ adoration.starttime }} &ndash; {{ adoration.endtime }}
+            {% if adoration.type %}
+                ( {{ adoration.type }} )
+            {% endif %}            
+            {% if adoration.info %}
+                <small>{{ adoration.info }}</small>
+            {% endif %}
+            </h5>
+		{% endfor %}            
+        
+	{% else %}
+		Nem tudunk szentségimádásról az elkövetkezőkben. Ha tudna valamit, kérjük a <a href="https://szentsegimadas.hu/" target="_blank">szentsegimadas.hu</a> csapatának <a title="Kapcsolat a szentségimádás.hu-hoz" href="mailto:oltaregyesulet@gmail.com">küldjön üzenetet</a>.
+    {% endif %}    
+{% endblock %}    
+
+{% block footer %}
+    <small>Adatok a <a href="https://szentsegimadas.hu/" target="_blank">szentsegimadas.hu</a>-ról. Hiba esetén <a title="Kapcsolat a szentségimádás.hu-hoz" href="mailto:oltaregyesulet@gmail.com">nekik küldjön üzenetet</a>.</small>
+{% endblock %}

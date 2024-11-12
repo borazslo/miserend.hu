@@ -18,7 +18,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
 	protected $attributesCache = null;
 	
-	
+    public function adorations()
+    {
+        return $this->hasMany(Adoration::class);
+    }
+    
 	public function attributes()
     {
         return $this->hasMany(Attribute::class);

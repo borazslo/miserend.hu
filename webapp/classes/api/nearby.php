@@ -50,6 +50,22 @@ class NearBy extends Api {
 			}	
 				
 			}
+
+			$results = $church->adorations()
+				->where('date', '>=', date('Y-m-d'))
+				->orderBy('date', 'ASC')
+				->orderBy('starttime', 'ASC')
+				->limit(5)
+				->get()
+				->toArray();
+			$adorations = [];
+			foreach($results as $key => $adoration) {
+				$adorations[$key]['kezdete'] = $adoration['date']." ".$adoration['starttime'];
+				$adorations[$key]['vege'] = $adoration['date']." ".$adoration['endtime'];				
+				$adorations[$key]['fajta'] = $adoration['type'];				
+				if($adoration['info'] != '') $adorations[$key]['info'] =  $adoration['info'];
+			}			
+
 			$this->return['templomok'][] = [
 				'id' => $church->id,
 				'nev' => $church->nev,
@@ -57,6 +73,7 @@ class NearBy extends Api {
 				'varos' => $church->varos,
 				'tavolsag' => (int) $church->distance,
 				'misek' => $misek,
+				'adoraciok' => $adorations,
 				'lat' => $church->lat,
 				'lon' => $church->lon
 			];

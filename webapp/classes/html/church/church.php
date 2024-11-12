@@ -43,7 +43,15 @@ class Church extends \Html\Html {
 		}
 				
 		$church->kozossegek = $church->kozossegek;
-				   
+        
+        $church->adorations = $church->adorations()
+            ->where('date', '>=', date('Y-m-d'))
+            ->orderBy('date', 'ASC')
+            ->orderBy('starttime', 'ASC')
+            ->limit(5)
+            ->get()
+            ->toArray();
+        		   
 		global $_honapok;
 		$this->_honapok = $_honapok;
 		
