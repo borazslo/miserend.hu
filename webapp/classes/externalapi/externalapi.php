@@ -89,6 +89,7 @@ class ExternalApi {
 					}
 				
 				}
+                return true;
             } else {
                 unlink($this->cacheFilePath);
                 return false;
@@ -111,8 +112,20 @@ class ExternalApi {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL,$this->apiUrl . $this->rawQuery);
 		//echo $this->apiUrl . $this->rawQuery."\n";
-        curl_setopt($ch, CURLOPT_HTTPHEADER,$header);
+        
 		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        if(isset($this->postfields)) {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postfields);      
+                          
+        } else {
+            curl_setopt($ch, CURLOPT_HTTPHEADER,$header); // Valahogy ha post-ban küldünk adatot, akkor jobb ha ez nincs itt.
+        }
+
+
+        
+        
 
         curl_setopt($ch, CURLOPT_HEADER  , false);  // we want headers
         curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
@@ -127,7 +140,7 @@ class ExternalApi {
 		}
 		
         $this->rawData = curl_exec($ch);
-    
+
         $this->responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE ); 
 		if(curl_error($ch)) {
 			$this->error = [curl_errno($ch), curl_error($ch)];		
@@ -187,12 +200,21 @@ class ExternalApi {
         $query = DB::table('stats_externalapi')->where('url',$url)->where('date',date('Y-m-d'));
         if($current = $query->first()) {   
             if($current->rawdata != $this->rawData ) $diff = $current->diff + 1; else $diff = $current->diff;            
+
+            //$maxAllowedPacket = DB::select(DB::raw('SHOW VARIABLES LIKE "max_allowed_packet"'))[0]->Value;
+            $maxAllowedPacket = 4194304 - 1000; // 4MB - 1KB
+            if (strlen($this->rawData) > $maxAllowedPacket) {
+                $rawData = substr($this->rawData, 0, $maxAllowedPacket);                
+            } else {
+                $rawData = $this->rawData;
+            }
+
             $echo = $query->update([
                         'name' => $this->name,
                         'url' => $url ,                    
                         'date' => date('Y-m-d'),                
                         'responsecode' => $this->responseCode,
-                        'rawdata' => $this->rawData,
+                        'rawdata' => $rawData,
                         'count'=> $current->count + 1,
                         'diff'=> $diff
             ]);
