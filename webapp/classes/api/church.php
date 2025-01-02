@@ -26,10 +26,10 @@ class Church extends Api {
 		
         $this->getInputJson();
 		
-		$church = \Eloquent\Church::find($this->input['id']);
+		$church = \Eloquent\Church::Where('id',$this->input['id'])->get()->map->toAPIArray();
 				
 
-        if($church == array() ) {
+        if(count($church) < 1 ) {
             $this->return = [
                 'error' => 1,
                 'text' => 'Nem létezik misézőhely ezzel az asonosítóval.'
@@ -37,29 +37,9 @@ class Church extends Api {
             return;
         }       
 
-        $masses = searchMasses(['templom'=>$church->id, 'mikor' => date('Y-m-d')] );
-        
-        $misek = [];
-        
-        if(isset($masses['churches'][$church->id])) {
-            foreach($masses['churches'][$church->id]['masses'] as $key => $mise) {
-                $misek[$key]['idopont'] = date('Y-m-d')." ".$mise['ido'];
-                $info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
-                if($info != '') $misek[$key]['informacio'] = $info;
-        }	
-            
-        }
-        $this->return = [
-            'id' => $church->id,
-            'nev' => $church->nev,
-            'ismertnev' => $church->ismertnev,
-            'varos' => $church->varos,
-            'misek' => $misek,
-            'lat' => $church->lat,
-            'lon' => $church->lon
-        ];
-						
-        return;
+       $this->return = $church[0];
+
+       return;
     }
     
 	
