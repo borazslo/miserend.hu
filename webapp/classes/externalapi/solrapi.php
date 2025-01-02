@@ -11,6 +11,7 @@ class SolrApi extends \ExternalApi\ExternalApi {
 	public $testQuery = 'solr/admin/cores?action=STATUS';
 	public $cache = false; // A Solr-nak meg van a saját cache-je. Arra hagyatkozunk
 	
+	public $q; // Ez a solr keresőben a query, nem pedig az API-ban a query
 			
 	function run() {					
 		$this->curl_setopt(CURLOPT_HTTPHEADER ,['Content-Type: application/json']);		 	
@@ -88,7 +89,7 @@ class SolrApi extends \ExternalApi\ExternalApi {
 			'defType' => 'edismax',
 			'indent' => true,
 			'fl' => 'id,nev,ismertnev,varos,fullName',
-			'qf' => 'nev^8 ismertnev^4 varos^2 cim megkozelites plebania megjegyzes misemegj',
+			'qf' => 'nev^32 ismertnev^16 varos^8 cim megkozelites plebania megjegyzes misemegj',
 			'q.op' => 'AND'
 		];
 		

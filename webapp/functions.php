@@ -479,58 +479,18 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         'offset' => $offset,
         'limit' => $limit);
 
-    if (isset($args['hely']) AND $args['hely'] != '') {
-        if ($args['tavolsag'] == '')
-            $args['tavolsag'] = 1;
-
-        if (!isset($args['hely_geocode']))
-            $args['hely_geocode'] = mapquestGeocode($args['hely']);
-        $latlng = $args['hely_geocode'];
-        $lat = $latlng['lat']; // latitude of centre of bounding circle in degrees
-        $lon = $latlng['lng']; // longitude of centre of bounding circle in degrees
-        $rad = $args['tavolsag'];
-        $R = 6371;  // earth's mean radius, km
-        $filterdistance = true;
-    }
-
-    $where = searchChurchesWhere($args);
-
-
 	$search = DB::table('templomok')
 		->select('templomok.id','nev','ismertnev','varos','lat','lon');
 
+        
+    $solrIsEnough = true;
+
 	/* WHERE */
 	$search->where('ok','i');
-	
-	// keyword
-	if (isset($args['kulcsszo']) AND $args['kulcsszo'] != '') {
-	
-		
-		//A Solr motorral keresünk itt már
-		$solr = new \ExternalApi\SolrApi();
-		$response = $solr->search($args['kulcsszo'],["rows" => 100000]);
-		//Ha működik a solr kereső, akkor komolyan vesszük
-		if($response) {
-			$ids = [];
-			foreach($response->docs as $doc) {
-				$ids[] = $doc->id;		
-			}		
-			// Ha van találat, akkor az azonosítókat összegyűjtve visszük tovább még a keresét.
-			if(count($ids) > 0) {
-				$search->whereIn('id',$ids);
-			} else {
-			// Ha nincs találat, akkor el kell rontani a fő keresésünket. Pedig szebb lenni valami return false vagy hasonló
-				$search->where('nev','nem adunk keresési eredményt hiszen a kulcsszóra nem találtunk semmit');			
-			}
-		} else {
-		//Ha nem működik a solr kereső, akkor is dolgozzunk azért valami egyszerűbbet
-			addMessage('Sajnos csak az egyszerűsített keresőmotor működik jelenleg. Elnézést kérünk.','warning');
-			$search->where('nev', 'LIKE', '%'.$args['kulcsszo'].'%');
-		}
-    }
-	
+
 	// varos
 	if (isset($args['varos']) AND $args['varos'] != '') {
+        $solrIsEnough = false;
         if ($args['varos'] == 'Budapest')
             $args['varos'] = 'Budapest*';
 
@@ -545,6 +505,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 	
 	// tnyelv
     if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
+        $solrIsEnough = false;
 		if ($args['tnyelv'] == 'h') $args['tnyelv'] = 'hu|h';
 		
 		$search->join('misek','misek.tid','=','templomok.id');		
@@ -553,94 +514,98 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 	
 	// gorog only
 	if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {
+        $solrIsEnough = false;
         $search->whereIn("egyhazmegye",[17,18,34]);
     }
 
 	// egyhazmegye
-    if (isset($args['ehm']) AND $args['ehm'] != 0)
+    if (isset($args['ehm']) AND $args['ehm'] != 0) {
+        $solrIsEnough = false;
         $search->where("egyhazmegye",$args['ehm']);
+    }
 
 	// espereskerulet
-    if (isset($args['espker']) AND $args['espker'] != 0)
+    if (isset($args['espker']) AND $args['espker'] != 0)  {
+        $solrIsEnough = false;
         $search->where("espereskerulet",$args['espker']);
-	
-	
-    if (count($where) > 0) {
-		foreach($where as $w)
-			$search->whereRaw($w);
-	}
-	
-	$search->groupBy('templomok.id'); //Igazából ez csak a tnyelv esetén szükséges
-	$search->orderBy('nev');
-	
-	$sum = $search;
-    $return['sum'] = count($sum->get());
-				
-	if (!isset($filterdistance)) {
-	
-        $search->offset($offset)->limit($limit);
-		$results = $search->get()->toArray();		
-		$return['results']  = array_map(function ($value) {return (array)$value;}, $results);		
-		
-	} else {
-		
-    
-	
-	foreach($rows as $row) {    
-        if (isset($filterdistance)) {
-            //acos(sin(:lat)*sin(radians(Lat)) + cos(:lat)*cos(radians(Lat))*cos(radians(Lon)-:lon)) * :R < :rad
-            $d = acos(sin(deg2rad($lat)) * sin(deg2rad($row['lat'])) + cos(deg2rad($lat)) * cos(deg2rad($row['lat'])) * cos(deg2rad($row['lon']) - deg2rad($lon))) * $R;
-            if ($d <= $rad) {
-                if ($config['mapquest']['useitforsearch'] == true) {
-                    $d = mapquestDistance(array('lat' => $lat, 'lng' => $lon), array('lat' => $row['lat'], 'lng' => $row['lon']));
-                    if ($d <= $rad)
-                        $return['results'][] = $row;
-                } else {
-                    $return['results'][] = $row;
-                }
-            }
-        } else {
-            $return['results'][] = (array) $row;
-        }
-    }
-	}
+	 }
 
-    if (isset($filterdistance)) {
-        $return['sum'] = count($return['results']);
-        if ($return['sum'] > 0)
-            $return['results'] = array_slice($return['results'], $offset, $limit + $offset);
+
+     if($solrIsEnough == false)   {         
+        // keyword
+        if (isset($args['kulcsszo']) AND $args['kulcsszo'] != '') {
+        
+            //A Solr motorral keresünk itt már
+            $solr = new \ExternalApi\SolrApi();
+
+            $solr->q = $args['kulcsszo']." AND ok:i";
+
+            $response = $solr->search($solr->q,["rows" => 100000]);
+            //Ha működik a solr kereső, akkor komolyan vesszük
+            if($response) {
+                $ids = [];
+                foreach($response->docs as $doc) {
+                    $ids[] = $doc->id;		
+                }		
+                // Ha van találat, akkor az azonosítókat összegyűjtve visszük tovább még a keresét.
+                if(count($ids) > 0) {
+                    $search->whereIn('id',$ids);
+                } else {
+                // Ha nincs találat, akkor el kell rontani a fő keresésünket. Pedig szebb lenni valami return false vagy hasonló
+                    $search->where('nev','nem adunk keresési eredményt hiszen a kulcsszóra nem találtunk semmit');			
+                }
+            } else {
+            //Ha nem működik a solr kereső, akkor is dolgozzunk azért valami egyszerűbbet
+                addMessage('Sajnos csak az egyszerűsített keresőmotor működik jelenleg. Elnézést kérünk.','warning');
+                $search->where('nev', 'LIKE', '%'.$args['kulcsszo'].'%');            
+            }
+        }
+        $search->groupBy('templomok.id'); //Igazából ez csak a tnyelv esetén szükséges
+	    $search->orderByRaw("FIELD(id, " . implode(',', $ids) . ")");
+        //$search->orderBy('nev');
+        
+        $sum = $search;
+        $return['sum'] = count($sum->get());
+        $search->offset($offset)->limit($limit);
+        $results = $search->get()->toArray();		
+        $return['results']  = array_map(function ($value) {return (array)$value;}, $results);	
     }
+
+    // Ha nincsenek külöfnéle speckó beállítások, akkor közvetlenül solr-ből is nyomhatjuk az adatokat. Ami a sorrend miatt és erőforrásilag is megéri.
+    if($solrIsEnough) {        
+        
+       //A Solr motorral keresünk itt már
+       $solr = new \ExternalApi\SolrApi();
+       
+       if (isset($args['kulcsszo']) AND $args['kulcsszo'] != '') $solr->q = $args['kulcsszo']." AND ok:i";
+       else $solr->q = "ok:i";
+       $response = $solr->search(
+            $solr->q, 
+            [
+                "start" => $offset,
+                "rows" => $limit
+            ]);
+
+        if($response) {
+            $return['sum'] = $response->numFound;
+            foreach($response->docs as $doc) {
+                foreach($doc as $key => $value) {
+                    $doc->{$key} = is_array($value) ? $value[0]: $value;
+                }   
+                $return['results'][] = (array) $doc;
+            }
+            
+        }
+    };
+	
+    
+    	
+		
+
     return $return;
 }
 
-function searchChurchesWhere($args) {
-    $where = [];
 
-   
-
-    
-
-    if (isset($args['hely']) AND $args['hely'] != '') {
-
-        $latlng = $args['hely_geocode'];
-        $lat = $latlng['lat']; // latitude of centre of bounding circle in degrees
-        $lon = $latlng['lng']; // longitude of centre of bounding circle in degrees
-        $rad = $args['tavolsag']; // radius of bounding circle in kilometers
-
-        $R = 6371;  // earth's mean radius, km
-        // first-cut bounding box (in degrees)
-        $maxLat = $lat + rad2deg($rad / $R);
-        $minLat = $lat - rad2deg($rad / $R);
-        // compensate for degrees longitude getting smaller with increasing latitude
-        $maxLon = $lon + rad2deg($rad / $R / cos(deg2rad($lat)));
-        $minLon = $lon - rad2deg($rad / $R / cos(deg2rad($lat)));
-
-        $where[] = "( lat BETWEEN " . $minLat . " AND " . $maxLat . " AND lon BETWEEN " . $minLon . " AND " . $maxLon . ")";
-    }
-
-    
-    return $where;
-}
 
 function searchMasses($args, $offset = 0, $limit = 20) {
 
