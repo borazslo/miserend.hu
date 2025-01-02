@@ -595,12 +595,12 @@ function searchChurches($args, $offset = 0, $limit = 20) {
                 $return['results'][] = (array) $doc;
             }
             
-        }
+        } 
     };
 	
     
     	
-		
+	if(!isset($return['results'])) $return['results'] = [];	
 
     return $return;
 }
