@@ -29,55 +29,14 @@ class NearBy extends Api {
 		
         $this->getInputJson();
 		
-		$churches = \Eloquent\Church::select()
+		$this->return['templomok'] = \Eloquent\Church::select()
 				->addSelect(DB::raw("ST_distance_sphere( ST_GeomFromText('POINT ( ".$this->input['lat']." ".$this->input['lon']." )', 4326), ST_GeomFromText(CONCAT('POINT ( ',lat,' ', lon, ')'), 4326) ) as distance"))
                 ->where('ok','i')
 				->where('lat','<>','')
                 ->orderBy('distance', 'ASC')
 				->limit(10)
-                ->get();
+                ->get()->map->toAPIArray();
 				
-//		printr($churches);		
-		foreach($churches as $church) {
-			$masses = searchMasses(['templom'=>$church->id, 'mikor' => date('Y-m-d')] );
-			$misek = [];
-			
-			if(isset($masses['churches'][$church->id])) {
-				foreach($masses['churches'][$church->id]['masses'] as $key => $mise) {
-					$misek[$key]['idopont'] = date('Y-m-d')." ".$mise['ido'];
-					$info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
-					if($info != '') $misek[$key]['informacio'] = $info;
-			}	
-				
-			}
-
-			$results = $church->adorations()
-				->where('date', '>=', date('Y-m-d'))
-				->orderBy('date', 'ASC')
-				->orderBy('starttime', 'ASC')
-				->limit(5)
-				->get()
-				->toArray();
-			$adorations = [];
-			foreach($results as $key => $adoration) {
-				$adorations[$key]['kezdete'] = $adoration['date']." ".$adoration['starttime'];
-				$adorations[$key]['vege'] = $adoration['date']." ".$adoration['endtime'];				
-				$adorations[$key]['fajta'] = $adoration['type'];				
-				if($adoration['info'] != '') $adorations[$key]['info'] =  $adoration['info'];
-			}			
-
-			$this->return['templomok'][] = [
-				'id' => $church->id,
-				'nev' => $church->nev,
-				'ismertnev' => $church->ismertnev,
-				'varos' => $church->varos,
-				'tavolsag' => (int) $church->distance,
-				'misek' => $misek,
-				'adoraciok' => $adorations,
-				'lat' => $church->lat,
-				'lon' => $church->lon
-			];
-		}
         //$this->return['lat'] = $this->input['lat'];
 
 		$hasNearbyChurch = false;

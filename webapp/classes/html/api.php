@@ -67,7 +67,11 @@ class Api extends Html {
                 case 'database':
                     $this->api = new \Api\Database();
                     break;   
-					
+
+                case 'search':
+                    $this->api = new \Api\Search();
+                    break;
+                                        
                 default:
                     throw new \Exception("API action '$action' is not supported.");
             }

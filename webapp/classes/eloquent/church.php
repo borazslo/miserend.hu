@@ -116,6 +116,52 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }    
     
     
+    public function toAPIArray()
+    {
+        
+        $masses = searchMasses(['templom'=>$this->id, 'mikor' => date('Y-m-d')] );
+        
+        $misek = [];        
+        if(isset($masses['churches'][$this->id])) {
+            foreach($masses['churches'][$this->id]['masses'] as $key => $mise) {
+                $misek[$key]['idopont'] = date('Y-m-d')." ".$mise['ido'];
+                $info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
+                if($info != '') $misek[$key]['informacio'] = $info;
+            }	            
+        }
+
+        $adorations = [];
+        $results = $this->adorations()
+				->where('date', '>=', date('Y-m-d'))
+				->orderBy('date', 'ASC')
+				->orderBy('starttime', 'ASC')
+				->limit(5)
+				->get()
+				->toArray();
+        foreach($results as $key => $adoration) {
+            $adorations[$key]['kezdete'] = $adoration['date']." ".$adoration['starttime'];
+            $adorations[$key]['vege'] = $adoration['date']." ".$adoration['endtime'];				
+            $adorations[$key]['fajta'] = $adoration['type'];				
+            if($adoration['info'] != '') $adorations[$key]['info'] =  $adoration['info'];
+        }
+
+        $return = [
+            'id' => $this->id,
+            'nev' => $this->nev,
+            'ismertnev' => $this->ismertnev,
+            'varos' => $this->varos,
+            'misek' => $misek,
+            'adoraciok' => $adorations,
+            'lat' => $this->lat,
+            'lon' => $this->lon
+        ];
+
+        if(isset($this->distance)) $return['tavolsag'] = (int) $this->distance;
+        
+
+        return $return;
+    }
+
     /* 
      * scopes
      *  boundaries() 

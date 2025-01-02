@@ -18,7 +18,7 @@
 
     RewriteRule ^(vendor|kepek|fajlok|node_modules|bower_components|img)/ - [L]
               
-    RewriteRule ^api/v([0-9]{1,4})/(sqlite|report|updated|signup|login|user)(/|)$ /index.php?q=api&action=$2&v=$1 [NC,QSA]
+    RewriteRule ^api/v([0-9]{1,4})/(sqlite|report|updated|signup|login|user|search)(/|)$ /index.php?q=api&action=$2&v=$1 [NC,QSA]
     
     RewriteRule ^api/v([0-9]{1,4})/miserend.sqlite3(/|)$ /fajlok/sqlite/miserend_v$1.sqlite3 [NC,L]	
     RewriteRule ^api/v([0-9]{1,4})/templomok(/|)$ /index.php?q=api&action=table&table=templomok&v=$1 [NC,QSA]    
