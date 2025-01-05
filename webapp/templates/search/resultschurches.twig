@@ -1,6 +1,9 @@
 {% extends "layout.twig" %}
 
 {% block content %}
+
+     {{ alert|raw }}
+
     {% include 'announcment.twig' ignore missing %}
     
     {% if churches %}

@@ -239,6 +239,8 @@ class SearchResultsMasses extends Html {
         }
         $tartalom.=$leptetprev . $leptetnext;
 
+        $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
+
         $this->setTitle("Szentmise kereső");
 
         $this->content = $tartalom;
