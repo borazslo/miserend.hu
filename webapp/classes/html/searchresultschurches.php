@@ -74,6 +74,9 @@ class SearchResultsChurches extends Html {
             $churchIds[] = $result['id'];
         }
         $this->churches = \Eloquent\Church::whereIn('id', $churchIds)->get();
+
+        $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
+
     }
 
 }
