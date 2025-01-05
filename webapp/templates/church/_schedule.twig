@@ -1,51 +1,73 @@
+{% set updated_date = updated|replace({'.': '-'})|slice(0, -1)|date('Y-m-d') %}
+{% set current_date = "now"|date('Y-m-d') %}
+{% set seven_years_ago = current_date|date_modify('-7 years')|date('Y-m-d') %}
 
- <div class="accordion accordion-flush" id="periods">
-    {% for key,idoszak in miserend.periods %}
-      <div class="accordion-item">
-          <h2 class="accordion-header" >
-              <button class="panel-title accordion-button {% if idoszak.current %}{% else %}collapsed{% endif %}"  data-bs-toggle="collapse" data-bs-target="#collapsePeriod{{ key }}" aria-expanded="{% if idoszak.current %}true{% else %}false{% endif %}" aria-controls="collapsePeriod{{ key }}">                    
-                      <strong>{{ idoszak.nev }} <span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></strong>
-              </button>
-          </h2>
-          <div id="collapsePeriod{{ key }}" class="accordion-collapse collapse  {% if idoszak.current %}show{% endif %}" data-bs-parent="#periods">
-              <div class="accordion-body">
-                    {% for nap in idoszak.napok %}
+ <div class="accordion accordion-flush position-relative" id="periods">
+  {% if updated_date < seven_years_ago %}
+    <div class="overlay" style="
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(204, 204, 204, 0.9);
+            color: rgb(141, 49, 124);
+            display: flex; flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 10px;
+            " id="overlay-periods">
+      <p><strong>Vigyázzat! Több mint hét éves adatok!</strong></p>
+      <p>Sajnos nagyon régen nem hallottunk erről a misézőhelyről, így könnyen előfordulhat, hogy hibás az itt látható miserend. Kérjük, ha tud frissebbet, vagy meg tudja erősíteni, hogy ezek helyes adatok, akkor <a href="javascript:OpenNewWindow('/templom/{{ id }}/ujeszrevetel',450,530);" class="link">
+            <font color="#8D317C"><b>küldjön nekünk észrevételt</b></font></a>!</p>
+      <button class="btn btn-primary" onclick="document.getElementById('overlay-periods').style.display='none';">Tovább a valószínűleg elavult miserendre.</button>
+      
+    </div>
+  {% endif %}
+  {% for key,idoszak in miserend.periods %}
+    <div class="accordion-item position-relative">          
+      <h2 class="accordion-header" >
+        <button class="panel-title accordion-button {% if idoszak.current %}{% else %}collapsed{% endif %}"  data-bs-toggle="collapse" data-bs-target="#collapsePeriod{{ key }}" aria-expanded="{% if idoszak.current %}true{% else %}false{% endif %}" aria-controls="collapsePeriod{{ key }}">                    
+            <strong>{{ idoszak.nev }} <span class="alap" style="font-size:11px">({{ idoszak.datumtol }} - {{ idoszak.datumig }})</span></strong>
+        </button>
+      </h2>
+      <div id="collapsePeriod{{ key }}" class="accordion-collapse collapse  {% if idoszak.current %}show{% endif %}" data-bs-parent="#periods">
+        <div class="accordion-body">
+          {% for nap in idoszak.napok %}
 
-                      <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
-                      {% if nap.misek|length < 1 %}
-                            <div style="display: table-row;">
+            <div class="nap" style="border-color: rgb(229, 234, 239);border-bottom-width: 1px;border-bottom-style: solid;margin-bottom:3px">
+            {% if nap.misek|length < 1 %}
+              <div style="display: table-row;">
 
-                          <div class="alap" valign="top" style="display: table-cell;width:80px;padding-left:5px;line-height:16px">{{ nap.nev }}</div></div>
+              <div class="alap" valign="top" style="display: table-cell;width:80px;padding-left:5px;line-height:16px">{{ nap.nev }}</div></div>
 
-                      {% endif %}
+            {% endif %}
 
-                      {% for key, mise in nap.misek %}
-                      <div style="display: table-row;">
-                        <div class="alap" valign="top" style="display: table-cell;width:80px;padding-left:5px;line-height:16px">{% if key == 0 %}{{ nap.nev }}{% endif %}&nbsp;</div>
+            {% for key, mise in nap.misek %}
+            <div style="display: table-row;">
+            <div class="alap" valign="top" style="display: table-cell;width:80px;padding-left:5px;line-height:16px">{% if key == 0 %}{{ nap.nev }}{% endif %}&nbsp;</div>
 
-                        <div style="display: table-cell;width:60px;text-align:right;line-height:16px" class="alap">{{ nap.misek[key].ido }}</div>
+            <div style="display: table-cell;width:60px;text-align:right;line-height:16px" class="alap">{{ nap.misek[key].ido }}</div>
 
-                        <div style="display: table-cell;padding-left:8px" class="alap" style="line-height:16px">
-                          {% if nap.misek[key].nap2_raw != "0" %}
-                              <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
-                          {% if nap.misek[key].attr %}
-                              {% for attr in nap.misek[key].attr %} 
-                                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name) }}
-                              {% endfor %}
-                          {% endif %}  
-                          {% if nap.misek[key].megjegyzes %}
-                              {{ _self.info('info2.gif',nap.misek[key].megjegyzes) }}
-                          {% endif %}       
-                        </div>
-                      </div>
-                      {% endfor %} 
-                      </div>
+            <div style="display: table-cell;padding-left:8px" class="alap" style="line-height:16px">
+              {% if nap.misek[key].nap2_raw != "0" %}
+                <span class="alap" style="margin-left: 2px;"> {{ nap.misek[key].nap2 }} </span>{% endif %}  
+              {% if nap.misek[key].attr %}
+                {% for attr in nap.misek[key].attr %} 
+                  {{ _self.info(attr.file,attr.weektext ~ ' ' ~ attr.name) }}
+                {% endfor %}
+              {% endif %}  
+              {% if nap.misek[key].megjegyzes %}
+                {{ _self.info('info2.gif',nap.misek[key].megjegyzes) }}
+              {% endif %}       
+            </div>
+            </div>
+            {% endfor %} 
+            </div>
 
-                    {% endfor %} 
-              </div>
-          </div>
+          {% endfor %} 
+        </div>
       </div>
-    {% endfor %}
+    </div>
+  {% endfor %}
   </div>
 
    <div class="accordion accordion-flush" id="particulars">
