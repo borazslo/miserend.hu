@@ -613,14 +613,14 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     if (isset($args['templom']) AND is_numeric($args['templom'])) {
         $where[] = ' m.tid = ' . $args['templom'];
     } elseif (
-			$args['varos'] != '' OR 
+			(isset($args['varos']) AND $args['varos'] != '') OR 
 			$args['kulcsszo'] != '' OR 
 			( isset($args['egyhazmegye']) and $args['egyhazmegye'] != '' ) OR 
 			( isset($args['gorog']) and $args['gorog'] == 'gorog' ) OR 
 			( isset($args['hely']) and $args['hely'] != '' ) OR 
 			$args['tnyelv'] != '0'
 		) {
-        if ($args['varos'] == 'Budapest')
+        if (isset($args['varos']) AND $args['varos'] == 'Budapest')
             $args['varos'] = 'Budapest*';
 
         $tmp = $args;
@@ -784,7 +784,12 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     if (count($where) > 0)
         $query .= " WHERE " . implode(' AND ', $where);
     $query .= " GROUP BY tid \n";
-    $query .= " ORDER BY ido, templomok.varos, templomok.nev ";
+    if (isset($tids) && is_array($tids) && count($tids) > 0) {
+        $query .= " ORDER BY FIELD(m.tid, " . implode(',', $tids) . "), ido, templomok.varos, templomok.nev ";
+    } else {
+        $query .= " ORDER BY ido, templomok.varos, templomok.nev ";
+    }
+    
     $query .= " LIMIT " . ($offset ) . "," . ($limit);
     $query .= ") groups ON groups.tid = m.tid ";
     if (count($where) > 0)
