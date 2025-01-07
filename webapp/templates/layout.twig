@@ -120,8 +120,7 @@
            </div>
            <div class="container">
                 <div class="row church-site-sidebar-holder">
-                    <div class="col-md-3  col-sm-3 church-site-left-sidebar">
-                        <!--{% include 'search/quicksearchform.twig' %}-->
+                    <div class="col-md-3  col-sm-3 church-site-left-sidebar">                        
                         {% block leftsidebar %}{% endblock %}
                         {% if chat %}{% include 'chat/chatbox.twig' with chat %}{% endif %}
                         {% if mychurches %}{% include "panel.twig" with {'title':'Módosítás','body': mychurches|raw } %}{% endif %}

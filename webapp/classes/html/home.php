@@ -36,7 +36,7 @@ class Home extends Html {
                 'id' => 'keyword',
                 'size' => 20,
                 'class' => 'keresourlap',
-                'placeholder' => 'kulcsszó, település, név, * ~ és más jelekel'),
+                'placeholder' => 'név, település, kulcsszó'),
             'varos' => array(
                 'name' => "varos",
                 'size' => 20,
