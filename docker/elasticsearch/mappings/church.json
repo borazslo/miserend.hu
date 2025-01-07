@@ -1,0 +1,71 @@
+{
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "hungarian_analyzer": {
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "hungarian_folding"
+                    ]
+                }
+            },
+            "filter": {
+                "hungarian_folding": {
+                    "type": "asciifolding",
+                    "preserve_original": false
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "id": {
+                "type": "keyword"
+            },
+            "nev": {
+                "type": "text",
+                "analyzer": "hungarian_analyzer"
+            },
+            "ismertnev": {
+                "type": "text",
+                "analyzer": "hungarian_analyzer"
+            },
+            "varos": {
+                "type": "text",
+                "analyzer": "hungarian_analyzer"
+            },
+            "misek": {
+                "type": "nested",
+                "properties": {
+                    "idopont": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm:ss"
+                    }
+                }
+            },
+            "adoraciok": {
+                "type": "nested",
+                "properties": {
+                    "kezdete": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm"
+                    },
+                    "vege": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm"
+                    },
+                    "fajta": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "lat": {
+                "type": "float"
+            },
+            "lon": {
+                "type": "float"
+            }
+        }
+    }
+}

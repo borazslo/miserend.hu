@@ -17,13 +17,14 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: pw           
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","user","-ppw"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppw"]
       timeout: 5s
       retries: 10
     networks:
       inner:
         aliases:
           - mysql
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: pma
@@ -41,34 +42,55 @@ services:
       inner:
         aliases:
           - pma
+
   mailcatcher:
     image: dockage/mailcatcher
     container_name: mailcatcher
     ports:
-    - 1025:1025
-    - 1080:1080
+      - 1025:1025
+      - 1080:1080
     restart: on-failure:10
     networks:
       inner:
         aliases:
           - mailcatcher
-  solr:
-    image: solr
-    container_name: solr
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     ports:
-     - 8983:8983
+      - "9200:9200"
+      - "9300:9300"
     volumes:
-      - solr_data:/var/solr 
-    entrypoint:
-      - docker-entrypoint.sh
-      - solr
-      - start
-      - -c
-      - -f      
+      - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
       inner:
         aliases:
-          - solr          
+          - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_SECURITY_ENABLED=false  # Disables Kibana security
+    depends_on:
+      - elasticsearch  
+    networks:
+      inner:
+        aliases:
+          - kibana
+
   miserend:
     container_name: miserend
     build:
@@ -80,11 +102,12 @@ services:
     ports:
       - "${MISEREND_PORT:-8000}:8000"
     environment:
-        MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
+      MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
     networks:
       inner:
         aliases:
           - miserend
+
 networks:
   inner:
     driver: bridge
@@ -92,4 +115,4 @@ networks:
 volumes:
   db_data: {}
   images: {}
-  solr_data: {}
+  elasticsearch_data: {}
