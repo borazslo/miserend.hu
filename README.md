@@ -25,6 +25,11 @@ A [docker-compose.yml](docker-compose.yml) a következő konténereket építi f
 
 **miserend**: Maga a honlap mindene. A forráskódból a /webapp rész kerül csak összekötésre / feltöltésre.
 
+**elasticsearch**: A kereső motor. A cron-ban rendszeresen futtani kell a _\Externalapi\ElasticsearchApi::updateChurches()_ függvényt, hogy a keresőben is frissüljenek az adatok. És első használatbavételkor is le kell futtatni, különben adatok és adatstruktúra hiányában kihal a kereső.
+
+**kibana**: Az Elasticsearch motorhoz adminisztrációs felület. Csak fejlesztéshez kell. Beizzítása kis varázslást igényelhet.
+
+
 ## További segítség
 - Belépés az egyes konténerekbe: `docker exec -it [mysql|pma|mailcatcher|miserend] bash`
 - A `mailcatcher` csak az env['production'] esetén nem lép közbe.

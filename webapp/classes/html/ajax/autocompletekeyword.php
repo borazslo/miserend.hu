@@ -11,24 +11,24 @@ class AutocompleteKeyword extends Ajax {
     public function __construct() {
         $this->input = $_REQUEST;
 		// TODO: kezeljük azért valahogy, nehogy bajt csináljon!
+
+		$limit = 9;
 		
-		$solr = new \ExternalApi\SolrApi();
-				
 		$return = [];
-		$response = $solr->search($this->input['text']);		
-		if(isset($response->docs)) {
-		
-			foreach ($response->docs as $doc) {
-				$label = $doc->fullName;
-				$return[$doc->id] = ['label' => $label, 'value' => '"'.$doc->nev[0].'"'." AND id:".$doc->id];
-			}	 
+		$results = searchChurches(['kulcsszo'=>$this->input['text']], 0, $limit);
+		foreach ($results['results'] as $key => $result) {
+			$label = $result['nev']. " (";
+			if($result['ismertnev'])	$label .= $result['ismertnev'].", ";
+			$label .= ( is_array($result['varos']) ? $result['varos'][0] : $result['varos']  ) .")";
+			//$label .= " (score: ".$result['score'].")";
+
+			$return[] = ['label' => $label, 'value' => $result['nev'] . ' id:' . $result['id']];
 			
-			// Ha több találatunk van, mint amennyit megjelenítettünk, akkor 
-			if($response->numFound > count($return)) {			
-				$return[] = ['label' => 'Van még további '.( $response->numFound - count($return) ).' találat ...', 'value' => $this->input['text']];
-			}
-		} 
-		
+		}
+	
+		if($results['sum'] > $limit ) {			
+			$return[] = ['label' => 'Van még további '.( $results['sum'] - $limit ).' találat ...', 'value' => $this->input['text']];
+		}
 		
 		$this->content = json_encode(array('results' => $return));
 		

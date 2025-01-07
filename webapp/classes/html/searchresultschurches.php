@@ -62,7 +62,7 @@ class SearchResultsChurches extends Html {
             return;
         } else if ($resultsCount == 1) {
             $url = '/templom/' . $results['results'][0]['id'];
-            $event = ['Search', 'fast', $_REQUEST['varos'] . $_REQUEST['kulcsszo'] . $_REQUEST['e']];
+            $event = ['Search', 'fast', ( isset($_REQUEST['varos']) ? $_REQUEST['varos'] : ''  ). $_REQUEST['kulcsszo'] . ( isset($_REQUEST['e']) ? $_REQUEST['e'] : '' ) ];  
             $this->redirectWithAnalyticsEvent($url, $event);
             return;
         } elseif ($resultsCount < $this->pagination->take * $this->pagination->active) {

@@ -483,14 +483,14 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 		->select('templomok.id','nev','ismertnev','varos','lat','lon');
 
         
-    $solrIsEnough = true;
+    $elasticsIsEnough = true;
 
 	/* WHERE */
 	$search->where('ok','i');
 
 	// varos
 	if (isset($args['varos']) AND $args['varos'] != '') {
-        $solrIsEnough = false;
+        $elasticsIsEnough = false;
         if ($args['varos'] == 'Budapest')
             $args['varos'] = 'Budapest*';
 
@@ -505,7 +505,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 	
 	// tnyelv
     if (isset($args['tnyelv']) AND $args['tnyelv'] != '0') {
-        $solrIsEnough = false;
+        $elasticsIsEnough = false;
 		if ($args['tnyelv'] == 'h') $args['tnyelv'] = 'hu|h';
 		
 		$search->join('misek','misek.tid','=','templomok.id');		
@@ -514,38 +514,35 @@ function searchChurches($args, $offset = 0, $limit = 20) {
 	
 	// gorog only
 	if (isset($args['gorog']) AND $args['gorog'] == 'gorog') {
-        $solrIsEnough = false;
+        $elasticsIsEnough = false;
         $search->whereIn("egyhazmegye",[17,18,34]);
     }
 
 	// egyhazmegye
     if (isset($args['ehm']) AND $args['ehm'] != 0) {
-        $solrIsEnough = false;
+        $elasticsIsEnough = false;
         $search->where("egyhazmegye",$args['ehm']);
     }
 
 	// espereskerulet
     if (isset($args['espker']) AND $args['espker'] != 0)  {
-        $solrIsEnough = false;
+        $elasticsIsEnough = false;
         $search->where("espereskerulet",$args['espker']);
 	 }
 
 
-     if($solrIsEnough == false)   {         
+     if($elasticsIsEnough == false)   {         
         // keyword
         if (isset($args['kulcsszo']) AND $args['kulcsszo'] != '') {
         
-            //A Solr motorral keresünk itt már
-            $solr = new \ExternalApi\SolrApi();
+            try {
+                //A Elasticsearch motorral keresünk itt már
+                $elastic = new \ExternalApi\ElasticsearchApi();
+                $response = $elastic->search($args['kulcsszo'],["from" => 0,"size" => 10000]);    
 
-            $solr->q = $args['kulcsszo']." AND ok:i";
-
-            $response = $solr->search($solr->q,["rows" => 100000]);
-            //Ha működik a solr kereső, akkor komolyan vesszük
-            if($response) {
                 $ids = [];
-                foreach($response->docs as $doc) {
-                    $ids[] = $doc->id;		
+                foreach($response->hits as $hit) {
+                    $ids[] = $hit->_source->id;		
                 }		
                 // Ha van találat, akkor az azonosítókat összegyűjtve visszük tovább még a keresét.
                 if(count($ids) > 0) {
@@ -554,15 +551,17 @@ function searchChurches($args, $offset = 0, $limit = 20) {
                 // Ha nincs találat, akkor el kell rontani a fő keresésünket. Pedig szebb lenni valami return false vagy hasonló
                     $search->where('nev','nem adunk keresési eredményt hiszen a kulcsszóra nem találtunk semmit');			
                 }
-            } else {
-            //Ha nem működik a solr kereső, akkor is dolgozzunk azért valami egyszerűbbet
-                addMessage('Sajnos csak az egyszerűsített keresőmotor működik jelenleg. Elnézést kérünk.','warning');
+            } catch (Exception $e) {
+                addMessage('Hiba történt a keresés közben. Kérjük próbálja újra később.','danger');
+                //Ha nem működik a elastics kereső, akkor is dolgozzunk azért valami egyszerűbbet
+                addMessage('Hiba történt a modern Elasticsearch kereső motor használata közben. Kérjük próbálja újra később.','warning');
                 $search->where('nev', 'LIKE', '%'.$args['kulcsszo'].'%');            
             }
+                        
         }
         $search->groupBy('templomok.id'); //Igazából ez csak a tnyelv esetén szükséges
-	    $search->orderByRaw("FIELD(id, " . implode(',', $ids) . ")");
-        //$search->orderBy('nev');
+	    if(isset($ids) AND is_array($ids) AND count($ids) > 0 ) $search->orderByRaw("FIELD(id, " . implode(',', $ids) . ")");
+        else $search->orderBy('nev');
         
         $sum = $search;
         $return['sum'] = count($sum->get());
@@ -571,36 +570,30 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         $return['results']  = array_map(function ($value) {return (array)$value;}, $results);	
     }
 
-    // Ha nincsenek külöfnéle speckó beállítások, akkor közvetlenül solr-ből is nyomhatjuk az adatokat. Ami a sorrend miatt és erőforrásilag is megéri.
-    if($solrIsEnough) {        
-        
-       //A Solr motorral keresünk itt már
-       $solr = new \ExternalApi\SolrApi();
-       
-       if (isset($args['kulcsszo']) AND $args['kulcsszo'] != '') $solr->q = $args['kulcsszo']." AND ok:i";
-       else $solr->q = "ok:i";
-       $response = $solr->search(
-            $solr->q, 
-            [
-                "start" => $offset,
-                "rows" => $limit
-            ]);
-
-        if($response) {
-            $return['sum'] = $response->numFound;
-            foreach($response->docs as $doc) {
-                foreach($doc as $key => $value) {
-                    $doc->{$key} = is_array($value) ? $value[0]: $value;
-                }   
-                $return['results'][] = (array) $doc;
-            }
-            
-        } 
+    // Ha nincsenek különféle speckó beállítások, akkor közvetlenül elasticsból is nyomhatjuk az adatokat. Ami a sorrend miatt és erőforrásilag is megéri.
+    if($elasticsIsEnough) {        
+        try {
+            $elastic = new \ExternalApi\ElasticsearchApi();
+            $response = $elastic->search($args['kulcsszo'],["from" => $offset,"size" => $limit]);
+            if($response) {
+                $return['sum'] = $response->total->value;
+                $return['results'] = [];    
+                foreach($response->hits as $hit) {            
+                    $tmp = (array) $hit->_source;
+                    $tmp['score'] = $hit->_score;
+                    $return['results'][] = $tmp;
+                }
+            } 
+        } catch (Exception $e) {
+            addMessage('Hiba történt a modern Elasticsearch kereső motor használata közben. Kérjük próbálja újra később.','danger');
+        }
+              
     };
 	
     
     	
 	if(!isset($return['results'])) $return['results'] = [];	
+    if(!isset($return['sum'])) $return['sum'] = 0;	
 
     return $return;
 }
