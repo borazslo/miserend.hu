@@ -21,13 +21,23 @@
             <div class="row" style="margin-bottom:6px">
                 <div class="col-md-10">
                     <a href='/templom/{{ church.id }}' class=felsomenulink title='{{ church.ismertnev }}'>
-                        <b>{{ church.nev }}</b> <font color=#8D317C>({{ church.varos }})</font>
+                        <b>{{ church.nev }}</b> 
+                        <font color=#8D317C>
+                            {% if church.varos is iterable %}
+                                ({{ church.varos[0] }})
+                            {% else %}
+                                ({{ church.varos }})
+                            {% endif %}
+                        </font>
+                        {% if user.isadmin %}
+                        <small>{{ church.score }}</small>
+                        {% endif %}
                     </a>
                     {% if church.ismertnev %}
                         <br/><span class="alap" style="margin-left: 20px; font-style: italic;">{{ church.ismertnev }}</span>
                     {% endif %}
                 </div>
-                {% if church.writeAccess %}
+                {% if user.isadmin %}
                     <div class="col-md-2">
                         <a href="/templom/{{ church.id }}/editschedule">
                             <span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése..."></span>

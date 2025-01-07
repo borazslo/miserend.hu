@@ -73,7 +73,8 @@ class SearchResultsChurches extends Html {
         foreach ($results['results'] as $result) {
             $churchIds[] = $result['id'];
         }
-        $this->churches = \Eloquent\Church::whereIn('id', $churchIds)->get();
+        $this->churches = $results['results'];
+        //$this->churches = \Eloquent\Church::whereIn('id', $churchIds)->get();
 
         $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
 

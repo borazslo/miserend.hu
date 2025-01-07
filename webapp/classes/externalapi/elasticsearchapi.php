@@ -142,6 +142,11 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			$data[$key] = $value;
 		}
 		
+		// Build the query
+		$data = [
+				'from' => $data['from'],
+				'size' => $data['size'],
+				'query' => ['bool' => ['should' => []]]];
 
 		if (preg_match('/\bid:(\d+)\b/i', $keyword, $matches)) {
 			$id = $matches[1];
@@ -155,23 +160,45 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 						[
 							'multi_match' => [
 								'query' => $keyword,
-								'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^4']
+								'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^40']
 							]
 						]
 					]
 				]
 			];
 		} else {
+			/*
 			$data['query'] = [
 				'multi_match' => [
 					'query' => $keyword,
-					'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^4']
+					'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^2']
 				]
 			];
+			*/
+
+			$data['query']['bool']['should'][] = [
+				"match" => [
+					"varos" => [
+						"query" => $keyword,
+						"operator" => "or",
+						"boost" => 64
+					]
+				]
+			];
+
+			$data['query']['bool']['should'][] = ['term'=>['nev'=>[ 'value' => $keyword, 'boost'=>32 ]]];			
+			$data['query']['bool']['should'][] = ['term'=>['varos'=>[ 'value' => $keyword, 'boost'=>18 ]]];
+			$data['query']['bool']['should'][] = ['term'=>['ismertnev'=>[ 'value' => $keyword, 'boost'=>7 ]]];
+			$data['query']['bool']['should'][] = ['match'=>['nev'=>[ 'query' => $keyword, 'boost'=>30 ]]];
+			$data['query']['bool']['should'][] = ['match'=>['varos'=>[ 'query' => $keyword, 'boost'=>15 ]]];
+			$data['query']['bool']['should'][] = ['match'=>['ismertnev'=>[ 'query' => $keyword, 'boost'=>5 ]]];
+			$data['query']['bool']['should'][] = ['wildcard'=>['nev'=>[ 'value' => '*'.$keyword.'*', 'boost'=>28 ]]];			
+			$data['query']['bool']['should'][] = ['wildcard'=>['varos'=>[ 'value' => '*'.$keyword.'*', 'boost'=>12 ]]];
+			$data['query']['bool']['should'][] = ['wildcard'=>['ismertnev'=>[ 'value' => '*'.$keyword.'*', 'boost'=>4 ]]];
+								
 		}
 
 		
-
 
 		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"GET");		
 		$this->buildQuery('churches/_search', json_encode($data));		
