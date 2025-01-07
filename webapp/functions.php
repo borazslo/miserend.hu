@@ -628,7 +628,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
             unset($tmp['leptet']);
         if (isset($tmp['min']))
             unset($tmp['min']);
-        $results = searchChurches($args, 0, 1000000);
+        $results = searchChurches($args, 0, 10000);
         $tids[] = 0;
         if (isset($results['results']))
             foreach ($results['results'] as $r)
