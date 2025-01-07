@@ -142,6 +142,11 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			$data[$key] = $value;
 		}
 		
+		// Build the query
+		$data = [
+				'from' => $data['from'],
+				'size' => $data['size'],
+				'query' => ['bool' => ['should' => []]]];
 
 		if (preg_match('/\bid:(\d+)\b/i', $keyword, $matches)) {
 			$id = $matches[1];
@@ -155,23 +160,45 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 						[
 							'multi_match' => [
 								'query' => $keyword,
-								'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^4']
+								'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^40']
 							]
 						]
 					]
 				]
 			];
 		} else {
+			/*
 			$data['query'] = [
 				'multi_match' => [
 					'query' => $keyword,
-					'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^4']
+					'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^2']
 				]
 			];
+			*/
+
+			$data['query']['bool']['should'][] = [
+				"match" => [
+					"varos" => [
+						"query" => $keyword,
+						"operator" => "or",
+						"boost" => 64
+					]
+				]
+			];
+
+			$data['query']['bool']['should'][] = ['term'=>['nev'=>[ 'value' => $keyword, 'boost'=>32 ]]];			
+			$data['query']['bool']['should'][] = ['term'=>['varos'=>[ 'value' => $keyword, 'boost'=>18 ]]];
+			$data['query']['bool']['should'][] = ['term'=>['ismertnev'=>[ 'value' => $keyword, 'boost'=>7 ]]];
+			$data['query']['bool']['should'][] = ['match'=>['nev'=>[ 'query' => $keyword, 'boost'=>30 ]]];
+			$data['query']['bool']['should'][] = ['match'=>['varos'=>[ 'query' => $keyword, 'boost'=>15 ]]];
+			$data['query']['bool']['should'][] = ['match'=>['ismertnev'=>[ 'query' => $keyword, 'boost'=>5 ]]];
+			$data['query']['bool']['should'][] = ['wildcard'=>['nev'=>[ 'value' => '*'.$keyword.'*', 'boost'=>28 ]]];			
+			$data['query']['bool']['should'][] = ['wildcard'=>['varos'=>[ 'value' => '*'.$keyword.'*', 'boost'=>12 ]]];
+			$data['query']['bool']['should'][] = ['wildcard'=>['ismertnev'=>[ 'value' => '*'.$keyword.'*', 'boost'=>4 ]]];
+								
 		}
 
 		
-
 
 		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"GET");		
 		$this->buildQuery('churches/_search', json_encode($data));		
@@ -240,288 +267,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		if(!$elastic->putBulk($bulkData))
 			throw new \Exception("Could not update churches!\n".$elastic->error);
 		
-
-
-
-		echo "ok";
-		//printr($elastic);
-		exit;
-
-		$query = json_encode([
-			"query" => [
-				"match_all" => (object)[]
-			],
-			"size" => 10
-		]);
-
-		$query = '{
-				"query": {
-					"function_score": {
-					"query": {
-						"multi_match": {
-						"query": "jezsu",
-						"fields": ["nev^4", "ismertnev^4", "varos^4"]
-						}
-					},
-					"boost_mode": "sum"
-					}
-				}
-				}';
-		$query = '{
-		
-		
-
-		}';
-
-
-		//printr($elastic->generateSearchQuery('Hódmező*'));
-		$query = json_encode($elastic->generateSearchQuery('Erzsébet'));
-
-		$elastic->buildQuery("churches/_search?format=json", $query);
-		$elastic->run();
-		if($elastic->responseCode != 200) {
-			throw new \Exception("Could not search churches!\n".$elastic->error);
-		}	
-		printr($elastic->jsonData);
-
-		exit;
-
-		
-		
-
-
-		
-		/*
-
-		if(!in_array('churches',$collections)) {
-			if(!$solr->createCollection('churches')) {
-				throw new \Exception("Could not create collection!\n".$solr->error);
-			}
-		}
-		
-		*/
-		
-
-		if($elastic->responseCode != 200) {
-			throw new \Exception("Could not update churches!\n".$elastic->error);
-		}		
-		//printr($elastic->jsonData);
-		
-		$query = [
-			"query" => [
-				"match_all" => (object)[]
-			],
-			"size" => 10
-		];
-		$elastic->buildQuery("churches/_search?format=json", json_encode($query));
-		$elastic->run();
-		if($elastic->responseCode != 200) {
-			throw new \Exception("Could not search churches!\n".$elastic->error);
-		}	
-		printr($elastic->jsonData);
-		exit;
-
-		echo json_encode($bulkData);
-
-
-		
-		/*
-		foreach($churches as $c => $church) {			
-			$fieldsToConvert = ['nev','ismertnev','varos','cim','megkozelites','plebania','megjegyzes','misemegj'];
-			foreach($fieldsToConvert as $field) {				
-				$fieldValues = $churches[$c][$field];
-				if(!is_array($fieldValues)) {
-					$fieldValues = [$fieldValues];
-				}
-				foreach($fieldValues as $fieldValue) {
-					$fieldValues[] = $solr->convertHungarianChars($fieldValue);
-				}				
-				$churches[$c][$field] = $fieldValues;
-			}
-		}
-		*/
-
-		
-
-		if(!$solr->truncateCollection('churches'))
-			return false;
-		if(!$solr->updateCollection('churches',json_encode($churches))) 
-			return false;
-		
-		
-		return true;
-		
-	}
-
-	static function convertHungarianChars($input) {
-		$transliterationMap = array(
-			'Ő' => 'O', 'ő' => 'o', 'Ű' => 'U', 'ű' => 'u',
-			'Á' => 'A', 'á' => 'a', 'É' => 'E', 'é' => 'e',
-			'Í' => 'I', 'í' => 'i', 'Ó' => 'O', 'ó' => 'o',
-			'Ö' => 'O', 'ö' => 'o', 'Ő' => 'O', 'ő' => 'o',
-			'Ú' => 'U', 'ú' => 'u', 'Ü' => 'U', 'ü' => 'u',
-			'Ñ' => 'N', 'ñ' => 'n', 'Ç' => 'C', 'ç' => 'c',
-			'À' => 'A', 'à' => 'a', 'È' => 'E', 'è' => 'e',
-			'Ì' => 'I', 'ì' => 'i', 'Ò' => 'O', 'ò' => 'o',
-			'Ù' => 'U', 'ù' => 'u', 'ÿ' => 'y'
-		);
-	
-		return strtr($input, $transliterationMap);
 	}
 	
-
-
-
-
-	static function generateSearchQuery($term) {
-		// Define the boosts for each case
-		$boosts = [
-			'nev' => [
-				'match' => 32,
-				'wildcard_prefix' => 30,
-				'wildcard_suffix' => 28
-			],
-			'ismertnev' => [
-				'match' => 16,
-				'wildcard_prefix' => 8,
-				'wildcard_suffix' => 6
-			],
-			'varos' => [
-				'match' => 4,
-				'wildcard_prefix' => 2,
-				'wildcard_suffix' => 1
-			]
-		];
-	
-		// Build the query array
-		$queryArray = [
-			'query' => [
-						'bool' => [
-							'should' => []
-						]
-					]
-		];
-	
-		// Loop through the fields and create the corresponding queries with boosts
-		foreach ($boosts as $field => $values) {
-			// Match query for the exact term
-			$queryArray['query']['bool']['should'][] = [
-				'match' => [
-					$field => [
-						'query' => $term,
-						'boost' => $values['match']
-					]
-				]
-			];
-	
-			// Wildcard query for "term*" (prefix match)
-			$queryArray['query']['bool']['should'][] = [
-				'wildcard' => [
-					$field => [
-						'value' => $term . '*',
-						'boost' => $values['wildcard_prefix']
-					]
-				]
-			];
-	
-			// Wildcard query for "*term" (suffix match)
-			$queryArray['query']['bool']['should'][] = [
-				'wildcard' => [
-					$field => [
-						'value' => '*' . $term,
-						'boost' => $values['wildcard_suffix']
-					]
-				]
-			];
-		}
-	
-		return $queryArray;
-	}
-	
-	static function createSearchQuery($term) {
-		return [
-			"query" => [
-				"bool" => [
-					"should" => [
-						[
-							"match" => [
-								"nev" => [
-									"query" => $term,
-									"boost" => 32
-								]
-							]
-						],
-						[
-							"wildcard" => [
-								"nev" => [
-									"value" => $term . "*",
-									"boost" => 30
-								]
-							]
-						],
-						[
-							"wildcard" => [
-								"nev" => [
-									"value" => "*" . $term,
-									"boost" => 28
-								]
-							]
-						],
-						[
-							"match" => [
-								"ismertnev" => [
-									"query" => $term,
-									"boost" => 16
-								]
-							]
-						],
-						[
-							"wildcard" => [
-								"ismertnev" => [
-									"value" => $term . "*",
-									"boost" => 8
-								]
-							]
-						],
-						[
-							"wildcard" => [
-								"ismertnev" => [
-									"value" => "*" . $term,
-									"boost" => 6
-								]
-							]
-						],
-						[
-							"match" => [
-								"varos" => [
-									"query" => $term,
-									"boost" => 4
-								]
-							]
-						],
-						[
-							"wildcard" => [
-								"varos" => [
-									"value" => $term . "*",
-									"boost" => 2
-								]
-							]
-						],
-						[
-							"wildcard" => [
-								"varos" => [
-									"value" => "*" . $term,
-									"boost" => 1
-								]
-							]
-						]
-					]
-				]
-			]
-		];
-	}
-	
-	
-
 	
 }

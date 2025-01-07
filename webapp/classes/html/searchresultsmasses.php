@@ -17,7 +17,7 @@ class SearchResultsMasses extends Html {
 
         $mikor2 = $_REQUEST['mikor2'];
         $mikorido = $_REQUEST['mikorido'];
-        $varos = $_REQUEST['varos'];
+        $varos = isset($_REQUEST['varos']) ? $_REQUEST['varos'] : "";
         $ehm = $_REQUEST['ehm'];
         $espkerT = isset($_REQUEST['espkerT']) ? $_REQUEST['espkerT'] : false;
         $nyelv = $_REQUEST['nyelv'];
