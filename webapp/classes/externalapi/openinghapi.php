@@ -31,7 +31,8 @@ class OpeninghApi extends \ExternalApi\ExternalApi {
         if(isset($this->jsonData->errors)) {
             $message = "Error! It is not a valid opening_hour!";
             $message .= $this->linkForDetails;
-            $message .= "\n".( count($this->jsonData->errors) > 1 ? print_r($this->jsonData->errors,1) : $this->jsonData->errors[0] );
+            printr($this);
+            $message .= "\n".( count($this->jsonData->errors) > 1 ? print_r($this->jsonData->errors,1) : (is_object($this->jsonData->errors[0]) ? print_r($this->jsonData->errors[0],1) : $this->jsonData->errors[0]) );
             throw new Exception($message);
         }
         
