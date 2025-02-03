@@ -19,7 +19,7 @@ class Church extends \Html\Html {
         if(!$church) {
             throw new \Exception("Church with tid = '$tid' does not exist.");
         }
-        $church = $church->append(['readAccess','writeAccess','liturgiatv']);
+        $church = $church->append(['readAccess','writeAccess','liturgiatv','accessibility']);
         
         if (!$church->readAccess) {
             throw new \Exception("Read access denied to church tid = '$tid'");
@@ -33,14 +33,6 @@ class Church extends \Html\Html {
 
         $church->photos = $church->photos()->get();
 		
-		foreach(['wheelchair','toilets:wheelchair','wheelchair:description','hearing_loop','disabled:description'] as $k=>$accessibility) {			
-			if(isset($church->$accessibility)) {
-					if(!isset($church->accessibility)) $church->accessibility = [];
-					$tmp = $church->accessibility;
-					$tmp[$accessibility] = $church->$accessibility;
-					$church->accessibility = $tmp;
-			}
-		}
 				
 		$church->kozossegek = $church->kozossegek;
         

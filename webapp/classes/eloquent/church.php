@@ -116,9 +116,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }    
     
     
-    public function toAPIArray()
+    public function toAPIArray($length = "minimal")
     {
-        
+        if($length == false) $length = "minimal";
+
         $masses = searchMasses(['templom'=>$this->id, 'mikor' => date('Y-m-d')] );
         
         $misek = [];        
@@ -144,19 +145,74 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             $adorations[$key]['fajta'] = $adoration['type'];				
             if($adoration['info'] != '') $adorations[$key]['info'] =  $adoration['info'];
         }
+        $this->loadAttributes();
+
+        if($length == "minimal") {
+            $return = [
+                'id' => $this->id,
+                'nev' => $this->nev,
+                'frissitve' => date('Y-m-d H:i:s', strtotime($this->frissites)),
+                'ismertnev' => $this->ismertnev,
+                'orszag' => ( DB::table('orszagok')->where('id', $this->orszag)->value('nev') ?: "" ),
+                'varos' => $this->varos,
+                'misek' => $misek,
+                'adoraciok' => $adorations,
+                'koordinatak' => [ $this->lat, $this->lon ],
+                'lat' => $this->lat,
+                'lon' => $this->lon,
+                'tavolsag' => $this->distance
+            ];
+            return $return;
+        }
 
         $return = [
             'id' => $this->id,
             'nev' => $this->nev,
+            'frissitve' => date('Y-m-d H:i:s', strtotime($this->frissites)),
             'ismertnev' => $this->ismertnev,
+            'orszag' => ( DB::table('orszagok')->where('id', $this->orszag)->value('nev') ?: "" ),
+            'egyhazmegye' => ( DB::table('egyhazmegye')->where('id', $this->egyhazmegye)->value('nev') ?: "" ),
+            'megye' => ( DB::table('megye')->where('id', $this->megye)->value('megyenev') ?: "" ),
             'varos' => $this->varos,
+            'cim' => $this->cim,
+            'megkozelites' => $this->megkozelites,
+            'plebania' => str_replace('<br>', "\n", strip_tags($this->plebania, '<br>')),
+            'leiras' => str_replace('<br>', "\n", strip_tags($this->leiras, '<br>')),
+            'accessibility' => $this->accessibility,
+            'email' => $this->pleb_eml,
+            'links' => $this->links->pluck('href')->toArray(),
             'misek' => $misek,
+            'miserend_deprecated' => DB::table('misek')
+                    ->select('nap', 'ido', 'nap2', 'idoszamitas', 'tol', 'ig', 'nyelv', 'milyen', 'megjegyzes')
+                    ->where('tid', $this->id)
+                    ->where(function($query) {
+                        $query->where('torles', '0000-00-00 00:00:00')
+                            ->orWhereNull('torles');
+                    })
+                    ->orderBy('nap')
+                    ->orderBy('ido')
+                    ->get()
+                    ->groupBy('idoszamitas')
+                    ->map(function($items) {
+                        return $items->map(function($item) {
+                            return (array) $item;
+                        })->toArray();
+                    }),
+            'miserend_megjegyzes' => str_replace('<br>', "\n", strip_tags($this->misemegj, '<br>')),
             'adoraciok' => $adorations,
+            'kozossegek' => array_map(function($kozosseg) {
+                return [
+                    'nev' => $kozosseg->name,
+                    'link' => $kozosseg->link
+                ];
+            }, $this->kozossegek),
+            'koordinatak' => [ $this->lat, $this->lon ],
             'lat' => $this->lat,
-            'lon' => $this->lon
+            'lon' => $this->lon,
+            'tavolsag' => $this->distance
         ];
 
-        if(isset($this->distance)) $return['tavolsag'] = (int) $this->distance;
+        
         
 
         return $return;
@@ -226,6 +282,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * remarksSatus
      * location
 	 * kozossegek
+     * accessibility
      */
     public function getLiturgiatvAttribute($value) {
         $litapi = new \ExternalApi\LiturgiatvApi();
@@ -423,6 +480,16 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 		else
 			return false;			
 	}
+
+    public function getAccessibilityAttribute($value) {
+        $return = [];
+        foreach(['wheelchair','toilets:wheelchair','wheelchair:description','hearing_loop','disabled:description'] as $k=>$accessibility) {			
+			if(isset($this->$accessibility)) {			
+					$return[$accessibility] = $this->$accessibility;
+			}
+		}
+        return $return;
+    }
 	
     /*
      * What does 'M' mean?

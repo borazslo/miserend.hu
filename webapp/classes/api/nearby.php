@@ -21,6 +21,9 @@ class NearBy extends Api {
         }
 		if (!is_numeric($this->input['lon']) OR $this->input['lon'] > 90 OR $this->input['lon'] < -180 ) {
             throw new \Exception("JSON input 'lon' should be float between -180 and 90.");
+        }
+		if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
+            throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
         }		
 	}
 
@@ -35,7 +38,7 @@ class NearBy extends Api {
 				->where('lat','<>','')
                 ->orderBy('distance', 'ASC')
 				->limit(10)
-                ->get()->map->toAPIArray();
+                ->get()->map->toAPIArray( isset($this->input['response_length']) ? $this->input['response_length'] : false );
 				
         //$this->return['lat'] = $this->input['lat'];
 

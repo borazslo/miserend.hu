@@ -19,6 +19,9 @@ class Church extends Api {
 		if (!is_numeric($this->input['id']))  {
             throw new \Exception("JSON input 'id' should be an integer.");
         }
+        if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
+            throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
+        }
 	}
 
     public function run() {
@@ -26,7 +29,7 @@ class Church extends Api {
 		
         $this->getInputJson();
 		
-		$church = \Eloquent\Church::Where('id',$this->input['id'])->get()->map->toAPIArray();
+		$church = \Eloquent\Church::Where('id',$this->input['id'])->get()->map->toAPIArray(isset($this->input['response_length']) ? $this->input['response_length'] : false );
 				
 
         if(count($church) < 1 ) {
