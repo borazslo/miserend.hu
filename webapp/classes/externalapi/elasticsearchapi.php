@@ -131,6 +131,38 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		return true;
 	}
 	
+	function random($params = []) {
+		// Defaults
+		$default_params = [
+			'size'=>10
+		];		
+		$data = $default_params;
+		foreach($params as $key => $value) {
+			$data[$key] = $value;
+		}
+
+		$data = [
+			"query" => [
+				"function_score" => [
+					"query" => ["match_all" => new \stdClass()],
+					"boost" => "5",
+					"random_score" => new \stdClass(),
+					"boost_mode" => "multiply"
+				]
+			]
+		];
+
+		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"GET");		
+		$this->buildQuery('churches/_search', json_encode($data));		
+		$this->run();
+
+		if($this->responseCode != 200) {
+			throw new \Exception("Could not search churches!\n".$this->error);
+		}
+
+		return $this->jsonData->hits;
+	}
+
 	function search($keyword, $params = [] ) {
 		// Defaults
 		$default_params = [

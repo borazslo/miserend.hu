@@ -22,6 +22,9 @@ class Search extends Api {
 		if (!is_numeric($this->input['limit']) OR $this->input['limit'] > 100 OR $this->input['limit'] < 1 ) {
             throw new \Exception("JSON input 'limit' should be an integer between 1 and 100.");
         }
+		if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
+            throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
+        }
     }
     
     public function run() {
@@ -48,7 +51,7 @@ class Search extends Api {
 		$this->return['templomok'] = \Eloquent\Church::select()	
 			->whereIN('id',$ids)
 			->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
-			->get()->map->toAPIArray();
+			->get()->map->toAPIArray(isset($this->input['response_length']) ? $this->input['response_length'] : false );
 
 
 		

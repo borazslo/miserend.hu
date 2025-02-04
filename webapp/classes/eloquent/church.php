@@ -478,7 +478,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 			return $api->jsonData->data;
 		}
 		else
-			return false;			
+			return [];			
 	}
 
     public function getAccessibilityAttribute($value) {

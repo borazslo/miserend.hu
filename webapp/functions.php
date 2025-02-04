@@ -574,7 +574,13 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     if($elasticsIsEnough) {        
         try {
             $elastic = new \ExternalApi\ElasticsearchApi();
-            $response = $elastic->search($args['kulcsszo'],["from" => $offset,"size" => $limit]);
+
+            if($args['kulcsszo'] == 'random') {
+                $response = $elastic->random(['from' => $offset,"size" => $limit]);
+            }
+            else {
+                $response = $elastic->search($args['kulcsszo'],["from" => $offset,"size" => $limit]);
+            }
             if($response) {
                 $return['sum'] = $response->total->value;
                 $return['results'] = [];    
@@ -583,7 +589,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
                     $tmp['score'] = $hit->_score;
                     $return['results'][] = $tmp;
                 }
-            } 
+            }             
         } catch (Exception $e) {
             addMessage('Hiba történt a modern Elasticsearch kereső motor használata közben. Kérjük próbálja újra később.','danger');
         }
