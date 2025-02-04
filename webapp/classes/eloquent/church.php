@@ -49,12 +49,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 		if($church) {
 			// Amikor leszóhívunk az adatbázisból egy templomot, akkor rögtön feltöltjük teljesen a tulajdonságaival
 			if ($method == 'find') {			
-				
-                // Overwrite nev and ismertnev with data from OSM attributes
-                // FIXME after Issue #257 has been fixed
-                $church->nev = isset($church->names[0]) ? $church->names[0] : '(Név nélküli misézőhely)';
-                $church->ismertnev = isset($church->alternative_names[0]) ? $church->alternative_names[0] : '';
-
+				                
                 // Minden OSM key->value betöltése
                 $church->loadAttributes();
             }
@@ -309,6 +304,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         } elseif (isset($attributes['name'])) {
             array_unshift($names, $attributes['name']);
         } else {
+            if($this->nev == '') 
+                $this->nev = '(Név nélküli misézőhely)';                        
             array_unshift($names, $this->nev);
         }
         // Let's find the other names
