@@ -14,7 +14,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     use \Illuminate\Database\Eloquent\SoftDeletes;
     
     protected $table = 'templomok';
-    protected $appends = array('fullName','location','links');
+    protected $appends = array('names', 'alternative_names', 'fullName','location','links');
 
 	protected $attributesCache = null;
 	
@@ -49,9 +49,15 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 		if($church) {
 			// Amikor leszóhívunk az adatbázisból egy templomot, akkor rögtön feltöltjük teljesen a tulajdonságaival
 			if ($method == 'find') {			
-				$church->loadAttributes();
-			} 
-		}
+				
+                // Overwrite nev and ismertnev with data from OSM attributes
+                $church->nev = $church->names[0];        
+                $church->ismertnev = $church->alternative_names[0];
+
+                // Minden OSM key->value betöltése
+                $church->loadAttributes();
+            }
+        }
 
         return $church;
         }   
@@ -271,6 +277,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     /*
      * getSomethingAttribute -> $this->something;
      * 
+     * names
+     * alternative_names
      * liturgiatv
      * denomination
      * holders
@@ -284,6 +292,60 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 	 * kozossegek
      * accessibility
      */
+    public function getNamesAttribute($value) {
+
+
+        $attributes = $this->attributes()->get()->pluck('value', 'key')->toArray();
+        
+        // Collect all the possible names of the church
+        $names = [];
+        // Let's find the main / default name 
+        if (isset($attributes['name:hu'])) {
+            array_unshift($names, $attributes['name:hu']);
+        } elseif (isset($attributes['name'])) {
+            array_unshift($names, $attributes['name']);
+        } else {
+            array_unshift($names, $this->nev);
+        }
+        // Let's find the other names
+        foreach ($attributes as $key => $value) {
+            if (preg_match('/^name(:.*)?$/', $key)) {
+                $names[] = $value;
+            }
+        }
+        return array_unique($names);
+    }
+
+    public function getAlternativeNamesAttribute($value) {
+        $attributes = $this->attributes()->get()->pluck('value', 'key')->toArray();
+
+       // Collect all alternative names of the church
+       $alternativeNames = [];
+       // Collect alternative names
+       if (isset($attributes['official_name:hu'])) {
+           array_unshift($alternativeNames, $attributes['official_name:hu']);
+       } elseif (isset($attributes['alt_name:hu'])) {
+           array_unshift($alternativeNames, $attributes['alt_name:hu']);
+       } elseif (isset($attributes['old_name:hu'])) {
+           array_unshift($alternativeNames, $attributes['old_name:hu']);
+       } elseif (isset($attributes['official_name'])) {
+           array_unshift($alternativeNames, $attributes['official_name']);
+       } elseif (isset($attributes['alt_name'])) {
+           array_unshift($alternativeNames, $attributes['alt_name']);
+       } elseif (isset($attributes['old_name'])) {
+           array_unshift($alternativeNames, $attributes['old_name']);
+       }
+
+       foreach ($attributes as $key => $value) {
+           if (preg_match('/^(alt_|old_|official_)name(:.*)?$/', $key)) {
+               $alternativeNames[] = $value;
+           }
+       }                
+       return array_unique($alternativeNames);
+       
+
+    }
+
     public function getLiturgiatvAttribute($value) {
         $litapi = new \ExternalApi\LiturgiatvApi();
         $datas = $litapi->getByChurch($this->id); 
