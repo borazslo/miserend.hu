@@ -130,7 +130,7 @@
 					<a href="{{ value.overpassturbo }}" target="_blank">
 				{% else %}
 					{% set church = (value.churches)|first %}
-					<a href="https://openstreetmap.org/{{ church.osmtype }}/{{ church.osmid }}" target="_blank"> {{church.nev }}
+					<a href="https://openstreetmap.org/{{ church.osmtype }}/{{ church.osmid }}" target="_blank"> {{church.names.0 }}
 				{% endif %}
 				{{ value.value }}</a>
 																	
@@ -143,7 +143,7 @@
 						<a href="{{ value.overpassturbo }}" target="_blank">
 					{% else %}
 						{% set church = (value.churches)|first %}
-						<a href="https://openstreetmap.org/{{ church.osmtype }}/{{ church.osmid }}" target="_blank"> {{church.nev }}
+						<a href="https://openstreetmap.org/{{ church.osmtype }}/{{ church.osmid }}" target="_blank"> {{church.names.0 }}
 					{% endif %}
 					{{ value.value }}</a> ({{ value.churches|length }})<br/>
 				{% endfor %}

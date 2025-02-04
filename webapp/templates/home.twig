@@ -218,7 +218,7 @@
 									} else {
 										var distance = ( Math.round(data.templomok[i].tavolsag / 100)/10 ) + " km";
 									}
-								
+                                    // FIXME for Issue #257
 									$('#nearby > ul').append('<li><a href="/templom/' + data.templomok[i].id + '">' + data.templomok[i].nev + ' (' + data.templomok[i].ismertnev + ')</a>, ' + data.templomok[i].varos + ' - ' + distance + '</li>');
 									// console.log(data.templomok[i]);
 								}								

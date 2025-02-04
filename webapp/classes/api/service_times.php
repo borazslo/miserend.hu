@@ -26,7 +26,7 @@ class Service_times extends Api {
 			if($syntax == 'horariosdemisa') {
 				$return = [
 					'church_id' => $church->id,
-					'name' => $church->nev,
+					'name' => $church->names[0],
 					'address' => $church->location->address,
 					'city, state' => $church->location->city['name'],
 					'country' => $church->location->country['name'],

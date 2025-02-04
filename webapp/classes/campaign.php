@@ -36,6 +36,7 @@ class Campaign {
         $cUsers = mysql_num_rows($result);
 
         //templomok
+        // FIXME for Issue #257
         $query = "
             SELECT t.id,t.nev,t.ismertnev,t.varos,t.nev,t.frissites,u.uid, u.timestamp 
             FROM templomok  t
@@ -132,6 +133,7 @@ class Campaign {
                     mysql_query($query);
                 else
                     echo $query . "\n<br/>";
+                // FIXME for Issue #257
                 $list .= "<li><a href='http://miserend.hu/templom/" . $templom['id'] . "'>" . $templom['nev'] . "</a>";
                 if ($templom['ismertnev'] != '')
                     $list .= " (" . $templom['ismertnev'] . ")";

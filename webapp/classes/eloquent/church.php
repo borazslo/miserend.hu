@@ -51,8 +51,9 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 			if ($method == 'find') {			
 				
                 // Overwrite nev and ismertnev with data from OSM attributes
-                $church->nev = $church->names[0];        
-                $church->ismertnev = $church->alternative_names[0];
+                // FIXME after Issue #257 has been fixed
+                $church->nev = isset($church->names[0]) ? $church->names[0] : '(Név nélküli misézőhely)';
+                $church->ismertnev = isset($church->alternative_names[0]) ? $church->alternative_names[0] : '';
 
                 // Minden OSM key->value betöltése
                 $church->loadAttributes();
@@ -156,9 +157,9 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         if($length == "minimal") {
             $return = [
                 'id' => $this->id,
-                'nev' => $this->nev,
+                'nev' => !empty($this->names) ? $this->names[0] : '',
                 'frissitve' => date('Y-m-d H:i:s', strtotime($this->frissites)),
-                'ismertnev' => $this->ismertnev,
+                'ismertnev' => !empty($this->alternative_names) ? $this->alternative_names[0] : '',
                 'orszag' => ( DB::table('orszagok')->where('id', $this->orszag)->value('nev') ?: "" ),
                 'varos' => $this->varos,
                 'misek' => $misek,
@@ -173,9 +174,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
         $return = [
             'id' => $this->id,
-            'nev' => $this->nev,
-            'frissitve' => date('Y-m-d H:i:s', strtotime($this->frissites)),
-            'ismertnev' => $this->ismertnev,
+            'names' => $this->names,
+            'nev' => !empty($this->names) ? $this->names[0] : '',
+            'ismertnev' => !empty($this->alternative_names) ? $this->alternative_names[0] : '',
+            'alternative_names' => $this->alternative_names,
+            'frissitve' => date('Y-m-d H:i:s', strtotime($this->frissites)),            
             'orszag' => ( DB::table('orszagok')->where('id', $this->orszag)->value('nev') ?: "" ),
             'egyhazmegye' => ( DB::table('egyhazmegye')->where('id', $this->egyhazmegye)->value('nev') ?: "" ),
             'megye' => ( DB::table('megye')->where('id', $this->megye)->value('megyenev') ?: "" ),
@@ -247,6 +250,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     function scopeChurchesAndMore($query) {
+        // FIXME for Issue #257
         return $query->where('nev', 'NOT LIKE', '%kápolna%');
     }
 
@@ -313,7 +317,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 $names[] = $value;
             }
         }
-        return array_unique($names);
+               
+        return array_values(array_unique($names));
     }
 
     public function getAlternativeNamesAttribute($value) {
@@ -341,7 +346,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                $alternativeNames[] = $value;
            }
        }                
-       return array_unique($alternativeNames);
+       return array_values(array_unique($alternativeNames));
        
 
     }
@@ -443,9 +448,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 	
     function getFullNameAttribute($value) {
-        $return = $this->nev;
-        if (!empty($this->ismertnev)) {
-            $return .= ' (' . $this->ismertnev . ')';
+        
+        $return = $this->names[0];
+
+        if (!empty($this->alternative_names)) {
+            $return .= ' (' . $this->alternative_names[0] . ')';
         } else {
             $return .= ' (' . $this->varos . ')';
         }

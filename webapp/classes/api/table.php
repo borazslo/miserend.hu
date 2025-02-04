@@ -96,6 +96,7 @@ class Table extends Api {
                     $tmp[$column] = $row->$column;
                 }
                 // simple data mapping
+                // FIXME for Issue #257
                 $mapping = array('name' => 'nev', 'alt_name' => 'ismertnev');
                 if (array_key_exists($column, $mapping)) {
                     $tmp[$column] = $row->{$mapping[$column]};

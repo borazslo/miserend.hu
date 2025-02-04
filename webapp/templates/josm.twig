@@ -55,7 +55,7 @@
 
         {% for church in multipleOSMids %}
 		<tr>			
-			<th colspan="3">{{ church.church.nev }} {% if church.church.ismertnev %}({{ church.church.ismertnev}}){% endif %}</th>
+			<th colspan="3">{{ church.church.fullName }}</th>
 			<th><a href="/templom/{{ church.church.id }}"><i class="{{ ICONS_CHURCH_SEE }}" title="Templom megtekintése..."></i></a></th>
 			<th><a href="/templom/{{ church.church.id }}/edit"><i class="{{ ICONS_CHURCH_EDIT }}" title="Templom szerkesztése..."></i></a>                   
 			</th>                    
@@ -95,7 +95,7 @@
              <tr>
                  <td>{{ church.orszag }}</td>
                  <td>{{ church.varos }}</td>
-                 <td>{{ church.nev }} {% if church.ismertnev %}({{ church.ismertnev}}){% endif %}</td>
+                 <td>{{ church.fullName }}</td>
                  <td><a href="/templom/{{ church.id }}"><i class="{{ ICONS_CHURCH_SEE }}" title="Templom megtekintése..."></i></a></td>                 
                  <td>
                     {% if not church.lat %}
@@ -135,7 +135,7 @@
              <tr>
                  <td>{{ church.orszag }}</td>
                  <td>{{ church.varos }}</td>
-                 <td>{{ church.nev }} {% if church.ismertnev %}({{ church.ismertnev}}){% endif %}</td>
+                 <td>{{ church.fullName }}</td>
                  <td><a href="/templom/{{ church.id }}"><i class="{{ ICONS_CHURCH_SEE }}" title="Templom megtekintése..."></i></a></td>                 
                  <td>
                     {% if not church.lat %}

@@ -479,6 +479,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         'offset' => $offset,
         'limit' => $limit);
 
+    // FIXME for Issue #257
 	$search = DB::table('templomok')
 		->select('templomok.id','nev','ismertnev','varos','lat','lon');
 
@@ -768,6 +769,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     if (count($not) > 0)
         $where[] = " m.milyen NOT REGEXP '(^|,)(" . implode('|', $not) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
 
+    // FIXME for Issue #257
     $select = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos \nFROM misek m \n";
     $select .= " LEFT JOIN templomok ON m.tid = templomok.id \n";
 
@@ -937,7 +939,7 @@ function feltoltes_block() {
         else
             $jelzes = '';
 
-        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->id."/edit' class=link_kek title='".$church->varos."'>".$church->nev."</a></li>";
+        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->id."/edit' class=link_kek title='".$church->varos."'>".$church->names[0]."</a></li>";
     }
 
     $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";

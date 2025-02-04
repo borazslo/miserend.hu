@@ -192,7 +192,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 						[
 							'multi_match' => [
 								'query' => $keyword,
-								'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^40']
+								'fields' => ['id^100','names^4', 'alternative_names^2', 'varos^40']
 							]
 						]
 					]
@@ -203,7 +203,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			$data['query'] = [
 				'multi_match' => [
 					'query' => $keyword,
-					'fields' => ['id^100','nev^4', 'ismertnev^2', 'varos^2']
+					'fields' => ['id^100','names^4', 'alternative_names^2', 'varos^2']
 				]
 			];
 			*/
@@ -218,15 +218,15 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 				]
 			];
 
-			$data['query']['bool']['should'][] = ['term'=>['nev'=>[ 'value' => $keyword, 'boost'=>32 ]]];			
+			$data['query']['bool']['should'][] = ['term'=>['names'=>[ 'value' => $keyword, 'boost'=>32 ]]];			
 			$data['query']['bool']['should'][] = ['term'=>['varos'=>[ 'value' => $keyword, 'boost'=>18 ]]];
-			$data['query']['bool']['should'][] = ['term'=>['ismertnev'=>[ 'value' => $keyword, 'boost'=>7 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['nev'=>[ 'query' => $keyword, 'boost'=>30 ]]];
+			$data['query']['bool']['should'][] = ['term'=>['alternative_names'=>[ 'value' => $keyword, 'boost'=>7 ]]];
+			$data['query']['bool']['should'][] = ['match'=>['names'=>[ 'query' => $keyword, 'boost'=>30 ]]];
 			$data['query']['bool']['should'][] = ['match'=>['varos'=>[ 'query' => $keyword, 'boost'=>15 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['ismertnev'=>[ 'query' => $keyword, 'boost'=>5 ]]];
-			$data['query']['bool']['should'][] = ['wildcard'=>['nev'=>[ 'value' => '*'.$keyword.'*', 'boost'=>28 ]]];			
+			$data['query']['bool']['should'][] = ['match'=>['alternative_names'=>[ 'query' => $keyword, 'boost'=>5 ]]];
+			$data['query']['bool']['should'][] = ['wildcard'=>['names'=>[ 'value' => '*'.$keyword.'*', 'boost'=>28 ]]];			
 			$data['query']['bool']['should'][] = ['wildcard'=>['varos'=>[ 'value' => '*'.$keyword.'*', 'boost'=>12 ]]];
-			$data['query']['bool']['should'][] = ['wildcard'=>['ismertnev'=>[ 'value' => '*'.$keyword.'*', 'boost'=>4 ]]];
+			$data['query']['bool']['should'][] = ['wildcard'=>['alternative_names'=>[ 'value' => '*'.$keyword.'*', 'boost'=>4 ]]];
 								
 		}
 
@@ -259,15 +259,14 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 				throw new \Exception("File not found: " . $filePath);
 			}
 			$data = file_get_contents($filePath);
-			if (!$elastic->putIndex('churches', json_decode($data, true))) {
-				printr($elastic);
+			if (!$elastic->putIndex('churches', json_decode($data, true))) {				
 				throw new \Exception("Failed to create index: churches");
 			}
 			
 		}
 
 		// Előkészítjük feltöltsére az adatokat
-		$churches = \Eloquent\Church::where('ok', 'i')->limit(20000)->get()->map->toAPIArray()->toArray();
+		$churches = \Eloquent\Church::where('ok', 'i')->limit(20000)->get()->map->toAPIArray('full')->toArray();
 
 		// Kiegészítjük Budapest kerületekkel
 		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
@@ -296,8 +295,17 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			]);
 			$bulkData[] = json_encode($church);
 		}
-		if(!$elastic->putBulk($bulkData))
-			throw new \Exception("Could not update churches!\n".$elastic->error);
+		
+		if(!$elastic->putBulk($bulkData)) {
+			$errors = [];
+			foreach($elastic->jsonData->items as $item ) {
+				if(isset($item->index->error)) {					
+					$errors[] = $item->index->error->type . ': ' . $item->index->error->reason . "\n";
+				}
+			}
+
+			throw new \Exception("Could not update churches!\n" . implode("\n", $errors));
+		}
 		
 	}
 	

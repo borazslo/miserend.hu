@@ -16,6 +16,7 @@ class AutocompleteKeyword extends Ajax {
 		
 		$return = [];
 		$results = searchChurches(['kulcsszo'=>$this->input['text']], 0, $limit);
+		// FIXME for Issue #257
 		foreach ($results['results'] as $key => $result) {
 			$label = $result['nev']. " (";
 			if($result['ismertnev'])	$label .= $result['ismertnev'].", ";

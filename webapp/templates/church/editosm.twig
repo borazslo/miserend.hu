@@ -7,13 +7,16 @@
 {% block pageHeader %}
     <div class="page-header">
         <h2>            
-            OSM szerkesztése: {{ church.nev }}
+            OSM szerkesztése: {{ church.names.0 }}
 			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
-            {% if church.ismertnev != ''  %}
+            {% if church.alternative_names|length > 0 %}
                 <br/>
                 <small>
-                    &nbsp;<span class="hidden-xs hidden-sm">
-                        ({{ church.ismertnev|raw }})
+                    <span class="hidden-xs hidden-sm">
+                       {{ church.alternative_names.0|raw }}{% if church.alternative_names|length > 1 %}, <a href="#" onclick="this.style.display='none'; document.getElementById('all-names').style.display='inline'; return false;">...</a><span id="all-names" style="display:none;" onclick="document.getElementById('all-names').style.display='none'; this.previousElementSibling.style.display='inline'; return false;">
+                            {{ church.alternative_names|slice(1)|join(", ")|raw }}                            
+                        </span>
+                    {% endif %}
                     </span>
                 </small>
             {% endif %}

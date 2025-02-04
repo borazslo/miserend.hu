@@ -88,8 +88,8 @@ class SolrApi extends \ExternalApi\ExternalApi {
 			'q' => $q,
 			'defType' => 'edismax',
 			'indent' => true,
-			'fl' => 'id,nev,ismertnev,varos,fullName',
-			'qf' => 'nev^32 ismertnev^16 varos^8 cim megkozelites plebania megjegyzes misemegj',
+			'fl' => 'id,names,alternative_names,varos,fullName',
+			'qf' => 'names^32 alternative_names^16 varos^8 cim megkozelites plebania megjegyzes misemegj',
 			'q.op' => 'AND'
 		];
 		
@@ -119,7 +119,7 @@ class SolrApi extends \ExternalApi\ExternalApi {
 			$solr->createCollection('churches');
 		}
 		
-		$churches = \Eloquent\Church::where('ok', 'i')->get()->toArray();
+		$churches = \Eloquent\Church::where('ok', 'i')->get()->toArray('full');
 		
 		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
 		foreach($churches as $c => $church) {
