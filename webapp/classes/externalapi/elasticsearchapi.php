@@ -136,10 +136,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		$default_params = [
 			'size'=>10
 		];		
-		$data = $default_params;
-		foreach($params as $key => $value) {
-			$data[$key] = $value;
-		}
+		$data = $default_params;		
 
 		$data = [
 			"query" => [
@@ -151,6 +148,10 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 				]
 			]
 		];
+
+		foreach($params as $key => $value) {
+			$data[$key] = $value;
+		}
 
 		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"GET");		
 		$this->buildQuery('churches/_search', json_encode($data));		
@@ -279,6 +280,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 
 		foreach ($churches as $index => $church) {
 			unset($churches[$index]['adoraciok']);
+			unset($churches[$index]['miserend_deprecated']);
 		}
 
 		// Truncate the index
