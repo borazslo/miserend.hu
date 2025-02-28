@@ -68,6 +68,10 @@ class Api extends Html {
                     $this->api = new \Api\Database();
                     break;   
 
+                case 'lorawan':
+                    $this->api = new \Api\LoRaWAN();
+                    break;                       
+
                 case 'search':
                     $this->api = new \Api\Search();
                     break;

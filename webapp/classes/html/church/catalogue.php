@@ -63,6 +63,7 @@ class Catalogue extends \Html\Html {
     }
 
     function loadForm() {
+        // FIXME for Issue #257
         $this->form = \Form::religiousAdministrationSelection(['diocese' => $this->filterDiocese, 'deanery' => $this->filterDeanery]);
 
         $this->form['keyword'] = $this->filterKeyword;
@@ -94,6 +95,7 @@ class Catalogue extends \Html\Html {
     }
 
     function buildQuery() {
+        // FIXME for Issue #257
         $search = \Eloquent\Church::where('templomok.id', '>', 1);
 
         if ($this->filterKeyword) {

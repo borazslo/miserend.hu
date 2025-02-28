@@ -8,7 +8,7 @@
         {% endif %}
     </div>
     <div class="col-md-9">
-        <h5><a href="/templom/{{ church.id }}">{{ church.nev }}</a></h5>
+        <h5><a href="/templom/{{ church.id }}">{{ church.names.0 }}</a></h5>
         <a href="http://www.openstreetmap.org/{{ church.osm.osmtype }}/{{ church.osm.osmid }}">{{ church.location.lat }}, {{ church.location.lon }}</a>
     </div>
 </div>

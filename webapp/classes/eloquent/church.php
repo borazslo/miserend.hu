@@ -14,7 +14,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     use \Illuminate\Database\Eloquent\SoftDeletes;
     
     protected $table = 'templomok';
-    protected $appends = array('fullName','location','links');
+    protected $appends = array('names', 'alternative_names', 'fullName','location','links');
 
 	protected $attributesCache = null;
 	
@@ -49,9 +49,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 		if($church) {
 			// Amikor leszóhívunk az adatbázisból egy templomot, akkor rögtön feltöltjük teljesen a tulajdonságaival
 			if ($method == 'find') {			
-				$church->loadAttributes();
-			} 
-		}
+				                
+                // Minden OSM key->value betöltése
+                $church->loadAttributes();
+            }
+        }
 
         return $church;
         }   
@@ -116,9 +118,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }    
     
     
-    public function toAPIArray()
+    public function toAPIArray($length = "minimal")
     {
-        
+        if($length == false) $length = "minimal";
+
         $masses = searchMasses(['templom'=>$this->id, 'mikor' => date('Y-m-d')] );
         
         $misek = [];        
@@ -144,19 +147,76 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             $adorations[$key]['fajta'] = $adoration['type'];				
             if($adoration['info'] != '') $adorations[$key]['info'] =  $adoration['info'];
         }
+        $this->loadAttributes();
+
+        if($length == "minimal") {
+            $return = [
+                'id' => $this->id,
+                'nev' => !empty($this->names) ? $this->names[0] : '',
+                'frissitve' => date('Y-m-d H:i:s', strtotime($this->frissites)),
+                'ismertnev' => !empty($this->alternative_names) ? $this->alternative_names[0] : '',
+                'orszag' => ( DB::table('orszagok')->where('id', $this->orszag)->value('nev') ?: "" ),
+                'varos' => $this->varos,
+                'misek' => $misek,
+                'adoraciok' => $adorations,
+                'koordinatak' => [ $this->lat, $this->lon ],
+                'lat' => $this->lat,
+                'lon' => $this->lon,
+                'tavolsag' => $this->distance
+            ];
+            return $return;
+        }
 
         $return = [
             'id' => $this->id,
-            'nev' => $this->nev,
-            'ismertnev' => $this->ismertnev,
+            'names' => $this->names,
+            'nev' => !empty($this->names) ? $this->names[0] : '',
+            'ismertnev' => !empty($this->alternative_names) ? $this->alternative_names[0] : '',
+            'alternative_names' => $this->alternative_names,
+            'frissitve' => date('Y-m-d H:i:s', strtotime($this->frissites)),            
+            'orszag' => ( DB::table('orszagok')->where('id', $this->orszag)->value('nev') ?: "" ),
+            'egyhazmegye' => ( DB::table('egyhazmegye')->where('id', $this->egyhazmegye)->value('nev') ?: "" ),
+            'megye' => ( DB::table('megye')->where('id', $this->megye)->value('megyenev') ?: "" ),
             'varos' => $this->varos,
+            'cim' => $this->cim,
+            'megkozelites' => $this->megkozelites,
+            'plebania' => str_replace('<br>', "\n", strip_tags($this->plebania, '<br>')),
+            'leiras' => str_replace('<br>', "\n", strip_tags($this->leiras, '<br>')),
+            'accessibility' => $this->accessibility,
+            'email' => $this->pleb_eml,
+            'links' => $this->links->pluck('href')->toArray(),
             'misek' => $misek,
+            'miserend_deprecated' => DB::table('misek')
+                    ->select('nap', 'ido', 'nap2', 'idoszamitas', 'tol', 'ig', 'nyelv', 'milyen', 'megjegyzes')
+                    ->where('tid', $this->id)
+                    ->where(function($query) {
+                        $query->where('torles', '0000-00-00 00:00:00')
+                            ->orWhereNull('torles');
+                    })
+                    ->orderBy('nap')
+                    ->orderBy('ido')
+                    ->get()
+                    ->groupBy('idoszamitas')
+                    ->map(function($items) {
+                        return $items->map(function($item) {
+                            return (array) $item;
+                        })->toArray();
+                    }),
+            'miserend_megjegyzes' => str_replace('<br>', "\n", strip_tags($this->misemegj, '<br>')),
             'adoraciok' => $adorations,
+            'kozossegek' => array_map(function($kozosseg) {
+                return [
+                    'nev' => $kozosseg->name,
+                    'link' => $kozosseg->link
+                ];
+            }, $this->kozossegek),
+            'koordinatak' => [ $this->lat, $this->lon ],
             'lat' => $this->lat,
-            'lon' => $this->lon
+            'lon' => $this->lon,
+            'tavolsag' => $this->distance
         ];
 
-        if(isset($this->distance)) $return['tavolsag'] = (int) $this->distance;
+        
         
 
         return $return;
@@ -185,6 +245,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     function scopeChurchesAndMore($query) {
+        // FIXME for Issue #257
         return $query->where('nev', 'NOT LIKE', '%kápolna%');
     }
 
@@ -215,6 +276,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     /*
      * getSomethingAttribute -> $this->something;
      * 
+     * names
+     * alternative_names
      * liturgiatv
      * denomination
      * holders
@@ -226,7 +289,65 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * remarksSatus
      * location
 	 * kozossegek
+     * accessibility
      */
+    public function getNamesAttribute($value) {
+
+
+        $attributes = $this->attributes()->get()->pluck('value', 'key')->toArray();
+        
+        // Collect all the possible names of the church
+        $names = [];
+        // Let's find the main / default name 
+        if (isset($attributes['name:hu'])) {
+            array_unshift($names, $attributes['name:hu']);
+        } elseif (isset($attributes['name'])) {
+            array_unshift($names, $attributes['name']);
+        } else {
+            if($this->nev == '') 
+                $this->nev = '(Név nélküli misézőhely)';                        
+            array_unshift($names, $this->nev);
+        }
+        // Let's find the other names
+        foreach ($attributes as $key => $value) {
+            if (preg_match('/^name(:.*)?$/', $key)) {
+                $names[] = $value;
+            }
+        }
+               
+        return array_values(array_unique($names));
+    }
+
+    public function getAlternativeNamesAttribute($value) {
+        $attributes = $this->attributes()->get()->pluck('value', 'key')->toArray();
+
+       // Collect all alternative names of the church
+       $alternativeNames = [];
+       // Collect alternative names
+       if (isset($attributes['official_name:hu'])) {
+           array_unshift($alternativeNames, $attributes['official_name:hu']);
+       } elseif (isset($attributes['alt_name:hu'])) {
+           array_unshift($alternativeNames, $attributes['alt_name:hu']);
+       } elseif (isset($attributes['old_name:hu'])) {
+           array_unshift($alternativeNames, $attributes['old_name:hu']);
+       } elseif (isset($attributes['official_name'])) {
+           array_unshift($alternativeNames, $attributes['official_name']);
+       } elseif (isset($attributes['alt_name'])) {
+           array_unshift($alternativeNames, $attributes['alt_name']);
+       } elseif (isset($attributes['old_name'])) {
+           array_unshift($alternativeNames, $attributes['old_name']);
+       }
+
+       foreach ($attributes as $key => $value) {
+           if (preg_match('/^(alt_|old_|official_)name(:.*)?$/', $key)) {
+               $alternativeNames[] = $value;
+           }
+       }                
+       return array_values(array_unique($alternativeNames));
+       
+
+    }
+
     public function getLiturgiatvAttribute($value) {
         $litapi = new \ExternalApi\LiturgiatvApi();
         $datas = $litapi->getByChurch($this->id); 
@@ -324,9 +445,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 	
     function getFullNameAttribute($value) {
-        $return = $this->nev;
-        if (!empty($this->ismertnev)) {
-            $return .= ' (' . $this->ismertnev . ')';
+        
+        $return = $this->names[0];
+
+        if (!empty($this->alternative_names)) {
+            $return .= ' (' . $this->alternative_names[0] . ')';
         } else {
             $return .= ' (' . $this->varos . ')';
         }
@@ -421,8 +544,18 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 			return $api->jsonData->data;
 		}
 		else
-			return false;			
+			return [];			
 	}
+
+    public function getAccessibilityAttribute($value) {
+        $return = [];
+        foreach(['wheelchair','toilets:wheelchair','wheelchair:description','hearing_loop','disabled:description'] as $k=>$accessibility) {			
+			if(isset($this->$accessibility)) {			
+					$return[$accessibility] = $this->$accessibility;
+			}
+		}
+        return $return;
+    }
 	
     /*
      * What does 'M' mean?

@@ -198,6 +198,7 @@ class SearchResultsMasses extends Html {
             //echo "<pre>".print_r($results['results'],1)."</pre>";
             foreach ($results['churches'] as $result) {
                 $tartalom .= "<img src=/img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
+                // FIXME for Issue #257
 				<a href='/templom/" . $result['tid'] . "' class=felsomenulink><b>" . $result['nev'] . "</b> <font color=#8D317C>(" . $result['varos'] . ")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">" . $result['ismertnev'] . "</span>";
                 
 				if(!isset($ertek)) $ertek = ''; // TODO: valószínűleg soha semmilyen körülmények között nincs már $ertek. 

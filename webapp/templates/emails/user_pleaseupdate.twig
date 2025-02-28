@@ -9,7 +9,7 @@ A templomaid a következőek:
 <ul class="list-group">
 	{% for key, church in responsible.church %}
 		<li class="list-group-item">
-			<a href="https://miserend.hu/templom/{{ church.id }}">{{ church.nev }}</a> ({{ church.varos }}). Frissítve: {{ church.frissites }}	                		
+			<a href="https://miserend.hu/templom/{{ church.id }}">{{ church.fullName }}</a>. Frissítve: {{ church.frissites }}	                		
 		</li>
 	{% endfor %}
 </ul>            

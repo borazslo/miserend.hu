@@ -23,11 +23,11 @@
             "id": {
                 "type": "keyword"
             },
-            "nev": {
+            "names": {
                 "type": "text",
                 "analyzer": "hungarian_analyzer"
             },
-            "ismertnev": {
+            "alternative_names": {
                 "type": "text",
                 "analyzer": "hungarian_analyzer"
             },
@@ -41,6 +41,15 @@
                     "idopont": {
                         "type": "date",
                         "format": "yyyy-MM-dd HH:mm:ss"
+                    },
+                    "nyelv": {
+                        "type": "text"
+                    },
+                    "zene" : {
+                        "type": "text"
+                    },
+                    "ritus": {
+                        "type": "text"
                     }
                 }
             },
@@ -60,11 +69,8 @@
                     }
                 }
             },
-            "lat": {
-                "type": "float"
-            },
-            "lon": {
-                "type": "float"
+            "location": {
+                "type": "geo_point"
             }
         }
     }

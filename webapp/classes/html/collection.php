@@ -32,6 +32,7 @@ class Collection extends Html {
                 ->select('church_id')
                 ->pluck('church_id');
         
+        // FIXME for Issue #257
         $churches = \Eloquent\Church::whereIn('id',$churchIds)
                 ->where('ok','i')
                 ->orderBy('nev')

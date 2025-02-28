@@ -479,6 +479,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
         'offset' => $offset,
         'limit' => $limit);
 
+    // FIXME for Issue #257
 	$search = DB::table('templomok')
 		->select('templomok.id','nev','ismertnev','varos','lat','lon');
 
@@ -574,7 +575,13 @@ function searchChurches($args, $offset = 0, $limit = 20) {
     if($elasticsIsEnough) {        
         try {
             $elastic = new \ExternalApi\ElasticsearchApi();
-            $response = $elastic->search($args['kulcsszo'],["from" => $offset,"size" => $limit]);
+
+            if($args['kulcsszo'] == 'random') {
+                $response = $elastic->random(['from' => $offset,"size" => $limit]);
+            }
+            else {
+                $response = $elastic->search($args['kulcsszo'],["from" => $offset,"size" => $limit]);
+            }
             if($response) {
                 $return['sum'] = $response->total->value;
                 $return['results'] = [];    
@@ -583,7 +590,7 @@ function searchChurches($args, $offset = 0, $limit = 20) {
                     $tmp['score'] = $hit->_score;
                     $return['results'][] = $tmp;
                 }
-            } 
+            }             
         } catch (Exception $e) {
             addMessage('Hiba történt a modern Elasticsearch kereső motor használata közben. Kérjük próbálja újra később.','danger');
         }
@@ -762,6 +769,7 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     if (count($not) > 0)
         $where[] = " m.milyen NOT REGEXP '(^|,)(" . implode('|', $not) . ")([0]{0,1}|" . $hanyadikP . "|" . $hanyadikM . "|" . $parossag . ")(,|$)' ";
 
+    // FIXME for Issue #257
     $select = "SELECT m.*,templomok.nev,templomok.ismertnev,templomok.varos \nFROM misek m \n";
     $select .= " LEFT JOIN templomok ON m.tid = templomok.id \n";
 
@@ -931,7 +939,7 @@ function feltoltes_block() {
         else
             $jelzes = '';
 
-        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->id."/edit' class=link_kek title='".$church->varos."'>".$church->nev."</a></li>";
+        $kod_tartalom.="\n<li>$jelzes<a href='/templom/".$church->id."/edit' class=link_kek title='".$church->varos."'>".$church->names[0]."</a></li>";
     }
 
     $kod_tartalom.="\n<li><a href='/user/maintainedchurches' class=felsomenulink>Teljes lista...</a></li>";

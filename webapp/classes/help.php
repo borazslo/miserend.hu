@@ -20,13 +20,6 @@ class Help {
                         '<br><br>Annak az adatai, aki kb. negyedévente megkereshető a templom adataival kapcsolatban, tud a változásokról, naprakész információi vannak.';
                 break;
 
-            case 3:
-                //miserend - templom adatlap
-                $this->html = '<b>Templom neve</b>' .
-                        '<br><br>Ide a templom valódi nevét kell beírni, ami nem mindig azonos azzal, ahogy a helybeliek hívják!' .
-                        '<br><br>Ha ezt nem tudjuk, akkor lehet ismert nevet vagy plébánia nevet is beírni, de ezt mindenképp jelezzük a szerkesztői megjegyzés részben, ahol egy későbbi módosítás során esetleg utánajárhatunk a valódi névnek.';
-                break;
-
             case 4:
                 //miserend - templom adatlap
                 $this->html = '<b>Közismert neve</b>' .

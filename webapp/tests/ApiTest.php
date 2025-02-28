@@ -306,6 +306,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function providerTestApiTable() {
+        // FIXME for Issue #257
         return array(
             array(
                 array('q' => 'api', 'action' => 'table', 'v' => '4', 'table' => 'miserend'),

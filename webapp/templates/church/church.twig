@@ -1,6 +1,6 @@
 {% extends "layout.twig" %}
 
-{% set title = nev %}
+
 
 {% block pageHeader %}
     <div class="page-header">
@@ -20,18 +20,22 @@
                     title="A kedvencek közé mentéshez be kell jelentkezni.">                    
                 </span>
             {% endif %}
-            {{ nev }}
+            <span title="{{ names|join(",\n ") }}">{{ names.0 }}</span>
 			{% if writeAcess == true %}
 				<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
 			{% endif %}
-            {% if ismertnev != ''  %}
+            {% if alternative_names|length > 0 %}
                 <br/>
                 <small>
-                    &nbsp;<span class="hidden-xs hidden-sm">
-                        ({{ ismertnev|raw }})
+                    <span class="hidden-xs hidden-sm">
+                       {{ alternative_names.0|raw }}{% if alternative_names|length > 1 %}, <a href="#" onclick="this.style.display='none'; document.getElementById('all-names').style.display='inline'; return false;">...</a><span id="all-names" style="display:none;" onclick="document.getElementById('all-names').style.display='none'; this.previousElementSibling.style.display='inline'; return false;">
+                            {{ alternative_names|slice(1)|join(", ")|raw }}                            
+                        </span>
+                    {% endif %}
                     </span>
                 </small>
             {% endif %}
+            
         </h2>
     </div>
 {%  endblock %}

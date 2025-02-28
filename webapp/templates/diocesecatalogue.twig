@@ -40,8 +40,8 @@
                         {{ church.varos }}
                     </td>
                     <td>
-                        <a href="/templom/{{ church.id }}/edit" title='{{ church.ismertnev }}'>
-                            <strong>{{ church.nev }}</strong>
+                        <a href="/templom/{{ church.id }}/edit">
+                            <strong>{{ church.names.0 }}</strong>{% if church.alternative_names|length > 0 %}<br/>{{ church.alternative_names|join(', ') }}{% endif %}
                         </a>
                     </td>
 					<td>

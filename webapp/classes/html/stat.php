@@ -171,6 +171,7 @@ class Stat extends Html {
         /*
 		 * Magyarországi aktív templomok frissítettségének statisztikája
 		*/
+		// FIXME for Issue #257
 		$stat = DB::table('templomok')
 			->selectRaw("DATEDIFF(NOW(), frissites) DIV 365 as yearago")
 			->selectRAW("count(*) as count");		

@@ -6,13 +6,16 @@
 {% block pageHeader %}
     <div class="page-header">
         <h2>            
-            Adatlap szerkesztése: {{ church.nev }}
+            Adatlap szerkesztése: {{ church.names.0 }}
 			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
-            {% if church.ismertnev != ''  %}
+            {% if church.alternative_names|length > 0 %}
                 <br/>
                 <small>
-                    &nbsp;<span class="hidden-xs hidden-sm">
-                        ({{ church.ismertnev|raw }})
+                    <span class="hidden-xs hidden-sm">
+                       {{ church.alternative_names.0|raw }}{% if church.alternative_names|length > 1 %}, <a href="#" onclick="this.style.display='none'; document.getElementById('all-names').style.display='inline'; return false;">...</a><span id="all-names" style="display:none;" onclick="document.getElementById('all-names').style.display='none'; this.previousElementSibling.style.display='inline'; return false;">
+                            {{ church.alternative_names|slice(1)|join(", ")|raw }}                            
+                        </span>
+                    {% endif %}
                     </span>
                 </small>
             {% endif %}
@@ -50,28 +53,13 @@
             </tr>
             {{ _self.helptr(2,help) }}
             <tr>
-                <td bgcolor=#efefef class=kiscim align=right>Feltöltő (jogosult):</td>
-                <td bgcolor=#efefef>
-                    <i>Ez az elem átkerült a jobb oldali oszlopba, mert már több felelőse is lehet egyetlen templomnak.</i>
+                <td bgcolor=#F5CC4C class=kiscim align=right>Szerkesztési név:</td>
+                <td bgcolor=#F5CC4C>
+                    <input type=text name=church[nev] value="{{ church.nev }}" class="urlap form-control" size=80 maxlength=150  placeholder="Templom neve">
+                    <i>A misézőhelyek neveit az OSM adatbázisából vesszük. Itt csak a rendszer hiba esetén az azonosításhoz szükséges nevet őrizzük. </i>
                 </td>
                 <td></td>
             </tr>
-            <tr>
-                <td bgcolor=#F5CC4C class=kiscim align=right>Templom neve:</td>
-                <td bgcolor=#F5CC4C>
-                    <input type=text name=church[nev] value="{{ church.nev }}" class="urlap form-control" size=80 maxlength=150  placeholder="Templom neve">
-                </td>
-                <td>{{ _self.helplink(3, ICONS_INFO ) }}</td>
-            </tr>
-            {{ _self.helptr(3,help) }}
-            <tr>
-                <td bgcolor=#FAE19C class=kiscim align=right>Közismert neve:</td>
-                <td bgcolor=#FAE19C>                    
-                    <input type=text name=church[ismertnev] value="{{ church.ismertnev }}" class=form-control size=80 maxlength=150  placeholder="Közismert név">                    
-                </td>
-                <td>{{ _self.helplink(4, ICONS_INFO ) }}</td>
-            </tr>
-            {{ _self.helptr(4,help) }}
            
             {% if not church.varos %}
             <tr>

@@ -11,6 +11,7 @@ class Crons {
      * görög katolikus -> görögkatolikus
      */
     static function gorogkatolizalas() {
+        // FIXME for Issue #257
         $tables = array(
             'templomok' => array('nev', 'ismertnev', 'megjegyzes', 'misemegj', 'leiras', 'megkozelites'),
             'misek' => array('megjegyzes'),
