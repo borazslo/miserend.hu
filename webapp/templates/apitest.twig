@@ -64,15 +64,14 @@
 			// Example list
 			{# Get the current date and subtract one week #}
 			{% set one_week_ago = date().modify('-1 week') %}
-
-
+            {% set response_length = random(['minimal', 'medium', 'full']) %}
 
             var examples = [
-                {url: '/api/v4/search', jsonPayload: '{ "q" : "jezsuita", "offset" : 0, "limit" : 10 }'},
+                {url: '/api/v4/search', jsonPayload: '{ "q" : "jezsuita", "offset" : 0, "limit" : 10, "response_length" : "{{ response_length }}"  }'},
                 {url: '/api/v4/templomok', jsonPayload: '{ "columns" : ["nev", "id"] }'},
-                {url: '/api/v4/nearby', jsonPayload: '{"lat": 47.47880, "lon": 19.07609 }'},
+                {url: '/api/v4/nearby', jsonPayload: '{"lat": 47.47880, "lon": 19.07609, "response_length" : "{{ response_length }}" }'},
                 {url: '/api/v4/updated/{{ one_week_ago|date('Y-m-d') }}', jsonPayload: '{}'},
-                {url: '/api/v4/church', jsonPayload: '{ "id": {{ random(5000) }} }'},
+                {url: '/api/v4/church', jsonPayload: '{ "id": {{ random(5000) }}, "response_length" : "{{ response_length }}"  }'},
                 {url: '/api/v4/lorawan', jsonPayload: '{ "id": {{ random(5000) }} }'}
             ];
 
