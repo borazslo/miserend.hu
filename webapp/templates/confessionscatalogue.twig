@@ -1,0 +1,36 @@
+{% set columns2 = true  %}
+{% extends "layout.twig" %}
+
+{% set title = "Gyóntatás jelzők" %}
+
+{% block content %}
+<p class="alap">Gyóntatásokhoz LoraWAN eszközöket használunk, amik a helium gateway-re kapcsolódnak és a Mikrohalo cégen keresztül érkeznek az adatok. Ezek érkeztek az elmúlt időben:</p>
+
+<FORM ENCTYPE='multipart/form-data' method=post>
+
+	<table class="table table-hover table-condensed table-striped">
+
+	<thead>
+		<tr>
+			<th>Dátum</th>
+			<th>Templom</th>
+			<th>Azonosító</th>
+		</tr>
+	</thead>
+
+	<tbody>
+	{% for key,confession in confessions %}
+		<tr>
+			<td>{{ confession.timestamp }}</td>
+			<td>
+				<a href="/templom/{{ confession.church.id }}">
+					<strong>{{ confession.church.names.0 }}</strong>{% if confession.church.alternative_names|length > 0 %}<br/>{{ confession.church.alternative_names|join(', ') }}{% endif %}
+				</a>
+			</td>
+			<td>{{ confession.local_id }}</td>
+			<td>{{ confession.fulldata }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+
+{% endblock %}
