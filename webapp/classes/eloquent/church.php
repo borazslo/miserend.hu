@@ -159,10 +159,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 'varos' => $this->varos,
                 'misek' => $misek,
                 'adoraciok' => $adorations,
-                'koordinatak' => [ $this->lat, $this->lon ],
-                'lat' => $this->lat,
-                'lon' => $this->lon,
-                'tavolsag' => $this->distance
+                'koordinatak' => [ (float) $this->lat, (float) $this->lon ],
+                'lat' => (float) $this->lat,
+                'lon' =>(float) $this->lon,
+                'tavolsag' => (int) $this->distance
             ];
             return $return;
         }
@@ -186,7 +186,25 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             'email' => $this->pleb_eml,
             'links' => $this->links->pluck('href')->toArray(),
             'misek' => $misek,
-            'miserend_deprecated' => DB::table('misek')
+            
+            'miserend_megjegyzes' => str_replace('<br>', "\n", strip_tags($this->misemegj, '<br>')),
+            'adoraciok' => $adorations,
+            'kozossegek' => array_map(function($kozosseg) {
+                return [
+                    'nev' => $kozosseg->name,
+                    'link' => $kozosseg->link
+                ];
+            }, $this->kozossegek),
+            'koordinatak' => [ (float) $this->lat, (float) $this->lon ],
+            'lat' => (float) $this->lat,
+            'lon' => (float) $this->lon,
+            'tavolsag' => (int) $this->distance
+        ];
+
+        if($length == 'full') {
+            $return = array_merge($return, [                
+                'photos' => $this->photos->pluck('url')->toArray(),
+                'miserend_deprecated' => DB::table('misek')
                     ->select('nap', 'ido', 'nap2', 'idoszamitas', 'tol', 'ig', 'nyelv', 'milyen', 'megjegyzes')
                     ->where('tid', $this->id)
                     ->where(function($query) {
@@ -202,20 +220,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                             return (array) $item;
                         })->toArray();
                     }),
-            'miserend_megjegyzes' => str_replace('<br>', "\n", strip_tags($this->misemegj, '<br>')),
-            'adoraciok' => $adorations,
-            'kozossegek' => array_map(function($kozosseg) {
-                return [
-                    'nev' => $kozosseg->name,
-                    'link' => $kozosseg->link
-                ];
-            }, $this->kozossegek),
-            'koordinatak' => [ $this->lat, $this->lon ],
-            'lat' => $this->lat,
-            'lon' => $this->lon,
-            'tavolsag' => $this->distance
-        ];
+                
+            ]);
 
+
+        }
         
         
 
