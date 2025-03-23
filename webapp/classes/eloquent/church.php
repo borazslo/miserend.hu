@@ -118,11 +118,19 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }    
     
     
-    public function toAPIArray($length = "minimal")
+    public function toAPIArray($length = "minimal", $whenMass = date('Y-m-d'))
     {
         if($length == false) $length = "minimal";
+        if ($whenMass == false || $whenMass == "today") $whenMass = date('Y-m-d');
+        elseif (!(in_array($whenMass, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) ||
+            preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $whenMass))) {
+            throw new \Exception("JSON input 'whenMass' should be a day or today or a date (yyyy-mm-dd).");
+        }
+        if (in_array($whenMass, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])) {
+            $whenMass = date('Y-m-d', strtotime("next $whenMass"));
+        }
 
-        $masses = searchMasses(['templom'=>$this->id, 'mikor' => date('Y-m-d')] );
+        $masses = searchMasses(['templom'=>$this->id, 'mikor' => $whenMass] );
         
         $misek = [];        
         if(isset($masses['churches'][$this->id])) {
