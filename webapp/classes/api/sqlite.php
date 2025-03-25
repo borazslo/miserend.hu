@@ -206,7 +206,7 @@ class Sqlite extends Api {
             $insert = [
                 'tid' => $church->id,
                 'nev' => $church->names[0],
-                'ismertnev' => isset($church->alternative_names[0]) ? $church->alternative_names[0] : null,
+                'ismertnev' => isset($church->alternative_names[0]) ? $church->alternative_names[0] : "",
             ];
 
             //Location

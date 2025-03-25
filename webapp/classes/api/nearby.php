@@ -22,6 +22,9 @@ class NearBy extends Api {
 		if (!is_numeric($this->input['lon']) OR $this->input['lon'] > 90 OR $this->input['lon'] < -180 ) {
             throw new \Exception("JSON input 'lon' should be float between -180 and 90.");
         }
+		if (!is_numeric($this->input['limit']) OR $this->input['limit'] > 100 OR $this->input['limit'] < 1 ) {
+            throw new \Exception("JSON input 'limit' should be an integer between 1 and 100.");
+        }
 		if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
             throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
         }		
@@ -31,13 +34,14 @@ class NearBy extends Api {
         parent::run();
 		
         $this->getInputJson();
+		$limit = isset($this->input['limit']) ? $this->input['limit'] : 10;
 		
 		$this->return['templomok'] = \Eloquent\Church::select()
 				->addSelect(DB::raw("ST_distance_sphere( ST_GeomFromText('POINT ( ".$this->input['lat']." ".$this->input['lon']." )', 4326), ST_GeomFromText(CONCAT('POINT ( ',lat,' ', lon, ')'), 4326) ) as distance"))
                 ->where('ok','i')
 				->where('lat','<>','')
                 ->orderBy('distance', 'ASC')
-				->limit(10)
+				->limit($limit)
                 ->get()->map->toAPIArray( isset($this->input['response_length']) ? $this->input['response_length'] : false );
 				
         //$this->return['lat'] = $this->input['lat'];
