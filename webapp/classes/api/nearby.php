@@ -22,9 +22,14 @@ class NearBy extends Api {
 		if (!is_numeric($this->input['lon']) OR $this->input['lon'] > 90 OR $this->input['lon'] < -180 ) {
             throw new \Exception("JSON input 'lon' should be float between -180 and 90.");
         }
-		if (!is_numeric($this->input['limit']) OR $this->input['limit'] > 100 OR $this->input['limit'] < 1 ) {
+		if (isset($this->input['limit']) AND (!is_numeric($this->input['limit']) OR $this->input['limit'] > 100 OR $this->input['limit'] < 1 )) {
             throw new \Exception("JSON input 'limit' should be an integer between 1 and 100.");
         }
+		if (isset($this->input['whenMass']) AND 
+			!(in_array($this->input['whenMass'], ['today', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) OR
+			preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $this->input['whenMass']))) {
+			throw new \Exception("JSON input 'whenMass' should be a day or today or a date (yyyy-mm-dd).");
+		}
 		if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
             throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
         }		
@@ -42,7 +47,7 @@ class NearBy extends Api {
 				->where('lat','<>','')
                 ->orderBy('distance', 'ASC')
 				->limit($limit)
-                ->get()->map->toAPIArray( isset($this->input['response_length']) ? $this->input['response_length'] : false );
+                ->get()->map->toAPIArray( isset($this->input['response_length']) ? $this->input['response_length'] : false, isset($this->input["whenMass"]) ? $this->input["whenMass"] : false);
 				
         //$this->return['lat'] = $this->input['lat'];
 
