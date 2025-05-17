@@ -118,7 +118,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }    
     
     
-    public function toAPIArray($length = "minimal", $whenMass = date('Y-m-d'))
+    public function toAPIArray($length = "minimal", $whenMass = false)
     {
         if($length == false) $length = "minimal";
         if ($whenMass == false || $whenMass == "today") $whenMass = date('Y-m-d');
