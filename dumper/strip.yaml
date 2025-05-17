@@ -1,0 +1,26 @@
+columns:
+  templomok:
+    - adminmegj
+    - kontakt
+    - kontaktmail
+    - log
+    - letrehozta
+    - modositotta
+  misek:
+    - modositotta
+    - torolte
+tables:
+  - chat
+  - church_holders
+  - favorites
+  - emails
+  - remarks
+  - user
+  - boundaries
+  - distances
+  - lookup_boundary_church
+  - messages
+  - osm
+  - osmtags
+  - stats_externalapi
+  - tokens
