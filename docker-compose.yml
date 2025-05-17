@@ -117,16 +117,9 @@ services:
     container_name: dumper
     build: ./dumper
     profiles: [ dumper ]
-    environment:
-      DB_USER: root
-      DB_PASSWORD: pw
-      DB_HOST: mysql
-      DB_SOURCE: miserend
-      DB_TEMP: miserend_clone
-      YAML_PATH: /app/strip.yaml
-      DUMP_FILE: /app/clean_dump.sql
     volumes:
       - ./dumper:/app
+      - ./docker/mysql/01-dump.sql:/app/01-dump.sql
     networks:
       inner:
         aliases:

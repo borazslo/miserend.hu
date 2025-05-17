@@ -5,7 +5,7 @@ A miserend.hu teljes forrása elavult mintaadatokkal.
 
 ## Telepítés
 - [Docker](https://docs.docker.com/engine/install/) telepítése a számítógépre.
-- A projekt root könyvtárában futtatni kell ezt: `docker-compose up`
+- A projekt root könyvtárában futtatni kell ezt: `docker-compose --profile main up` vagy `make start`
   - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
   - Windows környezetben a miserend konténer kiakad, hogy a `exec ./docker/entrypoint_miserend.sh: no such file or directory`. Megoldás az entrypoind_miserend.sh átalakítása, hogy unix sorvégeket (LF) használjon windows sorvégrek helyett (CRLF)
 - Egyes beállításokat, pl. portokat, az `.env.example` fájl tartalmának átmásolásával az `.env` fájlban lehet módosítani. 
@@ -13,6 +13,16 @@ A miserend.hu teljes forrása elavult mintaadatokkal.
   - `MISEREND_WEBAPP_ENVIRONMENT`= development | staging | production
 - És máris elérhető miserend lokális példánya a `http://localhost:8000` (vagy amit az `.env`-ben meghatároztunk)
   - Van egy regisztrált felhasználó is: `admin` névvel és a meglepő `admin` jelszóval.
+
+## Dump készítédumper/config.yamls
+
+Ha dump-ot szeretnénk készíteni az adatbázisról amit a fejlesztés során használhatunk, gondoskodnunk kell róla, hogy a kényes adatok ne kerüljenek bele. Erre való a `dumper`.
+
+Futtatása: `docker compose --profile dumper up` vagy `make dumper`
+
+Konfiguráció: `dumper/config.yaml`
+
+Elkészült dump: `docker/mysql/01-dump.sql`
 
 ## Konténerek
 A [docker-compose.yml](docker-compose.yml) a következő konténereket építi fel és indítja el:
