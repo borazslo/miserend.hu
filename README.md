@@ -20,9 +20,11 @@ Ha dump-ot szeretnénk készíteni az adatbázisról amit a fejlesztés során h
 
 Futtatása: `docker compose --profile dumper up` vagy `make dumper`
 
-Konfiguráció: `dumper/config.yaml`
+Adatbázis és purge konfiguráció: `dumper/config.yaml`
 
 Elkészült dump: `docker/mysql/01-dump.sql`
+
+Az elkészült dump-ot a fejlesztői környezet automatikusan lefuttatja mikor a mysql szerver container a compose-ban létrejön.
 
 ## Konténerek
 A [docker-compose.yml](docker-compose.yml) a következő konténereket építi fel és indítja el:
