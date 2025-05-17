@@ -1,0 +1,34 @@
+connection:
+  host: mysql
+  user: root
+  password: pw
+  source_db: miserend
+  temp_db: miserend_clone
+purge:
+  columns:
+    templomok:
+      - adminmegj
+      - kontakt
+      - kontaktmail
+      - log
+      - letrehozta
+      - modositotta
+    misek:
+      - modositotta
+      - torolte
+  tables:
+    - chat
+    - church_holders
+    - favorites
+    - emails
+    - remarks
+    - user
+    - boundaries
+    - distances
+    - lookup_boundary_church
+    - lookup_church_osm
+    - osm
+    - messages
+    - osmtags
+    - stats_externalapi
+    - tokens
