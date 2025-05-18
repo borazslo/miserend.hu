@@ -23,8 +23,12 @@ type ConnectionConfig struct {
 }
 
 type Config struct {
-	Purge      PurgeConfig      `yaml:"purge"`
-	Connection ConnectionConfig `yaml:"connection"`
+	Purge      PurgeConfig
+	Connection ConnectionConfig
+}
+
+type ConfigFile struct {
+	Purge PurgeConfig `yaml:"purge"`
 }
 
 func loadConfig() (*Config, error) {
@@ -39,10 +43,19 @@ func loadConfig() (*Config, error) {
 	}
 	defer file.Close()
 
-	var config Config
+	var config_file ConfigFile
 	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(&config); err != nil {
+	if err := decoder.Decode(&config_file); err != nil {
 		return nil, err
 	}
-	return &config, nil
+	return &Config{
+		Purge: config_file.Purge,
+		Connection: ConnectionConfig{
+			User:     os.Getenv("USER"),
+			Password: os.Getenv("PASSWORD"),
+			Host:     os.Getenv("HOST"),
+			SourceDB: os.Getenv("SOURCE_DB"),
+			TempDB:   os.Getenv("TEMP_DB"),
+		},
+	}, nil
 }

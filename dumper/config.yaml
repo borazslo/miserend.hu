@@ -1,9 +1,3 @@
-connection:
-  host: mysql
-  user: root
-  password: pw
-  source_db: miserend
-  temp_db: miserend_clone
 purge:
   columns:
     templomok:

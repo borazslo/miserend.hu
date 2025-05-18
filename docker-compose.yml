@@ -3,33 +3,36 @@ services:
     image: mysql:5.7
     container_name: mysql
     platform: linux/amd64
-    profiles: [ dumper, main ]
+    profiles:
+      - dumper
+      - main
     build:
       dockerfile: docker/Dockerfile.mysql
     command: --default-authentication-plugin=mysql_native_password --ssl=0 --skip-ssl
     volumes:
       - db_data:/var/lib/mysql
-      - ./docker/mysql:/docker-entrypoint-initdb.d    
+      - ./docker/mysql:/docker-entrypoint-initdb.d
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: pw
       MYSQL_DATABASE: miserend
       MYSQL_USER: user
-      MYSQL_PASSWORD: pw           
+      MYSQL_PASSWORD: pw
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppw"]
+      test: [CMD, mysqladmin, ping, -h, localhost, -u, user, -ppw]
       timeout: 5s
       retries: 10
     networks:
       inner:
         aliases:
           - mysql
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: pma
     platform: linux/amd64
-    profiles: [ dumper, main ]
+    profiles:
+      - dumper
+      - main
     links:
       - mysql
     environment:
@@ -44,11 +47,11 @@ services:
       inner:
         aliases:
           - pma
-
   mailcatcher:
     image: dockage/mailcatcher
     container_name: mailcatcher
-    profiles: [ main ]
+    profiles:
+      - main
     ports:
       - 1025:1025
       - 1080:1080
@@ -57,48 +60,48 @@ services:
       inner:
         aliases:
           - mailcatcher
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
     container_name: elasticsearch
-    profiles: [ main ]
+    profiles:
+      - main
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - xpack.security.enabled=false
     ulimits:
       memlock:
         soft: -1
         hard: -1
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - 9200:9200
+      - 9300:9300
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
       inner:
         aliases:
           - elasticsearch
-
   kibana:
     image: docker.elastic.co/kibana/kibana:8.10.1
     container_name: kibana
-    profiles: [ main ]
+    profiles:
+      - main
     ports:
-      - "5601:5601"
+      - 5601:5601
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - XPACK_SECURITY_ENABLED=false  # Disables Kibana security
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      XPACK_SECURITY_ENABLED: false
     depends_on:
-      - elasticsearch  
+      - elasticsearch
     networks:
       inner:
         aliases:
           - kibana
-
   miserend:
     container_name: miserend
-    profiles: [ main ]
+    profiles:
+      - main
     build:
       dockerfile: docker/Dockerfile.miserend
     volumes:
@@ -106,7 +109,7 @@ services:
       - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
       - images:/app/kepek
     ports:
-      - "${MISEREND_PORT:-8000}:8000"
+      - ${MISEREND_PORT:-8000}:8000
     environment:
       MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
     networks:
@@ -116,10 +119,17 @@ services:
   dumper:
     container_name: dumper
     build: ./dumper
-    profiles: [ dumper ]
+    profiles:
+      - dumper
     volumes:
       - ./dumper:/app
       - ./docker/mysql/01-dump.sql:/app/01-dump.sql
+    environment:
+      HOST: ${DUMPER_HOST:-mysql}
+      USER: ${DUMPER_USER:-root}
+      PASSWORD: ${DUMPER_PASSWORD:-pw}
+      SOURCE_DB: ${DUMPER_SOURCE_DB:-miserend}
+      TEMP_DB: ${DUMPER_TEMP_DB:-miserend_clone}
     networks:
       inner:
         aliases:
@@ -127,11 +137,9 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-
 networks:
   inner:
     driver: bridge
-
 volumes:
   db_data: {}
   images: {}

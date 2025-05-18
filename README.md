@@ -1,54 +1,148 @@
-miserend.hu
-========
+# 🙏 miserend.hu
 
 A miserend.hu teljes forrása elavult mintaadatokkal.
 
-## Telepítés
-- [Docker](https://docs.docker.com/engine/install/) telepítése a számítógépre.
-- A projekt root könyvtárában futtatni kell ezt: `docker-compose --profile main up` vagy `make start`
-  - Ha háttérben szeretnéd futtatni, akkor az utasítás végére mehet a `-d` argumentum (daemon) megadása: `docker compose up -d`
-  - Windows környezetben a miserend konténer kiakad, hogy a `exec ./docker/entrypoint_miserend.sh: no such file or directory`. Megoldás az entrypoind_miserend.sh átalakítása, hogy unix sorvégeket (LF) használjon windows sorvégrek helyett (CRLF)
-- Egyes beállításokat, pl. portokat, az `.env.example` fájl tartalmának átmásolásával az `.env` fájlban lehet módosítani. 
-  - Ha a docker up hibát generál, mondván hogy egy port már foglalt, akkor ez lehet a megoldás. Egyébiránt opcionális.
-  - `MISEREND_WEBAPP_ENVIRONMENT`= development | staging | production
-- És máris elérhető miserend lokális példánya a `http://localhost:8000` (vagy amit az `.env`-ben meghatároztunk)
-  - Van egy regisztrált felhasználó is: `admin` névvel és a meglepő `admin` jelszóval.
+# ⚙️ Telepítés
 
-## Dump készítédumper/config.yamls
+## 📦 Előfeltételek
 
-Ha dump-ot szeretnénk készíteni az adatbázisról amit a fejlesztés során használhatunk, gondoskodnunk kell róla, hogy a kényes adatok ne kerüljenek bele. Erre való a `dumper`.
+- [Docker](https://docs.docker.com/engine/install/)
+- [make](https://www.gnu.org/software/make/)
 
-Futtatása: `docker compose --profile dumper up` vagy `make dumper`
+_Megjegyzés: ha lehetőségünk a `make` telepítésére, a `Makefile`-ban megnézhetjük, melyik task mit futtat le._
 
-Adatbázis és purge konfiguráció: `dumper/config.yaml`
+## 🚀 Indítás
+
+```sh
+make start
+```
+
+### 🛸 Indítás a háttérben:
+
+```sh
+make start DAEMON=true
+```
+
+## 🌍 Környezeti változók
+
+Egyes beállításokat, pl. portokat, az `.env.example` fájl tartalmának átmásolásával az `.env` fájlban lehet módosítani.
+
+- Ha a `docker up` hibát generál, mondván hogy egy port már foglalt, akkor ez lehet a megoldás. Egyébként opcionális.
+- `MISEREND_WEBAPP_ENVIRONMENT` = `development` | `staging` | `production`
+
+## 🔗 Elérések
+
+| Megnevezés | Cím                   | Felhasználónév | Jelszó | Megjegyzés                      |
+| ---------- | --------------------- | -------------- | ------ | ------------------------------- |
+| Miserend   | http://localhost:8001 | admin          | admin  | `.env` fájlban állítható        |
+| phpMyAdmin | http://localhost:8081 | user vagy root | pw     | Host: mysql, Database: miserend |
+| Kibana     | http://localhost:5601 |                |        | Elasticsearch frontend          |
+
+## 🪟 Futtatás Windows alatt
+
+- Windows környezetben a miserend konténer kiakad, hogy a `exec ./docker/entrypoint_miserend.sh: no such file or directory`.  
+  Megoldás: az `entrypoint_miserend.sh` átalakítása, hogy **Unix sorvégeket (LF)** használjon **Windows sorvégrek (CRLF)** helyett.
+
+# 🗃️ Dump készítés
+
+Ha dump-ot szeretnénk készíteni az adatbázisról fejlesztési célra, a kényes adatok eltávolításáról gondoskodni kell. Erre való a `dumper`.
+
+## ⚙️ Tisztítás konfiguráció
+
+A konfigurációs fájl helye: `dumper/config.yaml`
+
+```yaml
+purge: [Tisztítási konfiguráció]
+  columns: [Oszlop szintű tisztítás]
+    [Tábla neve]:
+      - [Oszlop neve]
+  tables: [Tábla szintű tisztítás]
+    - [Tábla neve]
+```
+
+### ⚙️ Adatbázis kapcsolódás konfiguráció `.env` fájlban:
+
+```
+DUMPER_USER=[Felhasználó aki jogosult adatbázist is létrehozni]
+DUMPER_PASSWORD=[Felhasználó jelszava]
+DUMPER_HOST=[MySQL szerver címe]
+DUMPER_SOURCE_DB=[Adatbázis amelyet ki szeretnénk dump-olni]
+DUMPER_TEMP_DB=[Ideiglenes adatbázis neve, amelyben a tisztítást végezzük (a program hozza létre és semmisíti meg)]
+```
+
+## 🏃‍♂️ Futtatás
+
+```sh
+make dumper
+```
+
+## 💾 Dump
 
 Elkészült dump: `docker/mysql/01-dump.sql`
 
-Az elkészült dump-ot a fejlesztői környezet automatikusan lefuttatja mikor a mysql szerver container a compose-ban létrejön.
+Az elkészült dump-ot a fejlesztői környezet automatikusan betölti, amikor a MySQL konténer létrejön.
 
-## Konténerek
-A [docker-compose.yml](docker-compose.yml) a következő konténereket építi fel és indítja el:
+# 🐳 Konténerek
 
-**mysql**: Az adatbáziszerver. Ebbe tölti be a minta adatokat. A mysql adatbázisokat megőrzi későbbi leállítás / törlés esetén (`docker-compose remove mysql`) is! Az adatok törlése csak a konténerhez tartozó megfelelő *volume* törlésével lehet például a Docker Desktop alkalmazásban.
+A [docker-compose.yml](docker-compose.yml) a következő konténereket indítja el:
 
-**pma**: Egy phpMyAdmin is elérhetővé válik a mysql adminisztrálás támogatására a `http://localhost:8081` címen. (A port eltérhet a `.env` beállítása alapján.) Éles környezetben ezt le kell állítani!
+## 🛢️ mysql
 
-**mailcatcher**: Fejlesztői környezetekben az emaileket ténylegesen nem küldjük el, hanem elkapjuk őket és megtekinthetőek itt: `http://localhost:1080`. Éles környzetben ezt le kell állítani, és figyelni kell arra, hogy helyes beállítással kimenjenek ténylegesen a levelek.
+Az adatbázisszerver. Betölti a mintaadatokat és megőrzi az adatokat újraindítás esetén is.  
+Törléshez a hozzá tartozó _volume_-ot kell eltávolítani (pl. Docker Desktopban).
 
-**miserend**: Maga a honlap mindene. A forráskódból a /webapp rész kerül csak összekötésre / feltöltésre.
+## 🧰 pma (phpMyAdmin)
 
-**elasticsearch**: A kereső motor. A cron-ban rendszeresen futtani kell a _\Externalapi\ElasticsearchApi::updateChurches()_ függvényt, hogy a keresőben is frissüljenek az adatok. És első használatbavételkor is le kell futtatni, különben adatok és adatstruktúra hiányában kihal a kereső.
+Webes adatbázis-kezelő a `http://localhost:8081` címen.  
+Éles környezetben **le kell állítani**!
 
-**kibana**: Az Elasticsearch motorhoz adminisztrációs felület. Csak fejlesztéshez kell. Beizzítása kis varázslást igényelhet.
+## 📬 mailcatcher
 
+Fejlesztéshez használatos, az emaileket elkapja és a `http://localhost:1080` címen megtekinthetők.  
+Éles környezetben **le kell tiltani**, és biztosítani az emailküldést.
 
-## További segítség
-- Belépés az egyes konténerekbe: `docker exec -it [mysql|pma|mailcatcher|miserend] bash`
-- A `mailcatcher` csak az env['production'] esetén nem lép közbe.
-- Fejlesztéshez jól jöhet a `composer` használata, bár telepíti magát:  `docker exec miserend composer install|require|update`. Interactive (`-it`) módban természetesen elég a `composer...`
-- [később] Unit testing: `docker exec miserend ./vendor/bin/phpunit tests`
+## 🌐 miserend
 
-## Néhány vegyes gondolat
-  - a master branch kerül ki a staging környezetbe (staging.miserend.hu), de még nem automatikusan
-  - a production branch kerül ki az éles honlapra
-	
+A webalkalmazás fő komponense. A `/webapp` mappa kerül betöltésre.
+
+## 🔍 elasticsearch
+
+A keresőmotor. A következő függvény rendszeres futtatása szükséges:  
+`Externalapi\ElasticsearchApi::updateChurches()`  
+Első használatkor is futtatni kell!
+
+## 📊 kibana
+
+Elasticsearch admin felülete fejlesztéshez.  
+Beizzítása kis varázslást igényelhet.
+
+# 🛠️ További parancsok
+
+## 🧭 Konténerekbe belépés
+
+```sh
+docker exec -it [mysql|pma|mailcatcher|miserend] bash
+```
+
+## ✅ Unit tesztek futtatása (hamarosan)
+
+```sh
+make test
+```
+
+Megjegyzés: Jelenleg nincs `phpunit` telepítve.
+
+## 📦 Composer használata (interaktív módban):
+
+```sh
+docker exec miserend composer install|require|update
+```
+
+# 🌳 Branching stratégia
+
+- `master` ➜ staging környezet (`staging.miserend.hu`)
+- `production` ➜ éles honlap
+
+# 💬 Egyéb megjegyzések
+
+- A `mailcatcher` csak `env['production']` esetén nem aktív.
