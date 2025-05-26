@@ -16,7 +16,7 @@ class Table extends Api {
             'id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim',
             'megkozelites', 'plebania', 'pleb_eml', 'egyhazmegye',
             'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj',
-            'bucsu', 'frissites', 'lat', 'lon', 'geochecked', 'name', 'alt_name',
+            'frissites', 'lat', 'lon', 'geochecked', 'name', 'alt_name',
             'denomination', 'url'),
     );
 
