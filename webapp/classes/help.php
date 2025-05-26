@@ -14,12 +14,6 @@ class Help {
                         '<br><br>Pl. "még ne engedélyezd, most egyeztetek a plébánossal" vagy bármi hasonló';
                 break;
 
-            case 2:
-                //miserend - templom adatlap
-                $this->html = '<b>Felelős</b>' .
-                        '<br><br>Annak az adatai, aki kb. negyedévente megkereshető a templom adataival kapcsolatban, tud a változásokról, naprakész információi vannak.';
-                break;
-
             case 4:
                 //miserend - templom adatlap
                 $this->html = '<b>Közismert neve</b>' .
