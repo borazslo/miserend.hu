@@ -760,4 +760,20 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
   
+    public function save(array $options = [])
+    {
+        // Másolat készítése a modellről
+        $model = $this;
+
+        // Végigmegyünk az attribútumokon
+        foreach ($model->getAttributes() as $key => $value) {
+            // Ha az attribútum nem szerepel az eredeti attribútumok között, eltávolítjuk
+            if (!in_array($key, array_keys($model->getOriginal()))) {
+                unset($model->$key);
+            }
+        }
+
+        // Meghívjuk az eredeti save() metódust
+        return parent::save($options);
+    }
 }

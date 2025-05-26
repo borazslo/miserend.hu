@@ -50,12 +50,7 @@ class Edit extends \Html\Html {
         $this->church->log .= "\nMod: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
         
         /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt...*/
-        $model = $this->church;
-        foreach ($model->getAttributes() as $key => $value) {
-        if(!in_array($key, array_keys($model->getOriginal())))
-            unset($model->$key);
-        }
-        $model->save();
+        $this->church->save();        
 
         switch ($this->input['modosit']) {
             case 'n':
