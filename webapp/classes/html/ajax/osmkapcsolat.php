@@ -32,7 +32,9 @@ class OSMKapcsolat extends Ajax {
                 $church->osmid = null;
                 $church->osmtype = null;             
                 $church->save();
-                \Eloquent\Attribute::where('church_id',$church->id)->delete();
+                \Eloquent\Attribute::where('church_id', $church->id)
+                    ->where('fromOSM', 1)
+                    ->delete();
                 
                 $this->content = json_encode(["ok" => "Templom OSM összeköttetése sikeresen törölve."]);
                 return;    
