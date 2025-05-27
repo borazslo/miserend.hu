@@ -11,34 +11,43 @@ class Create extends \Html\Html {
         }
 
         $this->title = 'Új misézőhely létrehozása';
-        $this->template = 'layout.twig';
+        
+        $isForm = \Request::Text('submit');
+        if ($isForm) {
+            $tid = $this->create();            
+            if($tid) {
+                $this->redirect("/templom/".$tid."/edit");
+                return;
+            }
+            throw new \Exception('Nem sikerült a templomot létrehozni.');
+        }
 
-        $church = new \Eloquent\Church;
-        $church->nev = 'Új misézőhely';
-        $church->ok = 'n';
-        $church->megbizhato = 'i';
-        $church->frissites = date('Y-m-d');
-        $church->moddatum = date('Y-m-d');
-        $church->egyhazmegye = 1;
-        // General error: 1364 Field '...' doesn't have a default value
-        $church->megkozelites = '';
-        $church->plebania = '';
-        $church->leiras = '';
-        $church->megjegyzes = '';
-        $church->misemegj = '';
-        $church->adminmegj = '';
-        $church->log = '';
+        return;
 
+    }
 
+    function create() {
+        
+        $lat = \Request::IntegerRequired('church[lat]');
+        $lon = \Request::IntegerRequired('church[lon]');
+        $name = \Request::TextRequired('church[nev]');
+        $osm_id = \Request::Integer('church[osmid]');
+        $osm_type = \Request::InArray('church[osmtype]', ['node', 'way', 'relation']);
+
+        $church = \Eloquent\Church::create([
+            'nev' => $name,
+            'ok' => 'n',
+            'frissites' => date('Y-m-d'),
+            'lat' => $lat,
+            'lon' => $lon,
+            'osmid' => $osm_id,
+            'osmtype' => $osm_type,                                    
+        ]);
+         
         $church->save();
-        $church->nev = "Új misézőhely - ".$church->id;
-        $church->save();
 
-        $this->content = "Létrehozás sikeres: <br/><a href='/templom/".$church->id."/edit'>".$church->nev."</a>";
-
-        $this->redirect("/templom/".$church->id."/edit");
-
-
+        return $church->id;
+        
     }
 
 }
