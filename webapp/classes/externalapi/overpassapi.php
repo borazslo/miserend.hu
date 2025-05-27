@@ -29,7 +29,7 @@ class OverpassApi extends \ExternalApi\ExternalApi {
         $this->buildQuery();
     }
 
-    function buildSimpleQuery($filter = false) {
+    function buildSimpleQuery($filter = false, $out = "body qt center") {  
         if ($filter) {
             $this->queryFilter = $filter;
         }
@@ -37,7 +37,7 @@ class OverpassApi extends \ExternalApi\ExternalApi {
                 . "node" . $this->queryFilter . ";"
                 . "way" . $this->queryFilter . ";"
                 . "relation" . $this->queryFilter . ";);"
-                . "out body qt center;";
+                . "out " . $out . ";";
         $this->buildQuery();
     }
 	

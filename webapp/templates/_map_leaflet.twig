@@ -57,25 +57,78 @@
     
     var layerControls = new Array();
 
+    const pastelColors = [
+                "#AEC6CF", // pasztell kék
+                "#FFB347", // pasztell narancs
+                "#77DD77", // pasztell zöld
+                "#CBAACB", // pasztell lila
+                "#FFFACD", // pasztell citromsárga
+                "#FFD1DC", // pasztell rózsaszín
+                "#B39EB5", // világoslila
+                "#FF6961", // lágy piros
+                "#FDFD96", // világossárga
+                "#CB99C9", // pasztell lila (mélyebb)
+                "#F49AC2", // pasztell rózsaszín (erősebb)
+                "#B0E0E6", // halványkék
+                "#E6E6FA", // levendula
+                "#C1E1C1", // világos zöld
+                "#FFDAC1", // barackszín
+                "#E0BBE4", // halvány lila
+                "#D5AAFF", // világoslila-pink
+                "#B3E5FC", // világoskék
+                "#FCEABB", // krémsárga
+                "#D6F5D6"  // mentazöld
+                ];
+
     {% if dioceseslayer %}
-    var diocesesLayer = L.geoJSON({{ dioceseslayer.geoJson|raw }}, { 
-            onEachFeature: function (feature, layer) {
-                /*layer.setText('maci maci', {repeat: true, offset: -5});*/
-            },
-            style: {
-                    fillColor: 'blue',
+    // Egyházmegyék rétegekhez tartozó ID-k nyilvántartása
+    var addedGreekCatholicIds = new Set();
+    var addedRomanCatholicIds = new Set();
+
+    // Egyházmegyék rétegek inicializálása
+    var diocesesGreekcatholicLayer = L.geoJSON(null, {
+       style: function (feature) {
+         
+                //console.log('Feature properties:', feature.geometry);
+                var hash = 0;
+                for (var i = 0; i < feature.geometry.id.length; i++) {
+                    hash = feature.geometry.id.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                var colorIndex = Math.abs(hash) % pastelColors.length;
+                return {
+                    fillColor: pastelColors[colorIndex],
                     weight: 3,
-                    opacity: 0.4,
-                    color: 'blue',
+                    opacity: 0.8,
+                    color: '#6D3C8D', 
                     dashArray: '3',
-                    fillOpacity: 0.2,
-                    fillRule: null,
-                    fill: null,
-                  }
-                           /* onEachFeature: onEachFeature */ 
-    });       
-    diocesesLayer.addTo(mymap);
-    layerControls['Római katolikus egyházmegyék'] = diocesesLayer;  
+                    fillOpacity: 0.3
+                };
+            
+        }
+    });
+
+    var diocesesRomanCatholicLayer = L.geoJSON(null, {
+       style: function (feature) {
+         
+                //console.log('Feature properties:', feature.geometry);
+                var hash = 0;
+                for (var i = 0; i < feature.geometry.id.length; i++) {
+                    hash = feature.geometry.id.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                var colorIndex = Math.abs(hash) % pastelColors.length;
+                return {
+                    fillColor: pastelColors[colorIndex],
+                    weight: 3,
+                    opacity: 0.8,
+                    color: '#6D3C8D', 
+                    dashArray: '3',
+                    fillOpacity: 0.3
+                };
+            
+        }
+    }).addTo(mymap);
+    layerControls['Római katolikus egyházmegyék'] = diocesesRomanCatholicLayer;  
+    layerControls['Görögkatolikus egyházmegyék'] = diocesesGreekcatholicLayer;  
     {% endif %}               
     
       
@@ -187,8 +240,8 @@
            if(activeGreekLayer) activeGreekLayer.clearLayers();
            if(inactiveLayer) inactiveLayer.clearLayers();
 
-           return;
-      }
+           
+      } else {
       
         $.getJSON( "/ajax/churchesinbbox?bbox=" + params , function( data ) {                              
             if(data) {
@@ -229,7 +282,42 @@
                     }
                 });
             }
-        });   
+        });  
+        }
+         {% if dioceseslayer %}
+        // Egyházmegyéke lekérés a bbox alapján        
+        $.getJSON('/ajax/diocesesinbbox?bbox=' + params, function (data) {
+
+            // Új adatok hozzáadása a meglévő rétegekhez
+            if (data['greekcatholic']) {
+                const newGreekCatholicData = data['greekcatholic'].filter(feature => {
+                    const id = feature.id || feature.properties.id; // Azonosító lekérése
+                    if (!addedGreekCatholicIds.has(id)) {
+                        addedGreekCatholicIds.add(id); // Hozzáadás az ID-k listájához
+                        console.log('New Greekcatholic Diocese:', 'https://openstreetmap.org/' + id);
+                        return true; // Új adat
+                    }
+                    return false; // Már létező adat
+                });
+                diocesesGreekcatholicLayer.addData(newGreekCatholicData); // Csak az új adatok hozzáadása
+            }
+
+            if (data['roman_catholic']){
+                const newRomanCatholicData = data['roman_catholic'].filter(feature => {
+                    const id = feature.id || feature.properties.id; // Azonosító lekérése
+                    if (!addedRomanCatholicIds.has(id)) {
+                        addedRomanCatholicIds.add(id); // Hozzáadás az ID-k listájához
+                        console.log('New Roman Catholic Diocese:', 'https://openstreetmap.org/' + id);
+                        return true; // Új adat
+                    }
+                    return false; // Már létező adat
+                });
+                diocesesRomanCatholicLayer.addData(newRomanCatholicData); // Csak az új adatok hozzáadása
+            }
+        });
+        {% endif %}
+
+
     }
         
     mymap.on('moveend', onMapMoved);

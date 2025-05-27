@@ -16,10 +16,11 @@ class NominatimApi extends \ExternalApi\ExternalApi {
         $this->query .= "&osmtype=".$osmtype."&osmid=".$osmid;
         $this->query .= "&polygon_geojson=1&format=json";
 
-        if($this->runQuery())
-            return $this->jsonData->geometry;        
-        else
+        if ($this->runQuery() && isset($this->jsonData->geometry)) {            
+            return $this->jsonData->geometry;
+        } else {
             return false;
+        }
     }
 
     function buildQuery() {
