@@ -45,14 +45,6 @@
             </tr>
             {{ _self.helptr(1,help) }}
             <tr>
-                <td bgcolor=#efefef class=kiscim align=right>Felelős:</td>
-                <td bgcolor=#efefef>                
-                    <input type=text name=church[kontaktmail] size=40 class="urlap form-control" value='{{ church.kontaktmail }}'  placeholder="Felelős email címe">                    
-                </td>
-                <td>{{ _self.helplink(2, ICONS_INFO ) }}</td>
-            </tr>
-            {{ _self.helptr(2,help) }}
-            <tr>
                 <td bgcolor=#F5CC4C class=kiscim align=right>Szerkesztési név:</td>
                 <td bgcolor=#F5CC4C>
                     <input type=text name=church[nev] value="{{ church.nev }}" class="urlap form-control" size=80 maxlength=150  placeholder="Templom neve">
@@ -86,20 +78,21 @@
             {% if church.location.osm %}
                 <tr>
                     <td class=kiscim align=right>OSM azonosító:</td>
-                    <td>    
+                    <td id="deleteOsmId">    
                         <b><a href="{{ church.location.osm.url }}" target="_blank">{{ church.location.osm.type }}/{{ church.location.osm.id }}</a>
                             <a href="https://www.openstreetmap.org/edit?editor=id&{{ church.location.osm.type }}={{ church.location.osm.id }}#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}"  title="OSM szerkesztése..."></i></a>
+                            {% if user.isadmin %}
+                                <a href="#" id="delete-osm-${tid}" class="{{ ICONS_DELETE }}" title="OSM összeköttetés törlése" 
+                                   onclick="return deleteOsmId({{ tid }});"></a>
+                            {% endif %}
+
                         </b><br/>
                     </td>
                     <td>{{ _self.helplink(55, ICONS_INFO ) }}</td>                        
                 <tr>
                 <tr id="help55" style="display:none"><td colspan="3">
                         Ez a templom sikeresen össze van kötve az Open Street Map térkép adatbázissal.<br/> 
-                        A templom térkép-adatainak szerkesztése az OSM-ben lehetséges az előbbi <a href="https://www.openstreetmap.org/edit?editor=id&{{ church.location.osm.type }}={{ church.location.osm.id }}#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..." "></i></a> ikonra kattintva.<br/>
-                        Összekötés szétkapcsolása: <ol>
-                            <li>Az OSM szerkesztőben az 'url:miserend' címke törlése.</li>
-                            <li>A mySQL adatbázisból kézzel ki kell törölni az adott templom OSM beállításait: <i>UPDATE `templomok` SET `osmid`= NULL, `osmtype`= NULL WHERE `id`='{{ church.id }}';</i></li>
-                       
+                        A templom térkép-adatainak szerkesztése az OSM-ben lehetséges az előbbi <a href="https://www.openstreetmap.org/edit?editor=id&{{ church.location.osm.type }}={{ church.location.osm.id }}#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank"><i class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..." "></i></a> ikonra kattintva.                                               
                     </td></tr>
             {% else %}
                 <tr>
@@ -343,6 +336,53 @@
         newLinkDialog.dialog( "close" );
     }
   } );
+
+function deleteOsmId(tid) {
+    if (!confirm('Biztosan törölni szeretnéd ennek a templomnak az OSM összeköttetését?')) {
+        return false;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "/ajax/osmkapcsolat",
+        data: {
+            action: "delete",
+            tid: tid
+        },
+        success: function(response) {
+
+            const jsonResponse = JSON.parse(response);
+            const messagesDiv = $('#deleteOsmId');
+            
+            if (jsonResponse.error) {
+                messagesDiv.append(`
+                    <div class="alert alert-danger" role="alert">
+                        Hiba történt! ${jsonResponse.error}
+                    </div>
+                `);
+            } else if (jsonResponse.ok) {
+                messagesDiv.html(`
+                    <div class="alert alert-success" role="alert">
+                        ${jsonResponse.ok}
+                    </div>
+                `);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            const messagesDiv = $('#messages');
+            messagesDiv.append(`
+                <div class="alert alert-danger" role="alert">
+                    Hiba történt a kérés során.
+                </div>
+            `);            
+        }
+    });
+
+    return false; // Prevent default link behavior
+}
+
+   
   </script>
     <div id="church-link-delete-confirm"></div>
     <div id="church-link-add-form">

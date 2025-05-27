@@ -26,7 +26,6 @@ class Create extends \Html\Html {
         $church->leiras = '';
         $church->megjegyzes = '';
         $church->misemegj = '';
-        $church->bucsu = '';
         $church->adminmegj = '';
         $church->log = '';
 

@@ -30,7 +30,7 @@ class Database extends Api {
 				
 		// Van egy-két mező, amiben érzékeny adat lehet, ezért nem szabad lementeni
 		$this->columns_to_omit = [
-			'templomok' => ['adminmegj','kontakt','kontaktmail','log','letrehozta','modositotta'],
+			'templomok' => ['adminmegj','log','modositotta'],
 			'misek' => ['modositotta', 'torolte']
 		];
 		

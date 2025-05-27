@@ -56,6 +56,7 @@ class Map extends Html {
 			//Az általunk rögzített egyházmegyék osm azonosítói
 			// TODO: Sajna mindet veszi, pedig azt írjuk ki, hogy római katolikus egyházmegyék. Upsz.
             $results = DB::table('egyhazmegye')
+                ->where('nev', 'not like', '%(gk)%')
                 ->whereNotNull('osm_relation')
                 ->select("osm_relation")
                 ->pluck('osm_relation')
