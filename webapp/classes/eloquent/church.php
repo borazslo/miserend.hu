@@ -135,7 +135,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         $misek = [];        
         if(isset($masses['churches'][$this->id])) {
             foreach($masses['churches'][$this->id]['masses'] as $key => $mise) {
-                $misek[$key]['idopont'] = date('Y-m-d')." ".$mise['ido'];
+                $misek[$key]['idopont'] = $whenMass." ".$mise['ido'];
                 $info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
                 if($info != '') $misek[$key]['informacio'] = $info;
             }	            
