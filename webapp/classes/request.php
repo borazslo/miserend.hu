@@ -119,11 +119,25 @@ class Request {
     }
 
     static function get($name) {
-        if (isset($_REQUEST[$name])) {
-            return $_REQUEST[$name];
+         // Ellenőrizzük, hogy a kulcs tömbszerű-e (pl. church[lat])
+        if (strpos($name, '[') !== false && strpos($name, ']') !== false) {
+            // A kulcs feldarabolása tömbszerű kulcsokra
+            $keys = explode('[', str_replace(']', '', $name));
+            $value = $_REQUEST;
+
+            // Bejárjuk a kulcsokat, hogy elérjük a megfelelő értéket
+            foreach ($keys as $key) {
+                if (isset($value[$key])) {
+                    $value = $value[$key];
+                } else {
+                    return false; // Ha bármelyik kulcs nem létezik, false-t adunk vissza
+                }
+            }
+            return $value;
         } else {
-            return false;
-        }        
+            // Egyszerű kulcsok kezelése
+            return isset($_REQUEST[$name]) ? $_REQUEST[$name] : false;
+        }     
     }
 
 }

@@ -86,12 +86,12 @@ class Health extends Html {
 				
 				
 				$testresult = $externalapi->test();
-				$this->externalapis[$apiToTest]['apiUrl'] = $externalapi->apiUrl ;
-				$this->externalapis[$apiToTest]['testQuery'] = $externalapi->rawQuery;
-				
 				if($testresult !== true) 
 					throw new \Exception($testresult);
 				
+				$this->externalapis[$apiToTest]['apiUrl'] = $externalapi->apiUrl ;
+				$this->externalapis[$apiToTest]['testQuery'] = $externalapi->rawQuery;
+								
 				$this->externalapis[$apiToTest]['testresult'] = 'OK';
 			}
 			catch (\Exception $e) {
@@ -123,7 +123,21 @@ class Health extends Html {
 		$this->mailing['debug'] = $config['mail']['debug'];
 		
 		$email = new \Eloquent\Email();
-		$this->mailing['testresult'] = $email->test();
+
+		$html = '';
+
+		// We send the test results as a test email
+		$this->foremail = true;
+		global $user;
+		$this->user = $user;
+		$this->loadTwig();
+        $this->getTemplateFile();
+        $html = $this->twig->render(strtolower($this->template), (array) $this);
+		$html = $this->inlineCssFiles($html);
+		$this->foremail = false;
+
+
+		$this->mailing['testresult'] = $email->test($html);
 			
 		return;		
     }

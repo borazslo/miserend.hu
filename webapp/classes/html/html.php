@@ -64,9 +64,13 @@ class Html {
             $this->loadResponsibleMenu();
         }
         $this->menu[] = [
-            'title' => 'Térkép',
-            'url' => '/terkep'
+            'title' => 'Térkép',  'mid' => 27,
+            'url' => '/terkep',
+            'items' => [
+                [ 'title' => 'Térképes plakátkészítő', 'url' => 'https://szentjozsefhackathon.github.io/templom-terkep/' ]
+            ]
         ];
+        
     }
 
     function loadAdminMenu() {
@@ -196,5 +200,44 @@ class Html {
        
         return $return;
     }
+    
+    /**
+     * Inline CSS files found in the HTML content.
+     *
+     * @param string $html The HTML content to process.
+     * @return string The HTML content with CSS files inlined.
+     */     	
+    function inlineCssFiles($html) {
+        // Keresd meg az összes <link> elemet, amely CSS fájlokat hivatkozik
+        preg_match_all('/<link.*?href=["\'](.*?)["\'].*?rel=["\']stylesheet["\'].*?>/i', $html, $matches);
 
+        // Az összes megtalált CSS fájl URL-je
+        $cssFiles = $matches[1];
+
+        // A CSS tartalmakat ide gyűjtjük
+        $inlinedCss = '';
+
+        foreach ($cssFiles as $cssFile) {
+            // Teljes URL generálása, ha relatív útvonal
+            $cssFilePath = $cssFile;
+            if (strpos($cssFile, 'http') !== 0) {
+                $cssFilePath = $_SERVER['DOCUMENT_ROOT'] . $cssFile;
+            }
+
+            // Ellenőrizzük, hogy a fájl létezik-e
+            if (file_exists($cssFilePath)) {
+                // A CSS fájl tartalmának beolvasása
+                $cssContent = file_get_contents($cssFilePath);
+                $inlinedCss .= "<style>\n" . $cssContent . "\n</style>\n";
+            }
+        }
+
+        // Az összes <link> elem eltávolítása a HTML-ből
+        $html = preg_replace('/<link.*?rel=["\']stylesheet["\'].*?>/i', '', $html);
+
+        // Az inlined CSS hozzáadása a <head> részhez
+        $html = preg_replace('/<\/head>/', $inlinedCss . '</head>', $html);
+
+        return $html;
+    }	
 }

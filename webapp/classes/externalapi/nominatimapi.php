@@ -8,6 +8,7 @@ class NominatimApi extends \ExternalApi\ExternalApi {
 
     public $name = 'nominatim';
     public $apiUrl = "https://nominatim.openstreetmap.org/" ;    
+    public $testQuery = 'search?q=Szent%20József%20jezsuita&format=json';
 
     function OSM2GeoJson($osmtype, $osmid) {
         

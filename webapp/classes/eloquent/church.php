@@ -15,9 +15,34 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     
     protected $table = 'templomok';
     protected $appends = array('names', 'alternative_names', 'fullName','location','links');
-
+    protected $fillable = [
+        'nev', 'cim', 'orszag', 'megye', 'varos', 'plebania', 'pleb_eml', 'leiras',
+        'lat', 'lon', 'miseaktiv', 'ok', 'frissites', 'misemegj','osmid','osmtype',
+        'accessibility', 'megkozelites'
+    ];
 	protected $attributesCache = null;
 	
+    // TODO FIXME #174 sémakisimítás. Mindegyikben engedélyezni kéne a null-t vagy default érték
+    protected $attributes = [
+        'megkozelites' => '',
+        'plebania' => '',
+        'leiras' => '',
+        'megjegyzes' => '',
+        'misemegj' => '',
+        'bucsu' => '',
+        'kontakt' => '',
+        'kontaktmail' => '',
+        'adminmegj' => '',
+        'log' => '',
+        'osmid' => false,
+        'osmtype' => false,
+        'lat' => 0.0,
+        'lon' => 0.0,
+        'nev'   => '',
+        'frissites' => false,
+        'ok' => 'n', // n: nem engedélyezett, i: engedélyezett, f: feltöltött, áttekintésre vár
+    ];
+
     public function adorations()
     {
         return $this->hasMany(Adoration::class);

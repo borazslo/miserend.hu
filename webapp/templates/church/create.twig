@@ -1,0 +1,325 @@
+{% extends "layout.twig" %}
+
+{% import "forms.twig" as forms %}
+
+{% set columns2 = true  %}
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>            
+            Új misézőhely felvitele			
+        </h2>
+    </div>
+{%  endblock %}
+
+{% block content %}
+    <FORM ENCTYPE='multipart/form-data' method=post>
+
+        <style>
+            td {
+                padding: 5px;                
+            }
+            tr {
+                vertical-align: top;
+            }
+        </style>
+
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-12 font-weight-bold">
+                <h4>Szerkesztési név:</h4>
+                <p>A misézőhelyek neveit az OSM adatbázisából vesszük. Itt csak a rendszer hiba esetén az azonosításhoz szükséges nevet őrizzük.</p>
+            </div>
+            <div class="col-12">
+                <input type="text" name="church[nev]" value="{{ church.nev }}" class="urlap form-control" size="80" maxlength="150" placeholder="Templom neve">                
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 font-weight-bold">
+                <h4>Koordináta:</h4> 
+                <p>A térképen mozgatva a jelölőt változik a mentendő koordináta.</p>               
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="church[lat]" value="" class="form-control" placeholder="szélességi fok">
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="church[lon]" value="" class="form-control" placeholder="hosszúsági fok">
+            </div>
+            <div class="col-md-2 ">
+                <a id="osm-edit-link" href="https://www.openstreetmap.org/edit?editor=id#map=19/{{ church.location.lat }}/{{ church.location.lon }}" target="_blank">
+                    <span class="{{ ICONS_MAP_EDIT }}" title="OSM szerkesztése..."></span>
+                </a>
+            </div>
+            <div class="col-md-12" style="padding-top: 10px">
+                <div id="map" style="height: 400px; width: 100%; max-width: 100%; margin: 0 auto; box-sizing: border-box;">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 font-weight-bold">
+                <h4>OSM azonosító:</h4>
+                <p>A megadott koordináta alapján fellelhetünk meghelelő OSM-ben már létező misézőhelyet és akkor annak azonosítóját. De vigyázat, ezzel még az OSM-ben nem kerül rögzítésre, hogy hozzánk tartozik.</p>
+            </div>
+            <div class="col-md-6">
+                <select name="church[osmtype]" class="form-control">
+                    <option value="" ></option>
+                    <option value="node" {% if church.osmtype == 'node' %}selected{% endif %}>Node</option>
+                    <option value="way" {% if church.osmtype == 'way' %}selected{% endif %}>Way</option>
+                    <option value="relation" {% if church.osmtype == 'relation' %}selected{% endif %}>Relation</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="church[osmid]" value="{{ church.osmid }}" class="form-control" placeholder="OSM ID">
+            </div>
+            <div class="col-md-12">
+                
+                 <!-- Táblázat a közeli helyek megjelenítéséhez -->
+                <table id="nearby-places" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Templom</th>
+                            <th>Távolság</th>
+                            <th style="text-align:center">OSM</th>
+                            <th style="text-align:center">Miserend</th>
+                            <th style="text-align:center">Azonosítás</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Az eredmények ide kerülnek -->
+                    </tbody>
+                </table>
+            
+            </div
+
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 font-weight-bold">
+                <h4>Megjegyzés:</h4>
+                <p>Ez a megjegyzés nem kerül nyilvánosságra, csak a szerkesztőknek és adminisztrátoroknak látható.</p>
+            </div>
+            <div class="col-12">
+                <textarea name="church[adminmegj]" class="urlap form-control tinymce" cols="50" placeholder="Adminisztrátori megjegyzés" rows="2">{{ church.adminmegj|nl2br }}</textarea>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 text-center">
+                <input type="submit" name="submit" class="btn btn-primary btn-lg">                    
+            </div>
+        </div>
+
+    </div>
+
+                
+             
+    </form>                
+    <script language="javascript" type="text/javascript" src="/vendor/tinymce/tinymce/tinymce.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/js/tiny_mce_init.js"></script>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+    <script>
+  $( function() {
+		  
+  
+    $( ".info" ).on( "click", function() { 
+        console.log($( this ).data('id'));
+               $('#help' + $( this ).data('id') ).toggle(600);
+    });
+ });
+  
+    
+    $(function () {
+
+         // Mezők változásának figyelése
+        $('input[name="church[lat]"], input[name="church[lon]"]').on('input', function () {
+            var lat = $('input[name="church[lat]"]').val();
+            var lon = $('input[name="church[lon]"]').val();
+
+            // OSM szerkesztési link frissítése
+            $('#osm-edit-link').attr('href', `https://www.openstreetmap.org/edit?editor=id#map=19/${lat}/${lon}`);  
+
+            // osmtype és osmid mezők ürítése
+            $('select[name="church[osmtype]"]').val('');
+            $('input[name="church[osmid]"]').val('');
+
+            // Térkép frissítése
+            marker.setLatLng([lat, lon]);
+            map.setView([lat, lon], map.getZoom());
+                        
+            // Overpass Turbo API lekérés
+            fetchOverpassData(lat, lon);     
+        });
+
+        function fetchOverpassData(lat, lon, radius = 1000) {
+            // Overpass Turbo lekérdezés
+            var query = `
+                [out:json][timeout:25];
+                (
+                    node["amenity"="place_of_worship"]["religion"="christian"](around:${radius},${lat},${lon});
+                    way["amenity"="place_of_worship"]["religion"="christian"](around:${radius},${lat},${lon});
+                    relation["amenity"="place_of_worship"]["religion"="christian"](around:${radius},${lat},${lon});
+                );
+                out body center;
+            `;
+
+            $.ajax({
+                url: 'https://overpass-api.de/api/interpreter',
+                type: 'POST',
+                data: { data: query },
+                success: function (response) {
+                    // Eredmények feldolgozása
+                    var results = response.elements.map(function (element) {
+                        var distance = getDistanceFromLatLonInKm(lat, lon, element.lat || element.center.lat, element.lon || element.center.lon);
+                        return {
+                            id: element.id,
+                            type: element.type,
+                            lat: element.lat || element.center.lat,
+                            lon: element.lon || element.center.lon,
+                            distance: distance,
+                            name: element.tags.name || element.tags.name_hu || element.tags.alt_name,
+                            denomination: element.tags.denomination || element.tags.religion || 'unknown',
+                            miserend: element.tags['url:miserend']
+                        };
+                    });
+
+                    // Ha az eredmények száma 1 vagy kevesebb, újrapróbálkozás nagyobb radius értékkel
+                    if (results.length <= 1 && radius < 20000) {
+                        console.log(`Kevés találat (${results.length}), újrapróbálkozás nagyobb körrel (${radius + 5000}m)...`);
+                        fetchOverpassData(lat, lon, radius + 5000);
+                        return;
+                    }
+
+                    // Távolság szerint rendezés
+                    results.sort(function (a, b) {
+                        return a.distance - b.distance;
+                    });
+
+                    // Táblázat frissítése
+                    var rows = results.map(function (result) {
+                        return `
+                            <tr>
+                                <td>${result.name ? result.name : `${result.type}:${result.id}`}<br/><small>${result.denomination}</small></td>
+                                <td>${(result.distance * 1000).toFixed(0)} m</td>
+                                <td style="text-align:center"><a href="https://www.openstreetmap.org/${result.type}/${result.id}" target="_blank"><span class="{{ ICONS_MAP_SEE }}" title="OSM elem megtekintése."></span></a></td>                                
+                                <td style="text-align:center">
+                                    ${result.miserend ? `
+                                        <a href="${result.miserend}" target="_blank">
+                                            <span class="{{ ICONS_CHURCH_SEE }}" title="Misézőhely megtalálható a Miserend.hu-n. Lássuk."></span>
+                                        </a>
+                                    ` : ''}
+                                </td>
+                                <td style="text-align:center">
+                                ${result.miserend ? `` : `
+                                    <span class="{{ ICONS_ADD }} select-location" 
+                                        title="Legyen ez az OSM entitás a templom adata!"
+                                        data-lat="${result.lat}" 
+                                        data-lon="${result.lon}" 
+                                        data-osmtype="${result.type}" 
+                                        data-osmid="${result.id}">
+                                    </span>`}
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    $('#nearby-places tbody').html(rows);
+
+                    // Gomb eseménykezelő hozzáadása
+                    $('#nearby-places').on('click', '.select-location', function () {
+                        var lat = $(this).data('lat');
+                        var lon = $(this).data('lon');
+                        var osmtype = $(this).data('osmtype');
+                        var osmid = $(this).data('osmid');
+
+                        // Mezők kitöltése
+                        $('input[name="church[lat]"]').val(lat.toFixed(6));
+                        $('input[name="church[lon]"]').val(lon.toFixed(6));
+                        $('select[name="church[osmtype]"]').val(osmtype);
+                        $('input[name="church[osmid]"]').val(osmid);
+
+                        // Térkép frissítése
+                        marker.setLatLng([lat, lon]);
+                        map.setView([lat, lon], map.getZoom());
+                        
+                    });
+                },
+                error: function () {
+                    console.error('Hiba történt az Overpass Turbo API lekérése során.');
+                }
+            });
+        }
+
+    // Alapértelmezett koordináták az input mezőkből
+    var defaultLat = parseFloat($('input[name="church[lat]"]').val()) || 47.497913;
+    var defaultLon = parseFloat($('input[name="church[lon]"]').val()) || 19.040236;
+
+    // Térkép inicializálása
+    var map = L.map('map').setView([defaultLat, defaultLon], 15);
+
+    // OpenStreetMap csempék hozzáadása
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Marker inicializálása
+    var marker = L.marker([defaultLat, defaultLon], { draggable: true }).addTo(map);
+
+    // Marker mozgatásának kezelése
+    marker.on('moveend', function (e) {
+        var lat = e.target.getLatLng().lat.toFixed(6);
+        var lon = e.target.getLatLng().lng.toFixed(6);
+
+        // Mezők frissítése
+        $('input[name="church[lat]"]').val(lat);
+        $('input[name="church[lon]"]').val(lon);
+
+        // osmtype és osmid mezők ürítése
+        $('select[name="church[osmtype]"]').val('');
+        $('input[name="church[osmid]"]').val('');
+
+        // Overpass Turbo API lekérés
+        fetchOverpassData(lat, lon);
+        
+        
+        
+    });
+
+    // Távolság számítása két koordináta között
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        var R = 6371; // Föld sugara km-ben
+        var dLat = deg2rad(lat2 - lat1);
+        var dLon = deg2rad(lon2 - lon1);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c; // Távolság km-ben
+        return d;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+});
+
+   
+  </script>
+
+    
+{% endblock %}
+
+
+{% macro helplink(id, icon) %}
+    <span title="Súgó" class="grey {{ icon }} info" aria-hidden="true" data-id="{{ id }}"></span>
+{% endmacro %}
+
+{% macro helptr(id, help) %}
+    <tr style="display:none" id="help{{ id }}"><td colspan="3">{{ help[id]|raw }}</td></tr>
+{% endmacro %}
