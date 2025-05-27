@@ -11,6 +11,7 @@ class Create extends \Html\Html {
         }
 
         $this->title = 'Új misézőhely létrehozása';
+
         
         $isForm = \Request::Text('submit');
         if ($isForm) {
@@ -21,6 +22,7 @@ class Create extends \Html\Html {
             }
             throw new \Exception('Nem sikerült a templomot létrehozni.');
         }
+
 
         return;
 
