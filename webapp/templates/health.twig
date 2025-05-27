@@ -1,10 +1,13 @@
-{% extends 'layout.twig' %}
+{% set base_template = foremail ? 'layout_simpliest.twig' : 'layout.twig' %}
+{% extends base_template %}
+
 
 {% set columns2 = true %}
     
 
 {% block content %}
     
+	<p>Az ellenőrzést kezdeményezte <a href="/user/{{ user.uid }}/edit">{{ user.login }}</a> vagyis {{ user.name }}.</p>
 	
 	<h3 id="variables">Változók és körülmények</h3>
 	<table class="table table-hover table-condensed table-striped">
@@ -52,20 +55,24 @@
 	<h3 id="externalapis">Külső szolgáltatók elérhetősége</h3>
 	<p><i>Olyanok mint mapqquest, openstreetmap, kozossegekapi, liturgiativ, nominatim, openinghapi, overpass</i></p> 
 
-	<table class="table table-hover table-condensed table-striped">
+	<table class="table table-hover table-striped" style="table-layout: fixed; width: 100%;">
 		<tr>
 			<th class="col-2">name</th>
 			<th class="col-1">last_month</th>
-			<th class="col-5">testresult</th>
-			<th class="col-4 d-inline-block text-truncate">testQuery</th>
+			<th class="col-3">testresult</th>
+			<th class="">testQuery</th>
 			
 		</tr>
 		{% for externalapi in externalapis %}
 			<tr>
 				<td>{{ externalapi.name }}</td>
-				<td>{{ externalapi.stat }}</td>
+				<td style="text-align: center;">{{ externalapi.stat }}</td>
 				<td class="{% if externalapi.testresult != "OK" %}table-danger{% endif %}">{{ externalapi.testresult }}</td>
-				<td class="col-4 d-inline-block text-truncate"><a href="{{ externalapi.apiUrl }}{{ externalapi.testQuery }}"><span class="d-inline-block text-truncate">{{ externalapi.testQuery }}</span></a></td>								
+				<td class="col-6 text-truncate" style="max-width: 50%;">
+					<a href="{{ externalapi.apiUrl }}{{ externalapi.testQuery }}">
+						{{ externalapi.testQuery }}
+					</a>
+				</td>								
 				
 			</tr>
 		{% endfor %}
@@ -82,7 +89,13 @@
 			</tr>
 			<tr>				
 				<td>Teszt eredmény</td>
-				<td class="{% if mailing.testresult != 'OK' %}table-danger{% endif%}">{{ mailing.testresult }}</td>
+				<td>
+					{% if foremail %}
+						It is the test email itself. ;)
+					{% else %}
+						<span class="{% if mailing.testresult != 'OK' %}table-danger{% endif%}">{{ mailing.testresult }}</span>
+					{% endif %}
+				</td>
 			</tr>
 	</table>
 	

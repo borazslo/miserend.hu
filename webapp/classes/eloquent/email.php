@@ -126,8 +126,9 @@ class Email extends \Illuminate\Database\Eloquent\Model {
 		return $mailer;
 	}
 	
-	function test() {
-	
+	function test($content = false) {
+        global $user;
+
 		$mailer = $this->createMailer();
 		try {
 			$connection = $mailer->SmtpConnect();
@@ -136,10 +137,13 @@ class Email extends \Illuminate\Database\Eloquent\Model {
 		}
 		
 		$mailer->addAddress($this->debugger);               
-		$mailer->isHTML(false);                                  
+		$mailer->isHTML(true);                                  
 		$mailer->Subject = 'miserend.hu - egészség ellenőrzés';
-		$mailer->Body    = 'Hát ez most kiment. Kitette?';
-		
+		$mailer->Body    = '';
+		if($content) {
+            $mailer->Body .= "\n\n" . $content;
+        }   
+
 		if(!$mailer->send()) {
 			return "Valami hiba történt teszt email kiküldése közben.";
 		}
