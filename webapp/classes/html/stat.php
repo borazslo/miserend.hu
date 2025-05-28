@@ -184,7 +184,7 @@ class Stat extends Html {
 		$sum = 0; $maxYear = 0;
 		
 		if($results[0]->yearago > 0 ) {
-			array_unshift($results,new \stdClass() );
+			$results->prepend(new \stdClass() );
 			$results[0]->yearago = 0;
 			$results[0]->count = 0;
 		}

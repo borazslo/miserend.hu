@@ -473,8 +473,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
       public function getRemarksiconAttribute() {
-			
-		 $allapotok = \Eloquent\Remark::where('church_id',$this->id)->groupBy('allapot')->pluck('allapot')->toArray();            
+					 
+         $allapotok = $this->remarks->groupBy('allapot')->keys()->toArray();
             if (in_array('u', $allapotok))
 				$remarksicon = "ICONS_REMARKS_NEW";                
             elseif (in_array('f', $allapotok))
@@ -486,6 +486,20 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 			return $remarksicon;
     }
 	
+    public function getRemarksStatusTextAttribute() {
+			
+        $allapotok = $this->remarks->groupBy('allapot')->keys()->toArray();              
+           if (in_array('u', $allapotok))
+               $remarksStatusText = "Új észrevétel érkezett.";                
+           elseif (in_array('f', $allapotok))
+               $remarksStatusText = "Van még feldolgozás alatt álló észrevétel.";
+           elseif (count($allapotok) > 0)
+               $remarksStatusText = "Minden észrevétel feldolgozva.";
+           else
+               $remarksStatusText = "Nem érkezett még észrevétel.";
+           return $remarksStatusText;
+    }
+
     function getFullNameAttribute($value) {
         
         $return = $this->names[0];

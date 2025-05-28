@@ -67,6 +67,7 @@ class Html {
             'title' => 'Térkép',  'mid' => 27,
             'url' => '/terkep',
             'items' => [
+                [ 'title' => 'Térképen a misézőhelyek', 'url' => '/terkep' ],
                 [ 'title' => 'Térképes plakátkészítő', 'url' => 'https://szentjozsefhackathon.github.io/templom-terkep/' ]
             ]
         ];
@@ -75,9 +76,10 @@ class Html {
 
     function loadAdminMenu() {
         $adminmenuitems = [
-            ['title' => 'Miserend', 'url' => '/termplom/list', 'permission' => 'miserend', 'mid' => 27,
+            ['title' => 'Miserend', 'url' => '/templom/list', 'permission' => 'miserend', 'mid' => 27,
                 'items' => [
                     ['title' => 'teljes lista', 'url' => '/templom/list', 'permission' => ''],
+                    ['title' => 'kezelendő észrevételek', 'url' => '/templom/list?church%5Bstatus%5D=Rnj&church%5BorderBy%5D=remarks.created_at', 'permission' => ''],
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
                     ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
