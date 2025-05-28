@@ -486,6 +486,20 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 			return $remarksicon;
     }
 	
+    public function getRemarksStatusTextAttribute() {
+			
+        $allapotok = \Eloquent\Remark::where('church_id',$this->id)->groupBy('allapot')->pluck('allapot')->toArray();            
+           if (in_array('u', $allapotok))
+               $remarksStatusText = "Új észrevétel érkezett.";                
+           elseif (in_array('f', $allapotok))
+               $remarksStatusText = "Van még feldolgozás alatt álló észrevétel.";
+           elseif (count($allapotok) > 0)
+               $remarksStatusText = "Minden észrevétel feldolgozva.";
+           else
+               $remarksStatusText = "Nem érkezett még észrevétel.";
+           return $remarksStatusText;
+    }
+
     function getFullNameAttribute($value) {
         
         $return = $this->names[0];

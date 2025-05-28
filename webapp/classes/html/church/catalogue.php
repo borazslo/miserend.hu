@@ -20,18 +20,18 @@ class Catalogue extends \Html\Html {
             throw new \Exception('Nincs jogosultságod megnézni a templomok listáját.');
         }
                
-        $this->filterKeyword = (isset($this->input['church']['keyword']) ? $this->input['church']['keyword'] : false);
-        $this->filterDiocese = (isset($this->input['church']['egyhazmegye']) ? $this->input['church']['egyhazmegye'] : false);
-        $this->filterDeanery = ((isset($this->input['church']['espereskerulet']) AND $this->input['church']['espereskerulet'] != 0 ) ? $this->input['church']['espereskerulet'] : false);
-        $this->filterStatus = (isset($this->input['church']['status']) ? $this->input['church']['status'] : false);
-        $this->orderBy = (isset($this->input['church']['orderBy']) ? $this->input['church']['orderBy'] : 'updated_at DESC');
+        $this->filterKeyword = (isset($this->input['keyword']) ? $this->input['keyword'] : false);
+        $this->filterDiocese = (isset($this->input['egyhazmegye']) ? $this->input['egyhazmegye'] : false);
+        $this->filterDeanery = ((isset($this->input['espereskerulet']) AND $this->input['espereskerulet'] != 0 ) ? $this->input['espereskerulet'] : false);
+        $this->filterStatus = (isset($this->input['status']) ? $this->input['status'] : false);
+        $this->orderBy = (isset($this->input['orderBy']) ? $this->input['orderBy'] : 'updated_at DESC');
         
         $params = [
-            'church[keyword]' => $this->filterKeyword,
-            'church[egyhazmegye]' => $this->filterDiocese,
-            'church[espereskerulet]' => $this->filterDeanery,
-            'church[status]' => $this->filterStatus,
-            'church[orderBy]' => $this->orderBy
+            'keyword' => $this->filterKeyword,
+            'egyhazmegye' => $this->filterDiocese,
+            'espereskerulet' => $this->filterDeanery,
+            'status' => $this->filterStatus,
+            'orderBy' => $this->orderBy
         ];
         foreach ($params as $key => &$param) {
             if ($param == '' or $param == 0)
@@ -68,12 +68,13 @@ class Catalogue extends \Html\Html {
 
         $this->form['keyword'] = $this->filterKeyword;
         $this->form['status'] = [
-            'name' => 'church[status]',
+            'name' => 'status',
             'options' => [
                 0 => 'Mind',
                 'i' => 'csak engedélyezett templomok',
                 'f' => 'áttekintésre várók',
                 'n' => 'letiltott templomok',
+                'Rnj' => 'templomok nem jóváhagyott észrevétellel',
                 'Ru' => 'templomok új észrevétellel',
                 'Rf' => 'templomok folyamatban lévő észrevétellel',
                 'M0' => 'mise nélküliek'
@@ -82,7 +83,7 @@ class Catalogue extends \Html\Html {
         ];
 
         $this->form['orderBy'] = [
-            'name' => 'church[orderBy]',
+            'name' => 'orderBy',
             'options' => [
                 'updated_at DESC' => 'utolsó módosítás',
                 'frissites DESC' => 'utolsó frissítés',
@@ -105,6 +106,7 @@ class Catalogue extends \Html\Html {
                         orWhere('varos', 'LIKE', $filterKeyword)->
                         orWhere('ismertnev', 'LIKE', $filterKeyword);
             });
+
         }
 
         if ($this->filterDiocese) {
@@ -122,6 +124,10 @@ class Catalogue extends \Html\Html {
             } else if ($this->filterStatus == 'Rf') {
                 $search = $search->whereHas('remarks', function ($query) {
                     $query->where('allapot', 'f');
+                });
+            } else if ($this->filterStatus == 'Rnj') {
+                $search = $search->whereHas('remarks', function ($query) {
+                    $query->where('allapot', '!=', 'j');
                 });
             }
 
