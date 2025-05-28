@@ -68,8 +68,12 @@ class Catalogue extends \Html\Html {
 
         
         $this->form['dioceses']['name'] = 'egyhazmegye';
-        $this->form['deaneries']['name'] = 'espereskerulet';
-        
+        foreach ($this->form['deaneries'] as $key => $input) {
+            if (isset($input['name']) AND $input['name'] == 'church[espereskerulet]') {
+                $this->form['deaneries'][$key]['name'] = 'espereskerulet';               
+            }               
+        }
+                        
         $this->form['keyword'] = $this->filterKeyword;
         $this->form['status'] = [
             'name' => 'status',

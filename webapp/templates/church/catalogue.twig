@@ -39,7 +39,7 @@
 
             // Üres értékű mezők eltávolítása
             inputs.forEach(input => {
-                if (input.value.trim() === '') {
+                if (input.value.trim() === '' || input.value.trim() == 0 ) {
                     input.name = ''; // Eltávolítjuk a "name" attribútumot, így nem kerül elküldésre
                 }
             });
