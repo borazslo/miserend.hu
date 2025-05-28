@@ -67,6 +67,7 @@ class Html {
             'title' => 'Térkép',  'mid' => 27,
             'url' => '/terkep',
             'items' => [
+                [ 'title' => 'Térképen a misézőhelyek', 'url' => '/terkep' ],
                 [ 'title' => 'Térképes plakátkészítő', 'url' => 'https://szentjozsefhackathon.github.io/templom-terkep/' ]
             ]
         ];
