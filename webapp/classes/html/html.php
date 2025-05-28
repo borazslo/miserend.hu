@@ -76,7 +76,7 @@ class Html {
 
     function loadAdminMenu() {
         $adminmenuitems = [
-            ['title' => 'Miserend', 'url' => '/termplom/list', 'permission' => 'miserend', 'mid' => 27,
+            ['title' => 'Miserend', 'url' => '/templom/list', 'permission' => 'miserend', 'mid' => 27,
                 'items' => [
                     ['title' => 'teljes lista', 'url' => '/templom/list', 'permission' => ''],
                     ['title' => 'kezelendő észrevételek', 'url' => '/templom/list?church%5Bstatus%5D=Rnj&church%5BorderBy%5D=remarks.created_at', 'permission' => ''],
