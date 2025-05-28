@@ -66,6 +66,10 @@ class Catalogue extends \Html\Html {
         // FIXME for Issue #257
         $this->form = \Form::religiousAdministrationSelection(['diocese' => $this->filterDiocese, 'deanery' => $this->filterDeanery]);
 
+        
+        $this->form['dioceses']['name'] = 'egyhazmegye';
+        $this->form['deaneries']['name'] = 'espereskerulet';
+        
         $this->form['keyword'] = $this->filterKeyword;
         $this->form['status'] = [
             'name' => 'status',
