@@ -24,7 +24,11 @@
             }
         </style>
 
+<<<<<<< Updated upstream
+    
+=======
     <div class="container">
+>>>>>>> Stashed changes
         <div class="row mb-3">
             <div class="col-12 font-weight-bold">
                 <h4>Szerkesztési név:</h4>
@@ -115,7 +119,11 @@
 
                 
              
+<<<<<<< Updated upstream
+                 
+=======
     </form>                
+>>>>>>> Stashed changes
     <script language="javascript" type="text/javascript" src="/vendor/tinymce/tinymce/tinymce.min.js"></script>
     <script language="javascript" type="text/javascript" src="/js/tiny_mce_init.js"></script>
     
@@ -279,12 +287,17 @@
         $('input[name="church[lat]"]').val(lat);
         $('input[name="church[lon]"]').val(lon);
 
+        // OSM szerkesztési link frissítése
+        $('#osm-edit-link').attr('href', `https://www.openstreetmap.org/edit?editor=id#map=19/${lat}/${lon}`);  
+
         // osmtype és osmid mezők ürítése
         $('select[name="church[osmtype]"]').val('');
         $('input[name="church[osmid]"]').val('');
-
+        
         // Overpass Turbo API lekérés
         fetchOverpassData(lat, lon);
+
+
         
         
         

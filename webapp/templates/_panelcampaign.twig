@@ -1,35 +1,29 @@
 {% extends 'panel.twig' %}
 
 {% set title = random([
-    'Ajándékozz karácsonyra miserendet!',
-    'Támogasd a frissességet!',
-    'Támogasd a megújulást!',
-    'Legyen a miserend újra pontos!',
-    'Nem elég pontos? Van megoldás!',
-    'Gyűjtünk, hogy pontosak legyünk!'
+    'Már folyik a munka! - Köszönjük a támogatást!',
+    'Már fel van állványozva a honlap! - Köszönjük a támogatást!',
+    'Támogasd a megújulást! - Köszönjük a támogatást!',
+    'A kód pörög, a tervező izgul! - Köszönjük a támogatást!'
 ]) %}
-{% set panel = random(['warning', 'danger', 'success', 'primary']) %}
-{% set panel = 'warning' %}
+{% set panel = 'success' %}
 
 {% set footer = true %}
 
 {% block title %}
-    {{ title|raw }}
-    <span class="badge badge-danger" style="float: right;">0%</span>
+    {{ title|raw }}    
 {% endblock %}
 
 
 {% block body %}
-    <p>A több mint 5000 aktív misézőhely adatai leginkább azért elavultak, mert olyan bonyolult és elavult az adminisztrációs felület, hogy önkénteseink is elmenekülnének tőle. 
-    Most a megszámlálhatatlan önkéntes óra mellett fizetett programozókkal szeretnénk a motorháztető alatt a dugattyúkat és a hengert kicserélni. Ehhez kérünk anyagi segítséget mini adományoktól a kincsesládákig.</p>
-    <p>Az adománygyűjtés részlete, állása, és biztonságos fizetési mód elérhető az Adomány.hu oldal:</p>
-    <div class="text-center">
-        <a href="https://adjukossze.hu/adomanygyujtes/legyen-friss-az-orszagos-miserend-hu-3562" target="_blank" class="btn btn-lg btn-{{ panel }}">Legyen friss az országos miserend.hu!</a>
-    </div>
-
+    <p>323 támogató közreműködésével 4,5 millió forint gyűlt össze, hogy a miserend mélyét megújítsuk.</p>
+    <p>A gyűjtés lezárulása után elkezdtük egy céggel a részletes tervek kidolgozását.
+     Az elkészült tervhez aztán több kivitelezőt is megkerestük. 
+     Majd nem régen megszületett a szerződés. 
+     És most folyik a munka.</p>    
 {% endblock %}    
 
 {% block footer %}
-    Ezt a gyűjtést a minket támogató <a href="https://72tanitvany.hu/" target="_blank">72 Tanítvány Mozgalom</a> szervezi az <a href="https://adjukossze.hu/adomanygyujtes/legyen-friss-az-orszagos-miserend-hu-3562/">Adjukössze.hu</a> felületén.
+    A gyűjtést a minket támogató <a href="https://72tanitvany.hu/" target="_blank">72 Tanítvány Mozgalom</a> szervezte az <a href="https://adjukossze.hu/adomanygyujtes/legyen-friss-az-orszagos-miserend-hu-3562/">Adjukössze.hu</a> felületén.
            
 {% endblock %}    
