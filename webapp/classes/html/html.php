@@ -80,6 +80,7 @@ class Html {
                 'items' => [
                     ['title' => 'teljes lista', 'url' => '/templom/list', 'permission' => ''],
                     ['title' => 'kezelendő észrevételek', 'url' => '/list?status=Rnj&orderBy=updated_at+DESC', 'permission' => ''],
+
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
                     ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
