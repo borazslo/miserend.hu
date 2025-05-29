@@ -19,6 +19,7 @@ sql-mode="STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION"
 # join_buffer_size = 128M
 # sort_buffer_size = 2M
 # read_rnd_buffer_size = 2M
+max_allowed_packet=256M
 skip-host-cache
 skip-name-resolve
 skip-ssl
