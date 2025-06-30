@@ -25,7 +25,7 @@
 						<tr>
 							<td>
 								{% if "user" in user.roles %}<a href="/user/{{ holder.user.uid }}/edit">{% endif %}
-									<strong>{{ holder.user.login }}</strong> ({{ holder.user.nev }})
+									<strong>{{ holder.user_id }}</strong> ({{ holder.user.name }})
 								</a>
 							</td>
 							<td>
