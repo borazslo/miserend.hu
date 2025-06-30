@@ -5,14 +5,21 @@
     <script type='text/javascript'>
         $(document).ready(function () {
             var options = {
-                target: '#output', // target element(s) to be updated with server response 
                 beforeSubmit: beforeSubmit, // pre-submit callback 
                 success: afterSuccess, // post-submit callback 
+                error: onError, // error callback
                 uploadProgress: OnProgress, //upload progress callback 
-                resetForm: true        // reset the form after successful submit 
+                resetForm: true,        // reset the form after successful submit 
+                timeout: 60000, // 60 seconds timeout
+                dataType: 'json', // expect JSON response
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             };
 
             $('#MyUploadForm').submit(function () {
+                // Store upload start time for speed calculation
+                window.uploadStartTime = Date.now();
                 $(this).ajaxSubmit(options);
                 // always return false to prevent standard browser submit and page navigation 
                 return false;
@@ -20,28 +27,164 @@
 
 
             //function after succesful file upload (when server response)
-            function afterSuccess()
+            function afterSuccess(responseData, statusText, xhr, form)
             {
-                $('#submit-btn').show(); //hide submit button
-                $('#loading-img').hide(); //hide submit button
+                $('#submit-btn').show(); //show submit button
+                $('#loading-img').hide(); //hide loading image
                 $('#progressbox').delay(1000).fadeOut(); //hide progress bar
+                
+                if (responseData && responseData.success) {
+                    // Display success message with uploaded image
+                    $('#output').html(responseData.html)
+                             .addClass('alert-success')
+                             .removeClass('alert-warning alert-danger')
+                             .show();
+                    
+                    console.log('Upload successful:', {
+                        message: responseData.message,
+                        imageUrl: responseData.image_url,
+                        photoId: responseData.photo_id,
+                        statusText: statusText,
+                        status: xhr.status
+                    });
+                } else {
+                    // Handle unexpected response format
+                    $('#output').html('<strong>Váratlan szerver válasz:</strong><br/>' + 
+                                    (responseData.message || 'Ismeretlen hiba történt.'))
+                             .addClass('alert-warning')
+                             .removeClass('alert-success alert-danger')
+                             .show();
+                }
+            }
 
+            //detailed error handling function
+            function onError(xhr, status, error) {
+                $('#submit-btn').show(); //show submit button again
+                $('#loading-img').hide(); //hide loading image
+                $('#progressbox').hide(); //hide progress bar
+                
+                var errorMessage = '<strong>Hiba történt a feltöltés során:</strong><br/>';
+                
+                // Check different error types
+                if (xhr.status === 0) {
+                    errorMessage += 'Hálózati kapcsolat megszakadt. Ellenőrizze az internetkapcsolatot!';
+                } else if (xhr.status == 404) {
+                    errorMessage += 'A szerver nem található (404). Kérjük, próbálja újra később!';
+                } else if (xhr.status == 500) {
+                    errorMessage += 'Szerver hiba (500). A szerver nem tudta feldolgozni a kérést.';
+                } else if (xhr.status == 413) {
+                    errorMessage += 'A fájl túl nagy (413). Próbáljon kisebb méretű fájlt feltölteni!';
+                } else if (xhr.status == 415) {
+                    errorMessage += 'Nem támogatott fájltípus (415). Csak JPEG formátumú képek engedélyezettek!';
+                } else if (status === 'timeout') {
+                    errorMessage += 'Időtúllépés történt. A feltöltés túl sokáig tartott, próbálja újra!';
+                } else if (status === 'abort') {
+                    errorMessage += 'A feltöltés megszakítva.';
+                } else if (status === 'parsererror') {
+                    errorMessage += 'A szerver válasza nem valid JSON formátum.<br/>';
+                    errorMessage += 'Ez általában szerver oldali PHP hiba miatt történik.<br/>';
+                    if (xhr.responseText) {
+                        errorMessage += '<strong>Szerver válasz:</strong><br/>';
+                        errorMessage += '<pre style="max-height: 200px; overflow-y: auto; font-size: 12px;">' + 
+                                       xhr.responseText.substring(0, 1000) + '</pre>';
+                        if (xhr.responseText.length > 1000) {
+                            errorMessage += '<em>... (csonkolva)</em>';
+                        }
+                    }
+                } else {
+                    errorMessage += 'Ismeretlen hiba történt.<br/>';
+                    errorMessage += '<strong>Státusz:</strong> ' + status + '<br/>';
+                    errorMessage += '<strong>HTTP kód:</strong> ' + xhr.status + '<br/>';
+                    errorMessage += '<strong>Hibaüzenet:</strong> ' + error;
+                    
+                    // Try to get more details from response
+                    if (xhr.responseText) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.error) {
+                                errorMessage += '<br/><strong>Részletek:</strong> ' + response.error;
+                            }
+                        } catch (e) {
+                            // If not JSON, show first 200 characters of response
+                            if (xhr.responseText.length > 0) {
+                                errorMessage += '<br/><strong>Szerver válasz:</strong> ' + xhr.responseText.substring(0, 200);
+                                if (xhr.responseText.length > 200) {
+                                    errorMessage += '...';
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                $('#output').html(errorMessage).show();
+                
+                // Generate detailed error report for debugging
+                var errorReport = generateErrorReport();
+                errorReport.errorDetails = {
+                    status: xhr.status,
+                    statusText: status,
+                    error: error,
+                    responseText: xhr.responseText
+                };
+                
+                console.error('Upload error:', errorReport);
+            }
+
+            // Function to generate detailed debug information for errors
+            function generateErrorReport() {
+                var file = $('#FileInput')[0].files[0];
+                var report = {
+                    timestamp: new Date().toISOString(),
+                    browser: {
+                        userAgent: navigator.userAgent,
+                        platform: navigator.platform,
+                        language: navigator.language,
+                        cookieEnabled: navigator.cookieEnabled,
+                        onLine: navigator.onLine
+                    },
+                    file: file ? {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        lastModified: new Date(file.lastModified).toISOString()
+                    } : null,
+                    form: {
+                        churchId: $('input[name="id"]').val(),
+                        description: $('input[name="description"]').val()
+                    },
+                    connection: {
+                        effectiveType: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+                        downlink: navigator.connection ? navigator.connection.downlink : 'unknown'
+                    }
+                };
+                
+                console.log('Error Report:', report);
+                return report;
             }
 
             //function to check file size before uploading.
             function beforeSubmit() {
-                console.log('nis?');
+                console.log('Validating file before upload...');
                 //check whether browser fully supports all File API
                 if (window.File && window.FileReader && window.FileList && window.Blob)
                 {
                     if (!$('#FileInput').val()) //check empty input filed
                     {
-                        $('#output').html('Nincs fájl megadva. Mit töltsek fel?').show();
+                        $('#output').html('<strong>Hiba:</strong> Nincs fájl megadva. Kérjük válasszon egy feltöltendő fájlt!').show();
                         return false
                     }
 
-                    var fsize = $('#FileInput')[0].files[0].size; //get file size
-                    var ftype = $('#FileInput')[0].files[0].type; // get file type
+                    var file = $('#FileInput')[0].files[0];
+                    var fsize = file.size; //get file size
+                    var ftype = file.type; // get file type
+                    var fname = file.name; // get file name
+
+                    console.log('File details:', {
+                        name: fname,
+                        size: fsize,
+                        type: ftype,
+                        lastModified: new Date(file.lastModified)
+                    });
 
                     //allow file types 
                     switch (ftype)
@@ -59,24 +202,39 @@
                              case 'video/mp4':*/
                             break;
                         default:
-                            $('#output').html('<b>' + ftype + '</b> Nem támogatott formátum!').show();
+                            var supportedFormats = 'JPEG (.jpg, .jpeg)';
+                            $('#output').html('<strong>Nem támogatott fájlformátum!</strong><br/>' +
+                                '<strong>Választott fájl:</strong> ' + fname + '<br/>' +
+                                '<strong>Fájltípus:</strong> ' + (ftype || 'ismeretlen') + '<br/>' +
+                                '<strong>Támogatott formátumok:</strong> ' + supportedFormats + '<br/>' +
+                                'Kérjük válasszon JPEG formátumú képfájlt!').show();
                             return false
                     }
 
-                    //Allowed file size is less than 5 MB (1048576)
+                    //Allowed file size is less than 5 MB (5242880 bytes)
                     if (fsize > 5242880)
                     {
-                        $('#output').html('<b>' + bytesToSize(fsize) + '</b> Túl nagy a file! <br />A file nem lehet nagyobb mint 5 MB.').show();
+                        $('#output').html('<strong>Túl nagy fájl!</strong><br/>' +
+                            '<strong>Választott fájl:</strong> ' + fname + '<br/>' +
+                            '<strong>Fájlméret:</strong> ' + bytesToSize(fsize) + '<br/>' +
+                            '<strong>Maximum méret:</strong> 5 MB<br/>' +
+                            'Kérjük válasszon kisebb méretű fájlt vagy tömörítse a képet!').show();
                         return false
                     }
 
                     $('#submit-btn').hide(); //hide submit button
-                    $('#loading-img').show(); //hide submit button
+                    $('#loading-img').show(); //show loading image
                     $('#output').html('').hide();
+                    
+                    console.log('File validation passed, starting upload...');
                 } else
                 {
                     //Output error to older unsupported browsers that doesn't support HTML5 File API
-                    $('#output').html('Kérlek, frissítsd a böngésződet, hogy teljesíthessük kérésedet!').show();
+                    var browserInfo = 'Böngésző: ' + navigator.userAgent;
+                    $('#output').html('<strong>Elavult böngésző!</strong><br/>' +
+                        'A böngészője nem támogatja a fájlfeltöltést.<br/>' +
+                        browserInfo + '<br/>' +
+                        'Kérjük frissítse a böngészőjét a legújabb verzióra!').show();
                     return false;
                 }
             }
@@ -88,11 +246,39 @@
                 $('#progress').show();
                 $('#progressbox').show();
                 $('#progressbar').width(percentComplete + '%') //update progressbar percent complete
-                $('#statustxt').html(percentComplete + '%'); //update status text
+                
+                // Calculate and show detailed progress info
+                var uploadedMB = (position / 1024 / 1024).toFixed(2);
+                var totalMB = (total / 1024 / 1024).toFixed(2);
+                var speedKBps = 0;
+                
+                // Calculate upload speed if we have timing info
+                if (window.uploadStartTime && position > 0) {
+                    var elapsedTime = (Date.now() - window.uploadStartTime) / 1000; // seconds
+                    speedKBps = Math.round((position / 1024) / elapsedTime);
+                }
+                
+                var progressText = percentComplete + '%';
+                if (total > 0) {
+                    progressText += ' (' + uploadedMB + ' MB / ' + totalMB + ' MB)';
+                    if (speedKBps > 0) {
+                        progressText += ' - ' + speedKBps + ' KB/s';
+                    }
+                }
+                
+                $('#statustxt').html(progressText); //update status text
+                
                 if (percentComplete > 50)
                 {
                     $('#statustxt').css('color', '#000'); //change status text to white after 50%
                 }
+                
+                console.log('Upload progress:', {
+                    percent: percentComplete,
+                    position: position,
+                    total: total,
+                    speed: speedKBps + ' KB/s'
+                });
             }
 
             //function to format bites bit.ly/19yoIPO

@@ -18,20 +18,32 @@ class UploadImage extends Html {
     }
 
     function ajax() {
-        $tid = $_POST['id'];
-        if ($tid != $this->tid) {
-            throw new \Exception("The church.id of the page and the form are not the same.");
-        }
+        try {
+            $tid = $_POST['id'];
+            if ($tid != $this->tid) {
+                throw new \Exception("The church.id of the page and the form are not the same.");
+            }
 
-        $photo = new \Eloquent\Photo();
-        $photo->church_id = $this->church->id;
-        $photo->uploadFile($_FILES["FileInput"]);
+            $photo = new \Eloquent\Photo();
+            $photo->church_id = $this->church->id;
+            $photo->uploadFile($_FILES["FileInput"]);
 
-        $photo->title = htmlspecialchars($_REQUEST['description']);
-        $photo->save();
-        echo "Siker! Feltöltöttük. Jöhet a következő!<br/><img src='" . $photo->smallUrl . "'>";
+            $photo->title = htmlspecialchars($_REQUEST['description']);
+            $photo->save();
+            
+            // Set JSON response header
+            header('Content-Type: application/json');
+            
+            // Prepare success response
+            $response = [
+                'success' => true,
+                'message' => 'Siker! Feltöltöttük. Jöhet a következő!',
+                'image_url' => $photo->smallUrl,
+                'photo_id' => $photo->id,
+                'html' => "Siker! Feltöltöttük. Jöhet a következő!<br/><img src='" . $photo->smallUrl . "' class='img-thumbnail' style='max-width: 200px;'>"
+            ];
 
-        $this->photo = $photo;
+            $this->photo = $photo;
         
         
         /*
@@ -62,10 +74,26 @@ class UploadImage extends Html {
             $mail = new \Eloquent\Email();                
             $mail->render($email[0],$this);
             $mail->send($email[1]);
-            
         }
-              
+        
+        // Send JSON response
+        echo json_encode($response);
         exit;
+        
+        } catch (\Exception $e) {
+            // Set JSON response header for errors too
+            header('Content-Type: application/json');
+            http_response_code(500);
+            
+            $errorResponse = [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'message' => 'Hiba történt a feltöltés során: ' . $e->getMessage()
+            ];
+            
+            echo json_encode($errorResponse);
+            exit;
+        }
     }
 
 }

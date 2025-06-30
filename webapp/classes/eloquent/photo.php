@@ -65,14 +65,19 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
 
         if (file_exists($file)) {
             if (preg_match('/(jpg|jpeg)$/i', $file)) {
-                $src_img = @ImagecreateFromJpeg($file);
-                $this->height = @imagesy($src_img);  # original height
-                $this->width = @imagesx($src_img);  # original width
-                if ($this->height != '' AND $this->width != '') {
-                    $this->save();
-                    return true;
+                $src_img = @\imagecreatefromjpeg($file);
+                if ($src_img !== false) {
+                    $this->height = @\imagesy($src_img);  # original height
+                    $this->width = @\imagesx($src_img);  # original width
+                    \imagedestroy($src_img); // Free memory
+                    if ($this->height != '' AND $this->width != '') {
+                        $this->save();
+                        return true;
+                    } else {
+                        echo "A képnek nincs mérete: ". $file . "<br>\n";
+                    }
                 } else {
-                    echo "A képnek nincs mérete: ". $file . "<br>\n";
+                    echo "A kép nem olvasható: " . $file . "<br>\n";
                 }
             } else {            
                     echo "A kép nem jpg: " . $file . "<br>\n";
@@ -91,13 +96,13 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
             throw new \Exception("There is no `church_id` yet.");
         }
         if (!isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
-            die('Valami gond van. Bocsánat.');
+            throw new \Exception('Missing AJAX header. Invalid request.');
         }
         if ($inputFile["size"] > 5242880) {
             throw new \Exception("File size is too big!");
         }
         if (!in_array($inputFile['type'], [ 'image/jpg', 'image/jpeg', 'image/gif', 'image/png' ])) {
-            printr($inputFile);
+            \printr($inputFile);
             throw new \Exception("Unsopported file type.");
         }
         $konyvtar = $this->pathToPhotos . "/" . $this->church_id;
@@ -118,19 +123,19 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         $this->filename = $Random_Number . $File_Ext; //new file name
                 
         //Changed move_uploaded_file() to rename() because of tha API/upload
-        if (!rename($inputFile['tmp_name'], $konyvtar . "/" . $this->filename)) {
+        if (!\move_uploaded_file($inputFile['tmp_name'], $konyvtar . "/" . $this->filename)) {
             $exception = "Could not move the file to its new place.";
             if(!file_exists($inputFile['tmp_name'])) 
                 $exception .= " Because ".$inputFile['tmp_name']." does not exists";
             if(file_exists($konyvtar."/".$this->filename))
                     $exception .= " Because ".$konyvtar."/".$this->filename." already exists.";
-            printr($inputFile);
+            \printr($inputFile);
             throw new \Exception($exception);
         }
 
         $kimenet = $konyvtar . "/" . $this->filename;
         $kimenet1 = $konyvtar . "/kicsi/" . $this->filename;
-        $info = getimagesize($kimenet);
+        $info = \getimagesize($kimenet);
         $this->width = $info[0];
         $this->height = $info[1];
 
@@ -144,10 +149,10 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         if (!isset($max))
             $max = 120;# maximum size of 1 side of the picture.
 
-        $src_img = ImagecreateFromJpeg($forras);
+        $src_img = \imagecreatefromjpeg($forras);
 
-        $oh = imagesy($src_img);  # original height
-        $ow = imagesx($src_img);  # original width
+        $oh = \imagesy($src_img);  # original height
+        $ow = \imagesx($src_img);  # original width
 
         $new_h = $oh;
         $new_w = $ow;
@@ -159,12 +164,16 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         }
 
         // note TrueColor does 256 and not.. 8
-        $dst_img = ImageCreateTrueColor($new_w, $new_h);
-        /* imageantialias($dst_img, true); */
+        $dst_img = \imagecreatetruecolor($new_w, $new_h);
+        /* \imageantialias($dst_img, true); */
 
-        /* ImageCopyResized($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img)); */
-        ImageCopyResampled($dst_img, $src_img, 0, 0, 0, 0, $new_w, $new_h, ImageSX($src_img), ImageSY($src_img));
-        ImageJpeg($dst_img, "$kimenet");
+        /* \imagecopyresized($dst_img, $src_img, 0,0,0,0, $new_w, $new_h, \imagesx($src_img), \imagesy($src_img)); */
+        \imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $new_w, $new_h, \imagesx($src_img), \imagesy($src_img));
+        \imagejpeg($dst_img, "$kimenet");
+        
+        // Free up memory
+        \imagedestroy($src_img);
+        \imagedestroy($dst_img);
     }
 
 }
