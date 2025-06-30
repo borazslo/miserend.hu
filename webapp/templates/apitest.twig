@@ -22,6 +22,17 @@
 	<p>Ezen az oldalon az API-val lehet kísérletezni a megfelelő url és a json kulcs-érték párosok megadásával. Az API-ról itt olvashatsz bővebben:
     <a href="https://github.com/borazslo/miserend.hu/wiki/API">https://github.com/borazslo/miserend.hu/wiki/API</a></p>
     
+    <div class="alert alert-info">
+        <h5>📷 Kép feltöltés tesztelése</h5>
+        <p>Az új <code>/api/v4/upload</code> végpont lehetővé teszi képek feltöltését templomokhoz. A kép feltöltés teszteléséhez:</p>
+        <ul>
+            <li>Használd a "Use Sample Image for Upload Test" gombot egy minta kép automatikus betöltéséhez</li>
+            <li>Vagy válassz egy saját képet a "upload your own image" opcióval</li>
+            <li>A kép automatikusan base64 formátumba lesz kódolva a JSON payload-ban</li>
+        </ul>
+        <p><strong>Megjegyzés:</strong> A kép feltöltéshez szükséges a <code>tid</code> (templom ID) és a <code>photo</code> (base64 kódolt kép) mező.</p>
+    </div>
+    
 	<form id="ajaxForm" class="form" enctype="multipart/form-data">
 		<table class="table">
 			<tr>
@@ -42,6 +53,26 @@
 				<td><label for="jsonPayload">JSON Payload:</label></td>
 				<td><textarea name='jsonPayload' id="jsonPayload" class="form-control" rows="6" required></textarea></td>
 			</tr>       
+			<tr id="imageUploadTestRow" style="display: none;">
+				<td colspan="2" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+					<h5 style="margin-top: 0; color: #495057;">📷 Image Upload Testing</h5>
+					<div style="margin-bottom: 10px;">
+						<button type="button" id="addImageUploadTest" class="btn btn-info btn-sm">
+							Use Sample Image for Upload Test
+						</button>
+						<small class="text-muted" style="display: block; margin-top: 5px;">
+							This will populate the form with a sample image upload request to church ID {{ sampleChurchId }}
+						</small>
+					</div>
+					<div>
+						<label for="customImageFile" style="font-weight: bold; color: #495057;">Or upload your own image:</label>
+						<input type="file" id="customImageFile" accept="image/*" class="form-control-file" style="margin-top: 5px;">
+						<small class="text-muted" style="display: block; margin-top: 5px;">
+							Select an image file to automatically encode it and prepare the API request
+						</small>
+					</div>
+				</td>
+			</tr>
 			<!--<tr>
 				<td>File</td>
 				<td><input type="file" name="fileToUpload"  id="fileToUpload"></td>                
@@ -72,7 +103,8 @@
                 {url: '/api/v4/nearby', jsonPayload: '{"lat": 47.47880, "lon": 19.07609, "response_length" : "{{ response_length }}" }'},
                 {url: '/api/v4/updated/{{ one_week_ago|date('Y-m-d') }}', jsonPayload: '{}'},
                 {url: '/api/v4/church', jsonPayload: '{ "id": {{ random(5000) }}, "response_length" : "{{ response_length }}"  }'},
-                {url: '/api/v4/lorawan', jsonPayload: '{ "id": {{ random(5000) }} }'}
+                {url: '/api/v4/lorawan', jsonPayload: '{ "id": {{ random(5000) }} }'},
+                {url: '/api/v4/upload', jsonPayload: '{ "tid": {{ sampleChurchId }}, "photo": "data:image/jpeg;base64,..." }'}
             ];
 
             // Populate the select input with examples
@@ -87,9 +119,68 @@
                     var selectedExample = examples[selectedIndex];
                     $('#url').val(selectedExample.url);
                     $('#jsonPayload').val(selectedExample.jsonPayload);
+                    
+                    // Show/hide image upload testing section based on selected URL
+                    if (selectedExample.url === '/api/v4/upload') {
+                        $('#imageUploadTestRow').show();
+                    } else {
+                        $('#imageUploadTestRow').hide();
+                    }
                 } else {
                     $('#url').val('');
                     $('#jsonPayload').val('');
+                    $('#imageUploadTestRow').hide(); // Hide when nothing is selected
+                }
+            });
+
+            // Also check URL field changes (manual input)
+            $('#url').on('input', function() {
+                var currentUrl = $(this).val();
+                if (currentUrl === '/api/v4/upload') {
+                    $('#imageUploadTestRow').show();
+                } else {
+                    $('#imageUploadTestRow').hide();
+                }
+            });
+
+            // Add Image Upload Test button functionality
+            $('#addImageUploadTest').on('click', function() {
+                $('#url').val('/api/v4/upload');
+                var samplePayload = {
+                    "tid": {{ sampleChurchId }},
+                    "photo": "{{ sampleImageBase64|raw }}"
+                };
+                $('#jsonPayload').val(JSON.stringify(samplePayload, null, 2));
+                
+                // Find and select the upload example in the dropdown
+                var uploadIndex = examples.findIndex(function(example) {
+                    return example.url === '/api/v4/upload';
+                });
+                if (uploadIndex !== -1) {
+                    $('#exampleSelect').val(uploadIndex);
+                }
+            });
+
+            // Handle file input for custom image upload test
+            $('#customImageFile').on('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        alert('Please select an image file.');
+                        return;
+                    }
+                    
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var base64Data = e.target.result;
+                        $('#url').val('/api/v4/upload');
+                        var payload = {
+                            "tid": {{ sampleChurchId }},
+                            "photo": base64Data
+                        };
+                        $('#jsonPayload').val(JSON.stringify(payload, null, 2));
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
 		
@@ -150,6 +241,19 @@
                     }
                 });
             });
+            
+            // Initialize visibility of image upload section on page load
+            function updateImageUploadVisibility() {
+                var currentUrl = $('#url').val();
+                if (currentUrl === '/api/v4/upload') {
+                    $('#imageUploadTestRow').show();
+                } else {
+                    $('#imageUploadTestRow').hide();
+                }
+            }
+            
+            // Call initialization function on page load
+            updateImageUploadVisibility();
         });
     </script>
 	
