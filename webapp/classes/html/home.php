@@ -234,7 +234,12 @@ class Home extends Html {
         $this->favorites = $user->getFavorites();
         $this->searchform = $searchform;
         		
-		$this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
+        try {
+            $this->alert = (new \ExternalApi\BreviarskApi())->liturgicalAlert();
+        } catch (\Exception $e) {
+            addMessage('Nem sikerült a zsolozsma honlapról megtudni, hogy van-e ma különleges ünnep.', "warning");
+        }
+		
 							
 		// Adminok számára "dashboard"
 		if ( $user->checkrole('miserend') ) {
