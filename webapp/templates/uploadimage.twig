@@ -234,13 +234,16 @@
                             return false
                     }
 
-                    //Allowed file size is less than 5 MB (5242880 bytes)
-                    if (fsize > 5242880)
+                    //Check file size against PHP limits
+                    var maxSizeBytes = {{ uploadLimits.final_limit_bytes }};
+                    var maxSizeMB = {{ uploadLimits.final_limit_mb }};
+                    
+                    if (fsize > maxSizeBytes)
                     {
                         $('#output').html('<strong>Túl nagy fájl!</strong><br/>' +
                             '<strong>Választott fájl:</strong> ' + fname + '<br/>' +
                             '<strong>Fájlméret:</strong> ' + bytesToSize(fsize) + '<br/>' +
-                            '<strong>Maximum méret:</strong> 5 MB<br/>' +
+                            '<strong>Maximum méret:</strong> ' + maxSizeMB + ' MB<br/>' +
                             'Kérjük válasszon kisebb méretű fájlt vagy tömörítse a képet!').show();
                         return false
                     }
@@ -359,6 +362,6 @@
         <div  class="alert alert-warning" id="output" style="display:none"></div>
     </center>
     <div class="alert alert-info">
-        Kérjük kellően jó minőségű és méretű jpeg képet töltsön csak fel.
+        Kérjük kellően jó minőségű és méretű JPEG képet töltsön csak fel. Maximális méret: {{ uploadLimits.final_limit_mb }} MB
     </div>
 {% endblock %}

@@ -11,10 +11,59 @@ class UploadImage extends Html {
         $this->church = \Eloquent\Church::find($this->tid);
         $this->pageDescription = 'új kép feltöltése';
 
+        // Get PHP upload limits
+        $this->uploadLimits = $this->getUploadLimits();
+
         if (isset($_REQUEST['upload'])) {
             $this->ajax();
             exit;
         }
+    }
+
+    private function getUploadLimits() {
+        // Get various PHP upload settings
+        $upload_max_filesize = ini_get('upload_max_filesize');
+        $post_max_size = ini_get('post_max_size');
+        $memory_limit = ini_get('memory_limit');
+        $max_file_uploads = ini_get('max_file_uploads');
+        
+        // Convert to bytes for comparison
+        $upload_max_bytes = $this->convertToBytes($upload_max_filesize);
+        $post_max_bytes = $this->convertToBytes($post_max_size);
+        $memory_limit_bytes = $this->convertToBytes($memory_limit);
+        
+        // The effective limit is the smallest of upload_max_filesize and post_max_size
+        $effective_limit_bytes = min($upload_max_bytes, $post_max_bytes);
+        
+        $final_limit_bytes = $effective_limit_bytes;
+        
+        return [
+            'upload_max_filesize' => $upload_max_filesize,
+            'upload_max_bytes' => $upload_max_bytes,
+            'post_max_size' => $post_max_size,
+            'post_max_bytes' => $post_max_bytes,
+            'memory_limit' => $memory_limit,
+            'memory_limit_bytes' => $memory_limit_bytes,
+            'max_file_uploads' => $max_file_uploads,
+            'effective_limit_bytes' => $effective_limit_bytes,
+            'final_limit_bytes' => $final_limit_bytes,
+            'final_limit_mb' => round($final_limit_bytes / 1024 / 1024, 2)
+        ];
+    }
+    
+    private function convertToBytes($val) {
+        $val = trim($val);
+        $last = strtolower($val[strlen($val)-1]);
+        $val = (int) $val;
+        switch($last) {
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+        return $val;
     }
 
     function ajax() {

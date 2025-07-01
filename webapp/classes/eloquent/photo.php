@@ -126,8 +126,12 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
             'tmp_name_exists' => isset($inputFile['tmp_name']) ? file_exists($inputFile['tmp_name']) : false
         ]));
         
-        if ($inputFile["size"] > 5242880) {
-            throw new \Exception("File size is too big!");
+        // Get dynamic file size limit
+        $maxFileSize = $this->getMaxFileSize();
+        if ($inputFile["size"] > $maxFileSize) {
+            $maxSizeMB = round($maxFileSize / 1024 / 1024, 2);
+            $actualSizeMB = round($inputFile["size"] / 1024 / 1024, 2);
+            throw new \Exception("File size is too big! Maximum allowed: {$maxSizeMB} MB, uploaded: {$actualSizeMB} MB");
         }
         if (!in_array($inputFile['type'], [ 'image/jpg', 'image/jpeg', 'image/gif', 'image/png' ])) {
             \printr($inputFile);
@@ -187,6 +191,34 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         
         // Save the photo record to the database
         $this->save();
+    }
+    
+    private function getMaxFileSize() {
+        // Helper function to convert PHP ini values to bytes
+        $convertToBytes = function($val) {
+            $val = trim($val);
+            $last = strtolower($val[strlen($val)-1]);
+            $val = (int) $val;
+            switch($last) {
+                case 'g':
+                    $val *= 1024;
+                case 'm':
+                    $val *= 1024;
+                case 'k':
+                    $val *= 1024;
+            }
+            return $val;
+        };
+        
+        // Get PHP upload limits
+        $upload_max_bytes = $convertToBytes(ini_get('upload_max_filesize'));
+        $post_max_bytes = $convertToBytes(ini_get('post_max_size'));
+        
+        // The effective limit is the smallest of PHP limits
+        $php_limit = min($upload_max_bytes, $post_max_bytes);
+        
+        // Return the smallest limit
+        return $php_limit;
     }
 
     static function kicsinyites($forras, $kimenet, $max) {
