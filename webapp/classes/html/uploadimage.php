@@ -83,13 +83,22 @@ class UploadImage extends Html {
         } catch (\Exception $e) {
             // Set JSON response header for errors too
             header('Content-Type: application/json');
-            http_response_code(500);
+            http_response_code(400); // Changed from 500 to 400 (Bad Request)
             
             $errorResponse = [
                 'success' => false,
-                'error' => $e->getMessage(),
-                'message' => 'Hiba történt a feltöltés során: ' . $e->getMessage()
+                'error' => true,
+                'text' => $e->getMessage(),
+                'message' => 'Hiba történt a feltöltés során: ' . $e->getMessage(),
+                'debug_info' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString()
+                ]
             ];
+            
+            // Log the error for debugging
+            error_log("HTML Upload Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             
             echo json_encode($errorResponse);
             exit;

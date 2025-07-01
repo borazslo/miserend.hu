@@ -223,7 +223,7 @@
                         $('#response').html('<pre>' + JSON.stringify(response, null, 2) + '</pre>');
                     },
                     error: function(xhr, status, error) {
-                        $('#loading').removeClass('aler-info');
+                        $('#loading').removeClass('alert-info');
 						$('#loading').addClass('alert-danger');
 
                         // Log the full error to the console
@@ -233,11 +233,31 @@
                             responseText: xhr.responseText
                         });
 
-                        // Display a summarized error message to the user
-                        $('#loading').html(`                            
-                                Error: ${xhr.status} ${xhr.statusText}<br>
-                                Please check the console for more details.
-                        `);
+                        // Try to parse the JSON response to get detailed error message
+                        var errorMessage = `Error: ${xhr.status} ${xhr.statusText}`;
+                        var detailMessage = '';
+                        
+                        try {
+                            var errorResponse = JSON.parse(xhr.responseText);
+                            if (errorResponse.text) {
+                                detailMessage = errorResponse.text;
+                                errorMessage = `API Error: ${detailMessage}`;
+                            }
+                            if (errorResponse.debug_info) {
+                                console.log("Debug info:", errorResponse.debug_info);
+                            }
+                            // Show the full response in the response area as well
+                            $('#response').html('<pre style="color: #d32f2f;">' + JSON.stringify(errorResponse, null, 2) + '</pre>');
+                        } catch (e) {
+                            // If response is not JSON, show raw response
+                            detailMessage = xhr.responseText;
+                            if (detailMessage) {
+                                $('#response').html('<pre style="color: #d32f2f;">' + detailMessage + '</pre>');
+                            }
+                        }
+
+                        // Display the error message to the user
+                        $('#loading').html(errorMessage);
                     }
                 });
             });
