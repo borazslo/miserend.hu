@@ -24,6 +24,25 @@ class Health extends Html {
 			['mail/debug', $config['mail']['debug'] ]
 		];
 		
+		// Check GD extension specifically
+		if (!extension_loaded('gd')) {
+			$this->infos[] = ['GD Extension', '<span class="text-danger">⚠️ HIÁNYZIK! A képfeltöltés nem fog működni.</span>'];
+		} else {
+			$gd_info = gd_info();
+			$gd_functions = [
+				'imagecreatefromjpeg' => function_exists('imagecreatefromjpeg'),
+				'imagecreatefrompng' => function_exists('imagecreatefrompng'),
+				'imagecopyresampled' => function_exists('imagecopyresampled')
+			];
+			$missing_functions = array_keys(array_filter($gd_functions, function($exists) { return !$exists; }));
+			
+			if (empty($missing_functions)) {
+				$this->infos[] = ['GD Extension', '<span class="text-success">✅ Telepítve és működőképes</span>'];
+			} else {
+				$this->infos[] = ['GD Extension', '<span class="text-warning">⚠️ Telepítve, de hiányzó függvények: ' . implode(', ', $missing_functions) . '</span>'];
+			}
+		}
+		
 		
 		$results = [];
 		for($i=1;$i<=4;$i++) {		

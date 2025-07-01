@@ -4,6 +4,11 @@ namespace Eloquent;
 
 class Photo extends \Illuminate\Database\Eloquent\Model {
 
+    protected $table = 'photos';
+    public $timestamps = true; // Enable automatic timestamp handling
+    
+    protected $fillable = ['church_id', 'filename', 'title', 'weight', 'flag', 'height', 'width'];
+    
     protected $urlToPhotos = '/kepek/templomok';
     protected $appends = array('pathToPhoto', 'url', 'smallUrl');
 
@@ -122,18 +127,32 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         $Random_Number = rand(0, 9999999999); //Random number to be added to name.
         $this->filename = $Random_Number . $File_Ext; //new file name
                 
-        //Changed move_uploaded_file() to rename() because of tha API/upload
-        if (!\move_uploaded_file($inputFile['tmp_name'], $konyvtar . "/" . $this->filename)) {
+        // Handle both regular uploads and API uploads (temporary files)
+        $target_path = $konyvtar . "/" . $this->filename;
+        $move_success = false;
+        
+        // Check if this is a real uploaded file or a temporary file (from API)
+        if (\is_uploaded_file($inputFile['tmp_name'])) {
+            // This is a real uploaded file, use move_uploaded_file
+            $move_success = \move_uploaded_file($inputFile['tmp_name'], $target_path);
+        } else {
+            // This is a temporary file (from API), use rename or copy
+            $move_success = \rename($inputFile['tmp_name'], $target_path);
+        }
+        
+        if (!$move_success) {
             $exception = "Could not move the file to its new place.";
             if(!file_exists($inputFile['tmp_name'])) 
                 $exception .= " Because ".$inputFile['tmp_name']." does not exists";
-            if(file_exists($konyvtar."/".$this->filename))
-                    $exception .= " Because ".$konyvtar."/".$this->filename." already exists.";
+            if(file_exists($target_path))
+                    $exception .= " Because ".$target_path." already exists.";
+            if(!is_writable(dirname($target_path)))
+                    $exception .= " Because ".dirname($target_path)." is not writable.";
             \printr($inputFile);
             throw new \Exception($exception);
         }
 
-        $kimenet = $konyvtar . "/" . $this->filename;
+        $kimenet = $target_path;
         $kimenet1 = $konyvtar . "/kicsi/" . $this->filename;
         $info = \getimagesize($kimenet);
         $this->width = $info[0];
@@ -142,6 +161,9 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         if ($this->width > 1200 or $this->height > 800)
             $this->kicsinyites($kimenet, $kimenet, 1200);
         $this->kicsinyites($kimenet, $kimenet1, 120);
+        
+        // Save the photo record to the database
+        $this->save();
     }
 
     static function kicsinyites($forras, $kimenet, $max) {
