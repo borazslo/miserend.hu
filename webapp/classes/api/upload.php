@@ -21,29 +21,47 @@ class Upload extends Api {
     }
 
     public function run() {
-        parent::run();
-        $this->getInputJson();
-        
-        //Decoda and Validate ImageData
-        $image = $this->decodeImage($this->input['photo']);
-        
-        $imagesize = getimagesize($image['tmp_name']);
-        if(!$imagesize) {
-            throw new \Exception("File is not a valid image.");
+        try {
+            parent::run();
+            $this->getInputJson();
+            
+            //Decoda and Validate ImageData
+            $image = $this->decodeImage($this->input['photo']);
+            
+            $imagesize = getimagesize($image['tmp_name']);
+            if(!$imagesize) {
+                throw new \Exception("File is not a valid image.");
+            }
+            
+            $this->photo = new \Eloquent\Photo();
+            $_SERVER['HTTP_X_REQUESTED_WITH'] = true; //I do not know why I need it. See Eloquent/photo.php
+            $this->photo->church_id = $this->input['tid'];
+            $this->photo->flag = 'n'; // Set default flag as 'n' = normal (not featured) 
+            $this->photo->weight = 0; // Set default weight
+            $this->photo->uploadFile($image);
+            
+            // Additional debug info in response
+            $this->return['text'] = 'Köszönjük a képet. Elmentettük.';
+            $this->return['photo_id'] = $this->photo->id;
+            $this->return['church_id'] = $this->photo->church_id;
+            $this->return['filename'] = $this->photo->filename;
+            
+        } catch (\Exception $e) {
+            // Set error response with detailed message
+            $this->return['error'] = '1';
+            $this->return['text'] = $e->getMessage();
+            $this->return['debug_info'] = [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ];
+            
+            // Set HTTP status code to 400 (Bad Request) instead of 500
+            http_response_code(400);
+            
+            // Log the error for debugging
+            error_log("API Upload Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
         }
-        
-        $this->photo = new \Eloquent\Photo();
-        $_SERVER['HTTP_X_REQUESTED_WITH'] = true; //I do not know why I need it. See Eloquent/photo.php
-        $this->photo->church_id = $this->input['tid'];
-        $this->photo->flag = 'i'; // Set default flag as 'i' (inactive/pending)
-        $this->photo->weight = 0; // Set default weight
-        $this->photo->uploadFile($image);
-        
-        // Additional debug info in response
-        $this->return['text'] = 'Köszönjük a képet. Elmentettük.';
-        $this->return['photo_id'] = $this->photo->id;
-        $this->return['church_id'] = $this->photo->church_id;
-        $this->return['filename'] = $this->photo->filename;
     }
     
     private function decodeImage($data) {

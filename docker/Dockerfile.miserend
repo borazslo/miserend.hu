@@ -38,6 +38,9 @@ RUN apt-get update && apt-get install -y \
  
 RUN docker-php-ext-install mysqli pdo pdo_mysql && a2enmod rewrite
 
+# Copy PHP upload configuration
+COPY docker/miserend/php.ini /usr/local/etc/php/conf.d/php.ini
+
 # Settings
 RUN service apache2 restart
 

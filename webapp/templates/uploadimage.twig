@@ -82,13 +82,27 @@
                     errorMessage += 'A feltöltés megszakítva.';
                 } else if (status === 'parsererror') {
                     errorMessage += 'A szerver válasza nem valid JSON formátum.<br/>';
-                    errorMessage += 'Ez általában szerver oldali PHP hiba miatt történik.<br/>';
+                    
+                    // Try to parse the response to get error details
                     if (xhr.responseText) {
-                        errorMessage += '<strong>Szerver válasz:</strong><br/>';
-                        errorMessage += '<pre style="max-height: 200px; overflow-y: auto; font-size: 12px;">' + 
-                                       xhr.responseText.substring(0, 1000) + '</pre>';
-                        if (xhr.responseText.length > 1000) {
-                            errorMessage += '<em>... (csonkolva)</em>';
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.text) {
+                                errorMessage += '<strong>Hibaüzenet:</strong> ' + response.text + '<br/>';
+                            } else if (response.error) {
+                                errorMessage += '<strong>Hiba:</strong> ' + response.error + '<br/>';
+                            }
+                            if (response.message) {
+                                errorMessage += '<strong>Üzenet:</strong> ' + response.message + '<br/>';
+                            }
+                        } catch (e) {
+                            errorMessage += 'Ez általában szerver oldali PHP hiba miatt történik.<br/>';
+                            errorMessage += '<strong>Szerver válasz:</strong><br/>';
+                            errorMessage += '<pre style="max-height: 200px; overflow-y: auto; font-size: 12px;">' + 
+                                           xhr.responseText.substring(0, 1000) + '</pre>';
+                            if (xhr.responseText.length > 1000) {
+                                errorMessage += '<em>... (csonkolva)</em>';
+                            }
                         }
                     }
                 } else {
@@ -101,8 +115,17 @@
                     if (xhr.responseText) {
                         try {
                             var response = JSON.parse(xhr.responseText);
-                            if (response.error) {
+                            if (response.text) {
+                                errorMessage += '<br/><strong>Részletes hibaüzenet:</strong> ' + response.text;
+                            } else if (response.error) {
                                 errorMessage += '<br/><strong>Részletek:</strong> ' + response.error;
+                            }
+                            if (response.message) {
+                                errorMessage += '<br/><strong>Üzenet:</strong> ' + response.message;
+                            }
+                            if (response.debug_info) {
+                                console.log("Debug info:", response.debug_info);
+                                errorMessage += '<br/><small><em>További debug információ a konzolban.</em></small>';
                             }
                         } catch (e) {
                             // If not JSON, show first 200 characters of response
@@ -211,13 +234,16 @@
                             return false
                     }
 
-                    //Allowed file size is less than 5 MB (5242880 bytes)
-                    if (fsize > 5242880)
+                    //Check file size against PHP limits
+                    var maxSizeBytes = {{ uploadLimits.final_limit_bytes }};
+                    var maxSizeMB = {{ uploadLimits.final_limit_mb }};
+                    
+                    if (fsize > maxSizeBytes)
                     {
                         $('#output').html('<strong>Túl nagy fájl!</strong><br/>' +
                             '<strong>Választott fájl:</strong> ' + fname + '<br/>' +
                             '<strong>Fájlméret:</strong> ' + bytesToSize(fsize) + '<br/>' +
-                            '<strong>Maximum méret:</strong> 5 MB<br/>' +
+                            '<strong>Maximum méret:</strong> ' + maxSizeMB + ' MB<br/>' +
                             'Kérjük válasszon kisebb méretű fájlt vagy tömörítse a képet!').show();
                         return false
                     }
@@ -336,6 +362,6 @@
         <div  class="alert alert-warning" id="output" style="display:none"></div>
     </center>
     <div class="alert alert-info">
-        Kérjük kellően jó minőségű és méretű jpeg képet töltsön csak fel.
+        Kérjük kellően jó minőségű és méretű JPEG képet töltsön csak fel. Maximális méret: {{ uploadLimits.final_limit_mb }} MB
     </div>
 {% endblock %}

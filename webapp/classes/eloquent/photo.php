@@ -94,8 +94,21 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
     }
     
     function uploadFile($inputFile) {
-        if ($inputFile["error"] != UPLOAD_ERR_OK) {
-            throw new \Exception("There is no correct \$_FILES['FileInput'].");
+        // Check for upload errors, but be more flexible for API uploads
+        if (isset($inputFile["error"]) && $inputFile["error"] != UPLOAD_ERR_OK) {
+            $error_messages = [
+                UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+                UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive.',
+                UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+                UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+                UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.'
+            ];
+            $error_msg = isset($error_messages[$inputFile["error"]]) ? 
+                $error_messages[$inputFile["error"]] : 
+                "Unknown upload error: " . $inputFile["error"];
+            throw new \Exception($error_msg);
         }
         if (!isset($this->church_id)) {
             throw new \Exception("There is no `church_id` yet.");
@@ -103,8 +116,22 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         if (!isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
             throw new \Exception('Missing AJAX header. Invalid request.');
         }
-        if ($inputFile["size"] > 5242880) {
-            throw new \Exception("File size is too big!");
+        
+        // Debug: log file information for troubleshooting
+        error_log("Photo upload debug: " . json_encode([
+            'name' => $inputFile['name'] ?? 'N/A',
+            'size' => $inputFile['size'] ?? 'N/A',
+            'type' => $inputFile['type'] ?? 'N/A',
+            'error' => $inputFile['error'] ?? 'N/A',
+            'tmp_name_exists' => isset($inputFile['tmp_name']) ? file_exists($inputFile['tmp_name']) : false
+        ]));
+        
+        // Get dynamic file size limit
+        $maxFileSize = $this->getMaxFileSize();
+        if ($inputFile["size"] > $maxFileSize) {
+            $maxSizeMB = round($maxFileSize / 1024 / 1024, 2);
+            $actualSizeMB = round($inputFile["size"] / 1024 / 1024, 2);
+            throw new \Exception("File size is too big! Maximum allowed: {$maxSizeMB} MB, uploaded: {$actualSizeMB} MB");
         }
         if (!in_array($inputFile['type'], [ 'image/jpg', 'image/jpeg', 'image/gif', 'image/png' ])) {
             \printr($inputFile);
@@ -164,6 +191,34 @@ class Photo extends \Illuminate\Database\Eloquent\Model {
         
         // Save the photo record to the database
         $this->save();
+    }
+    
+    private function getMaxFileSize() {
+        // Helper function to convert PHP ini values to bytes
+        $convertToBytes = function($val) {
+            $val = trim($val);
+            $last = strtolower($val[strlen($val)-1]);
+            $val = (int) $val;
+            switch($last) {
+                case 'g':
+                    $val *= 1024;
+                case 'm':
+                    $val *= 1024;
+                case 'k':
+                    $val *= 1024;
+            }
+            return $val;
+        };
+        
+        // Get PHP upload limits
+        $upload_max_bytes = $convertToBytes(ini_get('upload_max_filesize'));
+        $post_max_bytes = $convertToBytes(ini_get('post_max_size'));
+        
+        // The effective limit is the smallest of PHP limits
+        $php_limit = min($upload_max_bytes, $post_max_bytes);
+        
+        // Return the smallest limit
+        return $php_limit;
     }
 
     static function kicsinyites($forras, $kimenet, $max) {
