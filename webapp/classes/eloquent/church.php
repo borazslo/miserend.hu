@@ -58,67 +58,118 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         }
         
         $confession = $lastConfessionData->first();
-            
-        if ($confession->status === 'ON' && ( time() - strtotime($confession->timestamp) ) <= 660) {
+        
+        $toleranceSeconds = 10660; // tolerance window in seconds
+
+        if ($confession->status === 'ON' && ( time() - strtotime($confession->timestamp) ) <= $toleranceSeconds) {
             $status = 'ON';
         } else {
             $status = 'OFF';
         }
         
         // Get all confession status changes for this church, ordered by timestamp DESC
-        $startTime = strtotime('-40 days');
+        $startTime2 = strtotime('-40 days');
         $confessions = \Eloquent\Confession::where('church_id', $this->id)
-            ->where('timestamp', '>=', date('Y-m-d H:i:s', $startTime))
+            ->where('timestamp', '>=', date('Y-m-d H:i:s', $startTime2))
             ->orderBy('timestamp', 'asc')
-            ->limit(50)
+            ->limit(50000)
             ->get(['status', 'timestamp', 'local_id','id']);
 
         $periods = [];
-        $onEnd = false;
-        $onStart = false;
-        $count = 0;
-        
+        $current = [];
+        $currentIds = [];
+        $lastTimeStamp = 0;
+       
+        foreach ($confessions as $conf) {   
+            //echo "<br>-------------<br>NEXT: ".$conf->local_id." ".$conf->status."<br/>";
+            //echo "CurrentTimestamp: " .strtotime($conf->timestamp). " - " . date('Y-m-d H:i:s', strtotime($conf->timestamp)) . " = ".$conf->timestamp."<br>";
+            //echo "LastTimeStamp: ". $lastTimeStamp ." - " . date('Y-m-d H:i:s', $lastTimeStamp) . "<br>";
+            // Calculate the difference between current and last timestamp in minutes
+            $diffMinutes = ($lastTimeStamp > 0) ? round((strtotime($conf->timestamp) - strtotime(date('Y-m-d H:i:s',$lastTimeStamp))) / 60, 2) : 0;
+            //echo "Diff from last: {$diffMinutes} minutes<br/>";
+            //echo "CurrentIds: ".count($currentIds)."<br/>";
+            // Rendezze a $currentIds tömböt érték szerint, a kulcsokat megtartva
+            asort($currentIds);
+            foreach ($currentIds as $id => $starttime) {
+                $startDate = date('Y-m-d H:i:s', $starttime);
+                $currentTimeStamp = strtotime($conf->timestamp);
+                $currentTimeStampDate = date('Y-m-d H:i:s', $currentTimeStamp);
+                $diff = $currentTimeStamp - $starttime;
+                $diffMinutes = round($diff / 60, 2);
+                //echo "currentIds[$id]: $startDate, diff: {$diffMinutes} minutes, conf->timestamp: {$currentTimeStampDate}";
+                if( $diff > $toleranceSeconds) {                  
+                    unset($currentIds[$id]);
+                    $current['end'] = $toleranceSeconds + $starttime;
+                } else {
+                    
+                }
+                //echo "<br/>";
+            }
+            
 
-        // Iterate through confessions to find periods of ON and OFF, knowing that there could be multiple local_ids at the same spot
-        foreach ($confessions as $conf) {            
-            $ts = strtotime($conf->timestamp);
-        
-            if ($conf->status === 'OFF') {
-                $onEnd = $ts;                
-                $count--;
-                if($count < 1 && $onStart !== false) {  
+            if(count($currentIds) < 1 AND $current !== []) {                                        
                     $periods[] = [
-                        'start' => date('Y-m-d H:i:s', $onStart ? $onStart : $startTime),
-                        'end' => date('Y-m-d H:i:s', $onEnd),
-                        'duration' => $onEnd - $onStart
+                        'start' => date('Y-m-d H:i:s', $current['start']),
+                        'end' => date('Y-m-d H:i:s', $current['end']),
+                        'duration' => $current['end'] - $current['start']
                     ];
-                    $onStart = false;
-                    $count = 0;
+                    $current = [];
+                    $currentIds = [];
                 }
+           
+            
+
+            //Ha OFF akkor biztosan vége valaminek, vagy csak békében tovább lépünk.
+            if ($conf->status === 'OFF') {
                 
-            } elseif ($conf->status === 'ON') {
-                
-                if ($onStart == false) {
-                    $onStart = $ts;                    
+                //Ha ezzel a local_id-vel van folyamatban, akkor azt lezárjuk.
+                if(isset($currentIds[$conf->local_id])) {
+                    $current['end'] = strtotime($conf->timestamp); //Ez még nem biztos, hogy a tényleges vég. Majd következő OFF-nál kiderül.
+                    unset($currentIds[$conf->local_id]);
                 }
-                $count++;
+                // Ha már egyetlen local_id-vel sincs folyamatban semmi, akkor az egész periódust lezárjuk.
+                if(count($currentIds) < 1 AND $current !== []) {                    
+                    $periods[] = [
+                        'start' => isset($current['start']) ? date('Y-m-d H:i:s', $current['start'] ) : 'error',
+                        'end' => date('Y-m-d H:i:s', $current['end']),
+                        'duration' => $current['end'] - $current['start']
+                    ];
+                    $current = [];
+                    $currentIds = [];
+                }
             }
-      
-            if (count($periods) >= 10) {
-                break;
+            
+            
+            // Ha rendesen ON, akkor elindítjuk vagy folytatjuk.
+            if($conf->status == 'ON') {
+                //Ha nincs, akkor elindítjuk
+                if(!isset($currentIds[$conf->local_id])) {
+                    $current['start'] = strtotime($conf->timestamp);                    
+                    $currentIds[$conf->local_id] = strtotime($conf->timestamp);
+                } else {
+                    //Ha már folyamatban van, akkor a korrábbi start idővel folytatjuk.
+                    $currentIds[$conf->local_id] = strtotime($conf->timestamp);
+                }
+
             }
+            //echo "SO: current start: " . (isset($current['start']) ? date('Y-m-d H:i:s', $current['start']) : 'n/a') . ", current end: " . (isset($current['end']) ? date('Y-m-d H:i:s', $current['end']) : 'n/a') . "<br/>";
+            $lastTimeStamp = strtotime($conf->timestamp);
+            
         }
 
-        if($count > 0) {
+        // Ha még van folyamatban, akkor azt beküldjük vég nélkül.
+        if($current !== []) {
             $periods[] = [
-                'start' => date('Y-m-d H:i:s', $onStart ? $onStart : $startTime),                
-                'duration' => time() - ($onStart ? $onStart : $startTime)
-            ];
-
+                'start' => date('Y-m-d H:i:s',$current['start']),
+                'duration' => time() - strtotime($current['start'])                
+                ];
         }
-        $periods = array_reverse($periods);
-        //$periods = array_slice($periods, 0, 10);
+       
 
+        $periods = array_reverse($periods);
+        
+        //$periods = array_slice($periods, 0, 10);
+        //printr($periods);
         return ['status' => $status, 'last_periods' => $periods];
     }
 
