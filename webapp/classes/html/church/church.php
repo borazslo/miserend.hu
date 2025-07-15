@@ -35,7 +35,8 @@ class Church extends \Html\Html {
 		
 				
 		$church->kozossegek = $church->kozossegek;
-        
+       $church->confessions = $church->confessions; 
+
         $church->adorations = $church->adorations()
             ->where('date', '>=', date('Y-m-d'))
             ->orderBy('date', 'ASC')
@@ -69,9 +70,9 @@ class Church extends \Html\Html {
         
         
         if(isset($this->location->city))
-            $this->setTitle($this->nev . " (" . $this->location->city['name'] . ")");
+            $this->setTitle($this->names[0] . " (" . $this->location->city['name'] . ")");
         else 
-            $this->setTitle($this->nev);
+            $this->setTitle($this->names[0]);
         
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
 
@@ -112,6 +113,7 @@ class Church extends \Html\Html {
         
         $this->isChurchHolder = $user->getHoldingData($this->id);                
 		
+
 		
     }
 

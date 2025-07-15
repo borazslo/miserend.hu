@@ -238,7 +238,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		$this->run();
 
 		if($this->responseCode != 200) {
-			throw new \Exception("Could not search churches!\n".$this->error);
+			throw new \Exception("Could not search churches!\n".print_r($this->jsonData->error,true));
 		}
 
 		return $this->jsonData->hits;
@@ -265,9 +265,9 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			}
 			
 		}
-
+		
 		// Előkészítjük feltöltsére az adatokat
-		$churches = \Eloquent\Church::where('ok', 'i')->limit(20000)->get()->map->toAPIArray('full')->toArray();
+		$churches = \Eloquent\Church::where('ok', 'i')->limit(200000)->get()->map->toAPIArray('medium')->toArray();
 
 		// Kiegészítjük Budapest kerületekkel
 		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];

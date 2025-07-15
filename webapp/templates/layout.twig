@@ -134,13 +134,14 @@
                         {% endblock %}
 
                         {% block messages %}
-                              {% if messages %}
-                                  <div id="messages" style="margin-bottom:6px">
+                              <div id="messages" style="margin-bottom:6px">
+                              {% if messages %}                                  
                                     {% for message in messages %}
                                         {% include 'message.twig' with message %}
                                     {% endfor %}
-                                  </div>  
+                                  
                               {% endif %}
+                              </div>  
                         {% endblock %}                     
                         {% block content %}{{ content|raw }}{% endblock %}<br/>
                         </div>
@@ -192,5 +193,36 @@
         });
     </script>
 
+    {# The next script is used by collapsible panels by panel.twig  #}
+    <script>
+        jQuery(function($) {
+            $('div[id^="panel_collapse_"]').each(function() {
+                var $panel = $(this);
+                var observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.attributeName === 'class') {
+
+                            var chevronId = $panel.attr('id') + '_chevron';
+                            var $chevron = $('#' + chevronId);
+            
+                            $chevron.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+
+                            var hasCollapse = $panel.hasClass('collapse') ;
+                            if ($chevron.length) {
+                                if (!hasCollapse) {
+                                    $chevron.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+                                } else {
+                                    $chevron.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+                                }
+                            }
+                        }
+                    });
+                });
+                observer.observe(this, { attributes: true, attributeFilter: ['class'] });
+            });
+        });
+    </script>
+
+    
 </body>
 </html>

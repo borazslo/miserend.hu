@@ -79,12 +79,13 @@ class Html {
             ['title' => 'Miserend', 'url' => '/templom/list', 'permission' => 'miserend', 'mid' => 27,
                 'items' => [
                     ['title' => 'teljes lista', 'url' => '/templom/list', 'permission' => ''],
-                    ['title' => 'kezelendő észrevételek', 'url' => '/list?status=Rnj&orderBy=updated_at+DESC', 'permission' => ''],
+                    ['title' => 'kezelendő észrevételek', 'url' => '/templom/list?status=Rnj&orderBy=updated_at+DESC', 'permission' => ''],
 
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
                     ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
                     ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
-					['title' => 'egészség', 'url' => '/health', 'permission' => 'miserend'],
+                    ['title' => 'gyóntatások', 'url' => '/confessionscatalogue', 'permission' => 'miserend'],
+					
                     ['title' => 'API tesztelés', 'url' => '/apitest', 'permission' => 'miserend'],
                     ['title' => 'OSM kapcsolat', 'url' => '/josm', 'permission' => 'miserend'],
                 ]
