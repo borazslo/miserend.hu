@@ -5,6 +5,7 @@
 
 {% block content %}
 <p class="alap">Gyóntatásokhoz LoraWAN eszközöket használunk, amik a helium gateway-re kapcsolódnak és a Mikrohalo cégen keresztül érkeznek az adatok. Ezek érkeztek az elmúlt időben:</p>
+<p>További információ: <a href="/staticpage/confessions" target="_blank">/static/confessions</a></p>
 
 <FORM ENCTYPE='multipart/form-data' method=post>
 
@@ -15,6 +16,8 @@
 			<th>Dátum</th>
 			<th>Templom</th>
 			<th>Azonosító</th>
+			<th>Státusz</th>
+			<th>Nyers adat</th>
 		</tr>
 	</thead>
 
@@ -28,9 +31,35 @@
 				</a>
 			</td>
 			<td>{{ confession.local_id }}</td>
-			<td>{{ confession.fulldata }}</td>
+			<td>{{ confession.status }}</td>
+			<td>
+				{% if confession.fulldata is defined and confession.fulldata is iterable %}
+					<button type="button" class="btn btn-link btn-sm toggle-json" data-key="{{ key }}">Részletek</button>
+					<pre id="json-{{ key }}" style="display:none; max-width:600px; white-space:pre-wrap; word-break:break-all;">{{ confession.fulldata|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}</pre>
+				{% else %}
+					{{ confession.fulldata }}
+				{% endif %}
+			</td>
 		</tr>
 	{% endfor %}
 	</table>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.toggle-json').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var key = btn.getAttribute('data-key');
+            var pre = document.getElementById('json-' + key);
+            if (pre.style.display === 'none') {
+                pre.style.display = 'block';
+                btn.textContent = 'Elrejt';
+            } else {
+                pre.style.display = 'none';
+                btn.textContent = 'Részletek';
+            }
+        });
+    });
+});
+</script>
 
 {% endblock %}

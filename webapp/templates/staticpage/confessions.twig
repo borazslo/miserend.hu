@@ -1,0 +1,36 @@
+{% extends "layout.twig" %}
+
+{% set title = 'Gyóntatás gyűjtés' %}
+
+{% block content %}
+    <p>Honlapunkon a szentmisék és szentségimádásokon kívül szeretnénk gyűjteni a gyóntatások időpontjait is.</p>
+    <p>Viszont egyre kevesebb olyan hely van, ahol előre meghatározott, hétről hétre változatlan, stabil időpontban van gyóntatás. 
+    Ez még nehezebbé teszi a hívők számára, hogy eljussanak a kiegensztelődés szentségéhez.</p>
+    <p>Megoldásunk, hogy templomokban ill. gyóntatószékekben egyedi kapcsolót üzemeltetünk, amik megnyomásával automatikusan jelezni lehet honlapunk felé, hogy gyónásra van lehetőség.
+    Ugyan ez még csak jelen idejű értesítésre ad lehetőséget, de a jövőben - kellő adat összegyűlése után - már előre is tudunk vetíteni gyónási lehetőségeket.</p>
+    <p>Reményeink szerint mobilalkalmazásba is bekerülhetnek az adatok, és így értesítést is kérhetünk majd közeli szentségimádásokról, 
+    vagy gyóntatásokról a környezetünkben.</p>
+    <h3>Egy egyszerű kapcsoló</h3>
+    <p>amit a templomoknak kínálunk. Elemmel működik és nem igényel semmilyen speciális bekötést. Előre össze van kötve a miserend.hu-ra és már csak kapcsolgatni kell.
+    Lehet a sekrestyébe tárolni és akár a gyóntatni igyekvő pap, akár a sekrestyés kapcsolhatja. De lehet a gyóntatószékekbe is külön-külön berakni egy-egy kapcsolót. 
+    (Nem veszélyezteti a gyóntatás titoktartását, mert az eszköz fizikailag képtelen másra mint egy igen / nem jel speciális elküldésére.)</p>
+    <h3>WiFi és SIM kártya nélkül</h3>
+    <p>A kapcsoló LoRaWAN hálózaton keresztül küldi el a jelet a szerverünknek. Így semmilyen helyi internet vagy mobil elérhetőségre nincs szükség. 
+    Ez egy speciáls rádióhálózat amit kifejezetten ilyen kis adatcsomagokat küldő érzékelők és kapcsolók számára fejlesztettek ki. 
+    Tehát olyan templomokban is könnyű telepíteni az eszközt, ahol semmilyen internetelérhetőség nincs jelenleg.</p>
+    <p>A lefedettség viszont fontos kérdés. Magyarország sok táján remekül működik már ez a hálózat, de sajnos még messze nem mindenhol. 
+    A lefedettséget az alábbi térképen lehet ellenőrizni: <a href="https://world.helium.com/en/network/iot/coverage" target="_blank">Helium LoRaWAN lefedettség</a>.</p>
+    <h3>Mennyiért?</h3>
+    <p>Egy-egy kapcsolót nagyjából 20 ezer forintért lehet ma beszerezni. 
+    Ezek után a hálózat használati díja van, de az gyóntatásonként 20 Ft körül van. 
+    Ez utóbbit egyelőre átvállalja a miserend.hu programozása mögötti is álló <a href="https://github.com/szentjozsefhackathon" target="_blank">Szent József Hackathon</a> közössége, mely adományokból működik.</p>
+    <h3>Holnaptól?</h3>
+    <p>Van, ahol már működik. A telepítés tényleg egyszerű. De pontos beszerzési útvonalak még nem teljesen bejáratottak. De szívesen segítünk, és intézzük!</p>
+    <h3>Más mód van?</h3>
+    <p>Az egyik lehetőség az, ha a templom környékén valahol egy LoRaWAN gateway-t telepítünk, amihez áramra és helyi internetelérésre van szükség. Ezzel nem csak magunknak segítünk, hanem az egész LoRaWAN hálózatot fejlesztjük. Viszont ennek telepítése százezer forint nagyságrendtől indul.</p>
+    <p>Ha a templomunkban már van elérhető WiFi például, akkor például a Shelly okoskapcsolókat is fel tudjuk programozni, hogy jelezzék a gyóntatást. Ezek ára 10-15 ezer forint körül mozog, de általában rá kell kötni az elektromos hálózatra is.</p>
+    <p>Később talán önkéntes programozókkal meg tudjuk csinálni hogy egyszerű mobilalkalmazásban is lehessen a gyóntatást jelezni egy gombnyomással. Hiszen egy egyszerű, megfelelően formázott http hívást kell csak kieszközölnünk és máris kész az összeköttetés.</p>
+    <h3>Kezdjük hát</h3>
+    <p>Keress meg: Elek László SJ, eleklaszlosj (kukac) gmail.com</p>
+                        
+{% endblock %}

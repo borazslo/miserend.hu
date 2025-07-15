@@ -47,7 +47,17 @@ class LoRaWAN extends Api {
 
         $this->getInputJson();
 
+
         $confession = new \Eloquent\Confession();
+        
+        if ($this->input['object']['Mód'] == 1) {
+            $confession->status = ($this->input['object']['Satus_Door'] == 1) ? 'ON' : 'OFF';
+        }
+        if ($this->input['object']['Mód'] == 2) {
+            $confession->status = ($this->input['object']['Status_Leak'] == 1) ? 'ON' : 'OFF';
+        }
+
+        
         $confession->local_id = $this->input['deviceInfo']['tags']['local_id'];
         $confession->church_id = $this->input['deviceInfo']['tags']['templom_id'];
         $confession->deduplicationId = $this->input['deduplicationId'];

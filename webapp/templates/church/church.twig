@@ -66,6 +66,8 @@
         {% include 'church/_paneladorations.twig' %}
     {% endif %}
 
+    {% include 'church/_panelconfessions.twig'  %}
+
     {% include 'church/_panelkozossegek.twig' with {collapsible: 'collapsed'} %}
 
     {% if photos|length > 0 %}

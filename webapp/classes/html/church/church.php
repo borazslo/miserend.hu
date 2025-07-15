@@ -35,7 +35,8 @@ class Church extends \Html\Html {
 		
 				
 		$church->kozossegek = $church->kozossegek;
-        
+       $church->confessions = $church->confessions; 
+
         $church->adorations = $church->adorations()
             ->where('date', '>=', date('Y-m-d'))
             ->orderBy('date', 'ASC')

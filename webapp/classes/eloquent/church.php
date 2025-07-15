@@ -48,6 +48,80 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany(Adoration::class);
     }
     
+    public function getConfessionsAttribute()
+    {
+        // Get all confessions related to this church
+        $lastConfessionData = \Eloquent\Confession::where('church_id', $this->id)->orderBy('timestamp', 'desc')->limit(1)->get();
+        // Ha sosem kaptunk még ilyen adatot, az azt jelenti, hogy a templomban nincs telepítve gyóntatási kapcsoló
+        if ($lastConfessionData->isEmpty()) {
+            return false;
+        }
+        
+        $confession = $lastConfessionData->first();
+            
+        if ($confession->status === 'ON' && ( time() - strtotime($confession->timestamp) ) <= 660) {
+            $status = 'ON';
+        } else {
+            $status = 'OFF';
+        }
+        
+        // Get all confession status changes for this church, ordered by timestamp DESC
+        $startTime = strtotime('-40 days');
+        $confessions = \Eloquent\Confession::where('church_id', $this->id)
+            ->where('timestamp', '>=', date('Y-m-d H:i:s', $startTime))
+            ->orderBy('timestamp', 'asc')
+            ->limit(50)
+            ->get(['status', 'timestamp', 'local_id','id']);
+
+        $periods = [];
+        $onEnd = false;
+        $onStart = false;
+        $count = 0;
+        
+
+        // Iterate through confessions to find periods of ON and OFF, knowing that there could be multiple local_ids at the same spot
+        foreach ($confessions as $conf) {            
+            $ts = strtotime($conf->timestamp);
+        
+            if ($conf->status === 'OFF') {
+                $onEnd = $ts;                
+                $count--;
+                if($count < 1 && $onStart !== false) {  
+                    $periods[] = [
+                        'start' => date('Y-m-d H:i:s', $onStart ? $onStart : $startTime),
+                        'end' => date('Y-m-d H:i:s', $onEnd),
+                        'duration' => $onEnd - $onStart
+                    ];
+                    $onStart = false;
+                    $count = 0;
+                }
+                
+            } elseif ($conf->status === 'ON') {
+                
+                if ($onStart == false) {
+                    $onStart = $ts;                    
+                }
+                $count++;
+            }
+      
+            if (count($periods) >= 10) {
+                break;
+            }
+        }
+
+        if($count > 0) {
+            $periods[] = [
+                'start' => date('Y-m-d H:i:s', $onStart ? $onStart : $startTime),                
+                'duration' => time() - ($onStart ? $onStart : $startTime)
+            ];
+
+        }
+        $periods = array_reverse($periods);
+        //$periods = array_slice($periods, 0, 10);
+
+        return ['status' => $status, 'last_periods' => $periods];
+    }
+
 	public function attributes()
     {
         return $this->hasMany(Attribute::class);
@@ -192,6 +266,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
                 'varos' => $this->varos,
                 'misek' => $misek,
                 'adoraciok' => $adorations,
+                'gyontatas' => $this->confessions ? $this->confessions['status'] : false,
                 'koordinatak' => [ (float) $this->lat, (float) $this->lon ],
                 'lat' => (float) $this->lat,
                 'lon' =>(float) $this->lon,
@@ -222,6 +297,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             
             'miserend_megjegyzes' => str_replace('<br>', "\n", strip_tags($this->misemegj, '<br>')),
             'adoraciok' => $adorations,
+            'gyontatas' => $this->confessions ? $this->confessions : false,
             'kozossegek' => array_map(function($kozosseg) {
                 return [
                     'nev' => $kozosseg->name,
@@ -473,31 +549,36 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
       public function getRemarksiconAttribute() {
-					 
-         $allapotok = $this->remarks->groupBy('allapot')->keys()->toArray();
-            if (in_array('u', $allapotok))
-				$remarksicon = "ICONS_REMARKS_NEW";                
-            elseif (in_array('f', $allapotok))
-				$remarksicon = "ICONS_REMARKS_PROCESSING";
-            elseif (count($allapotok) > 0)
-				$remarksicon = "ICONS_REMARKS_ALLDONE";
-			else
-				$remarksicon = "ICONS_REMARKS_NO";
-			return $remarksicon;
+        // Treat empty string allapot as 'j' for grouping
+        $allapotok = $this->remarks->map(function($remark) {
+            return ($remark->allapot === '' ? 'j' : $remark->allapot);
+        })->unique()->toArray();
+        //printr($allapotok);
+        if (in_array('u', $allapotok))
+            $remarksicon = "ICONS_REMARKS_NEW";
+        elseif (in_array('f', $allapotok))
+            $remarksicon = "ICONS_REMARKS_PROCESSING";
+        elseif (count($allapotok) > 0)
+            $remarksicon = "ICONS_REMARKS_ALLDONE";
+        else
+            $remarksicon = "ICONS_REMARKS_NO";
+        return $remarksicon;
     }
 	
     public function getRemarksStatusTextAttribute() {
-			
-        $allapotok = $this->remarks->groupBy('allapot')->keys()->toArray();              
-           if (in_array('u', $allapotok))
-               $remarksStatusText = "Új észrevétel érkezett.";                
-           elseif (in_array('f', $allapotok))
-               $remarksStatusText = "Van még feldolgozás alatt álló észrevétel.";
-           elseif (count($allapotok) > 0)
-               $remarksStatusText = "Minden észrevétel feldolgozva.";
-           else
-               $remarksStatusText = "Nem érkezett még észrevétel.";
-           return $remarksStatusText;
+        // Treat empty string allapot as 'j' for grouping
+        $allapotok = $this->remarks->map(function($remark) {
+            return ($remark->allapot === '' ? 'j' : $remark->allapot);
+        })->unique()->toArray();
+        if (in_array('u', $allapotok))
+            $remarksStatusText = "Új észrevétel érkezett.";
+        elseif (in_array('f', $allapotok))
+            $remarksStatusText = "Van még feldolgozás alatt álló észrevétel.";
+        elseif (count($allapotok) > 0)
+            $remarksStatusText = "Minden észrevétel feldolgozva.";
+        else
+            $remarksStatusText = "Nem érkezett még észrevétel.";
+        return $remarksStatusText;
     }
 
     function getFullNameAttribute($value) {
