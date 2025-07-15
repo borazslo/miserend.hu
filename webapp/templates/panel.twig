@@ -4,7 +4,7 @@
         {% if title %}
             <div class="panel-heading">
                 {% set rendered_title %}{% block title %}{{ title|raw }}{% endblock %}{% endset %}
-                <h4 class="panel-title d-flex justify-content-between align-items-center" style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 class="panel-title d-flex justify-content-between align-items-center">
                     {% if collapsible %}
                         <a data-toggle="collapse" href="#{{ collapse_id }}" style="text-decoration: none; color: inherit; width: 100%; display: flex; justify-content: space-between; align-items: center;">
                             <span>{{ rendered_title|raw }}</span>
