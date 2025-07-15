@@ -1,20 +1,24 @@
 <div class="panel-group">
     <div class="panel panel-{{ panel ? panel : 'default' }}" {% if id %}id="{{id}}"{% endif %}>
+        {% set collapse_id = 'panel_collapse_' ~ random() %}
         {% if title %}
             <div class="panel-heading">
-                <h4 class="panel-title">
+                {% set rendered_title %}{% block title %}{{ title|raw }}{% endblock %}{% endset %}
+                <h4 class="panel-title d-flex justify-content-between align-items-center" style="display: flex; justify-content: space-between; align-items: center;">
                     {% if collapsible %}
-                        <a data-toggle="collapse" href="">
-                    {% endif %}
-                    {% block title %}{{ title|raw }}{% endblock %}
-                    {% if collapsible %}                            
+                        <a data-toggle="collapse" href="#{{ collapse_id }}" style="text-decoration: none; color: inherit; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                            <span>{{ rendered_title|raw }}</span>
+                            <span class="panel-toggle-icon" style="margin-left:10px;">
+                                <i class="fa fa-chevron-down" id="{{ collapse_id }}_chevron"></i>
+                            </span>
                         </a>
+                    {% else %}
+                        <span>{{ rendered_title|raw }}</span>
                     {% endif %}
                 </h4>
             </div>
         {% endif %}
-        
-        <div class="panel-collapse {% if collapsible is not same as(true) and collapsible == 'collapsed' %}collapse{% endif %}">
+        <div id="{{ collapse_id }}" class="panel-collapse {% if collapsible is not same as(true) and collapsible == 'collapsed' %}collapse{% endif %}">
             <div class="panel-body">
             {% block body %}{{ body|raw }}{% endblock %}
             </div>
@@ -24,3 +28,6 @@
         </div>
     </div>
 </div>
+
+{# Additional script is needed for proper functionality. You can find that in layout.twig #}
+
