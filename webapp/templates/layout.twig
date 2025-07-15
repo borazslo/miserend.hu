@@ -134,13 +134,14 @@
                         {% endblock %}
 
                         {% block messages %}
-                              {% if messages %}
-                                  <div id="messages" style="margin-bottom:6px">
+                              <div id="messages" style="margin-bottom:6px">
+                              {% if messages %}                                  
                                     {% for message in messages %}
                                         {% include 'message.twig' with message %}
                                     {% endfor %}
-                                  </div>  
+                                  
                               {% endif %}
+                              </div>  
                         {% endblock %}                     
                         {% block content %}{{ content|raw }}{% endblock %}<br/>
                         </div>
