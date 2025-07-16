@@ -24,7 +24,24 @@ class NearBy extends Api {
                 'required',
                 'float',
                 'a hosszúsági fok, -180 &lt; c &lt; 90'
-            ]			
+			],
+			'limit' => [
+				'optional',
+				'integer',
+				'az egyszerre megmutantandó válaszok száma, 0 &lt; c &lt; 101'
+			],
+			'whenMass' => [
+				'optional',
+				'enum(today, monday, tuesday, wednesday, thursday, friday, saturday, sunday, yyyy-mm-dd)',
+				'csak az adott napi misék megjelenítése',
+				'false'
+			],
+			'response_length' => [
+				'optional',
+				'enum(minimal, medium, full)',
+				'az egy templomra vonatkozó válaszok részletessége',
+				'minimal (eloquent/church-ben meghatározva)'
+			]			
         ];
 		 
         $docs['description'] = <<<HTML
