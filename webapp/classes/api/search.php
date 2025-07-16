@@ -25,10 +25,10 @@ class Search extends Api {
                 'integer',
                 'hanyadik választól mutassuk az eredményeket (lapozó használatához)'
 						],
-			'q' => [
+			'limit' => [
                 'optional',
                 'integer',
-                'az egyszerre megmutantandó válaszok száma, 0 &lt; c &lt; 101'
+                'az egyszerre megmutatandó válaszok száma, 0 &lt; c &lt; 101'
             ]
         ];
 		 
