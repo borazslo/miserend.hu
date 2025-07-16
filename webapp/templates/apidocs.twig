@@ -1,17 +1,18 @@
 {% extends "layout.twig" %}
 
-{% set title = 'API ledokumentációírás' %}
+{% set title = 'API dokumentáció' %}
+{% set columns2 = true %}
 
-{% block content %}
 
-<p>Az aktuális API verzió az <strong>API v4</strong>. Az API v3 még támogatott, de kevesebb/pontatlanabb adatokat tartalmaz a misékről. A már nem támogatott API verziók mindenre a „2” szöveges értékkel tér vissza.</p>
-<p>Az API-val jelenleg http-n keresztül lehet kommunikálni. Várhatóan még az API v4 életében megjelenik a lehetőség a https használatára. Az <a href="https://github.com/borazslo/miserend.hu/issues/56">API v5</a> pedig kötelezővé teszi majd a https használatát (legalább a bejelentkezésnél?).</p>
-<p><strong>Kérünk minden API használót, hgy vegye fel velünk a kapcsolatot!</strong></p>
 
+{% set Updated %}
+Updated
 <h3>Adatbázis frissítettsége (v3+)</h3>
 <p>Egyet ad vissza, ha adott dátum óta nem volt változás a miserendek és templomok között. (A képek közötti változást nem vizsgálja.) Egyébként nullát.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/updated/2015-01-16</code></p>
+{% endset %}
 
+{% set Sqlite %}
 <h3>Adatbázis</h3>
 <p>SQLite formátumban a templomok, misék és képek. Naponta frissül.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/fajlok/sqlite/miserend_v3.sqlite3</code></p>
@@ -60,7 +61,9 @@
     <li>„tid” (<em>integer</em>): a templom azonosítója (mint az url-ben)</li>
     <li>„kep” (<em>varchar(255)</em>): a kép teljes url-je</li>
 </ul>
+{% endset %}
 
+{% set Table %}
 <h3>Listák / táblázatok</h3>
 <p>Az adatokat nem csak a teljes sqlite letöltésével lehet megkapni: a megfelelő url-re küldött JSON segítségével a számunkra érdekes oszlopokkal és minden sorral tér vissza az API.</p>
 <p><strong>Vigyázzat!</strong> Az egyes oszlopok / mezők neve, léte és tartalmának formátuma / értéktartománya előzetes figyelmeztetés nélkül változhat. Ezért ez a szolgáltatás rendszeresített / automatizált használata jelenleg nem ajánlott!</p>
@@ -79,36 +82,10 @@
     <li>„templomok”: a visszakapott templomok listája a kívánt mezőkkel</li>
     <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
 </ul>
+{% endset %}
 
-<h3>Egy misézőhely adata és miséi röviden (v4+)</h3>
-<p>Egy templom adatát adja vissza. Csak röviden, a legszükségesebb adatokkal. Az aktuális napi misék rendjét is hozza.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/church</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„id” (<em>integer</em>, kötelező): a templom azonosítója</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
-</ul>
-<p>Majd következik egy <em>templom</em> tömb és adatai.</p>
-<ul>
-    <li>„id”</li>
-    <li>„nev”</li>
-    <li>„ismertnev”</li>
-    <li>„varos”</li>
-    <li>„lat”</li>
-    <li>„lon”</li>
-    <li>„tavolsag” (<em>integer</em>): távolság méterben</li>
-    <li>„misek”: az adott napi szentmisék listája
-        <ul>
-            <li>„idopont” (<em>YYYY-MM-NN HH:ii:ss</em>): a szentmise időpontja</li>
-            <li>„informacio” (<em>string</em>, opcionális): megjegyzés, nyelv, stílus, satöbbi., ha van</li>
-        </ul>
-    </li>
-</ul>
-
+    
+{% set NearBy %}
 <h3>Közeli templomok és misék (v4+)</h3>
 <p>Adott koordinátákhoz legközelebbi templomok listáját adja vissza az adott napi misékkel együtt.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/nearby</code></p>
@@ -122,7 +99,9 @@
     <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
     <li>„templomok”: A közeli templomok listája. Mindegyik egy <em>templom</em> adattömb, ahogy az egy-egy templom lekérésénél láttuk.</li>
 </ul>
+{% endset %}
 
+{% set Search %}
 <h3>Templom keresése (v4+)</h3>
 <p>Templomok között lehet keresni egy (akár összetett) keresőszó megadásával.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/search</code></p>
@@ -137,8 +116,11 @@
     <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
     <li>„templomok”: A megtalált templomok listája. Mindegyik egy <em>templom</em> adattömb, ahogy az egy-egy templom lekérésénél láttuk.</li>
 </ul>
+{% endset %}
 
-<h3>Új felhasználó regisztrálása (v4+)</h3>
+{% set Signup %}
+<h3>Felhasználó kezelés (v4+)</h3>
+<h4>Új felhasználó regisztrálása (v4+)</h4>
 <p>Az API-n keresztül lehetséges új miserend felhasználó regisztrálása is. A megfelelő url-re JSON formátumban küldött adatok esetén JSON választ ad a rendszer.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/signup</code></p>
 <h5>Küldés:</h5>
@@ -154,8 +136,10 @@
     <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
     <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása. Ez olyan fontos üzeneteket tartalmazhat, mint hogy már foglalt a felhasználónév.</li>
 </ul>
+{% endset %}
 
-<h3>Felhasználó azonosítás (v4+)</h3>
+{% set User %}
+<h4>Felhasználó azonosítás (v4+)</h4>
 <p>Bizonyos API funkciókhoz szükséges (pl. kedvencek szinkronizálása) vagy lehetséges (pl. visszajelzés) a felhasználó azonosítása. A megfelelő url-re JSON formátumban küldött név-jelszó páros érvényessége esetén egy token-t küld vissza a rendszer JSON formátumban.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/login</code></p>
 <h5>Küldés:</h5>
@@ -169,8 +153,10 @@
     <li>„token” (<em>varchar(32)</em>): Az azonosításhoz szükséges token. Érvényességi ideje a <code>config.php</code>-ban van beállítva.</li>
     <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
 </ul>
+{% endset %}
 
-<h3>Felhasználó adatainak lekérdezése (v4+)</h3>
+{% set Login %}
+<h4>Felhasználó adatainak lekérdezése (v4+)</h4>
 <p>A megfelelő url-re JSON formátumban küldött token érvényessége esetén a rendszer JSON formátumban visszaküldi a felhasználó adatait.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/user</code></p>
 <h5>Küldés:</h5>
@@ -187,8 +173,10 @@
     <li>„favorites": A felhasználó kedvenc templomainak azonosítóinak listája/tömbje.</li>
     <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása.</li>
 </ul>
+{% endset %}
 
-<h3>Felhasználó kedvenc templomai (v4+)</h3>
+{% set Favorites %}
+<h4>Felhasználó kedvenc templomai (v4+)</h4>
 <p>A felhasználó kedven templomait le lehet kérdezni, valamint hozzá lehet adni vagy el lehet belőle venni a megfelelő url-re JSON formátumban küldött token érvényessége esetén. A rendszer JSON formátumban válaszol a kedvenc templomok megújult listájával. Először a hozzáadást hajtja végre, majd a törlést. Nem tér vissza hibajelzéssel, ha az adott templomazonosító már szerepel a kedvencek között. És akkor sem, ha olyan törlésére kerül sor, ami nem is szerepelt a kedvencek között.</p>
 <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/user/favorites</code></p>
 <h5>Küldés:</h5>
@@ -203,7 +191,9 @@
     <li>„favorites": A felhasználó kedvenc templomainak azonosítóinak frissült listája/tömbje.</li>
     <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
 </ul>
+{% endset %}
 
+{% set Report %}
 <h3>Visszajelzés / jelentés</h3>
 <p>Fontos, hogy a felhasználók tudják jelezni, ha valami hibát találnak a miserendben vagy a templom adataiban.<br>
 JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
@@ -230,7 +220,17 @@ JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az AP
     <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
     <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
 </ul>
+{% endset %}
 
+{% set ReportByAnonym  %}
+Lásd: <a href="#report">Report</a>
+{% endset %}
+
+{% set ReportByUser  %}
+Lásd: <a href="#report">Report</a>
+{% endset %}
+
+{% set Upload %}
 <h3>Fénykép feltöltése templomokhoz (v4+)</h3>
 <p>Lehetséges fénykép beküldése bármelyik templomhoz. A beküldött képek jelenleg azonnal megjelennek a honlapon. Ez változhat majd, hogy nem regisztrált felhasználóknak csak jóváhagyás után jelenik meg a fényképük. JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
 <p><strong>Fontos</strong> felhívni a beküldő figyelmét, hogy a fénykép feltöltésével <strong>a)</strong> a fotó jogos tulajdonosának jelenti ki magát <strong>b)</strong> a kép felhasználói jogait teljesen (de nem kizárólagosan) átadja a miserend.hu-nak (és a hozzá tartozó alkalmazásoknak).</p>
@@ -248,7 +248,90 @@ JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az AP
     <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
     <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
 </ul>
+{% endset %}
 
-<h3>Fejlesztés</h3>
-<p>Az API v5 fejlesztéséhez ötletek <a href="https://github.com/borazslo/miserend.hu/issues/56">issues:56</a></p>
+{# --- További tartalom, pl. dinamikus meghívás --- #}
+
+{% block content %}
+
+<p>Az aktuális API verzió az <strong>API v4</strong>. Az API v3 még támogatott, de kevesebb/pontatlanabb adatokat tartalmaz a misékről. A már nem támogatott API verziók mindenre a „2” szöveges értékkel tér vissza.</p>
+<p>Az API-val jelenleg http-n keresztül lehet kommunikálni. Várhatóan még az API v4 életében megjelenik a lehetőség a https használatára. Az <a href="https://github.com/borazslo/miserend.hu/issues/56">API v5</a> pedig kötelezővé teszi majd a https használatát (legalább a bejelentkezésnél?).</p>
+<p><strong>Kérünk minden API használót, hgy vegye fel velünk a kapcsolatot!</strong></p>
+
+
+<h3 id="top">API végpontok listája</h3>
+<ul>
+    {% for endpoint in endpoints %}
+        <li>
+            <a href="#{{ endpoint.name|lower|replace({' ': '-'}) }}">
+                {{ endpoint.name }}
+            </a>
+        </li>
+    {% endfor %}
+    
+</ul>
+
+{% for endpoint in endpoints %}
+    <div class="endpoint" id="{{ endpoint.name|lower|replace({' ': '-'}) }}">        
+        <h3>
+            {{ endpoint.title }}
+            {% if endpoint.requiredVersion %}
+            ({{ endpoint.requiredVersion[0] }} {{ endpoint.requiredVersion[1] }})
+            {% endif %}
+            <a href="#top" title="Vissza a tartalomjegyzékhez" style="font-size:0.8em; margin-left:10px; text-decoration:none;">&#8593;</a>
+        </h3>
+        
+        {% if endpoint.description is defined and endpoint.description %}
+            <div class="endpoint-description">
+                {{ endpoint.description|raw }}
+            </div>
+        {% endif %}
+
+        <div class="endpoint-input">
+            <h5>Küldés:</h5>
+            {% if endpoint.input is defined and endpoint.input is iterable %}
+                <table class="endpoint-input-table table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Mező</th>
+                            <th>Kötelező?</th>
+                            <th>Típus</th>                            
+                            <th>Leírás</th>
+                            <th>Alapértelmezett</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in endpoint.input %}
+                            <tr>
+                                <td><code>{{ key }}</code></td>                                
+                                <td>{{ value[0] }}</td>
+                                <td>{{ value[1] }}</td>
+                                <td><i>{{ value[2] }}</i></td>                                
+                                <td>{{ value[3] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% elseif endpoint.input is defined and endpoint.input %}
+                {{ endpoint.input|raw }}
+            {% else %}
+                <i>Nincs dokumentálva.</i>
+            {% endif %}
+        </div>
+
+        <div class="endpoint-response">
+            <h5>Válasz:</h5>
+            {% if endpoint.response is defined and endpoint.response %}        
+                    {{ endpoint.response|raw }}                
+            {% else %}
+                <i>Nincs dokumentálva.</i>
+            {% endif %}
+        </div>
+
+        {% if attribute(_context, endpoint.name) is defined %}
+            {{ attribute(_context, endpoint.name) }}                    
+        {% endif %}
+    </div>
+{% endfor %}
+
 {% endblock %}

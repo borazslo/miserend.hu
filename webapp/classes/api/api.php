@@ -20,6 +20,20 @@ class Api {
         if (!in_array($this->version, array(1, 2, 3, 4))) {
             throw new \Exception("Invalid API version.");
         }
+
+        // Each endpoint can have 'requiredVersion' property to specify the minimum or maximum version required
+        if(isset($this->requiredVersion))  {
+            if (is_array($this->requiredVersion)) {
+                if (!version_compare($this->requiredVersion[1], $this->version, $this->requiredVersion[0] )) {
+                    throw new \Exception("API version does not match the required version.");
+                }
+            } else {            
+                throw new \Exception("Invalid requiredVersion for API endpoint.");                
+            }
+
+        }
+
+        // Each endpoint can have its own version validation
         if (method_exists($this, 'validateVersion')) {
             $this->validateVersion();
         }
