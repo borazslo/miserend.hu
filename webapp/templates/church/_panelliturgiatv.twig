@@ -22,7 +22,7 @@
     <table class="table table-striped">
         {% for stream in liturgiatv|slice(0, 5) %}
             <tr>
-                <td>{{ _honapok[stream.date | date('n')][0] }}. {{ stream.date| date('d.')}} <strong>{{ stream.time|date('H:i') }}</strong></td>
+                <td>{{ stream.date|miserend_date('')  }} <strong>{{ stream.time|date('H:i') }}</strong></td>
                 <td>{{ stream.name }}</td>
                 <td><a href="{{ stream.url }}"><i class="material-icons {{ stream.iconstate }}">&#xe63a;</i></a></td>
             </tr>

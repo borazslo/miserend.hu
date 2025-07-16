@@ -17,13 +17,57 @@ class Table extends Api {
             'megkozelites', 'plebania', 'pleb_eml', 'egyhazmegye',
             'espereskerulet', 'leiras', 'megjegyzes', 'miseaktiv', 'misemegj',
             'frissites', 'lat', 'lon', 'geochecked', 'name', 'alt_name',
-            'denomination', 'url'),
+            'denomination', 'url')
     );
 
-    public function validateVersion() {
-        if ($this->version < 3) {
-            throw new \Exception("API action 'table' is not available under v3.");
+    public $requiredVersion = ['>=',3]; // API v4-től érhető el
+
+    public function docs() {
+
+        $docs = [];
+        $docs['title'] = 'Listák / táblázatok';
+        $docs['input'] = [
+            'columns' => [
+                'required',
+                'list of string',
+                'a megkapni kívánt oszlopok (részleteket lásd lejjebb)'
+            ],
+            'format' => [
+                'optional',
+                'string',
+                'a visszatérés formátuma; lehet még „text”',
+                'json'
+            ],
+            'delimiter' => [
+                'optional',
+                'string',
+                '„format:json” esetén az oszlopokat elválasztó jel',
+                ';'
+            ]
+        ];
+
+        $validColumns = '<p>';
+        foreach($this->validColumnsTables as $table => $columns) {
+            $validColumns .= "Engedélyezett oszlopok a <code>".$table."</code> tábla esetén: <code>".implode(', ',$columns)."</code><br/>";
         }
+        $validColumns .= '</p>';
+
+        $docs['description'] = <<<HTML
+        <p>Az adatokat nem csak a teljes sqlite letöltésével lehet megkapni: a megfelelő url-re küldött JSON segítségével a számunkra érdekes oszlopokkal és minden sorral tér vissza az API.</p>
+        <p><strong>Vigyázzat!</strong> Az egyes oszlopok / mezők neve, léte és tartalmának formátuma / értéktartománya előzetes figyelmeztetés nélkül változhat. Ezért ez a szolgáltatás rendszeresített / automatizált használata jelenleg nem ajánlott!</p>
+        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/templomok</code></p>
+        $validColumns
+        HTML;
+
+        $docs['response'] = <<<HTML
+        <ul>
+            <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
+            <li>„templomok”: a visszakapott templomok listája a kívánt mezőkkel</li>
+            <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
+        </ul>
+        HTML;
+
+        return $docs;
     }
 
     public function validateInput() {

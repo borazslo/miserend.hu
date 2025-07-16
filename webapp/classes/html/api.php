@@ -9,14 +9,21 @@ class Api extends Html {
 
         try {
             $action = \Request::SimpletextRequired('action');
-        } catch (\Exception $e) {
+        } catch (\Exception $e) {            
             $this->error = $e->getMessage();
         }
-
+        
         try {
 
             if(!isset($action)) {
-                $this->redirect('https://github.com/borazslo/miserend.hu/wiki/API');
+                $action = false;
+                $this->format = 'html';
+                
+                $this->redirect('staticpage/api');
+                exit;
+                return;
+                //$this->redirect('https://github.com/borazslo/miserend.hu/wiki/API');
+                $action = false;
             }
             switch ($action) {
                 case 'sqlite':
@@ -90,7 +97,7 @@ class Api extends Html {
         //Because of the Report::factoryCreate();
 
         if (!isset($this->api)) {
-            $this->html = json_encode(['error' => 1, 'text' => $this->error]);
+            $this->html = json_encode(['error' => 1, 'text' => isset($this->error) ? $this->error : 'Unknown error']);
             return;
         } elseif (isset($this->error)) {
             $this->api->return = ['error' => '1', 'text' => $this->error];

@@ -36,9 +36,11 @@ if (isset($_REQUEST['logout'])) {
 }
 $user = \User::load();
 
+include_once('twig_extras.php');
 $loader = new \Twig\Loader\FilesystemLoader(PATH . 'templates');
 $twig = new \Twig\Environment($loader);
-
+$twig->addFilter(new \Twig\TwigFilter('miserend_date', 'twig_hungarian_date_format'));
+// DANGER: a twig declarálva van / meg van hívva a Class/Html/Html.php -ban is. Így ott is módosítani kellhet a filterket
 
 //
 //  Useful CONSTANTS

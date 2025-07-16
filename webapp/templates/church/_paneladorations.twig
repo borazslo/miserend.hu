@@ -3,13 +3,13 @@
 {% set title = 'Szentségimádások a következő időben' %}
 
 {% set footer = true %}
-{% set daysOfWeek = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap'] %}
 
 {% block body %}
     {% if adorations|length > 1 %}
         
 		{% for adoration in adorations %}
-            <h5><strong>{{ adoration.date|date("F j.") }}, {{ daysOfWeek[adoration.date|date("N") - 1] }}</strong> {{ adoration.starttime }} &ndash; {{ adoration.endtime }}
+            <h5><strong>{{ adoration.date|miserend_date("")|capitalize }}</strong> {{ adoration.starttime }} &ndash; {{ adoration.endtime }}
+                        
             {% if adoration.type %}
                 ( {{ adoration.type }} )
             {% endif %}            

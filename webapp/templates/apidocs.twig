@@ -1,0 +1,92 @@
+{% extends "layout.twig" %}
+
+{% set title = 'API dokumentáció' %}
+{% set columns2 = true %}
+
+{% block content %}
+
+<p>Az aktuális API verzió az <strong>API v4</strong>. Az API v3 még támogatott, de kevesebb/pontatlanabb adatokat tartalmaz a misékről. A már nem támogatott API verziók mindenre a „2” szöveges értékkel tér vissza.</p>
+<p>Az API-val jelenleg http-n keresztül lehet kommunikálni. Várhatóan még az API v4 életében megjelenik a lehetőség a https használatára. Az <a href="https://github.com/borazslo/miserend.hu/issues/56">API v5</a> pedig kötelezővé teszi majd a https használatát (legalább a bejelentkezésnél?).</p>
+<p><strong>Kérünk minden API használót, hgy vegye fel velünk a kapcsolatot!</strong></p>
+
+
+<h3 id="top">API végpontok listája</h3>
+<ul>
+    {% for endpoint in endpoints %}
+        <li>
+            <a href="#{{ endpoint.name|lower|replace({' ': '-'}) }}">
+                {{ endpoint.name }}{% if endpoint.title is defined and endpoint.title != endpoint.name %}: {{ endpoint.title }}{% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    
+</ul>
+
+{% for endpoint in endpoints %}
+    <div class="endpoint" id="{{ endpoint.name|lower|replace({' ': '-'}) }}">        
+        <h3>
+            {{ endpoint.title }}
+            {% if endpoint.requiredVersion %}
+            ({{ endpoint.requiredVersion[0] }} {{ endpoint.requiredVersion[1] }})
+            {% endif %}
+            <a href="#top" title="Vissza a tartalomjegyzékhez" style="font-size:0.8em; margin-left:10px; text-decoration:none;">&#8593;</a>
+        </h3>
+        
+        {% if endpoint.description is defined and endpoint.description %}
+            <div class="endpoint-description">
+                {{ endpoint.description|raw }}
+            </div>
+        {% endif %}
+
+        <div class="endpoint-input">
+            <h5>Küldés:</h5>
+            {% if endpoint.input is defined and endpoint.input is iterable %}
+                {% if endpoint.input|length > 0 %}
+                <table class="endpoint-input-table table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Mező</th>
+                            <th>Kötelező?</th>
+                            <th>Típus</th>                            
+                            <th>Leírás</th>
+                            <th>Alapértelmezett</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in endpoint.input %}
+                            <tr>
+                                <td><code>{{ key }}</code></td>                                
+                                <td>{{ value[0] }}</td>
+                                <td>{{ value[1] }}</td>
+                                <td><i>{{ value[2] }}</i></td>                                
+                                <td>{{ value[3] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <i>Nincs küldendő adat.</i>
+                {% endif %}
+            {% elseif endpoint.input is defined and endpoint.input %}
+                {{ endpoint.input|raw }}
+            {% else %}
+                <i>Nincs dokumentálva.</i>
+            {% endif %}
+        </div>
+
+        <div class="endpoint-response">
+            <h5>Válasz:</h5>
+            {% if endpoint.response is defined and endpoint.response %}        
+                    {{ endpoint.response|raw }}                
+            {% else %}
+                <i>Nincs dokumentálva.</i>
+            {% endif %}
+        </div>
+
+        {% if attribute(_context, endpoint.name) is defined %}
+            {{ attribute(_context, endpoint.name) }}                    
+        {% endif %}
+    </div>
+{% endfor %}
+
+{% endblock %}
