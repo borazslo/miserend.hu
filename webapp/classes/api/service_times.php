@@ -31,7 +31,7 @@ class Service_times extends Api {
         $this->return = [];
 
 		
-        $churches = \Eloquent\Church::limit(10)->get();
+        $churches = \Eloquent\Church::limit(1000000)->get();
 		set_time_limit('600');
         foreach($churches as $church ) {
 			
