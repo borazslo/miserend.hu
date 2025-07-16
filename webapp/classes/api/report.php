@@ -17,6 +17,67 @@ class Report extends Api {
             return new ReportByUser();
         }
     }
+    
+    public function docs() {
+
+        $docs = [];
+        $docs['title'] = 'Visszajelzés / jelentés';
+        $docs['input'] = [
+            'tid' => [
+                'required',
+                'integer',
+                'a templom azonosítója (mint az url-ben)'
+            ],
+            'text' => [
+                'opcionális; „pid:2” esetén kötelező',
+                'string',
+                'szöveges üzenet'
+            ],
+            'timestamp' => [
+                'optional',
+                'string',
+                'a beküldés időpontja (hiánya esetén aktuális pillanat)',
+                'current timestamp'
+            ],
+            'email' => [
+                'optional',
+                'string',
+                'a beküldő email címe, hogy tudjunk neki válaszolni'
+            ],
+            'token' => [
+                'optional',
+                'string',
+                'bejelentkezett felhasználó esetén hasznos. Felülírja az „email” értéket. Csak v4+ esetén használható'
+            ],
+            'pid' => [
+                'required',
+                'enum(0,1,2)',
+                'visszajelzés típusa: 0 - rossz pozíció, 1 - hibás mise adatok, 2 - egyéb / ill. előbbiek részletezve'
+            ],
+            'dbdate' => [
+                '≤v3 optional, v4+ kötelező',
+                'timestamp or date',
+                'a használt adatbázis letöltöttségének ideje, timestamp vagy ÉÉÉÉ-HH-NN ÓÓ:PP:MM vagy ÉÉÉÉ-HH-NN',
+            ]
+        ];
+
+        $docs['description'] = <<<HTML
+        <p>Fontos, hogy a felhasználók tudják jelezni, ha valami hibát találnak a miserendben vagy a templom adataiban.<br>
+        JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
+        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/report</code></p>
+        HTML;
+
+        $docs['response'] = <<<HTML
+        <ul>
+            <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
+            <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
+        </ul>
+        HTML;
+
+        return $docs;
+    }
+
+
 
     public function validateInput() {
         //TODO: !isValidChurchId()?

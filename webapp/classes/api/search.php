@@ -7,12 +7,44 @@ use Illuminate\Database\Capsule\Manager as DB;
 class Search extends Api {
 
     public $format = 'json'; //or text
-	public $requiredFields = array('q');
-        
-    public function validateVersion() {
-        if ($this->version < 4) {
-            throw new \Exception("API action 'search' is not available under v4.");
-        }
+	public $requiredFields = array('q');        
+    public $requiredVersion = ['>=',4]; // API v4-től érhető el
+
+     public function docs() {
+
+        $docs = [];
+        $docs['title'] = 'Misézőhely keresése';
+        $docs['input'] = [
+            'q' => [
+                'required',
+                'string',
+                'a keresőkifejezés'
+			],
+			'offset' => [
+                'optional',
+                'integer',
+                'hanyadik választól mutassuk az eredményeket (lapozó használatához)'
+						],
+			'q' => [
+                'optional',
+                'integer',
+                'az egyszerre megmutantandó válaszok száma, 0 &lt; c &lt; 101'
+            ]
+        ];
+		 
+        $docs['description'] = <<<HTML
+        <p>Templomok között lehet keresni egy (akár összetett) keresőszó megadásával.</p>
+        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/search</code></p>
+        HTML;
+
+        $docs['response'] = <<<HTML
+        <ul>
+        	<li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
+        	<li>„templomok”: A megtalált templomok listája. Mindegyik egy <em>templom</em> adattömb, ahogy az egy-egy templom lekérésénél láttuk.</li>
+        </ul>
+        HTML;
+
+        return $docs;
     }
 
 	public function validateInput() {

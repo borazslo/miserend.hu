@@ -64,6 +64,16 @@ class ApiDocs extends Html {
             unset($result[$key]);
             $result = array_values($result);
         }
+
+        // A ReportByAnonym és ReportByUser osztályok nem külön endpointok, ezért kivesszük a listából
+        // TODO: máshogy megoldani, hogy ne kelljen kézzel frissíteni
+        $reportClasses = ['ReportByAnonym', 'ReportByUser'];
+        foreach ($reportClasses as $reportClass) {
+            if (($key = array_search($reportClass, $result)) !== false) {
+                unset($result[$key]);
+            }
+        }
+
         sort($result);
         return $result;
     }

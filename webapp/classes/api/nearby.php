@@ -7,12 +7,39 @@ use Illuminate\Database\Capsule\Manager as DB;
 class NearBy extends Api {
 
     public $format = 'json'; //or text
-	public $requiredFields = array('lat','lon');
-        
-    public function validateVersion() {
-        if ($this->version < 4) {
-            throw new \Exception("API action 'nearby' is not available under v4.");
-        }
+	public $requiredFields = array('lat','lon');        
+    public $requiredVersion = ['>=',4]; // API v4-től érhető el
+
+    public function docs() {
+
+        $docs = [];
+        $docs['title'] = 'Közeli templomok és misék';
+        $docs['input'] = [
+            'lat' => [
+                'required',
+                'float',
+                'a szélességi fok, -90 &lt; x &lt; 90'
+			],
+            'lon' => [
+                'required',
+                'float',
+                'a hosszúsági fok, -180 &lt; c &lt; 90'
+            ]			
+        ];
+		 
+        $docs['description'] = <<<HTML
+            <p>Adott koordinátákhoz legközelebbi templomok listáját adja vissza az adott napi misékkel együtt.</p>
+            <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/nearby</code></p>
+        HTML;
+
+        $docs['response'] = <<<HTML
+        <ul>
+            <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
+            <li>„templomok”: A közeli templomok listája. Mindegyik egy <em>templom</em> adattömb, ahogy az egy-egy templom lekérésénél láttuk.</li>
+        </ul>
+        HTML;
+
+        return $docs;
     }
 
     public function validateInput() {

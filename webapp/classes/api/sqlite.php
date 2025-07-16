@@ -11,6 +11,70 @@ class Sqlite extends Api {
     public $folder = 'fajlok/sqlite/';
     public $sqlite;
 
+
+
+    public function docs() {
+
+        $docs = [];
+        $docs['title'] = 'Adatbázis';
+        $docs['input'] = "Semmilyen adatot nem kell küldeni. Sőt meg sem kell hívni külön az API-t csak elkérni a fájlokat az alábbi URL-en";
+
+        $docs['description'] = <<<HTML
+        <p>SQLite formátumban a templomok, misék és képek. Naponta frissül. Nem szükséges külön meghívni.</p>
+        <p><strong>Elérhető:</strong> <code>http://miserend.hu/fajlok/sqlite/miserend_v3.sqlite3</code></p>
+        <p><em>(Léteznek még többé-kevésbé működő más url-ek is.)</em></p>
+        <p><strong>Vigyázat!</strong> A 2025 második felében kezdődött felújítás a <em>misék</em> adattáblát biztosan meg fogja változtatni!</p>
+        HTML;
+
+        $docs['response'] = <<<HTML
+        <h4>misék: „misek”</h4>
+        <ul>
+            <li>„mid” (<em>integer not null</em>): mise azonosító</li>
+            <li>„tid” (<em>integer</em>): a templom azonosítója (mint az url-ben)</li>
+            <li><del>„telnyar” (<em>varchar(1)</em>) (≤v3): <strong>t</strong> (téli miserend) / <strong>ny</strong> (nyári miserend)</del></li>
+            <li>„periodus” (<em>varchar(4)</em>) (v4+): a mise periódusa/ismétlődése, <strong>NULL</strong> ha mindig van, részletekért lásd: <a href="[[miserend-tulajdonságok]]">miserend-tulajdonságok</a></li>
+            <li>„idoszak” (<em>varchar(255)</em>) (v4+): az időszak megnevezése szöveggel kiírva, az azonos nevű időszakok egy kupacba tartoznak. pl.: <em>téli miserend</em> vagy <em>ádventi időszak</em></li>
+            <li>„suly” (<em>int</em>) (v4+): az „időszak” súlya. Ha két időszak (részben) átfedi egymást, akkor a nehezebb súlyú időszak miséi érvényesek csak.</li>
+            <li>„datumtol” (<em>int</em>) (v4+): az „időszak” első napjának dátuma <strong>(H)HNN</strong> formátumban. (Rendszeresen frissítendő, mert a legközelebbi határt jelöli, ami évenként változhat.)</li>
+            <li>„datumig” (<em>int</em>) (v4+): az „időszak” utolsó napjának dátuma <strong>(H)HNN</strong> formátumban. (Rendszeresen frissítendő, mert a legközelebbi határt jelöli, ami évenként változhat.)</li>
+            <li>„nap” (<em>integer</em>): <strong>1-7</strong> (hétfő - vasárnap) vagy <strong>0</strong> (bármilyen nap). (A nulla értékre példa a karácsonyi szentmise. Ilyenkor nem számít a nap milyensége, csak a dátum: a „datumtol” és „datumig”, ami ekkor azonos.)</li>
+            <li>„ido” (<em>time</em>): pl.: <em>08:30:00</em></li>
+            <li>„nyelv” (<em>varchar(3)</em>): a nyelv rövidítése és periódusa, több érték esetén esetén vesszőkkel elválasztva. lásd még: <a href="[[miserend-tulajdonságok]]">miserend-tulajdonságok</a></li>
+            <li>„milyen” (<em>varchar(10)</em>): minden nem nyelvi tulajdonság és periódusa, több érték esetén esetén vesszőkkel elválasztva. (A lehetséges értékek teljes listája API verziónként eltér.) lásd még: <a href="[[miserend-tulajdonságok]]">miserend-tulajdonságok</a></li>
+            <li>„megjegyzés” (<em>varchar(255)</em>) (v3+): szöveges megjegyzés a misével kapcsolatban, pl. olyan tulajdonságok/periódusok, amik a „milyen” mezőben nem megadhatóak</li>
+        </ul>
+
+        <h4>templomok: „templomok”</h4>
+        <ul>
+            <li>„tid” (<em>integer not null</em>): a templom azonosítója (mint az url-ben)</li>
+            <li>„nev” (<em>varchar(200)</em>): a templom teljes és hivatalos neve</li>
+            <li>„ismertnev” (<em>varchar(200)</em>): alternatív, közhasználatú név</li>
+            <li>„gorog” (<em>integer null</em>) (v3+): <strong>1</strong>/<strong>0</strong>/<strong>NULL</strong> 1, ha görögkatolikus misézőhely</li>
+            <li>„orszag” (<em>varchar(30)</em>): az ország neve kiírva (bár az eredeti adatbázis kódolva tárolja)</li>
+            <li>„megye” (<em>varchar(80)</em>): a megye egyszerű neve kiírva</li>
+            <li>„varos” (<em>varchar(80)</em>): a város neve kiírva. külföld esetén zároljelben másik nyelven pl. <em>Kolozsvár (Cluja-Napoca)</em></li>
+            <li>„cim” (<em>varchar(255)</em>): a templom (és nem a plébánia) hivatalos posta címe (ország és város nélkül)</li>
+            <li>„geocim” (<em>varchar(255)</em>) (≤v4): a koordináták alapján visszafejtet lehetséges posta cím (leginkább akkor használjuk, ha a „cim” üres)</li>
+            <li>„megkozelites” (<em>varchar(255)</em>): a templom megközelíthetősége szövegesen leírva (gyakran üres)</li>
+            <li>„lng” (<em>float</em>): a koordináta hosszúsági foka pl. <em>24.9018</em></li>
+            <li>„lat” (<em>float</em>): a koordináta szélességi foka pl. <em>46.5643</em></li>
+            <li><del>„nyariido” (<em>varchar(10)</em>) (≤v3): a templomban a nyári idő kezdete az aktuális évben (!), <strong>ÉÉÉÉ-HH-NN</strong></del></li>
+            <li><del>„teliido” (<em>varchar(10)</em>) (≤v3): a templomban a téli idő kezdete az aktuális évben (!), <strong>ÉÉÉÉ-HH-NN</strong></del></li>
+            <li>„kep” (<em>varchar(255)</em>): a templomhoz elérhető első/fő kép teljes url-je, pl.: <em>http://miserend.hu/kepek/templomok/3761/templom2.jpg</em></li>
+        </ul>
+
+        <h4>képek: „kep” (v2+)</h4>
+        <ul>
+            <li>„kid” (<em>integer not null</em>): a kép egyedi azonosítója</li>
+            <li>„tid” (<em>integer</em>): a templom azonosítója (mint az url-ben)</li>
+            <li>„kep” (<em>varchar(255)</em>): a kép teljes url-je</li>
+        </ul>
+        HTML;
+
+        return $docs;
+    }
+
+
     public function run() {
         parent::run();
 

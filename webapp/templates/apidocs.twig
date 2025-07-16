@@ -3,255 +3,6 @@
 {% set title = 'API dokumentáció' %}
 {% set columns2 = true %}
 
-
-
-{% set Updated %}
-Updated
-<h3>Adatbázis frissítettsége (v3+)</h3>
-<p>Egyet ad vissza, ha adott dátum óta nem volt változás a miserendek és templomok között. (A képek közötti változást nem vizsgálja.) Egyébként nullát.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/updated/2015-01-16</code></p>
-{% endset %}
-
-{% set Sqlite %}
-<h3>Adatbázis</h3>
-<p>SQLite formátumban a templomok, misék és képek. Naponta frissül.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/fajlok/sqlite/miserend_v3.sqlite3</code></p>
-<p><em>(Léteznek még többé-kevésbé működő más url-ek is.)</em></p>
-<p><strong>Vigyázat!</strong> A 2025 első felében várható felújítás a <em>misék</em> adattáblát biztosan meg fogja változtatni!</p>
-
-<h4>misék: „misek”</h4>
-<ul>
-    <li>„mid” (<em>integer not null</em>): mise azonosító</li>
-    <li>„tid” (<em>integer</em>): a templom azonosítója (mint az url-ben)</li>
-    <li><del>„telnyar” (<em>varchar(1)</em>) (≤v3): <strong>t</strong> (téli miserend) / <strong>ny</strong> (nyári miserend)</del></li>
-    <li>„periodus” (<em>varchar(4)</em>) (v4+): a mise periódusa/ismétlődése, <strong>NULL</strong> ha mindig van, részletekért lásd: <a href="[[miserend-tulajdonságok]]">miserend-tulajdonságok</a></li>
-    <li>„idoszak” (<em>varchar(255)</em>) (v4+): az időszak megnevezése szöveggel kiírva, az azonos nevű időszakok egy kupacba tartoznak. pl.: <em>téli miserend</em> vagy <em>ádventi időszak</em></li>
-    <li>„suly” (<em>int</em>) (v4+): az „időszak” súlya. Ha két időszak (részben) átfedi egymást, akkor a nehezebb súlyú időszak miséi érvényesek csak.</li>
-    <li>„datumtol” (<em>int</em>) (v4+): az „időszak” első napjának dátuma <strong>(H)HNN</strong> formátumban. (Rendszeresen frissítendő, mert a legközelebbi határt jelöli, ami évenként változhat.)</li>
-    <li>„datumig” (<em>int</em>) (v4+): az „időszak” utolsó napjának dátuma <strong>(H)HNN</strong> formátumban. (Rendszeresen frissítendő, mert a legközelebbi határt jelöli, ami évenként változhat.)</li>
-    <li>„nap” (<em>integer</em>): <strong>1-7</strong> (hétfő - vasárnap) vagy <strong>0</strong> (bármilyen nap). (A nulla értékre példa a karácsonyi szentmise. Ilyenkor nem számít a nap milyensége, csak a dátum: a „datumtol” és „datumig”, ami ekkor azonos.)</li>
-    <li>„ido” (<em>time</em>): pl.: <em>08:30:00</em></li>
-    <li>„nyelv” (<em>varchar(3)</em>): a nyelv rövidítése és periódusa, több érték esetén esetén vesszőkkel elválasztva. lásd még: <a href="[[miserend-tulajdonságok]]">miserend-tulajdonságok</a></li>
-    <li>„milyen” (<em>varchar(10)</em>): minden nem nyelvi tulajdonság és periódusa, több érték esetén esetén vesszőkkel elválasztva. (A lehetséges értékek teljes listája API verziónként eltér.) lásd még: <a href="[[miserend-tulajdonságok]]">miserend-tulajdonságok</a></li>
-    <li>„megjegyzés” (<em>varchar(255)</em>) (v3+): szöveges megjegyzés a misével kapcsolatban, pl. olyan tulajdonságok/periódusok, amik a „milyen” mezőben nem megadhatóak</li>
-</ul>
-
-<h4>templomok: „templomok”</h4>
-<ul>
-    <li>„tid” (<em>integer not null</em>): a templom azonosítója (mint az url-ben)</li>
-    <li>„nev” (<em>varchar(200)</em>): a templom teljes és hivatalos neve</li>
-    <li>„ismertnev” (<em>varchar(200)</em>): alternatív, közhasználatú név</li>
-    <li>„gorog” (<em>integer null</em>) (v3+): <strong>1</strong>/<strong>0</strong>/<strong>NULL</strong> 1, ha görögkatolikus misézőhely</li>
-    <li>„orszag” (<em>varchar(30)</em>): az ország neve kiírva (bár az eredeti adatbázis kódolva tárolja)</li>
-    <li>„megye” (<em>varchar(80)</em>): a megye egyszerű neve kiírva</li>
-    <li>„varos” (<em>varchar(80)</em>): a város neve kiírva. külföld esetén zároljelben másik nyelven pl. <em>Kolozsvár (Cluja-Napoca)</em></li>
-    <li>„cim” (<em>varchar(255)</em>): a templom (és nem a plébánia) hivatalos posta címe (ország és város nélkül)</li>
-    <li>„geocim” (<em>varchar(255)</em>) (≤v4): a koordináták alapján visszafejtet lehetséges posta cím (leginkább akkor használjuk, ha a „cim” üres)</li>
-    <li>„megkozelites” (<em>varchar(255)</em>): a templom megközelíthetősége szövegesen leírva (gyakran üres)</li>
-    <li>„lng” (<em>float</em>): a koordináta hosszúsági foka pl. <em>24.9018</em></li>
-    <li>„lat” (<em>float</em>): a koordináta szélességi foka pl. <em>46.5643</em></li>
-    <li><del>„nyariido” (<em>varchar(10)</em>) (≤v3): a templomban a nyári idő kezdete az aktuális évben (!), <strong>ÉÉÉÉ-HH-NN</strong></del></li>
-    <li><del>„teliido” (<em>varchar(10)</em>) (≤v3): a templomban a téli idő kezdete az aktuális évben (!), <strong>ÉÉÉÉ-HH-NN</strong></del></li>
-    <li>„kep” (<em>varchar(255)</em>): a templomhoz elérhető első/fő kép teljes url-je, pl.: <em>http://miserend.hu/kepek/templomok/3761/templom2.jpg</em></li>
-</ul>
-
-<h4>képek: „kep” (v2+)</h4>
-<ul>
-    <li>„kid” (<em>integer not null</em>): a kép egyedi azonosítója</li>
-    <li>„tid” (<em>integer</em>): a templom azonosítója (mint az url-ben)</li>
-    <li>„kep” (<em>varchar(255)</em>): a kép teljes url-je</li>
-</ul>
-{% endset %}
-
-{% set Table %}
-<h3>Listák / táblázatok</h3>
-<p>Az adatokat nem csak a teljes sqlite letöltésével lehet megkapni: a megfelelő url-re küldött JSON segítségével a számunkra érdekes oszlopokkal és minden sorral tér vissza az API.</p>
-<p><strong>Vigyázzat!</strong> Az egyes oszlopok / mezők neve, léte és tartalmának formátuma / értéktartománya előzetes figyelmeztetés nélkül változhat. Ezért ez a szolgáltatás rendszeresített / automatizált használata jelenleg nem ajánlott!</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/templomok</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„columns” (kötelező): a megkapni kívánt oszlopok (részleteket lásd lejjebb)</li>
-    <li>„format” (opcionális; alapértelmezett: „json”): a visszatérés formátuma; lehet még „text”</li>
-    <li>„delimiter” (opcionális; alapértelmezett: „;”): „format:json” esetén az oszlopokat elválasztó jel</li>
-</ul>
-<h5>Oszlopok/mezők „templomok” esetén:</h5>
-<p><code>id,nev,ismertnev,turistautak,orszag,megye,varos,cim,megkozelites,plebania,pleb_url,pleb_eml,egyhazmegye,espereskerulet,leiras,megjegyzes,miseaktiv,misemegj,bucsu,frissites,lat,lon,geochecked,name,alt_name,denomination,url,lon</code></p>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„templomok”: a visszakapott templomok listája a kívánt mezőkkel</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
-</ul>
-{% endset %}
-
-    
-{% set NearBy %}
-<h3>Közeli templomok és misék (v4+)</h3>
-<p>Adott koordinátákhoz legközelebbi templomok listáját adja vissza az adott napi misékkel együtt.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/nearby</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„lat” (<em>float</em>, kötelező): a szélességi fok, -90 &lt; x &lt; 90</li>
-    <li>„lon” (<em>float</em>, kötelező): a hosszúsági fok, -180 &lt; c &lt; 90</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„templomok”: A közeli templomok listája. Mindegyik egy <em>templom</em> adattömb, ahogy az egy-egy templom lekérésénél láttuk.</li>
-</ul>
-{% endset %}
-
-{% set Search %}
-<h3>Templom keresése (v4+)</h3>
-<p>Templomok között lehet keresni egy (akár összetett) keresőszó megadásával.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/search</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„q” (<em>string</em>, kötelező): a keresőkifejezés</li>
-    <li>„offset” (<em>integer</em>, opcionális): hanyadik választól mutassuk az eredményeket (lapozó használatához)</li>
-    <li>„limit” (<em>integer</em>, opcionális): az egyszerre megmutantandó válaszok száma, 0 &lt; c &lt; 101</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„templomok”: A megtalált templomok listája. Mindegyik egy <em>templom</em> adattömb, ahogy az egy-egy templom lekérésénél láttuk.</li>
-</ul>
-{% endset %}
-
-{% set Signup %}
-<h3>Felhasználó kezelés (v4+)</h3>
-<h4>Új felhasználó regisztrálása (v4+)</h4>
-<p>Az API-n keresztül lehetséges új miserend felhasználó regisztrálása is. A megfelelő url-re JSON formátumban küldött adatok esetén JSON választ ad a rendszer.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/signup</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„username”: a felhasználó regisztrált neve. (Maximum 20 karakter. Ékezetek és speciális karakterek nélkül.)</li>
-    <li>„email”: a felhasználó email címe. (A regisztrációról értesítést kap.)</li>
-    <li>„password”: a jelszó egyszerű szövegként. (Jelenleg nincsen összetettségi követelmény.)</li>
-    <li>„nickname” (opcionális): Becenév vagy megszólítás.</li>
-    <li>„name” (opcionális): Teljes név.</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása. Ez olyan fontos üzeneteket tartalmazhat, mint hogy már foglalt a felhasználónév.</li>
-</ul>
-{% endset %}
-
-{% set User %}
-<h4>Felhasználó azonosítás (v4+)</h4>
-<p>Bizonyos API funkciókhoz szükséges (pl. kedvencek szinkronizálása) vagy lehetséges (pl. visszajelzés) a felhasználó azonosítása. A megfelelő url-re JSON formátumban küldött név-jelszó páros érvényessége esetén egy token-t küld vissza a rendszer JSON formátumban.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/login</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„username”: a felhasználó regisztrált neve (e-mail címmel nem működik)</li>
-    <li>„password”: a jelszó egyszerű szövegként (egyszer talán lesz https)</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„token” (<em>varchar(32)</em>): Az azonosításhoz szükséges token. Érvényességi ideje a <code>config.php</code>-ban van beállítva.</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
-</ul>
-{% endset %}
-
-{% set Login %}
-<h4>Felhasználó adatainak lekérdezése (v4+)</h4>
-<p>A megfelelő url-re JSON formátumban küldött token érvényessége esetén a rendszer JSON formátumban visszaküldi a felhasználó adatait.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/user</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„token”: egy érvényes token</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error": <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„username”: A felhasználó felhasználó neve. (Soha nem üres.)</li>
-    <li>„nickname”: Becenév vagy megszólítás. (Lehetséges, hogy üres.)</li>
-    <li>„name”: Teljes név. (Lehetséges, hogy üres.)</li>
-    <li>„email”: A felhasználó email címe. (Elvileg nem lehet üres.)</li>
-    <li>„favorites": A felhasználó kedvenc templomainak azonosítóinak listája/tömbje.</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása.</li>
-</ul>
-{% endset %}
-
-{% set Favorites %}
-<h4>Felhasználó kedvenc templomai (v4+)</h4>
-<p>A felhasználó kedven templomait le lehet kérdezni, valamint hozzá lehet adni vagy el lehet belőle venni a megfelelő url-re JSON formátumban küldött token érvényessége esetén. A rendszer JSON formátumban válaszol a kedvenc templomok megújult listájával. Először a hozzáadást hajtja végre, majd a törlést. Nem tér vissza hibajelzéssel, ha az adott templomazonosító már szerepel a kedvencek között. És akkor sem, ha olyan törlésére kerül sor, ami nem is szerepelt a kedvencek között.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/user/favorites</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„token”: egy érvényes token</li>
-    <li>„add” (opcionális): A kedvencekhez hozzáadni kívánt templomok azonosítójának listája/tömbje.</li>
-    <li>„remove” (opcionális): A kedvencekből törölni kívánt templomok azonosítójának listája/tömbje.</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„favorites": A felhasználó kedvenc templomainak azonosítóinak frissült listája/tömbje.</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
-</ul>
-{% endset %}
-
-{% set Report %}
-<h3>Visszajelzés / jelentés</h3>
-<p>Fontos, hogy a felhasználók tudják jelezni, ha valami hibát találnak a miserendben vagy a templom adataiban.<br>
-JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/report</code></p>
-<p><em>(Léteznek még más, többé-kevésbé működő url-ek is. pl.: <a href="http://terkep.miserend.hu/jelentes.php">itt</a> vagy <a href="http://miserend.hu/jelentes.php">itt</a> )</em></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„tid”: a templom azonosítója (mint az url-ben)</li>
-    <li>„text” (opcionális; „pid:2” esetén kötelező): szöveges üzenet</li>
-    <li>„timestamp” (opcionális): a beküldés időpontja (hiánya esetén aktuális pillanat)</li>
-    <li>„email” (opcionális): a beküldő email címe, hogy tudjunk neki válaszolni</li>
-    <li>„token” (opcionális) (v4+): bejelentkezett felhasználó esetén hasznos. Felülírja a „email” értéket.</li>
-    <li>„pid”: visszajelzés típus:
-        <ul>
-            <li><strong>0</strong>: rossz pozíció</li>
-            <li><strong>1</strong>: hibás mise adatok</li>
-            <li><strong>2</strong>: egyéb / ill. előbbiek részletezve</li>
-        </ul>
-    </li>
-    <li>„dbdate” (≤v3: opcionális, v4+: kötelező): a használt adatbázis letöltöttségének ideje, timestamp vagy ÉÉÉÉ-HH-NN ÓÓ:PP:MM vagy ÉÉÉÉ-HH-NN.</li>
-</ul>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
-</ul>
-{% endset %}
-
-{% set ReportByAnonym  %}
-Lásd: <a href="#report">Report</a>
-{% endset %}
-
-{% set ReportByUser  %}
-Lásd: <a href="#report">Report</a>
-{% endset %}
-
-{% set Upload %}
-<h3>Fénykép feltöltése templomokhoz (v4+)</h3>
-<p>Lehetséges fénykép beküldése bármelyik templomhoz. A beküldött képek jelenleg azonnal megjelennek a honlapon. Ez változhat majd, hogy nem regisztrált felhasználóknak csak jóváhagyás után jelenik meg a fényképük. JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
-<p><strong>Fontos</strong> felhívni a beküldő figyelmét, hogy a fénykép feltöltésével <strong>a)</strong> a fotó jogos tulajdonosának jelenti ki magát <strong>b)</strong> a kép felhasználói jogait teljesen (de nem kizárólagosan) átadja a miserend.hu-nak (és a hozzá tartozó alkalmazásoknak).</p>
-<p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/upload</code></p>
-<h5>Küldés:</h5>
-<ul>
-    <li>„tid”: a templom azonosítója (mint az url-ben)</li>
-    <li>„photo”: a fénykép fájl streamje base64 kódolású stringben a megfelelő <code>data:image/jpeg;base64,</code> előtaggal. PHP-ban ez így állítható elő: </li>
-</ul>
-<pre><code class="language-php">$photo = 'data:'.$_FILES['fileToUpload']['type'].';base64,'.base64_encode(file_get_contents($_FILES['fileToUpload']['tmp_name']));
-</code></pre>
-<p>A kép formátuma lehet <code>image/jpg</code>, <code>image/jpeg</code>, <code>image/gif</code>, <code>image/png</code>. Van felső méret korlát is.</p>
-<h5>Válasz:</h5>
-<ul>
-    <li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
-    <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
-</ul>
-{% endset %}
-
-{# --- További tartalom, pl. dinamikus meghívás --- #}
-
 {% block content %}
 
 <p>Az aktuális API verzió az <strong>API v4</strong>. Az API v3 még támogatott, de kevesebb/pontatlanabb adatokat tartalmaz a misékről. A már nem támogatott API verziók mindenre a „2” szöveges értékkel tér vissza.</p>
@@ -264,7 +15,7 @@ Lásd: <a href="#report">Report</a>
     {% for endpoint in endpoints %}
         <li>
             <a href="#{{ endpoint.name|lower|replace({' ': '-'}) }}">
-                {{ endpoint.name }}
+                {{ endpoint.name }}{% if endpoint.title is defined and endpoint.title != endpoint.name %}: {{ endpoint.title }}{% endif %}
             </a>
         </li>
     {% endfor %}
@@ -290,6 +41,7 @@ Lásd: <a href="#report">Report</a>
         <div class="endpoint-input">
             <h5>Küldés:</h5>
             {% if endpoint.input is defined and endpoint.input is iterable %}
+                {% if endpoint.input|length > 0 %}
                 <table class="endpoint-input-table table table-striped table-bordered">
                     <thead>
                         <tr>
@@ -312,6 +64,9 @@ Lásd: <a href="#report">Report</a>
                         {% endfor %}
                     </tbody>
                 </table>
+                {% else %}
+                    <i>Nincs küldendő adat.</i>
+                {% endif %}
             {% elseif endpoint.input is defined and endpoint.input %}
                 {{ endpoint.input|raw }}
             {% else %}
