@@ -44,6 +44,9 @@ class Html {
 
 		$loader = new \Twig\Loader\FilesystemLoader(PATH . $this->templatesPath);
 		$this->twig = new \Twig\Environment($loader); //cache:
+        include_once('twig_extras.php');
+        $this->twig->addFilter(new \Twig\TwigFilter('miserend_date', 'twig_hungarian_date_format'));
+        // DANGER: a twig declarálva van / meg van hívva a Load.php -ban is. Így ott is módosítani kellhet a filterket
 
     }
 
