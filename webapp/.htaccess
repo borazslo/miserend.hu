@@ -30,9 +30,7 @@
     RewriteRule ^api/v([0-9]{1,4})/church(/|)$ /index.php?q=api&action=church&v=$1 [NC,QSA]
 	RewriteRule ^api/v([0-9]{1,4})/database(/|)$ /index.php?q=api&action=database&v=$1 [NC,QSA]
     RewriteRule ^api/v([0-9]{1,4})/lorawan(/|)$ /index.php?q=api&action=lorawan&v=$1 [NC,QSA]
-
-    RewriteRule ^api/ https://github.com/borazslo/miserend.hu/wiki/API [NC]
-
+        
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^([^?]*)$ /index.php?q=$1 [NC,L,QSA]
