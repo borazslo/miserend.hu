@@ -33,7 +33,7 @@ class ApiDocs extends Html {
         }
         
 
-        //printr($this->endpoints);
+        
         return;
     }
 
