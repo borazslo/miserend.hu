@@ -30,8 +30,8 @@
     		<th class="col-md-3">Felhasználónév / Név</th>
                 <th class="col-md-3">Email</th>
                 <th class="col-md-1"><img src="/img/templom1.gif" title="Ellátott templomok száma"></th>
-				<th class="col-md-1"><span class="ui-icon ui-icon-star" title="Kedvenc templomok száma">
-				<th class="col-md-1"><span class="ui-icon ui-icon-comment" title="Email üzenetküldés engedélyezve">
+				<th class="col-md-1"><span class="{{ ICONS_FAVORITE }}" title="Kedvenc templomok száma">
+				<th class="col-md-1"><span class="fa-solid fa-message" title="Email üzenetküldés engedélyezve">
                 </span></th>
     		<th class="col-md-3">{{ field }}</th>
     		<th class="col-md-1"><span class="fa {{ ICONS_DELETE }}" aria-hidden="true" style=""></span></th>
@@ -56,9 +56,9 @@
 				</td>								
 				<td>
 					{% if user.notifications %}
-						<span class="ui-icon ui-icon-radio-on" title="Email üzenetküldés engedélyezve">
+						<span class="fa-regular fa-circle-dot" title="Email üzenetküldés engedélyezve">
 					{% else %}
-						<span class="ui-icon ui-icon-radio-off" title="Email üzenetküldés NINCS engedélyezve">
+						<span class="fa-regular fa-circle" title="Email üzenetküldés NINCS engedélyezve">
 					{% endif %}
 				</td>
                                 <td>
