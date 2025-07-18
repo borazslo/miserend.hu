@@ -1,0 +1,54 @@
+{# templates/macros/icons.twig #}
+
+{# Requires css/icons.css for proper styling #}
+
+{% macro icon(name, classes = '') %}
+
+    {% set baseClass2 = 'fas fa-' ~ name %}
+    {% set baseClass = name %}
+
+    {% set isUncertain = 'uncertain' in classes %}
+    {% set isPartially = 'partially' in classes %}
+    {% set isCertain = 'certain' in classes %}
+    {% set isCrossed = 'crossed' in classes %}
+
+    {% set cleanedClasses = classes|replace({'certain': '', 'crossed': '', 'uncertain': '', 'partially': ''})|trim %}
+
+    {% if isUncertain %}
+        <span class="fa-stack fa-fw {{ cleanedClasses }}">
+            <i class="fa-regular fa-square fa-stack-2x "></i>
+            <i class="fa-solid {{ baseClass }} fa-stack-1x" style="opacity:0.5"></i>
+            <i class="fa-regular fa-circle-question fa-stack-1x white"></i>
+            <i class="fa-solid fa-circle-question fa-stack-1x blue"></i>
+        </span>
+    {% elseif isPartially %}
+        <span class="fa-stack icon-half-inverse {{ cleanedClasses }}" >
+            <i class="fa-solid fa-square fa-stack-2x half normal yellow"></i>
+            <i class="fa-solid fa-square fa-stack-2x half inverse grey"></i>
+            <i class="fa-solid {{ baseClass }} fa-stack-1x half normal grey" ></i>
+            <i class="fa-solid {{ baseClass }} fa-stack-1x half inverse" style="color:yellow"></i>
+            <i class="fa-regular fa-square fa-stack-2x "></i>
+        </span>
+    {% elseif isCertain %}
+        <span class="fa-stack fa-fw {{ cleanedClasses }}">
+            <i class="fa-solid fa-square fa-stack-2x green"></i>
+            <i class="fa-regular fa-square fa-stack-2x "></i>
+            <i class="fa-solid {{ baseClass }} fa-stack-1x white"></i>
+        </span>
+    {% elseif isCrossed %}
+        <span class="fa-stack fa-fw {{ cleanedClasses }}">
+	        <i class="fa-regular fa-square fa-stack-2x "></i>
+            <i class="fa-solid {{ baseClass }} fa-stack-1x "></i>
+            <i class="fa-solid fa-xmark fa-stack-1x red"></i>
+        </span>
+
+    {% else %}
+        <span class="fa-stack fa-fw {{ cleanedClasses }}">
+	        <i class="fa-regular fa-square fa-stack-2x "></i>
+            <i class="fa-solid {{ baseClass }} fa-stack-1x "></i>            
+        </span>
+    {% endif %}
+
+
+  
+{% endmacro %}
