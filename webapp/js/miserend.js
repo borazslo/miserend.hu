@@ -313,3 +313,14 @@ $(document).ready(function() {
   
 /* */
 });
+
+
+	function OpenNewWindow(url, x, y) {
+      var options = "toolbar=no,menubar=no,scrollbars=no,resizable=yes,width=" + x + ",height=" + y;
+      msgWindow=window.open(url,"", options);
+	}
+
+	function OpenScrollWindow(url, x, y) {
+      var options = "toolbar=no,menubar=no,scrollbars=yes,resizable=yes,width=" + x + ",height=" + y;
+      msgWindow=window.open(url,"", options);
+	}
