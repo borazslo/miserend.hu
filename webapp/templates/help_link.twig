@@ -1,7 +1,7 @@
+{% import 'macros/icons.twig' as icons %}
 <span 
     title="Súgó" 
-    onClick="OpenNewWindow('/help/{{ id }}',200,300);" 
-    class="grey glyphicon 
-    glyphicon-question-sign" 
+    onClick="OpenNewWindow('/help/{{ id }}',200,300);"      
     aria-hidden="true">
+    {{ icons.icon(ICONS_HELP, 'circle fa-2xs') }}
 </span>

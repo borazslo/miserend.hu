@@ -35,10 +35,10 @@ $(document).ready(function() {
             url: url,
             success: function( data ) {
               console.log(data);
-              ezez.html('<span title="' + data + '" class="glyphicon glyphicon-ok green"></span>');
+              ezez.html('<span title="' + data + '" class="fa-solid fa-check green"></span>');
             },
             error: function( data ) {
-              ezez.html('<span class="glyphicon glyphicon-remove red"></span>');
+              ezez.html('<i class="fa-solid fa-xmark red"></i>');
             }
           });
     return false;
@@ -82,24 +82,24 @@ $(document).ready(function() {
 
         $('#form_church_getdetails').on('click', function(e) {               
             $('#form_church_details').toggle('slow');
-            $('.form_church_details').toggle('slow');
-            $('#form_church_getdetails').toggleClass('glyphicon-minus-sign glyphicon-plus-sign');
+            $('.form_church_details').toggle('slow');            
+            $('#form_church_getdetails').find('.fa-minus, .fa-plus').toggleClass('fa-minus fa-plus');
         });
 
     $('#form_mass_getdetails').on('click', function(e) {                 
-            $('#form_mass_details').toggle('slow');
-            $('#form_mass_getdetails').toggleClass('glyphicon-minus-sign glyphicon-plus-sign');            
+            $('#form_mass_details').toggle('slow');            
+            $('#form_mass_getdetails').find('.fa-minus, .fa-plus').toggleClass('fa-minus fa-plus');
         });
 
 
     $('#password2').on('input', function() { 
         if($('#password1').val() != $(this).val() || $(this).val() == '') {
-              $('#password2').parent().find('.form-control-feedback').addClass("glyphicon-warning-sign").removeClass("glyphicon-ok");
+              $('#password2').parent().find('.form-control-feedback').addClass("fa-triangle-exclamation").removeClass("fa-solid fa-check");
               $('#password2').parent().addClass("has-error").removeClass("has-success");
 
               //$('#passwordcheck').attr("title","A két jelszó nem egyezik!");
         } else {
-              $('#password2').parent().find('.form-control-feedback').removeClass("glyphicon-warning-sign").addClass("glyphicon-ok");
+              $('#password2').parent().find('.form-control-feedback').removeClass("fa-triangle-exclamation").addClass("fa-check");
               $('#password2').parent().removeClass("has-error").addClass("has-success");
 
               //$('#password2').parent().find('.form-control-feedback').attr("title","Minden rendben!");
@@ -107,12 +107,12 @@ $(document).ready(function() {
     });
     $('#password1').on('input', function() { 
         if($('#password2').val() != $(this).val() || $(this).val() == '') {
-              $('#password2').parent().find('.form-control-feedback').addClass("glyphicon-warning-sign").removeClass("glyphicon-ok");
+              $('#password2').parent().find('.form-control-feedback').addClass("fa-triangle-exclamation").removeClass("fa-check");
               $('#password2').parent().addClass("has-error").removeClass("has-success");
 
               //$('#passwordcheck').attr("title","A két jelszó nem egyezik!");
         } else {
-              $('#password2').parent().find('.form-control-feedback').removeClass("glyphicon-warning-sign").addClass("glyphicon-ok");
+              $('#password2').parent().find('.form-control-feedback').removeClass("fa-triangle-exclamation").addClass("fa-check");
               $('#password2').parent().removeClass("has-error").addClass("has-success");
 
               //$('#passwordcheck').attr("title","Minden rendben!");
@@ -129,10 +129,10 @@ $(document).ready(function() {
             },
             success: function( data ) {
               if(data == 0) {
-                $('#username').parent().find('.form-control-feedback').addClass("glyphicon-warning-sign").removeClass("glyphicon-ok");
+                $('#username').parent().find('.form-control-feedback').addClass("fa-triangle-exclamation").removeClass("fa-check");
                 $('#username').parent().addClass("has-error").removeClass("has-success");
               } else {
-                $('#username').parent().find('.form-control-feedback').removeClass("glyphicon-warning-sign").addClass("glyphicon-ok");
+                $('#username').parent().find('.form-control-feedback').removeClass("fa-triangle-exclamation").addClass("fa-check");
                 $('#username').parent().removeClass("has-error").addClass("has-success");
               }
               console.log(data);

@@ -580,22 +580,22 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             }
 
             if ($this->ok == 'n')
-                $jelzes.=" <i class='fa fa-ban fa-lg' title='Nem engedélyezett!' style='color:red'></i> ";
+                $jelzes.=" <i class='fa fa-ban fa-lg red' title='Nem engedélyezett!' ></i> ";
             elseif ($this->ok == 'f')
                 $jelzes.=" <img src=/img/ora.gif title='Feltöltött/módosított templom, áttekintésre vár!' align=absmiddle> ";
 
             if($this->ok == 'i' AND $this->miseaktiv == 1) {
                 $updatedTime = strtotime($this->frissites);
                 if($updatedTime < strtotime("-10 years")) {
-                    $jelzes.=" <i class='fa fa-exclamation-triangle fa-lg' title='Több mint 10 éves adatok!' style='color:red'></i> ";
+                    $jelzes.=" <i class='fa fa-exclamation-triangle fa-lg red' title='Több mint 10 éves adatok!' > </i> ";
                 } elseif ($updatedTime < strtotime("-5 year")) {
-                    $jelzes.=" <i class='fa fa-exclamation fa-lg' title='Több mint öt éves adatok!' style='color:red'></i> ";
+                    $jelzes.=" <i class='fa fa-exclamation fa-lg red' title='Több mint öt éves adatok!'> </i> ";
                 } 
             }
             if($this->lat <= 0 OR $this->lon <= 0)
-                $jelzes .= '<span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" style="color:red" title="Nincsen koordináta!"></span>';
+                $jelzes .= '<span class="fa fa-map-marker" aria-hidden="true" style="color:red" title="Nincsen koordináta!"></span>';
             if($this->osmid == '' OR $this->osmtype == '')
-                $jelzes .= '<span class="glyphicon glyphicon glyphicon-map-marker" aria-hidden="true" style="color:grey" title="OSM adat hiányzik még"></span>';
+                $jelzes .= '<span class="fa fa-map-marker" aria-hidden="true" style="color:grey" title="OSM adat hiányzik még"></span>';
             return $jelzes;
     }
 

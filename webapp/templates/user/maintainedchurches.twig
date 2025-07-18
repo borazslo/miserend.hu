@@ -5,30 +5,50 @@
     <table class="table table-hover table-condensed table-striped">
         <tr>
             <th class="col-md-1"></th>
-            <th class="col-md-7">Misézőhely neve (és városa)</th>
-            <th class="col-md-1"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése"></span></th>
-            <th class="col-md-1"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="Templom szerkesztése"></span></th>
-            <th class="col-md-1"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Templom lapjának megtekintése"></span></th>
-            <th class="col-md-1"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom és miserendje törlése"></span></th>
+            <th class="col-md-5">Misézőhely neve (és városa)</th>
+            <th class="col-md-1"><i class="{{ ICONS_REMARKS_NEW }}" title="Észrevételek kezelése"></i></th>
+			<th class="col-md-1"><i class="{{ ICONS_CHURCH_EDIT }}" title="Templom szerkesztése"></i></th>			
+			<th class="col-md-1"><i class="{{ ICONS_CHURCH_OSM }}" title="Templom OSM adatainak szerkesztése"></i></th>			
+            <th class="col-md-1"><i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése"></i></th>            
+            <th class="col-md-1"><i class="{{ ICONS_CHURCH_SEE }}" title="Templom lapjának megtekintése"></i></th>			
+            <th class="col-md-1"><i class="{{ ICONS_DELETE }}" title="Templom és miserendje törlése"></i></th>
         </tr>
         {% for church in churches %}
             <tr>
                 <td>{{ church.remarksStatus.html|raw }}</td>
                 <td>
-                    <a href="/templom/{{ church.id }}/edit" title='{{ church.alternative_names.0 }}'><strong>{{ church.names.0 }}</strong> ({{ church.varos }})
+                    <a href="/templom/{{ church.id }}/edit" title='{{ church.alternative_names.0 }}'>
+                        <strong>{{ church.names.0 }}</strong> ({{ church.varos }})
+                    </a>
+                </td>
+				<td>
+					<a href="javascript:OpenScrollWindow('/templom/{{ church.id }}/eszrevetelek',550,500);">
+						<i class='{{ _context[church.remarksicon] }}' style='font-size:medium'  	title='{{ church.remarksStatusText }}'></i></a>
+					</td>                
+                <td>
+                    <a href="/templom/{{ church.id }}/edit">
+                        <i class="{{ ICONS_CHURCH_EDIT }}" title="A templom adatainak szerkesztése."></i>
                     </a>
                 </td>
                 <td>
-                    <a href="/templom/{{ church.id }}/editschedule"><span class="glyphicon glyphicon-time" aria-hidden="true" title="Miserend szerkesztése..."></span></a>
+                    <a href="/templom/{{ church.id }}/editosm">
+                        <i class="{{ ICONS_CHURCH_OSM }}" title="A templomnak az Open Street Map adatbázisban megtalálható adatainak szerkesztése."></i>
+                    </a>
+                </td>				
+				<td>
+                    <a href="/templom/{{ church.id }}/editschedule">
+                        <i class="{{ ICONS_MASSSCHEDULE }}" title="Miserend szerkesztése..."></i>
+                    </a>
                 </td>
                 <td>
-                    <a href="/templom/{{ church.id }}/edit"><span class="glyphicon glyphicon-edit" aria-hidden="true" title="A templom adatainak szerkesztése."></a>
-                </td>
-                <td>
-                    <a href="/templom/{{ church.id }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true" title="Ugrás a templom oldalára."></span></a>
+                    <a href="/templom/{{ church.id }}">
+                        <i class="{{ ICONS_CHURCH_SEE }}" title="Ugrás a templom oldalára."></i>
+                    </a>
                 </td>				
                 <td>
-                    <a href="/templom/{{ church.id }}/delete" class="red"><span class="glyphicon glyphicon-trash" aria-hidden="true" title="Templom törlése..."></span></a>
+                    <a href="/templom/{{ church.id }}/delete" class="red">
+                        <i class="{{ ICONS_DELETE }}" title="Templom törlése..."></i>
+                    </a>
                 </td>
             </tr>
         {% endfor %}
