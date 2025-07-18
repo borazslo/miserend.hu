@@ -1,0 +1,29 @@
+/* 
+ * This function/template is used by the 'templates/macros/icons.twig' file.
+ */
+
+.icon-half-inverse {
+  position: relative;
+  display: inline-block;
+  
+}
+
+.icon-half-inverse .half {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.icon-half-inverse .normal {
+  mask-image: linear-gradient(to right, black 50%, transparent 0);
+  -webkit-mask-image: linear-gradient(to right, black 50%, transparent 0);
+}
+
+.icon-half-inverse .inverse {
+   mask-image: linear-gradient(to left, rgb(142, 117, 250) 50%, transparent 0);
+  -webkit-mask-image: linear-gradient(to left, rgb(31, 28, 233) 50%, transparent 0);
+}
+
+

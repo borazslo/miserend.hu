@@ -39,29 +39,29 @@
 		</td>
     	<td valign=top style="padding:3px">
     	<div>
-    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.login }}){% if remark.user.volunteer == 1 %}<span title="A felhasználó önkéntességet vállalt!" class="reliable ui-icon ui-icon-star yellow" style="float:right">{% endif %}&nbsp;</span><br/><small>{{ remark.created_at }}</small></h5></div>
+    		<div style="float:left"><h5 style="margin:0px">{{ remark.nev }} ({{ remark.login }}){% if remark.user.volunteer == 1 %}<span title="A felhasználó önkéntességet vállalt!" class="reliable {{ ICONS_SPECIAL }} yellow" style="float:right">{% endif %}&nbsp;</span><br/><small>{{ remark.created_at }}</small></h5></div>
     		{% if remark.email %}
 
 				<div class="dropdown" style="float:left;margin-right:3px">
 				  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{ remark.id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="line-height:10px">
-					<span class="ui-icon ui-icon-mail-closed" style="color:#B51A7E;float:left"></span>
+					<span class="far fa-envelope" style="color:#B51A7E;float:left"></span>
 				  </button>
 				  <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{ remark.id }}">
-				      <li><a href="/remark/{{ remark.id }}/feedback"  class="alap dropdown-item"><span class="ui-icon ui-icon-mail-closed" style="float:left;margin-right:3px;color:#B51A7E"></span> {{ remark.email }}...</a></li>
-				      <li><a href="/remark/{{ remark.id }}/feedback?type=koszonet" class="alap dropdown-item"><span class="ui-icon ui-icon-heart" style="float:left;margin-right:3px;color:#ff0000"></span> Köszönet írása...</a></li>
-				      <li><a href="/remark/{{ remark.id }}/feedback?type=plebaniara" class="alap dropdown-item"><span class="ui-icon ui-icon-arrowreturnthick-1-w" style="float:left;margin-right:3px" class="grey"></span> Plébániára irányítás...</a></li>
-				      <li><a href="/remark/{{ remark.id }}/feedback?type=android" class="alap dropdown-item"><span class="ui-icon ui-icon-alert" style="float:left;margin-right:3px" class="lightgrey"></span> Frissítés androidon...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback"  class="alap dropdown-item"><span class="far fa-envelope" style="float:left;margin-right:3px;color:#B51A7E"></span> {{ remark.email }}...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=koszonet" class="alap dropdown-item"><span class="fa-solid fa-heart" style="float:left;margin-right:3px;color:#ff0000"></span> Köszönet írása...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=plebaniara" class="alap dropdown-item"><span class="fa-solid fa-reply" style="float:left;margin-right:3px" class="grey"></span> Plébániára irányítás...</a></li>
+				      <li><a href="/remark/{{ remark.id }}/feedback?type=android" class="alap dropdown-item"><span class="fa-solid fa-triangle-exclamation" style="float:left;margin-right:3px" class="lightgrey"></span> Frissítés androidon...</a></li>
 				  </ul>
 				</div>
     		{% else %}
-    			<!--<strong><span class="ui-icon ui-icon-mail-closed lightgrey" title="Nincs elérhető email cím." style="float:right;margin-left:3px;margin-right:3px"></span></strong>-->
+    			<!--<strong><span class="far fa-envelope lightgrey" title="Nincs elérhető email cím." style="float:right;margin-left:3px;margin-right:3px"></span></strong>-->
     		{% endif %}</span>
 
     		{% if remark.email or remark.login != "*vendeg*" %}
 	    		<div data-email="{{ remark.email }}" data-rid="{{ remark.id }}" title="A beküldő megbízhatósága állítható egyetlen kattintással: megbízható, nem megbízható vagy nem tudjuk.">
 	    			<button  type="button" class="btn btn-default" style="padding:6px">
-	    				<span class="reliable ui-icon ui-icon-alert alert {% if remark.megbizhato == 'n' %}red{% else %}lightgrey{% endif %}" style="float:right"></span>
-						<span class="reliable ui-icon ui-icon-check check {% if remark.megbizhato == 'i' %}green{% else %}lightgrey{% endif %}" style="float:left"></span>
+	    				<span class="reliable fa-solid fa-triangle-exclamation alert {% if remark.megbizhato == 'n' %}red{% else %}lightgrey{% endif %}" style="float:right"></span>
+						<span class="reliable fa-solid fa-check check {% if remark.megbizhato == 'i' %}green{% else %}lightgrey{% endif %}" style="float:left"></span>
 					</button>
 				</div>
 			{% endif %}

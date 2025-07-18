@@ -10,10 +10,10 @@
                                 console.log(e.feature);
                                 if (typeof e.feature.attributes['url:miserend'] !== "undefined") {
                                     var html = '<div class="alert alert-success alert-dismissible" role="alert" style="padding:8px;margin-bottom:8px">' +
-                                            '<span class="ui-icon ui-icon-check green" style="float:left;margin-right:5px"></span>';
+                                            '<span class="fa-solid fa-check green" style="float:left;margin-right:5px"></span>';
                                 } else {
                                     var html = '<div class="alert alert-warning alert-dismissible" role="alert" style="padding:8px;margin-bottom:8px">' +
-                                            '<span class="ui-icon ui-icon-alert red" style="float:left;margin-right:5px"></span>';
+                                            '<span class="fa-solid fa-triangle-exclamation red" style="float:left;margin-right:5px"></span>';
                                 }
                                 html += '<span class="alap">' +
                                         '<a href="https://www.openstreetmap.org/' + e.feature.fid.replace(".", "/") + '" target="_blank">[OSM]</a> ' +

@@ -2,18 +2,18 @@
 		{% set icon = 'check' %}
 		{% set color = 'green' %}			
 	{% elseif message.severity == 'info' %}
-		{% set icon = 'info' %}
+		{% set icon = 'circle-info' %}
 		{% set color = 'blue' %}			
 	{% elseif message.severity == 'warning' %}
-		{% set icon = 'alert' %}
+		{% set icon = 'triangle-exclamation' %}
 		{% set color = 'red' %}			
 	{% elseif message.severity == 'danger' %}
-		{% set icon = 'alert' %}
+		{% set icon = 'triangle-exclamation' %}
 		{% set color = 'red' %}			
 	{% endif %}
 
 <div class="alert alert-{{ message.severity }} alert-dismissible" role="alert" style="padding:8px;margin-bottom:8px">
-	<span class="ui-icon ui-icon-{{ icon }} {{ color }}" style="float:left;margin-right:5px"></span>
+	<span class="fa-solid fa-{{ icon }} {{ color }}" style="float:left;margin-right:5px"></span>
 	<span class="alap">{{ message.text|raw }}</span>
 
 </div>

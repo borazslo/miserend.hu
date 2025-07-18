@@ -19,6 +19,10 @@
 {% set ICONS_REMARKS_ALLDONE = 'far fa-envelope-open' %}
 {% set ICONS_REMARKS_PROCESSING = 'fa fa-envelope-open-text' %}
 {% set ICONS_REMARKS_NEW = 'fa fa-envelope' %}
+{% set ICONS_HELP = 'fa-question' %}
+{% set ICONS_SPECIAL = 'fa fa-star' %}
+{% set ICONS_FAVORITE = 'fa-solid fa-star' %}
+{% set ICONS_NON_FAVORITE = 'fa-regular fa-star' %}
 
 
 <html lang="hu">
@@ -51,10 +55,9 @@
         <link href="/css/style.css" rel="stylesheet">
         <link href="/css/icons.css" rel="stylesheet">
         <link href="/css/autocomplete.css" rel="stylesheet">
-
-        <link href="/css/jquery-ui.icon-font.css" rel="stylesheet" type="text/css" />
+        
         <link rel="stylesheet" href="/css/colorbox.css" />
-        <link rel="stylesheet" href="/css/als.css" />
+        
         
 
 
@@ -72,8 +75,7 @@
 		<link rel="stylesheet" href="/node_modules/jquery-ui/dist/themes/smoothness/jquery-ui.min.css" />
 		<script src="/node_modules/jquery/dist/jquery.min.js"></script>
 		<script src="/node_modules/jquery-ui/dist/jquery-ui.min.js"></script>
-        
-        <!--<script src="/js/als/jquery.als-1.5.min.js"></script>-->
+                
 		
 		<!--
         <script src="/node_modules/jquery-ui/ui/autocomplete.js"></script>
@@ -84,7 +86,7 @@
         <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
         <script src="/js/miserend.js"></script>
-        <script src="/js/somethingidontknow.js"></script>
+        
 
         {% block extraHead %}{% endblock %}
     </head>
