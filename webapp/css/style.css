@@ -1,3 +1,7 @@
+
+@import "/node_modules/@fortawesome/fontawesome-free/css/all.css";
+
+
 img {max-width: 100%;max-height: 100%;}
 .nopadding {padding: 0;}
 
@@ -62,11 +66,13 @@ span.toggle.active {
 .lightgrey { color: #E0E0E0;}
 .green { color: #008000;}
 .blue { color: blue;}
+.lightgreen { color: #6edc7a; }
 
 
 .tooltip{
     font-size: 14px;
 }
+
 
 #formschedule select.form-control,
 #formschedule input.form-control {
