@@ -94,7 +94,7 @@ $(document).ready(function() {
 
     $('#password2').on('input', function() { 
         if($('#password1').val() != $(this).val() || $(this).val() == '') {
-              $('#password2').parent().find('.form-control-feedback').addClass("fa-triangle-exclamation").removeClass("fa-solid fa-check");
+              $('#password2').parent().find('.form-control-feedback').addClass("fa-solid fa-triangle-exclamation").removeClass("fa-solid fa-check");
               $('#password2').parent().addClass("has-error").removeClass("has-success");
 
               //$('#passwordcheck').attr("title","A két jelszó nem egyezik!");
