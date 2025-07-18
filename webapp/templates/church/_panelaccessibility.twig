@@ -1,10 +1,23 @@
 {% extends 'panel.twig' %}
 
-{% set title = "<i class='"  ~ ICONS_WHEELCHAIR ~ "'></i> Akadálymentesség" %}
+{% import 'macros/icons.twig' as icons %}
+
+{% if accessibility['wheelchair'] == 'yes' %}
+	{% set title = icons.icon(ICONS_WHEELCHAIR, 'certain') ~ ' Akadálymentes' %}
+{% elseif accessibility['wheelchair'] == 'no' %}
+	{% set title = icons.icon(ICONS_WHEELCHAIR, 'crossed') ~ 'Nem akadálymentes</span>' %}
+{% elseif accessibility['wheelchair'] == 'limited' %}
+	{% set title = icons.icon(ICONS_WHEELCHAIR, 'partially') ~ 'Részben akadálymentes</span>' %}
+{% else %}
+	{% set title = icons.icon(ICONS_WHEELCHAIR, 'uncertain') ~ 'Akadálymentes?' %}
+{% endif %}
+
 {% set panel = 'primary' %}
 {% set footer = true %}
+{% set collapsible = 'collapsed' %}
 
-{% block body %}
+{% block body %}	
+
 	{% if accessibility['wheelchair'] == 'yes' %} 
 		<p><strong>Teljesen</strong> akadálymentes: A bejáratnál, a templomtérben és a helyiségekben sincsenek lépcsők.</p>		
 	{% elseif accessibility['wheelchair'] == 'limited' %}

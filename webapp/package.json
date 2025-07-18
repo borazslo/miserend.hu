@@ -11,8 +11,8 @@
     "jquery-colorbox": "1.5.*",
     "composer": "*",
     "jqplot": "1.0.*",
-	"lightbox2": "2.*"
-
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "lightbox2": "2.*"
   },
   "config": {
     "unsafe-perm": true
