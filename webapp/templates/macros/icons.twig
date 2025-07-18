@@ -16,7 +16,7 @@
     {% set isSolid = 'solid' in classes %}
     
 
-    {% set cleanedClasses = classes|replace({'certain': '', 'crossed': '', 'uncertain': '', 'partially': ''})|trim %}
+    {% set cleanedClasses = classes|replace({'certain': '', 'crossed': '', 'uncertain': '', 'partially': '', 'circle': '', 'solid': ''})|trim %}
 
     {% set format = isCircle ? 'fa-circle' : 'fa-square' %}
 
