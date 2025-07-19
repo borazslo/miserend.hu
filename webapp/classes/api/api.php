@@ -64,4 +64,45 @@ class Api {
         }
     }
 
+    /**
+     * Összegyűjti az összes API endpoint osztály nevét.
+     * Azaz visszaadja a classes/api könyvtárban található összes PHP fájl által ténylegesen definiált osztály nevét (kivéve api.php).
+     *
+     * @return array Az endpoint osztályok nevei (string)
+     */
+    public static function collectApiEndpoints() {
+        $dir = __DIR__ . '/';
+        $files = scandir($dir);
+        $result = [];
+        foreach ($files as $file) {
+            if (substr($file, -4) === '.php' && $file !== 'api.php') {
+                $before = get_declared_classes();
+                include_once($dir . $file);
+                $after = get_declared_classes();
+                $new = array_diff($after, $before);
+                foreach ($new as $class) {
+                    $result[] = preg_replace('/^Api\\\/', '', $class);
+                }
+            }
+        }
+
+        // Az Api osztály nem külön endpoint, ezért kivesszük a listából
+        if (($key = array_search('Api', $result)) !== false) {
+            unset($result[$key]);
+            $result = array_values($result);
+        }
+
+        // A ReportByAnonym és ReportByUser osztályok nem külön endpointok, ezért kivesszük a listából
+        // TODO: máshogy megoldani, hogy ne kelljen kézzel frissíteni
+        $reportClasses = ['ReportByAnonym', 'ReportByUser'];
+        foreach ($reportClasses as $reportClass) {
+            if (($key = array_search($reportClass, $result)) !== false) {
+                unset($result[$key]);
+            }
+        }
+
+        sort($result);
+        return $result;
+    }
+
 }
