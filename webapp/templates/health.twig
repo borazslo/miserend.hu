@@ -57,23 +57,28 @@
 
 	<table class="table table-hover table-striped" style="table-layout: fixed; width: 100%;">
 		<tr>
-			<th class="col-2">name</th>
-			<th class="col-1">last_month</th>
 			<th class="col-3">testresult</th>
-			<th class="">testQuery</th>
+			<th>name</th>
+			<th class="col-1">last_month</th>
+			<th class="col-1">cache</th>			
 			
 		</tr>
 		{% for externalapi in externalapis %}
 			<tr>
-				<td>{{ externalapi.name }}</td>
+				<td class="{% if externalapi.testresult != 'OK' %}table-danger{% endif %}">
+					{% if externalapi.testresult == 'OK' %}
+						<span class="badge bg-success">OK</span>
+					{% else %}
+						{{ externalapi.testresult }}
+					{% endif %}
+				</td>
+				<td class="text-truncate">
+					<strong>{{ externalapi.name }}</strong><br/>
+					<a href="{{ externalapi.apiUrl }}">{{ externalapi.apiUrl }}</a>
+				</td>
 				<td style="text-align: center;">{{ externalapi.stat }}</td>
-				<td class="{% if externalapi.testresult != "OK" %}table-danger{% endif %}">{{ externalapi.testresult }}</td>
-				<td class="col-6 text-truncate" style="max-width: 50%;">
-					<a href="{{ externalapi.apiUrl }}{{ externalapi.testQuery }}">
-						{{ externalapi.testQuery }}
-					</a>
-				</td>								
-				
+				<td style="text-align: center;">{{ externalapi.cache }}</td>				
+											
 			</tr>
 		{% endfor %}
 	</table>
