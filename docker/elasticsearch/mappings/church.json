@@ -71,6 +71,22 @@
             },
             "location": {
                 "type": "geo_point"
+            },
+            "gyontatas": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "keyword"
+                    },
+                    "last_periods": {
+                        "type": "nested",
+                        "properties": {
+                            "start": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss" },
+                            "end": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": null },
+                            "duration": { "type": "integer" }
+                        }
+                    }
+                }
             }
         }
     }
