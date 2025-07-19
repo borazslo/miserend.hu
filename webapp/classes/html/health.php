@@ -131,8 +131,7 @@ class Health extends Html {
 			->select('name',DB::raw('SUM(count) count'))
 			->where('date','>',date('Y-m-d',strtotime('-1 month')))
 			->groupBy('name')->orderBy('date','asc')
-			->get();        
-			printr($results);
+			->get();        			
 		foreach($results as $result) {			
 			foreach ($this->externalapis as $key => &$api) {
 				if (strtolower($key) === $result->name . "api") {
