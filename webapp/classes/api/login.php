@@ -19,7 +19,7 @@ class Login extends Api {
             'password' => [
                 'required',
                 'string',
-                'A felhasználó jelszava (egyszerű szövegként, egyszer talán lesz https)'
+                'A felhasználó jelszava'
             ]
         ];
 
