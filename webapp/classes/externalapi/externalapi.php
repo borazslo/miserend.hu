@@ -279,7 +279,7 @@ class ExternalApi {
         $files = scandir($dir);
         $result = [];
         foreach ($files as $file) {
-            if (substr($file, -4) === '.php' && $file !== 'api.php') {
+            if (substr($file, -4) === '.php' && $file !== 'externalapi.php') {
                 $before = get_declared_classes();
                 include_once($dir . $file);
                 $after = get_declared_classes();
