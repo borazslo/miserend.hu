@@ -104,10 +104,6 @@ class Health extends Html {
 				$this->externalapis[$apiToTest]['apiUrl'] = $externalapi->apiUrl ;
 				$this->externalapis[$apiToTest]['cache'] = $externalapi->cache ;
 				
-				if( $externalapi->enable !== true OR $externalapi->name == 'solr' OR $externalapi->name == 'solr') {
-					$this->externalapis[$apiToTest]['testresult'] = 'Nincs engedélyezve';
-					continue;
-				}
 				if(!method_exists($externalapi,'test')) 
 					throw new \Exception('Hiányzik a tesztelő függvény!');
 				
