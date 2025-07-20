@@ -104,6 +104,20 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		
 		return true;
 	}
+
+	function deleteIndex($name) {
+		
+		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"DELETE");		
+		$this->buildQuery($name);
+		$this->run();
+
+		if($this->responseCode != 200)
+			return false;
+		if(!isset($this->jsonData->acknowledged) OR $this->jsonData->acknowledged != 1)
+			return false;
+		
+		return true;
+	}
 	
 	function putBulk($data) {	
 		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"PUT");		
@@ -252,6 +266,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		
 		$elastic = new \ExternalApi\ElasticsearchApi();
 		
+		$elastic->deleteIndex('churches'); // Először töröljük az indexet, ha létezik. Ez nem baj, mert a putIndex úgyis létrehozza újra.
 		// Megnézzük, hogy létezik-e már a churches index és ha nem, akkor létrehozzuk
 		if(!$elastic->isexistsIndex('churches')) {
 						
@@ -281,6 +296,9 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		foreach ($churches as $index => $church) {
 			unset($churches[$index]['adoraciok']);
 			unset($churches[$index]['miserend_deprecated']);
+			if($churches[$index]['gyontatas'] == null) {
+				$churches[$index]['gyontatas'] = [];
+			}
 		}
 
 		// Truncate the index

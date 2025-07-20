@@ -87,7 +87,8 @@ class Health extends Html {
 		$this->cronjobs = \Eloquent\Cron::orderBy('deadline_at','DESC')->get()->toArray();
 		
 		// Health of ExternalApis
-		$apisToTest = ['breviarskapi','liturgiatvapi','kozossegekapi','mapquestapi','openinghapi','openstreetmapapi','overpassapi','nominatimapi','elasticsearchapi'];		
+		$this->externalapis = [];		
+		$apisToTest = \ExternalApi\ExternalApi::collectExternalApis();
 		foreach($apisToTest as $apiToTest) {
 			$this->externalapis[$apiToTest] = ['name' => $apiToTest, 'stat' => 0];
 			
@@ -100,6 +101,13 @@ class Health extends Html {
 				
 				$externalapi = new $className();
 				
+				$this->externalapis[$apiToTest]['apiUrl'] = $externalapi->apiUrl ;
+				$this->externalapis[$apiToTest]['cache'] = $externalapi->cache ;
+				
+				if( $externalapi->enable !== true OR $externalapi->name == 'solr' OR $externalapi->name == 'solr') {
+					$this->externalapis[$apiToTest]['testresult'] = 'Nincs engedélyezve';
+					continue;
+				}
 				if(!method_exists($externalapi,'test')) 
 					throw new \Exception('Hiányzik a tesztelő függvény!');
 				
@@ -108,8 +116,7 @@ class Health extends Html {
 				if($testresult !== true) 
 					throw new \Exception($testresult);
 				
-				$this->externalapis[$apiToTest]['apiUrl'] = $externalapi->apiUrl ;
-				$this->externalapis[$apiToTest]['testQuery'] = $externalapi->rawQuery;
+				
 								
 				$this->externalapis[$apiToTest]['testresult'] = 'OK';
 			}
@@ -124,10 +131,14 @@ class Health extends Html {
 			->select('name',DB::raw('SUM(count) count'))
 			->where('date','>',date('Y-m-d',strtotime('-1 month')))
 			->groupBy('name')->orderBy('date','asc')
-			->get();        
+			->get();        			
 		foreach($results as $result) {			
-			if(array_key_exists($result->name."api", $this->externalapis))
-				 $this->externalapis[$result->name."api"]['stat'] = $result->count; 							 								 
+			foreach ($this->externalapis as $key => &$api) {
+				if (strtolower($key) === $result->name . "api") {
+					$api['stat'] = $result->count;
+					break;
+				}
+			}
 		}
 		
 		// Health of Mailing

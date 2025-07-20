@@ -11,6 +11,7 @@ class ExternalApi {
     public $queryTimeout = 30;
     public $query;
     public $name = 'external';
+    public $enable = true; // A külső API-t csak akkor engedélyezzük, ha a külső API elérhető és működik.
 	public $format = 'json'; // enum('json','xml')
 	public $strictFormat = true; // if rawData not in XML/JSON format throw new \Exception
 	private $curl_opts = [];
@@ -267,6 +268,38 @@ class ExternalApi {
 	}
 	
 	
+    /**
+     * Összegyűjti az összes ExternalAPI-t amit használunk.
+     * Azaz visszaadja a classes/externalapi könyvtárban található összes PHP fájl által ténylegesen definiált osztály nevét (kivéve externalapi.php).
+     *
+     * @return array Az endpoint osztályok nevei (string)
+     */
+    public static function collectExternalApis() {
+        $dir = __DIR__ . '/';
+        $files = scandir($dir);
+        $result = [];
+        foreach ($files as $file) {
+            if (substr($file, -4) === '.php' && $file !== 'externalapi.php') {
+                $before = get_declared_classes();
+                include_once($dir . $file);
+                $after = get_declared_classes();
+                $new = array_diff($after, $before);
+                foreach ($new as $class) {
+                    $result[] = preg_replace('/^ExternalApi\\\/', '', $class);
+                }
+            }
+        }
+
+        // Az ExternalApi osztály nem külön ExternalApi, hanem az összefoglaló, ezért kivesszük a listából
+        if (($key = array_search('ExternalApi', $result)) !== false) {
+            unset($result[$key]);
+            $result = array_values($result);
+        }
+        
+        sort($result);
+        return $result;
+    }
+
 }
 
 class Exception extends \Exception {
