@@ -11,7 +11,6 @@ class ExternalApi {
     public $queryTimeout = 30;
     public $query;
     public $name = 'external';
-    public $enable = true; // A külső API-t csak akkor engedélyezzük, ha a külső API elérhető és működik.
 	public $format = 'json'; // enum('json','xml')
 	public $strictFormat = true; // if rawData not in XML/JSON format throw new \Exception
 	private $curl_opts = [];
