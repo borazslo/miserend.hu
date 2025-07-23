@@ -826,14 +826,14 @@ function searchMasses($args, $offset = 0, $limit = 20) {
     }
     // weight
     foreach ($masses as $tid => $periods) {
-        $weight = 0;
+        $weight = 1000;
         $tmp = array();
         foreach ($periods as $period) {
             $m = array_shift(array_values($period));
             $w = $m['weight'];
             if ($w == '')
-                $w = 0;
-            if ($w >= $weight) {
+                $w = 1000;
+            if ($w <= $weight) {
                 $tmp = $period;
                 $weight = $w;
             }
