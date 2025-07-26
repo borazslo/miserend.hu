@@ -121,7 +121,7 @@ class LoRaWAN extends Api {
         $confession = new \Eloquent\Confession();
         
         if ($this->input['object']['Mód'] == 1) {
-            $confession->status = ($this->input['object']['Satus_Door'] == 1) ? 'ON' : 'OFF';
+            $confession->status = ($this->input['object']['Status_Door'] == 1) ? 'ON' : 'OFF';
         }
         if ($this->input['object']['Mód'] == 2) {
             $confession->status = ($this->input['object']['Status_Leak'] == 1) ? 'ON' : 'OFF';
