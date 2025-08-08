@@ -2,9 +2,16 @@
 
 namespace Html;
 
+use stdClass;
+
 class Remark extends Html {
 
     public $template;
+    public $action;
+    public $tid;
+    public $church;
+    public $disclaimer;
+    public $debug;
 
     public function __construct($path) {
         $this->action = $path[0];
@@ -53,8 +60,50 @@ class Remark extends Html {
             return;
         }
         
-        $this->church->remarks;        
+        $this->church->remarks;
+
+        // Split adminmegj by line into adminmegjlist for each remark, and extract meta info if present
+        if (isset($this->church->remarks) && is_iterable($this->church->remarks)) {
+            foreach ($this->church->remarks as &$remark) {                
+                $remark->adminmegjlist = [];                
+                if (isset($remark->adminmegj) && is_string($remark->adminmegj)) {
+                    $lines = preg_split('/\r?\n/', $remark->adminmegj);
+                    foreach ($lines as $line) {
+                        $line = trim($line);
+                        if ($line === '') continue;
+                        $entry = [
+                            'raw' => $line,
+                            'user' => null,
+                            'timestamp' => null,
+                            'text' => null
+                        ];                             
+                        // Try to extract <img ... title='user (timestamp)'>
+                        if (preg_match(
+                            "#<img[^>]*title='([^']+)\s\(([^)]+)\)'>\s*(.*)#",
+                            $line,
+                            $m
+                        )) {
+
+                            $entry['user']      = $m[1]; // admin
+                            $entry['timestamp'] = $m[2]; // 2025-08-08 21:43:59
+                            $entry['text']      = $m[3]; // email küldve: remarkfeedback_koszonet (19)
+                            
+                            if (preg_match('/email küldve:\s*[^\(]*\((\d+)\)/', $entry['text'], $idMatch)) {
+                                $entry['email_id'] = $idMatch[1];
+                                
+                                $entry['email'] = \Eloquent\Email::find($idMatch[1]);
+                            }
+
+                        } else {
+                            $entry['text'] = $line;
+                        }
+                        $remark->adminmegjlist[] = $entry;                        
+                    }
+                }
+            }            
+        }    
     }
+    
        
    
     function pageAdded() {

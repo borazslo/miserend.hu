@@ -6,6 +6,8 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Remark extends \Illuminate\Database\Eloquent\Model {
     
+    public $adminmegjlist = [];
+
     public function church() {
         return $this->belongsTo('\Eloquent\Church');
     }

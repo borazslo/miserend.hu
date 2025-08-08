@@ -7,13 +7,14 @@
 <table cellpadding=0 cellspacing=1 class="table table-striped table-hover">
 {% for remark in church.remarks %}
     <tr>
-    	<td valign=top width=35 style="padding:3px">
+    	<td valign=top width=35 align="center" style="padding:3px">
+
     		{% if remark.allapot == 'u' %}
-                        <img src=/img/Folderdownloads.gif border=0 title='új észrevétel'>
-                {% elseif remark.allapot == 'f' %}
-                        <img src=/img/Filesedit.gif border=0 title='folyamatban van -> {{ remak.admin }} ({{ remark.admindatum }})'>
+                        <i class="{{ ICONS_REMARKS_NEW }} red fa-xl" style="margin-top: 12px;" title='új észrevétel'>
+				{% elseif remark.allapot == 'f' %}
+						<i class="{{ ICONS_REMARKS_PROCESSING }} yellow fa-xl" style="margin-top: 12px;" title='folyamatban van -> {{ remak.admin }} ({{ remark.admindatum }})'>
                 {% else %}
-                        <img src=/img/Hand.gif border=0 title='Javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})'>
+                        <i class="{{ ICONS_REMARKS_ALLDONE }} green fa-xl" style="margin-top: 12px;" title='Javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})'>
                 {% endif %}
 		</td>
 		<td valign=top width="140" style="padding:3px">
@@ -21,11 +22,11 @@
                         <input type=hidden name=rid value="{{ remark.id }}">
                         <div class='form-group '>
                             <label for='my_dropdown'>Állapot</label>
-                            <select name='state' class='form-control input-sm' id='my_dropdown'>
+                            <select name='state' class='form-control selectpicker ' id='my_dropdown'>
 								<option value=''>-----</option>
                                 <option value="u" {{ remark.allapot == 'u' ? ' selected ' }}>új</option>
                                 <option value="f" {{ remark.allapot == 'f' ? ' selected ' }}>folyamatban</option>
-                                <option value="j">{{ remark.allapot == 'j' ? ' selected ' }}lezárva/javítva</option>
+                                <option value="j" {{ remark.allapot == 'j' ? ' selected ' }}>lezárva/javítva</option>
                             </select>
                         </div>
                         {% if remark.allapot != 'j' %}
@@ -57,31 +58,104 @@
     			<!--<strong><span class="far fa-envelope lightgrey" title="Nincs elérhető email cím." style="float:right;margin-left:3px;margin-right:3px"></span></strong>-->
     		{% endif %}</span>
 
+			
     		{% if remark.email or remark.login != "*vendeg*" %}
 	    		<div data-email="{{ remark.email }}" data-rid="{{ remark.id }}" title="A beküldő megbízhatósága állítható egyetlen kattintással: megbízható, nem megbízható vagy nem tudjuk.">
 	    			<button  type="button" class="btn btn-default" style="padding:6px">
-	    				<span class="reliable fa-solid fa-triangle-exclamation alert {% if remark.megbizhato == 'n' %}red{% else %}lightgrey{% endif %}" style="float:right"></span>
+	    				<span class="reliable fa-solid fa-triangle-exclamation {% if remark.megbizhato == 'n' %}red{% else %}lightgrey{% endif %}" style="float:right"></span>
 						<span class="reliable fa-solid fa-check check {% if remark.megbizhato == 'i' %}green{% else %}lightgrey{% endif %}" style="float:left"></span>
 					</button>
 				</div>
 			{% endif %}
+			
 		</div>
 
+		<div style="clear: both;">
 		{% if remark.allapot != 'j' %}
-				<br><br><span class=alap>{{ remark.leiras|raw }}</span>
+				<div class="text-box alap">{{ remark.leiras|raw }}</div>
 		{% else %}
-				<span class='alap javitva' title="Kattintásra megtekinthető az észrevétel." style="display:block;margin-bottom:3px;clear:both;"><font color=red>Utoljára javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})</font></span>
-				<span class='alap' style='display:none;'>{{ remark.leiras|raw }}</span>								
+				<span class='alap javitva' title="Kattintásra megtekinthető az észrevétel." style="display:block;margin-bottom:3px;clear:both;">					
+					<font color=green>Utoljára javítva / lezárva -> {{ remak.admin }} ({{ remark.admindatum }})</font>
+					<i class="fa-solid fa-circle-info"></i>
+				</span>
+				<div class="alap text-box" style='display:none;'>
+					{{ remark.leiras|raw }}
+				</div>								
 		{% endif %}
+		</div>
 
-		{% if remark.adminmegj %} 
-				<br><br><span class=alap><u>Szerkesztői megjegyzés:</u><br>
-				{{ remark.adminmegj|raw|nl2br }}</span>
-		{% endif %}
+		{% if remark.adminmegjlist and remark.adminmegjlist|length > 0 %}
+			<div>
+				<h5><strong>Szerkesztői megjegyzés(ek):</strong></h5>
+				<ul style="margin-bottom:0;">
+				{% for entry in remark.adminmegjlist %}
+					<li style="position:relative;">
+						{% if entry.user or entry.timestamp %}
+							{{ entry.user }} <span class="text-muted small"><span style="white-space:nowrap">({{ entry.timestamp }})</span>:</span><br/>
+						{% endif %}
+						{{ entry.text|e }}
+						{% if entry.email_id %}
+							<span class="fa fa-envelope email-toggle" title="Kapcsolódó email megtekinthető!" style="color:#B51A7E;" data-email-id="{{ entry.email_id }}"></span>
+							<div class="email-body-popup text-box" id="email-body-{{ entry.email_id }}" style="display:none;">
+								{{ entry.email.body|raw }}
+							</div>
+						{% endif %}
+					</li>
+				{% endfor %}
+				</ul>
+
+            </div>
+        {% elseif remark.adminmegj %}
+            <div>
+                <h5><strong>Szerkesztői megjegyzés(ek):</strong></h5>
+                {{ remark.adminmegj|raw|nl2br }}
+            </div>
+        {% endif %}
 
 
     	</td>
     </tr>
 {% endfor %}
+
+
+<script>
+$(function() {
+	$('.email-toggle').on('click', function(e) {
+		e.stopPropagation();
+		var id = $(this).data('email-id');
+		var popup = $('#email-body-' + id);
+		// $('.email-body-popup').not(popup).hide(); // Csak egy popup legyen nyitva
+		popup.toggle();
+		// Toggle envelope icon
+		if (popup.is(':visible')) {
+			$(this).removeClass('fa-envelope').addClass('fa-envelope-open');
+		} else {
+			$(this).removeClass('fa-envelope-open').addClass('fa-envelope');
+		}
+	});
+
+	// Prevent form submit if my_dropdown is empty
+	$('form').on('submit', function(e) {
+		var sel = $(this).find('select#my_dropdown');
+		if (sel.length && sel.val() === '') {
+			alert('Kérjük, válassz állapotot!');
+			sel.focus();
+			e.preventDefault();
+			return false;
+		}
+	});
+});
+</script>
+
+<style>
+ .text-box {
+	font-size: 0.92em;
+	background: #f8f9fa;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 7px 10px;
+	margin-top: 5px;
+	color: #333;
+ }
+</style>
 {% endblock %}
-		

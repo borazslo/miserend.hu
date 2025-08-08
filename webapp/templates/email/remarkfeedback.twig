@@ -3,7 +3,7 @@
 {% block pageHeader %}
     <div class="jumbotron">
         <h3>
-            <a href="/templom/{{ church.id }}" target=_blank>{{ church.names }}</a>
+            <a href="/templom/{{ church.id }}" target=_blank>{{ church.names.0 }}</a>
             <small><strong>{% if church.alternative_names.0 %}{{ church.alternative_names.0 }} - {% endif %}{{ church.varos }}</strong><br/>
                 Javítások, változások bejelentésének kezelése</small>
         </h3>
