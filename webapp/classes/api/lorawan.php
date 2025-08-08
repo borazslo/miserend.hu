@@ -102,7 +102,7 @@ class LoRaWAN extends Api {
             throw new \Exception("JSON input 'deviceInfo[tags][templom_id]' is required and should be a number.");
         }
         if (!isset($this->input['deviceInfo']['devEui']) || !preg_match('/^[a-f0-9]{16}$/', $this->input['deviceInfo']['devEui'])) {
-            throw new \Exception("JSON input 'deviceInfo[deveui]' is required and should be in a valid format.");
+            throw new \Exception("JSON input 'deviceInfo[devEui]' is required and should be in a valid format.");
         }
 
         if (!is_array($this->input['object'])) {
