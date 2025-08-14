@@ -13,7 +13,7 @@ class Crons {
     static function gorogkatolizalas() {
         // FIXME for Issue #257
         $tables = array(
-            'templomok' => array('nev', 'ismertnev', 'megjegyzes', 'misemegj', 'leiras', 'megkozelites'),
+            'templomok' => array('nev', 'ismertnev', 'megjegyzes', 'misemegj', 'leiras'),
             'misek' => array('megjegyzes'),
             'photos' => array('title')
         );        

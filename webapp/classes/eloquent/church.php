@@ -18,13 +18,12 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     protected $fillable = [
         'nev', 'cim', 'orszag', 'megye', 'varos', 'plebania', 'pleb_eml', 'leiras',
         'lat', 'lon', 'miseaktiv', 'ok', 'frissites', 'misemegj','osmid','osmtype',
-        'accessibility', 'megkozelites'
+        'accessibility'
     ];
 	protected $attributesCache = null;
 	
     // TODO FIXME #174 sémakisimítás. Mindegyikben engedélyezni kéne a null-t vagy default érték
-    protected $attributes = [
-        'megkozelites' => '',
+    protected $attributes = [        
         'plebania' => '',
         'leiras' => '',
         'megjegyzes' => '',
@@ -338,7 +337,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             'megye' => ( DB::table('megye')->where('id', $this->megye)->value('megyenev') ?: "" ),
             'varos' => $this->varos,
             'cim' => $this->cim,
-            'megkozelites' => $this->megkozelites,
+            'megkozelites' => '',
             'plebania' => str_replace('<br>', "\n", strip_tags($this->plebania, '<br>')),
             'leiras' => str_replace('<br>', "\n", strip_tags($this->leiras, '<br>')),
             'accessibility' => $this->accessibility,
@@ -697,9 +696,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         } else {            
             $location->address = $this->cim;
         }
-		if($this->megkozelites != '')
-			$location->access = $this->megkozelites;
-		
+				
         /* Adminisrative Boundaries(Country,County, City, District) */
         $boundaries = $this->boundaries()
                 ->where('boundary','administrative')

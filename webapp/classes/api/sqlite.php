@@ -55,7 +55,7 @@ class Sqlite extends Api {
             <li>„varos” (<em>varchar(80)</em>): a város neve kiírva. külföld esetén zároljelben másik nyelven pl. <em>Kolozsvár (Cluja-Napoca)</em></li>
             <li>„cim” (<em>varchar(255)</em>): a templom (és nem a plébánia) hivatalos posta címe (ország és város nélkül)</li>
             <li>„geocim” (<em>varchar(255)</em>) (≤v4): a koordináták alapján visszafejtet lehetséges posta cím (leginkább akkor használjuk, ha a „cim” üres)</li>
-            <li>„megkozelites” (<em>varchar(255)</em>): a templom megközelíthetősége szövegesen leírva (gyakran üres)</li>
+            <li>„megkozelites” (<em>varchar(255)</em>): mindig üres!</li>
             <li>„lng” (<em>float</em>): a koordináta hosszúsági foka pl. <em>24.9018</em></li>
             <li>„lat” (<em>float</em>): a koordináta szélességi foka pl. <em>46.5643</em></li>
             <li><del>„nyariido” (<em>varchar(10)</em>) (≤v3): a templomban a nyári idő kezdete az aktuális évben (!), <strong>ÉÉÉÉ-HH-NN</strong></del></li>
@@ -286,7 +286,7 @@ class Sqlite extends Api {
             $insert['geocim'] = $church->geoaddress;
             $insert['lng'] = $church->location->lon;
             $insert['lat'] = $church->location->lat;
-            $insert['megkozelites'] = isset($church->location->access) ? $church->location->access : false;
+            $insert['megkozelites'] = false;
 			
 
             if ($this->version > 2) {
