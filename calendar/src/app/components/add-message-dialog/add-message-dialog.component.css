@@ -1,0 +1,28 @@
+.duration-wrapper {
+  display: flex;
+  column-gap: 2em;
+  justify-content: center;
+  align-items: baseline;
+
+  .mat-mdc-form-field {
+    max-width: 6em;
+  }
+}
+
+.mat-accordion {
+  padding: 0.5em 0;
+  display: block;
+}
+
+.comment {
+  width: 100%;
+}
+
+.mat-mdc-card-title {
+  display: flex;
+  align-items: center;
+
+  & span {
+    margin-left: 0.5em;
+  }
+}

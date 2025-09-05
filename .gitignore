@@ -7,3 +7,46 @@ vendor/
 var/
 node_modules/
 dumper/01-dump.sql
+
+.idea
+composer.phar
+.env.local
+/calendar/.editorconfig
+/calendar/dist
+/calendar/tmp
+/calendar/out-tsc
+/calendar/bazel-out
+/calendar/node_modules
+/calendar/npm-debug.log
+/calendar/yarn-error.log
+
+# IDEs and editors
+/calendar/.idea/
+/calendar/.project
+/calendar/.classpath
+/calendar/.c9/
+/calendar/*.launch
+/calendar/.settings/
+/calendar/*.sublime-workspace
+
+# Visual Studio Code
+/calendar/.vscode/*
+/calendar/!.vscode/settings.json
+/calendar/!.vscode/tasks.json
+/calendar/!.vscode/launch.json
+/calendar/!.vscode/extensions.json
+/calendar/.history/*
+
+# Miscellaneous
+/calendar/.angular/cache
+/calendar/.sass-cache/
+/calendar/connect.lock
+/calendar/coverage
+/calendar/libpeerconnection.log
+/calendar/testem.log
+/calendar/typings
+
+# System files
+/calendar/.DS_Store
+/calendar/Thumbs.db
+

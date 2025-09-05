@@ -1,0 +1,48 @@
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.simple-datetime {
+  line-height: 1.5em;
+}
+
+.mat-mdc-card-subtitle {
+  padding: 0 1.5em;
+  text-align: center;
+}
+
+.mat-mdc-card-title {
+  display: flex;
+  align-items: center;
+
+  & mat-icon {
+    font-size: 36px;
+    width: 40px;
+    height: 40px;
+  }
+
+  & span {
+    margin-left: 0.5em;
+  }
+}
+
+.type-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.comment {
+  font-style: italic;
+  border-left: 2px solid lightgrey;
+  margin-left: 0.5em;
+  padding: 0.5em;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  column-gap: 0.25em;
+  margin-top: 0.5em;
+}

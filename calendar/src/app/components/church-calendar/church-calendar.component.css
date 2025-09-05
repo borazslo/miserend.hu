@@ -1,0 +1,22 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5em 1em;
+}
+
+.sender-data {
+  display: flex;
+  width: 100%;
+  justify-content: right;
+  column-gap: 1em;
+  max-width: 60em;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  column-gap: 1em;
+  max-width: 60em;
+}

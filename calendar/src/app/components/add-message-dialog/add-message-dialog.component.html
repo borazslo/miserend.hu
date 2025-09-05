@@ -1,0 +1,17 @@
+<mat-card class="simple-event-card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title class="title-row">
+        <mat-panel-title>{{ data.message | translate }}</mat-panel-title>
+    </mat-card-title>
+  </mat-card-header>
+
+
+<mat-dialog-actions align="end">
+  @if (data.decision){
+    <button mat-flat-button mat-dialog-close>{{ 'CANCEL' | translate }}</button>
+    <button mat-flat-button (click)="onContinue()">{{ 'CONTINUE' | translate }}</button>
+  } @else {
+  <button mat-flat-button mat-dialog-close>{{ 'OK' | translate }}</button>
+  }
+</mat-dialog-actions>
+</mat-card>

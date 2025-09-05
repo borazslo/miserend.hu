@@ -146,3 +146,51 @@ docker exec miserend composer install|require|update
 # 💬 Egyéb megjegyzések
 
 - A `mailcatcher` csak `env['production']` esetén nem aktív.
+
+# 📆 Naptárnézet
+
+- Egy különálló projekt, ami be lett integrálva a meglévő rendszerbe
+- Első alkalommal le kell generálni az időszakokat:
+- Admin joggal, az `/eventscatalogue` felületen
+
+## Táblák beszúrása
+Ha még nincsenek a miserend adatbázisban a `cal_` prefixű táblák, akkor először másoljuk fel a dockerre az sql fájlokat:
+```
+docker cp ./scripts/calendar_sql_init mysql:/calendar_sql_init
+```
+
+Majd a mysql docker konténerbe belépve, az alábbi kódot futtassuk:
+```
+mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/calendar_init.sql
+```
+Ha minta adatokat is szeretnénk (periódushoz) akkor az alábbiakat is futtassuk, ebben a sorrendben:
+```
+mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/sample_periods.sql
+mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/sample_period_years.sql
+```
+Ezután be kell lépni a felületre, és az `/eventscatalogue` felületen legenerálni az aktuális időszakra.
+A minta adatok idővel elévülhetnek, fontos az aktualizálásuk!
+
+## Naptár szerkesztése
+
+A `/calendar` könyvtárban az alábbi parancsokat futtassuk:
+
+Ha még nem volt, akkor:
+```sh
+npm install
+```
+```sh
+ng build --configuration=localProd
+python ../scripts/calendar_deploy.py
+npm run start:integrated
+```
+- Ezzel egyrészt elérjük, hogy fejlesztői legyen a naptár
+- Másrészt elérjük, hogy ha valamit módosítunk, az szinte egyből érvényre jusson
+- Ilyenkor egy python script a `/calendar` mappában buildeli az Angularos projektet, majd a megfelelő helyre átmásolja a legenerált fájlokat
+
+## Éles / staging / UAT build
+Fejlesztés végén azonban egy megfelelő környezetbe való build kell, például:
+```
+ng build --configuration=production
+python ../scripts/calendar_deploy.py
+```

@@ -1,0 +1,16 @@
+.spinner-overlay {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: gray;
+  opacity: 0.5;
+  z-index: 15000;
+
+  mat-spinner {
+    margin: auto;
+    width: 3rem;
+  }
+}

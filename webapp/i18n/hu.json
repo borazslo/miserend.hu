@@ -1,0 +1,183 @@
+{
+  "SELECTED_DAY": "Ezen a napon",
+  "SELECTED_DAYS": "Ezeken a napokon",
+  "DAYS": {
+    "MO": "Hétfő",
+    "TU": "Kedd",
+    "WE": "Szerda",
+    "TH": "Csütörtök",
+    "FR": "Péntek",
+    "SA": "Szombat",
+    "SU": "Vasárnap",
+    "SHORT": {
+      "MO": "HÉT",
+      "TU": "KED",
+      "WE": "SZE",
+      "TH": "CSÜ",
+      "FR": "PÉN",
+      "SA": "SZO",
+      "SU": "VAS"
+    },
+    "ON": {
+      "MO": "hétfőn",
+      "TU": "kedden",
+      "WE": "szerdán",
+      "TH": "csütörtökön",
+      "FR": "pénteken",
+      "SA": "szombaton",
+      "SU": "vasárnap"
+    }
+  },
+  "ADD_NEW_MASS": "Új liturgia rögzítése",
+  "EDIT_MASS": "Meglévő liturgia szerkesztése",
+  "OTHER_SETTINGS": "Tulajdonságok",
+  "COMMENT": "Megjegyzés",
+
+  "RECURRENCE": "Ismétlődés",
+  "PERIOD": "Időszak",
+  "LANGUAGE": "Nyelv",
+  "START_DATE": "Dátum",
+  "START_TIME": "Időpont",
+  "TIMEZONE": "Időzóna",
+  "DURATION": "Időtartam",
+  "DURATION_DAYS": "nap",
+  "DURATION_HOURS": "óra",
+  "DURATION_MINUTES": "perc",
+  "TITLE": "Liturgia neve",
+  "RITE": "Rítus",
+
+  "CANCEL": "Mégsem",
+  "SAVE": "Mentés",
+  "SEND_TO_APPROVE": "Javaslat beküldése",
+  "CONTINUE": "Folytatás",
+  "OK": "Rendben",
+  "SEND": "Beküldés",
+  "DELETE_WARNING": "Biztosan törölni szeretnéd az alábbi eseményt?",
+
+  "ROMAN_CATHOLIC": "Római katolikus",
+  "GREEK_CATHOLIC": "Görögkatolikus",
+  "TRADITIONAL": "Régi rítusú szentmise",
+
+  "MASS_TITLE": {
+    "HOLY_MASS": "Szentmise",
+    "LITURGY_OF_THE_WORD": "Igeliturgia",
+    "DIVINE_LITURGY": "Szent Liturgia",
+    "LITURGY_OF_THE_PRESANCTIFIED_GIFTS": "Előszenteltek liturgiája",
+    "MASS_OF_THE_LORD_S_SUPPER": "Az utolsó vacsora emlékmiséje",
+    "GOOD_FRIDAY_LITURGY": "Nagypénteki szertartás",
+    "EASTER_VIGIL": "Húsvét vigíliája",
+    "TRADITIONAL_LATIN_MASS": "Régi rítusú szentmise",
+    "TRADITIONAL_MASS_OF_THE_LORD_S_SUPPER": "Az utolsó vacsora emlékmiséje (régi rítusú)",
+    "TRADITIONAL_GOOD_FRIDAY_LITURGY": "Nagypénteki szertartás (régi rítusú)",
+    "TRADITIONAL_EASTER_VIGIL": "Húsvét vigíliája (régi rítusú)"
+  },
+
+  "MASS_TYPES": "Jellemzők",
+  "FAMILY": "Családos/mocorgós",
+  "STUDENT": "Diák",
+  "UNIVERSITY_YOUTH": "Egyetemista/ifjúsági",
+  "GUITAR": "Gitáros",
+  "ORGAN": "Orgonás",
+  "SINGER": "Énekes",
+  "SILENT": "Csendes",
+
+  "LANGUAGES": {
+    "hu": "magyar",
+    "en": "angol",
+    "fr": "francia",
+    "gr": "görög",
+    "hr": "horvát",
+    "va": "latin",
+    "pl": "lengyel",
+    "de": "német",
+    "it": "olasz",
+    "pt": "portugál",
+    "ro": "román",
+    "es": "spanyol",
+    "sk": "szlovák",
+    "si": "szlovén",
+    "ua": "ukrán"
+  },
+
+  "EVENT_VIEWER": {
+    "EQUAL_TIMEZONE": "Az Önével azonos időzónában.",
+    "DIFFERENT_TIMEZONE": "Figyelem! A kezdési idő más időzónában ({{eventTimeZone}}) lett megadva, mint az öné ({{localTimeZone}})!",
+    "RECURRENCE": "Ismétlődés",
+    "EDIT": "Szerkesztés",
+    "EDIT_ONE": "Csak ennek az egy alkalomnak a szerkesztése",
+    "EDIT_ALL": "Az összes ismétlődés szerkesztése",
+    "DELETE": "Törlés",
+    "DELETE_ONE": "Csak ennek az egy alkalomnak a törlése",
+    "DELETE_ALL": "Az összes ismétlődés törlése",
+    "CLOSE": "Bezárás"
+  },
+
+  "RRULE": {
+    "NO_RECURRENCE": "Egyszeri alkalom",
+    "ON": {
+      "ODD": "páros heteken",
+      "EVEN": "páratlan heteken",
+      "EVERY_WEEK": "minden héten",
+      "FIRST_WEEK": "minden hónapban az első",
+      "SECOND_WEEK": "minden hónapban a második",
+      "THIRD_WEEK": "minden hónapban a harmadik",
+      "FOURTH_WEEK": "minden hónapban az negyedik",
+      "FIFTH_WEEK": "minden hónapban az ötödik",
+      "LAST_DAY_OF_MONTH": "minden hónapban az utolsó"
+    }
+  },
+  "SEPARATOR_AND": " és ",
+
+  "SUGGESTION": {
+    "SELECTED_PACKAGE": "Kiválasztott csomag",
+    "STATES": {
+      "ACCEPTED": "Elfogadott",
+      "REJECTED": "Elutasított",
+      "PENDING": "Függőben"
+    },
+    "SENDER": {
+      "NAME": "Javaslattevő neve",
+      "EMAIL": "Javaslattevő email címe",
+      "USERID": "Javaslattevő felhasználói azonosítója"
+    },
+    "STATE": "Javaslatcsomag állapota",
+    "THERE_IS_NO_SUGGESTION": "Jelenleg nincs beküldött ajánlás a templomhoz!",
+    "HEADER": {
+      "PREV": "Előző",
+      "NEXT": "Következő",
+      "DAY": "Nap",
+      "WEEK": "Hét",
+      "MONTH": "Hónap"
+    },
+    "ORIGINAL_CALENDAR": "Eredeti miserend",
+    "NEW_CALENDAR": "Módosított miserend",
+    "APPROVE": "Jóváhagy",
+    "REJECT": "Elutasít"
+  },
+
+  "PERIODS": {
+    "YEAR_EDITOR_TITLE": "Időszakok beállítása",
+    "YEAR_EDITOR_HINT": "Azokat az időszakokat lehet itt beállítani, amik évenként eltérő időpontokban vannak, és nem egy másik időszaktól függenek. Amennyiben olyan időszakról van szó, ami átnyúlik egy adott naptári éven, akkor mindig a kezdeti időpontja szerint kell kezelni. Generálni a már mentett adatokkal lehet. Amíg nincs egy generálás sem, addig a naptárban nem jelennek meg az események, még az időszak nélküliek sem.",
+    "START_DATE": "Kezdete",
+    "END_DATE": "Vége",
+    "SAVE": "Mentés",
+    "GENERATE": "Generálás"
+  },
+
+  "SIMPLE_EVENT": {
+    "MORE_SETTINGS": "További beállítások",
+    "SAVE": "Mentés"
+  },
+
+  "ERRORS": {
+    "REQUIRED_PERIOD": "Meg kell adni, hogy melyik időszakban ismétlődik.",
+    "REQUIRED_DAY": "Meg kell adni, hogy melyik napon van.",
+    "REQUIRED_DAYS": "Meg kell adni, hogy melyik napo(ko)n van."
+  },
+
+
+  "MASS_DETAILS_DATETIME": "A liturgia időpontja és ismétlődései",
+  "OTHER_SETTINGS_DETAILS": "A liturgia egyéb tulajdonságai"
+
+
+}

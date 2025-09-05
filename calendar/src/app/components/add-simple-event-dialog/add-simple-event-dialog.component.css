@@ -1,0 +1,12 @@
+.simple-datetime {
+  display: flex;
+  align-items: center;
+}
+
+.simple-datetime > mat-icon {
+  margin-right: 8px;
+}
+
+.mat-mdc-card-actions {
+  justify-content: end;
+}
