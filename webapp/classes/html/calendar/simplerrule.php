@@ -2,7 +2,7 @@
 namespace Html\Calendar;
 
 use Carbon\Carbon;
-use Carbon\CarbonTimeZone;
+use Carbon\CarbonInterface;
 use Exception;
 
 class SimpleRRule
@@ -13,6 +13,7 @@ class SimpleRRule
     private $freq;
     private $interval;
     private $byWeekday;
+    private $bySetpos;
     private $debugCallback;
 
     public function __construct(array $rrule, callable $debugCallback = null)
@@ -23,6 +24,7 @@ class SimpleRRule
         $this->freq       = strtoupper($rrule['freq'] ?? 'DAILY');
         $this->interval   = $rrule['interval'] ?? 1;
         $this->byWeekday  = $this->normalizeByWeekday($rrule['byweekday'] ?? []);
+        $this->bySetpos   = $rrule['bysetpos'] ?? null;
         $this->debugCallback = $debugCallback;
     }
 
@@ -48,13 +50,24 @@ class SimpleRRule
         $current = clone $this->start;
         $generated = 0;
 
+        $weekdayMap = [
+            1 => CarbonInterface::MONDAY,
+            2 => CarbonInterface::TUESDAY,
+            3 => CarbonInterface::WEDNESDAY,
+            4 => CarbonInterface::THURSDAY,
+            5 => CarbonInterface::FRIDAY,
+            6 => CarbonInterface::SATURDAY,
+            7 => CarbonInterface::SUNDAY,
+        ];
+
         $this->logDebug("getOccurrences indul", [
             'start'     => $this->start->toIso8601String(),
             'until'     => $this->until?->toIso8601String(),
-            'count'     => $this->count,
             'freq'      => $this->freq,
+            'count'     => $this->count,
             'interval'  => $this->interval,
             'byWeekday' => $this->byWeekday,
+            'bySetpos'  => $this->bySetpos,
         ]);
 
         while (
@@ -104,13 +117,16 @@ class SimpleRRule
                     if (!empty($this->byWeekday)) {
                         foreach ($this->byWeekday as $weekday) {
                             $monthStart = $current->copy()->startOfMonth();
-                            $firstWeekday = $monthStart->copy()->next($weekday);
-                            if ($monthStart->dayOfWeek === $weekday) {
-                                $firstWeekday = $monthStart;
+                            if ($this->bySetpos) {
+                                // Ha van BYSETPOS → pl. 2. hétfő
+                                $occurrence = $monthStart->copy()->nthOfMonth($this->bySetpos, $weekdayMap[$weekday]);
+                            } else {
+                                // Ha nincs BYSETPOS → alapértelmezés: első ilyen nap
+                                $occurrence = $monthStart->copy()->nthOfMonth(1, $weekdayMap[$weekday]);
                             }
 
-                            $occurrence = $firstWeekday->copy()->setTimeFrom($this->start);
-                            if ((!$this->until || $occurrence->lte($this->until)) &&
+                            if ($occurrence &&
+                                (!$this->until || $occurrence->lte($this->until)) &&
                                 (!$this->count || $generated < $this->count) &&
                                 $occurrence->gte($this->start)) {
                                 $occurrences[] = $occurrence;
@@ -118,6 +134,7 @@ class SimpleRRule
                                 $this->logDebug("Monthly occurrence", [
                                     'date' => $occurrence->toIso8601String(),
                                     'weekday' => $weekday,
+                                    'bySetpos' => $this->bySetpos,
                                     'generated' => $generated
                                 ]);
                             }
