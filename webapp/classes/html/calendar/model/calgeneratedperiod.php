@@ -9,10 +9,10 @@ class CalGeneratedPeriod extends CalModel
     protected $table = 'cal_generated_periods';
 
     protected $fillable = [
-        'period_id', 'name', 'weight', 'start_date', 'end_Date', 'color'
+        'period_id', 'name', 'weight', 'start_date', 'end_date', 'color'
     ];
 
-    protected $dates = ['start_date', 'end_Date'];
+    protected $dates = ['start_date', 'end_date'];
 
     public function period(): BelongsTo
     {

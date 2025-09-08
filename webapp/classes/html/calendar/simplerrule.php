@@ -14,6 +14,7 @@ class SimpleRRule
     private $interval;
     private $byWeekday;
     private $bySetpos;
+    private $byWeekNo;
     private $debugCallback;
 
     public function __construct(array $rrule, callable $debugCallback = null)
@@ -25,6 +26,7 @@ class SimpleRRule
         $this->interval   = $rrule['interval'] ?? 1;
         $this->byWeekday  = $this->normalizeByWeekday($rrule['byweekday'] ?? []);
         $this->bySetpos   = $rrule['bysetpos'] ?? null;
+        $this->byWeekNo   = $rrule['byweekno'] ?? [];
         $this->debugCallback = $debugCallback;
     }
 
@@ -93,6 +95,13 @@ class SimpleRRule
                 case 'WEEKLY':
                     // Heti frekvencia: minden héten BYDAY szerinti napokat generálunk
                     $weekStart = $current->copy()->startOfWeek(Carbon::MONDAY);
+
+                    // ha van megadva byWeekNo, és az aktuális hét száma nincs benne, akkor ugorjuk át
+                    if (!empty($this->byWeekNo) && !in_array((int)$weekStart->format('W'), $this->byWeekNo, true)) {
+                        $current->addWeeks($this->interval);
+                        break;
+                    }
+
                     foreach ($this->byWeekday ?: [($current->dayOfWeek === 0 ? 7 : $current->dayOfWeek)] as $weekday) {
                         $occurrence = $weekStart->copy()->addDays($weekday - 1)
                             ->setTimeFrom($this->start);
@@ -105,6 +114,7 @@ class SimpleRRule
                             $this->logDebug("Weekly occurrence", [
                                 'date' => $occurrence->toIso8601String(),
                                 'weekday' => $weekday,
+                                'weekNo' => (int)$weekStart->format('W'),
                                 'generated' => $generated
                             ]);
                         }
@@ -119,10 +129,12 @@ class SimpleRRule
                             $monthStart = $current->copy()->startOfMonth();
                             if ($this->bySetpos) {
                                 // Ha van BYSETPOS → pl. 2. hétfő
-                                $occurrence = $monthStart->copy()->nthOfMonth($this->bySetpos, $weekdayMap[$weekday]);
+                                $occurrence = $monthStart->copy()->nthOfMonth($this->bySetpos, $weekdayMap[$weekday])
+                                    ->setTimeFrom($this->start);
                             } else {
                                 // Ha nincs BYSETPOS → alapértelmezés: első ilyen nap
-                                $occurrence = $monthStart->copy()->nthOfMonth(1, $weekdayMap[$weekday]);
+                                $occurrence = $monthStart->copy()->nthOfMonth(1, $weekdayMap[$weekday])
+                                    ->setTimeFrom($this->start);
                             }
 
                             if ($occurrence &&

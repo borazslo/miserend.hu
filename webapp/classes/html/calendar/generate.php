@@ -549,12 +549,12 @@ class Generate extends \Html\Calendar\CalendarApi {
                 // --- periódusok betöltése ---
                 $periods = CalGeneratedPeriod::where('period_id', $mass->period_id)
                     ->where('start_date', '<=', $globalEnd->toDateString())
-                    ->where('end_Date', '>', $globalStart->toDateString())
+                    ->where('end_date', '>', $globalStart->toDateString())
                     ->get();
 
                 foreach ($periods as $generatedPeriod) {
                     $start = Carbon::parse($generatedPeriod->start_date)->startOfDay()->setTimezone($timezone);
-                    $end = Carbon::parse($generatedPeriod->end_Date)->endOfDay()->setTimezone($timezone);
+                    $end = Carbon::parse($generatedPeriod->end_date)->endOfDay()->setTimezone($timezone);
 
                     if ($start->lt($globalStart)) $start = (clone $globalStart)->setTimezone($timezone);
                     if ($end->gt($globalEnd))     $end   = (clone $globalEnd)->setTimezone($timezone);
@@ -578,7 +578,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                             $exP = CalGeneratedPeriod::where('period_id', $exPid)->first();
                             if ($exP) {
                                 $exStart = Carbon::parse($exP->start_date)->startOfDay();
-                                $exEnd = Carbon::parse($exP->end_Date)->endOfDay();
+                                $exEnd = Carbon::parse($exP->end_date)->endOfDay();
                                 if ($date->between($exStart, $exEnd)) {
                                     $insideExcluded = true;
                                     break;
