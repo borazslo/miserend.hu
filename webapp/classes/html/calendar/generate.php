@@ -72,6 +72,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                 $this->dateMax          = $_GET['date_max'] ?? null;
                 $this->startMinutesMin  = $_GET['start_minutes_min'] ?? null;
                 $this->startMinutesMax  = $_GET['start_minutes_max'] ?? null;
+                $timezone = $_GET['timezone'] ?? 'UTC';
 
                 $query = ["bool" => ["must" => [], "must_not" => []]];
 
@@ -156,43 +157,15 @@ class Generate extends \Html\Calendar\CalendarApi {
                         "range" => ["start_date" => $range]
                     ];
                 }
+
                 if ($this->startMinutesMin !== null || $this->startMinutesMax !== null) {
-                    $shouldClauses = [];
+                    $range = [];
+                    if ($this->startMinutesMin !== null) $range['gte'] = (int)$this->startMinutesMin;
+                    if ($this->startMinutesMax !== null) $range['lte'] = (int)$this->startMinutesMax;
 
-                    // --- 1) Egyszeri események range ---
-                    $singleEventRange = [];
-                    if ($this->startMinutesMin !== null) $singleEventRange['gte'] = (int)$this->startMinutesMin;
-                    if ($this->startMinutesMax !== null) $singleEventRange['lte'] = (int)$this->startMinutesMax;
-
-                    $shouldClauses[] = [
-                        "range" => ["start_minutes" => $singleEventRange]
+                    $query['bool']['must'][] = [
+                        "range" => ["start_minutes" => $range]
                     ];
-
-                    // --- 2) Ismétlődő események DST logika alapján ---
-                    foreach ($this->years as $year){
-                        foreach ($this->tids as $tid) {
-                            $church = \Eloquent\Church::find($tid);
-                            $tz = $church->time_zone ?? 'Europe/Budapest';
-                            $baseDates = [
-                                Carbon::create($year, 1, 15, 0, 0, 0, $tz), // tél
-                                Carbon::create($year, 7, 15, 0, 0, 0, $tz), // nyár
-                            ];
-
-                            foreach ($baseDates as $baseDate) {
-                                $shouldClauses[] = [
-                                    "range" => [
-                                        "start_minutes" => $this->convertRangeToUtc(
-                                            $this->startMinutesMin,
-                                            $this->startMinutesMax,
-                                            $baseDate
-                                        )
-                                    ]
-                                ];
-                            }
-                        }
-                    }
-
-                    $query['bool']['must'][] = ["bool" => ["should" => $shouldClauses]];
                 }
 
                 // build query
@@ -210,7 +183,21 @@ class Generate extends \Html\Calendar\CalendarApi {
                     foreach ($this->elastic->jsonData->hits->hits as $hit) {
                         $churchId = $hit->_source->church_id;
                         if (!isset($result[$churchId])) $result[$churchId] = [];
-                        $result[$churchId][] = $hit->_source;
+
+                        $source = $hit->_source;
+
+                        $dateUtc = Carbon::parse($source->start_date)->setTimezone('UTC');
+
+                        if ($timezone !== 'UTC') {
+                            $dateLocal = $dateUtc->copy()->setTimezone($timezone);
+                            $source->start_date = $dateLocal->format('c');
+                            $source->start_minutes = $dateLocal->hour * 60 + $dateLocal->minute;
+                        } else {
+                            $source->start_date = $dateUtc->format('c');
+                            $source->start_minutes = $dateUtc->hour * 60 + $dateUtc->minute;
+                        }
+
+                        $result[$churchId][] = $source;
                     }
                 }
 
@@ -237,12 +224,14 @@ class Generate extends \Html\Calendar\CalendarApi {
                     if (!empty($masses)) {
                         $allMasses = array_merge($allMasses, $masses);
                     }
+                    $church = \Eloquent\Church::find($tid);
+                    $churchTimezones[$tid] = $church->time_zone ?? 'Europe/Budapest';
                 }
 
                 $debug = [];
                 $debug[] = "Talált misék száma: " . count($allMasses);
 
-                $massesByChurch = $this->generateMassInstancesForYears($allMasses, $years);
+                $massesByChurch = $this->generateMassInstancesForYears($allMasses,$churchTimezones, $years);
 
                 foreach ($massesByChurch as $churchId => $massInstances) {
                     $debug[] = "Templom ID $churchId, generált miseidőpontok: " . count($massInstances);
@@ -442,7 +431,7 @@ class Generate extends \Html\Calendar\CalendarApi {
      * @param array $years
      * @return array [templom_id => miseidőpontok tömbje]
      */
-    function generateMassInstancesForYears($masses, array $years): array
+    function generateMassInstancesForYears($masses, array $churchTimezones, array $years): array
     {
         $instancesByChurch = [];
 
@@ -462,6 +451,8 @@ class Generate extends \Html\Calendar\CalendarApi {
             'after_count' => count($masses),
         ]);
 
+
+
         foreach ($years as $year) {
             $globalStart = Carbon::create($year, 1, 1)->startOfDay();
             $globalEnd = Carbon::create($year, 12, 31)->endOfDay();
@@ -479,7 +470,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                     $this->logDebug("Nincs RRULE", ['mass_id' => $mass->id]);
                     continue;
                 }
-                $timezone = $mass->time_zone ?? 'Europe/Budapest';
+                $timezone = $churchTimezones[$mass->church_id] ?? 'Europe/Budapest';
 
                 // ---- duration konvertálása percekre ----
                 $durationMinutes = 0;
