@@ -102,11 +102,13 @@ class SimpleRRule
                         break;
                     }
 
-                    foreach ($this->byWeekday ?: [($current->dayOfWeek === 0 ? 7 : $current->dayOfWeek)] as $weekday) {
+                    foreach ($this->byWeekday as $weekday) {
                         $occurrence = $weekStart->copy()->addDays($weekday - 1)
                             ->setTimeFrom($this->start);
 
-                        if ((!$this->until || $occurrence->lte($this->until)) &&
+                        if ($occurrence->gte($current->copy()->startOfWeek()) &&
+                            $occurrence->lte($current->copy()->endOfWeek()) &&
+                            (!$this->until || $occurrence->lte($this->until)) &&
                             (!$this->count || $generated < $this->count) &&
                             $occurrence->gte($this->start)) {
                             $occurrences[] = $occurrence;
@@ -119,7 +121,7 @@ class SimpleRRule
                             ]);
                         }
                     }
-                    $current->addWeeks($this->interval);
+                    $current = $weekStart->copy()->addWeeks($this->interval);
                     break;
 
                 case 'MONTHLY':
@@ -164,7 +166,7 @@ class SimpleRRule
                             ]);
                         }
                     }
-                    $current->addMonths($this->interval);
+                    $current->addMonths($this->interval)->startOfMonth();
                     break;
 
                 default:

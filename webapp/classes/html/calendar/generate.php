@@ -554,7 +554,7 @@ class Generate extends \Html\Calendar\CalendarApi {
 
                 foreach ($periods as $generatedPeriod) {
                     $start = Carbon::parse($generatedPeriod->start_date)->startOfDay()->setTimezone($timezone);
-                    $end = Carbon::parse($generatedPeriod->end_date)->endOfDay()->setTimezone($timezone);
+                    $end = Carbon::parse($generatedPeriod->end_date)->subDay()->endOfDay()->setTimezone($timezone);
 
                     if ($start->lt($globalStart)) $start = (clone $globalStart)->setTimezone($timezone);
                     if ($end->gt($globalEnd))     $end   = (clone $globalEnd)->setTimezone($timezone);
