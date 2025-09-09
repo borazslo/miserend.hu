@@ -115,8 +115,8 @@
   "RRULE": {
     "NO_RECURRENCE": "Egyszeri alkalom",
     "ON": {
-      "ODD": "páros heteken",
-      "EVEN": "páratlan heteken",
+      "EVEN": "páros heteken",
+      "ODD": "páratlan heteken",
       "EVERY_WEEK": "minden héten",
       "FIRST_WEEK": "minden hónapban az első",
       "SECOND_WEEK": "minden hónapban a második",
