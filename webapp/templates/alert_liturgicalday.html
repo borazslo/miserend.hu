@@ -1,3 +1,25 @@
 <div class="alert alert-warning" role="alert">
-{{ text|raw }}, ezért lehet, hogy különleges (a vasárnapihoz hasonló) miserend van életben.
+
+
+{% if name == 'Nagycsütörtök' %}
+        Ma <strong><a href="https://lexikon.katolikus.hu/N/nagycs%C3%BCt%C3%B6rt%C3%B6k.html">Nagycsütörtök</a></strong> van.<br/>
+            Ilyenkor csak az utolsó vacsora emlékmiséje van az est folyamán. Valamint általában krizmaszentelési mise a székesegyházban.
+{% elseif name == 'Nagypéntek' %}
+        Ma <strong><a href="https://lexikon.katolikus.hu/N/nagyp%C3%A9ntek.html">Nagypéntek</a></strong> van.<br/>
+            Ilyenkor csak esti úgynevezett „csonkamise” van, <a href="https://katolikus.hu/cikk/nagypentek---jezus-krisztus-kereszthalalanak-napja-24874153">amiben ünnepeljük Krisztus kereszthalálát.
+{% elseif name == 'Nagyszombat' %}
+        Ma <strong><a href="https://lexikon.katolikus.hu/N/Nagyszombat.html">Nagyszombat</a></strong> van.<br/>
+            Ilyenkor nincs szentmise. Csak a sír. Este pedig a feltámadás vigíliája, amely a húsvétot megnyitja.
+{% else %}
+
+    {{ text|raw }}. 
+    {% if parancsoltunnep %}
+        Ez olyan fontos, hogy <a href="https://lexikon.katolikus.hu/P/parancsolt%20%C3%BCnnep.html">parancsolt</a> ünnep rangra emelte az Egyház, hogy kötelezően szentmisével és lehetőség szerint munkaszünettel szenteljük meg.<br/>
+        <strong>Ezért valószínűleg, különleges miserend van életben.</strong>
+    {% else %}
+        <br/><strong>Ezért lehetséges, hogy különleges miserend van életben.</strong>
+    {% endif %}
+
+{% endif %}
+
 </div>

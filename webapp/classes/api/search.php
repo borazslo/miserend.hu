@@ -29,7 +29,13 @@ class Search extends Api {
                 'optional',
                 'integer',
                 'az egyszerre megmutatandó válaszok száma, 0 &lt; c &lt; 101'
-            ]
+            ],
+            'when' => [
+				'optional',
+				'enum(today, monday, tuesday, wednesday, thursday, friday, saturday, sunday, yyyy-mm-dd)',
+				'csak az adott napi misék megjelenítése',
+				'false'
+			],
         ];
 		 
         $docs['description'] = <<<HTML
@@ -57,6 +63,11 @@ class Search extends Api {
 		if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
             throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
         }
+        if (isset($this->input['when']) AND 
+			!(in_array($this->input['when'], ['today', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) OR
+			preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $this->input['when']))) {
+			throw new \Exception("JSON input 'when' should be a day or today or a date (yyyy-mm-dd).");
+		}
     }
     
     public function run() {
@@ -67,13 +78,22 @@ class Search extends Api {
 		$offset = isset($this->input['offset']) ? $this->input['offset'] : 0;
 		$limit = isset($this->input['limit']) ? $this->input['limit'] : 10;
 		
-		$results = searchChurches(['kulcsszo' => $this->input['q']], $offset, $limit);
-				
-		$ids = [];
-		foreach ($results['results'] as $key => $result) {		
-			$ids[] = $result['id'];
-		}		
-		unset($results['results']);
+        
+		
+		
+        if (isset($this->input['when']) && $this->input['when']) {
+            $results = searchMasses(['kulcsszo' => $this->input['q'], 'mikor' => $this->input['when']], $offset, $limit);
+            $ids = array_keys($results['churches']);
+            unset($results['churches']);                                  
+        } else {
+            $results = searchChurches(['kulcsszo' => $this->input['q']], $offset, $limit);
+            $ids = [];
+            foreach ($results['results'] as $key => $result) {		
+                $ids[] = $result['id'];
+            }		
+            unset($results['results']);
+        }
+		
 		$this->return = $results;
 
 		if(count($ids) == 0) {
@@ -83,10 +103,10 @@ class Search extends Api {
 		$this->return['templomok'] = \Eloquent\Church::select()	
 			->whereIN('id',$ids)
 			->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
-			->get()->map->toAPIArray(isset($this->input['response_length']) ? $this->input['response_length'] : false );
-
-
-		
+			->get()->map->toAPIArray(
+                isset($this->input['response_length']) ? $this->input['response_length'] : false ,
+                isset($this->input['when']) ? $this->input['when'] : false );
+        
         return;
     }
 

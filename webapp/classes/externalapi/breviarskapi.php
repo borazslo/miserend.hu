@@ -27,14 +27,33 @@ class breviarskApi extends \ExternalApi\ExternalApi {
 		}
 		$celebration = $this->xmlData->CalendarDay->Celebration;
 				
-		if ($celebration->LiturgicalCelebrationLevel <= 4 AND date('N', strtotime($date)) != 7) {
+		if ($celebration->LiturgicalCelebrationLevel <= 2 || ($celebration->LiturgicalCelebrationLevel <= 3 && date('N', strtotime($date)) != 7)) {
 
             $text = "Ma van <strong>" . $celebration->LiturgicalCelebrationName . "</strong>";
             if (preg_match("/ünnep$/i", $celebration->LiturgicalCelebrationType))
                 $text .= " " . $celebration->LiturgicalCelebrationType . "e";
+			
+			// A parancsolt ünnepek
+			$parancsoltunnep = false;
+			$specialDates = [
+				'01-01',
+				'01-06',
+				'08-15',
+				'11-01',
+				'12-25'
+			];
+			if (in_array(date('m-d', strtotime($date)), $specialDates)) {
+				$parancsoltunnep = true;
+			}
 
 			global $twig;
-			return $twig->render('alert_liturgicalday.html', array('text' => $text));
+			return $twig->render('alert_liturgicalday.html', 
+				array(
+					'text' => $text,
+					'name' => $celebration->LiturgicalCelebrationName,
+					'type' => $celebration->LiturgicalCelebrationType, 
+					'parancsoltunnep' => $parancsoltunnep
+				));
             
         }
 		return false;
