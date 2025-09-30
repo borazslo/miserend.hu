@@ -5,28 +5,31 @@ namespace Api;
 class Favorites extends Api {
 
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
+    public $extraUri = ['user/favorites'];
 
+    public $fields = [
+        'token' => [
+            'required' => true, 
+            'description' => 'Egy érvényes token'
+        ],
+        'add' => [
+            'validation' => [
+                'list' => 'integer'
+            ],
+            'description' =>  'A kedvencekhez hozzáadni kívánt templomok azonosítójának listája/tömbje.',            
+        ],
+        'remove' => [
+            'validation' => [
+                'list' => 'integer'
+            ],
+            'description' =>  'A kedvencekből törölni kívánt templomok azonosítójának listája/tömbje.'            
+        ]
+    ];
      public function docs() {
 
         $docs = [];
         $docs['title'] = 'Felhasználó kedvenc templomai';
-        $docs['input'] = [
-            'token' => [
-                'required',
-                'integer',
-                'Egy érvényes token'
-            ],
-            'add' => [
-                'optional',
-                'list of integer', 
-                'A kedvencekhez hozzáadni kívánt templomok azonosítójának listája/tömbje.',
-                ],
-            'remove' => [
-                'optional',
-                'list of integer', 
-                'A kedvencekből törölni kívánt templomok azonosítójának listája/tömbje.',
-                ]                
-        ];
+
 
         $docs['description'] = <<<HTML
         <p>A felhasználó kedven templomait le lehet kérdezni, valamint hozzá lehet adni vagy el lehet belőle venni a megfelelő url-re JSON formátumban küldött token érvényessége esetén. A rendszer JSON formátumban válaszol a kedvenc templomok megújult listájával. Először a hozzáadást hajtja végre, majd a törlést. Nem tér vissza hibajelzéssel, ha az adott templomazonosító már szerepel a kedvencek között. És akkor sem, ha olyan törlésére kerül sor, ami nem is szerepelt a kedvencek között.</p>
@@ -43,27 +46,7 @@ class Favorites extends Api {
 
         return $docs;
     }
-
-    public function validateInput() {
-        if (!isset($this->input['token'])) {
-            throw new \Exception("JSON input misses token.");
-        }
-        foreach (array('add', 'remove') as $method) {
-            if (isset($this->input[$method])) {
-                if (!is_array($this->input[$method]) AND ! is_numeric($this->input[$method])) {
-                    throw new \Exception("Wrong format of '$method' in JSON input.");
-                } elseif (!is_array($this->input[$method])) {
-                    $this->input[$method] = array($this->input[$method]);
-                }
-                foreach ($this->input[$method] as $tid) {
-                    if (!is_numeric($tid)) {
-                        throw new \Exception("Wrong value in '$method' of JSON input.");
-                    }
-                }
-            }
-        }
-    }
-
+    
     public function run() {
         parent::run();
         $this->getInputJson();

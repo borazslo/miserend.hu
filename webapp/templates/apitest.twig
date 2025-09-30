@@ -102,7 +102,9 @@
             {% set response_length = random(['minimal', 'medium', 'full']) %}
 
             var examples = [
-                {url: '/api/v4/search', jsonPayload: '{ "q" : "jezsuita", "offset" : 0, "limit" : 10, "response_length" : "{{ response_length }}"  }'},
+                {% for endpoint in endpoints %}
+                    {url: '{{ endpoint.url }}', jsonPayload: '{{ endpoint.jsonPayload|e('js') }}' },
+                {% endfor %}                
                 {url: '/api/v4/templomok', jsonPayload: '{ "columns" : ["nev", "id"] }'},
                 {url: '/api/v4/nearby', jsonPayload: '{"lat": 47.47880, "lon": 19.07609, "response_length" : "{{ response_length }}" }'},
                 {url: '/api/v4/updated/{{ one_week_ago|date('Y-m-d') }}', jsonPayload: '{}'},

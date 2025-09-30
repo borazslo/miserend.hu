@@ -6,13 +6,14 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Service_times extends Api {
 
+	public $fields = [];
+
+
 	public function docs() {
 
         $docs = [];
         $docs['title'] = 'Kapcsolat a "Horarios de Misa" API-val';
-        $docs['input'] = [];
         
-
         $docs['description'] = <<<HTML
         <p>Olyan kimenetet próbálunk adni, ami a <a href="https://horariosdemisa.com/" target="_blank">Horario de Misa</a> nemzetközi miserend honlap számára értelmes adatot tud közvetíteni.</p>
         <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/service_times</code></p>

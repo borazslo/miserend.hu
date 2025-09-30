@@ -6,23 +6,24 @@ class Login extends Api {
 
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
 
+    public $fields = [
+        'username' => [
+            'required' => true, 
+            'validation' => 'string',
+            'description' => 'A felhasználó regisztrált neve (e-mail címmel nem működik)'
+        ],
+        'password' => [
+            'required' => true, 
+            'validation' => 'string',
+            'description' => 'A felhasználó jelszava'        
+        ]
+    ];
+
     public function docs() {
 
         $docs = [];
         $docs['title'] = 'Felhasználó azonosítás';
-        $docs['input'] = [
-            'username' => [
-                'required',
-                'string',
-                'A felhasználó regisztrált neve (e-mail címmel nem működik)'
-            ],
-            'password' => [
-                'required',
-                'string',
-                'A felhasználó jelszava'
-            ]
-        ];
-
+        
         $docs['description'] = <<<HTML
         <p>Bizonyos API funkciókhoz szükséges (pl. kedvencek szinkronizálása) vagy lehetséges (pl. visszajelzés) a felhasználó azonosítása. A megfelelő url-re JSON formátumban küldött név-jelszó páros érvényessége esetén egy token-t küld vissza a rendszer JSON formátumban.</p>
         <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/login</code></p>

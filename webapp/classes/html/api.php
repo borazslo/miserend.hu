@@ -6,87 +6,77 @@ class Api extends Html {
 
     public function __construct() {
         ini_set('memory_limit', '256M');
+        //printr($_SERVER['REQUEST_URI']);
+        //printr($this);
 
-        try {
-            $action = \Request::SimpletextRequired('action');
-        } catch (\Exception $e) {            
-            $this->error = $e->getMessage();
+        $uri = $_SERVER['REQUEST_URI'];
+
+        // API version is obligatory in the URL
+        if (!preg_match('#^/api/(v[1-4])(/|$)#', $uri)) {
+            $this->error = "Invalid API endpoint: " . $uri;
+            \Message::add($this->error, 'danger');
+            $this->redirect('/apidocs');
+            exit;
+        }
+
+        // API v1 és v2 már nem elérhető
+        if (preg_match('#^/api/(v1|v2)(/|$)#', $uri)) {
+            echo 2;
+            exit;
+        }
+
+        // Determine the action from the URL if not provided in the query string
+        $endpoints = \Api\Api::collectApiEndpoints();                        
+        if (preg_match('#^/api/(v[1-4])/?([^/?]*)#i', $uri, $matches)) {
+            $_REQUEST['v'] = preg_replace('/\D/', '', $matches[1]);
+
+            // Simple uri - endpoint mapping
+            $remaining = strtolower($matches[2]);
+            foreach ($endpoints as $endpoint) {
+                if (strtolower($endpoint) === $remaining) {
+
+                    if($remaining == 'sqlite') {
+                        $this->redirect(DOMAIN . '/fajlok/sqlite/miserend_v' . $_REQUEST['v'] . '.sqlite3');
+                        exit;   
+                    }
+
+                    if($remaining == 'report') {
+                        // Special case because of the Report::factoryCreate();
+                        $this->api = \Api\Report::factoryCreate();                        
+                        break;
+                    }
+
+                    $this->api = new ('\\Api\\' . $endpoint)();                    
+                    break;
+                }
+            }
+        
+            // Find alternative URL patterns if no match found
+            if(!isset($this->api)) {
+                // Collect alternative URL patterns from the endpoint classes
+                $alternativePatterns = [];
+                foreach ($endpoints as $endpoint) {
+                    $className = 'Api\\' . $endpoint;
+                    $api = new $className();
+                    $patterns = $api->getAlternativeUrlPatterns();                
+                        foreach ($patterns as $pattern) {
+                            $alternativePatterns[$pattern] = $endpoint;
+                        }                
+                }                
+                if(array_key_exists($remaining, $alternativePatterns)) {
+                    $this->api = new ('\\Api\\' . $alternativePatterns[$remaining])();
+                }
+            }
+        }
+
+        if(!isset($this->api)) {
+            \Message::add('Invalid API endpoint:'.$uri, 'danger');
+            $this->redirect('/apidocs');
+            exit;
         }
         
+
         try {
-
-            if(!isset($action)) {
-                $action = false;
-                $this->format = 'html';
-                
-                $this->redirect('staticpage/api');
-                exit;
-                return;
-                //$this->redirect('https://github.com/borazslo/miserend.hu/wiki/API');
-                $action = false;
-            }
-            switch ($action) {
-                case 'sqlite':
-                    $this->redirect(DOMAIN . '/fajlok/sqlite/miserend_v' . $_REQUEST['v'] . '.sqlite3');
-                    exit;
-                    break;
-                case 'signup':
-                    $this->api = new \Api\Signup();
-                    break;
-                case 'login':
-                    $this->api = new \Api\Login();
-                    break;
-                case 'user':
-                    $this->api = new \Api\User();
-                    break;
-                case 'favorites':
-                    $this->api = new \Api\Favorites();
-                    break;
-
-                case 'report':
-                    $this->api = \Api\Report::factoryCreate();
-                    break;
-
-                case 'updated':
-                    $this->api = new \Api\Updated();
-                    break;
-
-                case 'table':
-                    $this->api = new \Api\Table();
-                    break;
-
-                case 'upload':
-                    $this->api = new \Api\Upload();
-                    break;
-
-                case 'service_times':
-                    $this->api = new \Api\Service_times();
-                    break;   
-
-                case 'nearby':
-                    $this->api = new \Api\NearBy();
-                    break;   					
-
-                case 'church':
-                    $this->api = new \Api\Church();
-                    break;   					
-
-                case 'database':
-                    $this->api = new \Api\Database();
-                    break;   
-
-                case 'lorawan':
-                    $this->api = new \Api\LoRaWAN();
-                    break;                       
-
-                case 'search':
-                    $this->api = new \Api\Search();
-                    break;
-                                        
-                default:
-                    throw new \Exception("API action '$action' is not supported.");
-            }
-
             $this->api->run();
         } catch (\Exception $e) {
             $this->error = $e->getMessage();

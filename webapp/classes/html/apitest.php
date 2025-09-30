@@ -1,6 +1,6 @@
 <?php
 
-namespace Html;
+namespace Html;    
 
 use Illuminate\Database\Capsule\Manager as DB;
 
@@ -20,6 +20,38 @@ class Apitest extends Html {
             $this->redirect('/');
         }
 
+        $this->endpoints = [];
+        // Collect API endpoints
+        $endpointNames = \Api\Api::collectApiEndpoints();
+        foreach($endpointNames as $name) {
+            $className = 'Api\\' . $name;
+            $endpointClass = new $className();
+
+            $endpoint = new class {};
+            $endpoint->name = $name;
+
+            $payLoad = false;
+            foreach($endpointClass->fields as $field => $details) {
+                if(isset($details['example'])) {
+                    $payLoad[$field] = $details['example'];
+                } elseif(isset($details['default'])) {
+                    if( $details['default'] !== 'false' && $details['default'] !== false) 
+                        $payLoad[$field] = $details['default'];
+
+                } else {
+                    $payLoad[$field] = '...';
+                }
+            }
+                
+
+            $this->endpoints[] = [
+               'url' => '/api/v4/' . strtolower($name),
+               'jsonPayload' => json_encode($payLoad,                   
+                   JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+               ),
+            ];
+        }
+        
         // Get a sample church ID for testing
         $this->sampleChurchId = 1;
         

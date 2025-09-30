@@ -273,7 +273,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         if ($whenMass == false || $whenMass == "today") $whenMass = date('Y-m-d');
         elseif (!(in_array($whenMass, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) ||
             preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $whenMass))) {
-            throw new \Exception("JSON input 'whenMass' should be a day or today or a date (yyyy-mm-dd).");
+            throw new \Exception("'whenMass' should be a day or today or a date (yyyy-mm-dd).");
         }
         if (in_array($whenMass, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])) {
             $whenMass = date('Y-m-d', strtotime("next $whenMass"));

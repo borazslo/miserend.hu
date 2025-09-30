@@ -6,6 +6,43 @@ class Report extends Api {
 
     public $requiredFields = array('tid','pid');
 
+    public $fields = [
+        'tid' => [
+            'required' => true, 
+            'validation' => 'integer', 
+            'description' => 'a templom azonosítója (mint az url-ben)'
+        ],
+        'text' => [
+            'validation' => 'string',
+            'description' => 'szöveges üzenet; „pid:2” esetén kötelező'
+        ],
+        'timestamp' => [
+            'validation' => 'string', // TODO: timestamp validation
+            'description' => 'a beküldés időpontja (hiánya esetén aktuális pillanat)',
+            'default' => 'current timestamp'
+        ],
+        'email' => [
+            'validation' => 'string', // TODO: email validation
+            'description' => 'a beküldő email címe, hogy tudjunk neki válaszolni'
+        ],
+        'token' => [
+            'validation' => 'string',
+            'description' => 'bejelentkezett felhasználó esetén hasznos. Felülírja az „email” értéket. Csak v4+ esetén használható'
+        ],
+        'pid' => [
+            'validation' => [
+                'enum' => [0,1,2]
+            ], 
+            'description' => 'visszajelzés típusa: 0 - rossz pozíció, 1 - hibás mise adatok, 2 - egyéb / ill. előbbiek részletezve'
+        ],
+        'dbdate' => [
+            'validation' => [
+                'timestampOrDate' => [] // TODO: timestamp or date validation
+            ], 
+            'description' =>  'a használt adatbázis letöltöttségének ideje, timestamp vagy ÉÉÉÉ-HH-NN ÓÓ:PP:MM vagy ÉÉÉÉ-HH-NN (≤v3 optional, v4+ kötelező)',
+        ]
+    ];
+
     static function factoryCreate() {
         $api = new Api();
         $api->getInputJson();
@@ -22,45 +59,7 @@ class Report extends Api {
 
         $docs = [];
         $docs['title'] = 'Visszajelzés / jelentés';
-        $docs['input'] = [
-            'tid' => [
-                'required',
-                'integer',
-                'a templom azonosítója (mint az url-ben)'
-            ],
-            'text' => [
-                'opcionális; „pid:2” esetén kötelező',
-                'string',
-                'szöveges üzenet'
-            ],
-            'timestamp' => [
-                'optional',
-                'string',
-                'a beküldés időpontja (hiánya esetén aktuális pillanat)',
-                'current timestamp'
-            ],
-            'email' => [
-                'optional',
-                'string',
-                'a beküldő email címe, hogy tudjunk neki válaszolni'
-            ],
-            'token' => [
-                'optional',
-                'string',
-                'bejelentkezett felhasználó esetén hasznos. Felülírja az „email” értéket. Csak v4+ esetén használható'
-            ],
-            'pid' => [
-                'required',
-                'enum(0,1,2)',
-                'visszajelzés típusa: 0 - rossz pozíció, 1 - hibás mise adatok, 2 - egyéb / ill. előbbiek részletezve'
-            ],
-            'dbdate' => [
-                '≤v3 optional, v4+ kötelező',
-                'timestamp or date',
-                'a használt adatbázis letöltöttségének ideje, timestamp vagy ÉÉÉÉ-HH-NN ÓÓ:PP:MM vagy ÉÉÉÉ-HH-NN',
-            ]
-        ];
-
+       
         $docs['description'] = <<<HTML
         <p>Fontos, hogy a felhasználók tudják jelezni, ha valami hibát találnak a miserendben vagy a templom adataiban.<br>
         JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
@@ -80,13 +79,7 @@ class Report extends Api {
 
 
     public function validateInput() {
-        //TODO: !isValidChurchId()?
-        if (!is_numeric($this->input['tid'])) {
-            throw new \Exception("Wrong format of 'tid' in JSON input.");
-        }
-        if (!in_array($this->input['pid'], array(0, 1, 2))) {
-            throw new \Exception("Wrong format of 'pid' in JSON input.");
-        }
+        
         if ($this->input['pid'] === 2 AND ! isset($this->input['text'])) {
             throw new \Exception("In the case of 'pid=2' the 'text' field required in JSON input.");
         }
