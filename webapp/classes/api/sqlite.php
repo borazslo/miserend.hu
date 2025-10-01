@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Sqlite extends Api {
 
+    public $title = 'Adatbázis';
     public $format = false;
     public $sqliteFileName;
     public $folder = 'fajlok/sqlite/';
@@ -16,12 +17,12 @@ class Sqlite extends Api {
     public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Adatbázis';
+        
         $docs['input'] = "Semmilyen adatot nem kell küldeni. Sőt meg sem kell hívni külön az API-t csak elkérni a fájlokat az alábbi URL-en";
 
         $docs['description'] = <<<HTML
         <p>SQLite formátumban a templomok, misék és képek. Naponta frissül. Nem szükséges külön meghívni.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/fajlok/sqlite/miserend_v3.sqlite3</code></p>
+        <p><strong>Átirányít a konkrét fájlhoz:</strong> <code>http://miserend.hu/fajlok/sqlite/miserend_v3.sqlite3</code></p>
         <p><em>(Léteznek még többé-kevésbé működő más url-ek is.)</em></p>
         <p><strong>Vigyázat!</strong> A 2025 második felében kezdődött felújítás a <em>misék</em> adattáblát biztosan meg fogja változtatni!</p>
         HTML;

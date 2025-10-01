@@ -3,12 +3,14 @@
 {% set title = 'API dokumentáció' %}
 {% set columns2 = true %}
 
+{% set currentVersion = 4 %}
+
 {% block content %}
 
-<p>Az aktuális API verzió az <strong>API v4</strong>. Az API v3 még támogatott, de kevesebb/pontatlanabb adatokat tartalmaz a misékről. A már nem támogatott API verziók mindenre a „2” szöveges értékkel tér vissza.</p>
+<p>Az aktuális API verzió az <strong>API v{{ currentVersion }}</strong>. Az API v3 még támogatott, de kevesebb/pontatlanabb adatokat tartalmaz a misékről. A már nem támogatott API verziók mindenre a „2” szöveges értékkel tér vissza.</p>
 <p>Természetesen https a megfelelő kommunikációs csatorna.</p>
 <p>Figyelem az API v4 alatt olykor bővülnek funkciók, és adatok. Az <a href="https://github.com/borazslo/miserend.hu/issues/56">API v5</a> tervezése már folyik.</p>
-<p><strong>Kérünk minden API használót, hgy vegye fel velünk a kapcsolatot!</strong></p>
+<p><strong>Kérünk minden API használót, hogy vegye fel velünk a kapcsolatot!</strong></p>
 
 
 <h3 id="top">API végpontok listája</h3>
@@ -39,6 +41,8 @@
             </div>
         {% endif %}
 
+        <p><strong>Végpont URL:</strong> <code>{{ basic_url }} https://miserend.hu/api/v{{ currentVersion }}/{{ endpoint.name|lower }}</code></p>
+
         <div class="endpoint-input">
             <h5>Küldés:</h5>
             {% if endpoint.input is defined and endpoint.input is iterable %}
@@ -59,7 +63,7 @@
                                 <td><code>{{ key }}</code></td>                                
                                 <td>{{ value[0] }}</td>
                                 <td>{{ value[1] }}</td>
-                                <td><i>{{ value[2] }}</i></td>                                
+                                <td><i>{{ value[2]|raw }}</i></td>                                
                                 <td>{{ value[3] }}</td>
                             </tr>
                         {% endfor %}

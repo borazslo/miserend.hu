@@ -6,9 +6,9 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Church extends Api {
 
+    public $title = 'Egy misézőhely adatai és miséi röviden';
     public $format = 'json'; //or text	
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
-    public $extraUri = ['templomok'];
 
     public $fields = [
         'id' => [
@@ -28,11 +28,9 @@ class Church extends Api {
 
     public function docs() {
         $docs = [];
-        $docs['title'] = 'Egy misézőhely adatai és miséi röviden';
-     
+             
         $docs['description'] = <<<HTML
-        <p>Egy templom adatát adja vissza. Csak röviden, a legszükségesebb adatokkal. Az aktuális napi misék rendjét is hozza.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/church</code></p>
+        <p>Egy templom adatát adja vissza. Csak röviden, a legszükségesebb adatokkal. Az aktuális napi misék rendjét is hozza.</p>        
         HTML;
 
         $docs['response'] = <<<HTML

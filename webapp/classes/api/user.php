@@ -4,23 +4,23 @@ namespace Api;
 
 class User extends Api {
 
+    public $title = 'Felhasználó adatainak lekérése';
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
+    
+    public $fields = [
+        'token' => [
+            'required' => true,
+            'validation' => 'string',
+            'description' => 'Egy érvényes token'      
+        ]
+    ];
 
    public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Felhasználó adatainak lekérdezése';
-        $docs['input'] = [
-            'token' => [
-                'required',
-                'string',
-                'Egy érvényes token'
-            ]
-        ];
-
+        
         $docs['description'] = <<<HTML
-        <p>A megfelelő url-re JSON formátumban küldött token érvényessége esetén a rendszer JSON formátumban visszaküldi a felhasználó adatait.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/user</code></p>
+        <p>A megfelelő url-re JSON formátumban küldött token érvényessége esetén a rendszer JSON formátumban visszaküldi a felhasználó adatait.</p>        
         HTML;
 
         $docs['response'] = <<<HTML
@@ -38,14 +38,7 @@ class User extends Api {
 
         return $docs;
     }
-
     
-    public function validateInput() {
-        if (!isset($this->input['token'])) {
-            throw new \Exception("JSON input misses token.");
-        }
-    }
-
     public function run() {
         parent::run();
         $this->getInputJson();

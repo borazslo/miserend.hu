@@ -12,6 +12,7 @@ class Api {
     public function run() {
         $this->version = \Request::IntegerRequired('v');
         $this->validateVersionMain();
+         
 
         $defaultDate = date('Y-m-d');
         $this->date = \Request::DatewDefault('datum', $defaultDate);
@@ -25,8 +26,8 @@ class Api {
         // Each endpoint can have 'requiredVersion' property to specify the minimum or maximum version required
         if(isset($this->requiredVersion))  {
             if (is_array($this->requiredVersion)) {
-                if (!version_compare($this->requiredVersion[1], $this->version, $this->requiredVersion[0] )) {
-                    throw new \Exception("API version does not match the required version.");
+                if (!version_compare($this->version, $this->requiredVersion[1], $this->requiredVersion[0] )) {
+                    throw new \Exception("API version (".$this->version.") does not match the required version: '".$this->requiredVersion[0]."".$this->requiredVersion[1]."'.");
                 }
             } else {            
                 throw new \Exception("Invalid requiredVersion for API endpoint.");                
@@ -44,8 +45,10 @@ class Api {
         if (!$inputJSONstring = file_get_contents('php://input')) {
             throw new \Exception("There is no JSON input.");
         }
-        if (!$inputJSONarray = json_decode($inputJSONstring, TRUE)) {  
-            throw new \Exception("Invalid JSON input.");
+        
+        $inputJSONarray = json_decode($inputJSONstring, TRUE);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception("Invalid JSON input: " . json_last_error_msg());
         }
         $this->input = $inputJSONarray;
         
@@ -85,9 +88,7 @@ class Api {
                     } elseif($function == 'float') {
                         $this->validateFloat($field, $details); // Call custom float validation if exists                        
                     } elseif($function == 'string') {
-                        if(!is_string($this->input[$field])) {
-                            throw new \Exception("Field '".$field."' should be a string.");
-                        }
+                        $this->validateString($field, $details); // Call custom string validation if exists
                     } elseif($function == 'boolean') {
                         if(!is_bool($this->input[$field])) {
                             throw new \Exception("Field '".$field."' should be a boolean.");
@@ -185,6 +186,21 @@ class Api {
         }
     }   
 
+    public function validateString($field, $details) {
+        if(!is_string($this->input[$field])) {
+            throw new \Exception("Field '".$field."' should be a string.");
+        }
+        if(isset($details['minLength']) && strlen($this->input[$field]) < $details['minLength']) {
+            throw new \Exception("Field '".$field."' should be at least ".$details['minLength']." characters long.");
+        }
+        if(isset($details['maxLength']) && strlen($this->input[$field]) > $details['maxLength']) {
+            throw new \Exception("Field '".$field."' should be at most ".$details['maxLength']." characters long.");
+        }
+        if(isset($details['pattern']) && !preg_match('/'.$details['pattern'].'/', $this->input[$field])) {
+            throw new \Exception("Field '".$field."' does not match the required pattern.");
+        }
+    }
+
     public function validateEnum($field, $details) {
         $return = false;
         foreach($details as $key => $value) {
@@ -260,16 +276,7 @@ class Api {
             unset($result[$key]);
             $result = array_values($result);
         }
-
-        // A ReportByAnonym és ReportByUser osztályok nem külön endpointok, ezért kivesszük a listából
-        // TODO: máshogy megoldani, hogy ne kelljen kézzel frissíteni
-        $reportClasses = ['ReportByAnonym', 'ReportByUser'];
-        foreach ($reportClasses as $reportClass) {
-            if (($key = array_search($reportClass, $result)) !== false) {
-                unset($result[$key]);
-            }
-        }
-
+        
         sort($result);
         return $result;
     }

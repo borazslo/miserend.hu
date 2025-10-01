@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class NearBy extends Api {
 
+	public $title = 'Közeli templomok és misék';
     public $format = 'json'; //or text	
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
 
@@ -63,12 +64,9 @@ class NearBy extends Api {
     public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Közeli templomok és misék';
-   
-		 
+         
         $docs['description'] = <<<HTML
             <p>Adott koordinátákhoz legközelebbi templomok listáját adja vissza az adott napi misékkel együtt.</p>
-            <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/nearby</code></p>
         HTML;
 
         $docs['response'] = <<<HTML

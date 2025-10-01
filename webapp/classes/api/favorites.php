@@ -4,8 +4,8 @@ namespace Api;
 
 class Favorites extends Api {
 
-    public $requiredVersion = ['>=',4]; // API v4-től érhető el
-    public $extraUri = ['user/favorites'];
+    public $title = 'Felhasználó kedvenc templomai';
+    public $requiredVersion = ['>=',4]; // API v4-től érhető el    
 
     public $fields = [
         'token' => [
@@ -27,13 +27,10 @@ class Favorites extends Api {
     ];
      public function docs() {
 
-        $docs = [];
-        $docs['title'] = 'Felhasználó kedvenc templomai';
-
+        $docs = [];        
 
         $docs['description'] = <<<HTML
-        <p>A felhasználó kedven templomait le lehet kérdezni, valamint hozzá lehet adni vagy el lehet belőle venni a megfelelő url-re JSON formátumban küldött token érvényessége esetén. A rendszer JSON formátumban válaszol a kedvenc templomok megújult listájával. Először a hozzáadást hajtja végre, majd a törlést. Nem tér vissza hibajelzéssel, ha az adott templomazonosító már szerepel a kedvencek között. És akkor sem, ha olyan törlésére kerül sor, ami nem is szerepelt a kedvencek között.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/user/favorites</code></p>
+        <p>A felhasználó kedven templomait le lehet kérdezni, valamint hozzá lehet adni vagy el lehet belőle venni a megfelelő url-re JSON formátumban küldött token érvényessége esetén. A rendszer JSON formátumban válaszol a kedvenc templomok megújult listájával. Először a hozzáadást hajtja végre, majd a törlést. Nem tér vissza hibajelzéssel, ha az adott templomazonosító már szerepel a kedvencek között. És akkor sem, ha olyan törlésére kerül sor, ami nem is szerepelt a kedvencek között.</p>        
         HTML;
 
         $docs['response'] = <<<HTML

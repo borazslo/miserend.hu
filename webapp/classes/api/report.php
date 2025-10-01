@@ -3,27 +3,30 @@
 namespace Api;
 
 class Report extends Api {
-
-    public $requiredFields = array('tid','pid');
-
+    
+    public $title = 'Visszajelzés / jelentés';
     public $fields = [
         'tid' => [
             'required' => true, 
             'validation' => 'integer', 
-            'description' => 'a templom azonosítója (mint az url-ben)'
+            'description' => 'a templom azonosítója (mint az url-ben)',
+            'example' => 7
         ],
         'text' => [
             'validation' => 'string',
-            'description' => 'szöveges üzenet; „pid:2” esetén kötelező'
+            'description' => 'szöveges üzenet; „pid:2” esetén kötelező',
+            'example' => 'A mise vasárnap 11-kor van, de a honlapon 10:30 szerepel.'
         ],
         'timestamp' => [
             'validation' => 'string', // TODO: timestamp validation
             'description' => 'a beküldés időpontja (hiánya esetén aktuális pillanat)',
-            'default' => 'current timestamp'
+            'default' => 'current timestamp',
+            'example' => '2024-01-16 12:34:56'
         ],
         'email' => [
             'validation' => 'string', // TODO: email validation
-            'description' => 'a beküldő email címe, hogy tudjunk neki válaszolni'
+            'description' => 'a beküldő email címe, hogy tudjunk neki válaszolni',
+            'example' => 'somebody@no.mail'
         ],
         'token' => [
             'validation' => 'string',
@@ -33,37 +36,27 @@ class Report extends Api {
             'validation' => [
                 'enum' => [0,1,2]
             ], 
-            'description' => 'visszajelzés típusa: 0 - rossz pozíció, 1 - hibás mise adatok, 2 - egyéb / ill. előbbiek részletezve'
+            'description' => 'visszajelzés típusa: 0 - rossz pozíció, 1 - hibás mise adatok, 2 - egyéb / ill. előbbiek részletezve',
+            'example' => 2,
         ],
         'dbdate' => [
             'validation' => [
-                'timestampOrDate' => [] // TODO: timestamp or date validation
+                'string' => [
+                    'pattern' => '^\d{4}-\d{2}(-\d{2}( \d{2}:\d{2}(:\d{2})?)?)?$'
+                ] 
             ], 
             'description' =>  'a használt adatbázis letöltöttségének ideje, timestamp vagy ÉÉÉÉ-HH-NN ÓÓ:PP:MM vagy ÉÉÉÉ-HH-NN (≤v3 optional, v4+ kötelező)',
+            'example' => '2024-01-16'
         ]
     ];
-
-    static function factoryCreate() {
-        $api = new Api();
-        $api->getInputJson();
-
-
-        if (!isset($api->input['token'])) {
-            return new ReportByAnonym();
-        } else {
-            return new ReportByUser();
-        }
-    }
-    
+        
     public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Visszajelzés / jelentés';
        
         $docs['description'] = <<<HTML
         <p>Fontos, hogy a felhasználók tudják jelezni, ha valami hibát találnak a miserendben vagy a templom adataiban.<br>
         JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/report</code></p>
         HTML;
 
         $docs['response'] = <<<HTML
@@ -86,15 +79,35 @@ class Report extends Api {
         if ($this->version > 3 AND ( !isset($this->input['dbdate']) OR strtotime($this->input['dbdate']) == false )) {
             throw new \Exception("Field 'dbdate' is required after API version 3 in JSON input.");
         }
-        if (isset($this->input['timestamp']) AND strtotime($this->input['timestamp']) == false) {
+        if (isset($this->input['timestamp']) AND    strtotime($this->input['timestamp']) == false) {
             throw new \Exception("Wrong format of 'timestamps' in JSON input.");
+        }
+    
+        if (isset($this->input['token'])) {                    
+            $this->token = \Eloquent\Token::where('name',$this->input['token'])->first();
+            if(!$this->token or !$this->token->isValid) {
+                throw new \Exception("Invalid token.");
+            }            
         }
     }
 
     public function run() {
         parent::run();
         $this->getInputJson();
-        $this->prepareUser();
+        
+
+        if(!isset($this->input['token'])) {
+            // Prepare anonymus user
+            $this->user = new \User();
+            $this->user->name = "Mobil felhasználó";
+            if (isset($this->input['email'])) {
+                $this->user->email = sanitize($this->input['email']);
+            }
+        } else {            
+            // Prepare logged in user
+            $this->user = new \User($this->token->uid);
+        }
+
         $this->prepareRemark();
 
         try {

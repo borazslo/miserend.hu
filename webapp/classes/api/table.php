@@ -6,11 +6,12 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Table extends Api {
 
+    public $title = 'Listák / táblázatok';
     public $tableName;
     public $columns;
     public $table; //output
     public $format = 'json'; //or text
-    public $delimiter = ';';
+    
     public $validColumnsTables = array(
         'templomok' => array(
             'id', 'nev', 'ismertnev', 'turistautak', 'orszag', 'megye', 'varos', 'cim',
@@ -20,32 +21,41 @@ class Table extends Api {
             'denomination', 'url')
     );
 
-    public $requiredVersion = ['>=',3]; // API v4-től érhető el
-
+    public $fields = [
+        'table' => [
+            'validation' => [
+                'enum' => ['templomok']
+            ],
+            'description' => 'A lekérdezni kívánt tábla neve. Jelenleg csak a „templomok” tábla érhető el.',
+            'default' => 'templomok',
+            'example' => 'templomok'
+        ],
+        'columns' => [
+            'required' => true,
+            'validation' => [
+                'list' => ['string' => []]
+            ],
+            'description' => 'A lekérdezni kívánt oszlopok listája. Részleteket lásd lejjebb.',
+            'example' => ['id', 'nev', 'varos', 'lat', 'lon']
+        ],
+        'format' => [
+            'validation' => [
+                'enum' => ['json', 'text', 'csv']
+            ],
+            'description' =>  'A visszatérés formátuma',
+            'default' => 'json'
+        ],
+        'delimiter' => [
+            'validation' => 'string',
+            'description' =>  '„format:csv” esetén az oszlopokat elválasztó jel',
+            'default' => ';'
+        ]
+    ];
+    
     public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Listák / táblázatok';
-        $docs['input'] = [
-            'columns' => [
-                'required',
-                'list of string',
-                'a megkapni kívánt oszlopok (részleteket lásd lejjebb)'
-            ],
-            'format' => [
-                'optional',
-                'string',
-                'a visszatérés formátuma; lehet még „text”',
-                'json'
-            ],
-            'delimiter' => [
-                'optional',
-                'string',
-                '„format:json” esetén az oszlopokat elválasztó jel',
-                ';'
-            ]
-        ];
-
+        
         $validColumns = '<p>';
         foreach($this->validColumnsTables as $table => $columns) {
             $validColumns .= "Engedélyezett oszlopok a <code>".$table."</code> tábla esetén: <code>".implode(', ',$columns)."</code><br/>";
@@ -54,8 +64,7 @@ class Table extends Api {
 
         $docs['description'] = <<<HTML
         <p>Az adatokat nem csak a teljes sqlite letöltésével lehet megkapni: a megfelelő url-re küldött JSON segítségével a számunkra érdekes oszlopokkal és minden sorral tér vissza az API.</p>
-        <p><strong>Vigyázzat!</strong> Az egyes oszlopok / mezők neve, léte és tartalmának formátuma / értéktartománya előzetes figyelmeztetés nélkül változhat. Ezért ez a szolgáltatás rendszeresített / automatizált használata jelenleg nem ajánlott!</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/templomok</code></p>
+        <p><strong>Vigyázzat!</strong> Az egyes oszlopok / mezők neve, léte és tartalmának formátuma / értéktartománya előzetes figyelmeztetés nélkül változhat. Ezért ez a szolgáltatás rendszeresített / automatizált használata jelenleg nem ajánlott!</p>        
         $validColumns
         HTML;
 
@@ -70,32 +79,26 @@ class Table extends Api {
         return $docs;
     }
 
-    public function validateInput() {
-        if (!is_array($this->input['columns']) OR $this->input['columns'] === array()) {
-            throw new \Exception("JSON input 'columns' should be a list/array.");
-        }
+    public function validateInput() {        
         foreach ($this->input['columns'] as $column) {
             if (!in_array($column, $this->validColumnsTables[$this->tableName])) {
                 throw new \Exception("Column '$column' is invalid in '$this->tableName'.");
             }
-        }
-        if (isset($this->input['format']) AND ! in_array($this->input['format'], array('json', 'text', 'csv'))) {
-            throw new \Exception("Format '" . $this->input['format'] . "' is not supported.");
-        }
+        }        
     }
 
     public function run() {
         parent::run();
 
-        $this->tableName = \Request::SimpletextRequired('table');
+        $this->tableName = isset($this->input['table']) ? $this->input['table'] : $this->fields['table']['default'];
         if (!array_key_exists($this->tableName, $this->validColumnsTables)) {
             throw new \Exception("Table '$this->tableName' is invalid.");
         }
         $this->getInputJson();
 
-        if (isset($this->input['delimiter'])) {
-            $this->delimiter = $this->input['delimeter'];
-        }
+        
+        $this->delimiter = isset($this->input['delimiter']) ? $this->input['delimiter'] : $this->fields['delimiter']['default'];
+        
         if (isset($this->input['format'])) {
             $this->format = $this->input['format'];
         }

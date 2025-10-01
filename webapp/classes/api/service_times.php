@@ -6,17 +6,16 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Service_times extends Api {
 
+	public $title = 'Kapcsolat a "Horarios de Misa" API-val';	
 	public $fields = [];
 
 
 	public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Kapcsolat a "Horarios de Misa" API-val';
         
         $docs['description'] = <<<HTML
         <p>Olyan kimenetet próbálunk adni, ami a <a href="https://horariosdemisa.com/" target="_blank">Horario de Misa</a> nemzetközi miserend honlap számára értelmes adatot tud közvetíteni.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/service_times</code></p>
         HTML;
 
         $docs['response'] = <<<HTML
@@ -48,8 +47,8 @@ class Service_times extends Api {
 					'church_id' => $church->id,
 					'name' => $church->names[0],
 					'address' => $church->location->address,
-					'city, state' => $church->location->city['name'],
-					'country' => $church->location->country['name'],
+					'city, state' => isset($church->location->city['name']) ? $church->location->city['name'] : $church->varos,
+					'country' => isset($church->location->country['name']) ? $church->location->country['name'] : $church->orszag,
 					'phone' => false,
 					'email' => $church->pleb_eml,
 					'url' => false,

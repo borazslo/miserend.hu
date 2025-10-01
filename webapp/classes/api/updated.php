@@ -6,20 +6,32 @@ use Illuminate\Database\Capsule\Manager as DB;
         
 class Updated extends Api {
 
-    public $format = 'text';
-
-    public $requiredVersion = ['>=',2]; // API v2-től érhető el
+    public $title = 'Adatbázis frissítettsége';
+    
+    public $fields = [
+        'date' => [
+            'validation' => 'date', 
+            'description' => 'a dátum, amely óta vizsgálni kell a frissítéseket (kötelező itt vagy URL-ben)',
+            'example' => '2025-10-16'
+        ],
+        'format' => [
+            'validation' => [
+                'enum' => ['text', 'json']
+            ],
+            'description' =>  'A visszatérés formátuma',
+            'default' => 'text'
+        ]
+    ];
 
     public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Adatbázis frissítettsége';
-        $docs['input'] = [];
-        
-
+                        
         $docs['description'] = <<<HTML
-        <p>Egyet ad vissza, ha adott dátum óta nem volt változás a miserendek és templomok között. (A képek közötti változást nem vizsgálja.) Egyébként nullát.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v3/updated/2015-01-16</code></p>
+        <p>TEXT esetén: Egyet ad vissza, ha adott dátum óta volt változás a miserendek és templomok között. (A képek közötti változást nem vizsgálja.) <br/>Nullát ad vissza, ha nem volt változás. (Vagy valamiért épp nem volt elérhető az adatbázis sqlite fájl.)</p>
+        <p>JSON esetén: Egy JSON objektumot ad vissza, amely tartalmazza, hogy volt-e változás (true/false), illetve hiba esetén egy hibaüzenetet.</p>
+        <p>Nem csak JSON payload-dal, hanem a dátumot a URL-ben is meg lehet adni. Például: <code>api/v4/updated/2026-12-01</code> .</p>
+            
         HTML;
 
         $docs['response'] = <<<HTML
@@ -31,18 +43,43 @@ class Updated extends Api {
 
     public function run() {
         parent::run();
+        $this->getInputJson();
 
+        $this->format = isset($this->input['format']) ? $this->input['format'] : $this->fields['format']['default'];
+
+        if (isset($_REQUEST['date']) and preg_match('#^\d{4}-\d{2}-\d{2}$#',$_REQUEST['date'])) {
+            $this->date = $_REQUEST['date'];
+        } elseif (isset($this->input['date'])) {
+           $this->date = $this->input['date'];
+        } else {
+            throw new \Exception("Field 'date' is required in URL or JSON input.");
+        }
+
+        // If we cannot find the sqlite file, return "0" (no update)
         $sqlite = new \Api\Sqlite();
         $sqlite->version = $this->version;        
         if(!$sqlite->checkSqliteFile()) {
-            $this->return = "0";
+            if($this->input['format'] == 'json') {
+                $this->return = [
+                    "error" => 1, 
+                    "text" => "Sqlite file is not available.",
+                    "updated" => false
+                ];
+            } else 
+                $this->return = "0";
             return;
         }
 
-        if( DB::table('templomok')->where('frissites','>=',$this->date)->count() > 0) 
-            $this->return = "1";
-        else 
-            $this->return = "0";
+        if( DB::table('templomok')->where('frissites','>=',$this->date)->count() > 0)  {
+            if($this->input['format'] == 'json') {
+                $this->return = ["error" => 0, "updated" => true];
+            } else
+                $this->return = "1";
+        } else 
+            if($this->input['format'] == 'json') {
+                $this->return = ["error" => 0, "updated" => false];
+            } else  
+                $this->return = "0";
     }
 
 }

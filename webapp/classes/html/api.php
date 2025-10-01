@@ -35,38 +35,21 @@ class Api extends Html {
             foreach ($endpoints as $endpoint) {
                 if (strtolower($endpoint) === $remaining) {
 
+                    if($remaining == 'updated') {
+                        if (preg_match('#/api/v(\d+)/updated/(\d{4}-\d{2}-\d{2})#', $_SERVER['REQUEST_URI'], $m)) {                         
+                            $_REQUEST['date'] = $m[2];                            
+                        }
+                    }
+
                     if($remaining == 'sqlite') {
                         $this->redirect(DOMAIN . '/fajlok/sqlite/miserend_v' . $_REQUEST['v'] . '.sqlite3');
                         exit;   
                     }
 
-                    if($remaining == 'report') {
-                        // Special case because of the Report::factoryCreate();
-                        $this->api = \Api\Report::factoryCreate();                        
-                        break;
-                    }
-
                     $this->api = new ('\\Api\\' . $endpoint)();                    
                     break;
                 }
-            }
-        
-            // Find alternative URL patterns if no match found
-            if(!isset($this->api)) {
-                // Collect alternative URL patterns from the endpoint classes
-                $alternativePatterns = [];
-                foreach ($endpoints as $endpoint) {
-                    $className = 'Api\\' . $endpoint;
-                    $api = new $className();
-                    $patterns = $api->getAlternativeUrlPatterns();                
-                        foreach ($patterns as $pattern) {
-                            $alternativePatterns[$pattern] = $endpoint;
-                        }                
-                }                
-                if(array_key_exists($remaining, $alternativePatterns)) {
-                    $this->api = new ('\\Api\\' . $alternativePatterns[$remaining])();
-                }
-            }
+            }                    
         }
 
         if(!isset($this->api)) {

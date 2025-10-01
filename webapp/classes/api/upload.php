@@ -4,7 +4,7 @@ namespace Api;
 
 class Upload extends Api {
 
-    public $requiredFields = array('tid','photo');
+    public $title = 'Fénykép feltöltése templomokhoz';
     public $photo; // Photo object
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
 
@@ -26,13 +26,10 @@ class Upload extends Api {
      public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Fénykép feltöltése templomokhoz';
-       
-
+               
         $docs['description'] = <<<HTML
         <p>Lehetséges fénykép beküldése bármelyik templomhoz. A beküldött képek jelenleg azonnal megjelennek a honlapon. Ez változhat majd, hogy nem regisztrált felhasználóknak csak jóváhagyás után jelenik meg a fényképük. JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
         <p><strong>Fontos</strong> felhívni a beküldő figyelmét, hogy a fénykép feltöltésével <strong>a)</strong> a fotó jogos tulajdonosának jelenti ki magát <strong>b)</strong> a kép felhasználói jogait teljesen (de nem kizárólagosan) átadja a miserend.hu-nak (és a hozzá tartozó alkalmazásoknak).</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/upload</code></p>
 
         <p>A kép formátuma lehet <code>image/jpg</code>, <code>image/jpeg</code>, <code>image/gif</code>, <code>image/png</code>. Van felső méret korlát is.</p>
         HTML;

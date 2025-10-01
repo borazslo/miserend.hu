@@ -20,6 +20,7 @@ class ApiDocs extends Html {
 
             $endpoint = new class {};
             $endpoint->name = $name;
+            $endpoint->title = $endpointClass->title ?? $name; // Default title if not set
             $docs = method_exists($endpointClass, 'docs') ? $endpointClass->docs() : [];
             
             if(isset($endpointClass->fields)) {
@@ -51,15 +52,13 @@ class ApiDocs extends Html {
             foreach($docs as $key => $value) {
                 $endpoint->$key = $value;
             }
-            $endpoint->title = $endpoint->title ?? $name; // Default title if not set
+            
             $endpoint->requiredVersion = $endpointClass->requiredVersion ?? null; // Default to null if not set
             
             $this->endpoints[] = $endpoint;
             
 
         }
-        
-
         
         return;
     }

@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Search extends Api {
 
+    public $title = 'Misézőhely keresése';
     public $format = 'json'; //or text
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
 
@@ -48,13 +49,10 @@ class Search extends Api {
 
      public function docs() {
 
-        $docs = [];
-        $docs['title'] = 'Misézőhely keresése';
-    
+        $docs = [];            
 	 
         $docs['description'] = <<<HTML
         <p>Templomok között lehet keresni egy (akár összetett) keresőszó megadásával.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/search</code></p>
         HTML;
 
         $docs['response'] = <<<HTML

@@ -15,7 +15,7 @@ class Apitest extends Html {
         $this->setTitle('API tesztelés');
 
         global $user;
-        if (!$user->isadmin) {
+        if (!isset($user->isadmin) OR !$user->isadmin) {
             addMessage("Hozzáférés megtagadva!", "danger");
             $this->redirect('/');
         }
