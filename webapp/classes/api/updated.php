@@ -19,7 +19,8 @@ class Updated extends Api {
                 'enum' => ['text', 'json']
             ],
             'description' =>  'A visszatérés formátuma',
-            'default' => 'text'
+            'default' => 'text',
+            'example' => 'json'
         ]
     ];
 
@@ -28,14 +29,16 @@ class Updated extends Api {
         $docs = [];
                         
         $docs['description'] = <<<HTML
-        <p>TEXT esetén: Egyet ad vissza, ha adott dátum óta volt változás a miserendek és templomok között. (A képek közötti változást nem vizsgálja.) <br/>Nullát ad vissza, ha nem volt változás. (Vagy valamiért épp nem volt elérhető az adatbázis sqlite fájl.)</p>
-        <p>JSON esetén: Egy JSON objektumot ad vissza, amely tartalmazza, hogy volt-e változás (true/false), illetve hiba esetén egy hibaüzenetet.</p>
-        <p>Nem csak JSON payload-dal, hanem a dátumot a URL-ben is meg lehet adni. Például: <code>api/v4/updated/2026-12-01</code> .</p>
-            
+        <p>Visszaadja, hogy adott dátum után volt-e változás a miserendekben vagy templomokban. A képek változását nem vizsgálja.</p>
+        
+        <p>Régen a dátumot az url-ben kellett megadni, például: <code>api/v3/updated/2024-10-16</code>, és a válasz csak 0 vagy 1 lehetett mindenféle formázás nélkül. 
+        Ez ma is működik, de javasoljuk a JSON formátum használatát az adatok küldésére és fogadására is, mert így egységesebb a válaszformátum.</p>
+
         HTML;
 
         $docs['response'] = <<<HTML
-        0, ha nem volt változás és 1, ha volt változás.
+        TEXT esetén: 0, ha nem volt változás és 1, ha volt változás.<br/>
+        JSON esetén:  Egy JSON objektumot ad vissza, amely tartalmazza, hogy volt-e változás (true/false), illetve hiba esetén egy hibaüzenetet.
         HTML;
 
         return $docs;

@@ -50,8 +50,14 @@ class Api {
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception("Invalid JSON input: " . json_last_error_msg());
         }
+
         $this->input = $inputJSONarray;
+
+
         
+        // Check for unknown fields
+        // Be aware that $this->fields can contain 'field/subfield' - that is, hierarchical fields. But we are not checking that here.
+        // TODO: We should check hierarchical fields too. Even though "lorawan.php" has a lot of such fields, it does not use this check.
         foreach ($this->input as $key => $value) {
             if (!isset($this->fields[$key])) {
                 throw new \Exception("Unknown field '".$key."' in JSON input.");
@@ -60,8 +66,27 @@ class Api {
 
         if(isset($this->fields)) {
             foreach($this->fields as $field => $details) {
+            
+                // A $this->fields-ben lehet olyat definiálni hogy 'field/subfield' - azaz alá-fölé rendeltség
+                $parts = explode('/', $field);
+                $ref = $this->input;
+                foreach ($parts as $part) {
+                    if (!isset($ref[$part])) {
+                        $ref = null;
+                        break;
+                    }
+                    $ref = $ref[$part];
+                }
+                $inputValue = $ref;
+                
+                // Check required fields
                 if(isset($details['required']) && $details['required'] === true) {
                     $this->requiredInput([$field]);
+                }
+
+                // If field is not set, skip validation
+                if($inputValue === null) {
+                    continue; 
                 }
 
                 // Prepare validation rules
@@ -75,65 +100,10 @@ class Api {
                     if(!is_array($value)) {
                         $details['validation'][$key] = [$value => []];
                     }
-                }
-                
+                }                
                 //Check validation rules
                 foreach($details['validation'] as $function => $details) {
-                    if(!isset($this->input[$field])) {
-                        continue; // Skip validation if field is not set
-                    }
-
-                    if($function == 'integer') {
-                        $this->validateInteger($field, $details); // Call custom integer validation if exists
-                    } elseif($function == 'float') {
-                        $this->validateFloat($field, $details); // Call custom float validation if exists                        
-                    } elseif($function == 'string') {
-                        $this->validateString($field, $details); // Call custom string validation if exists
-                    } elseif($function == 'boolean') {
-                        if(!is_bool($this->input[$field])) {
-                            throw new \Exception("Field '".$field."' should be a boolean.");
-                        }
-                    } elseif($function == 'date') {
-                        if(!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $this->input[$field])) {
-                            throw new \Exception("Field '".$field."' should be a date (yyyy-mm-dd).");
-                        }
-                    } elseif($function == 'enum') {
-                        $this->validateEnum($field, $details); // Call custom enum validation if exists                        
-                    } elseif($function == 'list') {                        
-                        if(!is_array($this->input[$field])) {
-                            throw new \Exception("Field '".$field."' should be a list/array.");
-                        }                        
-                        foreach($this->input[$field] as $item) {
-                            
-                            foreach($details as $function => $detail) {
-                                
-                                if($function == 'integer') {
-                                    $this->validateInteger($field, $detail, $item); // Call custom integer validation if exists                          
-                                } elseif($function == 'float') {
-                                     $this->validateFloat($field, $detail, $item); // Call custom integer validation if exists                          
-                                } elseif($function == 'string') {
-                                    if(!is_string($item)) {
-                                        throw new \Exception("Items in field '".$field."' should be strings.");
-                                    }                                    
-                                } elseif($function == 'enum') {
-                                    if(!in_array($item, $detail)) {
-                                        throw new \Exception("Items in field '".$field."' should be one of: ".implode(", ", $detail).".");
-                                    }                                    
-                                } elseif(method_exists($this, 'validateField')) {
-                                    $this->validateField($field, [$function => $detail]);
-                                } else {
-                                    throw new \Exception("Unknown validation function '".$function."' for items in field '".$field."'.");
-                                }                                
-                            }
-
-                            
-                        }   
-                    } elseif(method_exists($this, 'validateField')) {
-                        $this->validateField($field, [$function => $details]);
-                    } else {
-                        throw new \Exception("Unknown validation function '".$function."' for field '".$field."'.");
-                }
-                    
+                    $this->validateVariable($function, $field, $details, $inputValue);
                 }
             
                 if(isset($details['validation']) && method_exists($this, 'validateField')) {
@@ -152,60 +122,98 @@ class Api {
     
     public function requiredInput($fields) {
         foreach($fields as $field) {
-            if(! isset($this->input[$field])) {
-                throw new \Exception("Field '".$field."' is required in JSON.");
+            $parts = explode('/', $field);
+            $ref = $this->input;
+            foreach ($parts as $part) {
+                if (!isset($ref[$part])) {
+                    throw new \Exception("Field '".$field."' is required in JSON.");
+                }
+                $ref = $ref[$part];
             }
         }
     }
 
-    public function validateFloat($field, $details) {
-        if(!is_numeric($this->input[$field]) || floatval($this->input[$field]) != $this->input[$field]) {
+    public function validateVariable($type, $name, $details, $input = null) {
+        if($input === null) {
+            printr($this->input);
+            $input = $this->input[$name];        
+        }
+
+        if($type == 'integer') {
+            $this->validateInteger($name, $details, $input);
+        } elseif($type == 'boolean') {
+            if(!is_bool($input)) {
+                throw new \Exception("Field '".$name."' should be a boolean.");
+            }
+        } elseif($type == 'date') {
+            if(!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $input)) {
+                throw new \Exception("Field '".$name."' should be a date (yyyy-mm-dd).");
+            }
+        } elseif($type == 'float') {
+            $this->validateFloat($name, $details, $input);
+        } elseif($type == 'string') {
+            $this->validateString($name, $details, $input);
+        } elseif($type == 'enum') {
+            $this->validateEnum($name, $details, $input);
+        
+        } elseif($type == 'list') {                        
+            if(!is_array($input)) {
+                throw new \Exception("Field '".$name."' should be a list/array.");
+            }                        
+            foreach($input as $item) {                            
+                foreach($details as $function => $detail) {
+                    $this->validateVariable($function, $name, $detail, $item);                                
+                }                
+            }       
+        } else {
+            throw new \Exception("Unknown validation type '".$type."' for field '".$name."'.");
+        }
+    }
+
+    public function validateFloat($field, $details, $input) {        
+        if(!is_numeric($input) || floatval($input) != $input) {
             throw new \Exception("Field '".$field."' should be a float.");
         }
-        if(isset($details['minimum']) && $this->input[$field] < $details['minimum']) {
+        if(isset($details['minimum']) && $input < $details['minimum']) {
             throw new \Exception("Field '".$field."' should be at least ".$details['minimum'].".");
         }
-        if(isset($details['maximum']) && $this->input[$field] > $details['maximum']) {
+        if(isset($details['maximum']) && $input > $details['maximum']) {
             throw new \Exception("Field '".$field."' should be at most ".$details['maximum'].".");
         }
     }   
 
-    public function validateInteger($fieldName, $details, $field = null) {        
-        if($field == null) {
-            $field = $this->input[$fieldName];        
-        }
-
-        if(!is_numeric($field) || intval($field) != $field) {
+    public function validateInteger($fieldName, $details, $input) {        
+        if(!is_numeric($input) || intval($input) != $input) {
             throw new \Exception("Field '".$fieldName."' should be an integer.");
         }
-        if(isset($details['minimum']) && $field < $details['minimum']) {
+        if(isset($details['minimum']) && $input < $details['minimum']) {
             throw new \Exception("Field '".$fieldName."' should be at least ".$details['minimum'].".");
         }
-        if(isset($details['maximum']) && $field > $details['maximum']) {
+        if(isset($details['maximum']) && $input > $details['maximum']) {
             throw new \Exception("Field '".$fieldName."' should be at most ".$details['maximum'].".");
         }
     }   
 
-    public function validateString($field, $details) {
-        if(!is_string($this->input[$field])) {
+    public function validateString($field, $details, $input) {
+        if(!is_string($input)) {
             throw new \Exception("Field '".$field."' should be a string.");
         }
-        if(isset($details['minLength']) && strlen($this->input[$field]) < $details['minLength']) {
+        if(isset($details['minLength']) && strlen($input) < $details['minLength']) {
             throw new \Exception("Field '".$field."' should be at least ".$details['minLength']." characters long.");
         }
-        if(isset($details['maxLength']) && strlen($this->input[$field]) > $details['maxLength']) {
+        if(isset($details['maxLength']) && strlen($input) > $details['maxLength']) {
             throw new \Exception("Field '".$field."' should be at most ".$details['maxLength']." characters long.");
         }
-        if(isset($details['pattern']) && !preg_match('/'.$details['pattern'].'/', $this->input[$field])) {
+        if(isset($details['pattern']) && !preg_match('/'.$details['pattern'].'/', $input)) {
             throw new \Exception("Field '".$field."' does not match the required pattern.");
         }
     }
 
-    public function validateEnum($field, $details) {
+    public function validateEnum($field, $details, $input) {
         $return = false;
         foreach($details as $key => $value) {
             // Simple value
-            if(!is_array($value) && $this->input[$field] === $value) {
+            if(!is_array($value) && $input === $value) {
                 $return = true;
                 break;
             }
@@ -219,15 +227,15 @@ class Api {
                         } elseif($fieldType == 'float') {
                             $this->validateFloat($field, $validationRule);                            
                         } elseif($fieldType == 'string') {
-                            if(!is_string($this->input[$field])) {
+                            if(!is_string($input)) {
                                 throw new \Exception("Field '".$field."' should be a string.");
                             }                            
                         } elseif($fieldType == 'date') {
-                            if(!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $this->input[$field])) {
+                            if(!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $input)) {
                                 throw new \Exception("Field '".$field."' should be a date (yyyy-mm-dd).");
                             }
                         } elseif($fieldType == 'boolean') {
-                            if(!is_bool($this->input[$field])) {
+                            if(!is_bool($input)) {
                                 throw new \Exception("Field '".$field."' should be a boolean.");
                             }       
                         } else {
