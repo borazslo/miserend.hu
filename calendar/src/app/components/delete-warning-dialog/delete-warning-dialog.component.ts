@@ -5,7 +5,7 @@ import { FormsModule} from '@angular/forms';
 import {MatIcon} from '@angular/material/icon';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {DialogResponse} from '../../enum/dialog-response';
-import {EventViewerDialogData} from '../church-calendar/church-calendar.component';
+import {DeleteDialogData} from '../church-calendar/church-calendar.component';
 import {
   MatCard,
   MatCardActions,
@@ -40,8 +40,9 @@ import {DateTimeUtil} from '../../util/date-time-util';
 })
 export class DeleteWarningDialogComponent {
   readonly dialogRef = inject(MatDialogRef<DeleteWarningDialogComponent>);
-  readonly data = inject<EventViewerDialogData>(MAT_DIALOG_DATA);
-  public readonly start = DateTimeUtil.getReadableDateTime(this.data.start);
+  readonly data = inject<DeleteDialogData>(MAT_DIALOG_DATA);
+  public readonly start = DateTimeUtil.getReadableDateTime(this.data.eventData.start);
+  public readonly startTime = DateTimeUtil.getReadableTime(this.data.eventData.start);
 
 
   constructor(
@@ -56,12 +57,12 @@ export class DeleteWarningDialogComponent {
   }
 
   get period(): string {
-    const period = this.periodService.getPeriodById(this.data.mass.periodId);
+    const period = this.periodService.getPeriodById(this.data.eventData.mass.periodId);
     return period ? period.name : '';
   }
 
   get days(): string {
-    let days = this.data.mass.rrule?.byweekday;
+    let days = this.data.eventData.mass.rrule?.byweekday;
     if (ScriptUtil.isNotNull(days)) {
       const translatedDays: string[] = [...days].map(d => this.translateService.instant('DAYS.ON.' + d));
       return TextUtil.concatDays(translatedDays, ', ', this.translateService.instant('SEPARATOR_AND'));
@@ -70,7 +71,7 @@ export class DeleteWarningDialogComponent {
   }
 
   get week(): string | null {
-    const rrule = this.data.mass.rrule;
+    const rrule = this.data.eventData.mass.rrule;
     if (ScriptUtil.isNull(rrule) || rrule.freq !== 'weekly') {
       return null;
     }
@@ -94,7 +95,7 @@ export class DeleteWarningDialogComponent {
   }
 
   get month(): string | null {
-    const rrule = this.data.mass.rrule;
+    const rrule = this.data.eventData.mass.rrule;
     if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.bysetpos)) {
       let renumByPos = MassUtil.renumByPos(rrule.bysetpos);
       if(renumByPos != null) {

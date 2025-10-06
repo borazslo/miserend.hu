@@ -2,7 +2,7 @@
   <mat-card-header>
     <mat-card-title class="title-row">
       <mat-icon fontSet="material-symbols-outlined" class="bold-icon">exclamation_mark</mat-icon>
-      <span >{{ 'DELETE_WARNING'|translate }}</span>
+      <span >{{ 'DELETE_WARNING' | translate }}</span>
     </mat-card-title>
     <button mat-icon-button mat-dialog-close class="dialog-header-close">
       <mat-icon>close</mat-icon>
@@ -10,33 +10,29 @@
   </mat-card-header>
   <mat-card-content>
 
-    <div>
-      <span class="bold-text">{{ data.churchName }}</span>
-    </div>
-    <div>
-      <span class="bold-text">{{ data.mass.title }}</span>
-    </div>
-    <div class="simple-datetime bold-text">
-      <span>{{start}}</span>
-    </div>
-
-    @if (!data.mass.rrule || data.mass.rrule.count === 1) {
-      <div><span class="bold-text">{{ 'RRULE.NO_RECURRENCE' | translate }}</span></div>
-    } @else {
-      <div class="bold-text">
-        <span>{{ 'EVENT_VIEWER.RECURRENCE' | translate }}: </span>
-        @if (week) {
-          <span>{{ period }}</span>, <span>{{ week }}</span>, <span>{{ days }}</span>
-        } @else if (month) {
-          <span>{{ period }}</span>, <span>{{ month }} </span><span>{{ days }}</span>
-        } @else {
-          <div><span>{{ 'RRULE.NO_RECURRENCE' | translate }}</span></div>
-        }
+      <div>
+        <span class="bold-text">{{ data.eventData.churchName }}</span>
       </div>
-    }
+      <div>
+          <span class="bold-text">{{ data.eventData.mass.title }}</span>
+      </div>
+
+      @if (data.deleteOne || !data.eventData.mass.rrule || data.eventData.mass.rrule.count === 1) {
+          <div class="simple-datetime bold-text">
+              <span>{{start}}</span>
+          </div>
+      } @else {
+          <div class="bold-text">
+              @if (week) {
+                  <span>{{ period }}</span>, <span>{{ week }}</span>, <span>{{ days }}</span>, <span>{{ startTime }}</span>
+              } @else if (month) {
+                  <span>{{ period }}</span>, <span>{{ month }} </span><span>{{ days }}</span>, <span>{{ startTime }}</span>
+              }
+          </div>
+      }
   </mat-card-content>
   <mat-card-actions class="actions-row">
-    <button mat-flat-button (click)="onContinue()" class="bold-text">{{ 'SEND' | translate }}</button>
+      <button mat-flat-button (click)="onContinue()" class="bold-text">{{ 'DELETE_CONFIRM' | translate }}</button>
       <button mat-flat-button mat-dialog-close class="bold-text">{{ 'EVENT_VIEWER.CLOSE' | translate }}</button>
   </mat-card-actions>
 </mat-card>

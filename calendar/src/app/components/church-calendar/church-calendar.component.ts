@@ -56,6 +56,11 @@ export interface EventViewerDialogData {
   start: Date;
 }
 
+export interface DeleteDialogData {
+  eventData: EventViewerDialogData;
+  deleteOne: boolean;
+}
+
 export interface DialogData {
   title: string;
   event: DialogEvent;

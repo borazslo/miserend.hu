@@ -12,7 +12,7 @@ import {
 import {MatIcon} from '@angular/material/icon';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import {EventViewerDialogData} from '../church-calendar/church-calendar.component';
+import {DeleteDialogData, EventViewerDialogData} from '../church-calendar/church-calendar.component';
 import {DateTimeUtil} from '../../util/date-time-util';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {PeriodService} from '../../services/period.service';
@@ -59,8 +59,9 @@ export class EventViewerDialogComponent {
   }
 
   onDeleteMassOne(): void {
+    const deleteDialogData: DeleteDialogData = {eventData: this.data, deleteOne: true};
     const messageDialogRef = this.dialog.open(DeleteWarningDialogComponent, {
-      data:this.data
+      data: deleteDialogData
     });
 
     messageDialogRef.afterClosed().subscribe(result => {
@@ -71,8 +72,9 @@ export class EventViewerDialogComponent {
   }
 
   onDeleteMassAll(): void {
+    const deleteDialogData: DeleteDialogData = {eventData: this.data, deleteOne: false};
     const messageDialogRef = this.dialog.open(DeleteWarningDialogComponent, {
-      data:this.data
+      data: deleteDialogData
     });
 
     messageDialogRef.afterClosed().subscribe(result => {

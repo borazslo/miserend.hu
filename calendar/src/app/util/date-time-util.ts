@@ -57,6 +57,10 @@ export class DateTimeUtil {
     return DateTime.fromJSDate(dateTime).setLocale('hu').toFormat(DateTimeUtil.READABLE_DATETIME_FORMAT);
   }
 
+  public static getReadableTime(dateTime: Date): string {
+    return DateTime.fromJSDate(dateTime).setLocale('hu').toFormat(DateTimeUtil.CALENDAR_TIME_FORMAT);
+  }
+
   public static getReadableDateTimeFromIso(dateTime: string): string {
     return DateTime.fromISO(dateTime).setLocale('hu').toFormat(DateTimeUtil.READABLE_DATETIME_FORMAT);
   }

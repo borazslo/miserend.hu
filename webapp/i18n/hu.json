@@ -53,6 +53,7 @@
   "OK": "Rendben",
   "SEND": "Beküldés",
   "DELETE_WARNING": "Biztosan törölni szeretnéd az alábbi eseményt?",
+  "DELETE_CONFIRM": "Törlés",
 
   "ROMAN_CATHOLIC": "Római katolikus",
   "GREEK_CATHOLIC": "Görögkatolikus",
