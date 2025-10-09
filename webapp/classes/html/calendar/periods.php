@@ -200,7 +200,7 @@ class Periods extends \Html\Calendar\CalendarApi {
                 $endDate = (clone $startDate)->addDay();
             }
 
-            if ($endDate->equalTo($startDate)) {
+            if ($endDate->equalTo($startDate) || $period->all_inclusive) {
                 $endDate->addDay();
             }
 

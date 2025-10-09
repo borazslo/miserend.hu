@@ -23,11 +23,15 @@
           </div>
       } @else {
           <div class="bold-text">
-              @if (week) {
-                  <span>{{ period }}</span>, <span>{{ week }}</span>, <span>{{ days }}</span>, <span>{{ startTime }}</span>
-              } @else if (month) {
-                  <span>{{ period }}</span>, <span>{{ month }} </span><span>{{ days }}</span>, <span>{{ startTime }}</span>
-              }
+            @if (christmas) {
+              <span>{{ christmas }}</span>
+            } @else if (easter) {
+              <span>{{ easter }}</span>
+            } @else if (week) {
+              <span>{{ period }}</span>, <span>{{ week }}</span>, <span>{{ days }}</span>, <span>{{ startTime }}</span>
+            } @else if (month) {
+              <span>{{ period }}</span>, <span>{{ month }} </span><span>{{ days }}</span>, <span>{{ startTime }}</span>
+            }
           </div>
       }
   </mat-card-content>

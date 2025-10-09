@@ -28,6 +28,19 @@
       "SU": "vasárnap"
     }
   },
+  "CHRISTMAS_DAY": "Karácsony napja",
+  "EASTER_DAY": "Húsvét napja",
+  "CHRISTMAS_DAYS": {
+    "DEC_24": "Szenteste",
+    "DEC_25": "Karácsony",
+    "DEC_26": "Karácsony másnapja"
+  },
+  "EASTER_DAYS": {
+    "TH": "Nagycsütörtök",
+    "FR": "Nagypéntek",
+    "SA": "Húsvéti vigília",
+    "SU": "Húsvétvasárnap"
+  },
   "ADD_NEW_MASS": "Új liturgia rögzítése",
   "EDIT_MASS": "Meglévő liturgia szerkesztése",
   "OTHER_SETTINGS": "Tulajdonságok",
@@ -173,7 +186,9 @@
   "ERRORS": {
     "REQUIRED_PERIOD": "Meg kell adni, hogy melyik időszakban ismétlődik.",
     "REQUIRED_DAY": "Meg kell adni, hogy melyik napon van.",
-    "REQUIRED_DAYS": "Meg kell adni, hogy melyik napo(ko)n van."
+    "REQUIRED_DAYS": "Meg kell adni, hogy melyik napo(ko)n van.",
+    "REQUIRED_EASTER_DAY": "Meg kell adni, hogy mely napon van a liturgia.",
+    "REQUIRED_CHRISTMAS_DAY": "Meg kell adni, hogy mely napon van a liturgia."
   },
 
 

@@ -43,6 +43,7 @@ import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-to
 import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
 import {SearchService} from '../../services/search.service';
+import {GeneratedPeriod} from "../../model/generated-period";
 
 export interface SimpleDialogData {
   dateTime: Date;
@@ -282,6 +283,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         if (!editOne && mass.periodId) {
           this.dialogEvent.period =
             this.periodService.getCurrentGeneratedPeriodByPeriodId(mass.periodId, new Date(mass.startDate));
+          this.setSpecialPeriodDays(mass);
         }
         this.openFullDialog('EDIT_MASS');
       }
@@ -422,7 +424,8 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
           const newMassId: number = this.selectedMassId ? this.selectedMassId : MassUtil.generateTmpMassId();
           const periodId = this.dialogEvent.period?.periodId;
           const periodWeight = this.dialogEvent.period?.weight;
-          const calendarEvent: CalendarEvent = MassUtil.createEventByType(this.dialogEvent, newMassId);
+          const specialPeriodType = this.periodService.getSpecialPeriodType(periodId);
+          const calendarEvent: CalendarEvent = MassUtil.createEventByType(this.dialogEvent, newMassId, specialPeriodType);
           const mass: Mass = MassUtil.createMass(calendarEvent, this.dialogEvent, this.currentChurch!, newMassId);
 
           this.calEvents = this.calEvents.filter(event => event.extendedProps.massId !== newMassId);
@@ -606,7 +609,8 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
           globalChanged = true;
 
           //ha még nem volt hasonló üzenet, hogy a most hozzáadott mise periódusát kizárjuk ebből az időszakból, akkor majd most megtesszük
-          if (ScriptUtil.isNotNull(m.periodId) && this.hasPreviouslySentNotification(m.periodId, periodId)) {
+          if (ScriptUtil.isNotNull(m.periodId) && !recentlyExclusionSourcePeriodIds.includes(m.periodId) &&
+              this.hasPreviouslySentNotification(m.periodId, periodId)) {
             recentlyExclusionSourcePeriodIds.push(m.periodId);
           }
         }
@@ -671,7 +675,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
           globalChanged = true;
 
           //ha még nem volt hasonló üzenet, hogy most hozzáadott mise periódusából kizárjuk ezt az időszakot, akkor majd most megtesszük
-          if (!this.hasPreviouslySentNotification(periodId, higherPeriodId)) {
+          if (!recentlyExcludedPeriodIds.includes(higherPeriodId) && !this.hasPreviouslySentNotification(periodId, higherPeriodId)) {
             recentlyExcludedPeriodIds.push(higherPeriodId);
           }
         }
@@ -710,13 +714,31 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     if (ScriptUtil.isNotNull(periodId) &&
       (recentlyExclusionSourcePeriodIds.length > 0 || recentlyExcludedPeriodIds.length > 0)) {
 
-      this.dialog.open(PeriodExclusionDialogComponent, {
-        data: {
-          periodName: this.periodService.getPeriodNameById(periodId),
-          recentlyExcludedPeriodNames: this.periodService.getPeriodNamesByIds(recentlyExcludedPeriodIds),
-          recentlyExclusionSourcePeriodNames: this.periodService.getPeriodNamesByIds(recentlyExclusionSourcePeriodIds)
-        }
-      });
+      const recentlyExclusionSourcePeriods = this.periodService.getGeneratedPeriodsByPeriodIds(recentlyExclusionSourcePeriodIds);
+      const recentlyExcludedPeriods = this.periodService.getGeneratedPeriodsByPeriodIds(recentlyExcludedPeriodIds);
+      const generatedPeriods = this.periodService.getGeneratedPeriodsByPeriodId(periodId);
+
+      const filteredRecentlyExclusionSourcePeriodIds = this.filterOverlappingPeriodIds(
+          generatedPeriods,
+          recentlyExclusionSourcePeriods,
+          recentlyExclusionSourcePeriodIds
+      );
+
+      const filteredRecentlyExcludedPeriodIds = this.filterOverlappingPeriodIds(
+          generatedPeriods,
+          recentlyExcludedPeriods,
+          recentlyExcludedPeriodIds
+      );
+
+      if (filteredRecentlyExclusionSourcePeriodIds.length > 0 || filteredRecentlyExcludedPeriodIds.length > 0) {
+        this.dialog.open(PeriodExclusionDialogComponent, {
+          data: {
+            periodName: this.periodService.getPeriodNameById(periodId),
+            recentlyExcludedPeriodNames: this.periodService.getPeriodNamesByIds(filteredRecentlyExcludedPeriodIds),
+            recentlyExclusionSourcePeriodNames: this.periodService.getPeriodNamesByIds(filteredRecentlyExclusionSourcePeriodIds)
+          }
+        });
+      }
     }
   }
 
@@ -727,6 +749,36 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
   public setCalendarsTitle(title: string) {
     setTimeout(() => {
       this.calendarsTitle = title;
+    });
+  }
+
+  private setSpecialPeriodDays(mass: Mass) {
+    if (this.periodService.isChristmasPeriod(mass.periodId!)) {
+      this.dialogEvent!.selectedChristmasDay = MassUtil.getChristmasDayByMass(mass);
+    }
+    if (this.periodService.isEasterPeriod(mass.periodId!)) {
+      this.dialogEvent!.selectedEasterDay = MassUtil.getEasterDayByMass(mass);
+    }
+  }
+
+  private periodsOverlap(a: GeneratedPeriod, b: GeneratedPeriod): boolean {
+    const aStart = new Date(a.startDate);
+    const aEnd = new Date(a.endDate);
+    const bStart = new Date(b.startDate);
+    const bEnd = new Date(b.endDate);
+    return aStart < bEnd && aEnd > bStart;
+  }
+
+  private filterOverlappingPeriodIds(
+      currentPeriods: GeneratedPeriod[],
+      targetPeriods: GeneratedPeriod[],
+      targetIds: number[]
+  ): number[] {
+    return targetIds.filter(id => {
+      const targetGroup = targetPeriods.filter(p => p.periodId === id);
+      return targetGroup.some(t =>
+          currentPeriods.some(c => this.periodsOverlap(c, t))
+      );
     });
   }
 }

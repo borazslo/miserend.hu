@@ -8,4 +8,6 @@ export interface RecurrenceRule {
   byweekno?: number[] | null;
   bysetpos?: number | null;
   byweekday?: Day[] | null;
+  bymonth?: number | null;
+  bymonthday?: number[] | null;
 }

@@ -28,6 +28,11 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {GeneratedPeriod} from '../../model/generated-period';
 import {ScriptUtil} from '../../util/script-util';
 import {DateTime} from 'luxon';
+import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
+import {MatDivider} from "@angular/material/divider";
+import {SpecialType} from "../../model/period";
+import {EasterDay} from "../../enum/easter-day";
+import {ChristmasDay} from "../../enum/christmas-day";
 
 @Component({
   selector: 'app-event-edit-dialog',
@@ -53,6 +58,9 @@ import {DateTime} from 'luxon';
     TranslatePipe,
     TitleCasePipe,
     MatExpansionModule,
+    MatRadioGroup,
+    MatRadioButton,
+    MatDivider,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './add-full-event-dialog.component.html',
@@ -65,27 +73,39 @@ export class AddFullEventDialogComponent {
   periodCtr = new FormControl<GeneratedPeriod | null>(this.data.event.period);
   filteredPeriods$: Observable<GeneratedPeriod[]> = of([]);
 
+  public singleEvent: boolean = this.data.event.renum === Renum.NONE;
+  public specialPeriodType?: SpecialType | null = null;
+
   public selectableGenPeriods: GeneratedPeriod[] = [];
   public titles: string[] = MassUtil.getTitles(this.data.event.rite);
 
   public readonly allDays = Object.values(Day);
+  public readonly easterDays = Object.values(EasterDay);
+  public readonly christmasDays = Object.values(ChristmasDay);
   public readonly recurrences = recurrences;
   public readonly rites = Object.values(Rite);
   public readonly languages = Object.values(LanguageCode);
   public readonly Object = Object;
 
   public dayError: boolean = false;
+  public christmasDayError: boolean = false;
+  public easterDayError: boolean = false;
+
+  selectedDays: Day | Day[] = this.data.event.selectedDays;
+  selectedChristmasDay?: ChristmasDay | null = this.data.event.selectedChristmasDay;
+  selectedEasterDay?: EasterDay | null = this.data.event.selectedEasterDay;
 
   constructor(
-    readonly periodMockService: PeriodService,
+    readonly periodService: PeriodService,
     readonly translateService: TranslateService,
   ) {
-    periodMockService.getSelectableGeneratedPeriodsByDate(this.data.event.start).subscribe(generatedPeriods => {
+    periodService.getSelectableGeneratedPeriodsByDate(this.data.event.start).subscribe(generatedPeriods => {
       this.selectableGenPeriods = generatedPeriods;
     });
 
     this.periodCtr.valueChanges.subscribe(value => {
       this.data.event.period = value;
+      this.specialPeriodType = this.periodService.getPeriodById(value?.periodId)?.specialType;
     });
 
     this.filteredPeriods$ = this.periodCtr.valueChanges.pipe(
@@ -95,22 +115,49 @@ export class AddFullEventDialogComponent {
         return this.selectableGenPeriods.filter(period => period.name.toLowerCase().includes(filterValue));
       })
     );
+
+    if (this.data.event.period !== null) {
+      this.specialPeriodType = this.periodService.getSpecialPeriodType(this.data.event.period.periodId);
+      if (this.specialPeriodType !== null) {
+        this.singleEvent = false;
+      }
+    }
   }
 
-  selectedDays: Day | Day[] = this.data.event.selectedDays;
-
   onSave(): void {
-    if (this.data.event.renum !== Renum.NONE && ScriptUtil.isNull(this.data.event.period)) {
+    if (!this.singleEvent && ScriptUtil.isNull(this.data.event.period)) {
       this.periodCtr.setErrors({required: true});
       return;
     }
 
-    if (this.data.event.renum !== Renum.NONE && (ScriptUtil.isNull(this.selectedDays) || this.selectedDays.length < 1)) {
+    if (!this.singleEvent && this.specialPeriodType === SpecialType.CHRISTMAS && ScriptUtil.isNull(this.selectedChristmasDay)) {
+      this.christmasDayError = true;
+      return;
+    }
+
+    if (!this.singleEvent && this.specialPeriodType === SpecialType.EASTER && ScriptUtil.isNull(this.selectedEasterDay)) {
+      this.easterDayError = true;
+      return;
+    }
+
+    if (!this.singleEvent && this.specialPeriodType === null && (ScriptUtil.isNull(this.selectedDays) || this.selectedDays.length < 1)) {
       this.dayError = true;
       return;
     }
 
-    this.data.event.selectedDays = Array.isArray(this.selectedDays) ? this.selectedDays : [this.selectedDays];
+    if (this.specialPeriodType === SpecialType.CHRISTMAS) {
+      this.data.event.selectedChristmasDay = this.selectedChristmasDay;
+      this.data.event.selectedEasterDay = null;
+      this.data.event.selectedDays = [];
+    } else if (this.specialPeriodType === SpecialType.EASTER) {
+      this.data.event.selectedChristmasDay = null;
+      this.data.event.selectedEasterDay = this.selectedEasterDay;
+      this.data.event.selectedDays = [];
+    } else {
+      this.data.event.selectedChristmasDay = null;
+      this.data.event.selectedEasterDay = null;
+      this.data.event.selectedDays = Array.isArray(this.selectedDays) ? this.selectedDays : [this.selectedDays];
+    }
     this.dialogRef.close(DialogResponse.SAVE);
   }
 
@@ -135,6 +182,14 @@ export class AddFullEventDialogComponent {
       }
     } else {
       this.selectedDays = [];
+    }
+  }
+
+  onRecurrenceModChange() {
+    if (this.singleEvent) {
+      this.data.event.renum = Renum.NONE;
+    } else {
+      this.data.event.renum = Renum.EVERY_WEEK;
     }
   }
 
@@ -170,6 +225,14 @@ export class AddFullEventDialogComponent {
     this.dayError = false;
   }
 
+  onSelectedChristmasDayChange() {
+    this.christmasDayError = false;
+  }
+
+  onSelectedEasterDayChange() {
+    this.easterDayError = false;
+  }
+
   resetPeriod(event: any) {
     event.preventDefault();
     event.stopPropagation();
@@ -181,4 +244,6 @@ export class AddFullEventDialogComponent {
   }
 
   protected readonly RiteMassTypes = RiteMassTypes;
+  protected readonly Renum = Renum;
+  protected readonly SpecialType = SpecialType;
 }

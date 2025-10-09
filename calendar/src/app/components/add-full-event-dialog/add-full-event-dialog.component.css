@@ -47,10 +47,33 @@
   }
 }
 
+.full-width-item {
+  grid-column: span 2;
+}
+
+.single-recurrence-selector {
+  display: flex;
+  text-align: center;
+  margin-bottom: 1.5em;
+  flex-direction: column;
+
+  & mat-radio-group {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}
+
 @media screen and (max-width: 600px) {
   .datetime-settings {
-    grid-template-columns: 1fr;
-    grid-column-gap: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .single-recurrence-selector {
+    & mat-radio-group {
+      flex-direction: column;
+      align-items: start;
+    }
   }
 }
 

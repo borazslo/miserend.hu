@@ -9,4 +9,10 @@ export interface Period {
   allInclusive: boolean | null;
   multiDay: boolean;
   selectable: boolean;
+  specialType: SpecialType | null;
+}
+
+export enum SpecialType {
+  EASTER = 'EASTER',
+  CHRISTMAS = 'CHRISTMAS'
 }

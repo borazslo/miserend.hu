@@ -4,7 +4,6 @@
     <mat-icon>close</mat-icon>
   </button>
 </div>
-
 <mat-dialog-content class="mat-typography">
 
   <mat-accordion class="example-headers-align" multi>
@@ -18,92 +17,131 @@
 
       <div class="datetime-settings">
         @if (!data.event.editOne) {
-          <mat-form-field>
-            <mat-label>{{'RECURRENCE' | translate}}</mat-label>
-            <mat-select [(ngModel)]="data.event.renum" name="renum" (selectionChange)="onRenumChange()">
-              @for (recurrence of Object.values(recurrences); track recurrence.type) {
-                <mat-option [value]="recurrence.type"
-                            [matTooltip]="recurrence.hint"
-                            [matTooltipShowDelay]="1000"
-                >
-                  {{recurrence.name}}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        }
-        @if (recurrences[data.event.renum].type !== 'NONE') {
-          @if (recurrences[data.event.renum].multiDays) {
+          <div class="full-width-item single-recurrence-selector">
+            <mat-radio-group [(ngModel)]="singleEvent" (change)="onRecurrenceModChange()">
+              <mat-radio-button class="no-select pointer" [value]="true">Egyszeri alkalom</mat-radio-button>
+              <mat-radio-button class="no-select pointer" [value]="false">Ismétlődő esemény</mat-radio-button>
+            </mat-radio-group>
+            <mat-divider></mat-divider>
+          </div>
+
+          @if (!singleEvent) {
             <mat-form-field>
-              <mat-label>{{'SELECTED_DAYS' | translate}}</mat-label>
-              <mat-select [(ngModel)]="selectedDays" multiple (selectionChange)="onSelectedDaysChange()">
-                @for (day of allDays; track day) {
-                  <mat-option [value]="day">{{('DAYS.' + day) | translate}}</mat-option>
+              <mat-label>{{'PERIOD' | translate}}</mat-label>
+              <input type="text"
+                     placeholder="{{'PERIOD' | translate}}"
+                     matInput
+                     [formControl]="periodCtr"
+                     [matAutocomplete]="auto">
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayPeriod">
+                @for (period of filteredPeriods$ | async; track period.id) {
+                  <mat-option [value]="period">{{period.name}}</mat-option>
+                }
+              </mat-autocomplete>
+              <button matSuffix class="input-suffix" mat-icon-button title="" (click)="resetPeriod($event)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+              @if (periodCtr.invalid) {
+                @if (periodCtr.hasError('required')) {
+                  <mat-error class="input-error">{{ 'ERRORS.REQUIRED_PERIOD' | translate }}</mat-error>
+                }
+              }
+            </mat-form-field>
+          }
+        }
+        @if (!data.event.editOne && !singleEvent) {
+          @if (specialPeriodType === SpecialType.CHRISTMAS) {
+            <mat-form-field>
+              <mat-label>{{'CHRISTMAS_DAY' | translate}}</mat-label>
+              <mat-select [(ngModel)]="selectedChristmasDay" (selectionChange)="onSelectedChristmasDayChange()">
+                @for (day of christmasDays; track day) {
+                  <mat-option [value]="day">{{('CHRISTMAS_DAYS.' + day) | translate}}</mat-option>
                 }
               </mat-select>
-              @if (dayError) {
-                <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_DAYS' | translate }}</mat-error></div>
+              @if (christmasDayError) {
+                <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_CHRISTMAS_DAY' | translate }}</mat-error></div>
+              }
+            </mat-form-field>
+          } @else if (specialPeriodType === SpecialType.EASTER) {
+            <mat-form-field>
+              <mat-label>{{'EASTER_DAY' | translate}}</mat-label>
+              <mat-select [(ngModel)]="selectedEasterDay" (selectionChange)="onSelectedEasterDayChange()">
+                @for (day of easterDays; track day) {
+                  <mat-option [value]="day">{{('EASTER_DAYS.' + day) | translate}}</mat-option>
+                }
+              </mat-select>
+              @if (easterDayError) {
+                <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_EASTER_DAY' | translate }}</mat-error></div>
               }
             </mat-form-field>
           } @else {
             <mat-form-field>
-              <mat-label>{{'SELECTED_DAY' | translate}}</mat-label>
-              <mat-select [(ngModel)]="selectedDays" (selectionChange)="onSelectedDaysChange()">
-                @for (day of allDays; track day) {
-                  <mat-option [value]="day">{{('DAYS.' + day) | translate}}</mat-option>
+              <mat-label>{{'RECURRENCE' | translate}}</mat-label>
+              <mat-select [(ngModel)]="data.event.renum" name="renum" (selectionChange)="onRenumChange()">
+                @for (recurrence of Object.values(recurrences); track recurrence.type) {
+                  @if (recurrence.type !== Renum.NONE) {
+                    <mat-option
+                            [value]="recurrence.type"
+                            [matTooltip]="recurrence.hint"
+                            [matTooltipShowDelay]="1000">
+                      {{recurrence.name}}
+                    </mat-option>
+                  }
                 }
               </mat-select>
-              @if (dayError) {
-                <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_DAY' | translate }}</mat-error></div>
-              }
             </mat-form-field>
-          }
 
-          <mat-form-field>
-            <mat-label>{{'PERIOD' | translate}}</mat-label>
-            <input type="text"
-                   placeholder="{{'PERIOD' | translate}}"
-                   matInput
-                   [formControl]="periodCtr"
-                   [matAutocomplete]="auto">
-            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayPeriod">
-              @for (period of filteredPeriods$ | async; track period.id) {
-                <mat-option [value]="period">{{period.name}}</mat-option>
-              }
-            </mat-autocomplete>
-            <button matSuffix class="input-suffix" mat-icon-button title="" (click)="resetPeriod($event)">
-              <mat-icon>delete</mat-icon>
-            </button>
-
-            @if (periodCtr.invalid) {
-              @if (periodCtr.hasError('required')) {
-                <mat-error class="input-error">{{ 'ERRORS.REQUIRED_PERIOD' | translate }}</mat-error>
-              }
+            @if (recurrences[data.event.renum].multiDays) {
+              <mat-form-field>
+                <mat-label>{{'SELECTED_DAYS' | translate}}</mat-label>
+                <mat-select [(ngModel)]="selectedDays" multiple (selectionChange)="onSelectedDaysChange()">
+                  @for (day of allDays; track day) {
+                    <mat-option [value]="day">{{('DAYS.' + day) | translate}}</mat-option>
+                  }
+                </mat-select>
+                @if (dayError) {
+                  <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_DAYS' | translate }}</mat-error></div>
+                }
+              </mat-form-field>
+            } @else {
+              <mat-form-field>
+                <mat-label>{{'SELECTED_DAY' | translate}}</mat-label>
+                <mat-select [(ngModel)]="selectedDays" (selectionChange)="onSelectedDaysChange()">
+                  @for (day of allDays; track day) {
+                    <mat-option [value]="day">{{('DAYS.' + day) | translate}}</mat-option>
+                  }
+                </mat-select>
+                @if (dayError) {
+                  <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_DAY' | translate }}</mat-error></div>
+                }
+              </mat-form-field>
             }
+          }
+        }
+
+        @if (singleEvent) {
+          <mat-form-field>
+            <mat-label>{{'START_DATE' | translate}}</mat-label>
+            <input matInput
+                   [matDatepicker]="datePicker"
+                   [(ngModel)]="data.event.start"
+                   [ngModelOptions]="{updateOn: 'blur'}">
+            <mat-datepicker #datePicker/>
+            <mat-datepicker-toggle [for]="datePicker" matSuffix/>
           </mat-form-field>
         }
 
-          @if (recurrences[data.event.renum].type === 'NONE') {
-            <mat-form-field>
-              <mat-label>{{'START_DATE' | translate}}</mat-label>
-              <input matInput
-                     [matDatepicker]="datePicker"
-                     [(ngModel)]="data.event.start"
-                     [ngModelOptions]="{updateOn: 'blur'}">
-              <mat-datepicker #datePicker/>
-              <mat-datepicker-toggle [for]="datePicker" matSuffix/>
-            </mat-form-field>
-          }
-          <mat-form-field>
-            <mat-label>{{'START_TIME' | translate}}</mat-label>
-            <input matInput
-                   [matTimepicker]="timepicker"
-                   [(ngModel)]="data.event.start"
-                   (ngModelChange)="onStartTimeChange()"
-                   [ngModelOptions]="{updateOn: 'blur'}">
-            <mat-timepicker #timepicker/>
-            <mat-timepicker-toggle [for]="timepicker" matSuffix/>
-          </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'START_TIME' | translate}}</mat-label>
+          <input matInput
+                 [matTimepicker]="timepicker"
+                 [(ngModel)]="data.event.start"
+                 (ngModelChange)="onStartTimeChange()"
+                 [ngModelOptions]="{updateOn: 'blur'}">
+          <mat-timepicker #timepicker/>
+          <mat-timepicker-toggle [for]="timepicker" matSuffix/>
+        </mat-form-field>
       </div>
 
     </mat-expansion-panel>

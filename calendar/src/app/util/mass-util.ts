@@ -9,6 +9,10 @@ import {DialogEvent} from '../model/dialog-event';
 import {GeneratedPeriod} from '../model/generated-period';
 import {ScriptUtil} from './script-util';
 import {TranslateService} from '@ngx-translate/core';
+import {ChristmasDay} from "../enum/christmas-day";
+import {EasterDay} from "../enum/easter-day";
+import {Day} from "../enum/day";
+import {SpecialType} from "../model/period";
 
 export class MassUtil {
 
@@ -142,66 +146,84 @@ export class MassUtil {
     return events;
   }
 
-  public static createEventByType(event: DialogEvent, massId: number): CalendarEvent {
+  public static createEventByType(event: DialogEvent, massId: number, specialPeriodType?: SpecialType | null): CalendarEvent {
     const dtstart: string = DateTimeUtil.getIsoString(event.start, event.period?.startDate);
     const periodEnd = event.period?.endDate;
 
     let rrule: RecurrenceRule;
-    switch (event.renum) {
-      case Renum.NONE:
-        return {
-          title: event.title,
-          ...(this.getDuration(event)),
-          rrule: {
+
+    if (specialPeriodType === SpecialType.CHRISTMAS) {
+      rrule = {
+        dtstart: dtstart,
+        until: periodEnd,
+        freq: 'monthly',
+        bymonth: 12,
+        bymonthday: [this.getWeekdayByChristmasDay(event.selectedChristmasDay!)],
+      };
+    } else if (specialPeriodType === SpecialType.EASTER) {
+      rrule = {
+        dtstart: dtstart,
+        until: periodEnd,
+        freq: 'weekly',
+        byweekday: [this.getWeekdayByEasterDay(event.selectedEasterDay!)],
+      };
+    } else {
+      switch (event.renum) {
+        case Renum.NONE:
+          return {
+            title: event.title,
+            ...(this.getDuration(event)),
+            rrule: {
+              dtstart: dtstart,
+              freq: 'daily',
+              count: 1,
+            },
+            ...(ScriptUtil.isNotNull(event.exdate) && {exdate: event.exdate}),
+            extendedProps: {
+              massId: massId
+            }
+          };
+        case Renum.EVERY_WEEK:
+          rrule = {
             dtstart: dtstart,
-            freq: 'daily',
-            count: 1,
-          },
-          ...(ScriptUtil.isNotNull(event.exdate) && {exdate: event.exdate}),
-          extendedProps: {
-            massId: massId
-          }
-        };
-      case Renum.EVERY_WEEK:
-        rrule = {
-          dtstart: dtstart,
-          until: periodEnd,
-          freq: 'weekly',
-          byweekday: event.selectedDays,
-        };
-        break;
-      case Renum.FIRST_WEEK:
-      case Renum.SECOND_WEEK:
-      case Renum.THIRD_WEEK:
-      case Renum.FOURTH_WEEK:
-      case Renum.FIFTH_WEEK:
-        rrule = {
-          dtstart: dtstart,
-          until: periodEnd,
-          freq: 'monthly',
-          bysetpos: this.bysetpos(event.renum),
-          byweekday: event.selectedDays,
-        };
-        break;
-      case Renum.LAST_DAY_OF_MONTH:
-        rrule = {
-          dtstart: dtstart,
-          until: periodEnd,
-          freq: 'monthly',
-          bysetpos: -1,
-          byweekday: event.selectedDays,
-        };
-        break;
-      case Renum.ODD_WEEK:
-      case Renum.EVEN_WEEK:
-        rrule = {
-          dtstart: dtstart,
-          until: periodEnd,
-          freq: 'weekly',
-          byweekno: event.renum == Renum.ODD_WEEK ? this.oddWeeks : this.evenWeeks,
-          byweekday: event.selectedDays,
-        };
-        break;
+            until: periodEnd,
+            freq: 'weekly',
+            byweekday: event.selectedDays,
+          };
+          break;
+        case Renum.FIRST_WEEK:
+        case Renum.SECOND_WEEK:
+        case Renum.THIRD_WEEK:
+        case Renum.FOURTH_WEEK:
+        case Renum.FIFTH_WEEK:
+          rrule = {
+            dtstart: dtstart,
+            until: periodEnd,
+            freq: 'monthly',
+            bysetpos: this.bysetpos(event.renum),
+            byweekday: event.selectedDays,
+          };
+          break;
+        case Renum.LAST_DAY_OF_MONTH:
+          rrule = {
+            dtstart: dtstart,
+            until: periodEnd,
+            freq: 'monthly',
+            bysetpos: -1,
+            byweekday: event.selectedDays,
+          };
+          break;
+        case Renum.ODD_WEEK:
+        case Renum.EVEN_WEEK:
+          rrule = {
+            dtstart: dtstart,
+            until: periodEnd,
+            freq: 'weekly',
+            byweekno: event.renum == Renum.ODD_WEEK ? this.oddWeeks : this.evenWeeks,
+            byweekday: event.selectedDays,
+          };
+          break;
+      }
     }
 
     return {
@@ -266,6 +288,19 @@ export class MassUtil {
       case 3: return  Renum.THIRD_WEEK;
       case 4: return  Renum.FOURTH_WEEK;
       case 5: return  Renum.FIFTH_WEEK;
+      default: return null;
+    }
+  }
+
+  public static christmasDayByMonthday(bymonthday: number[]): ChristmasDay | null {
+    if (bymonthday.length !== 1) {
+      return null;
+    }
+
+    switch (bymonthday[0]) {
+      case 24: return ChristmasDay.DEC_24;
+      case 25: return ChristmasDay.DEC_25;
+      case 26: return ChristmasDay.DEC_26;
       default: return null;
     }
   }
@@ -383,5 +418,56 @@ export class MassUtil {
     });
 
     return exrule;
+  }
+
+  public static getChristmasDayByMass(mass: Mass): ChristmasDay | null {
+    if (ScriptUtil.isNull(mass.rrule) || mass.rrule.bymonth !== 12 || ScriptUtil.isNull(mass.rrule.bymonthday) ||
+        mass.rrule.bymonthday.length !== 1) {
+      return null;
+    }
+
+    const day = mass.rrule.bymonthday[0];
+
+    switch (day) {
+      case 24: return ChristmasDay.DEC_24;
+      case 25: return ChristmasDay.DEC_25;
+      case 26: return ChristmasDay.DEC_26;
+    }
+
+    return null;
+  }
+
+  public static getEasterDayByMass(mass: Mass): EasterDay | null {
+    if (ScriptUtil.isNull(mass.rrule) || ScriptUtil.isNull(mass.rrule.byweekday) || mass.rrule.byweekday.length !== 1) {
+      return null;
+    }
+
+    const day = mass.rrule.byweekday[0];
+
+    switch (day) {
+      case Day.TH: return EasterDay.TH;
+      case Day.FR: return EasterDay.FR;
+      case Day.SA: return EasterDay.SA;
+      case Day.SU: return EasterDay.SU;
+    }
+
+    return null;
+  }
+
+  private static getWeekdayByEasterDay(selectedEasterDay: EasterDay): Day {
+    switch (selectedEasterDay) {
+      case EasterDay.TH: return Day.TH;
+      case EasterDay.FR: return Day.FR;
+      case EasterDay.SA: return Day.SA;
+      case EasterDay.SU: return Day.SU;
+    }
+  }
+
+  private static getWeekdayByChristmasDay(selectedChristmasDay: ChristmasDay): number {
+    switch (selectedChristmasDay) {
+      case ChristmasDay.DEC_24: return 24;
+      case ChristmasDay.DEC_25: return 25;
+      case ChristmasDay.DEC_26: return 26;
+    }
   }
 }

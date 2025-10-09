@@ -1,23 +1,18 @@
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogClose, MatDialogRef} from '@angular/material/dialog';
 import {MatButton, MatIconButton} from '@angular/material/button';
-import { FormsModule} from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {MatIcon} from '@angular/material/icon';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {DialogResponse} from '../../enum/dialog-response';
 import {DeleteDialogData} from '../church-calendar/church-calendar.component';
-import {
-  MatCard,
-  MatCardActions,
-  MatCardContent,
-  MatCardHeader,
-  MatCardTitle
-} from '@angular/material/card';
+import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {ScriptUtil} from '../../util/script-util';
 import {TextUtil} from '../../util/text-util';
 import {MassUtil} from '../../util/mass-util';
 import {PeriodService} from '../../services/period.service';
 import {DateTimeUtil} from '../../util/date-time-util';
+import {SpecialType} from "../../model/period";
 
 @Component({
   selector: 'app-add-message-dialog',
@@ -100,6 +95,38 @@ export class DeleteWarningDialogComponent {
       let renumByPos = MassUtil.renumByPos(rrule.bysetpos);
       if(renumByPos != null) {
         return this.translateService.instant('RRULE.ON.' + renumByPos);
+      }
+    }
+    return null;
+  }
+
+  get christmas(): string | null {
+    if (ScriptUtil.isNotNull(this.data.eventData.mass.periodId)) {
+      const specialPeriodType = this.periodService.getSpecialPeriodType(this.data.eventData.mass.periodId);
+      if (specialPeriodType === SpecialType.CHRISTMAS) {
+        const rrule = this.data.eventData.mass.rrule;
+        if (ScriptUtil.isNotNull(rrule) && rrule.bymonth === 12 && ScriptUtil.isNotNull(rrule.bymonthday)) {
+          let christmasDay = MassUtil.christmasDayByMonthday(rrule.bymonthday);
+          if(christmasDay != null) {
+            return this.translateService.instant("CHRISTMAS_DAYS." + christmasDay);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  get easter(): string | null {
+    if (ScriptUtil.isNotNull(this.data.eventData.mass.periodId)) {
+      const specialPeriodType = this.periodService.getSpecialPeriodType(this.data.eventData.mass.periodId);
+      if (specialPeriodType === SpecialType.EASTER) {
+        const rrule = this.data.eventData.mass.rrule;
+        if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.byweekday) && rrule.byweekday.length === 1) {
+          let easterDay = rrule.byweekday[0];
+          if(easterDay != null) {
+            return this.translateService.instant("EASTER_DAYS." + easterDay);
+          }
+        }
       }
     }
     return null;

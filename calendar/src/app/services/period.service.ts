@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, map, Observable, of} from 'rxjs';
-import {Period} from '../model/period';
+import {Period, SpecialType} from '../model/period';
 import {GeneratedPeriod} from '../model/generated-period';
 import {HttpClient} from '@angular/common/http';
 import {PeriodsWrapper} from '../model/http/periods-wrapper';
@@ -144,6 +144,12 @@ export class PeriodService {
     return generatedPeriods ?? null;
   }
 
+  public getGeneratedPeriodsByPeriodIds(periodIds?: number[]) {
+    const currentGeneratedPeriods = this.generatedPeriods$.getValue();
+    const generatedPeriods = currentGeneratedPeriods.filter(p => periodIds?.includes(p.periodId));
+    return generatedPeriods ?? null;
+  }
+
   public getCurrentGeneratedPeriodByPeriodId(periodId?: number | null, localDate?: Date): GeneratedPeriod | null {
     if (ScriptUtil.isNull(periodId) || ScriptUtil.isNull(localDate)) {
       return null;
@@ -173,5 +179,17 @@ export class PeriodService {
 
   public generatePeriods(): Observable<any> {
     return this.http.post(`${environment.apiUrl}periods/generate`, {});
+  }
+
+  public getSpecialPeriodType(periodId?: number): SpecialType | null {
+    return this.getPeriodById(periodId)?.specialType ?? null;
+  }
+
+  public isChristmasPeriod(periodId: number): boolean {
+    return this.getPeriodById(periodId)?.specialType === SpecialType.CHRISTMAS;
+  }
+
+  public isEasterPeriod(periodId: number): boolean {
+    return this.getPeriodById(periodId)?.specialType === SpecialType.EASTER;
   }
 }

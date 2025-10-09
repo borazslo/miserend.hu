@@ -21,6 +21,7 @@ import {MassUtil} from '../../util/mass-util';
 import {ScriptUtil} from '../../util/script-util';
 import {MatTooltip} from '@angular/material/tooltip';
 import {DeleteWarningDialogComponent} from '../delete-warning-dialog/delete-warning-dialog.component';
+import {SpecialType} from "../../model/period";
 
 @Component({
   selector: 'app-event-viewer-dialog',
@@ -136,6 +137,33 @@ export class EventViewerDialogComponent {
       let renumByPos = MassUtil.renumByPos(rrule.bysetpos);
       if(renumByPos != null) {
         return this.translateService.instant('RRULE.ON.' + renumByPos);
+      }
+    }
+    return null;
+  }
+
+  get christmas(): string | null {
+    const rrule = this.data.mass.rrule;
+    if (ScriptUtil.isNotNull(rrule) && rrule.bymonth === 12 && ScriptUtil.isNotNull(rrule.bymonthday)) {
+      let christmasDay = MassUtil.christmasDayByMonthday(rrule.bymonthday);
+      if(christmasDay != null) {
+        return this.translateService.instant("CHRISTMAS_DAYS." + christmasDay);
+      }
+    }
+    return null;
+  }
+
+  get easter(): string | null {
+    if (ScriptUtil.isNotNull(this.data.mass.periodId)) {
+      const specialPeriodType = this.periodService.getSpecialPeriodType(this.data.mass.periodId);
+      if (specialPeriodType === SpecialType.EASTER) {
+        const rrule = this.data.mass.rrule;
+        if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.byweekday) && rrule.byweekday.length === 1) {
+          let easterDay = rrule.byweekday[0];
+          if(easterDay != null) {
+            return this.translateService.instant("EASTER_DAYS." + easterDay);
+          }
+        }
       }
     }
     return null;
