@@ -1,0 +1,80 @@
+.duration-wrapper {
+  display: flex;
+  column-gap: 2em;
+  justify-content: center;
+  align-items: baseline;
+
+  .mat-mdc-form-field {
+    max-width: 6em;
+  }
+}
+
+.mat-accordion {
+  padding: 0.5em 0;
+  display: block;
+}
+
+.datetime-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 1em;
+}
+
+.comment {
+  width: 100%;
+}
+
+.text-description {
+  font-size: 0.8em;
+  display: flex;
+  flex-direction: column;
+  line-height: normal;
+  margin-right: 1em;
+
+  .rite {
+    font-size: x-small;
+  }
+}
+
+.description-icons {
+  display: flex;
+  column-gap: 0.15em;
+
+  .type-icon,
+  .lang-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.full-width-item {
+  grid-column: span 2;
+}
+
+.single-recurrence-selector {
+  display: flex;
+  text-align: center;
+  margin-bottom: 1.5em;
+  flex-direction: column;
+
+  & mat-radio-group {
+    display: flex;
+    justify-content: space-evenly;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .datetime-settings {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .single-recurrence-selector {
+    & mat-radio-group {
+      flex-direction: column;
+      align-items: start;
+    }
+  }
+}
+
+

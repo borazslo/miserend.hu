@@ -1,0 +1,55 @@
+@if (showHeader) {
+  <div class="calendar-header">
+    <div class="left-controls">
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
+        <mat-button-toggle (click)="prev()" [matTooltip]="'SUGGESTION.HEADER.PREV' | translate"><mat-icon>keyboard_arrow_left</mat-icon></mat-button-toggle>
+        <mat-button-toggle (click)="next()" [matTooltip]="'SUGGESTION.HEADER.NEXT' | translate"><mat-icon>keyboard_arrow_right</mat-icon></mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="current-date">
+      {{ calendarsTitle }}
+    </div>
+
+    <div class="right-controls">
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
+        <mat-button-toggle (click)="changeView('dayGridDay')">{{ 'SUGGESTION.HEADER.DAY' | translate }}</mat-button-toggle>
+        <mat-button-toggle [checked]="true" (click)="changeView('timeGridWeek')">{{ 'SUGGESTION.HEADER.WEEK' | translate }}</mat-button-toggle>
+        <mat-button-toggle (click)="changeView('dayGridMonth')">{{ 'SUGGESTION.HEADER.MONTH' | translate }}</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+}
+<full-calendar
+  #calendar
+  [options]="calendarOptions"
+  [events]="eventsPromise | async"
+></full-calendar>
+@if (showFooter && (editable || suggestible)) {
+  @if (suggestible && (changes.size != 0 || deletedMasses.length != 0)) {
+    <div class="footer suggestion-footer">
+      <div class="sender-data">
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.NAME' | translate }}</mat-label>
+          <input matInput [formControl]="suggestionSenderName" />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.EMAIL' | translate }}</mat-label>
+          <input matInput [formControl]="suggestionSenderEmail" />
+        </mat-form-field>
+      </div>
+      <div class="buttons">
+        <button mat-flat-button="tonal" (click)="onResetCalendar()"> {{ 'CANCEL' | translate }}</button>
+        <button mat-flat-button (click)="onSendToApprove()">{{ 'SEND_TO_APPROVE' | translate }}</button>
+      </div>
+    </div>
+  } @else if (editable && (deletedMasses.length > 0 || changes.size > 0)) {
+    <div class="footer">
+      <div class="buttons">
+        <button mat-flat-button (click)="onResetCalendar()"> {{ 'CANCEL' | translate }}</button>
+        <button mat-flat-button (click)="onSaveCalendar()">{{ 'SAVE' | translate }}</button>
+      </div>
+    </div>
+  }
+}

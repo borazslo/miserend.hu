@@ -1,0 +1,90 @@
+<mat-card class="simple-event-card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-subtitle>{{ data.churchName }}</mat-card-subtitle>
+    <mat-card-title>
+      <mat-icon fontSet="material-symbols-outlined" class="icon">calendar_clock</mat-icon>
+      <span>{{ data.mass.title }}</span>
+    </mat-card-title>
+    <button mat-icon-button mat-dialog-close class="dialog-header-close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="simple-datetime">
+      <span>{{start}}</span>
+    </div>
+
+    @if (data.mass.duration) {
+      <div>
+        @if (data.mass.duration.days) {
+          <span> {{ data.mass.duration.days }} {{ 'DURATION_DAYS' | translate }}</span>
+        }
+        @if (data.mass.duration.hours) {
+          <span> {{ data.mass.duration.hours }} {{ 'DURATION_HOURS' | translate }}</span>
+        }
+        @if (data.mass.duration.minutes) {
+          <span> {{ data.mass.duration.minutes }} {{ 'DURATION_MINUTES' | translate }}</span>
+        }
+      </div>
+    }
+
+    @if (!data.mass.rrule || data.mass.rrule.count === 1) {
+      <div><span>{{ 'RRULE.NO_RECURRENCE' | translate }}</span></div>
+    } @else {
+      <div>
+        <span>{{ 'EVENT_VIEWER.RECURRENCE' | translate }}: </span>
+        @if (christmas) {
+          <span>{{ christmas }}</span>
+        } @else if (easter) {
+          <span>{{ easter }}</span>
+        } @else if (week) {
+          <span>{{ period }}</span>, <span>{{ week }}</span>, <span>{{ days }}</span>
+        } @else if (month) {
+          <span>{{ period }}</span>, <span>{{ month }} </span><span>{{ days }}</span>
+        } @else {
+          <div><span>{{ 'RRULE.NO_RECURRENCE' | translate }}</span></div>
+        }
+      </div>
+    }
+
+    <p class="icons">
+      @if (data.mass.types != undefined && data.mass.types.length > 0) {
+        @for (type of data.mass.types; track type) {
+          <img class="type-icon"
+               [matTooltip]="type | translate"
+               [src]="'/cal_images/types/' + type.toLowerCase() + '.png'" [alt]="type | translate" />
+        }
+      }
+      <img class="type-icon"
+           [matTooltip]="(('LANGUAGES.' + data.mass.lang) | translate) + ' nyelvű'"
+           [src]="'/cal_images/flags/' + data.mass.lang.toLowerCase() + '.svg'" [alt]="(('LANGUAGES.' + data.mass.lang) | translate) + ' nyelvű'" />
+    </p>
+
+    @if (data.mass.comment && data.mass.comment.length > 0) {
+      <p class="comment">
+        {{ data.mass.comment }}
+      </p>
+    }
+  </mat-card-content>
+  <mat-card-actions>
+    @if (data.suggestOrEditable) {
+      @if (!data.mass.rrule || data.mass.rrule.count === 1) {
+        <button mat-flat-button (click)="onEditMassAll()">{{ 'EVENT_VIEWER.EDIT' | translate }}</button>
+        <button mat-flat-button (click)="onDeleteMassAll()">{{ 'EVENT_VIEWER.DELETE' | translate }}</button>
+      } @else {
+        <button mat-flat-button [matMenuTriggerFor]="editMenu">{{ 'EVENT_VIEWER.EDIT' | translate }}</button>
+        <mat-menu #editMenu="matMenu">
+          <button mat-menu-item (click)="onEditMassOne()">{{ 'EVENT_VIEWER.EDIT_ONE' | translate }}</button>
+          <button mat-menu-item (click)="onEditMassAll()">{{ 'EVENT_VIEWER.EDIT_ALL' | translate }}</button>
+        </mat-menu>
+        <button mat-flat-button [matMenuTriggerFor]="delMenu">{{ 'EVENT_VIEWER.DELETE' | translate }}</button>
+        <mat-menu #delMenu="matMenu">
+          <button mat-menu-item (click)="onDeleteMassOne()">{{ 'EVENT_VIEWER.DELETE_ONE' | translate }}</button>
+          <button mat-menu-item (click)="onDeleteMassAll()">{{ 'EVENT_VIEWER.DELETE_ALL' | translate }}</button>
+        </mat-menu>
+      }
+    } @else {
+      <button mat-flat-button mat-dialog-close>{{ 'EVENT_VIEWER.CLOSE' | translate }}</button>
+    }
+  </mat-card-actions>
+</mat-card>

@@ -1,0 +1,18 @@
+<mat-card class="simple-event-card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>{{title | translate}}</mat-card-title>
+    <button mat-icon-button mat-dialog-close class="dialog-header-close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="simple-datetime">
+      <mat-icon fontSet="material-symbols-outlined" class="icon">calendar_clock</mat-icon>
+      <span>{{ dateTime }}</span>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-flat-button (click)="onMoreDetails()">{{ 'SIMPLE_EVENT.MORE_SETTINGS' | translate }}</button>
+    <button mat-flat-button (click)="onSaveSimple()">{{ 'SIMPLE_EVENT.SAVE' | translate }}</button>
+  </mat-card-actions>
+</mat-card>

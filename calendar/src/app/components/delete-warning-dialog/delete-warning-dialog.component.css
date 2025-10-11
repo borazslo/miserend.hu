@@ -1,0 +1,43 @@
+
+.actions-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+
+.mat-mdc-card-title {
+  display: flex;
+  align-items: center;
+
+  & mat-icon {
+    font-size: 36px;
+    width: 40px;
+    height: 40px;
+  }
+  .bold-icon {
+    font-size: 48px;
+    line-height: 1;
+    font-weight: 700;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    text-align: center;
+  }
+
+  & span {
+    margin-left: 0.5em;
+  }
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.mat-mdc-card-subtitle {
+  padding: 0 1.5em;
+  text-align: center;
+}
+

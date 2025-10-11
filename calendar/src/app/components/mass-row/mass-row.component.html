@@ -1,0 +1,37 @@
+@if (!mass.period || mass.period.length === 0) {
+  {{ mass.startDate }}
+}
+@if (mass.week) {
+  <span>{{ mass.period }}</span>, <span>{{ mass.week }}</span>, <span>{{ mass.days }}</span><span>, {{ mass.time }}</span>
+} @else if (mass.month) {
+  <span>{{ mass.period }}</span>, <span>{{ mass.month }} </span><span>{{ mass.days }}</span><span>, {{ mass.time }}</span>
+} @else {
+  <span>(nem ismétlődő)</span>
+}
+@for (mDate of mass.mDates; track $index) {
+  <span class="deleted-occasional-date">{{ mDate }}</span>
+}
+@if (showDetails) {
+  <div class="event-row-details">
+    <span> (</span>
+    @if (mass.title && mass.title.length > 0){
+      <span>Liturgia neve: {{mass.title}};</span>
+    }
+    @if (mass.lang && mass.lang.length > 0){
+      <span> nyelv: {{mass.lang}};</span>
+    }
+    @if (mass.rite && mass.rite.length > 0){
+      <span> rítus: {{mass.rite}};</span>
+    }
+    @if (mass.types && mass.types.length > 0){
+      <span> jellemzők: {{mass.types}};</span>
+    }
+    @if (mass.duration && mass.duration.length > 0){
+      <span> hossz: {{mass.duration}};</span>
+    }
+    @if (mass.comment && mass.comment.length > 0){
+      <span class="event-row-comment"> megjegyzés: {{mass.comment}};</span>
+    }
+    <span>)</span>
+  </div>
+}

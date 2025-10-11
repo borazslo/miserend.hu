@@ -1,0 +1,57 @@
+<div class="component-wrapper">
+  <h1>{{ 'PERIODS.YEAR_EDITOR_TITLE' | translate }}</h1>
+  <div class="hint">{{ 'PERIODS.YEAR_EDITOR_HINT' | translate }}</div>
+  <mat-tab-group>
+    @for ( periodYearWrapper of periodsWrapperMap.values(); track periodYearWrapper.year) {
+      <mat-tab label="{{periodYearWrapper.year}}">
+        <div class="container">
+          @for (periodYearEdit of periodYearWrapper.periodYearEdits; track periodYearEdit.id) {
+
+              @if (periodYearEdit.multiDay) {
+                <mat-form-field>
+                  <mat-label>{{ periodYearEdit.periodName }}</mat-label>
+                  <mat-date-range-input [rangePicker]="picker">
+                    <input matStartDate
+                           [placeholder]="'PERIODS.START_DATE' | translate"
+                           [(ngModel)]="periodYearEdit.startDate"
+                           (dateChange)="changed = true"
+                    >
+                    <input matEndDate
+                           [placeholder]="'PERIODS.END_DATE' | translate"
+                           [(ngModel)]="periodYearEdit.endDate"
+                           (dateChange)="changed = true"
+                    >
+                  </mat-date-range-input>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-date-range-picker #picker></mat-date-range-picker>
+                </mat-form-field>
+              } @else {
+                <mat-form-field>
+                  <mat-label>{{ periodYearEdit.periodName }}</mat-label>
+                  <input matInput [matDatepicker]="picker"
+                         [(ngModel)]="periodYearEdit.startDate"
+                         [min]="periodYearWrapper.minDate"
+                         [max]="periodYearWrapper.maxDate"
+                         (dateChange)="changed = true"
+                  >
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              }
+
+          }
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
+
+
+  <div class="footer">
+    <button mat-flat-button (click)="onSavePeriodsYear()" [disabled]="!changed">
+      {{ 'PERIODS.SAVE' | translate }}
+    </button>
+    <button mat-flat-button (click)="onGeneratePeriods()" [disabled]="changed">
+      {{ 'PERIODS.GENERATE' | translate }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+.sender-data {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-column-gap: 1em;
+  grid-row-gap: 0.25em;
+}
+
+.package-data {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  column-gap: 1em;
+
+  .package-selector {
+    flex: 1;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .suggestion-header {
+    display: flex;
+    column-gap: 1em;
+  }
+
+  .package-data {
+    flex: 1;
+  }
+}
+
+.calendars {
+  display: flex;
+  justify-content: space-evenly;
+  column-gap: 1em;
+  row-gap: 1em;
+}
+
+.calendar-wrapper {
+  flex: 1;
+}
+
+.calendar-title {
+  font-weight: 700;
+  text-align: center;
+  margin-top: 0;
+}
+
+.no-suggestion-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.5em;
+}
+
+.bottom-buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  column-gap: 1em;
+  max-width: 60em;
+  margin: 1em auto;
+
+  & .reject {
+    background-color: #dc1010;
+    border-radius: 10px;
+    color: white;
+  }
+
+  & .approve {
+    background-color: greenyellow;
+    border-radius: 10px;
+    color: darkgreen;
+  }
+}

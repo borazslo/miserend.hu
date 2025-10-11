@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>{{ 'Periódus módosítás' | translate }}</h2>
+<mat-dialog-content>
+  @if (data.recentlyExcludedPeriodNames && data.recentlyExcludedPeriodNames.length > 0) {
+    <span>A <span class="periodName">{{ data.periodName }}</span> periódust módosítják a következő időszakok:</span>
+    <ul>
+      @for (period of data.recentlyExcludedPeriodNames; track period) {
+        <li class="periodName">{{ period }}</li>
+      }
+    </ul>
+  }
+  @if (data.recentlyExclusionSourcePeriodNames && data.recentlyExclusionSourcePeriodNames.length > 0) {
+    <span>A <span class="periodName">{{ data.periodName }}</span> periódus módosítja az alábbi időszakokat:</span>
+    <ul>
+      @for (period of data.recentlyExclusionSourcePeriodNames; track period) {
+        <li class="periodName">{{ period }}</li>
+      }
+    </ul>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="close()">OK</button>
+</mat-dialog-actions>
