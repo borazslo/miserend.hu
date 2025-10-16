@@ -49,7 +49,11 @@
             @if (!rdm.period || rdm.period.length === 0) {
               {{ rdm.startDate }}
             }
-            @if (rdm.week) {
+            @if (rdm.christmas) {
+              <span>{{ rdm.christmas }}</span><span>, {{ rdm.time }}</span>
+            } @else if (rdm.easter) {
+              <span>{{ rdm.easter }}</span><span>, {{ rdm.time }}</span>
+            } @else if (rdm.week) {
               <span>{{ rdm.period }}</span>, <span>{{ rdm.week }}</span>, <span>{{ rdm.days }}</span><span>, {{ rdm.time }}</span>
             } @else if (rdm.month) {
               <span>{{ rdm.period }}</span>, <span>{{ rdm.month }} </span><span>{{ rdm.days }}</span><span>, {{ rdm.time }}</span>

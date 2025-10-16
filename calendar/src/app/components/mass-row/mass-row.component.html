@@ -1,7 +1,11 @@
 @if (!mass.period || mass.period.length === 0) {
   {{ mass.startDate }}
 }
-@if (mass.week) {
+@if (mass.christmas) {
+  <span>{{ mass.christmas }}</span><span>, {{ mass.time }}</span>
+} @else if (mass.easter) {
+  <span>{{ mass.easter }}</span><span>, {{ mass.time }}</span>
+} @else if (mass.week) {
   <span>{{ mass.period }}</span>, <span>{{ mass.week }}</span>, <span>{{ mass.days }}</span><span>, {{ mass.time }}</span>
 } @else if (mass.month) {
   <span>{{ mass.period }}</span>, <span>{{ mass.month }} </span><span>{{ mass.days }}</span><span>, {{ mass.time }}</span>
