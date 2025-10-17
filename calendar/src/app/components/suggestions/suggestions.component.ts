@@ -27,6 +27,7 @@ import {DateTimeUtil} from '../../util/date-time-util';
 import {MassRowComponent} from '../mass-row/mass-row.component';
 import {MassesDiffComponent} from '../masses-diff/masses-diff.component';
 import {SearchService} from '../../services/search.service';
+import {SpecialType} from "../../model/period";
 
 @Component({
   selector: 'app-suggestions',
@@ -334,6 +335,33 @@ export class SuggestionsComponent implements OnInit {
     return null;
   }
 
+  private getEaster(mass: Mass): string | null {
+    if (ScriptUtil.isNotNull(mass.periodId)) {
+      const specialPeriodType = this.periodService.getSpecialPeriodType(mass.periodId);
+      if (specialPeriodType === SpecialType.EASTER) {
+        const rrule = mass.rrule;
+        if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.byweekday) && rrule.byweekday.length === 1) {
+          let easterDay = rrule.byweekday[0];
+          if(easterDay != null) {
+            return this.translateService.instant("EASTER_DAYS." + easterDay);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  private getChristmas(mass: Mass): string | null {
+    const rrule = mass.rrule;
+    if (ScriptUtil.isNotNull(rrule) && rrule.bymonth === 12 && ScriptUtil.isNotNull(rrule.bymonthday)) {
+      let christmasDay = MassUtil.christmasDayByMonthday(rrule.bymonthday);
+      if(christmasDay != null) {
+        return this.translateService.instant("CHRISTMAS_DAYS." + christmasDay);
+      }
+    }
+    return null;
+  }
+
   private getReadableMass(mass?: Mass, dates?: string[]): ReadableMass | null {
     if (!mass) {
       return null;
@@ -342,6 +370,8 @@ export class SuggestionsComponent implements OnInit {
     const period: string = this.getPeriod(mass);
     const exPeriodNames: string[] = this.getExPeriodNames(mass.experiod);
     const days: string = this.getDays(mass);
+    const christmas: string | null = this.getChristmas(mass);
+    const easter: string | null = this.getEaster(mass);
     const week: string | null = this.getWeek(mass);
     const month: string | null = this.getMonth(mass);
     const time: string = DateTimeUtil.getOnlyTimeString(mass.startDate);
@@ -355,6 +385,8 @@ export class SuggestionsComponent implements OnInit {
       ...(period && period.length > 0 && {period: period}),
       ...(exPeriodNames && exPeriodNames.length > 0 && {experiod: exPeriodNames}),
       ...(days && days.length > 0 && {days: days}),
+      ...(easter && easter.length > 0 && {easter: easter}),
+      ...(christmas && christmas.length > 0 && {christmas: christmas}),
       ...(week && week.length > 0 && {week: week}),
       ...(month && month.length > 0 && {month: month}),
       ...(dates && dates.length > 0 && {mDates: dates}),

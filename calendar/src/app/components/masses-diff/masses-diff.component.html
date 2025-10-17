@@ -3,6 +3,10 @@
     <span>
       @if (!origMass.period || origMass.period.length === 0) {
         {{ origMass.startDate }}
+      } @else if (origMass.christmas) {
+        <span>{{ origMass.christmas }}</span><span>, {{ origMass.time }}</span>
+      } @else if (origMass.easter) {
+        <span>{{ origMass.easter }}</span><span>, {{ origMass.time }}</span>
       } @else if (origMass.week) {
         <span>{{ origMass.period }}</span>, <span>{{ origMass.week }}</span>, <span>{{ origMass.days }}</span><span>, {{ origMass.time }}</span>
       } @else if (origMass.month) {
@@ -17,6 +21,10 @@
         <span> => </span>
         @if (!newMass.period || newMass.period.length === 0) {
           {{ newMass.startDate }}
+        } @else if (newMass.christmas) {
+          <span>{{ newMass.christmas }}</span><span>, {{ newMass.time }}</span>
+        } @else if (newMass.easter) {
+          <span>{{ newMass.easter }}</span><span>, {{ newMass.time }}</span>
         } @else if (newMass.week) {
           <span>{{ newMass.period }}</span>, <span>{{ newMass.week }}</span>, <span>{{ newMass.days }}</span><span>, {{ newMass.time }}</span>
         } @else if (newMass.month) {

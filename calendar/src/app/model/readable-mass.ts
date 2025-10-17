@@ -1,6 +1,8 @@
 export interface ReadableMass {
   period?: string;
   days?: string;
+  christmas?: string;
+  easter?: string;
   week?: string;
   month?: string;
   time: string;
