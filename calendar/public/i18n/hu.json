@@ -159,6 +159,8 @@
     "HEADER": {
       "PREV": "Előző",
       "NEXT": "Következő",
+      "LIST" : "Lista",
+      "TODAY": "Ma",
       "DAY": "Nap",
       "WEEK": "Hét",
       "MONTH": "Hónap"

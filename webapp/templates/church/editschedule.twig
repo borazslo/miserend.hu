@@ -12,7 +12,7 @@
 {% block pageHeader %}
     <div class="page-header">
         <h2>            
-            Miserend szerkesztése: {{ church.names }}
+            Miserend szerkesztése: {{ church.names.0 }}
 			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
             {% if church.alternative_names|length > 0 %}
                 <br/>
@@ -30,7 +30,9 @@
 {%  endblock %}
 
 {% block content %}
-{#calendar-app#}<mcal class="calendar-app"><app-root></app-root><script src="/js/mcal/polyfills-FFHMD2TL.js" type="module"></script><script src="/js/mcal/main-VWKE5XSE.js" type="module"></script></mcal>
+
+{#calendar-app#}<mcal class="calendar-app"><app-root></app-root><script src="/js/mcal/polyfills-B6TNHZQ6.js" type="module"></script><script src="/js/mcal/main-DDQL74LP.js" type="module"></script></mcal>
+
 <FORM ENCTYPE='multipart/form-data' method=post id="formschedule" class="">	
 	<input type=hidden name=tid value={{ tid }}>
 
@@ -45,7 +47,7 @@
 		</td>
 	</tr>
 </table>
-
+<!--
 <span class=kiscim>Miseidőpontok:</span>
 	
 <div id="periods" style="margin-bottom:5px">
@@ -61,7 +63,7 @@
 	{% endfor %}
 	<span class="urlap button addparticular" last="{{ lastparticular }}" >Új különleges nap hozzáadása</span>
 </div>
-
+-->
 
 </table>
 

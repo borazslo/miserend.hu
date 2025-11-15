@@ -2,6 +2,7 @@ import {CalendarOptions} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
 import rrulePlugin from '@fullcalendar/rrule';
 import huLocale from '@fullcalendar/core/locales/hu';
 import {DialogEvent} from '../model/dialog-event';
@@ -17,18 +18,17 @@ export class CalendarUtil {
 
   public static getSimpleCalendarOptions(timeZone: string): CalendarOptions {
     return {
-      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, rrulePlugin],
-      initialView: 'timeGridWeek',
-      slotDuration: '01:00',
+      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, rrulePlugin],
+      initialView: 'listWeek',
+      slotDuration: '00:30',
+      allDaySlot: false, 
+      // Hide the hour labels in the left time axis (prevent stacked hour strings)
+      // slotLabelContent can return an object with html to override rendering
+      slotLabelContent: function() { return { html: '' }; },
       timeZone: timeZone,
       locale: huLocale,
-      firstDay: 1,
+      firstDay: 7,
       height: '600px',
-      headerToolbar: {
-        left: 'prev,next',
-        center: 'title',
-        right: 'dayGridDay,timeGridWeek,dayGridMonth'
-      },
       editable: false,
       dayMaxEvents: true,
 
@@ -44,6 +44,7 @@ export class CalendarUtil {
 
   public static getSimpleCalendarOptionsWithoutHeader(timeZone: string): CalendarOptions {
     const simpleCalendarOptions = this.getSimpleCalendarOptions(timeZone);
+    // ensure the FullCalendar built-in toolbar is disabled so the custom Angular header remains the only visible one
     simpleCalendarOptions.headerToolbar = false;
     return simpleCalendarOptions;
   }

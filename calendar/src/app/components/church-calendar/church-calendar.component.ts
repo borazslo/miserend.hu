@@ -157,12 +157,15 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
 
   private initializeCalendar(): void {
     const timeZone: string = this.currentChurch.timeZone;
+    // use the options without FullCalendar's built-in toolbar so the custom Angular/Material header is the only visible header
     this.calendarOptions = CalendarUtil.getSimpleCalendarOptionsWithoutHeader(timeZone);
 
     this.calendarOptions = {
       ...this.calendarOptions,
       eventClick: (arg: any) => this.handleEventClick(arg),
       datesSet: (arg: any) => this.onDatesSet(arg),
+      // Render custom event content so we can append a language flag in list views
+      eventContent: (info: any) => this.renderEventContent(info),
       ...((this.editable || this.suggestible) && {dateClick: (arg: any) => this.handleDateClick(arg)} ),
       eventDidMount:  function (info) {
         const eventDate = info.event.startStr.slice(0, 10);
@@ -542,8 +545,9 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     this.calendarComponent.getApi().prev();
   }
 
-  public changeView(view: 'dayGridDay' | 'dayGridMonth' | 'timeGridWeek') {
-    this.calendarComponent.getApi().changeView(view);
+  // Accept listWeek as well so template buttons can call changeView('listWeek') without type errors
+  public changeView(view: 'dayGridDay' | 'dayGridMonth' | 'timeGridWeek' | 'listWeek') {
+    this.calendarComponent.getApi().changeView(view as any);
   }
 
   private onDatesSet(arg : any) {
@@ -780,5 +784,47 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
           currentPeriods.some(c => this.periodsOverlap(c, t))
       );
     });
+  }
+
+  // Create event HTML that includes time, title and a small flag for the event language (if available)
+  renderEventContent(info: any) {
+    try {
+      // determine current view type (use info.view when available)
+      const viewType = info.view?.type || (this.calendarComponent ? this.calendarComponent.getApi().view.type : '');
+      const isListView = typeof viewType === 'string' && viewType.startsWith('list');
+
+      // For list views build a list-style row (with optional flag)
+      if (isListView) {
+        const timeHtml = info.timeText ? `<span class="fc-list-item-time">${info.timeText}</span>` : '';
+        const titleHtml = `<span class="fc-list-item-title">${info.event.title}</span>`;
+
+        // only append language flag in list views
+        const massId = info.event.extendedProps?.massId;
+        let lang = '';
+        let mass: any | undefined = undefined;
+        if (massId != null) {
+          if (this.changes && this.changes.has(massId)) {
+            mass = this.changes.get(massId);
+          } else if (this.masses && this.masses.has(massId)) {
+            mass = this.masses.get(massId);
+          }
+          if (mass && mass.lang) lang = mass.lang;
+        }
+
+        const flagMap: Record<string,string> = { hu: '🇭🇺', en: '🇬🇧', de: '🇩🇪', sk: '🇸🇰', ro: '🇷🇴' };
+        const flag = flagMap[lang] || (lang ? lang.toUpperCase() : '');
+        const flagHtml = flag ? `<span class="event-lang-flag" style="margin-left:6px">${flag}</span>` : '';
+
+        return { html: `${timeHtml} ${titleHtml} ${flagHtml}` };
+      }
+
+      // For non-list views return simple markup using FullCalendar's standard classes so
+      // default styles (colors, layout) are preserved.
+      const timeHtml = info.timeText ? `<span class="fc-event-time">${info.timeText}</span>` : '';
+      const titleHtml = `<span class="fc-event-title">${info.event.title}</span>`;
+      return { html: `${timeHtml} ${titleHtml}` };
+    } catch (e) {
+      return { html: info.event.title };
+    }
   }
 }

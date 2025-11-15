@@ -1,9 +1,12 @@
 @if (showHeader) {
-  <div class="calendar-header">
+  <div class="calendar-header">    
     <div class="left-controls">
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
         <mat-button-toggle (click)="prev()" [matTooltip]="'SUGGESTION.HEADER.PREV' | translate"><mat-icon>keyboard_arrow_left</mat-icon></mat-button-toggle>
-        <mat-button-toggle (click)="next()" [matTooltip]="'SUGGESTION.HEADER.NEXT' | translate"><mat-icon>keyboard_arrow_right</mat-icon></mat-button-toggle>
+        <mat-button-toggle (click)="calendarComponent.getApi().today()" [matTooltip]="'SUGGESTION.HEADER.TODAY' | translate" aria-label="today">
+          {{ 'SUGGESTION.HEADER.TODAY' | translate }}          
+        </mat-button-toggle>
+        <mat-button-toggle (click)="next()" [matTooltip]="'SUGGESTION.HEADER.NEXT' | translate"><mat-icon>keyboard_arrow_right</mat-icon></mat-button-toggle>        
       </mat-button-toggle-group>
     </div>
 
@@ -13,7 +16,7 @@
 
     <div class="right-controls">
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
-        <mat-button-toggle (click)="changeView('dayGridDay')">{{ 'SUGGESTION.HEADER.DAY' | translate }}</mat-button-toggle>
+        <mat-button-toggle (click)="changeView('listWeek')">{{ 'SUGGESTION.HEADER.LIST' | translate }}</mat-button-toggle>        
         <mat-button-toggle [checked]="true" (click)="changeView('timeGridWeek')">{{ 'SUGGESTION.HEADER.WEEK' | translate }}</mat-button-toggle>
         <mat-button-toggle (click)="changeView('dayGridMonth')">{{ 'SUGGESTION.HEADER.MONTH' | translate }}</mat-button-toggle>
       </mat-button-toggle-group>

@@ -43,22 +43,24 @@
 
 
 {% block content %}
-{#calendar-app#}<mcal class="calendar-app"><app-root></app-root><script src="/js/mcal/polyfills-FFHMD2TL.js" type="module"></script><script src="/js/mcal/main-VWKE5XSE.js" type="module"></script></mcal>
+
     {{ alert|raw }}
         
     <h5><b>Frissítve ill. megerősítve:</b> {{ updated }}</h5>
 
     {% include '_panelcampaign.twig' with { collapsible: 'collapsed' }  %}
 
+    {% if miseaktiv == 1 %}
+       {#calendar-app#}<mcal class="calendar-app"><app-root></app-root><script src="/js/mcal/polyfills-B6TNHZQ6.js" type="module"></script><script src="/js/mcal/main-DDQL74LP.js" type="module"></script></mcal>
+       <br/><br/> 
+    {% else %}
+        <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
+    {% endif %}
+    
     {% if liturgiatv is not empty %}
         {% include 'church/_panelliturgiatv.twig' %}
     {% endif %}
 
-    {% if miseaktiv == 1 %}
-        {% include "church/_schedule.twig" %}
-    {% else %}
-        <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
-        {% endif %}
 
     {% if misemegj %}
         {% include "panel.twig" with {title:'Kapcsolódó információk','body': misemegj|raw|nl2br } %}    
