@@ -114,40 +114,26 @@ def replace_or_insert_calendar_app(template_path, main_js, polyfills_js):
     inserted = False
     after_content_block = False
 
-    app_html = (
-        '{#calendar-app#}<mcal class="calendar-app">'
+    # app_html body (no marker) and a separate marker line so we don't duplicate/accidentally add extra '{'
+    app_html_body = (
+        '<mcal class="calendar-app">'
         '<app-root></app-root>'
         f'<script src="/js/mcal/{polyfills_js}" type="module"></script>'
         f'<script src="/js/mcal/{main_js}" type="module"></script></mcal>\n'
     )
+    marker_line = '{#calendar-app#}'
 
     i = 0
     while i < len(lines):
         line = lines[i]
         stripped = line.strip()
-        new_lines.append(line)
 
-        # Megjegyezzük, ha már túl vagyunk a {% block content %} soron
-        if re.match(r"{%\s*block\s+content\s*%}", stripped):
-            after_content_block = True
-
-            # Ha editschedule.twig vagy remark_list.twig fájlban vagyunk, akkor itt szúrjuk be közvetlenül
-            if (filename == "editschedule.twig" or filename == "remark_list.twig" or "eventscatalogue.twig") and not inserted:
-                if (i + 1) < len(lines) and lines[i + 1].strip().startswith("{#calendar-app#}"):
-                    new_lines.append(app_html)
-                    i += 1  # kihagyjuk a régit
-                else:
-                    new_lines.append(app_html)
-                inserted = True
-
-        elif filename == "church.twig" and after_content_block and re.match(r"{%\s*if\s+miseaktiv\s*==\s*1\s*%}", stripped):
-            if not inserted:
-                if (i + 1) < len(lines) and lines[i + 1].strip().startswith("{#calendar-app#}"):
-                    new_lines.append(app_html)
-                    i += 1
-                else:
-                    new_lines.append(app_html)
-                inserted = True
+        if stripped.startswith("{#calendar-app#}") and not inserted:
+            indent = line[:len(line) - len(stripped) - 1]
+            new_lines.append(indent + marker_line + app_html_body)
+            inserted = True
+        else:
+            new_lines.append(line)
 
         i += 1
 
