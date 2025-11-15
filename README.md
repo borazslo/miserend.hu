@@ -151,7 +151,7 @@ docker exec miserend composer install|require|update
 
 - Egy különálló projekt, ami be lett integrálva a meglévő rendszerbe
 - Első alkalommal le kell generálni az időszakokat:
-- Admin joggal, az `/eventscatalogue` felületen
+- Admin joggal, az `/periodyeareditor` felületen
 
 ## Táblák beszúrása
 Ha még nincsenek a miserend adatbázisban a `cal_` prefixű táblák, akkor először másoljuk fel a dockerre az sql fájlokat:
@@ -168,7 +168,7 @@ Ha minta adatokat is szeretnénk (periódushoz) akkor az alábbiakat is futtassu
 mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/sample_periods.sql
 mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/sample_period_years.sql
 ```
-Ezután be kell lépni a felületre, és az `/eventscatalogue` felületen legenerálni az aktuális időszakra.
+Ezután be kell lépni a felületre, és az `/periodyeareditor` felületen legenerálni az aktuális időszakra.
 A minta adatok idővel elévülhetnek, fontos az aktualizálásuk!
 
 ## Naptár szerkesztése

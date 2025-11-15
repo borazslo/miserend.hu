@@ -215,9 +215,9 @@ def main():
     remark_list_path = os.path.join(TO_PATH, "templates", "remark_list.twig")
     replace_or_insert_calendar_app(remark_list_path, main_js, polyfills_js)
     
-    # eventscatalogue.twig => időszak szerkesztő
-    eventscatalogue_path = os.path.join(TO_PATH, "templates", "eventscatalogue.twig")
-    replace_or_insert_calendar_app(eventscatalogue_path, main_js, polyfills_js)
+    # periodyeareditor.twig => időszak szerkesztő
+    periodyeareditor_path = os.path.join(TO_PATH, "templates", "periodyeareditor.twig")
+    replace_or_insert_calendar_app(periodyeareditor_path, main_js, polyfills_js)
     
     # home.twig
     # home_twig_path = os.path.join(TO_PATH, "templates", "home.twig")
