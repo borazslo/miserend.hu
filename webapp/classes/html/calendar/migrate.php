@@ -1,0 +1,636 @@
+<?php
+
+namespace Html\Calendar;
+
+use Api\Church;
+use Illuminate\Database\Capsule\Manager as DB;
+
+
+class Migrate extends \Html\Html {
+
+    public $template = "layout_empty.twig";
+
+    public $napok = [ 1 => "MO", 2 => "TU", 3 => "WE", 4 => "TH", 5 => "FR", 6 => "SA", 7 => "SU"];
+    public $specialDays = [
+                '01-01', '01-06', '03-25', '05-01', '06-29', '07-26', '08-05', '08-15', '08-15 -8', '08-20', '08-20 -8', '08-29', '10-20', '10-23', '11-01', '11-02', '12-31'
+            ];
+
+    public function __construct($path) {
+        $time = microtime(true);
+
+        $churcheswitherror = [];
+        $periodswitherror = [];
+
+        try {
+            // find templomok that have exactly one distinct misek.idoszamitas
+            $templomok = DB::table('templomok as t')
+            ->join('misek as m', 'm.tid', '=', 't.id')
+            ->select('t.*')
+            ->where('ok','i')->where('miseaktiv','1');
+
+            if(isset($_GET['limit'])) {
+                $templomok = $templomok->limit($_GET['limit']);
+            }
+            
+            $templomok = $templomok->groupBy('t.id');
+            
+            if(isset($_GET['tid'])) {
+                $templomok = $templomok->where('t.id',$_GET['tid']);
+            } 
+
+            $templomok = $templomok->get();
+
+            echo count($templomok)." templomot találtunk.<br/>\n";
+            $countperiods = 0;
+            $countmasses = 0;
+            $savednasses = 0;
+            $countmisekwitherror = 0;
+            //printr($templomok);
+
+            
+            
+            $rows = [];
+            foreach ($templomok as $t) {
+                
+                $templom = \Eloquent\Church::find($t->id);
+                if(!$templom) {
+                    // throw new \Exception("No church found with id ".$t->id);
+                    echo "<br><strong>Error:</strong> No church found with id ".$t->id."<br/>\n";
+                    continue;
+                }
+                // delete existing calendar entries for this church
+                DB::table('cal_masses')->where('church_id', $t->id)->delete();
+
+                // Load all rows from `misek` for this church, then group them by `idoszamitas`
+                // (collection grouping, done in PHP after fetching).
+                $Idoszakok = DB::table('misek')
+                    ->where('tid', $t->id)
+                    ->where('torles', '0000-00-00 00:00:00')
+                    ->orderBy('idoszamitas')
+                    ->get()
+                    ->groupBy('idoszamitas');
+                $countperiods += count($Idoszakok);
+                foreach ($Idoszakok as $idoszaknev => $misek) {
+                    $countmasses += count($misek);
+                    try {               
+                        
+                        $period = $this->findPeriod($misek[0]);
+                        if(!$period) {
+                            throw new \Exception("No period found for mise idoszamitas ".$idoszaknev);
+                        }
+                        
+                        $misek = $this->concatDays($misek);
+
+                        foreach ($misek as $mise) {
+                        
+                                $title = "Szentmise";
+                                if($mise->milyen == "ige") {
+                                    $title = "Igeliturgia";
+                                }
+
+                                $calmass = \Html\Calendar\Model\CalMass::create([
+                                    'church_id' => $t->id,
+                                    'period_id' => $period->id,
+                                    'title' => $title,
+                                    'types' => [],
+                                    'rite' => 'ROMAN_CATHOLIC',
+                                    'start_date' => $period->start_date."T".$mise->ido,
+                                    'rrule' => [
+                                        'freq' => 'weekly',
+                                        'until' => $period->end_date."T23:59:59",
+                                        "dtstart" => $period->start_date."T".$mise->ido,
+                                    ],
+                                    'lang' => 'hu',
+                                    'comment' => $mise->megjegyzes
+                                ]);
+                                
+                                $rrule = &$calmass->rrule;
+
+                                // Ha meg van adva, hogy milyen napon van, akkor beletesszük
+                                $byweekday = array_map(function($day) {
+                                        if($day == 0) return false;
+                                        return $this->napok[$day];
+                                    }, $mise->nap);                                
+                                $byweekday = array_values(array_filter($byweekday, function($v) {
+                                    return $v !== false;
+                                }));
+                                if($byweekday != [])                                                                   
+                                    $rrule['byweekday'] = $byweekday;
+                                
+
+                                // Páros héten, páratlan héten, a hónap valahanyadik hetében, stb...
+                                if($mise->nap2 and $mise->nap2 != "") {
+                                    if(in_array($mise->nap2, [1,2,3,4,5,-1])) {
+                                        $rrule['freq'] = "monthly";
+                                        $rrule['bysetpos'] = $mise->nap2;    
+                                    }
+                                    else if (in_array($mise->nap2, ['ps','pt'])) {
+                                        $rrule['freq'] = "weekly";
+                                        if($mise->nap2 == 'ps') {
+                                            // páros
+                                            $rrule['byweekno'] = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52];
+                                        } else {
+                                            // páratlan
+                                            $rrule['byweekno'] = [1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51];
+                                        }
+                                    }
+                                    else {
+                                        echo "Unknown nap2 value: ".$mise->nap2." (templom id: ".$t->id.", mise idoszamitas: ".$mise->idoszamitas.")<br/>\n";   
+                                        throw new \Exception("Unknown nap2 value: ".$mise->nap2);
+                                    }
+                                }
+
+                                // Egyetlen napos periódusok esetén külön szabályok
+                                if($mise->tol == $mise->ig) {
+                                    
+                                    // Karácsony napjaira külön szabály
+                                    if($period->name == 'Karácsony') {
+                                        {
+                                            $rrule['freq'] = 'monthly';
+                                            if($mise->tol == '12-24' or $mise->tol == '12-24 -8') {
+                                                $mise->tol = '12-24';
+                                                $rrule['bymonthday'] = [24];
+                                            } else if($mise->tol == '12-25' or $mise->tol == '12-25 -8') {
+                                                $mise->tol = '12-25';
+                                                $rrule['bymonthday'] = [25];
+                                            } else if($mise->tol == '12-26') {
+                                                $rrule['bymonthday'] = [26];
+                                            } else {
+                                                echo "Invalid date for Karácsony period: ".$mise->tol." (templom id: ".$t->id.", mise idoszamitas: ".$mise->idoszamitas.")<br/>\n";
+                                                throw new \Exception("Invalid date for Karácsony period: ".$mise->tol);
+                                            }
+                                        }
+                                    }
+                                    else if($period->name == 'Nagyszombat' or $period->name == 'Húsvéti vigília') {
+                                        $rrule['freq'] = 'weekly';
+                                        $rrule['byweekday'] = ['SA'];
+                                    } else if ($period->name == 'Nagycsütörtök' or $period->name = 'Nagcsütörtök') {
+                                        $rrule['freq'] = 'weekly';
+                                        $rrule['byweekday'] = ['TH'];
+                                    } else if ($period->name == 'Nagypéntek') {
+                                        $rrule['freq'] = 'weekly';
+                                        $rrule['byweekday'] = ['FR'];
+                                    } else if ($period->name == 'Húsvétvasárnap' or $period->name == 'Húsvét') {
+                                        $rrule['freq'] = 'weekly';
+                                        $rrule['byweekday'] = ['SU'];
+                                    }
+                                    // Dátumos nagy ünnepeink 
+                                    else if (in_array($mise->tol, $this->specialDays) ) {
+                                        $rrule['freq'] = 'yearly';
+                                        $rrule['bymonthday'] = [ (int)substr($mise->tol, 3,2) ];
+                                        $rrule['bymonth'] = [ (int)substr($mise->tol, 0,2) ];
+                                    }
+
+                                }
+                                $calmass->rrule = $rrule;
+                                
+                                $calmass->save();
+                                $savednasses++;
+                                                                
+                        }
+                    } catch (\Exception $e) {   
+                        $churcheswitherror[$t->id] = $t;
+                        $countmisekwitherror += count($misek);
+
+                        $key = $misek[0]->tol."-".$misek[0]->ig;
+                        if(!isset($periodswitherror[$key])) {
+                            $periodswitherror[$key] = $misek[0];
+                            $periodswitherror[$key]->count = 0;
+                            $periodswitherror[$key]->countall = 0;
+                        } 
+                        $periodswitherror[$key]->count++;       
+                        $periodswitherror[$key]->countall += count($misek);
+                        
+                        /*
+                        echo "Error processing templom <i>".$t->nev.", ".$t->varos." (".$t->id.")</i>";
+                        if(isset($misek[0])) 
+                            echo ": <b>".$misek[0]->idoszamitas."</b> ['".$misek[0]->tol."', '".$misek[0]->ig."'] ";
+                        echo " - ".$e->getMessage()."<br/>\n";
+                        */        
+                    }
+                
+                } 
+                                                
+            }
+
+            echo $countperiods." időszakot dolgoztam fel.<br/>\n";
+            echo $countmasses." miséd dolgoztam fel.<br/>\n";
+            echo $savednasses." misét mentettem.<br/>\n";
+            echo $countmisekwitherror." misével gyűlt meg a bajom.<br/>\n";
+            echo count($churcheswitherror)." templommal gyűlt meg a bajom.<br/>\n";
+            echo "Futási idő: ".round(microtime(true) - $time, 2)." másodperc.<br/>\n";
+            
+            if (!empty($periodswitherror) && is_array($periodswitherror)) {
+                uasort($periodswitherror, function($a, $b) {
+                    $ac = isset($a->count) ? (int)$a->count : 0;
+                    $bc = isset($b->count) ? (int)$b->count : 0;
+                    if ($ac !== $bc) {
+                        // primary: count, descending
+                        return ($ac > $bc) ? -1 : 1;
+                    }
+
+                    // secondary: updated_at (use church.updated_at if tid present), more recent first
+                    $a_up = '';
+                    $b_up = '';
+                    if (isset($a->tid)) {
+                        $churchA = \Eloquent\Church::find($a->tid);
+                        $a_up = $churchA ? $churchA->updated_at : '';
+                    }
+                    if (isset($b->tid)) {
+                        $churchB = \Eloquent\Church::find($b->tid);
+                        $b_up = $churchB ? $churchB->updated_at : '';
+                    }
+
+                    $ta = $a_up ? strtotime($a_up) : 0;
+                    $tb = $b_up ? strtotime($b_up) : 0;
+                    if ($ta === $tb) return 0;
+                    return ($ta > $tb) ? -1 : 1; // descending (newer first)
+                });
+            }
+            
+            echo "<h2>Periods with errors</h2>\n";
+            if (empty($periodswitherror)) {
+                echo "<p>No periods with errors.</p>\n";
+            } else {
+                echo "<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\">\n";
+                echo "<thead>
+                    <tr>
+                        <th>idoszamitas</th>
+                        <th>[tol, ig]</th>
+                        <th>templom</th>
+                        <th>count</th>
+                        <th>countall</th>
+                        <th>updated_at</th>
+                        <th></th>
+                    </tr></thead>\n";
+                echo "<tbody>\n";
+                foreach ($periodswitherror as $key => $m) {
+                    $idoszamitas = isset($m->idoszamitas) ? htmlspecialchars($m->idoszamitas) : '';
+                    $tol = isset($m->tol) ? htmlspecialchars($m->tol) : '';
+                    $ig = isset($m->ig) ? htmlspecialchars($m->ig) : '';
+                    $count = isset($m->count) ? (int)$m->count : 0;
+                    $countall = isset($m->countall) ? (int)$m->countall : 0;
+                    
+
+                    $church = null;
+                    if (isset($m->tid)) {
+                        $church = \Eloquent\Church::find($m->tid);
+                    }
+                    $nev = $church ? htmlspecialchars($church->nev) : '';
+                    $varos = $church ? htmlspecialchars($church->varos) : '';
+                    $tid = isset($m->tid) ? (int)$m->tid : '';
+                    $updated_at = $church ? htmlspecialchars($church->updated_at) : '';
+
+                    echo "<tr>";
+                    echo "<td>{$idoszamitas}</td>";
+                    echo "<td>['" . $tol . "', '" . $ig . "']</td>";
+                    echo "<td>{$nev}, {$varos} ({$tid}) </td>";                    
+                    echo "<td>{$count}</td>";
+                    echo "<td>{$countall}</td>";
+                    echo "<td>{$updated_at}</td>";
+                    echo "<td>";
+                    echo "<a href=\"/templom/{$tid}/editschedule\">/editschedule</a> ";
+                    echo "<a href=\"/calendar/migrated/?tid={$tid}\">/migrated/...</a>";
+                    echo "</td>";
+                    echo "</tr>\n";
+                }
+                echo "</tbody>\n</table>\n";
+            }
+
+
+        } catch (\Exception $e) {
+            $this->rows = ['error' => $e->getMessage()];
+            printr($e->getMessage());
+        }
+
+
+        //$this->content = json_encode($_REQUEST);
+
+
+
+    }
+
+    public function findPeriod($mise) {
+            //printr($mise);
+
+
+        /* Milyen időszakok léteznek:
+        SELECT 
+            m.*, 
+            x.db AS darabszam
+        FROM misek m
+        JOIN (
+            SELECT 
+                idoszamitas, 
+                MIN(id) AS sample_id,
+                COUNT(*) AS db
+            FROM misek
+            GROUP BY idoszamitas
+        ) x ON m.id = x.sample_id
+        WHERE torles = '0000-00-00 00:00:00'  
+        ORDER BY `darabszam` DESC
+        */
+
+        /* Egy adott időszak előfordulása és változatai 
+        SELECT 
+                m.*,                -- mintasor
+                x.db AS darabszam   -- ennyi ilyen (tol,ig) pár van
+            FROM misek m
+            JOIN (
+                SELECT 
+                    tol,
+                    ig,
+                    MIN(id) AS sample_id,
+                    COUNT(*) AS db
+                FROM misek
+                WHERE idoszamitas = 'advent'                
+                    AND torles = '0000-00-00 00:00:00'
+                    AND tol <> ig 
+                GROUP BY tol, ig
+            ) x ON m.id = x.sample_id
+            ORDER BY x.tol, x.ig;
+        */
+//printr($mise);
+        
+        // Karácsony
+        if( in_array( [$mise->tol, $mise->ig], [
+            [ '12-24','12-26'], ['12-24','12-25'], ['12-24 -8', '12-24 -8'], ['12-25','12-26'],['12-25','12-25'],['12-25 -8', '12-25 -8'],
+            ['12-24', '12-24'],['12-25', '12-25'],['12-26', '12-26']
+        ] ) )  {
+            $periodName = 'Karácsony';
+        }
+        // Szent három nap
+        elseif (
+            in_array($mise->idoszamitas, ['Húsvét','Húsvétvasárnap','Nagyszombat','Húsvéti vigília','Nagypéntek', 'Nagycsütörtök'])
+        ) {
+            $periodName = 'Szent három nap';
+
+        }
+        // Egy-egy nagy ünnep az egész évbenbe rakjuk bele
+        else if ( in_array( $mise->tol, $this->specialDays ) and $mise->tol == $mise->ig ) {
+            $periodName = 'Egész évben';
+        }
+
+        // Egész évben
+        else if( in_array( [$mise->tol, $mise->ig], [
+            [ '12-25','Advent I. vasárnapja -1'],	['1', '12-31'],
+            [ "01-01", "12-31"],['12-24', 'Advent I. vasárnapja'],
+            [ "12-25", "Advent I. vasárnapja"],['06-01', '04-30'],['Húsvéthétfő +1', '11.06.'],
+            ['Advent I. vasárnapja', '12-24 -1'] , ['Húsvétvasárnap', 'Krisztus Király vasárnapja']
+        ] ) )  {
+            $periodName = 'Egész évben';
+        }
+        // Ősszel
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['08-28', '10-31'],['szeptember 2. vasárnapja +1', '10-31'],['09-01', '11-30 -1'],['09-01', '10-31'],['09-01', 'Advent I. vasárnapja'],['11-01', 'Advent I. vasárnapja -1'],
+                ['első tanítási nap', 'Őszi óraátállítás -1'],['szeptember utolsó vasárnapja +1', 'Advent I. vasárnapja'],['09-01', 'október utolsó vasárnapja -1'],['10-01', 'Advent I. vasárnapja -1'],['09-01', '12-31'],	['szeptember utolsó vasárnapja', 'Advent I. vasárnapja -1'],
+                ['szeptember 1. vasárnapja', 'Advent I. vasárnapja -1'],['09-01', 'Advent I. vasárnapja -1'],	['10-26', 'Advent I. vasárnapja'],
+                ['első tanítási nap', 'Advent I. vasárnapja -1'],['09-01', 'Őszi óraátállítás -1'],	['10-02', 'Advent I. vasárnapja']
+                 
+        ] ) ) { 
+                $periodName = 'Ősz';
+        }
+        
+        // Tavasszal
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['Tavaszi óraátállítás', '06-30'],['Tavaszi óraátállítás', 'utolsó tanítási nap'],
+                ['03-30', 'utolsó tanítási nap'],['03-01', '05-31'],['első tanítási nap', '09-30'],	['05-01', '06-19'],
+                ['03-01', '04-30'],['03-16', '05-30'], 	['04-25', '05-31'], 	['05-01', 'utolsó tanítási nap']
+        ] ) ) { 
+            $periodName = 'Tavasz';
+        }
+        
+        // Télen 
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['október utolsó vasárnapja', '03-25'],	['10-01', '05-01 -1'],	['12-25', 'Tavaszi óraátállítás -1'],['Őszi óraátállítás', '02-28'],	['szeptember 1. vasárnapja', '03-28'],
+                ['12-01', '02-28'],	["12-25 +1", "03-24"],['12-25 +1', '04-30'],['09-04', '02-25'],	['10-01', '02-28'],['09-01', '07-31'],	['10-01', '03-28'],	['09-01', '03-24'],
+                ['10-26', '03-28'], ['10-30', '03-25'],['10-01', '03-30'],['11-01', 'Advent I. vasárnapja'],	['09-30', '04-07'],['09-01', '05-31 -1'],['09-03', '06-30'],
+                ['10-30', '03-26'],	['10-28', '03-24'],	['10-01', '05-31'],	['10-04', '04-30'],['10-01', '03-25'],['október második vasárnapja +1', '05-31'],	['12-25', '03-25'],
+                ['11-01','03-15'],['10-01', '03-31'],['10-31', '03-27'],	['11-01', 'Húsvétvasárnap -1'],['Őszi óraátállítás', '02-27'],	['09-03', '06-30'],['12-25', 'utolsó tanítási nap -1'],
+                ['10-02', '03-29'],['10-26', '03-29'],['10-29', '03-24'],['10-01', '03-29'],	['09-29', '04-24'],	['11-01', '03-25'],	['10-30', '04-30'],	['szeptember 1', '03.31'],
+                ['október első vasárnapja', 'Tavaszi óraátállítás'],['11-01', '03-01 -1'],['10-27', '03-30'],['10-01', '04-30'],	['12-25', '03-29'],['09-01', 'Húsvétvasárnap'],['10-27', '03-29'],['Advent I. vasárnapja +1', 'Húsvétvasárnap']	,	['10-15', 'Tavaszi óraátállítás'],
+                ['09-02', '04-30'],['Őszi óraátállítás', 'Tavaszi óraátállítás'],['11-01', '04-30'],['Őszi óraátállítás', 'Advent I. vasárnapja -1'],['11-01', '03-30'],['10-31', '03-26'],['10-01', '03-23'],
+                ['12-25', '03-31 -1'],['09-10', '03-30'],['Őszi óraátállítás', 'Tavaszi óraátállítás -1'],	['09-30', '04-23'], 	['10-01', 'Húsvétvasárnap'],['10-02', '03-24'], 	['09-01', '12-31 -1'], 	
+                ['szeptember 1. vasárnapja', '03-28'],['09-01', '05-31'],    	['11-01', '03-31']  , ['11-01', '02-28'], ['12-25', '06-30'], ['12-25', '04-23'],	['10-15', '03-14'],	['09-02', '05-31'],['05-01', '09-31'],                	['10-01', 'március utolsó vasárnapja -1'], ['11-01', 'Húsvétvasárnap'], ['09-02', '06-06'],	['09-30', '04-24'], ['12-25', '03-31'], 	['szeptember utolsó vasárnapja +1', 'Húsvétvasárnap -1'],	['11-01', '01-31'], 	['10.01', '03.31'], ['10.01', '03.31 -1'], 	['10.01', '04.30 -1'],['12-25', 'Húsvéthétfő']
+            ] ) ) { 
+            $periodName = 'Tél';
+        }        
+        // Nyáron
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['03-29', 'szeptember 1. vasárnapja -1'],['03-27', '10-29'],['03-25', '10-27'],	['03-30', '09-30'],['Húsvétvasárnap', 'október utolsó szombatja'],['03-15', '10-14'],	['03-25', '10-01'],['03-17', '10-02'],
+                ['03-30', '10-01 -1'],['05-01', '09-01'],['03-30', '10-25'],['03-25', '10-28'],['Tavaszi óraátállítás', '09-30'],	['05-29', '09-03'],['04-01', '10-01 -1'],['04.01', '09.30'],['03-01', '05-21 -1'],
+                ['03-29', 'október első vasárnapja -1'],['05-01', '09-01 -1'],['04-01', '09-09 -1'],['06-01', '09-31'],['04-01', '10-31'],['03-31', '09-30'],['március utolsó vasárnapja', '09-30'],['06.01 +1', 'október második vasárnapja -1'],	['Húsvéthétfő +1', 'szeptember utolsó vasárnapja -1'],
+                ['03-30', 'szeptember 2. vasárnapja'],['Tavaszi óraátállítás', 'Őszi óraátállítás'],['04-24', '09-29'],	['05-01', '10-03'],['04-01', '10-30'],['03-31', '10-31'],['03-27', '10-30'],
+                ['Tavaszi óraátállítás', 'Őszi óraátállítás -1'],['05-01', '10-29'],	['Húsvéthétfő', '08-30'],['Tavaszi óraátállítás', '10-15'],['03-24', '09-30'],
+                ['03-31', '10-26'],['03-28', '10-30'],	['05-01', '09-30'],['Húsvétvasárnap', '09-30'],['04-25', '09-29'],['05-01', 'szeptember 1. vasárnapja'],	['03-25', 'szeptember utolsó vasárnapja'],
+                ['03-26', '10-29'],['05-01', '10-31'],['03-01', '09-30'],	['Húsvétvasárnap', '10-31'],['06-16', '10-20'],['05.01', '09.30 -1'],	['07-01', '09-02'],
+                ['03-29', '10-25'],['04-01', '09-30'],['Húsvétvasárnap +1', '10-31'],	['03-30', '10-01'], ['03-25', '08-31'],	['április 1', 'augusztus 31 -1'],
+                 ['04.01', '09.30 -1'], ['03-26', '09-30'],['04-01', '09-30 -1'], ['04-24', '10-01'], 	['03-30', '10-26'],	['04-08', '09-29']
+         
+        ] ) ) { 
+            $periodName = 'Nyár';
+        }
+
+        // Tanítási időben
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['első tanítási nap', 'utolsó tanítási nap'],
+                ['09-01', '06-15'],['09-01', '04-30'],	['szeptember 2. vasárnapja', 'utolsó tanítási nap'],
+                ['09-01', '06-30'],['09-01', '06-14'],	['09-01', 'utolsó tanítási nap'],['szeptember 1. vasárnapja', 'június első vasárnapja'],
+                ['szeptember 1. vasárnapja', 'Úrnapja -1'],['08-29', '06-04'],['09-30 +1', '05-01'],
+                ['szeptember 1. vasárnapja', 'Június 3. vasárnapja'],	['10-02', '06-30'], 	['09-01', 'Virágvasárnap -1'], 	['szeptember 1. vasárnapja +1', '04-30']
+        ] ) ) { 
+            $periodName = 'Tanítási idő';
+        }
+        // Nyári szünetben
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['07-01', '08-31'],	['06-16', '08-31'],['06-15', '08-31'],['utolsó tanítási nap +1', '0831'],	['07-01', '09-30'], 	['június 2. vasárnapja', 'szeptember 2. vasárnapja'],
+                ['06-01', '08-31'],['06-01', '09-30'],['06-01', '09-01'],['utolsó tanítási nap', 'szeptember 2. vasárnapja'],	['07-01', '10-01'],
+                ['utolsó tanítási nap +1','első tanítási nap -1'],['05-21', '08-31'],['07-05', '08-23'],['Pünkösdvasárnap', '09-30'],['Június 3. vasárnapja', 'szeptember 1. vasárnapja'],
+                ['06-19 +1', '08-28 -1'],['Júius 3. vasárnapja', 'szeptember 1. vasárnapja'], ['07-24', '08-27'], ['utolsó tanítási nap', 'első tanítási nap'], 	['Húsvétvasárnap', 'szeptember utolsó vasárnapja'], ['június első vasárnapja +1', 'szeptember 1. vasárnapja -1'],['06-27', '09-06'],	['Virágvasárnap', '08-31']	
+        ] ) ) { 
+            $periodName = 'Nyári szünet';
+        }
+
+        // Advent
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['Advent I. vasárnapja', '12-24'],['Advent I. vasárnapja', '12-23 -1'],['Advent I. vasárnapja +1', '12-25 -1'],
+                ['Advent I. vasárnapja', '12-25 -1'],	['Advent I. vasárnapja +1', '12-23'],['Advent I. vasárnapja', '12-20 -1'],
+                ['12-01', '12-25 -1'] ,['Advent I. vasárnapja', '12-25']       , ['Advent I. vasárnapja', '12-19']
+        ] ) ) {         
+            $periodName =  'Advent';            
+        } 
+
+        // Nagyböjt
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['Hamvazószerda', 'Nagycsütörtök'],
+                ['Hamvazószerda', 'Húsvétvasárnap']
+                
+        ] ) ) { 
+            $periodName = 'Nagyböjt';                                    
+        }
+        // Húsvét
+        else if ( in_array( [$mise->tol, $mise->ig], [
+                ['Nagykedd', 'Húsvéthétfő'],['Nagycsütörtök', 'Húsvétvasárnap'],['Nagycsütörtök', 'Nagycsütörtök']  
+                
+        ] ) ) { 
+            $periodName = 'Szent három nap';                                    
+        }
+
+
+        //
+        // Lássuk hónapokra bontva
+        //
+        //Januárban
+        else if ( in_array( [$mise->tol, $mise->ig], [['01-01', '01-31']] ) ) { 
+            $periodName = 'Január';                                    
+        }
+        // Februárban
+        else if ( in_array( [$mise->tol, $mise->ig], [['02-01', '02-28'], ['02-01', '02-29']] ) ) { 
+            $periodName = 'Február';                                    
+        }
+        // Márciusban
+        else if ( in_array( [$mise->tol, $mise->ig], [['03-01', '03-31']] ) ) { 
+            $periodName = 'Március';                                    
+        }
+        //Áprilisban
+        else if ( in_array( [$mise->tol, $mise->ig], [['04-01', '04-30']] ) ) { 
+            $periodName = 'Április';                                    
+        }
+        // Májusban
+        else if ( in_array( [$mise->tol, $mise->ig], [['05-01', '05-31']] ) ) { 
+            $periodName = 'Május';                                    
+        }
+        // Júniusban
+        else if ( in_array( [$mise->tol, $mise->ig], [['06-01', '06-30']] ) ) { 
+            $periodName = 'Június';                                    
+        }
+        // Júliusban
+        else if ( in_array( [$mise->tol, $mise->ig], [['07-01', '07-31']] ) ) { 
+            $periodName = 'Július';                                    
+        }
+        // Augusztusban
+        else if ( in_array( [$mise->tol, $mise->ig], [['08-01', '08-31']] ) ) { 
+            $periodName = 'Augusztus';                                    
+        }
+        // Szeptemberben
+        else if ( in_array( [$mise->tol, $mise->ig], [['09-01', '09-30'],['09-01', '09-31']] ) ) { 
+            $periodName = 'Szeptember';                                    
+        }
+        // Októberben
+        else if ( in_array( [$mise->tol, $mise->ig], [['10-01', '10-31']] ) ) { 
+            $periodName = 'Október';            
+        }
+        // Novemberben
+        else if ( in_array( [$mise->tol, $mise->ig], [['11-01', '11-30']] ) ) { 
+            $periodName = 'November';                                    
+        }
+        // Decemberben
+        else if ( in_array( [$mise->tol, $mise->ig], [['12-01', '12-31']] ) ) { 
+            $periodName = 'December';                                    
+        }
+       
+        else {
+            throw new \Exception("Cannot map mise idoszamitas with tol=".$mise->tol." and ig=".$mise->ig);
+        }
+
+        $period = \Html\Calendar\Model\CalPeriod::where('name', $periodName )->first();
+        if (!$period) {
+            throw new \Exception("CalPeriod '".$periodName."' not found");   
+        }
+        
+
+        $year = date('Y');
+        $period->start_date = $this->findPeriodStart($period, $year);
+        if($period->start_date > date('Y-m-d')) {
+            $year - 1;
+            $period->start_date = $this->findPeriodStart($period, $year);
+        }
+        $period->end_date = $this->findPeriodEnd($period, $year);
+        if($period->end_date < $period->start_date) {
+            $period->end_date = $this->findPeriodEnd($period, $year + 1);
+        }
+        return $period;
+        
+        return false;
+
+    }
+
+    public function findPeriodStart ($period, $year) {
+        if($period->start_month_day) {
+            $start_parts = explode('-', $period->start_month_day);
+            
+            return sprintf("%04d-%02d-%02d", $year, $start_parts[0], $start_parts[1]);
+        }
+        
+        if($period->start_period_id) {
+            $start_period = \Html\Calendar\Model\CalPeriod::find($period->start_period_id);
+            if(!$start_period) {
+                throw new \Exception("Start period with id ".$period->start_period_id." not found");
+            }
+            return $this->findPeriodStart($start_period, $year);
+        }
+
+        $year_period = \Html\Calendar\Model\CalPeriodYear::where('period_id', $period->id)->where('start_year', $year)->first();
+        if(!$year_period) {
+            throw new \Exception("No year period found for period id ".$period->id." and year ".$year);           
+        }
+        return $year_period->start_date;
+
+        throw new \Exception("Cannot find start date for period ".$period->id);
+        return false;
+    }
+
+    public function findPeriodEnd ($period, $year) {
+        if($period->multi_day == 0) {
+            return $this->findPeriodStart($period, $year);
+        }
+
+        if($period->end_month_day) {
+            $end_parts = explode('-', $period->end_month_day);
+            return sprintf("%04d-%02d-%02d", $year, $end_parts[0], $end_parts[1]);
+        }
+
+        if($period->end_period_id) {
+            $end_period = \Html\Calendar\Model\CalPeriod::find($period->end_period_id);
+            if(!$end_period) {
+                throw new \Exception("End period with id ".$period->end_period_id." not found");
+            }
+            return $this->findPeriodEnd($end_period, $year);
+        }
+
+
+        throw new \Exception("Cannot find end date for period ".$period->id);
+        return false;
+    }
+    
+    // Ha két mise között csak a hét napja a külünbség, akkor szépen összevonjuk
+    public function concatDays($misek) {
+        
+        $return = [];
+        $fieldToConcat = ['tid', 'ido', 'nap2', 'tol', 'ig', 'nyelv', 'milyen', 'megjegyzes','torles'];
+        
+        
+        foreach($misek as $mise) {            
+            $parts = [];
+            foreach ($fieldToConcat as $field) {
+                $parts[] = isset($mise->{$field}) ? (string)$mise->{$field} : '';
+            }
+            $key = implode('_', $parts);
+            
+            if(!isset($return[$key])) {
+                $return[$key] = $mise;
+                $return[$key]->nap = [ $mise->nap ];
+            } else {
+                $return[$key]->nap[] = $mise->nap;
+            }                        
+        }
+
+        return $return;
+
+
+        
+
+
+        
+    }
+}
