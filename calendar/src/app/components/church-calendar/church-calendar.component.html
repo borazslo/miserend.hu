@@ -29,6 +29,30 @@
   [events]="eventsPromise | async"
 ></full-calendar>
 
+<!-- Template used to render FullCalendar list items via Angular bindings.
+     Context variables provided from component: timeText, title, lang, types -->
+<ng-template #eventListTemplate let-timeText="timeText" let-title="title" let-lang="lang" let-types="types">
+  <div class="fc-list-item-container d-flex align-items-center" style="gap:6px;">
+    <span class="fc-list-item-time" *ngIf="timeText">{{ timeText }}</span>
+    <div class="fc-list-item-main d-flex align-items-center" style="gap:6px;">
+      <span class="fc-list-item-title">{{ title }}</span>
+
+      <ng-container *ngIf="lang">
+        <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="('LANGUAGES.' + lang) | translate" [src]="'/cal_images/flags/' + (lang | lowercase) + '.svg'" [alt]="('LANGUAGES.' + lang) | translate" />
+      </ng-container>
+
+      <ng-container *ngIf="types && types.length">
+        <ng-container *ngFor="let t of types">
+          <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="t | translate" [src]="'/cal_images/types/' + (t | lowercase) + '.png'" [alt]="t | translate" />
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Hidden anchor where the component will create embedded views from the template -->
+<ng-template #eventListTemplateContainer></ng-template>
+
 @if (showFooter && (editable || suggestible)) {
   @if (suggestible && (changes.size != 0 || deletedMasses.length != 0)) {
     <div class="footer suggestion-footer">
@@ -65,7 +89,7 @@
     <div *ngFor="let group of massListGrouped">
       <h4 class="d-flex align-items-center">        
         <div>
-          <span *ngIf="group.color" class="badge period-color-badge" [style.backgroundColor]="group.color" style="">{{ group.color }}</span> 
+          <span *ngIf="group.color" class="badge period-color-badge" [style.backgroundColor]="group.color">{{ group.color }}</span> 
            <strong>{{ group.periodName }}</strong>
           <div class="text-muted small">            
             <ng-container *ngIf="group.startMonthDay || group.startPeriodName || group.endMonthDay || group.endPeriodName">

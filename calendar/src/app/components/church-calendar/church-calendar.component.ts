@@ -7,7 +7,10 @@ import {
   OnInit,
   output,
   SimpleChanges,
-  ViewChild
+  ViewChild,
+  TemplateRef,
+  ViewContainerRef,
+  EmbeddedViewRef
 } from '@angular/core';
 import {AsyncPipe, CommonModule} from '@angular/common';
 import {FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
@@ -44,6 +47,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
 import {SearchService} from '../../services/search.service';
 import {GeneratedPeriod} from "../../model/generated-period";
+import { eventListTemplate, EventListTemplateVars } from './event-list-template';
 
 export interface SimpleDialogData {
   dateTime: Date;
@@ -89,6 +93,9 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
   datesSet = output<string>();
   private edit = false;
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
+  // Template for rendering list-view event HTML via Angular bindings
+  @ViewChild('eventListTemplate', { read: TemplateRef }) eventListTemplateRef!: TemplateRef<any>;
+  @ViewChild('eventListTemplateContainer', { read: ViewContainerRef }) eventListTemplateContainer!: ViewContainerRef;
 
   private dialogEvent?: DialogEvent;
   readonly dialog = inject(MatDialog);
@@ -187,7 +194,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       ...this.calendarOptions,
       eventClick: (arg: any) => this.handleEventClick(arg),
       datesSet: (arg: any) => this.onDatesSet(arg),
-      // Render custom event content so we can append a language flag in list views
+      // Render custom event content so we can append a language flag ant types in list views
       eventContent: (info: any) => this.renderEventContent(info),
       ...((this.editable || this.suggestible) && {dateClick: (arg: any) => this.handleDateClick(arg)} ),
       eventDidMount:  function (info) {
@@ -663,7 +670,9 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         }
 
         let changed: boolean = false;
-        if (ScriptUtil.isNotNull(m.experiod)) {
+        if (ScriptUtil.isNotNull(m.periodId) && m.periodId === periodId) {
+          changed = false;          
+        } else if (ScriptUtil.isNotNull(m.experiod)) {
           if (!m.experiod.includes(periodId)) {
             m.experiod.push(periodId);
             changed = true;
@@ -850,7 +859,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     });
   }
 
-  // Create event HTML that includes time, title and a small flag for the event language (if available)
+  // Create event HTML that includes time, title, a flag, and other icons (if available)
   renderEventContent(info: any) {
     try {
       // determine current view type (use info.view when available)
@@ -859,12 +868,11 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
 
       // For list views build a list-style row (with optional flag)
       if (isListView) {
-        const timeHtml = info.timeText ? `<span class="fc-list-item-time">${info.timeText}</span>` : '';
-        const titleHtml = `<span class="fc-list-item-title">${info.event.title}</span>`;
-
-        // only append language flag in list views
+        // Render the Angular template into DOM nodes and serialize to HTML so translation pipes
+        // and other Angular bindings work.
         const massId = info.event.extendedProps?.massId;
-        let lang = '';
+        let lang = null as string | null;
+        let types: string[] = [];
         let mass: any | undefined = undefined;
         if (massId != null) {
           if (this.changes && this.changes.has(massId)) {
@@ -873,30 +881,19 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
             mass = this.masses.get(massId);
           }
           if (mass && mass.lang) lang = mass.lang;
+          if (mass && mass.types) types = mass.types;
         }
 
-        const flagMap: Record<string,string> = { hu: '🇭🇺', en: '🇬🇧', de: '🇩🇪', sk: '🇸🇰', ro: '🇷🇴' };
-        const flag = flagMap[lang] || (lang ? lang.toUpperCase() : '');
-        const flagHtml = flag ? `<span class="event-lang-flag" style="margin-left:6px">${flag}</span>` : '';
-
-        // build icons HTML (type icons + flag SVG) similar to the event viewer popup
-        let iconsHtml = '';
-        const types: string[] = info.event.extendedProps?.types || [];
-        if (Array.isArray(types) && types.length > 0) {
-          for (const t of types) {
-            const tLower = String(t).toLowerCase();
-            const title = this.translateService ? this.translateService.instant(t) : t;
-            iconsHtml += `<img class=\"type-icon\" title=\"${title}\" src=\"/cal_images/types/${tLower}.png\" alt=\"${title}\" style=\"height:18px; margin-left:6px\"/>`;
-          }
+        // Create embedded view from ng-template, pass context values and serialize
+        if (this.eventListTemplateRef && this.eventListTemplateContainer) {
+          const ctx = { timeText: info.timeText || '', title: info.event.title || '', lang: lang, types: types };
+          const view: EmbeddedViewRef<any> = this.eventListTemplateContainer.createEmbeddedView(this.eventListTemplateRef, ctx);
+          view.detectChanges();
+          // serialize root nodes
+          const html = view.rootNodes.map((n: any) => n.nodeType === 1 ? (n as HTMLElement).outerHTML : n.textContent || '').join('');
+          view.destroy();
+          return { html };
         }
-        // flag SVG (preferred) + tooltip
-        if (lang) {
-          const langLower = String(lang).toLowerCase();
-          const langTitle = this.translateService ? (this.translateService.instant('LANGUAGES.' + lang) + ' nyelvű') : (lang + ' nyelvű');
-          iconsHtml += `<img class=\"type-icon\" title=\"${langTitle}\" src=\"/cal_images/flags/${langLower}.svg\" alt=\"${lang}\" style=\"height:18px; margin-left:6px\"/>`;
-        }
-
-        return { html: `${timeHtml} ${titleHtml} ${flagHtml} ${iconsHtml}` };
       }
 
       // For non-list views return simple markup using FullCalendar's standard classes so
