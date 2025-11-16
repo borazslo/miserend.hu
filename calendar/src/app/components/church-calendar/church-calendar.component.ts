@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, CommonModule} from '@angular/common';
 import {FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
 import {CalendarOptions, EventInput} from '@fullcalendar/core';
 import {EventService} from '../../event.service';
@@ -69,7 +69,7 @@ export interface DialogData {
 
 @Component({
   selector: 'app-church-calendar',
-  imports: [FullCalendarModule, AsyncPipe, MatButton, TranslatePipe, MatInput, MatFormField, MatLabel, FormsModule, ReactiveFormsModule, MatButtonToggle, MatButtonToggleGroup, MatIcon, MatTooltip],
+  imports: [CommonModule, FullCalendarModule, AsyncPipe, MatButton, TranslatePipe, MatInput, MatFormField, MatLabel, FormsModule, ReactiveFormsModule, MatButtonToggle, MatButtonToggleGroup, MatIcon, MatTooltip],
   templateUrl: './church-calendar.component.html',
   styleUrls: ['../../../styles.scss', './church-calendar.component.css']
 })
@@ -107,6 +107,19 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
 
   public calendarsTitle: string = '';
 
+  // Show a simple mass list under the calendar in edit/admin contexts (editschedule)
+  public showMassListInEdit: boolean = false;
+  public massListGrouped: Array<{
+    weight: number,
+    periodName: string,
+    masses: any[],
+    startMonthDay?: string | null,
+    endMonthDay?: string | null,
+    startPeriodName?: string | null,
+    endPeriodName?: string | null,
+    color?: string | null
+  }> = [];
+
   constructor(
     private readonly eventService: EventService,
     private readonly searchService: SearchService,
@@ -119,6 +132,10 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
 
   ngOnInit() {
     this.initializeCalendar();
+    // determine whether we should render the mass list under the calendar
+    const pathname: string = (typeof window !== 'undefined' && window.location && window.location.pathname) ? String(window.location.pathname) : '';
+    this.showMassListInEdit = !!this.editable || pathname.indexOf('editschedule') !== -1;
+
     this.userService.loadUser().subscribe(user => {
       if (user) {
         this.suggestionSenderName.setValue(user.username);
@@ -159,6 +176,12 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     const timeZone: string = this.currentChurch.timeZone;
     // use the options without FullCalendar's built-in toolbar so the custom Angular/Material header is the only visible header
     this.calendarOptions = CalendarUtil.getSimpleCalendarOptionsWithoutHeader(timeZone);
+
+    // If we're in an editable/admin context or the URL indicates editschedule, prefer the week view as the default
+    const preferWeekView = this.editable || (typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.indexOf('editschedule') !== -1);
+    if (preferWeekView) {
+      this.calendarOptions.initialView = 'timeGridWeek';
+    }
 
     this.calendarOptions = {
       ...this.calendarOptions,
@@ -223,6 +246,42 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     dialogRef.afterClosed().subscribe(result => {
       this.processEventViewerDialogResult(result);
     });
+  }
+
+  // Open the same event viewer popup when a mass row title is clicked in the editable mass list
+  public openMassFromList(m: any): void {
+    if (!m || !m.id) return;
+    this.selectedMassId = m.id;
+    this.selectedEventStart = m.startDate ? new Date(m.startDate) : undefined;
+
+    // Ensure selectedMassId is defined for TS-safe map access
+    if (this.selectedMassId === undefined || this.selectedMassId === null) {
+      return;
+    }
+    const id: number = this.selectedMassId as number;
+
+    // Instead of opening the EventViewer, open the full editor for the existing liturgy
+    let mass: Mass | undefined = undefined;
+    if (this.changes.has(id)) {
+      mass = this.changes.get(id);
+    } else if (this.masses.has(id)) {
+      // clone to avoid mutating original until saved
+      mass = ScriptUtil.clone(this.masses.get(id)!);
+    }
+
+    if (!mass) {
+      console.error('NINCS ILYEN MISE ID: ' + id);
+      return;
+    }
+
+    // Prepare dialog event for editing the existing liturgy (full editor)
+    this.dialogEvent = MassUtil.massToDialogEvent(mass);
+    if (mass.periodId) {
+      this.dialogEvent.period =
+        this.periodService.getCurrentGeneratedPeriodByPeriodId(mass.periodId, new Date(mass.startDate));
+      this.setSpecialPeriodDays(mass);
+    }
+    this.openFullDialog('EDIT_MASS');
   }
 
   private processEventViewerDialogResult(result: any) {
@@ -526,6 +585,11 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         this.calendarComponent.getApi().removeAllEventSources();
         this.calendarComponent.getApi().addEventSource(events);
         this.spinnerService.hide();
+
+        // rebuild the editable mass list when in edit/admin context
+        if (this.showMassListInEdit) {
+          this.buildMassList();
+        }
       });
     }
   }
@@ -815,7 +879,24 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         const flag = flagMap[lang] || (lang ? lang.toUpperCase() : '');
         const flagHtml = flag ? `<span class="event-lang-flag" style="margin-left:6px">${flag}</span>` : '';
 
-        return { html: `${timeHtml} ${titleHtml} ${flagHtml}` };
+        // build icons HTML (type icons + flag SVG) similar to the event viewer popup
+        let iconsHtml = '';
+        const types: string[] = info.event.extendedProps?.types || [];
+        if (Array.isArray(types) && types.length > 0) {
+          for (const t of types) {
+            const tLower = String(t).toLowerCase();
+            const title = this.translateService ? this.translateService.instant(t) : t;
+            iconsHtml += `<img class=\"type-icon\" title=\"${title}\" src=\"/cal_images/types/${tLower}.png\" alt=\"${title}\" style=\"height:18px; margin-left:6px\"/>`;
+          }
+        }
+        // flag SVG (preferred) + tooltip
+        if (lang) {
+          const langLower = String(lang).toLowerCase();
+          const langTitle = this.translateService ? (this.translateService.instant('LANGUAGES.' + lang) + ' nyelvű') : (lang + ' nyelvű');
+          iconsHtml += `<img class=\"type-icon\" title=\"${langTitle}\" src=\"/cal_images/flags/${langLower}.svg\" alt=\"${lang}\" style=\"height:18px; margin-left:6px\"/>`;
+        }
+
+        return { html: `${timeHtml} ${titleHtml} ${flagHtml} ${iconsHtml}` };
       }
 
       // For non-list views return simple markup using FullCalendar's standard classes so
@@ -826,5 +907,177 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     } catch (e) {
       return { html: info.event.title };
     }
+  }
+
+// RRule parsing helpers for human-readable recurrence description
+// A masslist használja
+  private getDaysFromRRule(mass: Mass): string {
+    const days = mass.rrule?.byweekday;
+    if (ScriptUtil.isNotNull(days)) {
+      const translatedDays: string[] = [...days].map(d => this.translateService.instant('DAYS.ON.' + d));
+      return translatedDays.join(', ');
+    }
+    return '';
+  }
+
+  private getWeekFromRRule(mass: Mass): string | null {
+    const rrule = mass.rrule;
+    if (ScriptUtil.isNull(rrule) || rrule.freq !== 'weekly') {
+      return null;
+    }
+
+    if (rrule.byweekno && rrule.byweekno.length > 0) {
+      const isEven = rrule.byweekno.every((n: number) => n % 2 === 0);
+      const isOdd = rrule.byweekno.every((n: number) => n % 2 === 1);
+      const week: string = this.translateService.instant(isEven ? 'RRULE.ON.EVEN' : isOdd ? 'RRULE.ON.ODD' : '');
+      return week || null;
+    }
+
+    return this.translateService.instant('RRULE.ON.EVERY_WEEK');
+  }
+
+  private getMonthFromRRule(mass: Mass): string | null {
+    const rrule = mass.rrule;
+    if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.bysetpos)) {
+      const renumByPos = MassUtil.renumByPos(rrule.bysetpos);
+      if (renumByPos != null) {
+        return this.translateService.instant('RRULE.ON.' + renumByPos);
+      }
+    }
+    return null;
+  }
+
+  private getEasterFromMass(mass: Mass): string | null {
+    if (ScriptUtil.isNotNull(mass.periodId)) {
+      const specialPeriodType = this.periodService.getSpecialPeriodType(mass.periodId);
+      // SpecialType enum isn't imported here; periodService method returns something comparable to suggestions logic
+      if (specialPeriodType === (window as any).SpecialType?.EASTER || specialPeriodType === 'EASTER') {
+        const rrule = mass.rrule;
+        if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.byweekday) && rrule.byweekday.length === 1) {
+          let easterDay = rrule.byweekday[0];
+          if (easterDay != null) {
+            return this.translateService.instant("EASTER_DAYS." + easterDay);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  private getChristmasFromRRule(mass: Mass): string | null {
+    const rrule = mass.rrule;
+    if (ScriptUtil.isNotNull(rrule) && rrule.bymonth === 12 && ScriptUtil.isNotNull(rrule.bymonthday)) {
+      let christmasDay = MassUtil.christmasDayByMonthday(rrule.bymonthday);
+      if (christmasDay != null) {
+        return this.translateService.instant("CHRISTMAS_DAYS." + christmasDay);
+      }
+    }
+    return null;
+  }
+
+  private getReadableRRule(mass: Mass): string {
+    if (!mass || ScriptUtil.isNull(mass.rrule)) return '';
+    const parts: string[] = [];
+    const days = this.getDaysFromRRule(mass);
+    if (days) parts.push(days);
+    const week = this.getWeekFromRRule(mass);
+    if (week) parts.push(week);
+    const month = this.getMonthFromRRule(mass);
+    if (month) parts.push(month);
+    const easter = this.getEasterFromMass(mass);
+    if (easter) parts.push(easter);
+    const christmas = this.getChristmasFromRRule(mass);
+    if (christmas) parts.push(christmas);
+    return parts.join(', ');
+  }
+  // Itt ért véget a masslist használta rész
+
+  private buildMassList(): void {
+    // Merge base masses and changes (changes override base), exclude deleted masses.
+    const combined = new Map<number, Mass>();
+    for (const m of this.masses.values()) {
+      combined.set(m.id!, m);
+    }
+    for (const [id, changed] of this.changes.entries()) {
+      combined.set(id, changed);
+    }
+    for (const del of this.deletedMasses) {
+      if (combined.has(del)) combined.delete(del);
+    }
+
+    // groups now carry additional optional metadata for header rendering
+    const groups: {[key: number]: {weight: number, periodName: string, masses: any[], startMonthDay?: string | null, endMonthDay?: string | null, startPeriodName?: string | null, endPeriodName?: string | null, color?: string | null}} = {};
+
+    combined.forEach(m => {
+      const period = m.periodId ? this.periodService.getPeriodById(m.periodId) : null;
+      const weight = period && period.weight ? period.weight : 0;
+      const pname = period && period.name ? period.name : '';
+
+      if (!groups[weight]) {
+        // try to fetch a representative generated period to obtain a color
+        let color: string | null = null;
+        if (period && period.id) {
+          const gen = this.periodService.getGeneratedPeriodsByPeriodId(period.id);
+          if (Array.isArray(gen) && gen.length > 0) {
+            color = gen[0].color || null;
+          }
+        }
+
+        groups[weight] = {
+          weight: weight,
+          periodName: pname,
+          masses: [],
+          startMonthDay: period ? period.startMonthDay : null,
+          endMonthDay: period ? period.endMonthDay : null,
+          startPeriodName: period && period.startPeriodId ? this.periodService.getPeriodNameById(period.startPeriodId) : null,
+          endPeriodName: period && period.endPeriodId ? this.periodService.getPeriodNameById(period.endPeriodId) : null,
+          color: color
+        };
+      } else {
+        // fill missing group metadata from other masses' periods if available
+        const g = groups[weight];
+        if ((!g.color || g.color === null) && period && period.id) {
+          const gen = this.periodService.getGeneratedPeriodsByPeriodId(period.id);
+          if (Array.isArray(gen) && gen.length > 0) {
+            g.color = gen[0].color || g.color;
+          }
+        }
+        if ((!g.startMonthDay || g.startMonthDay === null) && period && period.startMonthDay) {
+          g.startMonthDay = period.startMonthDay;
+        }
+        if ((!g.endMonthDay || g.endMonthDay === null) && period && period.endMonthDay) {
+          g.endMonthDay = period.endMonthDay;
+        }
+        if ((!g.startPeriodName || g.startPeriodName === null) && period && period.startPeriodId) {
+          g.startPeriodName = this.periodService.getPeriodNameById(period.startPeriodId);
+        }
+        if ((!g.endPeriodName || g.endPeriodName === null) && period && period.endPeriodId) {
+          g.endPeriodName = this.periodService.getPeriodNameById(period.endPeriodId);
+        }
+      }
+
+      const flagMap: Record<string,string> = { hu: '🇭🇺', en: '🇬🇧', de: '🇩🇪', sk: '🇸🇰', ro: '🇷🇴' };
+      const flag = flagMap[m.lang] || (m.lang ? String(m.lang).toUpperCase() : '');
+
+      groups[weight].masses.push({
+        id: m.id,
+        title: m.title,
+        rite: m.rite,
+        startDate: m.startDate,
+        rrule: m.rrule,
+        readableRRule: this.getReadableRRule(m),
+        lang: m.lang,
+        flag: flag,
+        types: m.types ? m.types : [],
+        comment: m.comment,
+        // include experiod ids and resolved period names for display
+        experiod: m.experiod ? m.experiod : [],
+        experiodNames: m.experiod ? m.experiod.map((pid: number) => this.periodService.getPeriodNameById(pid)).filter((n: any) => n) : []
+      });
+    });
+
+    // Convert to array and sort by weight desc, and sort masses by startDate
+    this.massListGrouped = Object.keys(groups).map(k => groups[parseInt(k)]).sort((a, b) => b.weight - a.weight);
+    this.massListGrouped.forEach(g => g.masses.sort((x, y) => (x.startDate || '').localeCompare(y.startDate || '')));
   }
 }

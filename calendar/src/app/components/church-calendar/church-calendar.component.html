@@ -28,6 +28,7 @@
   [options]="calendarOptions"
   [events]="eventsPromise | async"
 ></full-calendar>
+
 @if (showFooter && (editable || suggestible)) {
   @if (suggestible && (changes.size != 0 || deletedMasses.length != 0)) {
     <div class="footer suggestion-footer">
@@ -55,4 +56,74 @@
       </div>
     </div>
   }
+}
+
+
+@if (showMassListInEdit) {
+  <div class="mass-list mt-3">
+    <h3>Misék listája</h3>
+    <div *ngFor="let group of massListGrouped">
+      <h4 class="d-flex align-items-center">        
+        <div>
+          <span *ngIf="group.color" class="badge period-color-badge" [style.backgroundColor]="group.color" style="">{{ group.color }}</span> 
+           <strong>{{ group.periodName }}</strong>
+          <div class="text-muted small">            
+            <ng-container *ngIf="group.startMonthDay || group.startPeriodName || group.endMonthDay || group.endPeriodName">
+              <span *ngIf="group.startMonthDay || group.startPeriodName" style="font-weight: normal;">
+                {{ group.startPeriodName ? group.startPeriodName : group.startMonthDay }}
+              </span>
+              -
+              <span *ngIf="group.endMonthDay || group.endPeriodName" style="font-weight: normal;">
+                {{ group.endPeriodName ? group.endPeriodName : group.endMonthDay }}
+              </span>
+            </ng-container>
+          </div>
+        </div>
+      </h4>
+      <div class="table-responsive">
+        <table class="table table-sm table-striped">
+          <thead>
+            <tr>
+              <th>Start</th>
+              <th>Title</th>
+              <th>Rite</th>
+              <th>Icons</th>
+              <th>Edit</th>
+              <th>Kizárt időszakok</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of group.masses">
+              <td>{{ m.startDate | date:'HH:mm' }}</td>
+              <td>
+                <span class="mass-list-title">{{m.title}}</span>
+                <div *ngIf="m.readableRRule" class="text-muted small">{{m.readableRRule}}</div>
+              </td>
+              <td>{{m.rite | translate }}</td>
+              <td>
+                <ng-container *ngFor="let t of m.types">
+                  <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="t | translate" [src]="'/cal_images/types/' + t.toLowerCase() + '.png'" [alt]="t | translate" />
+                </ng-container>
+                <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="(('LANGUAGES.' + m.lang) | translate) + ' nyelvű'" [src]="'/cal_images/flags/' + m.lang.toLowerCase() + '.svg'" [alt]="(('LANGUAGES.' + m.lang) | translate) + ' nyelvű'" />
+              </td>
+              <td>
+                <button mat-icon-button (click)="openMassFromList(m)" [matTooltip]="'EDIT' | translate" aria-label="edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </td>
+              <td>
+                <div *ngIf="m.experiodNames && m.experiodNames.length" class="text-muted small">
+                  <ng-container *ngFor="let e of m.experiodNames; let i = index">
+                    {{ e }}<span *ngIf="i < m.experiodNames.length - 1">, </span>
+                  </ng-container>
+                </div>
+              </td>
+              <td>{{m.comment}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 }
