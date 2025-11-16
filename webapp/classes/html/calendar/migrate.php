@@ -16,6 +16,9 @@ class Migrate extends \Html\Html {
             ];
 
     public function __construct($path) {
+        set_time_limit(300);
+        ini_set('memory_limit', '512M');
+
         $time = microtime(true);
 
         $churcheswitherror = [];
@@ -210,9 +213,46 @@ class Migrate extends \Html\Html {
                     }
                 
                 } 
-                                                
+            
+                // Egymást kizáró periódusok rendbetétele. Egyszerüsítve.
+                $rows = DB::table('cal_masses')
+                    ->select('cal_masses.church_id', 'cal_periods.name', 'cal_periods.id', 'cal_periods.weight')
+                    ->join('cal_periods', 'cal_periods.id', '=', 'cal_masses.period_id')
+                    ->where('cal_masses.church_id', $t->id)
+                    ->groupBy('cal_masses.period_id')
+                    ->get();
+
+                foreach ($rows as $i => $row) {
+                    $experiod = [];
+                    $currWeight = isset($row->weight) ? (int)$row->weight : 0;
+                    foreach ($rows as $other) {
+                        if ($other->id === $row->id) continue;
+                        $otherWeight = isset($other->weight) ? (int)$other->weight : 0;
+                        if ($otherWeight > $currWeight) {
+                            $experiod[] = $other->id;
+                        }
+                    }
+                    $rows[$i]->experiod = empty($experiod) ? false : $experiod;
+                }
+
+                // Map period_id => experiod from the grouped rows
+                $periodEx = [];
+                foreach ($rows as $row) {
+                    $periodEx[(int)$row->id] = $row->experiod === false ? false : (array)$row->experiod;
+                }
+
+                // Fetch all cal_masses for this church and update each row's experiod column
+                $masses = DB::table('cal_masses')->where('church_id', $t->id)->get();
+                foreach ($masses as $m) {
+                    $ex = isset($periodEx[(int)$m->period_id]) ? $periodEx[(int)$m->period_id] : false;
+                    $updateValue = $ex === false ? null : json_encode($ex);
+                    DB::table('cal_masses')->where('id', $m->id)->update(['experiod' => $updateValue]);
+                }
+                
             }
 
+
+            /// Munka vége. Írjuk ki az eredményeket.
             echo $countperiods." időszakot dolgoztam fel.<br/>\n";
             echo $countmasses." miséd dolgoztam fel.<br/>\n";
             echo $savednasses." misét mentettem.<br/>\n";
@@ -220,6 +260,8 @@ class Migrate extends \Html\Html {
             echo count($churcheswitherror)." templommal gyűlt meg a bajom.<br/>\n";
             echo "Futási idő: ".round(microtime(true) - $time, 2)." másodperc.<br/>\n";
             
+
+            // Sorbarendezem az eredményeket
             if (!empty($periodswitherror) && is_array($periodswitherror)) {
                 uasort($periodswitherror, function($a, $b) {
                     $ac = isset($a->count) ? (int)$a->count : 0;
@@ -383,7 +425,7 @@ class Migrate extends \Html\Html {
         // Ősszel
         else if ( in_array( [$mise->tol, $mise->ig], [
                 ['08-28', '10-31'],['szeptember 2. vasárnapja +1', '10-31'],['09-01', '11-30 -1'],['09-01', '10-31'],['09-01', 'Advent I. vasárnapja'],['11-01', 'Advent I. vasárnapja -1'],
-                ['első tanítási nap', 'Őszi óraátállítás -1'],['szeptember utolsó vasárnapja +1', 'Advent I. vasárnapja'],['09-01', 'október utolsó vasárnapja -1'],['10-01', 'Advent I. vasárnapja -1'],['09-01', '12-31'],	['szeptember utolsó vasárnapja', 'Advent I. vasárnapja -1'],
+                ['első tanítási nap', 'Őszi óraátállítás -1'],['szeptember utolsó vasárnapja +1', 'Advent I. vasárnapja'],['09-01', 'október utolsó vasárnapja -1'],['10-01', 'Advent I. vasárnapja -1'],['09-01', '12-31'],	['szeptember utolsó vasárnapja', 'Advent I. vasárnapja -1'],['első tanítási nap', '09-30'],
                 ['szeptember 1. vasárnapja', 'Advent I. vasárnapja -1'],['09-01', 'Advent I. vasárnapja -1'],	['10-26', 'Advent I. vasárnapja'],
                 ['első tanítási nap', 'Advent I. vasárnapja -1'],['09-01', 'Őszi óraátállítás -1'],	['10-02', 'Advent I. vasárnapja']
                  
@@ -394,8 +436,8 @@ class Migrate extends \Html\Html {
         // Tavasszal
         else if ( in_array( [$mise->tol, $mise->ig], [
                 ['Tavaszi óraátállítás', '06-30'],['Tavaszi óraátállítás', 'utolsó tanítási nap'],
-                ['03-30', 'utolsó tanítási nap'],['03-01', '05-31'],['első tanítási nap', '09-30'],	['05-01', '06-19'],
-                ['03-01', '04-30'],['03-16', '05-30'], 	['04-25', '05-31'], 	['05-01', 'utolsó tanítási nap']
+                ['03-30', 'utolsó tanítási nap'],['03-01', '05-31'],['05-01', '06-19'],
+                ['03-01', '04-30'],['03-16', '05-30'], 	['04-25', '05-31'], ['05-01', 'utolsó tanítási nap']
         ] ) ) { 
             $periodName = 'Tavasz';
         }
@@ -433,6 +475,7 @@ class Migrate extends \Html\Html {
 
         // Tanítási időben
         else if ( in_array( [$mise->tol, $mise->ig], [
+                ['12-26', 'utolsó tanítási nap'],
                 ['első tanítási nap', 'utolsó tanítási nap'],
                 ['09-01', '06-15'],['09-01', '04-30'],	['szeptember 2. vasárnapja', 'utolsó tanítási nap'],
                 ['09-01', '06-30'],['09-01', '06-14'],	['09-01', 'utolsó tanítási nap'],['szeptember 1. vasárnapja', 'június első vasárnapja'],
