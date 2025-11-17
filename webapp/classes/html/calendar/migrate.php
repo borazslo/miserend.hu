@@ -50,6 +50,9 @@ class Migrate extends \Html\Html {
             $countmisekwitherror = 0;
             //printr($templomok);
 
+            $languages = unserialize(LANGUAGES);
+            $languages['hu'] = $languages['h'];
+            $languages = is_array($languages) ? array_keys($languages) : [];
             
             
             $rows = [];
@@ -84,11 +87,23 @@ class Migrate extends \Html\Html {
                         
                         $misek = $this->concatDays($misek);
 
+                        $misek = $this->normalizeMiseLanguage($misek, $templom);
+
                         foreach ($misek as $mise) {
                         
                                 $title = "Szentmise";
                                 if($mise->milyen == "ige") {
                                     $title = "Igeliturgia";
+                                }
+
+                                if($mise->nyelv && in_array($mise->nyelv, $languages)) {
+                                    if($mise->nyelv == 'h')  $mise->nyelv = 'hu';                                    
+                                } else if ($mise->nyelv == '' ) {
+                                    $mise->nyelv = 'hu';
+                                } else {
+                                    echo "Unknown language code: '".$mise->nyelv."' (templom id: ".$t->id.", mise idoszamitas: ".$mise->idoszamitas.", nap2 : ".$mise->nap2.")<br/>\n";   
+                                    $mise->nyelv = 'hu';
+                                    //throw new \Exception("Unknown language code: '".$mise->nyelv."'");
                                 }
 
                                 $calmass = \Html\Calendar\Model\CalMass::create([
@@ -103,7 +118,7 @@ class Migrate extends \Html\Html {
                                         'until' => $period->end_date."T23:59:59",
                                         "dtstart" => $period->start_date."T".$mise->ido,
                                     ],
-                                    'lang' => 'hu',
+                                    'lang' => $mise->nyelv,
                                     'comment' => $mise->megjegyzes
                                 ]);
                                 
@@ -125,7 +140,7 @@ class Migrate extends \Html\Html {
                                 if($mise->nap2 and $mise->nap2 != "") {
                                     if(in_array($mise->nap2, [1,2,3,4,5,-1])) {
                                         $rrule['freq'] = "monthly";
-                                        $rrule['bysetpos'] = $mise->nap2;    
+                                        $rrule['bysetpos'] = (int)$mise->nap2;    
                                     }
                                     else if (in_array($mise->nap2, ['ps','pt'])) {
                                         $rrule['freq'] = "weekly";
@@ -669,11 +684,125 @@ class Migrate extends \Html\Html {
         }
 
         return $return;
-
-
         
+    }
+
+    // A miséknél a nyelv mező rendezése és optimalizálása
+    public function normalizeMiseLanguage($misek, $templom) {
+        $languages = unserialize(LANGUAGES);
+        $languages['hu'] = $languages['h'];
+        $languages = is_array($languages) ? array_keys($languages) : [];
+            
+        foreach( $misek as &$mise) {
+            if(!$mise->nyelv) continue;
+
+            $val = strtolower(trim((string)$mise->nyelv));
+            
+            if (preg_match('/\b^('.join('|',$languages).')(([1-5]|-1|ps|pt))$\b/', $val, $m)) {
+                                              
+                // Tulajdonképpen felesleges volt a ciklus, mert a misének is van ciklusa
+                if($mise->nap2 == $m[2]) {
+                    $mise->nyelv = $m[1];
+                    continue;
+                } 
+
+                if($mise->nap2 == 0 OR $mise->nap2 == '') {
+                    
+                    $nyelv1 = $m[1];
+                    if($m[1] == 'hu' or $m[1] == 'h')  {
+                        
+                        echo "Hungarian language found in mise id=".$mise->id.", templom_id = ".$mise->tid." updated_at:".$templom->updated_at."<br/>\n";
+                        $nyelv2 = 'en';
+                    }
+                    else $nyelv2 = 'hu';
+
+                    if (in_array($m[2], ['ps', 'pt'])) {
+                        // current mise gets the matched nap2 and language
+                        $mise->nap2 = $m[2];
+                        $mise->nyelv = $nyelv1;
+
+                        // create a copy with the opposite nap2 and same language
+                        $opposite = ($m[2] === 'ps') ? 'pt' : 'ps';
+                        $copy = clone $mise;
+                        $copy->nap2 = $opposite;
+                        $copy->nyelv = $nyelv2;
+
+                        // append the copy to the collection with a unique key to avoid collisions
+                        $misek['dup_' . uniqid()] = $copy;
+                    
+                    } else if (in_array($m[2], ['1','2','3','4','5'])) {
+                        // current mise gets the matched nap2 and language
+                        $mise->nap2 = $m[2];
+                        $mise->nyelv = $nyelv1;
+
+                        // create copies for other nap2 values
+                        for ($day = 1; $day <= 5; $day++) {
+                            if ($day == (int)$m[2]) continue; // skip the current nap2
+
+                            $copy = clone $mise;
+                            $copy->nap2 = (string)$day;
+                            $copy->nyelv = $nyelv2;
+
+                            // append the copy to the collection with a unique key to avoid collisions
+                            $misek['dup_' . uniqid()] = $copy;
+                        }
+                    
+                    } else if ($m[2] == '-1') {
+                        // current mise gets the matched nap2 and language
+                        $mise->nap2 = $m[2];
+                        $mise->nyelv = $nyelv1;
+
+                        // create copies for other nap2 values including 'ps' and 'pt'
+                        for ($day = 1; $day <= 4; $day++) {
+                            $copy = clone $mise;
+                            $copy->nap2 = (string)$day;
+                            $copy->nyelv = $nyelv2;
+
+                            // append the copy to the collection with a unique key to avoid collisions
+                            $misek['dup_' . uniqid()] = $copy;
+                        }
+                        
+                     
+                    }
+
+                    continue;
+                }
+
+            }
+
+            // Ha minden hétre más nyelv van megadva
+            $pattern = '/^(?:(?:'.join('|',$languages).'|h)[1-5])(?:,(?:'.join('|',$languages).')[1-5]){4}$/';
+            if( preg_match($pattern, $val) ) {
+                $pairs = explode(',', $val);
+                $first = true;
+                foreach ($pairs as $p) {
+                    $p = trim($p);
+                    if (!preg_match('/^([a-z]{1,2})([1-5])$/i', $p, $m2)) {
+                        continue;
+                    }
+                    $lang = strtolower($m2[1]);
+                    $day = (string)$m2[2];
+
+                    if ($first) {
+                        $mise->nyelv = $lang;
+                        $mise->nap2 = $day;
+                        $first = false;
+                    } else {
+                        $copy = clone $mise;
+                        $copy->nyelv = $lang;
+                        $copy->nap2 = $day;
+                        $misek['dup_' . uniqid()] = $copy;
+                    }
+                }
+            }
 
 
-        
+
+
+
+        }
+
+
+        return $misek;
     }
 }
