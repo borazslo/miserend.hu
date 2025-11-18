@@ -1,0 +1,52 @@
+	{% if "miserend" in user.roles %}
+		
+			{% if admindashboard.suggestion_packages %}
+			<h4>Beérkezett javaslatok</h4>
+			{% set states = {
+					"ACCEPTED": "Elfogadott",
+      				"REJECTED": "Elutasított",
+					"PENDING": "Függőben"                        
+            } %}
+			{% if admindashboard.suggestion_packages|length > 0 %}
+				<i>Az előző belépesed óta történt valamennyi változás, valamint a korábbi még függőben lévő javaslatok.</i>
+				<table class="table table-hover table-condensed table-striped">
+					<tr>
+						<th>javasló</th>
+						<th>templom</th>
+						<th>javaslat állapota</th>
+					</tr>
+					{% for sgpack in admindashboard.suggestion_packages %}
+						<tr>
+							<td>
+								{% if sgpack.senderUser %}
+									{% if "user" in user.roles %}<a href="/user/{{ sgpack.senderUser.uid }}/edit">{% endif %}
+										<strong>{{ sgpack.senderUser.name }}</strong> ({{ sgpack.senderUser.login }})
+									{% if "user" in user.roles %}</a><br/>{% endif %}
+								{% else %}
+									{% if sgpack.sender_name %}
+										{{ sgpack.sender_name }}
+									{% endif %}
+									{% if sgpack.sender_email %}
+										({{ sgpack.sender_email }})
+									{% endif %}
+								{% endif %}	
+								
+								</a>
+							</td>
+							<td>
+								<a href="/templom/{{ sgpack.church.id }}">
+									{{ sgpack.church.names.0 }} ({{ sgpack.church.varos }})
+								</a>
+							</td>
+							<td>{{ states[sgpack.state] }}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% else %}
+			 <i>Nincs intézendő beküldött javaslat csomag kapcsán, se változás legutóbbi belépésed óta.</i>
+			{% endif %}
+			
+			
+			{% endif %}			
+		
+	{% endif %}

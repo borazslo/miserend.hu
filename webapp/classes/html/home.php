@@ -248,7 +248,14 @@ class Home extends Html {
 		
 			$this->admindashboard['holders'] = \Eloquent\ChurchHolder::where('updated_at', '>', $user->lastlogin)
                              ->orWhere('status', 'asked')
+                             ->orderBy('created_at', 'asc')
                              ->get();
+
+            $this->admindashboard['suggestion_packages'] = \Html\Calendar\Model\CalSuggestionPackage::where('updated_at', '>', $user->lastlogin)
+                             ->orWhere('state', 'PENDING')
+                             ->orderBy('created_at', 'asc')
+                             ->get();
+                                              
 		}
         
     }

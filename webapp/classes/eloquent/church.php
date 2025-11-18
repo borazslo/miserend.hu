@@ -218,6 +218,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany('\Eloquent\Remark')->orderBy('created_at', 'DESC');
     }
 
+    public function suggestionPackages() {
+        return $this->hasMany('\Html\Calendar\Model\CalSuggestionPackage', 'church_id')->orderBy('created_at', 'DESC');
+    }
+
     public function updateNeighbours() {
         //TODO: Does not work! 
         // "Call to undefined method Illuminate\Database\Query\Builder::MupdateChurch()"
@@ -598,7 +602,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             return $jelzes;
     }
 
-      public function getRemarksiconAttribute() {
+    /* Észrevételekhez azaz Remarks-hez kapcsolódó attribútumok */
+    public function getRemarksiconAttribute() {
         // Treat empty string allapot as 'j' for grouping
         $allapotok = $this->remarks->map(function($remark) {
             return ($remark->allapot === '' ? 'j' : $remark->allapot);
@@ -631,18 +636,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $remarksStatusText;
     }
 
-    function getFullNameAttribute($value) {
-        
-        $return = $this->names[0];
-
-        if (!empty($this->alternative_names)) {
-            $return .= ' (' . $this->alternative_names[0] . ')';
-        } else {
-            $return .= ' (' . $this->varos . ')';
-        }
-        return $return;
-    }
-
     function getRemarksStatusAttribute($value) {
         $return = false;
         $remark = $this->remarks()
@@ -669,6 +662,33 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         }
         return $return;
     }
+
+    /* Javaslat csomagokhoz azaz suggestion_packages-hez kapcsolódó attribútumok */
+    public function getHasPendingSuggestionPackageAttribute() {        
+        $hasPendingSuggestionPackage = $this->suggestionPackages()
+                        ->select('id')
+                        ->where('state', 'PENDING')                        
+                        ->first();                        
+        if ($hasPendingSuggestionPackage) {
+            return true;
+        } 
+        return false;
+    }
+
+
+    function getFullNameAttribute($value) {
+        
+        $return = $this->names[0];
+
+        if (!empty($this->alternative_names)) {
+            $return .= ' (' . $this->alternative_names[0] . ')';
+        } else {
+            $return .= ' (' . $this->varos . ')';
+        }
+        return $return;
+    }
+
+
     
     function getLocationAttribute($value) {
         $location = new \stdClass();

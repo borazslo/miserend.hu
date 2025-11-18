@@ -85,6 +85,7 @@ class Catalogue extends \Html\Html {
                 'Rnj' => 'templomok nem jóváhagyott észrevétellel',
                 'Ru' => 'templomok új észrevétellel',
                 'Rf' => 'templomok folyamatban lévő észrevétellel',
+                'Sp' => 'javaslatokkal rendelkező templomok',
                 'M0' => 'mise nélküliek'
             ],
             'selected' => $this->filterStatus
@@ -136,6 +137,12 @@ class Catalogue extends \Html\Html {
             } else if ($this->filterStatus == 'Rnj') {
                 $search = $search->whereHas('remarks', function ($query) {
                     $query->where('allapot', '!=', 'j');
+                });
+            }
+
+            if( $this->filterStatus == 'Sp') {
+                $search = $search->whereHas('suggestionPackages', function ($query) {
+                    $query->where('state','PENDING');
                 });
             }
 

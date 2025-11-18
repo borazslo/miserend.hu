@@ -212,8 +212,8 @@ def main():
     replace_or_insert_calendar_app(editschedule_path, main_js, polyfills_js)
     
     # editschedule.twig => Javaslat elfogadó
-    remark_list_path = os.path.join(TO_PATH, "templates", "remark_list.twig")
-    replace_or_insert_calendar_app(remark_list_path, main_js, polyfills_js)
+    suggestion_packages_path = os.path.join(TO_PATH, "templates", "church/suggestionpackages.twig")
+    replace_or_insert_calendar_app(suggestion_packages_path, main_js, polyfills_js)
     
     # periodyeareditor.twig => időszak szerkesztő
     periodyeareditor_path = os.path.join(TO_PATH, "templates", "periodyeareditor.twig")

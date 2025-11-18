@@ -177,7 +177,15 @@
     </div>
 	
 	{% if "miserend" in user.roles %}
-		{% include '_admindashboard.twig' %}
+        <div id="dashboard" style="margin-top:12px">		
+			<!-- <h3>Miserend adminisztrátorok számára</h3> -->            
+            {% if admindashboard.suggestion_packages %}
+                {% include '_admindashboard_suggestion_packages.twig' %}
+            {% endif %}
+            {% if admindashboard.holders %}
+                {% include '_admindashboard_holders.twig' %}
+            {% endif %}                    
+        </div>
 	{% endif %}
 
     <div id="favorites" style="margin-top:12px">

@@ -1,5 +1,15 @@
 <a href="javascript:OpenScrollWindow('/templom/{{ church.id }}/eszrevetelek',550,500);">
 	<i class='{{ _context[church.remarksicon] }}' style='font-size:medium'  	title='{{ church.remarksStatusText }}'></i></a>
+<a href="/templom/{{ church.id }}/javaslatok">
+	{% if church.hasPendingSuggestionPackage %}
+		{% set icon = ICONS_SUGGESTION_PACKAGES_PENDING %}
+		{% set title = "Van függőben lévő javaslat csomag" %}
+	{% else %}
+		{% set icon = ICONS_SUGGESTION_PACKAGES_NONE %}
+		{% set title = "Nincs függőben lévő javaslat csomag" %}
+	{% endif %}
+	<i class='{{ icon }}' style='font-size:medium'  	title='{{ title }}'></i></a>
+	
 <a href='/templom/{{ church.id }}/edit'>
 	<i class='{{ ICONS_CHURCH_EDIT }}' style='font-size:medium'  	title='Adatlap szerkesztése'></i></a>
 <a href='/templom/{{ church.id }}/editosm'>

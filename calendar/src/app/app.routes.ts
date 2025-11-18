@@ -8,7 +8,7 @@ import {SearchComponent} from './components/search/search.component';
 export const routes: Routes = [
   { path: 'templom/:id', component: ChurchComponent },
   { path: 'templom/:id/editschedule', component: EditScheduleComponent },
-  { path: 'templom/:id/eszrevetelek', component: SuggestionsComponent },
+  { path: 'templom/:id/javaslatok', component: SuggestionsComponent },
   { path: 'periodyeareditor', component: PeriodYearEditorComponent },
   { path: '', component: SearchComponent },
 ];
