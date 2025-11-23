@@ -105,6 +105,23 @@ def update_layout_template(css_file):
     with open(layout_path, "w", encoding="utf-8") as f:
         f.writelines(updated_lines)
 
+
+def replace_calendar_app(template_path, main_js, polyfills_js):
+    with open(template_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    # Insert Twig variables at the top; escape braces in the f-string by doubling them.
+    first_line = f'{{% set polyfills = "{polyfills_js}" %}}{{% set main = "{main_js}" %}}\n'
+
+    if lines:
+        lines[0] = first_line
+    else:
+        lines = [first_line]
+
+    with open(template_path, "w", encoding="utf-8") as f:
+        f.writelines(lines)
+
+
 def replace_or_insert_calendar_app(template_path, main_js, polyfills_js):
     with open(template_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
@@ -203,26 +220,9 @@ def main():
         print("The required JS file(s) could not be found!")
         return
 
-    # church.twig => Sima naptár + javaslatbeküldő 2in1
-    church_twig_path = os.path.join(TO_PATH, "templates", "church", "church.twig")
-    replace_or_insert_calendar_app(church_twig_path, main_js, polyfills_js)
-
-    # editschedule.twig => Védett szerkesztő
-    editschedule_path = os.path.join(TO_PATH, "templates", "church", "editschedule.twig")
-    replace_or_insert_calendar_app(editschedule_path, main_js, polyfills_js)
-    
-    # editschedule.twig => Javaslat elfogadó
-    suggestion_packages_path = os.path.join(TO_PATH, "templates", "church/suggestionpackages.twig")
-    replace_or_insert_calendar_app(suggestion_packages_path, main_js, polyfills_js)
-    
-    # periodyeareditor.twig => időszak szerkesztő
-    periodyeareditor_path = os.path.join(TO_PATH, "templates", "periodyeareditor.twig")
-    replace_or_insert_calendar_app(periodyeareditor_path, main_js, polyfills_js)
-    
-    # home.twig
-    # home_twig_path = os.path.join(TO_PATH, "templates", "home.twig")
-    # update_home_twig(home_twig_path, main_js, polyfills_js)
-
+    # angularjs.twig => Egyetlen script angular alkalmazáshoz, amit be lehet szúrni a twig fájlokba
+    church_twig_path = os.path.join(TO_PATH, "templates", "angularjs.twig")    
+    replace_calendar_app(church_twig_path, main_js, polyfills_js)
     
     # === i18n fájl másolása ===
     i18n_src = os.path.join(FROM_PATH, "i18n", "hu.json")
