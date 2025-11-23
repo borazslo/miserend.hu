@@ -21,6 +21,7 @@ class Migrate extends \Html\Html {
 
         $time = microtime(true);
 
+        $masseswitherror = [];
         $churcheswitherror = [];
         $periodswitherror = [];
 
@@ -29,7 +30,8 @@ class Migrate extends \Html\Html {
             $templomok = DB::table('templomok as t')
             ->join('misek as m', 'm.tid', '=', 't.id')
             ->select('t.*')
-            ->where('ok','i')->where('miseaktiv','1');
+            ->where('ok','i')->where('miseaktiv','1')
+            ->where('updated_at', '>=', '2020-01-01 00:00:00');
 
             if(isset($_GET['limit'])) {
                 $templomok = $templomok->limit($_GET['limit']);
@@ -88,30 +90,60 @@ class Migrate extends \Html\Html {
                         $misek = $this->concatDays($misek);
 
                         $misek = $this->normalizeMiseLanguage($misek, $templom);
+                        $misek = $this->normalizeMiseTitleAndRite($misek, $templom);
 
                         foreach ($misek as $mise) {
+                                
+                            
                         
                                 $title = "Szentmise";
-                                if($mise->milyen == "ige") {
+
+                                if($mise->liturgy == "ige") {
                                     $title = "Igeliturgia";
-                                }
+                                    $rite = "ROMAN_CATHOLIC";
+
+                                } else if ( $mise->liturgy == 'rom' ) {
+                                    $title = "Szentmise";
+                                    $rite = "ROMAN_CATHOLIC";
+                                } else if ( $mise->liturgy == 'regi' ) {
+                                    $title = "Régi rítusú szentmise";
+                                    $rite = "TRADITIONAL";
+                                } else if ($mise->liturgy == 'gor' ) {
+                                    $title = "Szent liturgia";
+                                    $rite = "GREEK_CATHOLIC";
+                                } else if ( $mise->liturgy == 'utr' or $mise->liturgy == 'vecs' or $mise->liturgy == 'szent' ) { 
+                                    if($mise->liturgy == 'utr') {
+                                        $title = "Utrenye";
+                                    } else if ($mise->liturgy == 'szent' ) {
+                                        $title = "Szentségimádás";
+                                    } else {
+                                        $title = "Vecsernye";
+                                    }
+                                    $rite = "GREEK_CATHOLIC";
+                                } else {
+                                    //echo "Unknown liturgy type: '".$mise->liturgy."' (templom id: ".$t->id.", mise idoszamitas: ".$mise->idoszamitas.")<br/>\n";   
+                                    $mise->error = "Unknown liturgy type: '".$mise->liturgy."'";
+                                    throw new \Exception($mise->error,45);
+                                }   
 
                                 if($mise->nyelv && in_array($mise->nyelv, $languages)) {
                                     if($mise->nyelv == 'h')  $mise->nyelv = 'hu';                                    
                                 } else if ($mise->nyelv == '' ) {
                                     $mise->nyelv = 'hu';
-                                } else {
-                                    echo "Unknown language code: '".$mise->nyelv."' (templom id: ".$t->id.", mise idoszamitas: ".$mise->idoszamitas.", nap2 : ".$mise->nap2.")<br/>\n";   
+                                } else {                                                                        
+                                    $mise->error = "Unknown language code: '".$mise->nyelv."'";
                                     $mise->nyelv = 'hu';
-                                    //throw new \Exception("Unknown language code: '".$mise->nyelv."'");
+                                    throw new \Exception($mise->error,35);
                                 }
+
+                                
 
                                 $calmass = \Html\Calendar\Model\CalMass::create([
                                     'church_id' => $t->id,
                                     'period_id' => $period->id,
                                     'title' => $title,
                                     'types' => [],
-                                    'rite' => 'ROMAN_CATHOLIC',
+                                    'rite' => $rite,
                                     'start_date' => $period->start_date."T".$mise->ido,
                                     'rrule' => [
                                         'freq' => 'weekly',
@@ -208,16 +240,30 @@ class Migrate extends \Html\Html {
                         }
                     } catch (\Exception $e) {   
                         $churcheswitherror[$t->id] = $t;
-                        $countmisekwitherror += count($misek);
+                        
+                        
+                        $code = $e->getCode();                                                                            
 
-                        $key = $misek[0]->tol."-".$misek[0]->ig;
-                        if(!isset($periodswitherror[$key])) {
-                            $periodswitherror[$key] = $misek[0];
-                            $periodswitherror[$key]->count = 0;
-                            $periodswitherror[$key]->countall = 0;
-                        } 
-                        $periodswitherror[$key]->count++;       
-                        $periodswitherror[$key]->countall += count($misek);
+                        if ( $code > 0  ) {
+                            // egy misére vonatkozó hiba
+                            $countmisekwitherror++;
+                            if(!isset($mise->error)) $mise->error = $e->getMessage();
+                            $masseswitherror[$mise->id] = $mise;   
+                            //echo  $code." -- Error processing mise id=".$mise->id.", templom id = ".$mise->tid.": ".$e->getMessage()."<br/>\n"; 
+                        
+                        }  else {                       
+                            // periódusokra vonatkozó hiba 
+                            $countmisekwitherror += count($misek);
+                        
+                            $key = $misek[0]->tol."-".$misek[0]->ig;
+                            if(!isset($periodswitherror[$key])) {
+                                $periodswitherror[$key] = $misek[0];
+                                $periodswitherror[$key]->count = 0;
+                                $periodswitherror[$key]->countall = 0;
+                            } 
+                            $periodswitherror[$key]->count++;       
+                            $periodswitherror[$key]->countall += count($misek);
+                        }
                         
                         /*
                         echo "Error processing templom <i>".$t->nev.", ".$t->varos." (".$t->id.")</i>";
@@ -272,6 +318,7 @@ class Migrate extends \Html\Html {
             echo $countmasses." miséd dolgoztam fel.<br/>\n";
             echo $savednasses." misét mentettem.<br/>\n";
             echo $countmisekwitherror." misével gyűlt meg a bajom.<br/>\n";
+            echo count($periodswitherror)." időszakkal gyűlt meg a bajom.<br/>\n";
             echo count($churcheswitherror)." templommal gyűlt meg a bajom.<br/>\n";
             echo "Futási idő: ".round(microtime(true) - $time, 2)." másodperc.<br/>\n";
             
@@ -347,12 +394,67 @@ class Migrate extends \Html\Html {
                     echo "<td>{$updated_at}</td>";
                     echo "<td>";
                     echo "<a href=\"/templom/{$tid}/editschedule\">/editschedule</a> ";
-                    echo "<a href=\"/calendar/migrated/?tid={$tid}\">/migrated/...</a>";
+                    echo "<a href=\"/calendar/migrate/?tid={$tid}\">/migrate/...</a>";
                     echo "</td>";
                     echo "</tr>\n";
                 }
                 echo "</tbody>\n</table>\n";
             }
+
+            // masses with errors
+            echo "<h2>Masses with errors</h2>\n";
+            if (empty($masseswitherror)) {
+                echo "<p>No masses with errors.</p>\n";
+            } else {
+                echo "<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\">\n";
+                echo "<thead>
+                    <tr>
+                        <th>templom</th>
+                        <th>idoszamitas</th>
+                        <th>[tol, ig]</th>
+                        <th>nap</th>
+                        <th>nap2</th>                    
+                        <th>nyelv</th>
+                        <th>liturgy</th>
+                        <th>milyen</th>
+                        <th>megjegyzes</th>
+                        <th>updated_at</th>
+                        <th>error</th>
+                        <th></th>
+                    </tr></thead>\n";
+                echo "<tbody>\n";
+                foreach ($masseswitherror as $mise) {
+                    
+                    echo "<tr>";
+                    echo "<td>";
+                    $church = \Eloquent\Church::find($mise->tid);
+                    if ($church) {
+                        $nev = htmlspecialchars($church->nev);
+                        $varos = htmlspecialchars($church->varos);
+                        $tid = (int)$church->id;
+                        echo "{$nev}, {$varos} ({$tid}) ";
+                    }
+                    echo "</td>";
+                    echo "<td>".$mise->idoszamitas."</td>";
+                    echo "<td>".$mise->tol." - ".$mise->ig."</td>";
+                    echo "<td>".json_encode($mise->nap)."</td>";
+                    echo "<td>".$mise->nap2."</td>";
+                    echo "<td>".$mise->nyelv."</td>";
+                    echo "<td>".$mise->liturgy." ".json_encode($mise->liturgies)."</td>";
+                    echo "<td>".$mise->milyen."</td>";
+                    echo "<td>".$mise->megjegyzes."</td>";
+                    echo "<td>".$church->updated_at."</td>";
+                    echo "<td>".( isset($mise->error) ? $mise->error : "" )."</td>";
+                    echo "<td>";
+                    echo "<a href=\"/templom/{$tid}/editschedule\">/editschedule</a> ";
+                    echo "<a href=\"/calendar/migrate/?tid={$tid}\">/migrate/...</a>";
+                    echo "</td>";
+
+                    echo "</tr>";
+                }
+            }
+
+            
 
 
         } catch (\Exception $e) {
@@ -687,6 +789,57 @@ class Migrate extends \Html\Html {
         
     }
 
+    public function normalizeMiseTitleAndRite($misek, $templom) {
+        $periods = [0,1,2,3,4,5,-1,"ps","pt"];
+        //$liturgies = ['csal','d','ifi','g','cs','gor','rom','regi','vecs','utr','szent'];
+        $liturgies = ['gor','rom','regi','vecs','utr','szent'];
+        
+        foreach($misek as &$mise) {
+
+            $types = explode(',', strtolower((string)$mise->milyen));
+            $mise->liturgies = [];            
+            foreach($types as $type) {
+                $type = trim($type);                                
+                $pattern = '/^(' . implode('|', $liturgies) . ')(' . implode('|', $periods) . '|)$/i';                
+                if (preg_match($pattern, $type, $m)) {                                        
+                    $mise->liturgies[] = [
+                        strtolower($m[1]),
+                        isset($m[2]) ? $m[2] : null
+                    ];                    
+                }
+            }
+            // Ha nincs liturgia megadva, akkor alapértelmezett rítus szerinti szentmise
+            if(count($mise->liturgies) == 0 ) {
+                if(in_array($templom->egyhazmegye, [17,18,34])) {
+                    // Görög katolikus egyházmegyékben görög katolikus rítus
+                    $mise->liturgy = 'gor';
+                } else {
+                    // Minden más esetben római katolikus rítus
+                    $mise->liturgy = 'rom';
+                }
+            }
+            // Ha csak egy liturgia van megadva, akkor azt állítjuk be
+            else if(count($mise->liturgies) == 1 && ( 
+                        $mise->liturgies[0][1] === null or 
+                        $mise->liturgies[0][1] == '' or 
+                        $mise->liturgies[0][1]  == $mise->nap2 ) ) {
+                $mise->liturgy = $mise->liturgies[0][0];
+            } // Ha valami bonyolultabb van, akkor egyelőre elvérzünk
+            else {                
+                $mise->liturgy = implode(',', array_map(function($x){
+                    return (string)$x[0] . (isset($x[1]) && $x[1] !== null && $x[1] !== '' ? (string)$x[1] : '');
+                }, $mise->liturgies));
+                $mise->error = "Complex liturgy found '".$mise->milyen;
+                throw new \Exception($mise->error, 25);
+                
+            }
+        }
+        
+        return $misek;
+
+
+    }
+
     // A miséknél a nyelv mező rendezése és optimalizálása
     public function normalizeMiseLanguage($misek, $templom) {
         $languages = unserialize(LANGUAGES);
@@ -695,6 +848,11 @@ class Migrate extends \Html\Html {
             
         foreach( $misek as &$mise) {
             if(!$mise->nyelv) continue;
+
+            if($mise->nyelv == 'h2,h4') {
+                $mise->nap2 = 'ps';
+                $mise->nyelv = 'hu';
+            }
 
             $val = strtolower(trim((string)$mise->nyelv));
             
@@ -708,11 +866,16 @@ class Migrate extends \Html\Html {
 
                 if($mise->nap2 == 0 OR $mise->nap2 == '') {
                     
+                    // TODO FIXME -- EZ MIII?
                     $nyelv1 = $m[1];
-                    if($m[1] == 'hu' or $m[1] == 'h')  {
-                        
-                        echo "Hungarian language found in mise id=".$mise->id.", templom_id = ".$mise->tid." updated_at:".$templom->updated_at."<br/>\n";
-                        $nyelv2 = 'en';
+                    if($m[1] == 'hu' or $m[1] == 'h')  {                        
+                        //echo "Hungarian language found in mise id=".$mise->id.", templom_id = ".$mise->tid." updated_at:".$templom->updated_at."<br/>\n";
+                        //throw new \Exception("Hungarian language found", 26);
+
+                        $nyelv2 = $this->languageCodeFromOrszagId($templom->orszag);
+                        if($nyelv2 == $nyelv1) {
+                            $mise->nap2 = $m[2];
+                        }
                     }
                     else $nyelv2 = 'hu';
 
@@ -765,8 +928,31 @@ class Migrate extends \Html\Html {
                      
                     }
 
+
+                    
                     continue;
                 }
+
+            } else if (preg_match('/^(?:(de|h|hu|sk)[1-5](?:\s*,\s*(de|h|hu|sk)[1-5]){3,4})$/i', $val, $m) AND ( $mise->nap2 == 0 OR $mise->nap2 == '' ) ) {
+                $weeks = explode(',',$m[0]);
+                
+                $first = true;
+                foreach ($weeks as $w) {
+                    $w = trim($w);
+                    if (preg_match('/^(de|h|hu|sk)([1-5])$/i', $w, $m2)) {
+                        
+                        if ($first) {
+                            $mise->nyelv = $m2[1];
+                            $mise->nap2 = $m2[2];
+                            $first = false;
+                        } else {
+                            $copy = clone $mise;
+                            $copy->nyelv = $m2[1];
+                            $copy->nap2 = $m2[2];
+                            $misek['dup_' . uniqid()] = $copy;
+                        }
+                    }
+                }        
 
             }
 
@@ -805,4 +991,38 @@ class Migrate extends \Html\Html {
 
         return $misek;
     }
+
+    public function languageCodeFromOrszagId($id) {
+        $map = [
+            1  => 'de', // Ausztria
+            2  => 'nl', // Belgium
+            3  => 'bg', // Bulgária
+            4  => 'el', // Ciprus
+            5  => 'cs', // Cseh Köztársaság
+            6  => 'da', // Dánia
+            7  => 'et', // Észtország
+            8  => 'fi', // Finnország
+            9  => 'fr', // Franciaország
+            10 => 'de', // Németország
+            11 => 'el', // Görögország
+            12 => 'hu', // Magyarország
+            13 => 'it', // Olaszország
+            14 => 'en', // Írország
+            15 => 'is', // Izland
+            16 => 'lv', // Lettország
+            17 => 'de', // Liechtenstein
+            18 => 'de', // Luxemburg
+            19 => 'lt', // Litvánia
+            20 => 'mt', // Málta
+            21 => 'nl', // Hollandia
+            22 => 'no', // Norvégia
+            23 => 'pl', // Lengyelország
+            24 => 'pt', // Portugália
+            25 => 'ro', // Románia
+        ];
+
+        return isset($map[(int)$id]) ? $map[(int)$id] : null;
+    }
+
+    
 }
