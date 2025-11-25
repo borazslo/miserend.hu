@@ -17,23 +17,9 @@ class Generate extends \Html\Calendar\CalendarApi {
 
     public function __construct($path) {
 
-        $this->elastic = new ElasticsearchApi();
+        $this->elastic = new ElasticsearchApi();        
         if (!$this->elastic->isexistsIndex('mass_index')) {
-            $this->elastic->putIndex('mass_index', [
-                "mappings" => [
-                    "properties" => [
-                        "church_id" => ["type" => "integer"],
-                        "mass_id" => ["type" => "integer"],
-                        "start_date" => ["type" => "date"],
-                        "title" => ["type" => "text"],
-                        "types" => ["type" => "keyword"],
-                        "rite" => ["type" => "keyword"],
-                        "duration" => ["type" => "object"],
-                        "lang" => ["type" => "keyword"],
-                        "comment" => ["type" => "text"]
-                    ]
-                ]
-            ]);
+            $this->createMassIndex();            
         }
 
         $this->tids = !empty($_GET['tids']) ? (is_array($_GET['tids']) ? $_GET['tids'] : [$_GET['tids']]) : [];
@@ -219,6 +205,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                 }
 
                 $allMasses = [];
+                $churches = [];
                 foreach ($this->tids as $tid) {
                     $masses = $this->getByChurchId($tid);
                     if (!empty($masses)) {
@@ -226,6 +213,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                     }
                     $church = \Eloquent\Church::find($tid);
                     $churchTimezones[$tid] = $church->time_zone ?? 'Europe/Budapest';
+                    $churches[$tid] = $church;
                 }
 
                 $debug = [];
@@ -241,7 +229,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                     foreach ($massInstances as $mi) {
                         $debug[] = "  - Mass ID {$mi['mass_id']}, start: {$mi['start_date']}, title: {$mi['title']}";
                     }
-
+                    $churchData = $churches[$churchId]->toElasticArray();
                     $bulkInsert = [];
                     foreach ($massInstances as $massData) {
                         $bulkInsert[] = [
@@ -250,6 +238,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                                 '_id' => uniqid()
                             ]
                         ];
+                        $massData['church'] = $churchData;
                         $bulkInsert[] = $massData;
                     }
 
@@ -608,6 +597,26 @@ class Generate extends \Html\Calendar\CalendarApi {
         return $instancesByChurch;
     }
 
+    public function createMassIndex(): void
+    {
+        $massFilePath = '../docker/elasticsearch/mappings/mass.json';
+        if (!file_exists($massFilePath)) {
+            throw new \Exception("File not found: " . $massFilePath);
+        }
+        $massData = file_get_contents($massFilePath);
+        $churchFilePath = '../docker/elasticsearch/mappings/church.json';
+        if (!file_exists($churchFilePath)) {
+            throw new \Exception("File not found: " . $churchFilePath);
+        }
+        $churchData = file_get_contents($churchFilePath);
+        $data = json_decode($massData, true);
+        $data['settings'] = json_decode($churchData, true)['settings'];
+        $data['mappings']['properties']['church'] = json_decode($churchData, true)['mappings'];
+
+        if (!$this->elastic->putIndex('mass_index', $data)) {				
+            throw new \Exception("Failed to create index: mass_index");
+        }                
+    }
 
 
 

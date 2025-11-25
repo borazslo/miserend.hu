@@ -282,25 +282,8 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		}
 		
 		// Előkészítjük feltöltsére az adatokat
-		$churches = \Eloquent\Church::where('ok', 'i')->limit(200000)->get()->map->toAPIArray('medium')->toArray();
-
-		// Kiegészítjük Budapest kerületekkel
-		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
-		foreach($churches as $c => $church) {
-			preg_match('/^Budapest (.*?)\. kerület$/',$church['varos'],$match);
-			if($match) {
-				$churches[$c]['varos'] = [ $church['varos'], 'Budapest '.array_search($match[1], $romai).'. kerület', 'Budapest' ];
-			}
-		}
-
-		foreach ($churches as $index => $church) {
-			unset($churches[$index]['adoraciok']);
-			unset($churches[$index]['miserend_deprecated']);
-			if($churches[$index]['gyontatas'] == null) {
-				$churches[$index]['gyontatas'] = [];
-			}
-		}
-
+		$churches = \Eloquent\Church::where('ok', 'i')->limit(200000)->get()->map->toElasticArray()->toArray();
+		
 		// Truncate the index
 		$elastic->truncateIndex('churches');
 

@@ -394,6 +394,28 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $return;
     }
 
+    public function toElasticArray()
+    {
+        $church = $this->toAPIArray('medium');
+
+        // Kiegészítjük Budapest kerületekkel
+		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
+		
+        preg_match('/^Budapest (.*?)\. kerület$/',$church['varos'],$match);
+        if($match) {
+            $church['varos'] = [ $church['varos'], 'Budapest '.array_search($match[1], $romai).'. kerület', 'Budapest' ];
+        }
+
+        unset($church['adoraciok']);
+        unset($church['miserend_deprecated']);
+        if($church['gyontatas'] == null) {
+            $church['gyontatas'] = [];
+        }
+		
+        return $church;
+    }   
+    
+
     /* 
      * scopes
      *  boundaries() 
