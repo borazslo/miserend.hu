@@ -109,7 +109,7 @@ class Migrate extends \Html\Html {
                                     $title = "Régi rítusú szentmise";
                                     $rite = "TRADITIONAL";
                                 } else if ($mise->liturgy == 'gor' ) {
-                                    $title = "Szent liturgia";
+                                    $title = "Szent Liturgia";
                                     $rite = "GREEK_CATHOLIC";
                                 } else if ( $mise->liturgy == 'utr' or $mise->liturgy == 'vecs' or $mise->liturgy == 'szent' ) { 
                                     if($mise->liturgy == 'utr') {
