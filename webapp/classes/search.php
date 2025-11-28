@@ -217,12 +217,14 @@ class Search {
         if($this->massOrChurch === 'mass') {
             $index = "mass_index";
             $esQuery['sort'] = [
+                [ "_score" =>  [ "order" => "desc" ] ],
                 [ "start_date" =>  [ "order" => "asc" ] ],
                 [ "church_id" => [ "order" => "asc" ] ]
             ];        
         } else if ($this->massOrChurch === 'church') {
             $index = "churches";
             $esQuery['sort'] = [
+                [ "_score" =>  [ "order" => "desc" ] ],
                 [ "nev.keyword" =>  [ "order" => "asc" ] ]            
             ];        
         }

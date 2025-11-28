@@ -45,17 +45,14 @@
                                 {% else %}
                                     ({{ church.varos }})
                                 {% endif %}
-                            </font>
-                            {% if user.isadmin %}
-                            <small>{{ church.score }}</small>
-                            {% endif %}
+                            </font>                            
                         </a>
                         {% if church.alternative_names.0 %}
                             <br/><span class="alap" style="margin-left: 20px; font-style: italic;" title="{{ church.alternative_names|slice(1)|join(', ') }}">{{ church.alternative_names.0 }}</span>
                         {% endif %}
                     </div>
                     {% if user.isadmin %}
-                        <div class="col-md-3">
+                        <div class="col-md-3">                            
                             {% include "church/_adminlinks.twig" with church %}                       
                         </div>
                     {% endif %}
@@ -67,6 +64,10 @@
                             <div class="col-md-12" style="margin-bottom:4px">
                                 <span class="badge badge-primary" title="{{ item.title ~ ' ' ~ item.rite }}">{{ item.start_date }}</span>
                                 {{ item.rite }} {{ item.title }}
+
+                                {% if user.isadmin %}
+                                    <small>{{ church.score }}</small>
+                                {% endif %}
                             </div>                            
                         {% endif %}
                     {% endfor %}
