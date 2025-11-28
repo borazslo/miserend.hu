@@ -7,15 +7,25 @@ use Html\Calendar\Model\CalGeneratedPeriod;
 use Html\Calendar\Model\CalMass;
 use Html\Calendar\Model\CalPeriod;
 
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: PUT, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+if (!headers_sent()) {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, PUT, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit;
+    }
+}
 
 class Generate extends \Html\Calendar\CalendarApi {
 
     protected $elastic;
 
-    public function __construct($path) {
+    public function __construct($path = false) {
+
+        if($_SERVER['REQUEST_METHOD'] === false ) {
+            return;            
+        }   
 
         $this->elastic = new ElasticsearchApi();        
         if (!$this->elastic->isexistsIndex('mass_index')) {
@@ -34,6 +44,7 @@ class Generate extends \Html\Calendar\CalendarApi {
             exit;
         }
 
+        
 
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'OPTIONS':
@@ -193,59 +204,8 @@ class Generate extends \Html\Calendar\CalendarApi {
 
             case 'PUT':
                 $years = is_array($this->years) ? $this->years : [$this->years];
-
-                foreach ($this->tids as $tid) {
-                    $this->elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "POST");
-                    $this->elastic->buildQuery('mass_index/_delete_by_query', json_encode([
-                        "query" => [
-                            "term" => ["church_id" => (int)$tid]
-                        ]
-                    ]));
-                    $this->elastic->run();
-                }
-
-                $allMasses = [];
-                $churches = [];
-                foreach ($this->tids as $tid) {
-                    $masses = $this->getByChurchId($tid);
-                    if (!empty($masses)) {
-                        $allMasses = array_merge($allMasses, $masses);
-                    }
-                    $church = \Eloquent\Church::find($tid);
-                    $churchTimezones[$tid] = $church->time_zone ?? 'Europe/Budapest';
-                    $churches[$tid] = $church;
-                }
-
-                $debug = [];
-                $debug[] = "Talált misék száma: " . count($allMasses);
-
-                $massesByChurch = $this->generateMassInstancesForYears($allMasses,$churchTimezones, $years);
-
-                foreach ($massesByChurch as $churchId => $massInstances) {
-                    $debug[] = "Templom ID $churchId, generált miseidőpontok: " . count($massInstances);
-
-                    // Debug: az első 5 generált mise megjelenítése
-                    $first5 = array_slice($massInstances, 0, 10);
-                    foreach ($massInstances as $mi) {
-                        $debug[] = "  - Mass ID {$mi['mass_id']}, start: {$mi['start_date']}, title: {$mi['title']}";
-                    }
-                    $churchData = $churches[$churchId]->toElasticArray();
-                    $bulkInsert = [];
-                    foreach ($massInstances as $massData) {
-                        $bulkInsert[] = [
-                            'index' => [
-                                '_index' => 'mass_index',
-                                '_id' => uniqid()
-                            ]
-                        ];
-                        $massData['church'] = $churchData;
-                        $bulkInsert[] = $massData;
-                    }
-
-                    if (!empty($bulkInsert)) {
-                        $elasticResult = $this->elastic->putBulk($bulkInsert);
-                    }
-                }
+                
+                $debug = \ExternalApi\ElasticsearchApi::updateMasses($years, $this->tids);
 
                 echo json_encode([
                     'success' => true,
@@ -264,10 +224,6 @@ class Generate extends \Html\Calendar\CalendarApi {
         $this->debugLog[] = $line;
     }
 
-
-    public function getByChurchId(int $churchId) {
-        return CalMass::where('church_id', $churchId)->get()->all();
-    }
 
     private function sendJsonError($message, $code): void {
         http_response_code($code);
@@ -540,7 +496,7 @@ class Generate extends \Html\Calendar\CalendarApi {
                     ->where('start_date', '<=', $globalEnd->toDateString())
                     ->where('end_date', '>', $globalStart->toDateString())
                     ->get();
-
+echo $mass->church_id." / " .$mass->id . " periódusok száma: " . count($periods) . "<br/>\n";
                 foreach ($periods as $generatedPeriod) {
                     $start = Carbon::parse($generatedPeriod->start_date)->startOfDay()->setTimezone($timezone);
                     $end = Carbon::parse($generatedPeriod->end_date)->subDay()->endOfDay()->setTimezone($timezone);
@@ -597,6 +553,12 @@ class Generate extends \Html\Calendar\CalendarApi {
         return $instancesByChurch;
     }
 
+
+    /**
+     * Létrehozza a mass_index indexet az Elasticsearch-ben.
+     * Ez a metódus a mass.json és church.json fájlokat használja a mapping és settings beállításokhoz.
+     * @throws \Exception
+     */
     public function createMassIndex(): void
     {
         $massFilePath = '../docker/elasticsearch/mappings/mass.json';

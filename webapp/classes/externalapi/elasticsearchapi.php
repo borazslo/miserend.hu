@@ -309,8 +309,94 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 
 			throw new \Exception("Could not update churches!\n" . implode("\n", $errors));
 		}
-		
+				
 	}
 	
+	/*
+	 * Frissíti az összes elasticsearch mise indexet az adatbázisból
+	 * Ehhez legenerálja az összes miseidőpontot is
+	 */
+	static function updateMasses($years = [], $tids = []) {
+		$startTime = time();
+		set_time_limit(3000); // Hosszabb idő kellhet a frissítéshez
+
+		if (empty($years)) {
+			$years = [date('Y') - 1, date('Y'), date('Y') + 1];
+		}
+		if( empty($tids)) {
+			$tids = \Eloquent\Church::where('ok', 'i')->limit(8000)->pluck('id')->toArray();
+		} 
+
+		$chunksize = 100;
+		if (is_array($tids) && count($tids) > $chunksize) {
+			foreach (array_chunk($tids,  $chunksize) as $chunk) {
+				static::updateMasses($years, $chunk);
+			}
+			return;
+		}
+
+		$elastic = new \ExternalApi\ElasticsearchApi();
+		
+		// Delete existing masses for the given church IDs
+		$elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "POST");
+		$elastic->buildQuery('mass_index/_delete_by_query', json_encode([
+			"conflicts" => "proceed",
+			"query" => [
+				"term" => ["church_id" => $tids]
+			]
+		]));
+		$elastic->run();
+		
+		$churchTimezones = [];
+		$allMasses = [];
+		$churches = [];
+
+		foreach ($tids as $tid) {
+			$_SERVER['REQUEST_METHOD'] = false; // Egyelőre sajnos kell mert a generate az bizony a REQUEST_METHOD alapján dönt, hogy kérdez vagy mond	
+			$masses =  \Html\Calendar\Model\CalMass::where('church_id', $tid)->get()->all();
+			if (!empty($masses)) {
+				$allMasses = array_merge($allMasses, $masses);
+			}
+			$church = \Eloquent\Church::find($tid);
+			$churchTimezones[$tid] = $church->time_zone ?? 'Europe/Budapest';
+			$churches[$tid] = $church;
+		}
+
+		$debug = [];
+		$debug[] = "Talált misék száma: " . count($allMasses);
+		echo "Talált misék száma: " . count($allMasses)."<br>\n";
+
+		$generator = new \Html\Calendar\Generate();
+		$massesByChurch = $generator->generateMassInstancesForYears($allMasses,$churchTimezones, $years);
+
+		foreach ($massesByChurch as $churchId => $massInstances) {
+			$debug[] = "Templom ID $churchId, generált miseidőpontok: " . count($massInstances);
+
+			// Debug: az első 5 generált mise megjelenítése
+			$first5 = array_slice($massInstances, 0, 10);
+			foreach ($massInstances as $mi) {
+				$debug[] = "  - Mass ID {$mi['mass_id']}, start: {$mi['start_date']}, title: {$mi['title']}";
+			}
+			$churchData = $churches[$churchId]->toElasticArray();
+			$bulkInsert = [];
+			foreach ($massInstances as $massData) {
+				$bulkInsert[] = [
+					'index' => [
+						'_index' => 'mass_index',
+						'_id' => uniqid()
+					]
+				];
+				$massData['church'] = $churchData;
+				$bulkInsert[] = $massData;
+			}
+
+			if (!empty($bulkInsert)) {
+				$elasticResult = $elastic->putBulk($bulkInsert);
+			}
+		}	
+		
+		echo "Elkészült a frissítés " . (time() - $startTime) . " másodperc alatt azaz ".round((time() - $startTime)/60,2)." perc alatt.<br>\n";	
+		return $debug;
+	}
 	
 }

@@ -139,8 +139,9 @@ class SimpleRRule
                                 } else {
                                     throw new Exception("Unsupported BYSETPOS value: {$this->bySetpos}");
                                 }
-                                                                
-                                $occurrence->setTimeFrom($this->start);
+                                // pySetpos 5 esetén gyarkan előfordulhat, hogy nincs ilyen nap a hónapban
+                                if($occurrence)                                
+                                    $occurrence->setTimeFrom($this->start);
 
                             } else {
                                 // Ha nincs BYSETPOS → alapértelmezés: első ilyen nap
