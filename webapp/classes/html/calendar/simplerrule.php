@@ -130,9 +130,18 @@ class SimpleRRule
                         foreach ($this->byWeekday as $weekday) {
                             $monthStart = $current->copy()->startOfMonth();
                             if ($this->bySetpos) {
-                                // Ha van BYSETPOS → pl. 2. hétfő
-                                $occurrence = $monthStart->copy()->nthOfMonth($this->bySetpos, $weekdayMap[$weekday])
-                                    ->setTimeFrom($this->start);
+                                if($this->bySetpos > 0) {
+                                    // Pozitív BYSETPOS esetén az adott hónap elejétől számolunk
+                                    $occurrence = $monthStart->copy()->nthOfMonth($this->bySetpos, $weekdayMap[$weekday]);
+                                } elseif($this->bySetpos == -1)  {
+                                    // -1 BYSETPOS esetén a hónap utolsóját számoljuk
+                                    $occurrence = $monthStart->copy()->lastOfMonth($weekdayMap[$weekday]);
+                                } else {
+                                    throw new Exception("Unsupported BYSETPOS value: {$this->bySetpos}");
+                                }
+                                                                
+                                $occurrence->setTimeFrom($this->start);
+
                             } else {
                                 // Ha nincs BYSETPOS → alapértelmezés: első ilyen nap
                                 $occurrence = $monthStart->copy()->nthOfMonth(1, $weekdayMap[$weekday])
