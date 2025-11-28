@@ -15,10 +15,7 @@ class SearchResultsMasses extends Html {
         //TODO
         $zene = $_REQUEST['zene'];
         $kor = $_REQUEST['kor'];
-        
-        //TODO
-        $tnyelv = isset($_REQUEST['tnyelv']) ? $_REQUEST['tnyelv'] : false;
-        
+               
         // Diocese filter
         $ehm = isset($_REQUEST['ehm']) ? $_REQUEST['ehm'] : 0;
         if ($ehm > 0) {
@@ -27,7 +24,13 @@ class SearchResultsMasses extends Html {
             $search->filters[] = "Egyházmegye: " . htmlspecialchars($ehmnev) ." egyházmegye";                              
         }
             
-        
+        // nyelvek filter
+        $tnyelv = isset($_REQUEST['tnyelv']) ? $_REQUEST['tnyelv'] : false;
+        if($tnyelv == "h") $tnyelv = "hu";
+        if ($tnyelv AND $tnyelv != '0') {
+            $search->addMust(["term" => ['nyelvek' => $tnyelv ]]); 
+            $search->filters[] = "Amelyik templomban van '" . htmlspecialchars($tnyelv) . "' nyelvű mise.";                              
+        }
                 
         $zeneT = array('g' => 'gitáros', 'o' => 'orgonás', 'cs' => 'csendes', 'na' => 'meghátorazatlan');
         $korT = array('csal' => 'családos', 'd' => 'diák', 'ifi' => 'ifjúsági', 'na' => 'meghátorazatlan');
@@ -39,18 +42,7 @@ class SearchResultsMasses extends Html {
         if (isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {            
             $search->keyword($_REQUEST['kulcsszo']);
         }
-
-        
-        // TODO
-        if (isset($_REQUEST['gorog']) AND $_REQUEST['gorog'] == 'gorog') {
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.";            
-        }
-        if (isset($_REQUEST['tnyelv']) AND $_REQUEST['tnyelv'] != '0') {
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle>Amelyik templomban van '" . $_REQUEST['tnyelv'] . "' nyelvű mise.<br/>";
-        }
-
-
-
+    
         // Time range search
         $mikor = $_REQUEST['mikor'];
         $mikordatum = $_REQUEST['mikordatum'];

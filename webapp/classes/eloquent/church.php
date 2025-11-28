@@ -3,6 +3,7 @@
 namespace Eloquent;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use ExternalApi\ElasticsearchApi;
 
 /*
  ALTER TABLE `miserend`.`templomok` 
@@ -210,6 +211,21 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany('\Eloquent\Photo')->ordered();
     }
 
+    public function massrules()
+    {
+        return $this->hasMany('\Html\Calendar\Model\CalMass', 'church_id');
+    }
+
+    public function getLanguagesAttribute() {
+        // Grab the 'lang' column from related massrules, remove empty values, unique and return as array
+        return $this->massrules()
+                    ->pluck('lang')
+                    ->filter(function($v) { return $v !== null && $v !== ''; })
+                    ->unique()
+                    ->values()
+                    ->toArray();
+    }
+
     public function keywordshortcuts() {
         return $this->hasMany('\Eloquent\KeywordShortcut');
     }
@@ -348,7 +364,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             'email' => $this->pleb_eml,
             'links' => $this->links->pluck('href')->toArray(),
             'misek' => $misek,
-            
+            'nyelvek' => $this->languages,
             'miserend_megjegyzes' => str_replace('<br>', "\n", strip_tags($this->misemegj, '<br>')),
             'adoraciok' => $adorations,
             'gyontatas' => $this->confessions ? $this->confessions : false,
@@ -396,8 +412,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     public function toElasticArray()
     {
-        $church = $this->toAPIArray('medium');
 
+        $church = $this->toAPIArray('medium');        
         // Kiegészítjük Budapest kerületekkel
 		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
 		
@@ -412,6 +428,13 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             $church['gyontatas'] = [];
         }
 		
+        //görög
+        if( isset($this->denomination) && $this->denomination == 'greek_catholic') {
+            $church['gorog'] = 'true';
+        } else {
+            $church['gorog'] = 'false';
+        }
+
         return $church;
     }   
     
@@ -984,6 +1007,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         }
 
         // Meghívjuk az eredeti save() metódust
-        return parent::save($options);
+        $return = parent::save($options);
+
+        // Miután már elmentettük, akkor
+        // Elasticsearch frissítése
+        ElasticsearchApi::updateChurches([$this->id]);
     }
 }

@@ -59,21 +59,7 @@ class Home extends Html {
 
         $searchform['ehm'] = array(
             'name' => "ehm",
-            'class' => 'keresourlap',
-            'onChange' => "
-						var a = document.getElementsByName('espker');	
-						for (index = 0; index < a.length; ++index) {
-						    console.log(a[index]);
-						    a[index].style.display = 'none';
-						}
-
-						if(this.value!=0) {	
-							document.getElementById('espkerlabel').style.display='inline';
-							document.getElementById('ehm'+this.value).style.display='inline';
-
-						} else {
-							document.getElementById('espkerlabel').style.display='none';
-						}");
+            'class' => 'keresourlap');            						
         $searchform['ehm']['options'][0] = 'mindegy';
         
         $egyhmegyes = DB::table('egyhazmegye')
@@ -84,21 +70,7 @@ class Home extends Html {
                     foreach ($egyhmegyes as $egyhmegye) {
                         $searchform['ehm']['options'][$egyhmegye->id] = $egyhmegye->nev;
                     }
-        
-        foreach ($espkerT as $ehm => $espker) {
-            $searchform['espker'][$ehm] = array(
-                'name' => "espker",
-                'id' => "ehm" . $ehm,
-                'style' => "display:none",
-                'class' => 'keresourlap');
-            $searchform['espker'][$ehm]['options'][0] = 'mindegy';
-            if (is_array($espker)) {
-                foreach ($espker as $espid => $espnev) {
-                    $searchform['espker'][$ehm]['options'][$espid] = $espnev;
-                }
-            }
-        }
-
+               
         $searchform['gorog'] = array(
             'type' => 'checkbox',
             'name' => "gorog",

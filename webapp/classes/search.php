@@ -210,48 +210,79 @@ class Search {
             ],
             "query" => $this->query,
             "from"  => $from,
-            "size"  => $size,
-            "sort" => [
+            "size"  => $size                 
+        ];
+
+
+        if($this->massOrChurch === 'mass') {
+            $index = "mass_index";
+            $esQuery['sort'] = [
                 [ "start_date" =>  [ "order" => "asc" ] ],
                 [ "church_id" => [ "order" => "asc" ] ]
-            ],       
-        ];
+            ];        
+        } else if ($this->massOrChurch === 'church') {
+            $index = "churches";
+            $esQuery['sort'] = [
+                [ "nev.keyword" =>  [ "order" => "asc" ] ]            
+            ];        
+        }
 
         $elastic = new ElasticSearchApi();
         $elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "GET");
-        $elastic->buildQuery('mass_index/_search', json_encode($esQuery));
+        $elastic->buildQuery($index.'/_search', json_encode($esQuery));
         $elastic->run();
 
         $result = [];   
 
         if (isset($elastic->jsonData->hits->hits)) {
             $this->total = $elastic->jsonData->hits->total->value;    
-
-            foreach ($elastic->jsonData->hits->hits as $hit) {
-                $churchId = $hit->_source->church_id;
-
-                $source = $hit->_source;
-
-                $dateUtc = Carbon::parse($source->start_date)->setTimezone('UTC');
-
-                if ($this->timezone !== 'UTC') {
-                    $dateLocal = $dateUtc->copy()->setTimezone($this->timezone);
-                    $source->start_date = $dateLocal->format('c');
-                    $source->start_minutes = $dateLocal->hour * 60 + $dateLocal->minute;
-                } else {
-                    $source->start_date = $dateUtc->format('c');
-                    $source->start_minutes = $dateUtc->hour * 60 + $dateUtc->minute;
-                }
-
-                if($groupByChurch) {
-                    if (!isset($result[$churchId])) $result[$churchId] = [];
-                    $result[$churchId][] = $source;
-                } else {
-                    $result[] = $source;
-                }
+            if($this->massOrChurch === 'mass') {
+                $result = $this->prepareMassesResults($elastic->jsonData->hits->hits, $groupByChurch);
+            } else if ($this->massOrChurch === 'church') {
+                $result = $this->prepareChurchesResults($elastic->jsonData->hits->hits);
             }
         }
 
+        return $result;
+    }
+
+    private function prepareMassesResults($hits, $groupByChurch) {
+        $result = [];
+        foreach ($hits as $hit) {
+            $churchId = $hit->_source->church_id;
+
+            $source = $hit->_source;
+            $source->score = $hit->_score;
+
+            $dateUtc = Carbon::parse($source->start_date)->setTimezone('UTC');
+
+            if ($this->timezone !== 'UTC') {
+                $dateLocal = $dateUtc->copy()->setTimezone($this->timezone);
+                $source->start_date = $dateLocal->format('c');
+                $source->start_minutes = $dateLocal->hour * 60 + $dateLocal->minute;
+            } else {
+                $source->start_date = $dateUtc->format('c');
+                $source->start_minutes = $dateUtc->hour * 60 + $dateUtc->minute;
+            }
+
+            if($groupByChurch) {
+                if (!isset($result[$churchId])) $result[$churchId] = [];
+                $result[$churchId][] = $source;
+            } else {
+                $result[] = $source;
+            }
+        }
+        return $result;
+
+    }
+
+    private function prepareChurchesResults($hits) {
+        $result = [];
+        foreach ($hits as $hit) {             
+            $source = $hit->_source; 
+            $source->score = $hit->_score;           
+            $result[] = $source;
+        }
         return $result;
     }
 

@@ -2,6 +2,8 @@
 
 namespace Html;
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 class SearchResultsChurches extends Html {
 
     public $template = 'search/resultsChurches.twig';
@@ -14,46 +16,53 @@ class SearchResultsChurches extends Html {
 
         $this->setTitle('Templom keresése');
 
-        //Beginning of new Search Egine
-        $search = \Eloquent\Church::where('ok', 'i');
-        if (isset($this->input['kulcsszo'])) {
-            $keyword = preg_replace("/\*/", "%", $this->input['kulcsszo']);
-            $search->whereShortcutLike($keyword, 'name');
-        }
-        if (isset($this->input['varos'])) {
-            $keyword = preg_replace("/\*/", "%", $this->input['varos']);
-            $search->whereShortcutLike($keyword, 'administrative');
-        }
-
-        //Data For _panelSearchForChurch.twig
-        $this->form['varos']['value'] = isset($_REQUEST['varos']) ? $_REQUEST['varos'] : false;
-        $this->form['kulcsszo']['value'] = isset($_REQUEST['kulcsszo']) ? $_REQUEST['kulcsszo'] : false ;
+        $search = new \Search('churches');
         
-		
-		$selectReligiousAdministration = \Form::religiousAdministrationSelection(['diocese' => isset($_REQUEST['ehm']) ? $_REQUEST['ehm'] : false , 'deanery' => isset($_REQUEST['espker']) ? $_REQUEST['espker'] : false ]);
-        $this->form['diocese'] = $selectReligiousAdministration['dioceses'];
-        $this->form['diocese']['name'] = 'ehm';
-        $this->form['deaneries'] = $selectReligiousAdministration['deaneries'];
-        foreach ($this->form['deaneries'] as &$form) {
-            $form['name'] = 'espker';
+        // Main keyword search
+        if (isset($this->input['kulcsszo'])) {
+            $search->keyword($this->input['kulcsszo']);    
+            $this->form['kulcsszo']['value'] = $this->input['kulcsszo'];        
+        } else {
+             $this->form['kulcsszo']['value'] = '';
+        }
+    
+        // Diocese filter		
+        $ehm = isset($_REQUEST['ehm']) ? $_REQUEST['ehm'] : 0;
+        if ($ehm > 0) {
+            $ehmnev = DB::table('egyhazmegye')->where('id',$ehm)->pluck('nev')[0];
+            $search->addMust(["wildcard" => ['egyhazmegye.keyword' => $ehmnev ]]); 
+            $search->filters[] = "Egyházmegye: " . htmlspecialchars($ehmnev) ." egyházmegye";                              
         }
 
-        //Old Search Engine
-        $offset = $this->pagination->take * $this->pagination->active;
-        $limit = $this->pagination->take;
-        $results = searchChurches($_REQUEST, $offset, $limit);
-        $resultsCount = $results['sum'];
+        // gorog only
+        if (isset($_REQUEST['gorog']) AND $_REQUEST['gorog'] == 'gorog') {                        
+            $search->addMust(["term" => ['gorog' => true ]]); 
+            $search->filters[] = "Csak görögkatolikus templomok.";                              
+        }
 
-		//Data for pagination
+        // nyelvek filter
+        $tnyelv = isset($_REQUEST['tnyelv']) ? $_REQUEST['tnyelv'] : false;
+        if($tnyelv == "h") $tnyelv = "hu";
+        if ($tnyelv AND $tnyelv != '0') {
+            $search->addMust(["term" => ['nyelvek' => $tnyelv ]]); 
+            $search->filters[] = "Amelyik templomban van '" . htmlspecialchars($tnyelv) . "' nyelvű mise.";                              
+        }
+
+        //Let's do the search
+        $offset = $this->pagination->take * $this->pagination->active;
+        $limit = $this->pagination->take;        		        
+        $results = [];
+        $results['results'] = $search->getResults($offset, $limit, false);                
+        $resultsCount = $search->total;
+                		
+        //Data for pagination
 		$params = [];
-		foreach( ['varos','tavolsag','hely','kulcsszo','gorog','tnyelv','espker','ehm'] as $param ) {
-		
+        $params['q'] = 'SearchResultsChurches';
+		foreach( ['kulcsszo','gorog','tnyelv','ehm'] as $param ) {
 			if( isset($_REQUEST[$param]) AND $_REQUEST[$param] != ''  AND $_REQUEST[$param] != '0' ) {
 				$params[$param] = $_REQUEST[$param];
 			}
-		}
-		
-        $params['q'] = 'SearchResultsChurches';
+		}		
         $url = \Pagination::qe($params, '/?' );
         $this->pagination->set($resultsCount, $url );
 
@@ -61,7 +70,7 @@ class SearchResultsChurches extends Html {
             addMessage('A keresés nem hozott eredményt', 'info');
             return;
         } else if ($resultsCount == 1) {
-            $url = '/templom/' . $results['results'][0]['id'];
+            $url = '/templom/' . $results['results'][0]->id;
             $event = ['Search', 'fast', ( isset($_REQUEST['varos']) ? $_REQUEST['varos'] : ''  ). $_REQUEST['kulcsszo'] . ( isset($_REQUEST['e']) ? $_REQUEST['e'] : '' ) ];  
             $this->redirectWithAnalyticsEvent($url, $event);
             return;
@@ -70,12 +79,13 @@ class SearchResultsChurches extends Html {
             return;
         }
 
-        foreach ($results['results'] as $result) {
-            $churchIds[] = $result['id'];
+        /* foreach ($results['results'] as $result) {
+            $churchIds[] = $result->id;
         }
-        $this->churches = $results['results'];
-        //$this->churches = \Eloquent\Church::whereIn('id', $churchIds)->get();
-
+        $this->churches = \Eloquent\Church::whereIn('id', $churchIds)->get(); */
+        $this->churches = json_decode(json_encode($results['results']), true);
+        
+        $this->filters = $search->getFilters();
         $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
 
     }

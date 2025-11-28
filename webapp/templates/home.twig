@@ -87,11 +87,7 @@
                 <div class="form-group row">
                     <label class="col-sm-4 control-label" >egyházmegye</label>
                     <div class="col-sm-8">{{ forms.select(searchform.ehm) }} </div>
-                </div>
-                <div class="form-group row" id="espkerlabel" style="display:none" >
-                    <label class="col-sm-4 control-label" >esperes kerület</label>
-                    <div class="col-sm-8">{% for key, item in searchform.espker %}{{ forms.select(item) }}{% endfor %}</div>
-                </div>
+                </div>                
                 <div class="form-group row">
                     <label class="col-sm-4 control-label" >csak görögkatolikus</label>
                     <div class="col-sm-8">{{ forms.input(searchform.gorog) }} </div>

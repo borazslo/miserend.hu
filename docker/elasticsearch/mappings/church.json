@@ -72,6 +72,12 @@
             "location": {
                 "type": "geo_point"
             },
+            "gorog": {
+                "type": "boolean"
+            },
+            "nyelvek": {
+                "type": "keyword"
+            },            
             "gyontatas": {
                 "type": "object",
                 "properties": {

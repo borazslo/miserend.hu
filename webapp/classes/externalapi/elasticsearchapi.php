@@ -178,90 +178,9 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		return $this->jsonData->hits;
 	}
 
-	function search($keyword, $params = [] ) {
-		// Defaults
-		$default_params = [
-			'from'=>0,
-			'size'=>10
-		];		
-		$data = $default_params;
-		foreach($params as $key => $value) {
-			$data[$key] = $value;
-		}
-		
-		// Build the query
-		$data = [
-				'from' => $data['from'],
-				'size' => $data['size'],
-				'query' => ['bool' => ['should' => []]]];
-
-		if (preg_match('/\bid:(\d+)\b/i', $keyword, $matches)) {
-			$id = $matches[1];
-			$keyword = trim(str_replace($matches[0], '', $keyword));
-			$data['query'] = [
-				'bool' => [
-					'must' => [
-						['term' => ['id' => $id]]
-					],
-					'should' => [
-						[
-							'multi_match' => [
-								'query' => $keyword,
-								'fields' => ['id^100','names^4', 'alternative_names^2', 'varos^40']
-							]
-						]
-					]
-				]
-			];
-		} else {
-			/*
-			$data['query'] = [
-				'multi_match' => [
-					'query' => $keyword,
-					'fields' => ['id^100','names^4', 'alternative_names^2', 'varos^2']
-				]
-			];
-			*/
-
-			$data['query']['bool']['should'][] = [
-				"match" => [
-					"varos" => [
-						"query" => $keyword,
-						"operator" => "or",
-						"boost" => 64
-					]
-				]
-			];
-
-			$data['query']['bool']['should'][] = ['term'=>['names'=>[ 'value' => $keyword, 'boost'=>32 ]]];			
-			$data['query']['bool']['should'][] = ['term'=>['varos'=>[ 'value' => $keyword, 'boost'=>18 ]]];
-			$data['query']['bool']['should'][] = ['term'=>['alternative_names'=>[ 'value' => $keyword, 'boost'=>7 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['names'=>[ 'query' => $keyword, 'boost'=>30 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['varos'=>[ 'query' => $keyword, 'boost'=>15 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['alternative_names'=>[ 'query' => $keyword, 'boost'=>5 ]]];
-			$data['query']['bool']['should'][] = ['wildcard'=>['names'=>[ 'value' => '*'.$keyword.'*', 'boost'=>28 ]]];			
-			$data['query']['bool']['should'][] = ['wildcard'=>['varos'=>[ 'value' => '*'.$keyword.'*', 'boost'=>12 ]]];
-			$data['query']['bool']['should'][] = ['wildcard'=>['alternative_names'=>[ 'value' => '*'.$keyword.'*', 'boost'=>4 ]]];
-								
-		}
-
-		
-
-		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"GET");		
-		$this->buildQuery('churches/_search', json_encode($data));		
-		$this->run();
-
-		if($this->responseCode != 200) {
-			throw new \Exception("Could not search churches!\n".print_r($this->jsonData->error,true));
-		}
-
-		return $this->jsonData->hits;
-		
-		
-	}
 	
 	// Rendszeresen feltöltjük a keresőbe az adatbázisunkat, mert az jó.
-	static function updateChurches() {
+	static function updateChurches(array $tids = []) {
 
 		
 		$elastic = new \ExternalApi\ElasticsearchApi();
@@ -282,7 +201,12 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		}
 		
 		// Előkészítjük feltöltsére az adatokat
-		$churches = \Eloquent\Church::where('ok', 'i')->limit(200000)->get()->map->toElasticArray()->toArray();
+		$churches = \Eloquent\Church::where('ok', 'i');
+		if(!empty($tids)) {
+
+			$churches = $churches->whereIn('id', $tids);
+		}
+		$churches = $churches->limit(200000)->get()->map->toElasticArray()->toArray();
 		
 		// Truncate the index
 		$elastic->truncateIndex('churches');
