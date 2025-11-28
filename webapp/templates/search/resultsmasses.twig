@@ -12,9 +12,70 @@
 
 {% block content %}
 
-{{ alert|raw }}
+    {{ alert|raw }}
+    {{ tartalom|raw }}
+    <strong><span class=kiscim>Keresési paraméterek:</span></strong><br/>
+    {% if filters is defined and filters|length %}
+        {% for filter in filters %}
+            <span class="alap"><img src="/img/negyzet_lila.gif" align="absmidle"> {{ filter }}</span><br/>
+        {% endfor %}
+    {% endif %}
+    <br/>
 
-{{ content|raw }}</td>
+    {% if results %}
+            <div class="row" style="margin-bottom:12px">
+                Összesen: {{ pagination.resultsCount }} találat<br/>
+                Listázás: {{ (pagination.active * pagination.take) + 1 }} - 
+                {% if pagination.resultsCount < ( pagination.active + 1 ) * pagination.take %}
+                    {{ pagination.resultsCount }}
+                {% else %}
+                    {{ ( pagination.active + 1 ) * pagination.take }} 
+                {% endif %}
+            </div>
+
+            {% for result in results %}
+                {% set church = result.church %}
+                <div class="row">
+                    <div class="col-md-9">
+                        <a href='/templom/{{ church.id }}' class=felsomenulink title='{{ church.names|slice(1)|join(', ') }}'>
+                            <b>{{ church.names.0 }}</b> 
+                            <font color=#8D317C>
+                                {% if church.varos is iterable %}
+                                    ({{ church.varos.0 }})
+                                {% else %}
+                                    ({{ church.varos }})
+                                {% endif %}
+                            </font>
+                            {% if user.isadmin %}
+                            <small>{{ church.score }}</small>
+                            {% endif %}
+                        </a>
+                        {% if church.alternative_names.0 %}
+                            <br/><span class="alap" style="margin-left: 20px; font-style: italic;" title="{{ church.alternative_names|slice(1)|join(', ') }}">{{ church.alternative_names.0 }}</span>
+                        {% endif %}
+                    </div>
+                    {% if user.isadmin %}
+                        <div class="col-md-3">
+                            {% include "church/_adminlinks.twig" with church %}                       
+                        </div>
+                    {% endif %}
+
+                </div>
+                <div class="row" style="margin-bottom:6px">
+                    {% for key, item in result %}                    
+                        {% if key != 'church' %}                                                     
+                            <div class="col-md-12" style="margin-bottom:4px">
+                                <span class="badge badge-primary" title="{{ item.title ~ ' ' ~ item.rite }}">{{ item.start_date }}</span>
+                                {{ item.rite }} {{ item.title }}
+                            </div>                            
+                        {% endif %}
+                    {% endfor %}
+                </div>    
+            {% endfor %}
+        {% endif %}
+
+        {% include '_pagination.twig' %}
+
 
 {% endblock %}
 

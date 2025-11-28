@@ -7,38 +7,24 @@ use Illuminate\Database\Capsule\Manager as DB;
 class SearchResultsMasses extends Html {
 
     public function __construct() {
-
+        parent::__construct();
         global $user, $config;
 
-        $mikor = $_REQUEST['mikor'];
-        $mikordatum = $_REQUEST['mikordatum'];
-        if ($mikor != 'x')
-            $mikordatum = $mikor;
-
-        $mikor2 = $_REQUEST['mikor2'];
-        $mikorido = $_REQUEST['mikorido'];
-        $varos = isset($_REQUEST['varos']) ? $_REQUEST['varos'] : "";
-        $ehm = $_REQUEST['ehm'];
-        $espkerT = isset($_REQUEST['espkerT']) ? $_REQUEST['espkerT'] : false;
-        $nyelv = $_REQUEST['nyelv'];
+        $search = new \Search('masses', $_REQUEST);
+        
+        //TODO
         $zene = $_REQUEST['zene'];
         $kor = $_REQUEST['kor'];
-        $ritus = $_REQUEST['ritus'];
-        $ige = isset($_REQUEST['ige']) ? $_REQUEST['ige'] : false;
-
-
-        $min = isset($_REQUEST['min']) ? $_REQUEST['min'] : 0;       
-		$leptet = isset($_REQUEST['leptet']) ? $_REQUEST['leptet'] : 25;		
         
-        $ma = date('Y-m-d');
-        $holnap = date('Y-m-d', (time() + 86400));
-      
+        //TODO
+        $tnyelv = isset($_REQUEST['tnyelv']) ? $_REQUEST['tnyelv'] : false;
+        
+        // Diocese filter
+        $ehm = isset($_REQUEST['ehm']) ? $_REQUEST['ehm'] : 0;
         if ($ehm > 0) {
-            $ehmnev = DB::table('egyhazmegye')->where('id',$ehm)->pluck('nev')[0];            
-			
-			if ($espkerT != false and $espkerT[$ehm] > 0) {
-				$espkernev = DB::table('espereskerulet')->where('id',$espkerT[$ehm])->pluck('nev')[0];            
-			}	
+            $ehmnev = DB::table('egyhazmegye')->where('id',$ehm)->pluck('nev')[0];
+            $search->addMust(["wildcard" => ['church.egyhazmegye.keyword' => $ehmnev ]]); 
+            $search->filters[] = "Egyházmegye: " . htmlspecialchars($ehmnev) ." egyházmegye";                              
         }
             
         
@@ -47,206 +33,134 @@ class SearchResultsMasses extends Html {
         $korT = array('csal' => 'családos', 'd' => 'diák', 'ifi' => 'ifjúsági', 'na' => 'meghátorazatlan');
         $ritusT = array('gor' => 'görögkatolikus', 'rom' => 'római katolikus', 'regi' => 'régi rítusú');
         $nyelvekT = array('h' => 'magyar', 'en' => 'angol', 'de' => 'német', 'it' => 'olasz', 'va' => 'latin', 'gr' => 'görög', 'sk' => 'szlovák', 'hr' => 'horvát', 'pl' => 'lengyel', 'si' => 'szlovén', 'ro' => 'román', 'fr' => 'francia', 'es' => 'spanyol');
+        $tartalom = '';        
 
-		$leptet_urlap = '';
-        $tartalom ="\n<span class=kiscim>Keresési paraméterek:</span><br><span class=alap>";
-        if (isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {
-            $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> Kulcsszó: " . $_REQUEST['kulcsszo'] . "<br/>";
-            $leptet_urlap.="<input type=hidden name=kulcsszo value='" . $_REQUEST['kulcsszo'] . "'>";
-        }
-        if (isset($_REQUEST['hely']) AND $_REQUEST['hely'] != '') {
-            $_REQUEST['hely_geocode'] = mapquestGeocode($_REQUEST['hely']);
-            $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> " . $_REQUEST['hely'] . " + " . $_REQUEST['tavolsag'] . " km<br/><img src='" . $_REQUEST['hely_geocode']['mapUrl'] . "'><br/>";
-            $leptet_urlap.="<input type=hidden name=hely value='" . $_REQUEST['hely'] . "'>";
-            $leptet_urlap.="<input type=hidden name=tavolsag value='" . $_REQUEST['tavolsag'] . "'>";
+        // Main keyword search
+        if (isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {            
+            $search->keyword($_REQUEST['kulcsszo']);
         }
 
-        if (!empty($varos)) {
-            $varos = ucfirst($varos);
-            $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> $varos településen<br/>";
-            $leptet_urlap.="<input type=hidden name=varos value='$varos'>";
-        }
+        
+        // TODO
         if (isset($_REQUEST['gorog']) AND $_REQUEST['gorog'] == 'gorog') {
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.";
-            $leptet_urlap.="<input type=hidden name=gorog value='gorog'>";
+            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> Csak görögkatolikus templomokban.";            
         }
         if (isset($_REQUEST['tnyelv']) AND $_REQUEST['tnyelv'] != '0') {
             $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle>Amelyik templomban van '" . $_REQUEST['tnyelv'] . "' nyelvű mise.<br/>";
         }
-        $leptet_urlap.="<input type=hidden name=tnyelv value='" . $_REQUEST['tnyelv'] . "'>";
 
-        if (!empty($ehmnev)) {
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> $ehmnev egyházmegyében,";
-            $leptet_urlap.="<input type=hidden name=ehm value='$ehm'>";
-        }
-        if (!empty($espkernev)) {
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> $espkernev espereskerületben,";
-            $leptet_urlap.="<input type=hidden name=espkerT[$ehm] value='$espkerT[$ehm]'>";
-        }
-        if (!empty($ehmnev))
-            $tartalom .= '<br/>';
-        $tartalom.="<img src=/img/negyzet_lila.gif align=absmidle> ";
-        if ($mikordatum == $ma) {
-            $tartalom.='ma';
-            $leptet_urlap.="<input type=hidden name=mikor value='$ma'>";
-        } elseif ($mikordatum == $holnap) {
-            $tartalom.='holnap';
-            $leptet_urlap.="<input type=hidden name=mikor value='$holnap'>";
-        } else {
-            $mev = substr($mikordatum, 0, 4);
-            $mho = substr($mikordatum, 5, 2);
-            $mnap = substr($mikordatum, 8, 2);
-            $mnapnev = date('w', mktime(0, 0, 0, $mho, $mnap, $mev));
-            $napokT = array('vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat');
-            $mikornap = ' ' . $napokT[$mnapnev];
-            $tartalom.=$mikordatum . $mikornap;
 
-            $leptet_urlap.="<input type=hidden name=mikor value='x'>";
-            $leptet_urlap.="<input type=hidden name=mikordatum value='$mikordatum'>";
-        }
-        $tartalom.=' ';
+
+        // Time range search
+        $mikor = $_REQUEST['mikor'];
+        $mikordatum = $_REQUEST['mikordatum'];
+        if ($mikor != 'x')
+            $mikordatum = $mikor;
+        $mikor2 = isset($_REQUEST['mikor2']) ? $_REQUEST['mikor2'] : false;
+        $mikorido = $_REQUEST['mikorido'];
         if ($mikor2 == 'de') {
-            $tartalom.='délelőtt,';
-            $leptet_urlap.="<input type=hidden name=mikor2 value='de'>";
+            $hourFrom = "00:00";
+            $hourTo = "11:59";
         } elseif ($mikor2 == 'du') {
-            $tartalom.='délután,';
-            $leptet_urlap.="<input type=hidden name=mikor2 value='du'>";
+            $hourFrom = "12:00";
+            $hourTo = "23:59";
         } elseif ($mikor2 == 'x') {
-            $tartalom.=$mikorido;
-            $leptet_urlap.="<input type=hidden name=mikor2 value='x'>";
-            $leptet_urlap.="<input type=hidden name=mikorido value='$mikorido'>";
-        } else {
-            $tartalom.='egész nap,';
-            $leptet_urlap.="<input type=hidden name=mikor2 value='0'>";
-        }
-        if (!empty($nyelv) or ( !empty($zene) AND count($zene) < 3) or ( !empty($kor) AND count($kor) < 4))
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> ";
-        if (!empty($nyelv)) {
-            $tartalom.="$nyelvekT[$nyelv] nyelvű, ";
-            //		$leptet_urlap.="<input type=hidden name=nyelv value='$nyelv'>";
-        }
-        $leptet_urlap.="<input type=hidden name=nyelv value='$nyelv'>";
+            [$hourFrom, $hourTo] = explode('-', $mikorido);
+            // normalize times to HH:MM (e.g. "8:00" -> "08:00")
+            $hourFrom = trim($hourFrom);
+            $hourTo = trim($hourTo);
 
+            $fixTime = function ($t) {
+                if ($t === '' || $t === null) return $t;
+                $parts = explode(':', $t, 2);
+                $h = isset($parts[0]) ? str_pad((int)$parts[0], 2, '0', STR_PAD_LEFT) : '00';
+                $m = isset($parts[1]) ? str_pad((int)$parts[1], 2, '0', STR_PAD_LEFT) : '00';
+                return $h . ':' . $m;
+            };
+            $hourFrom = $fixTime($hourFrom);
+            $hourTo = $fixTime($hourTo);
+        } else {
+            $hourFrom = "00:00";
+            $hourTo = "23:59";
+        }                
+        $search->timeRange($mikordatum."T".$hourFrom.":00", $mikordatum."T".$hourTo.":00");
+
+        // Languages
+        $nyelv = isset($_REQUEST['nyelv']) ? $_REQUEST['nyelv'] : false;        
+        if (!empty($nyelv)) {
+            $search->languages([$nyelv]);
+        }
+
+        // TODO
         if (!empty($zene)) {
             foreach ($zene as $z) {
                 if (count($zene) < 3)
                     $tartalom.="$zeneT[$z], ";
-                $leptet_urlap.="<input type=hidden name=zene[] value='$z'>";
             }
         }
         if (!empty($kor)) {
             foreach ($kor as $k) {
                 if (count($kor) < 4)
                     $tartalom.="$korT[$k], ";
-                $leptet_urlap.="<input type=hidden name=kor[] value='$k'>";
-            }
-        }
-        if (!empty($ritus)) {
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> $ritusT[$ritus]";
-            $leptet_urlap.="<input type=hidden name=ritus value='$ritus'>";
-        }
-        if (!empty($ige)) {
-            $tartalom.="<br><img src=/img/negyzet_lila.gif align=absmidle> igeliturgiák is";
-            $leptet_urlap.="<input type=hidden name=ige value='yes'>";
-        }
-
-        $tartalom.="</span><br/>" . $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert($mikordatum);
-
-        if (!empty($_REQUEST['leptet']))
-            $visszalink = "?";
-        else
-            $visszalink = "javascript:history.go(-1);";
-        $templomurlap = "<img src=/img/space.gif width=5 height=6><br><a href=$visszalink class=link><img src=/img/search.gif width=16 height=16 border=0 align=absmiddle hspace=2><b>Vissza a főoldali keresőhöz</b></a><br><img src=/img/space.gif width=5 height=6>";
-
-        $results = searchMasses($_REQUEST, $min, $leptet);
-        $mennyi = $results['sum'];
-
-        $kezd = $min + 1;
-        $prev = $min - $leptet;
-        if ($prev < 0)
-            $prev = 0;
-        $veg = $mennyi;
-		$leptetprev = '';
-        if ($min > 0) {
-            $leptetprev.="\n<form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
-            $leptetprev.=$leptet_urlap;
-            $leptetprev.="<input type=hidden name=min value=$prev>";
-            $leptetprev.="\n<input type=submit value=Előző class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
-        }
-		$leptetnext = '';
-        if ($mennyi > $leptet) {
-            $veg = $min + $leptet;
-
-            $next = $min + $leptet;
-			
-            if ($mennyi > $min + $leptet) {
-                $leptetnext.="\n<form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=hidden name=min value=$next><input type=\"hidden\" id=\"misekereses\" name=\"misekereses\" value=\"1\">";
-                $leptetnext.=$leptet_urlap;
-                $leptetnext.="\n<input type=submit value=Következő class=urlap><input type=text size=2 value=$leptet name=leptet class=urlap></form>";
             }
         }
 
+        // Ritus
+        $ritus = isset($_REQUEST['ritus']) ? $_REQUEST['ritus'] : false;
+        if (!empty($ritus)) {            
+            $ritusMap = [
+                'gor' => 'GREEK_CATHOLIC',
+                'rom' => 'ROMAN_CATHOLIC',
+                'regi' => 'TRADITIONAL'
+            ];
+            $search->rites([$ritusMap[$ritus]]);
+        }
+
+        // Exclude 'Igeliturgia' masses unless specifically requested
+        $ige = isset($_REQUEST['ige']) ? $_REQUEST['ige'] : false;
+        if (empty($ige)) {
+            $search->notTitle('Igeliturgia'); 
+        }
+
+        $tartalom.="</span><br/>";
+
+        $templomurlap = "<img src=/img/space.gif width=5 height=6><br><a href=\"/\" class=link><img src=/img/search.gif width=16 height=16 border=0 align=absmiddle hspace=2><b>Vissza a főoldali keresőhöz</b></a><br><img src=/img/space.gif width=5 height=6>";
 
 
-        if ($mennyi == 0) {
-            $tartalom.='<br/><span class=alap><strong>Sajnos nincs találat</strong></span>';
-            //$tartalom.='<span class=alap>Elnézést kérünk, a kereső technikai hiba miatt nem üzemel. Javításán már dolgozunk.</span>';
-        } else {
-            //$tartalom.="<span class=kiscim>Összesen $mennyi templomban van megfelelő mise.</span><br><br>";
-            $tartalom.="<br><span class=alap>Összesen: $mennyi templomban van megfelelő mise.<br>Listázás: $kezd - $veg</span><br><br>";
-
-            //echo "<pre>".print_r($results['results'],1)."</pre>";
-            foreach ($results['churches'] as $result) {
-                $tartalom .= "<img src=/img/templom1.gif align=absmiddle width=16 height=16 hspace=2>
-                <!--// FIXME for Issue #257 -->
-				<a href='/templom/" . $result['tid'] . "' class=felsomenulink><b>" . $result['nev'] . "</b> <font color=#8D317C>(" . $result['varos'] . ")</font></a><br><span class=alap style=\"margin-left: 20px; font-style: italic;\">" . $result['ismertnev'] . "</span>";
-                
-				if(!isset($ertek)) $ertek = ''; // TODO: valószínűleg soha semmilyen körülmények között nincs már $ertek. 
-                $tartalom.=$ertek . '<br> &nbsp; &nbsp; &nbsp;';
-
-                if ($_REQUEST['mikor'] == 'x')
-                    $_REQUEST['mikor'] = $_REQUEST['mikordatum'];
-                //$masses = getMasses($result['tid'],$_REQUEST['mikordatum']);
-                //$masses = searchMasses(array_merge(array('templom'=>$result['tid']),$_REQUEST));
-                foreach ($result['masses'] as $mass) {
-                    $tartalom .="<img src=/img/clock.gif width=16 height=16 align=absmiddle hspace=2><span class=alap>" . substr($mass['ido'], 0, 5) . "</span>";
-
-                    $mass['nyelv'] = decodeMassAttr($mass['nyelv']);
-                    foreach ($mass['nyelv'] as $milyen)
-                        $tartalom.= '<img src="/img/' . $milyen['file'] . '" class="massinfo" width=14 title="' . $milyen['description'] . '"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-    					<span class="massfullinfo" style="display:none" >' . $milyen['description'] . '</span>';
-
-                    $mass['milyen'] = decodeMassAttr($mass['milyen']);
-                    foreach ($mass['milyen'] as $milyen)
-                        $tartalom.= '<img src="/img/' . $milyen['file'] . '" class="massinfo" width=14 title="' . $milyen['description'] . '"" height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-    					<span class="massfullinfo" style="display:none">' . $milyen['description'] . '</span>';
-
-                    if ($mass['megjegyzes'] != '')
-                        $tartalom.= '<img src="/img/info2.gif" class="massinfo" width=14 title="' . $mass['megjegyzes'] . '"  height=14 align=absmiddle style="margin-top:0px;margin-left:1px">
-					<span class="massfullinfo" style="display:none">' . $mass['megjegyzes'] . '</span>';
-                }
-                //$tartalom .= print_r($masses,1);
-
-                $tartalom.="<br><img src=/img/space.gif width=4 height=8><br>";
+        $min = isset($_REQUEST['min']) ? $_REQUEST['min'] : 0;       
+		$leptet = isset($_REQUEST['leptet']) ? $_REQUEST['leptet'] : 25;		        
+        $results = $search->getResults($min, $leptet, true);
+                        
+        if ($search->total != 0) {                   
+            foreach ($results as &$result) {
+                $result['church'] = \Eloquent\Church::find($result[0]->church_id)->toArray();                
             }
         }
 
-        //Léptetés
-        if ($mennyi > $min + $leptet) {
-            $next = $min + $leptet;
-            $leptetes = "<br><form method=post><input type=hidden name=q value=SearchResultsMasses><input type=hidden name=m_op value=keres><input type=\"hidden\" id=\"keresestipus\" name=\"keresestipus\" value=\"1\">";
-            $leptetes.=$leptet_urlap;
-            $leptetes.="<input type=submit value=Következő class=urlap><input type=text name=leptet value=$leptet class=urlap size=2><input type=hidden name=min value=$next></form>";
-        }
-        $tartalom.=$leptetprev . $leptetnext;
+        //Data for pagination
+		$params = [];
+		foreach( ['varos','tavolsag','hely','kulcsszo','gorog','tnyelv','espker','ehm',
+            'mikor', 'mikordatum', 'mikor2','mikorido','nyelv','zene','kor','ritus','tnyelv'] as $param ) {
+		
+			if( isset($_REQUEST[$param]) AND $_REQUEST[$param] != ''  AND $_REQUEST[$param] != '0' ) {
+				$params[$param] = $_REQUEST[$param];
+			}
+		}
+		
+        $params['q'] = 'SearchResultsMasses';
+        $url = \Pagination::qe($params, '/?' );
+        $this->pagination->set($search->total, $url );
+
+        $this->filters = $search->getFilters();
 
         $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
 
         $this->setTitle("Szentmise kereső");
-
-        $this->content = $tartalom;
+        $this->tartalom = $tartalom;    
         $this->templomurlap = $templomurlap;
         $this->template = 'search/resultsmasses.twig';
+        
+        $this->results = $results;
     }
 
 }
