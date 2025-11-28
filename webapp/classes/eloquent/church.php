@@ -299,13 +299,16 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             $whenMass = date('Y-m-d', strtotime("next $whenMass"));
         }
 
-        $masses = searchMasses(['templom'=>$this->id, 'mikor' => $whenMass] );
-        
+        $search = new \Search('masses');
+        $search->timeRange($whenMass."T00:00", $whenMass."T23:59");
+        $search->tids([$this->id]);
+        $masses = $search->getResults(0,10);
+                
         $misek = [];        
-        if(isset($masses['churches'][$this->id])) {
-            foreach($masses['churches'][$this->id]['masses'] as $key => $mise) {
-                $misek[$key]['idopont'] = $whenMass." ".$mise['ido'];
-                $info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
+        if(isset($masses)) {
+            foreach($masses as $key => $mise) {
+                $misek[$key]['idopont'] = date('Y-m-d H:i:s', strtotime($mise->start_date));
+                $info = trim( $mise->rite." ".implode(',',$mise->types)." ".$mise->lang." ".$mise->comment);
                 if($info != '') $misek[$key]['informacio'] = $info;
             }	            
         }
@@ -382,26 +385,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
         if($length == 'full') {
             $return = array_merge($return, [                
-                'photos' => $this->photos->pluck('url')->toArray(),
-                'miserend_deprecated' => DB::table('misek')
-                    ->select('nap', 'ido', 'nap2', 'idoszamitas', 'tol', 'ig', 'nyelv', 'milyen', 'megjegyzes')
-                    ->where('tid', $this->id)
-                    ->where(function($query) {
-                        $query->where('torles', '0000-00-00 00:00:00')
-                            ->orWhereNull('torles');
-                    })
-                    ->orderBy('nap')
-                    ->orderBy('ido')
-                    ->get()
-                    ->groupBy('idoszamitas')
-                    ->map(function($items) {
-                        return $items->map(function($item) {
-                            return (array) $item;
-                        })->toArray();
-                    }),
-                
+                'photos' => $this->photos->pluck('url')->toArray()                
             ]);
-
 
         }
         

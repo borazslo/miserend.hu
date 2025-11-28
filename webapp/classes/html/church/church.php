@@ -76,9 +76,6 @@ class Church extends \Html\Html {
         
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
 
-        //Miseidőpontok
-        $misek = getMasses($tid);
-
         //Convert to OSM ServiceTimes
         if(isset($user->isadmin) AND $user->isadmin == 1)  {
             $serviceTimes = new \ServiceTimes();
@@ -107,8 +104,7 @@ class Church extends \Html\Html {
         if ($user->checkFavorite($tid)) {
             $this->favorite = 1;
         }
-                
-        $this->miserend = $misek;
+                        
 		$this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
         
         $this->isChurchHolder = $user->getHoldingData($this->id);                

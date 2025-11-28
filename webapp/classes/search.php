@@ -97,6 +97,20 @@ class Search {
         $this->query['bool']['must'][] = $condition;
     }
 
+    function tids(array $tids) {
+        $this->filters[] = "Templom ID-k: " . htmlspecialchars(implode(', ', $tids));
+        if($this->massOrChurch === 'mass') {
+            $field = "church_id";
+        } else {
+            $field = "id";
+        }
+        if (is_array($tids) && count($tids) > 0) {
+            $this->query['bool']['must'][] = [
+                "terms" => [$field => $tids]
+            ];
+        }
+    }
+
     function keyword($keyword) {
         if (empty($keyword)) return;
         $this->filters[] = "Kulcsszó: " . htmlspecialchars($keyword);
