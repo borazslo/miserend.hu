@@ -7,9 +7,6 @@ purge:
       - log
       - letrehozta
       - modositotta
-    misek:
-      - modositotta
-      - torolte
   tables:
     - chat
     - church_holders
