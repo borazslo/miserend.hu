@@ -85,8 +85,7 @@ class Catalogue extends \Html\Html {
                 'Rnj' => 'templomok nem jóváhagyott észrevétellel',
                 'Ru' => 'templomok új észrevétellel',
                 'Rf' => 'templomok folyamatban lévő észrevétellel',
-                'Sp' => 'javaslatokkal rendelkező templomok',
-                'M0' => 'mise nélküliek'
+                'Sp' => 'javaslatokkal rendelkező templomok'
             ],
             'selected' => $this->filterStatus
         ];
@@ -150,22 +149,6 @@ class Catalogue extends \Html\Html {
                 $search = $search->where('ok', $this->filterStatus);
             }
 
-            if ($this->filterStatus == 'M0') {
-                $search = $search->leftJoin(
-                                DB::raw("(" .
-                                        DB::table('misek')
-                                        ->select('id as mass_id', 'tid as mass_church_id', 'torles as mass_deleted_at')
-                                        ->whereRaw("`torles` = '0000-00-00 00:00:00'")
-                                        ->groupBy('mass_church_id')
-                                        ->orderBy('mass_deleted_at', 'ASC')
-                                        ->toSql()
-                                        . ") mass  ")
-                                , function ($j) {
-                            $j->on('mass_church_id', '=', 'templomok.id');
-                        }
-                        )
-                        ->whereNull('mass_id');
-            }
         }
 
         if ($this->orderBy) {
