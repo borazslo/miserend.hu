@@ -90,28 +90,6 @@ function getWeekInMonth($date, $order = '+') {
     return $num;
 }
 
-function widget_miserend($args) {
-    global $twig, $config;
-    $tid = $args['tid'];
-    $vars = \Eloquent\Church::find($tid)->toArray();
-    if ($vars == array())
-        $html = 'Nincs ilyen templom.';
-    else {
-        $vars['miserend'] = getMasses($tid);
-
-        if ($args['misemegj'] == 'off')
-            unset($vars['misemegj']);
-        $html = $twig->render('widget_massschedule.twig', $vars);
-    };
-
-    if (!isset($args['callback']))
-        return $html;
-    else
-        return $args['callback'] . '(' . json_encode(array('html' => $html)) . ')';
-}
-
-
-
 function feltoltes_block() {
     global $user;
     

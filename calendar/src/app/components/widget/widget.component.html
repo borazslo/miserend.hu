@@ -1,0 +1,14 @@
+<div class="widget-root" *ngIf="!loading">
+  <div *ngIf="error" class="widget-error">{{ error }}</div>
+  <div *ngIf="church">
+    <app-church-calendar [showHeader]="true" [showFooter]="false" [editable]="false" [suggestible]="false" [currentChurch]="church" [masses]="massesMap"></app-church-calendar>
+
+    <!-- widget footer: link back to original church page on miserend.hu -->
+    <div class="widget-footer" *ngIf="church?.id">
+      <small>
+        Ez a naptár a <a [href]="'/templom/' + (church.id)" target="_blank" rel="noopener noreferrer">miserend.hu</a> segítségével készül.
+      </small>
+    </div>
+  </div>
+</div>
+<div *ngIf="loading" class="widget-loading">Betöltés…</div>

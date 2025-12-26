@@ -1,0 +1,9 @@
+.widget-root{width:100%;}
+.widget-loading{padding:12px;text-align:center}
+.widget-error{color:#c62828;padding:8px}
+:host ::ng-deep .fc .fc-list-table td {padding:4px}
+:host ::ng-deep .fc .fc-list-table td .type-icon {height:16px;margin-left:6px}
+
+.widget-footer{padding:8px 6px 0;text-align:center;color:#666}
+.widget-footer a{color:#1976d2;text-decoration:none}
+.widget-footer a:hover{text-decoration:underline}

@@ -33,6 +33,7 @@ class Path {
     function convertAliases() {
 
         $replacementPatterns = [
+            ["^templom\/([0-9]{1,5})\/widget$", "church/widget/$1"],
             ["^templom\/([0-9]{1,5})\/javaslatok$", "church/suggestionpackages/$1"],
             ["^templom\/([0-9]{1,5})\/eszrevetelek$", "remark/list/$1"],
             ["^templom\/([0-9]{1,5})\/ujeszrevetel$", "remark/addform/$1"],

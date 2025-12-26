@@ -47,10 +47,23 @@
     <h5><b>Frissítve ill. megerősítve:</b> {{ updated }}</h5>
 
     {% include '_panelcampaign.twig' with { collapsible: 'collapsed' }  %}
-
+s
     {% if miseaktiv == 1 %}
        {% include 'angularjs.twig' %}
-       <br/><br/> 
+    <small class="text-muted">
+        A naptár widget egyszerűen beépíthető más honlapba egy iframe segítségével. 
+        <span id="cal-preview-{{ id }}">
+            <span title="Kattints a megnyitáshoz" style="cursor:pointer;color:#337ab7;text-decoration:underline" onclick="document.getElementById('cal-full-{{ id }}').style.display='inline'; this.style.display='none'; return false;">…</span>
+        </span>
+
+        <span id="cal-full-{{ id }}" style="display:none;">
+            <br/>
+            <code>&lt;iframe src="https://{{ constant('DOMAIN') }}/templom/{{ id }}/calendar" width="320" height="480" frameborder="0" scrolling="no"&gt;&lt;/iframe&gt;</code>
+            <br/>
+            Állítsd a width/height értékeket vagy alkalmazz responsive CSS-t (pl. max-width:100%; height:auto;) a megjelenéshez.
+            &nbsp;<a href="#" onclick="document.getElementById('cal-full-{{ id }}').style.display='none'; document.getElementById('cal-preview-{{ id }}').style.display='inline'; return false;" title="Bezárás">bezár</a>
+        </span>
+    </small>
     {% else %}
         <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
     {% endif %}
