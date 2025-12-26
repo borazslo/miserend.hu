@@ -523,9 +523,36 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
   }
 
   public onSaveCalendar() {
-    this.spinnerService.show();
-    const changesArray = Array.from(this.changes.values());
-    this.eventService.saveChanges(this.currentChurch!.id, changesArray, this.deletedMasses).subscribe(masses => {
+    // Prepare combined view of masses after pending changes/deletes so we can check for Easter-period masses
+    const combined = new Map<number, Mass>();
+    for (const m of this.masses.values()) {
+      combined.set(m.id!, m);
+    }
+    for (const [id, changed] of this.changes.entries()) {
+      combined.set(id, changed);
+    }
+    for (const del of this.deletedMasses) {
+      if (combined.has(del)) combined.delete(del);
+    }
+    // Check whether any remaining mass belongs to a period that is an Easter or Christmas period
+    let hasEasterMass = false;
+    let hasChristmasMass = false;
+    for (const m of combined.values()) {
+      if (ScriptUtil.isNotNull(m.periodId)) {
+      if (this.periodService.isEasterPeriod(m.periodId)) {
+        hasEasterMass = true;
+      }
+      if (this.periodService.isChristmasPeriod(m.periodId)) {
+        hasChristmasMass = true;
+      }
+      if (hasEasterMass && hasChristmasMass) break;
+      }
+    }
+
+    const proceedWithSave = () => {
+      this.spinnerService.show();
+      const changesArray = Array.from(this.changes.values());
+      this.eventService.saveChanges(this.currentChurch!.id, changesArray, this.deletedMasses).subscribe(masses => {
       this.changes.clear();
       this.deletedMasses = [];
       this.masses = new Map(masses.map(e => [e.id!, e]));
@@ -536,7 +563,33 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       const currentYear = new Date().getFullYear();
       const years: number[] = [currentYear - 1, currentYear, currentYear + 1];
       this.searchService.generateMasses(years, this.currentChurch!.id).subscribe();
-    });
+      });
+    };
+
+    // If either Easter or Christmas is missing, ask confirmation with appropriate message(s)
+    if (!hasEasterMass || !hasChristmasMass) {
+      let msg = '';
+      if (!hasEasterMass && !hasChristmasMass) {
+      msg = 'Ehhez a templomhoz nincs húsvéti és karácsonyi misrend megadva. Mentsük így?';
+      } else if (!hasEasterMass) {
+      msg = 'Ehhez a templomhoz nincs húsvéti misrend megadva. Mentsük így?';
+      } else { // !hasChristmasMass
+      msg = 'Ehhez a templomhoz nincs karácsonyi misrend megadva. Mentsük így?';
+      }
+
+      const dialogRef = this.dialog.open(AddMessageDialogComponent, {
+      data: { message: msg, decision: true }
+      });
+      dialogRef.afterClosed().subscribe(result => {
+      if (result === DialogResponse.CONTINUE) {
+        proceedWithSave();
+      }
+      });
+      return;
+    }
+    
+    // Normal path: Easter masses exist, proceed with save immediately
+    proceedWithSave();
   }
 
   public onSendToApprove() {
