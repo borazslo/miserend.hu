@@ -231,6 +231,34 @@ export class AddFullEventDialogComponent {
 
   onSelectedEasterDayChange() {
     this.easterDayError = false;
+
+    console.log('AddFullEventDialogComponent.onSelectedEasterDayChange invoked', {
+      selectedEasterDay: this.selectedEasterDay,
+      rite: this.data.event.rite
+    });
+
+    // If Roman Catholic, pick a sensible default title key for the selected Easter-related day
+    if (this.data.event.rite === Rite.ROMAN_CATHOLIC && this.selectedEasterDay) {
+      let titleKey = '';
+      switch (this.selectedEasterDay) {
+        case EasterDay.TH:
+          titleKey = 'MASS_TITLE.MASS_OF_THE_LORD_S_SUPPER';
+          break;
+        case EasterDay.FR:
+          titleKey = 'MASS_TITLE.GOOD_FRIDAY_LITURGY';
+          break;
+        case EasterDay.SA:
+          titleKey = 'MASS_TITLE.EASTER_VIGIL';
+          break;
+        case EasterDay.SU:
+        case EasterDay.MO:
+          titleKey = 'MASS_TITLE.HOLY_MASS';
+          break;
+      }
+      if (titleKey) {
+        this.data.event.title = this.translateService.instant(titleKey);        
+      }
+    }
   }
 
   resetPeriod(event: any) {
