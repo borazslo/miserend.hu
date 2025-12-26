@@ -605,11 +605,12 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     public function getJelzesAttribute() {
             $jelzes = ""; //$this->remarksStatus['html'];
 
-            if ($this->miseaktiv == 1) {
-                $countMasses = DB::table('misek')->where('tid', $this->id)->where('torles', '0000-00-00 00:00:00')->count();
-                if ($countMasses < 1) {
-                    $jelzes.=' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
+            if ($this->miseaktiv == 1) {                
+                $calMassCount = \Eloquent\CalMass::where('church_id', $this->id)->count();
+                if ($calMassCount < 1) {
+                    $jelzes .= ' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
                 }
+                
             }
 
             if ($this->ok == 'n')
