@@ -124,7 +124,19 @@ export class SuggestionsComponent implements OnInit {
           b.createdAt.getTime() - a.createdAt.getTime()
         );
 
-        this.selectedSuggestionPackage = this.suggestionPackages[0];
+        // choose initial package: prefer one specified in URL query param (pkg|packageId|suggestionId) or route param
+        const pkgIdParam = this.activatedRoute.snapshot.queryParams['packageId'];
+        const pkgId = pkgIdParam ? Number(pkgIdParam) : NaN;
+        if (!isNaN(pkgId)) {
+          const found = this.suggestionPackages.find(p => p.id === pkgId);
+          if (found) {
+            this.selectedSuggestionPackage = found;
+          } else {
+            this.selectedSuggestionPackage = this.suggestionPackages[0];
+          }
+        } else {
+          this.selectedSuggestionPackage = this.suggestionPackages[0];
+        }
         this.initSuggestionPackage();
       }
     });

@@ -38,7 +38,11 @@
 									{{ sgpack.church.names.0 }} ({{ sgpack.church.varos }})
 								</a>
 							</td>
-							<td>{{ states[sgpack.state] }}</td>
+							{% if sgpack.state == "PENDING" %}
+								<td><a href="/templom/{{ sgpack.church.id }}/javaslatok?packageId={{ sgpack.id }}">{{ states[sgpack.state] }}</a></td>
+							{% else %}
+								<td>{{ states[sgpack.state] }}</td>
+							{% endif %}
 						</tr>
 					{% endfor %}
 				</table>
