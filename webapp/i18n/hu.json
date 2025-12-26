@@ -39,7 +39,8 @@
     "TH": "Nagycsütörtök",
     "FR": "Nagypéntek",
     "SA": "Húsvéti vigília",
-    "SU": "Húsvétvasárnap"
+    "SU": "Húsvétvasárnap",
+    "MO": "Húsvéthétfő"
   },
   "ADD_NEW_MASS": "Új liturgia rögzítése",
   "EDIT_MASS": "Meglévő liturgia szerkesztése",

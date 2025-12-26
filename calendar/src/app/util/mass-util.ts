@@ -449,6 +449,7 @@ export class MassUtil {
       case Day.FR: return EasterDay.FR;
       case Day.SA: return EasterDay.SA;
       case Day.SU: return EasterDay.SU;
+      case Day.MO: return EasterDay.MO;
     }
 
     return null;
@@ -460,6 +461,7 @@ export class MassUtil {
       case EasterDay.FR: return Day.FR;
       case EasterDay.SA: return Day.SA;
       case EasterDay.SU: return Day.SU;
+      case EasterDay.MO: return Day.MO; 
     }
   }
 
