@@ -316,13 +316,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
             }
 
             this.calEvents = this.calEvents.filter(event => event.extendedProps.massId !== this.selectedMassId);
-
-            this.calEvents.push(
-              ...MassUtil.createCalendarEvent(mass, this.periodService.generatedPeriods$.getValue(), this.deletedDates.get(mass.id))
-            );
-
-            this.calendarComponent.getApi().removeAllEvents();
-            this.calendarComponent.getApi().addEventSource(this.calEvents);
+            this.refreshCalendarAndMassList();
           }
         }
       }
@@ -335,8 +329,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       }
 
       this.calEvents = this.calEvents.filter(event => event.extendedProps.massId !== this.selectedMassId);
-      this.calendarComponent.getApi().removeAllEvents();
-      this.calendarComponent.getApi().addEventSource(this.calEvents);
+      this.refreshCalendarAndMassList();
 
     } else if(result === DialogResponse.EVENT_VIEWER_EDIT_ALL || result === DialogResponse.EVENT_VIEWER_EDIT_ONE) {
       const editOne: boolean = result === DialogResponse.EVENT_VIEWER_EDIT_ONE;
@@ -432,8 +425,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     this.changes.set(simpleMass.id!, simpleMass);
 
     this.calEvents.push(simpleCalendarEvent);
-    this.calendarComponent.getApi().removeAllEvents();
-    this.calendarComponent.getApi().addEventSource(this.calEvents);
+    this.refreshCalendarAndMassList();
   }
 
   openFullDialog(title: string, date?: Date) {
@@ -487,8 +479,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
           this.changes.set(newSingleMass.id!, ScriptUtil.clone(newSingleMass));
           this.calEvents.push(newSingleCalendarEvent);
 
-          this.calendarComponent.getApi().removeAllEvents();
-          this.calendarComponent.getApi().addEventSource(this.calEvents);
+          this.refreshCalendarAndMassList();
 
         } else {
           const newMassId: number = this.selectedMassId ? this.selectedMassId : MassUtil.generateTmpMassId();
@@ -516,8 +507,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
 
           this.changes.set(mass.id!, ScriptUtil.clone(mass));
 
-          this.calendarComponent.getApi().removeAllEvents();
-          this.calendarComponent.getApi().addEventSource(this.calEvents);
+          this.refreshCalendarAndMassList();
         }
       }
     });
@@ -656,6 +646,22 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     }
   }
 
+  // Central helper to refresh the calendar's event source and rebuild the editable mass list when shown
+  private refreshCalendarAndMassList(): void {
+    if (this.calendarComponent && this.calendarComponent.getApi) {
+      try {
+        this.calendarComponent.getApi().removeAllEvents();
+        this.calendarComponent.getApi().removeAllEventSources();
+        this.calendarComponent.getApi().addEventSource(this.calEvents);
+      } catch (e) {
+        // ignore - calendar may not be initialized yet
+      }
+    }
+    if (this.showMassListInEdit) {
+      this.buildMassList();
+    }
+  }
+
   onResetCalendar() {
     this.spinnerService.show();
     this.changes.clear();
@@ -762,6 +768,8 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
             );
           }
         });
+        // ensure calendar UI and the editable mass list reflect the changes
+        this.refreshCalendarAndMassList();
       }
     }
     return recentlyExclusionSourcePeriodIds;
@@ -823,6 +831,8 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
             this.periodService.generatedPeriods$.getValue(),
           )
         );
+        // ensure calendar UI and the editable mass list reflect the changes
+        this.refreshCalendarAndMassList();
       }
     }
     return recentlyExcludedPeriodIds;
