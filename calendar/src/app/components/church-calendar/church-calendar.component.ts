@@ -149,6 +149,10 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     const pathname: string = (typeof window !== 'undefined' && window.location && window.location.pathname) ? String(window.location.pathname) : '';
     this.showMassListInEdit = !!this.editable || pathname.indexOf('editschedule') !== -1;
 
+    // default edit mode: enable immediately for the dedicated editschedule route,
+    // otherwise keep false so users see the confirmation dialog on first edit attempt
+    this.edit = pathname.indexOf('editschedule') !== -1;
+    
     this.userService.loadUser().subscribe(user => {
       if (user) {
         this.suggestionSenderName.setValue(user.username);

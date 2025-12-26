@@ -47,7 +47,7 @@
     <h5><b>Frissítve ill. megerősítve:</b> {{ updated }}</h5>
 
     {% include '_panelcampaign.twig' with { collapsible: 'collapsed' }  %}
-s
+
     {% if miseaktiv == 1 %}
        {% include 'angularjs.twig' %}
     <small class="text-muted">
@@ -58,7 +58,7 @@ s
 
         <span id="cal-full-{{ id }}" style="display:none;">
             <br/>
-            <code>&lt;iframe src="https://{{ constant('DOMAIN') }}/templom/{{ id }}/calendar" width="320" height="480" frameborder="0" scrolling="no"&gt;&lt;/iframe&gt;</code>
+            <code>&lt;iframe src="{{ constant('DOMAIN') }}/templom/{{ id }}/calendar" width="320" height="480" frameborder="0" scrolling="no"&gt;&lt;/iframe&gt;</code>
             <br/>
             Állítsd a width/height értékeket vagy alkalmazz responsive CSS-t (pl. max-width:100%; height:auto;) a megjelenéshez.
             &nbsp;<a href="#" onclick="document.getElementById('cal-full-{{ id }}').style.display='none'; document.getElementById('cal-preview-{{ id }}').style.display='inline'; return false;" title="Bezárás">bezár</a>

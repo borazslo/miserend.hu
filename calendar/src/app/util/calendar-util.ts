@@ -17,10 +17,16 @@ import {TranslateService} from '@ngx-translate/core';
 export class CalendarUtil {
 
   public static getSimpleCalendarOptions(timeZone: string): CalendarOptions {
+    // Prefer timeGridWeek when the editor is active (URL contains 'editschedule') so edit flows show week view
+    let initialView = 'listWeek';
+    if (typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.indexOf('editschedule') !== -1) {
+      initialView = 'timeGridWeek';
+    }
+
     return {
       plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, rrulePlugin],
-      initialView: 'listWeek',
-      slotDuration: '00:30',
+      initialView: initialView,
+      slotDuration: '00:20',
       allDaySlot: false, 
       // Hide the hour labels in the left time axis (prevent stacked hour strings)
       // slotLabelContent can return an object with html to override rendering
