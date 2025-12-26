@@ -17,6 +17,7 @@ class CalSuggestionPackage extends CalModel
         'sender_name',
         'sender_email',
         'sender_user_id',
+        'sender_message',
         'state',
     ];
 

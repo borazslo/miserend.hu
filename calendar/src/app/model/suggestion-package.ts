@@ -6,6 +6,7 @@ export interface SuggestionPackage {
   senderName?: string;
   senderEmail?: string;
   senderUserId?: number;
+  senderMessage?: string;
   suggestions: Suggestion[];
   state: SuggestionState;
   createdAt: Date;

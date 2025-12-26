@@ -111,6 +111,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
   suggestionSenderName: FormControl<string> = new FormControl();
   suggestionSenderEmail: FormControl<string> = new FormControl();
   suggestionSenderID: FormControl<number> = new FormControl();
+  suggestionSenderMessage: FormControl<string> = new FormControl();
 
   public calendarsTitle: string = '';
 
@@ -600,6 +601,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       senderName: this.suggestionSenderName.value,
       senderEmail: this.suggestionSenderEmail.value,
       senderUserId: this.suggestionSenderID.value,
+      senderMessage: this.suggestionSenderMessage.value,
       suggestions: SuggestionUtil.generateSuggestions(this.masses, this.changes, this.deletedMasses),
       state: SuggestionState.PENDING,
       createdAt: new Date()

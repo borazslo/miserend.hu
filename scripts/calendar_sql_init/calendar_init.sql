@@ -68,6 +68,7 @@ CREATE TABLE miserend.cal_suggestion_packages (
                                                   sender_name VARCHAR(255),
                                                   sender_email VARCHAR(255),
                                                   sender_user_id BIGINT UNSIGNED,
+                                                  sender_message TEXT NULL,
                                                   state ENUM('ACCEPTED', 'REJECTED', 'PENDING') DEFAULT 'PENDING',
                                                   created_at TIMESTAMP NULL DEFAULT NULL,
                                                   updated_at TIMESTAMP NULL DEFAULT NULL

@@ -272,6 +272,7 @@ class Suggestions extends \Html\Calendar\CalendarApi
                 'sender_name' => $input['senderName'] ?? null,
                 'sender_email' => $input['senderEmail'] ?? null,
                 'sender_user_id' => $input['senderUserId'] ?? null,
+                'sender_message' => $input['senderMessage'] ?? null,
                 'state' => $input['state'] ?? 'PENDING',
                 'created_at' => $input['created_at'] ?? null,
             ]);

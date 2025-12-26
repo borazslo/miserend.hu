@@ -66,6 +66,11 @@
           <mat-label>{{ 'SUGGESTION.SENDER.EMAIL' | translate }}</mat-label>
           <input matInput [formControl]="suggestionSenderEmail" />
         </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.MESSAGE' | translate }}</mat-label>
+          <textarea matInput rows="3" [formControl]="suggestionSenderMessage"></textarea>
+        </mat-form-field>
       </div>
       <div class="buttons">
         <button mat-flat-button="tonal" (click)="onResetCalendar()"> {{ 'CANCEL' | translate }}</button>

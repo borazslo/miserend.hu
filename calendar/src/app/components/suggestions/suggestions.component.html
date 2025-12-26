@@ -98,6 +98,15 @@
         }
       </fieldset>
     }
+
+    @if (selectedSuggestionPackage && selectedSuggestionPackage.id && selectedSuggestionPackage.senderMessage ) {
+      <fieldset>
+        <legend>Javaslattevő üzenete</legend>
+        <div class="event-row message-event-row">
+          {{ selectedSuggestionPackage.senderMessage }}
+        </div>
+      </fieldset>
+    }
   </div>
 
   <div class="calendar-header">
