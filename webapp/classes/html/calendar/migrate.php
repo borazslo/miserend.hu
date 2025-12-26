@@ -91,6 +91,7 @@ class Migrate extends \Html\Html {
 
                         $misek = $this->normalizeMiseLanguage($misek, $templom);
                         $misek = $this->normalizeMiseTitleAndRite($misek, $templom);
+                        $misek = $this->normalizeMiseAttributes($misek, $templom);
 
                         foreach ($misek as $mise) {
                                 
@@ -136,13 +137,16 @@ class Migrate extends \Html\Html {
                                     throw new \Exception($mise->error,35);
                                 }
 
-                                
+                                // Nem teljesen világos, hogy miért kell itt még ellenőrizni mert a normalizeMiseAttributes függvényben is megvan ez az ellenőrzés
+                                if(!isset($mise->types)) {
+                                    $mise->types = [];
+                                }
 
                                 $calmass = \Html\Calendar\Model\CalMass::create([
                                     'church_id' => $t->id,
                                     'period_id' => $period->id,
                                     'title' => $title,
-                                    'types' => [],
+                                    'types' => $mise->types,
                                     'rite' => $rite,
                                     'start_date' => $period->start_date."T".$mise->ido,
                                     'rrule' => [
@@ -794,6 +798,53 @@ class Migrate extends \Html\Html {
 
         return $return;
         
+    }
+
+
+
+    public function normalizeMiseAttributes($misek, $templom) {
+        $periods = [0,1,2,3,4,5,-1,"ps","pt"];
+        $attributes = ['csal','d','ifi','g','cs'];
+        
+        $attributeMapping = [
+            'csal' => 'FAMILY',
+            'd'    => 'STUDENT',
+            'ifi'  => 'UNIVERSITY_YOUTH',
+            'g'    => 'GUITAR',
+            'o'   => 'ORGAN',
+            'cs'   => 'SILENT'
+        ];
+
+        foreach($misek as &$mise) {            
+            $mise->types = ['ma'];
+            $types = explode(',', strtolower((string)$mise->milyen));
+            $mise->attributes = [];            
+            foreach($types as $type) {
+                $type = trim($type);                                
+                $pattern = '/^(' . implode('|', $attributes) . ')(' . implode('|', $periods) . '|)$/i';                
+                if (preg_match($pattern, $type, $m)) {                                        
+                    $mise->attributes[] = [
+                        strtolower($m[1]),
+                        isset($m[2]) ? $m[2] : null
+                    ];                    
+                }
+            } 
+
+            foreach($mise->attributes as &$attr) {
+                if($attr[1] == "" or $mise->nap2 == $attr[1]) {
+                    if(isset($attributeMapping[$attr[0]])) {                        
+                        $mise->types[] = $attributeMapping[$attr[0]];
+                    } else {
+                        throw new \Exception("Unknown attribute code '".$attr[0]."' in mise id=".$mise->id. "(templom id=".$templom->id.")", 30);
+                    }
+                } else {
+                    throw new \Exception("Mismatched attribute period in mise id=".$mise->id. "(templom id=".$templom->id.")", 31);                        
+                }
+                
+            }
+         
+            return $misek;
+        }
     }
 
     public function normalizeMiseTitleAndRite($misek, $templom) {
