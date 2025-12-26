@@ -239,6 +239,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 	/*
 	 * Frissíti az összes elasticsearch mise indexet az adatbázisból
 	 * Ehhez legenerálja az összes miseidőpontot is
+	 * !! TODO: Iszonyú overkill mindig mindent frissíteni. Optimalizálni kellene!!
 	 */
 	static function updateMasses($years = [], $tids = []) {
 		$startTime = time();
