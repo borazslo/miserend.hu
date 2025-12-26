@@ -142,7 +142,7 @@ class Migrate extends \Html\Html {
                                     $mise->types = [];
                                 }
 
-                                $calmass = \Html\Calendar\Model\CalMass::create([
+                                $calmass = \Eloquent\CalMass::create([
                                     'church_id' => $t->id,
                                     'period_id' => $period->id,
                                     'title' => $title,
@@ -704,7 +704,7 @@ class Migrate extends \Html\Html {
             throw new \Exception("Cannot map mise idoszamitas with tol=".$mise->tol." and ig=".$mise->ig);
         }
 
-        $period = \Html\Calendar\Model\CalPeriod::where('name', $periodName )->first();
+        $period = \Eloquent\CalPeriod::where('name', $periodName )->first();
         if (!$period) {
             throw new \Exception("CalPeriod '".$periodName."' not found");   
         }
@@ -734,14 +734,14 @@ class Migrate extends \Html\Html {
         }
         
         if($period->start_period_id) {
-            $start_period = \Html\Calendar\Model\CalPeriod::find($period->start_period_id);
+            $start_period = \Eloquent\CalPeriod::find($period->start_period_id);
             if(!$start_period) {
                 throw new \Exception("Start period with id ".$period->start_period_id." not found");
             }
             return $this->findPeriodStart($start_period, $year);
         }
 
-        $year_period = \Html\Calendar\Model\CalPeriodYear::where('period_id', $period->id)->where('start_year', $year)->first();
+        $year_period = \Eloquent\CalPeriodYear::where('period_id', $period->id)->where('start_year', $year)->first();
         if(!$year_period) {
             throw new \Exception("No year period found for period id ".$period->id." and year ".$year);           
         }
@@ -762,7 +762,7 @@ class Migrate extends \Html\Html {
         }
 
         if($period->end_period_id) {
-            $end_period = \Html\Calendar\Model\CalPeriod::find($period->end_period_id);
+            $end_period = \Eloquent\CalPeriod::find($period->end_period_id);
             if(!$end_period) {
                 throw new \Exception("End period with id ".$period->end_period_id." not found");
             }

@@ -2,8 +2,8 @@
 namespace Html\Calendar;
 
 use ExternalApi\ElasticsearchApi;
-use Html\Calendar\Model\CalMass;
-use Html\Calendar\Model\CalModel;
+use Eloquent\CalMass;
+use Eloquent\CalModel;
 use Html\Calendar\Http\ChangeRequest;
 use RRule\RRule;
 

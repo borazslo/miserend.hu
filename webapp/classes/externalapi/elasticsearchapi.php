@@ -277,7 +277,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 
 		foreach ($tids as $tid) {
 			$_SERVER['REQUEST_METHOD'] = false; // Egyelőre sajnos kell mert a generate az bizony a REQUEST_METHOD alapján dönt, hogy kérdez vagy mond	
-			$masses =  \Html\Calendar\Model\CalMass::where('church_id', $tid)->get()->all();
+			$masses =  \Eloquent\CalMass::where('church_id', $tid)->get()->all();
 			if (!empty($masses)) {
 				$allMasses = array_merge($allMasses, $masses);
 			}

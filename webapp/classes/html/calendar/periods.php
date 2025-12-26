@@ -4,9 +4,9 @@ namespace html\calendar;
 
 use Carbon\Carbon;
 
-use html\calendar\model\CalPeriod;
-use html\calendar\model\CalPeriodYear;
-use html\calendar\model\CalGeneratedPeriod;
+use Eloquent\CalPeriod;
+use Eloquent\CalPeriodYear;
+use Eloquent\CalGeneratedPeriod;
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
@@ -38,13 +38,13 @@ class Periods extends \Html\Calendar\CalendarApi {
                         exit();
                     }
 
-                    $existing = Model\CalPeriodYear::whereIn('start_year', $this->years)
+                    $existing = CalPeriodYear::whereIn('start_year', $this->years)
                         ->get()
                         ->map(fn($py) => $py->period_id . '-' . $py->start_year)
                         ->toArray();
 
                     // 2. Lekérjük azokat a periodusokat, amik nem kapcsolódnak másikhoz, és nem fixek minden évben
-                    $independentPeriods = Model\CalPeriod::whereNull('start_period_id')
+                    $independentPeriods = CalPeriod::whereNull('start_period_id')
                         ->whereNull('end_period_id')
                         ->whereNull('start_month_day')
                         ->whereNull('end_month_day')
@@ -68,16 +68,16 @@ class Periods extends \Html\Calendar\CalendarApi {
                     }
 
                     if (!empty($toInsert)) {
-                        Model\CalPeriodYear::insert($toInsert);
+                        CalPeriodYear::insert($toInsert);
                     }
 
-                    $periodsYear = Model\CalPeriodYear::whereIn('start_year', $this->years)->get();
+                    $periodsYear = CalPeriodYear::whereIn('start_year', $this->years)->get();
 
                     echo json_encode($periodsYear->toArray());
                 } else {
                     //ha csak simán lekérjük a periódusokat
-                    $periods = Model\CalPeriod::all();
-                    $generatedPeriods = Model\CalGeneratedPeriod::all();
+                    $periods = CalPeriod::all();
+                    $generatedPeriods = CalGeneratedPeriod::all();
 
                     $result = [
                         'periods' => $periods->toArray(),
@@ -152,7 +152,7 @@ class Periods extends \Html\Calendar\CalendarApi {
         }
 
         if (!empty($upsert)) {
-            Model\CalPeriodYear::upsert($upsert, ['id'],
+            CalPeriodYear::upsert($upsert, ['id'],
                 ['period_id', 'start_year', 'start_date', 'end_date', 'created_at', 'updated_at']);
         }
 

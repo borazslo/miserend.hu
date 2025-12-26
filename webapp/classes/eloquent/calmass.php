@@ -1,6 +1,6 @@
 <?php
 
-namespace Html\Calendar\Model;
+namespace Eloquent;
 
 class CalMass extends CalModel
 {

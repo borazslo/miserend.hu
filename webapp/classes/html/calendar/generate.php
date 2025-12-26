@@ -3,9 +3,9 @@ namespace Html\Calendar;
 
 use Carbon\Carbon;
 use ExternalApi\ElasticsearchApi;
-use Html\Calendar\Model\CalGeneratedPeriod;
-use Html\Calendar\Model\CalMass;
-use Html\Calendar\Model\CalPeriod;
+use Eloquent\CalGeneratedPeriod;
+use Eloquent\CalMass;
+use Eloquent\CalPeriod;
 
 if (!headers_sent()) {
     header("Access-Control-Allow-Origin: *");

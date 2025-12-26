@@ -223,7 +223,7 @@ class Home extends Html {
                              ->orderBy('created_at', 'asc')
                              ->get();
 
-            $this->admindashboard['suggestion_packages'] = \Html\Calendar\Model\CalSuggestionPackage::where('updated_at', '>', $user->lastlogin)
+            $this->admindashboard['suggestion_packages'] = \Eloquent\CalSuggestionPackage::where('updated_at', '>', $user->lastlogin)
                              ->orWhere('state', 'PENDING')
                              ->orderBy('created_at', 'asc')
                              ->get();

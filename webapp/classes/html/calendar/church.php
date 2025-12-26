@@ -2,7 +2,7 @@
 namespace html\calendar;
 
 use ExternalApi\ElasticsearchApi;
-use Html\Calendar\Model\CalMass;
+use Eloquent\CalMass;
 use RRule\RRule;
 
 header("Access-Control-Allow-Origin: *");

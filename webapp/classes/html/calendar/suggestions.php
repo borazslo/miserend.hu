@@ -2,9 +2,9 @@
 
 namespace Html\Calendar;
 
-use Html\Calendar\Model\CalMass;
-use Html\Calendar\Model\CalSuggestion;
-use Html\Calendar\Model\CalSuggestionPackage;
+use Eloquent\CalMass;
+use Eloquent\CalSuggestion;
+use Eloquent\CalSuggestionPackage;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Facades\Log;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Html\Calendar\Model;
+namespace Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 

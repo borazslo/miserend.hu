@@ -213,7 +213,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     public function massrules()
     {
-        return $this->hasMany('\Html\Calendar\Model\CalMass', 'church_id');
+        return $this->hasMany('\Eloquent\CalMass', 'church_id');
     }
 
     public function getLanguagesAttribute() {
@@ -235,7 +235,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     }
 
     public function suggestionPackages() {
-        return $this->hasMany('\Html\Calendar\Model\CalSuggestionPackage', 'church_id')->orderBy('created_at', 'DESC');
+        return $this->hasMany('\Eloquent\CalSuggestionPackage', 'church_id')->orderBy('created_at', 'DESC');
     }
 
     public function updateNeighbours() {
