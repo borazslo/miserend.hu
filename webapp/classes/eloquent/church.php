@@ -968,9 +968,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         
         //Nem elegáns:
         DB::table('lookup_boundary_church')->where('church_id',$this->id)->delete();
-                
-        DB::table('misek')->where('tid',$this->tid)->delete();
-        
+                        
+        // Calendar dolgok törlése
+        \Eloquent\CalMass::where('church_id', $this->id)->delete();
+        \Eloquent\CalSuggestionPackage::where('church_id', $this->id)->delete();
+
         $this->remarks()->delete();
         $this->photos()->delete();
 
