@@ -104,6 +104,11 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
 
   private calEvents: CalendarEvent[] = [];
 
+  // Loading state for events to control the empty-view text
+  private loadingEvents: boolean = false;
+  private loadedEvents: boolean = false;
+  private everHadEvents: boolean = false;
+
   selectedEvent?: any;
   selectedEventStart?: Date;
   selectedMassId?: number;
@@ -185,11 +190,10 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     // use the options without FullCalendar's built-in toolbar so the custom Angular/Material header is the only visible header
     this.calendarOptions = CalendarUtil.getSimpleCalendarOptionsWithoutHeader(timeZone);
 
-    // If we're in an editable/admin context or the URL indicates editschedule, prefer the week view as the default
-    const preferWeekView = this.editable || (typeof window !== 'undefined' && window.location && window.location.pathname && window.location.pathname.indexOf('editschedule') !== -1);
-    if (preferWeekView) {
-      this.calendarOptions.initialView = 'timeGridWeek';
-    }
+    // replace default no-events content to show loading / empty messages
+    this.calendarOptions.noEventsContent = () => {
+      return this.renderNoEventsContent();
+    };
 
     this.calendarOptions = {
       ...this.calendarOptions,
@@ -197,6 +201,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       datesSet: (arg: any) => this.onDatesSet(arg),
       // Render custom event content so we can append a language flag ant types in list views
       eventContent: (info: any) => this.renderEventContent(info),
+      noEventsContent: () => this.renderNoEventsContent(),
       ...((this.editable || this.suggestible) && {dateClick: (arg: any) => this.handleDateClick(arg)} ),
       eventDidMount:  function (info) {
         const eventDate = info.event.startStr.slice(0, 10);
@@ -631,12 +636,21 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
 
   public reLoadCalendar() {
     if (this.calendarComponent) {
+      // mark loading state so the calendar can show the 'loading' placeholder
+      this.loadingEvents = true;
+      this.loadedEvents = false;
+
       this.loadEventsIntoCalendar().then(events => {
         this.calEvents = events;
         this.calendarComponent.getApi().removeAllEvents();
         this.calendarComponent.getApi().removeAllEventSources();
         this.calendarComponent.getApi().addEventSource(events);
         this.spinnerService.hide();
+
+        // update loading flags
+        this.loadingEvents = false;
+        this.loadedEvents = true;
+        if (events && events.length > 0) this.everHadEvents = true;
 
         // rebuild the editable mass list when in edit/admin context
         if (this.showMassListInEdit) {
@@ -646,7 +660,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     }
   }
 
-  // Central helper to refresh the calendar's event source and rebuild the editable mass list when shown
+  // Ensure FullCalendar shows current calEvents and rebuild editable list when visible
   private refreshCalendarAndMassList(): void {
     if (this.calendarComponent && this.calendarComponent.getApi) {
       try {
@@ -654,7 +668,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         this.calendarComponent.getApi().removeAllEventSources();
         this.calendarComponent.getApi().addEventSource(this.calEvents);
       } catch (e) {
-        // ignore - calendar may not be initialized yet
+        // calendar not initialized yet or api error - ignore
       }
     }
     if (this.showMassListInEdit) {
@@ -1141,5 +1155,29 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     // Convert to array and sort by weight desc, and sort masses by startDate
     this.massListGrouped = Object.keys(groups).map(k => groups[parseInt(k)]).sort((a, b) => b.weight - a.weight);
     this.massListGrouped.forEach(g => g.masses.sort((x, y) => (x.startDate || '').localeCompare(y.startDate || '')));
+  }
+
+  // Build the HTML shown when no events exist in the current view
+  private renderNoEventsContent(): { html: string } | string {
+    // Priority: if still loading show "betöltés folyamatban".
+    if (this.loadingEvents && !this.loadedEvents) {
+      return { html: `<div class="fc-no-events">Betöltés folyamatban...</div>` };
+    }
+
+    // If we've loaded but there are no events in the current range
+    // Distinguish between "soha nincs esemény" and "nincs megjeleníthető esemény"
+    const hasAnySourceMasses = (this.masses && this.masses.size > 0) || (this.changes && this.changes.size > 0);
+    
+    
+    if (!this.everHadEvents && !hasAnySourceMasses) {
+      return { html: `<div class="fc-no-events">Ehhez a misézőhelyhez egyáltalán nem tartozik esemény.</div>` };
+    }
+
+    if (!this.loadedEvents) {
+      // defensive fallback
+      return { html: `<div class="fc-no-events">Ebben az időszakban nincsenek események.</div>` };
+    }
+
+    return { html: `<div class="fc-no-events">Nincs megjeleníthető esemény ebben az időszakban.</div>` };
   }
 }
