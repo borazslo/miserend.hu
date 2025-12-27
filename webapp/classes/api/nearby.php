@@ -45,7 +45,7 @@ class NearBy extends Api {
 		],
 		'whenMass' => [
 			'validation' => [
-				'enum' => ['today', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+				'enum' => ['today', 'tomorrow', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
 				['date' => []]]				
 			],
 			'description' =>  'csak az adott napi misék megjelenítése',

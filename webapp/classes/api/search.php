@@ -39,7 +39,7 @@ class Search extends Api {
         ],
         'when' => [
             'validation' => [
-                'enum' => ['today', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+                'enum' => ['today', 'tomorrow', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
                 ['date'=>[]]]
             ],
             'description' => 'csak az adott napi misék megjelenítése',
@@ -59,6 +59,7 @@ class Search extends Api {
         <ul>
         	<li>„error”: <strong>0</strong>, ha nincs hiba. <strong>1</strong>, ha van valami hiba.</li>
         	<li>„templomok”: A megtalált templomok listája. Mindegyik egy <em>templom</em> adattömb, ahogy az egy-egy templom lekérésénél láttuk.</li>
+            <li>„text” (opcionális): „error:1” esetén a hiba szöveges leírása</li>
         </ul>
         HTML;
 
@@ -73,28 +74,37 @@ class Search extends Api {
 		$offset = isset($this->input['offset']) ? $this->input['offset'] : 0;
 		$limit = isset($this->input['limit']) ? $this->input['limit'] : 10;
 		
+        $search = new \Search('masses');
+        $search->keyword($this->input['q']);				
+        if (isset($this->input['when']) && $this->input['when']) {            
+            $search->day($this->input['when']);            
+        } 
+		$results = $search->getResults($offset, $limit, true);
+            
+        $this->return = [
+            'offset' => $offset,
+            'limit' => $limit,
+            'sum' => $search->total,
+            'error' => 1,
+            'templomok' => []
+        ];
         
-		
-		
-        if (isset($this->input['when']) && $this->input['when']) {
-            $results = searchMasses(['kulcsszo' => $this->input['q'], 'mikor' => $this->input['when']], $offset, $limit);
-            $ids = array_keys($results['churches']);
-            unset($results['churches']);                                  
-        } else {
-            $results = searchChurches(['kulcsszo' => $this->input['q']], $offset, $limit);
-            $ids = [];
-            foreach ($results['results'] as $key => $result) {		
-                $ids[] = $result['id'];
-            }		
-            unset($results['results']);
-        }
-		
-		$this->return = $results;
+        $ids = array_keys($results);
+        unset($results);
 
-		if(count($ids) == 0) {
+		if(count($ids) == 0)
+        {
+            if($this->total != 0) {
+                $this->return['error'] = 1;
+                $this->return['text'] = 'Elvileg találtunk több templomot, de mégsem találtunk. Hmm.';
+                return;
+            }
+
 			$this->return['templomok'] = [];
+            $this->return['error'] = 0;
 			return;
 		}
+
 		$this->return['templomok'] = \Eloquent\Church::select()	
 			->whereIN('id',$ids)
 			->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
@@ -102,6 +112,13 @@ class Search extends Api {
                 isset($this->input['response_length']) ? $this->input['response_length'] : (  $this->fields['response_length']['default'] ? $this->fields['response_length']['default'] : false ), 
                 isset($this->input["when"]) ? $this->input["when"] : (  $this->fields['when']['default'] ? $this->fields['when']['default'] : false ));
         
+        if(count($ids) == count($this->return['templomok'])) {
+            $this->return['error'] = 0;
+        } else {
+            $this->return['error'] = 1;
+            $this->return['text'] = 'Belső hiba történt: nem sikerült minden templomot lekérni.';
+        }
+
         return;
     }
 

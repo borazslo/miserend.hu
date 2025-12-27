@@ -198,6 +198,44 @@ class Search {
     }
     
     /**
+     * day()
+     *
+     * Convenience helper that sets the search time range to a single calendar day.
+     *
+     * Accepted input values for $whenDate:
+     *  - a weekday name: 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+     *    (these are resolved to the next occurrence of that weekday as a YYYY-MM-DD date)
+     *  - the strings 'today' or 'tomorrow'
+     *  - an explicit date string in ISO format: 'YYYY-MM-DD'
+     *
+     * The function validates the resolved date and then calls $this->timeRange()
+     * with the day's full interval (00:00 - 23:59). If the input cannot be
+     * interpreted as a valid date it throws an exception.
+     *
+    * Note: api/nearby and api/search also call this function and perform their own local validation.
+    * Ensure their validation logic remains consistent with this function's expectations.
+     * 
+     * @param string $whenDate day name, 'today', 'tomorrow' or date 'YYYY-MM-DD'
+     * @throws \Exception when the provided value cannot be parsed to a valid date
+     */
+    function day($whenDate) {
+        if (in_array($whenDate, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])) {
+            $whenDate = date('Y-m-d', strtotime("next $whenDate"));
+        }
+        else if ($whenDate == 'today') {
+            $whenDate = date('Y-m-d');
+        } else if ($whenDate == 'tomorrow' ) {
+            $whenDate = date('Y-m-d', strtotime('+1 day'));
+        }
+
+        if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $whenDate)) {
+            throw new \Exception("'whenDate' should be a day or today or a date (yyyy-mm-dd).");
+        }
+                
+        $this->timeRange($whenDate."T00:00", $whenDate."T23:59");
+    }
+
+    /**
      * Execute the search and return results.
      *
      * The method builds an Elasticsearch query payload from $this->query,
