@@ -816,7 +816,7 @@ class Migrate extends \Html\Html {
         ];
 
         foreach($misek as &$mise) {            
-            $mise->types = ['ma'];
+            $mise->types = [];
             $types = explode(',', strtolower((string)$mise->milyen));
             $mise->attributes = [];            
             foreach($types as $type) {
