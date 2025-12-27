@@ -206,8 +206,7 @@ class SearchResultsMasses extends Html {
         $this->templomurlap = $templomurlap;
         $this->template = 'search/resultsmasses.twig';
         
-        $this->results = $results;        
-        printr($results);
+        $this->results = $results;                
     }
 
 }
