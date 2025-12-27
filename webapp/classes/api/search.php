@@ -94,7 +94,7 @@ class Search extends Api {
 
 		if(count($ids) == 0)
         {
-            if($this->total != 0) {
+            if($search->total != 0) {
                 $this->return['error'] = 1;
                 $this->return['text'] = 'Elvileg találtunk több templomot, de mégsem találtunk. Hmm.';
                 return;
