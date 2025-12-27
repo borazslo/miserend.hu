@@ -1,3 +1,5 @@
+{% set columns2 = true  %}
+
 {% extends "layout.twig" %}
 
 {% set pageTitle = 'Szentmise keresés | Miserend' %}
@@ -63,7 +65,16 @@
                         {% if key != 'church' %}                                                     
                             <div class="col-md-12" style="margin-bottom:4px">
                                 <span class="badge badge-primary" title="{{ item.title ~ ' ' ~ item.rite }}">{{ item.start_date }}</span>
-                                {{ item.rite }} {{ item.title }}
+                                {{ item.rite }} <strong><span class="mass-list-title">{{ item.title }}</span></strong>
+                                {% if item.readable_rrule %}
+                                    <div class="text-muted small">{{ item.readable_rrule }}</div>
+                                {% endif %}
+                                {% if item.types is iterable and item.types|length %}
+                                ->
+                                    {% for type in item.types %}
+                                        {{ type }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% endif %}
 
                                 {% if user.isadmin %}
                                     <small>{{ church.score }}</small>

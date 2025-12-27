@@ -143,53 +143,7 @@ class Home extends Html {
         foreach ($languages as $abbrev => $language) {
             $searchform['nyelv']['options'][$abbrev] = $language['name'];
         }
-
-        //group music
-        $music['na'] = '<i>meghatározatlan</i>';
-        foreach ($attributes as $abbrev => $attribute) {
-            if ($attribute['group'] == 'music')
-                $music = array($abbrev => $attribute['name']) + $music;
-        }
-        foreach ($music as $value => $label) {
-            $searchform['zene'][] = array(
-                'type' => 'checkbox',
-                'name' => "zene[]",
-                'class' => "keresourlap",
-                'value' => $value,
-                'labelback' => $label,
-                'checked' => true,
-            );
-        }
-
-        //group age
-        $age['na'] = '<i>meghatározatlan</i>';
-        foreach ($attributes as $abbrev => $attribute) {
-            if ($attribute['group'] == 'age')
-                $age = array($abbrev => $attribute['name']) + $age;
-        }
-        foreach ($age as $value => $label) {
-            $searchform['kor'][] = array(
-                'type' => 'checkbox',
-                'name' => "kor[]",
-                'class' => "keresourlap",
-                'value' => $value,
-                'checked' => true,
-                'labelback' => $label,
-            );
-        }
-
-        //group rite
-        $searchform['ritus'] = array(
-            'name' => "ritus",
-            'id' => "ritus",
-            'class' => 'keresourlap',
-            'options' => array(0 => 'mindegy')
-        );
-        foreach ($attributes as $abbrev => $attribute) {
-            if ($attribute['group'] == 'liturgy' AND isset($attribute['isitmass']))
-                $searchform['ritus']['options'][$abbrev] = $attribute['name'];
-        }
-
+      
         $searchform['ige'] = array(
             'type' => 'checkbox',
             'name' => "liturgy[]",
