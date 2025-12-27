@@ -106,6 +106,8 @@ export class AddFullEventDialogComponent {
     this.periodCtr.valueChanges.subscribe(value => {
       this.data.event.period = value;
       this.specialPeriodType = this.periodService.getPeriodById(value?.periodId)?.specialType;
+      // Ensure titles are filtered when period changes
+      this.applyTitleFilter();
     });
 
     this.filteredPeriods$ = this.periodCtr.valueChanges.pipe(
@@ -122,6 +124,9 @@ export class AddFullEventDialogComponent {
         this.singleEvent = false;
       }
     }
+
+    // Apply initial filtering of titles based on the current mode/period
+    this.applyTitleFilter();
   }
 
   onSave(): void {
@@ -191,12 +196,16 @@ export class AddFullEventDialogComponent {
     } else {
       this.data.event.renum = Renum.EVERY_WEEK;
     }
+    // titles may need to be refreshed when recurrence mode changes
+    this.applyTitleFilter();
   }
 
   onRiteChange() {
     this.titles = MassUtil.getTitles(this.data.event.rite);
     this.data.event.title = this.titles && this.titles.length > 0 ? this.translateService.instant(this.titles.at(0)!) : "";
     this.data.event.types = [];
+    // titles may have to be filtered depending on the selected period / recurrence mode
+    this.applyTitleFilter();
   }
 
   onStartTimeChange() {
@@ -232,11 +241,6 @@ export class AddFullEventDialogComponent {
   onSelectedEasterDayChange() {
     this.easterDayError = false;
 
-    console.log('AddFullEventDialogComponent.onSelectedEasterDayChange invoked', {
-      selectedEasterDay: this.selectedEasterDay,
-      rite: this.data.event.rite
-    });
-
     // If Roman Catholic, pick a sensible default title key for the selected Easter-related day
     if (this.data.event.rite === Rite.ROMAN_CATHOLIC && this.selectedEasterDay) {
       let titleKey = '';
@@ -269,6 +273,34 @@ export class AddFullEventDialogComponent {
 
   displayPeriod(period: GeneratedPeriod | null): string {
     return period ? period.name : '';
+  }
+
+  // Filter out Easter-specific titles when in recurring mode and the selected period is NOT an Easter period
+  private applyTitleFilter(): void {
+    // Re-load the canonical list of titles for the current rite
+    const originalTitles = MassUtil.getTitles(this.data.event.rite) || [];
+    this.titles = [...originalTitles];
+
+    if (this.titles.length === 0) return;
+
+    const removals = [
+      'MASS_TITLE.TRADITIONAL_MASS_OF_THE_LORD_S_SUPPER',
+      'MASS_TITLE.TRADITIONAL_GOOD_FRIDAY_LITURGY',
+      'MASS_TITLE.TRADITIONAL_EASTER_VIGIL',
+      'MASS_TITLE.MASS_OF_THE_LORD_S_SUPPER',
+      'MASS_TITLE.GOOD_FRIDAY_LITURGY',
+      'MASS_TITLE.EASTER_VIGIL'
+    ];
+
+    // If not a single event (i.e. recurring) AND the selected period isn't Easter, remove Easter-specific titles
+    const isEasterPeriod = this.specialPeriodType === SpecialType.EASTER;
+    if (!this.singleEvent && !isEasterPeriod) {
+      this.titles = this.titles.filter(t => !removals.includes(t));
+      // If the currently selected title was removed, reset to first available
+      if (this.data.event.title && removals.includes(this.data.event.title)) {
+        this.data.event.title = this.titles && this.titles.length > 0 ? this.translateService.instant(this.titles[0]) : '';
+      }
+    }
   }
 
   protected readonly RiteMassTypes = RiteMassTypes;
