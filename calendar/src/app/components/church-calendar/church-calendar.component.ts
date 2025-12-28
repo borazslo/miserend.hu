@@ -1086,14 +1086,17 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     }
 
     // groups now carry additional optional metadata for header rendering
+    // key: groupId (period id or 0 for no period)
     const groups: {[key: number]: {weight: number, periodName: string, masses: any[], startMonthDay?: string | null, endMonthDay?: string | null, startPeriodName?: string | null, endPeriodName?: string | null, color?: string | null}} = {};
 
     combined.forEach(m => {
       const period = m.periodId ? this.periodService.getPeriodById(m.periodId) : null;
+      // group by period id when available, otherwise groupId = 0
+      const groupId = period && period.id ? period.id : 0;
       const weight = period && period.weight ? period.weight : 0;
       const pname = period && period.name ? period.name : '';
 
-      if (!groups[weight]) {
+      if (!groups[groupId]) {
         // try to fetch a representative generated period to obtain a color
         let color: string | null = null;
         if (period && period.id) {
@@ -1103,7 +1106,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
           }
         }
 
-        groups[weight] = {
+        groups[groupId] = {
           weight: weight,
           periodName: pname,
           masses: [],
@@ -1115,7 +1118,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         };
       } else {
         // fill missing group metadata from other masses' periods if available
-        const g = groups[weight];
+        const g = groups[groupId];
         if ((!g.color || g.color === null) && period && period.id) {
           const gen = this.periodService.getGeneratedPeriodsByPeriodId(period.id);
           if (Array.isArray(gen) && gen.length > 0) {
@@ -1139,11 +1142,12 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       const flagMap: Record<string,string> = { hu: '🇭🇺', en: '🇬🇧', de: '🇩🇪', sk: '🇸🇰', ro: '🇷🇴' };
       const flag = flagMap[m.lang] || (m.lang ? String(m.lang).toUpperCase() : '');
 
-      groups[weight].masses.push({
+      groups[groupId].masses.push({
         id: m.id,
         title: m.title,
         rite: m.rite,
         startDate: m.startDate,
+        periodId: m.periodId,
         rrule: m.rrule,
         readableRRule: this.getReadableRRule(m),
         lang: m.lang,
