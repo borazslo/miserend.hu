@@ -6,9 +6,14 @@ use ExternalApi\ElasticsearchApi;
 class Search {
 
     public $query =  ["bool" => ["must" => [], "must_not" => []]];
+    public $sort = [];
     public $total = 0; // Találatok száma
     public $filters = []; 
     public $massOrChurch = 'church';
+    public $pitId = false; 
+    private $pit_keepAlive;
+    public $search_after = false;    
+    private $index;
     
     /**
      * Constructor
@@ -29,10 +34,12 @@ class Search {
             case 'mass':
             case 'masses':
                 $this->massOrChurch = 'mass';
+                $this->index = "mass_index";
                 break;
             case 'church':
             case 'churches':
                 $this->massOrChurch = 'church';
+                $this->index = "churches";
                 break;
             default:
                 throw new Exception("Invalid massOrChurch parameter: " . $massOrChurch);
@@ -235,6 +242,10 @@ class Search {
         $this->timeRange($whenDate."T00:00", $whenDate."T23:59");
     }
 
+    function addSortBy($field, $order = 'asc') {
+        $this->sort[] = [ $field => [ "order" => $order ] ];
+    }
+
     /**
      * Execute the search and return results.
      *
@@ -262,19 +273,36 @@ class Search {
             ],
             "query" => $this->query,
             "from"  => $from,
-            "size"  => $size                 
+            "size"  => $size,
+            "track_total_hits" => true
         ];
+
+        // Nagy adatkupacoknál jobb PIT-et nyitni ( openPit() ) és azt használva kérdezgetni le
+        if ($this->pitId) {
+            $esQuery['pit'] = [
+                'id' => $this->pitId,
+                'keep_alive' => $this->pit_keepAlive
+            ];
+            if($this->search_after != false ) {
+                $esQuery['search_after'] = $this->search_after;
+                $esQuery['from'] = 0;
+            }
+            $url = '_search';
+        } else {
+            $url = $this->index.'/_search';
+        }
+        
 
 
         if($this->massOrChurch === 'mass') {
-            $index = "mass_index";
+            
             $esQuery['sort'] = [
                 [ "_score" =>  [ "order" => "desc" ] ],
                 [ "start_date" =>  [ "order" => "asc" ] ],
                 [ "church_id" => [ "order" => "asc" ] ]
             ];        
         } else if ($this->massOrChurch === 'church') {
-            $index = "churches";
+            
             $esQuery['sort'] = [
                 [ "_score" =>  [ "order" => "desc" ] ],
                 [ "nev.keyword" =>  [ "order" => "asc" ] ]            
@@ -283,21 +311,67 @@ class Search {
 
         $elastic = new ElasticSearchApi();
         $elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "GET");
-        $elastic->buildQuery($index.'/_search', json_encode($esQuery));
+        $this->rawQuery = json_encode($esQuery);
+        $elastic->buildQuery($url, json_encode($esQuery));
         $elastic->run();
 
         $result = [];   
 
         if (isset($elastic->jsonData->hits->hits)) {
+            $this->countHits = count($elastic->jsonData->hits->hits);
             $this->total = $elastic->jsonData->hits->total->value;    
             if($this->massOrChurch === 'mass') {
                 $result = $this->prepareMassesResults($elastic->jsonData->hits->hits, $groupByChurch);
             } else if ($this->massOrChurch === 'church') {
                 $result = $this->prepareChurchesResults($elastic->jsonData->hits->hits);
+            }                        
+            $lastHit = end($elastic->jsonData->hits->hits);
+            if($lastHit) {
+                $this->search_after = $lastHit->sort;
             }
+            
         }
 
         return $result;
+    }
+
+    public function openPit($keepAliveTime) {
+        $this->pit_keepAlive = $keepAliveTime;
+
+        $elastic = new ElasticSearchApi();
+        $elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "POST");
+        $elastic->buildQuery($this->index.'/_pit?keep_alive='.$this->pit_keepAlive);
+        $elastic->run();
+
+        if (isset($elastic->jsonData->id)) {
+            $this->pitId = $elastic->jsonData->id;                        
+        } else {
+            throw new Exception("Failed to open PIT: " . $elastic->error);
+        }
+        return true;
+    }
+
+    public function closePit($pitId = false) {
+        if (!$pitId) {
+            $pitId = $this->pitId;
+        }
+        if (!$pitId) {
+            throw new Exception("No PIT ID provided or opened.");
+        }
+
+        $elastic = new ElasticSearchApi();
+        $elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "DELETE");
+        $elastic->buildQuery('_pit', json_encode(['id' => [$pitId]]));
+        $elastic->run();
+printr($elastic); 
+        if (isset($elastic->jsonData->succeeded) && $elastic->jsonData->succeeded == true) {
+            if ($pitId == $this->pitId) {
+                $this->pitId = false;
+            }
+            return true;
+        } else {
+            throw new Exception("Failed to close PIT: " . $elastic->error);
+        }
     }
 
     private function prepareMassesResults($hits, $groupByChurch) {

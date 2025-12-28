@@ -16,7 +16,9 @@ class Periods extends \Html\Calendar\CalendarApi {
 
     private array $years;
 
-    public function __construct($path) {
+    public $format = 'json';
+
+    public function __construct($path, $format = 'json') {
         global $user;
 
         $this->years = [
@@ -25,11 +27,13 @@ class Periods extends \Html\Calendar\CalendarApi {
             Carbon::now()->year + 1
         ];
 
+        $this->format = $format;
+
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'OPTIONS':
                 http_response_code(200);
                 exit();
-            case 'GET':
+            case 'GET':                
                 //ha szerkeszteni is akarjuk, lekérjük az időszak éveket +- 1 évre
                 if (!empty($path[0]) && $path[0] === 'edit') {
 
@@ -84,7 +88,10 @@ class Periods extends \Html\Calendar\CalendarApi {
                         'generatedPeriods' => $generatedPeriods->toArray()
                     ];
 
-                    echo json_encode($result);
+                    if($this->format == 'json')
+                        echo json_encode($result);
+                    else
+                        $this->result = $result;                        
                 }
                 break;
             case 'POST':
