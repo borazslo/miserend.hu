@@ -3,7 +3,7 @@
 namespace Html\Church;
 
 use Eloquent\CalMass;
-use Eloquent\Church as ChurchModel;
+use Eloquent\Church ;
 
 class Ical extends \Html\Html {
 
@@ -15,10 +15,15 @@ class Ical extends \Html\Html {
         $tid = (int)$path[0];
 
         // Fetch church and masses
-        $church = ChurchModel::find($tid);
+        $church = Church::find($tid);
+
+        $_SERVER['REQUEST_METHOD'] = 'GET'; // Sajnos a Periods az még nem erre van kitalálva, ezért kell itt ez
+        $periodsClass = new \html\calendar\Periods('generate','array');
+        $generatedPeriods = $periodsClass->result;
         $masses = CalMass::where('church_id', $tid)->get()->toArray();
 
-        $ical = $this->generateIcal($masses, $church, $tid);
+                
+        $ical = $this->generateIcal($masses, $generatedPeriods, $church, $tid);
 
         // Output headers for .ics
         header('Content-Type: text/calendar; charset=utf-8');
@@ -68,7 +73,121 @@ class Ical extends \Html\Html {
         return implode(';', $parts);
     }
 
-    private function generateIcal(array $masses, $church, int $churchId): string {
+    private function createCalendarEvent($mass, $periods, $deletedDates) {
+        $events = [];
+
+        printr($periods);
+        exit;
+
+        // normalize keys: support both snake_case and camelCase
+        $get = function($k, $default=null) use ($mass) {
+            if (isset($mass[$k])) return $mass[$k];
+            $alt = str_replace('_', '', $k);
+            if (isset($mass[$alt])) return $mass[$alt];
+            $alt2 = preg_replace_callback('/([A-Z])/', function($m){ return '_' . strtolower($m[1]); }, $k);
+            if (isset($mass[$alt2])) return $mass[$alt2];
+            return $default;
+        };
+
+        $rrule = $get('rrule', null);
+        if (is_string($rrule)) {
+            $decoded = json_decode($rrule, true);
+            if (json_last_error() === JSON_ERROR_NONE) $rrule = $decoded;
+        }
+
+        $exdate = $get('exdate', null);
+        if (is_string($exdate)) {
+            $decoded = json_decode($exdate, true);
+            if (json_last_error() === JSON_ERROR_NONE) $exdate = $decoded;
+        }
+
+        $experiod = $get('experiod', null);
+        if (is_string($experiod)) {
+            $decoded = json_decode($experiod, true);
+            if (json_last_error() === JSON_ERROR_NONE) $experiod = $decoded;
+        }
+
+        $duration = $get('duration', null);
+        if (is_string($duration)) {
+            $decoded = json_decode($duration, true);
+            if (json_last_error() === JSON_ERROR_NONE) $duration = $decoded;
+        }
+
+        // recurring case: rrule + period_id
+        $periodId = $get('period_id', $get('periodId', null));
+        if (!empty($rrule) && !empty($periodId)) {
+            // load generated periods for this period id
+            $genPeriods = \Eloquent\CalGeneratedPeriod::where('period_id', $periodId)->get()->toArray();
+            foreach ($genPeriods as $gp) {
+                // clone rrule
+                $r = is_array($rrule) ? $rrule : (array)$rrule;
+                // attach exrule from experiod if present
+                $exrule = [];
+                if (!empty($experiod) && is_array($experiod)) {
+                    foreach ($experiod as $exPid) {
+                        $fps = \Eloquent\CalGeneratedPeriod::where('period_id', $exPid)->get()->toArray();
+                        foreach ($fps as $fp) {
+                            // dtstart: fp.start_date + time part of original rrule.dtstart
+                            $timeSuffix = '';
+                            if (!empty($r['dtstart']) && strlen($r['dtstart']) > 10) {
+                                $timeSuffix = substr($r['dtstart'], 10);
+                            }
+                            $exrule[] = [
+                                'dtstart' => ($fp['start_date'] ?? '') . $timeSuffix,
+                                'until' => ($fp['end_date'] ?? ''),
+                                'freq' => 'daily'
+                            ];
+                        }
+                    }
+                }
+
+                // set rrule dtstart to period start + time suffix
+                $timeSuffix = '';
+                if (!empty($r['dtstart']) && strlen($r['dtstart']) > 10) {
+                    $timeSuffix = substr($r['dtstart'], 10);
+                }
+                $r['dtstart'] = ($gp['start_date'] ?? '') . $timeSuffix;
+                if (!empty($r['until'])) {
+                    $r['until'] = ($gp['end_date'] ?? $r['until']);
+                }
+
+                $evt = [];
+                $evt['id'] = $get('id', null);
+                $evt['title'] = $get('title', '');
+                $evt['rrule'] = $r;
+                if (!empty($duration)) $evt['duration'] = $duration;
+                if (!empty($exdate)) $evt['exdate'] = $exdate;
+                if (!empty($exrule)) $evt['exrule'] = $exrule;
+                $evt['startDate'] = $r['dtstart'];
+                $evt['color'] = $gp['color'] ?? null;
+                $evt['comment'] = $get('comment', '');
+
+                $events[] = $evt;
+            }
+        } else {
+            // single event fallback
+            $start = $get('startDate', $get('start_date', null));
+            if (empty($start)) return $events;
+            $evt = [];
+            $evt['id'] = $get('id', null);
+            $evt['title'] = $get('title', '');
+            $evt['startDate'] = $start;
+            $evt['rrule'] = [
+                'dtstart' => $start,
+                'freq' => 'daily',
+                'count' => 1
+            ];
+            $evt['exdate'] = is_array($exdate) ? $exdate : [];
+            $evt['exrule'] = [];
+            if (!empty($duration)) $evt['duration'] = $duration;
+            $evt['comment'] = $get('comment', '');
+            $events[] = $evt;
+        }
+
+        return $events;
+    }
+
+    private function generateIcal(array $masses, $periods, $church, int $churchId): string {
         $lines = [];
         $lines[] = 'BEGIN:VCALENDAR';
         $lines[] = 'VERSION:2.0';
@@ -79,7 +198,15 @@ class Ical extends \Html\Html {
         $dtstamp = gmdate('Ymd\\THis\\Z');
         $counter = 1;
 
-        foreach ($masses as $m) {
+        $tmp = [];
+        foreach ($masses as $m) { 
+            $tmp = array_merge($tmp, $this->createCalendarEvent($m, $periods, false));
+        }
+
+        foreach ($tmp as $m) {
+
+
+
             if (empty($m['startDate'])) continue;
             $evStart = $m['startDate'];
 
