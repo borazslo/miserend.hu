@@ -21,6 +21,8 @@
         {% for filter in filters %}
             <span class="alap"><img src="/img/negyzet_lila.gif" align="absmidle"> {{ filter }}</span><br/>
         {% endfor %}
+    {% else %}
+        <span class="alap">Nincsenek szűrők</span><
     {% endif %}
     <br/>
 
@@ -64,15 +66,24 @@
                     {% for key, item in result %}                    
                         {% if key != 'church' %}                                                     
                             <div class="col-md-12" style="margin-bottom:4px">
-                                <span class="badge badge-primary" title="{{ item.title ~ ' ' ~ item.rite }}">{{ item.start_date }}</span>
-                                {{ item.rite }} <strong><span class="mass-list-title">{{ item.title }}</span></strong>
+                                
+                                <span class="badge badge-primary" title="{{ item.title ~ ' ' ~ item.rite }}">{{ item.start_date|miserend_date('H:i') }}</span>
+                                
+                                <img src="/cal_images/types/{{ item.rite|lower }}.svg" alt="{{ item.rite|trans }}" title="{{ item.rite|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+
+                                <strong><span class="mass-list-title">{{ item.title }}</span></strong>
+
                                 {% if item.readable_rrule %}
                                     <div class="text-muted small">{{ item.readable_rrule }}</div>
                                 {% endif %}
-                                {% if item.types is iterable and item.types|length %}
-                                ->
+
+                                {% if item.lang and item.lang != 'hu' %}
+                                    <img src="/cal_images/flags/{{ item.lang|lower }}.svg" alt="{{ item.lang|trans }}" title="{{ item.lang|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+                                {% endif %}
+                                {% if item.types is iterable and item.types|length %}                                
                                     {% for type in item.types %}
-                                        {{ type }}{% if not loop.last %}, {% endif %}
+                                        <img src="/cal_images/types/{{ type|lower }}.png" alt="{{ type|trans }}" title="{{ type|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+                                        {% if not loop.last %} {% endif %}
                                     {% endfor %}
                                 {% endif %}
 

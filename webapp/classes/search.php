@@ -297,8 +297,8 @@ class Search {
         if($this->massOrChurch === 'mass') {
             
             $esQuery['sort'] = [
-                [ "_score" =>  [ "order" => "desc" ] ],
                 [ "start_date" =>  [ "order" => "asc" ] ],
+                [ "_score" =>  [ "order" => "desc" ] ],                
                 [ "church_id" => [ "order" => "asc" ] ]
             ];        
         } else if ($this->massOrChurch === 'church') {

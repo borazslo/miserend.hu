@@ -39,40 +39,14 @@ class SearchResultsMasses extends Html {
             $search->keyword($_REQUEST['kulcsszo']);
         }
     
-        // Time range search
-        $mikor = $_REQUEST['mikor'];
-        $mikordatum = $_REQUEST['mikordatum'];
-        if ($mikor != 'x')
-            $mikordatum = $mikor;
-        $mikor2 = isset($_REQUEST['mikor2']) ? $_REQUEST['mikor2'] : false;
-        $mikorido = $_REQUEST['mikorido'];
-        if ($mikor2 == 'de') {
-            $hourFrom = "00:00";
-            $hourTo = "11:59";
-        } elseif ($mikor2 == 'du') {
-            $hourFrom = "12:00";
+        // Time range search       
+        if(isset($_REQUEST['mikordatum']) AND $_REQUEST['mikordatum'] != '') {            
+            $mikordatum = $_REQUEST['mikordatum'];         
+            $hourFrom = ( isset($_REQUEST['mikortol']) and $_REQUEST['mikortol'] != '') ? $_REQUEST['mikortol'] : '00:00';
             $hourTo = "23:59";
-        } elseif ($mikor2 == 'x') {
-            [$hourFrom, $hourTo] = explode('-', $mikorido);
-            // normalize times to HH:MM (e.g. "8:00" -> "08:00")
-            $hourFrom = trim($hourFrom);
-            $hourTo = trim($hourTo);
-
-            $fixTime = function ($t) {
-                if ($t === '' || $t === null) return $t;
-                $parts = explode(':', $t, 2);
-                $h = isset($parts[0]) ? str_pad((int)$parts[0], 2, '0', STR_PAD_LEFT) : '00';
-                $m = isset($parts[1]) ? str_pad((int)$parts[1], 2, '0', STR_PAD_LEFT) : '00';
-                return $h . ':' . $m;
-            };
-            $hourFrom = $fixTime($hourFrom);
-            $hourTo = $fixTime($hourTo);
-        } else {
-            $hourFrom = "00:00";
-            $hourTo = "23:59";
-        }                
-        $search->timeRange($mikordatum."T".$hourFrom.":00", $mikordatum."T".$hourTo.":00");
-
+            $search->timeRange($mikordatum."T".$hourFrom.":00", $mikordatum."T".$hourTo.":00");
+        } else 
+            $search->timeRange(date('Y-m-d')."T00:00", date('Y-m-d',strtotime("+ 6 days"))."T23:59");
         // Languages
         $nyelv = isset($_REQUEST['nyelv']) ? $_REQUEST['nyelv'] : false;        
         if (!empty($nyelv)) {
@@ -174,8 +148,10 @@ class SearchResultsMasses extends Html {
 
 
         $min = isset($_REQUEST['min']) ? $_REQUEST['min'] : 0;       
-		$leptet = isset($_REQUEST['leptet']) ? $_REQUEST['leptet'] : 25;		        
-        $results = $search->getResults($min, $leptet, true);
+		$leptet = isset($_REQUEST['leptet']) ? $_REQUEST['leptet'] : 25;	
+        $offset = $this->pagination->take * $this->pagination->active;
+        $limit = $this->pagination->take;     	        
+        $results = $search->getResults($offset, $limit, true);
                         
         if ($search->total != 0) {                   
             foreach ($results as &$result) {
@@ -186,14 +162,13 @@ class SearchResultsMasses extends Html {
         //Data for pagination
 		$params = [];
 		foreach( ['varos','tavolsag','hely','kulcsszo','gorog','tnyelv','espker','ehm',
-            'mikor', 'mikordatum', 'mikor2','mikorido','nyelv','zene','kor','ritus','tnyelv'] as $param ) {
+            'mikordatum', 'mikortol','nyelv','zene','kor','ritus','tnyelv'] as $param ) {
 		
 			if( isset($_REQUEST[$param]) AND $_REQUEST[$param] != ''  AND $_REQUEST[$param] != '0' ) {
 				$params[$param] = $_REQUEST[$param];
 			}
 		}
-		
-        $params['q'] = 'SearchResultsMasses';
+		$params['q'] = 'SearchResultsMasses';
         $url = \Pagination::qe($params, '/?' );
         $this->pagination->set($search->total, $url );
 

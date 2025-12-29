@@ -9,6 +9,20 @@
 		{% set columns2 = true  %}		
 {% endif %}
 
+{# Macro to render a type-toggle button. Usage: {{ macros.type_button('FAMILY', 'Family') }} #}
+{% macro type_button(type, special=false) %}
+    <button type="button" class="btn btn-outline-secondary type-toggle{% if special %} special-toggle{% endif %}" data-type="{{ type }}" data-state="0"{% if special %} data-special="true"{% endif %}>
+        {% if not special %}
+            <img src="/cal_images/types/{{ type|lower }}.png" title="{{ type|trans }}" alt="{{ type|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+        {% else %}            
+            <img src="/cal_images/types/{{ type|lower }}.svg" title="{{ type|trans }}" alt="{{ type|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+            {{ type|trans }}
+        {% endif %}            
+            
+    </button>
+{% endmacro %}
+
+{% import _self as macros %}
 
 {% block extraHead %}
     <style>
@@ -102,30 +116,38 @@
                 <div class="form-group row">
                     <label class="col-sm-4 control-label">Mise</label>
                     <div class="col-sm-6">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                {{ forms.select(searchform.mikor) }}
+                        <div class="btn-group btn-group-toggle" role="group" id="mass_quick_group">
+                            <button type="button" class="btn btn-light mass-quick" data-value="today">Ma</button>
+                            <button type="button" class="btn btn-light mass-quick" data-value="tomorrow">Holnap</button>
+                            <button type="button" class="btn btn-light mass-quick" data-value="sunday">Vasárnap</button>
+                            <button type="button" class="btn btn-light mass-quick" data-value="date" >Adott napon</button>
+                        
+                            <!-- Time toggle button (separate control, neutral by default) -->
+                            <button type="button" class="btn btn-light time-toggle" id="time_toggle" style="margin-left:30px">Óra</button>
+                            <div id="time_controls" style="display:none; margin-top:6px;">
+                                <select id="mikorido_hour" class="form-control" style="display:inline-block; width:5rem;">
+                                    {% for h in 0..23 %}
+                                        <option value="{{ '%02d'|format(h) }}" {% if h == 10 %}selected{% endif %}>{{ '%02d'|format(h) }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select id="mikorido_min" class="form-control" style="display:inline-block; width:5rem; margin-left:1px;">
+                                    <option value="00" selected>00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                                <span style="margin-left:8px; vertical-align:middle">-től</span>
                             </div>
-                            <div class="form-group">
-                                {{ forms.input(searchform.mikordatum) }}
-                            </div>
-                        </div> 
+                        </div>
+                        <!-- Offscreen datepicker input used to pick the date -->
+                        <!-- Hidden inputs submitted with the form -->
+                        <input type="hidden" name="mikor" id="mikor" value="">
+                        <input type="hidden" name="mikordatum" id="mikordatum" value="">
+                        <input type="hidden" name="mikortol" id="mikortol" value="">
+                        <!-- Offscreen datepicker input used to pick the date -->
+                        <input type="text" id="mass_datepicker" class="datepicker form-control" style="display:none; margin-top:6px; width:auto;" />
                     </div>
-                    <div class="cols-sm-2" style="text-align:right">
-                    <span id="form_mass_getdetails">{{ icons.icon('fa-plus', 'fa-2xs circle') }}</span></div>      
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 control-label"></label>
-                    <div class="col-sm-8">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                {{ forms.select(searchform.mikor2) }}
-                            </div>
-                            <div class="form-group">
-                                {{ forms.input(searchform.mikorido) }}
-                            </div>
-                        </div> 
-                    </div>
+                    <div class="cols-sm-2" style="text-align:right"><span id="form_mass_getdetails">{{ icons.icon('fa-plus', 'fa-2xs circle') }}</span></div>
                 </div>
             </div>
 
@@ -144,28 +166,28 @@
                 <div class="form-group row">
                     <label class="col-sm-4 control-label">Típusok</label>
                     <div class="col-sm-8">
-                        <div class="btn-group" role="group" aria-label="Type filters" id="type_Roman_catholic_Group">
-                            <button type="button" class="btn btn-outline-secondary type-toggle special-toggle" data-type="ROMAN_CATHOLIC" data-state="0" data-special="true">Roman Catholic</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="FAMILY" data-state="0">Family</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="STUDENT" data-state="0">Student</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="UNIVERSITY_YOUTH" data-state="0">University youth</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="GUITAR" data-state="0">Guitar</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="ORGAN" data-state="0">Organ</button>
+                        <div class="btn-group" role="group" aria-label="Type filters" id="type_Roman_catholic_Group">                            
+                            {{ macros.type_button('ROMAN_CATHOLIC',true)}}
+                            {{ macros.type_button('FAMILY') }}
+                            {{ macros.type_button('STUDENT') }}
+                            {{ macros.type_button('UNIVERSITY_YOUTH') }}
+                            {{ macros.type_button('GUITAR') }}
+                            {{ macros.type_button('ORGAN') }}
                         </div>
 
                         {# second group under the first: GREEK_CATHOLIC + FAMILY, STUDENT, UNIVERSITY_YOUTH #}
-                        <div class="btn-group mt-2" role="group" aria-label="Type filters 2"  id="type_Greek_catholic_Group">
-                            <button type="button" class="btn btn-outline-secondary type-toggle special-toggle" data-type="GREEK_CATHOLIC" data-state="0" data-special="true">Greek Catholic</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="FAMILY" data-state="0">Family</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="STUDENT" data-state="0">Student</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="UNIVERSITY_YOUTH" data-state="0">University youth</button>
+                        <div class="btn-group mt-2" role="group" aria-label="Type filters 2"  id="type_Greek_catholic_Group">                            
+                            {{ macros.type_button('GREEK_CATHOLIC', true) }}
+                            {{ macros.type_button('FAMILY') }}
+                            {{ macros.type_button('STUDENT') }}
+                            {{ macros.type_button('UNIVERSITY_YOUTH') }}
                         </div>
 
                         {# third group: TRADITIONAL + SINGER and SILENT #}
                         <div class="btn-group mt-2" role="group" aria-label="Type filters 3"  id="type_Traditional_Group">
-                            <button type="button" class="btn btn-outline-secondary type-toggle special-toggle" data-type="TRADITIONAL" data-state="0" data-special="true">Traditional</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="SINGER" data-state="0">Singer</button>
-                            <button type="button" class="btn btn-outline-secondary type-toggle" data-type="SILENT" data-state="0">Silent</button>
+                            {{ macros.type_button('TRADITIONAL',true) }}
+                            {{ macros.type_button('SINGER') }}
+                            {{ macros.type_button('SILENT') }}
                         </div>
 
                         <div style="margin-top:6px; font-size:0.9em; color:#666">Kattints a gombra: zöld = legyen (should), piros = kizárt (must_not)</div>
@@ -330,6 +352,192 @@
 
                             // update hidden inputs on init
                             updateHiddenInputs();
+                        });
+                    })(jQuery);
+                </script>
+
+                <script>
+                    (function($){
+                        // Single-select behavior for mass quick buttons
+                        function pad(n){ return n<10? '0'+n : ''+n; }
+                        function formatYMD(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+
+                        function computeDateForValue(value){
+                            var d = new Date();
+                            if(value === 'today'){
+                                // keep today
+                            } else if (value === 'tomorrow'){
+                                d.setDate(d.getDate() + 1);
+                            } else if (value === 'sunday'){
+                                var day = d.getDay(); // 0 = Sunday
+                                var diff = (7 - day) % 7; // 0 if today is Sunday
+                                d.setDate(d.getDate() + diff);
+                            }
+                            return formatYMD(d);
+                        }
+
+                        function clearMassSelection() {
+                            var $group = $('#mass_quick_group');
+                            $group.find('.mass-quick').removeClass('btn-success').addClass('btn-light');
+                            $group.find('.mass-quick[data-value="date"]').text('Adott napon');
+                            $('#mikor').val('');
+                            $('#mikordatum').val('');
+                            $("#mikortol").val('');
+                            $("#time_controls").hide();
+                            $('#time_toggle').removeClass('btn-success').addClass('btn-light');
+                        }
+
+                        function setMassSelection(value, date) {
+                            var $group = $('#mass_quick_group');
+                            $group.find('.mass-quick').removeClass('btn-success').addClass('btn-light');
+
+                            var $btn = $group.find('.mass-quick[data-value="' + value + '"]');
+                            if ($btn.length) {
+                                $btn.removeClass('btn-light').addClass('btn-success');
+                            }
+
+                            // Ensure mikor is always a YYYY-MM-DD date
+                            var dateStr = date || null;
+                            if (!dateStr) {
+                                // compute for keywords
+                                if (value === 'date') {
+                                    // no date yet
+                                    dateStr = '';
+                                } else {
+                                    dateStr = computeDateForValue(value);
+                                }
+                            }
+
+                            if (dateStr) {
+                                $('#mikor').val(dateStr);
+                                $('#mikordatum').val(dateStr);
+                            } else {
+                                $('#mikor').val('');
+                                $('#mikordatum').val('');
+                            }
+
+                            if (value === 'date' && dateStr) {
+                                $group.find('.mass-quick[data-value="date"]').text('Adott napon: ' + dateStr);
+                            } else if (value === 'date') {
+                                $group.find('.mass-quick[data-value="date"]').text('Adott napon');
+                            } else {
+                                $group.find('.mass-quick[data-value="date"]').text('Adott napon');
+                            }
+                        }
+
+                        $(function(){
+                            // Initialize the hidden datepicker (ensure regional & format)
+                            $('#mass_datepicker').datepicker({
+                                regional: 'hu',
+                                dateFormat: 'yy-mm-dd',
+                                onSelect: function(dateText) {
+                                    setMassSelection('date', dateText);
+                                    $('#mass_datepicker').hide();
+                                }
+                            });
+
+                            // If the server prefilled values, reflect them
+                            var initMikor = ($('#mikor').val() || '').toString();
+                            var initMikordatum = ($('#mikordatum').val() || '').toString();
+
+                            if (initMikordatum) {
+                                // explicit date present
+                                setMassSelection('date', initMikordatum);
+                            } else if (initMikor) {
+                                // maybe keyword or date
+                                var kw = initMikor.trim();
+                                if (kw === 'today' || kw === 'tomorrow' || kw === 'sunday') {
+                                    var computed = computeDateForValue(kw);
+                                    setMassSelection('date', computed);
+                                } else if (/^\d{4}-\d{2}-\d{2}$/.test(kw)) {
+                                    setMassSelection('date', kw);
+                                } else {
+                                    // unknown value: leave unselected
+                                }
+                            }
+
+                            // Click handler: make clicked button the only selected one
+                            $(document).on('click', '#mass_quick_group .mass-quick', function(e){
+                                e.preventDefault();
+                                var val = $(this).data('value');
+                                var $this = $(this);
+                                var already = $this.hasClass('btn-success');
+
+                                if (already) {
+                                    if (val === 'date') {
+                                        // if 'Adott napon' is already selected, reopen the datepicker to modify the date
+                                        $('#mass_datepicker').show();
+                                        $('#mass_datepicker').datepicker('show');
+                                        var existing = $('#mikordatum').val();
+                                        setMassSelection('date', existing || null);
+                                        return;
+                                    }
+                                    // toggle off for other buttons
+                                    clearMassSelection();
+                                    return;
+                                }
+
+                                if (val === 'date') {
+                                    // open the datepicker popup for first-time selection
+                                    $('#mass_datepicker').show();
+                                    $('#mass_datepicker').datepicker('show');
+                                    var existing = $('#mikordatum').val();
+                                    if (existing) setMassSelection('date', existing);
+                                    else setMassSelection('date', null);
+                                } else {
+                                    setMassSelection(val, null);
+                                }
+                            });
+                        });
+                    })(jQuery);
+                </script>
+
+                <script>
+                    (function($){
+                        // Time toggle behavior and mikorido handling
+                        function updateMikoridoFromControls() {
+                            var hh = $('#mikorido_hour').val();
+                            var mm = $('#mikorido_min').val();
+                            if (hh && mm) {
+                                $('#mikortol').val(hh + ':' + mm);
+                            } else {
+                                $('#mikortol').val('');
+                            }
+                        }
+
+                        $(function(){
+                            // toggle the time button: show/hide controls and set mikorido
+                            $(document).on('click', '#time_toggle', function(e){
+                                e.preventDefault();
+                                var $btn = $(this);
+                                var active = $btn.hasClass('btn-success');
+
+                                // If activating but no date selected yet, auto-select 'Ma'
+                                if (!active && ($('#mikordatum').val() || '') === '') {
+                                    // trigger the 'Ma' button click so mikordatum is set consistently
+                                    $('#mass_quick_group .mass-quick[data-value="today"]').trigger('click');
+                                }
+
+                                if (active) {
+                                    // deactivate
+                                    $btn.removeClass('btn-success').addClass('btn-light');
+                                    $('#time_controls').hide();
+                                    $('#mikortol').val('');
+                                } else {
+                                    // activate
+                                    $btn.removeClass('btn-light').addClass('btn-success');
+                                    $('#time_controls').show();
+                                    // ensure defaults
+                                    if (!$('#mikorido_hour').val()) $('#mikorido_hour').val('10');
+                                    if (!$('#mikorido_min').val()) $('#mikorido_min').val('00');
+                                    updateMikoridoFromControls();
+                                }
+                            });
+
+                            // update hidden mikorido when selects change
+                            $(document).on('change', '#mikorido_hour, #mikorido_min', function(){
+                                updateMikoridoFromControls();
+                            });
                         });
                     })(jQuery);
                 </script>
