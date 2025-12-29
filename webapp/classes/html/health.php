@@ -85,7 +85,15 @@ class Health extends Html {
 
 		// Health of CronJobs
 		$this->cronjobs = \Eloquent\Cron::orderBy('deadline_at','DESC')->get()->toArray();
-		
+
+		// Health of ElasticSearch database
+		$elastic = new \ExternalApi\ElasticsearchApi();
+		$elastic->query ="_cat/indices?format=json";
+		$elastic->run();		
+		if(isset($elastic->jsonData))
+			$this->elasticsearch = $elastic->jsonData;
+
+
 		// Health of ExternalApis
 		$this->externalapis = [];		
 		$apisToTest = \ExternalApi\ExternalApi::collectExternalApis();
