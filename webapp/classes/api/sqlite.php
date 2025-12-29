@@ -345,9 +345,8 @@ class Sqlite extends Api {
             'STUDENT' => 'd',
             'UNIVERSITY_YOUTH' => 'ifi',
             'GUITAR' => 'g',
-            'ORGAN' => 'o',
             'SILENT' => 'cs'
-        ];
+        ]; // Van ORGAN is, de azt nem tudja kezelni a régi miserend alkalmazás azt hiszem
         
         foreach($misek as $mass) {
             $this->massId++;
@@ -357,9 +356,9 @@ class Sqlite extends Api {
                 'nap' => 0,
                 'ido' => isset($mass->start_minutes) ? sprintf('%02d:%02d:00', (int) floor($mass->start_minutes / 60), (int) ($mass->start_minutes % 60)) : null,
                 'nyelv' => $mass->lang,
-                'milyen' => implode(',', array_map(function($t) use ($attributeMapping) {
-                    return isset($attributeMapping[$t]) ? $attributeMapping[$t] : $t;
-                }, is_array($mass->types) ? $mass->types : array_filter(array_map('trim', explode(',', (string)$mass->types))))),
+                'milyen' => implode(',', array_filter(array_map(function($t) use ($attributeMapping) {
+                    return isset($attributeMapping[$t]) ? $attributeMapping[$t] : null;
+                }, is_array($mass->types) ? $mass->types : array_filter(array_map('trim', explode(',', (string)$mass->types)))))),
             ];
 
             
@@ -367,7 +366,7 @@ class Sqlite extends Api {
              if ($this->version >= 4) {
                 $insert['datumtol'] =  date('nd', strtotime($mass->start_date));
                 $insert['datumig'] =  date('nd', strtotime($mass->start_date));
-                $insert['periodus'] = null;
+                $insert['periodus'] = 0;
                 $insert['idoszak'] = "Ezen a napon: ".date('Y-m-d', strtotime($mass->start_date));
                 $insert['suly'] = 1;
             }
