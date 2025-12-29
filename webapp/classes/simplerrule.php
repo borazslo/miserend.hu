@@ -1,9 +1,7 @@
 <?php
-namespace Html\Calendar;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Exception;
 
 class SimpleRRule
 {

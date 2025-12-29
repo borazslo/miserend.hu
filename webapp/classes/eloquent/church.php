@@ -289,23 +289,31 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     
     public function toAPIArray($length = "minimal", $whenMass = false)
     {
+
+        if($length == 'elastic') {
+            $elastic = true;
+            $length = 'medium';
+        }
+
         if($length == false) $length = "minimal";
         if ($whenMass == false ) $whenMass = date('Y-m-d');
         
-        $search = new \Search('masses');
-        $search->day($whenMass);
-        
-        $search->tids([$this->id]);
-        $masses = $search->getResults(0,10);
-                
-        $misek = [];        
-        if(isset($masses)) {
-            foreach($masses as $key => $mise) {
-                $misek[$key]['idopont'] = date('Y-m-d H:i:s', strtotime($mise->start_date));
-                $info = trim( $mise->rite." ".implode(',',$mise->types)." ".$mise->lang." ".$mise->comment);
-                if($info != '') $misek[$key]['informacio'] = $info;
-            }	            
-        }
+        $misek = [];
+        if(!$elastic) {
+            $search = new \Search('masses');
+            $search->day($whenMass);
+            
+            $search->tids([$this->id]);
+            $masses = $search->getResults(0,10);
+                    
+            if(isset($masses)) {
+                foreach($masses as $key => $mise) {
+                    $misek[$key]['idopont'] = date('Y-m-d H:i:s', strtotime($mise->start_date));
+                    $info = trim( $mise->rite." ".implode(',',$mise->types)." ".$mise->lang." ".$mise->comment);
+                    if($info != '') $misek[$key]['informacio'] = $info;
+                }	            
+            }
+        } 
 
         $adorations = [];
         $results = $this->adorations()
@@ -384,36 +392,36 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
         }
         
-        
+        if($elastic) {
+
+            // Kiegészítjük Budapest kerületekkel
+            $romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
+            
+            preg_match('/^Budapest (.*?)\. kerület$/',$return['varos'],$match);
+            if($match) {
+                $return['varos'] = [ $return['varos'], 'Budapest '.array_search($match[1], $romai).'. kerület', 'Budapest' ];
+            }
+
+            unset($return['adoraciok']);
+            unset($return['miserend_deprecated']);
+            if($return['gyontatas'] == null) {
+                $return['gyontatas'] = [];
+            }
+
+            //görög
+            if( isset($this->denomination) && $this->denomination == 'greek_catholic') {
+                $return['gorog'] = 'true';
+            } else {
+                $return['gorog'] = 'false';
+            }
+        }
 
         return $return;
     }
 
     public function toElasticArray()
     {
-
-        $church = $this->toAPIArray('medium');        
-        // Kiegészítjük Budapest kerületekkel
-		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
-		
-        preg_match('/^Budapest (.*?)\. kerület$/',$church['varos'],$match);
-        if($match) {
-            $church['varos'] = [ $church['varos'], 'Budapest '.array_search($match[1], $romai).'. kerület', 'Budapest' ];
-        }
-
-        unset($church['adoraciok']);
-        unset($church['miserend_deprecated']);
-        if($church['gyontatas'] == null) {
-            $church['gyontatas'] = [];
-        }
-		
-        //görög
-        if( isset($this->denomination) && $this->denomination == 'greek_catholic') {
-            $church['gorog'] = 'true';
-        } else {
-            $church['gorog'] = 'false';
-        }
-
+        $church = $this->toAPIArray('elastic');           
         return $church;
     }   
     

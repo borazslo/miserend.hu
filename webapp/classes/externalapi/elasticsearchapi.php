@@ -267,7 +267,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		$elastic->buildQuery('mass_index/_delete_by_query', json_encode([
 			"conflicts" => "proceed",
 			"query" => [
-				"term" => ["church_id" => $tids]
+				"terms" => ["church_id" => $tids]
 			]
 		]));
 		$elastic->run();
@@ -284,39 +284,73 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			}
 			$church = \Eloquent\Church::find($tid);
 			$churchTimezones[$tid] = $church->time_zone ?? 'Europe/Budapest';
-			$churches[$tid] = $church;
+			$churches[$tid] = $church->toElasticArray();
 		}
 
 		$debug = [];
 		$debug[] = "Talált misék száma: " . count($allMasses);
 		echo "Talált misék száma: " . count($allMasses)."<br>\n";
 
-		$generator = new \Html\Calendar\Generate();
-		$massesByChurch = $generator->generateMassInstancesForYears($allMasses,$churchTimezones, $years);
+		$massesByChurch = \Eloquent\CalMass::generateMassInstancesForYears($allMasses,$churchTimezones, $years);
 
 		foreach ($massesByChurch as $churchId => $massInstances) {
 			$debug[] = "Templom ID $churchId, generált miseidőpontok: " . count($massInstances);
-
+			echo "Templom ID $churchId, generált miseidőpontok: " . count($massInstances)."<br>\n";
 			// Debug: az első 5 generált mise megjelenítése
 			$first5 = array_slice($massInstances, 0, 10);
-			foreach ($massInstances as $mi) {
+			foreach ($first5 as $mi) {
 				$debug[] = "  - Mass ID {$mi['mass_id']}, start: {$mi['start_date']}, title: {$mi['title']}";
-			}
-			$churchData = $churches[$churchId]->toElasticArray();
-			$bulkInsert = [];
-			foreach ($massInstances as $massData) {
-				$bulkInsert[] = [
-					'index' => [
-						'_index' => 'mass_index',
-						'_id' => uniqid()
-					]
-				];
-				$massData['church'] = $churchData;
-				$bulkInsert[] = $massData;
-			}
+			}			
 
-			if (!empty($bulkInsert)) {
-				$elasticResult = $elastic->putBulk($bulkInsert);
+
+			
+			// Build and send bulk inserts in chunks of 500 when large
+			$chunkSize = 500;
+			$totalMasses = count($massInstances);
+			if ($totalMasses > $chunkSize) {
+				$offset = 0;
+				while ($offset < $totalMasses) {
+					$slice = array_slice($massInstances, $offset, $chunkSize);
+					$bulkInsert = [];
+					foreach ($slice as $massData) {
+						$bulkInsert[] = [
+							'index' => [
+								'_index' => 'mass_index',
+								'_id' => uniqid()
+							]
+						];
+						$massData['church'] = $churches[$churchId];
+						$bulkInsert[] = $massData;
+					}
+
+					if (!empty($bulkInsert)) {
+						$elasticResult = $elastic->putBulk($bulkInsert);
+						if (!$elasticResult) {
+							// optionally collect or log errors
+						}
+					}
+
+					$offset += $chunkSize;
+				}
+			} else {
+				$bulkInsert = [];
+				foreach ($massInstances as $massData) {
+					$bulkInsert[] = [
+						'index' => [
+							'_index' => 'mass_index',
+							'_id' => uniqid()
+						]
+					];
+					$massData['church'] = $churches[$churchId];
+					$bulkInsert[] = $massData;
+				}
+
+				if (!empty($bulkInsert)) {
+					$elasticResult = $elastic->putBulk($bulkInsert);
+					if ($elasticResult) {
+						// success
+					}
+				}
 			}
 		}	
 		
