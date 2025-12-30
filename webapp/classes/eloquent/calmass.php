@@ -340,7 +340,7 @@ class CalMass extends CalModel
                 if (!is_array($rrule) || empty($rrule)) {
                     
                     // throw new \Exception('Ilyennek igazából nem szabadna lennie, mert egy napos rrule-t kapnak az egyedi alkalmak. ');
-                    echo "Ilyennek igazából nem szabadna lennie, mert egy napos rrule-t kapnak az egyedi alkalmak. ".$mass->id;
+                    //echo "Ilyennek igazából nem szabadna lennie, mert egy napos rrule-t kapnak az egyedi alkalmak. ".$mass->id;
                     $rrule = [
                         "freq" => "daily",
                         "count" => 1,
