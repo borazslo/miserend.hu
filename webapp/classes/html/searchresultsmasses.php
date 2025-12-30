@@ -161,7 +161,7 @@ class SearchResultsMasses extends Html {
 
         //Data for pagination
 		$params = [];
-		foreach( ['varos','tavolsag','hely','kulcsszo','gorog','tnyelv','espker','ehm',
+		foreach( ['varos','tavolsag','hely','kulcsszo','gorog','tnyelv','espker','ehm','types','rites',
             'mikordatum', 'mikortol','nyelv','zene','kor','ritus','tnyelv'] as $param ) {
 		
 			if( isset($_REQUEST[$param]) AND $_REQUEST[$param] != ''  AND $_REQUEST[$param] != '0' ) {

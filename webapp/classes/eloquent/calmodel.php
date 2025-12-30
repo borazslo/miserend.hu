@@ -4,6 +4,13 @@ namespace Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/*
+ Ezt önmagában sehol nem használjuk. 
+ A különféle "cal"-al kezdődő eloquent modellek használják.
+ Programozástörténeti hagyaták. Át lehetne alakítani.
+ 
+*/
+
 class CalModel extends Model
 {
     protected array $excludeFromArray = ['created_at', 'updated_at'];
