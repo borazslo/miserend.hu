@@ -13,6 +13,7 @@ class SimpleRRule
     private $byWeekday;
     private $bySetpos;
     private $byWeekNo;
+    private $exDate;
     private $debugCallback;
 
     public function __construct(array $rrule, callable $debugCallback = null)
@@ -25,6 +26,7 @@ class SimpleRRule
         $this->byWeekday  = $this->normalizeByWeekday($rrule['byweekday'] ?? []);
         $this->bySetpos   = $rrule['bysetpos'] ?? null;
         $this->byWeekNo   = $rrule['byweekno'] ?? [];
+        $this->exDate     = $rrule['exdate'] ?? [];
         $this->debugCallback = $debugCallback;
     }
 
@@ -182,8 +184,16 @@ class SimpleRRule
             }
         }
 
+        $occurrences = $this->filterDates($occurrences);
+
         $this->logDebug("getOccurrences vége", ['total' => count($occurrences)]);
         return $occurrences;
+    }
+
+    function filterDates(array $occurrences) {
+        return array_filter($occurrences, function($date) {
+            return !in_array($date->toDateString(), $this->exDate);
+        });
     }
 
 }

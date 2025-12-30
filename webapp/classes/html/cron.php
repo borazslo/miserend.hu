@@ -38,7 +38,7 @@ class Cron extends Html {
 		$job = $nextjob;
         $job->attempts++;
         $job->save();
-
+        $start = microtime(true);
         try {
             $this->runJob($job);
         } catch (\Exception $exception) {
@@ -50,6 +50,18 @@ class Cron extends Html {
         if (!isset($this->error)) {
             $job->success();
         }
+        $elapsed = microtime(true) - $start;
+        $hours = (int) floor($elapsed / 3600);
+        $minutes = (int) floor(($elapsed % 3600) / 60);
+        $seconds = $elapsed - ($hours * 3600) - ($minutes * 60);
+        $s = round($seconds, 2);
+
+        $parts = [];
+        if ($hours > 0) $parts[] = $hours . ' hour' . ($hours > 1 ? 's' : '');
+        if ($minutes > 0) $parts[] = $minutes . ' minute' . ($minutes > 1 ? 's' : '');
+        $parts[] = $s . ' second' . ($s != 1 ? 's' : '');
+
+        echo "Cron job " . $job->class . "->" . $job->function . "() completed in " . implode(' ', $parts) . ".<br>\n";
     }
 
     function runJob($job) {

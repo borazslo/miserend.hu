@@ -54,7 +54,7 @@ class SearchResultsMasses extends Html {
         }
       
         // Exclude 'Igeliturgia' masses unless specifically requested
-        $ige = isset($_REQUEST['ige']) ? $_REQUEST['ige'] : false;
+        $ige = isset($_REQUEST['liturgy']) ? $_REQUEST['liturgy'] : false;
         if (empty($ige)) {
             $search->notTitle('Igeliturgia'); 
         }

@@ -4,6 +4,9 @@ namespace Html\Church;
 
 use Eloquent\CalMass;
 use Eloquent\Church ;
+use Eloquent\CalPeriod;
+use Eloquent\CalGeneratedPeriod;
+use SimpleRRule;
 
 class Ical extends \Html\Html {
 
@@ -16,19 +19,25 @@ class Ical extends \Html\Html {
 
         // Fetch church and masses
         $church = Church::find($tid);
+        $masses = CalMass::where('church_id', $tid)->get()->all();
 
-        $_SERVER['REQUEST_METHOD'] = 'GET'; // Sajnos a Periods az még nem erre van kitalálva, ezért kell itt ez
-        $periodsClass = new \html\calendar\Periods('generate','array');
-        $generatedPeriods = $periodsClass->result;
-        $masses = CalMass::where('church_id', $tid)->get()->toArray();
+        $massPeriods = CalMass::generateMassPeriodInstancesForYears( $masses, [], [date('Y'),date('Y')+1]);
+        foreach($massPeriods as $k => $mass) {
+            $rrule = new SimpleRRule($mass['rrule']);
+            $occ = reset($rrule->getOccurrences());            
+            
+            $massPeriods[$k]['start_date'] = $occ->toString();
+            
 
-                
-        $ical = $this->generateIcal($masses, $generatedPeriods, $church, $tid);
+        }
+        $ical = $this->generateIcal($massPeriods, $church, $tid);
 
         // Output headers for .ics
-        header('Content-Type: text/calendar; charset=utf-8');
-        header('Content-Disposition: inline; filename="miserend_church_' . $tid . '.ics"');
-
+        if(!isset($_GET['text'])) {
+            header('Content-Type: text/calendar; charset=utf-8');
+            header('Content-Disposition: inline; filename="miserend_church_' . $tid . '.ics"');
+        }
+  
         echo $ical;
         exit;
     }
@@ -40,9 +49,9 @@ class Ical extends \Html\Html {
         }
         try {
             $dt = new \DateTime($iso);
-            return $dt->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\\THis\\Z');
+            return $dt->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\\THis');
         } catch (\Exception $e) {
-            return preg_replace('/[^0-9T]/', '', $iso) . 'Z';
+            return preg_replace('/[^0-9T]/', '', $iso) ;
         }
     }
 
@@ -52,9 +61,15 @@ class Ical extends \Html\Html {
     }
 
     private function rruleToString($rrule) {
-        if (!$rrule || !is_array($rrule)) return '';
+        // Accept either the rrule array or an array that also contains 'exdate'
+        if (!$rrule || !is_array($rrule)) return ['rrule' => '', 'exdate' => ''];
         $parts = [];
         foreach ($rrule as $k => $v) {
+            // skip exdate here; handle later
+            if ($k === 'exdate') continue;
+
+            if($k == 'byweekday') $k = 'byday';
+
             if ($k === 'dtstart') continue;
             if ($k === 'until') {
                 $parts[] = 'UNTIL=' . $this->formatIcsDate($v);
@@ -70,186 +85,110 @@ class Ical extends \Html\Html {
                 $parts[] = strtoupper($k) . '=' . (string)$v;
             }
         }
-        return implode(';', $parts);
+
+        $rruleStr = implode(';', $parts);
+
+        // handle exdate if present: build a single EXDATE line with TZID
+        $exdateLine = '';
+        if (isset($rrule['exdate']) && is_array($rrule['exdate']) && count($rrule['exdate']) > 0) {
+            $formatted = array_map(function($d){ 
+                $dt = new \DateTime($d);
+                return $dt->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\\THis');
+            }, $rrule['exdate']);
+            $exdateLine = 'EXDATE;TZID=Europe/Budapest:' . implode(',', $formatted);
+        }
+
+        return ['rrule' => $rruleStr, 'exdate' => $exdateLine];
     }
 
-    private function createCalendarEvent($mass, $periods, $deletedDates) {
-        $events = [];
+    private function createCalendarEvent($mass) {
+        $lines = [];
+           //printr($mass);         
+        if (empty($mass['start_date'])) return [];
+        $start = date('Y-m-d\TH:i:s\Z',strtotime($mass['start_date']));
+        $lines[] = 'BEGIN:VEVENT';
+        $uid = $mass['mass_id']."-".$mass['generated_period_id']."@miserend.hu"; //TODO: legyen az a domain szerinte akár uat vagy local, stb.
+        $lines[] = 'UID:' . $uid;
+        $lines[] = 'DTSTAMP:' . gmdate('Ymd\\THis\\Z');         
+        $lines[] = 'DTSTART;TZID=Europe/Budapest:' . $this->formatIcsDate($start);
+                    
+        $duration = ($mass['duration_minutes']!=0) ? $mass['duration_minutes'] : 60;
+        $dt = new \DateTime($start);
+        $dt->modify('+' . $duration . ' minutes');
+        $dtend = $dt->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\TH:i:s\Z');
+        $lines[] = 'DTEND;TZID=Europe/Budapest:' . $this->formatIcsDate($dtend);
 
-        printr($periods);
-        exit;
-
-        // normalize keys: support both snake_case and camelCase
-        $get = function($k, $default=null) use ($mass) {
-            if (isset($mass[$k])) return $mass[$k];
-            $alt = str_replace('_', '', $k);
-            if (isset($mass[$alt])) return $mass[$alt];
-            $alt2 = preg_replace_callback('/([A-Z])/', function($m){ return '_' . strtolower($m[1]); }, $k);
-            if (isset($mass[$alt2])) return $mass[$alt2];
-            return $default;
-        };
-
-        $rrule = $get('rrule', null);
-        if (is_string($rrule)) {
-            $decoded = json_decode($rrule, true);
-            if (json_last_error() === JSON_ERROR_NONE) $rrule = $decoded;
+        $lines[] = 'SUMMARY:' . $this->escapeString($mass['title'] ?? '');
+        //if(!empty($mass['comment'] )) $lines[] = 'DESCRIPTION:' . $this->escapeString($mass['comment'] ?? '');
+        $lines[] = 'DESCRIPTION:'.$uid; // TODO: TYPES, COMMENT, ETC.
+         
+        if (!empty($mass['types'])) {
+            $lines[] = 'CATEGORIES:' . implode(',', $this->escapeString($mass['types']));
         }
 
-        $exdate = $get('exdate', null);
-        if (is_string($exdate)) {
-            $decoded = json_decode($exdate, true);
-            if (json_last_error() === JSON_ERROR_NONE) $exdate = $decoded;
+        // Color
+        if (!empty($mass['color'])) {
+            $lines[] = 'COLOR:' . $this->escapeString($mass['color']);
         }
 
-        $experiod = $get('experiod', null);
-        if (is_string($experiod)) {
-            $decoded = json_decode($experiod, true);
-            if (json_last_error() === JSON_ERROR_NONE) $experiod = $decoded;
+        // RRULE and EXDATE
+        if (!empty($mass['rrule'])) {
+            $rrInput = $mass['rrule'];
+            if (!empty($mass['exdate'])) $rrInput['exdate'] = $mass['exdate'];
+            $rrRes = $this->rruleToString($rrInput);
+            if (!empty($rrRes['rrule'])) $lines[] = 'RRULE:' . $rrRes['rrule'];
+            if (!empty($rrRes['exdate'])) $lines[] = $rrRes['exdate'];
         }
 
-        $duration = $get('duration', null);
-        if (is_string($duration)) {
-            $decoded = json_decode($duration, true);
-            if (json_last_error() === JSON_ERROR_NONE) $duration = $decoded;
-        }
+        $lines[] = 'END:VEVENT';
 
-        // recurring case: rrule + period_id
-        $periodId = $get('period_id', $get('periodId', null));
-        if (!empty($rrule) && !empty($periodId)) {
-            // load generated periods for this period id
-            $genPeriods = \Eloquent\CalGeneratedPeriod::where('period_id', $periodId)->get()->toArray();
-            foreach ($genPeriods as $gp) {
-                // clone rrule
-                $r = is_array($rrule) ? $rrule : (array)$rrule;
-                // attach exrule from experiod if present
-                $exrule = [];
-                if (!empty($experiod) && is_array($experiod)) {
-                    foreach ($experiod as $exPid) {
-                        $fps = \Eloquent\CalGeneratedPeriod::where('period_id', $exPid)->get()->toArray();
-                        foreach ($fps as $fp) {
-                            // dtstart: fp.start_date + time part of original rrule.dtstart
-                            $timeSuffix = '';
-                            if (!empty($r['dtstart']) && strlen($r['dtstart']) > 10) {
-                                $timeSuffix = substr($r['dtstart'], 10);
-                            }
-                            $exrule[] = [
-                                'dtstart' => ($fp['start_date'] ?? '') . $timeSuffix,
-                                'until' => ($fp['end_date'] ?? ''),
-                                'freq' => 'daily'
-                            ];
-                        }
-                    }
-                }
-
-                // set rrule dtstart to period start + time suffix
-                $timeSuffix = '';
-                if (!empty($r['dtstart']) && strlen($r['dtstart']) > 10) {
-                    $timeSuffix = substr($r['dtstart'], 10);
-                }
-                $r['dtstart'] = ($gp['start_date'] ?? '') . $timeSuffix;
-                if (!empty($r['until'])) {
-                    $r['until'] = ($gp['end_date'] ?? $r['until']);
-                }
-
-                $evt = [];
-                $evt['id'] = $get('id', null);
-                $evt['title'] = $get('title', '');
-                $evt['rrule'] = $r;
-                if (!empty($duration)) $evt['duration'] = $duration;
-                if (!empty($exdate)) $evt['exdate'] = $exdate;
-                if (!empty($exrule)) $evt['exrule'] = $exrule;
-                $evt['startDate'] = $r['dtstart'];
-                $evt['color'] = $gp['color'] ?? null;
-                $evt['comment'] = $get('comment', '');
-
-                $events[] = $evt;
-            }
-        } else {
-            // single event fallback
-            $start = $get('startDate', $get('start_date', null));
-            if (empty($start)) return $events;
-            $evt = [];
-            $evt['id'] = $get('id', null);
-            $evt['title'] = $get('title', '');
-            $evt['startDate'] = $start;
-            $evt['rrule'] = [
-                'dtstart' => $start,
-                'freq' => 'daily',
-                'count' => 1
-            ];
-            $evt['exdate'] = is_array($exdate) ? $exdate : [];
-            $evt['exrule'] = [];
-            if (!empty($duration)) $evt['duration'] = $duration;
-            $evt['comment'] = $get('comment', '');
-            $events[] = $evt;
-        }
-
-        return $events;
+        return $lines;
     }
 
-    private function generateIcal(array $masses, $periods, $church, int $churchId): string {
+    private function generateIcal(array $masses, $church, int $churchId): string {
         $lines = [];
         $lines[] = 'BEGIN:VCALENDAR';
         $lines[] = 'VERSION:2.0';
-        $lines[] = 'PRODID:-//miserend.hu//Calendar//HU';
+        $lines[] = 'PRODID:-//miserend.hu//'.$church['id'].'//HU';
         $lines[] = 'CALSCALE:GREGORIAN';
         $lines[] = 'METHOD:PUBLISH';
 
+        $nev = is_array($church) ? ($church['nev'] ?? '') : ($church->nev ?? '');
+        $ismertnev = is_array($church) ? ($church['ismertnev'] ?? '') : ($church->ismertnev ?? '');
+        $varos = is_array($church) ? ($church['varos'] ?? '') : ($church->varos ?? '');
+        $calName = $nev;
+        if ($ismertnev) $calName .= $calName ? ' (' . $ismertnev . ')' : $ismertnev;
+        if ($varos) $calName .= $calName ? ' - ' . $varos : $varos;
+
+        $lines[] = 'X-WR-CALNAME:' . $this->escapeString($calName);
+        $lines[] = 'X-WR-CALDESC:Frissített miserend automatikusan';
+        $lines[] = 'X-WR-TIMEZONE:Europe/Budapest';
+
+        $lines[] = 'BEGIN:VTIMEZONE';
+        $lines[] = 'TZID:Europe/Budapest';
+        $lines[] = 'X-LIC-LOCATION:Europe/Budapest';
+        $lines[] = 'BEGIN:DAYLIGHT';
+        $lines[] = 'TZOFFSETFROM:+0100';
+        $lines[] = 'TZOFFSETTO:+0200';
+        $lines[] = 'TZNAME:CEST';
+        $lines[] = 'DTSTART:19700329T020000';
+        $lines[] = 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU';
+        $lines[] = 'END:DAYLIGHT';
+        $lines[] = 'BEGIN:STANDARD';
+        $lines[] = 'TZOFFSETFROM:+0200';
+        $lines[] = 'TZOFFSETTO:+0100';
+        $lines[] = 'TZNAME:CET';
+        $lines[] = 'DTSTART:19701025T030000';
+        $lines[] = 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU';
+        $lines[] = 'END:STANDARD';
+        $lines[] = 'END:VTIMEZONE';
+
+
         $dtstamp = gmdate('Ymd\\THis\\Z');
         $counter = 1;
-
-        $tmp = [];
-        foreach ($masses as $m) { 
-            $tmp = array_merge($tmp, $this->createCalendarEvent($m, $periods, false));
-        }
-
-        foreach ($tmp as $m) {
-
-
-
-            if (empty($m['startDate'])) continue;
-            $evStart = $m['startDate'];
-
-            $lines[] = 'BEGIN:VEVENT';
-            $uid = 'miserend-' . ($m['id'] ?? $counter++ ) . '@miserend.hu';
-            $lines[] = 'UID:' . $uid;
-            $lines[] = 'DTSTAMP:' . $dtstamp;
-
-            // DTSTART
-            $lines[] = 'DTSTART:' . $this->formatIcsDate($evStart);
-
-            // DTEND from duration if provided
-            if (!empty($m['duration'])) {
-                try {
-                    $dur = $m['duration'];
-                    $d = new \DateTime($evStart);
-                    if (!empty($dur['days'])) $d->modify('+' . (int)$dur['days'] . ' days');
-                    if (!empty($dur['hours'])) $d->modify('+' . (int)$dur['hours'] . ' hours');
-                    if (!empty($dur['minutes'])) $d->modify('+' . (int)$dur['minutes'] . ' minutes');
-                    $lines[] = 'DTEND:' . $d->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\\THis\\Z');
-                } catch (\Exception $e) {
-                    // ignore
-                }
-            }
-
-            // RRULE
-            if (!empty($m['rrule'])) {
-                $rr = $this->rruleToString($m['rrule']);
-                if ($rr) $lines[] = 'RRULE:' . $rr;
-            }
-
-            // EXDATE
-            if (!empty($m['exdate']) && is_array($m['exdate'])) {
-                $fixed = array_map(function($d){ return $this->formatIcsDate($d); }, $m['exdate']);
-                $lines[] = 'EXDATE:' . implode(',', $fixed);
-            }
-
-            $lines[] = 'SUMMARY:' . $this->escapeString($m['title'] ?? '');
-            if (!empty($m['comment'])) $lines[] = 'DESCRIPTION:' . $this->escapeString($m['comment']);
-            $lines[] = 'X-MASS-ID:' . ($m['id'] ?? '');
-            if (!empty($m['color'])) $lines[] = 'COLOR:' . $m['color'];
-
-            $lines[] = 'END:VEVENT';
+        
+        foreach ($masses as $m) {
+            $lines = array_merge($lines, $this->createCalendarEvent($m)); //TODO: bele a LOCATION és GEO
         }
 
         $lines[] = 'END:VCALENDAR';

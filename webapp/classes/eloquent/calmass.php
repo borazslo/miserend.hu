@@ -145,7 +145,8 @@ class CalMass extends CalModel
                     continue;
                 }
 
-                // --- kizárt dátumok ---
+                
+                // --- kizárt dátumokkal  ---
                 $excludedDatesRaw = $mass->exdate ?? [];
                 if (is_string($excludedDatesRaw)) {
                     $decoded = json_decode($excludedDatesRaw, true);
@@ -153,9 +154,7 @@ class CalMass extends CalModel
                         $excludedDatesRaw = $decoded;
                     }
                 }
-                $excludedDates = collect(is_array($excludedDatesRaw) ? $excludedDatesRaw : [])
-                    ->map(fn($d) => Carbon::parse($d)->toDateString());
-
+                                                                    
                 // --- kizárt periódusok ---
                 $excludedPeriods = $mass->experiod ?? [];
                 if (is_string($excludedPeriods)) {
@@ -166,7 +165,7 @@ class CalMass extends CalModel
                 }
                 $excludedPeriods = is_array($excludedPeriods) ? $excludedPeriods : [];
 
-                // --- periódusok betöltése ---
+                // --- az adott miséhez való legeneráltperiódusok betöltése ---
                 $periods = CalGeneratedPeriod::where('period_id', $mass->period_id)
                     ->where('start_date', '<=', $globalEnd->toDateString())
                     ->where('end_date', '>', $globalStart->toDateString())
@@ -180,6 +179,50 @@ class CalMass extends CalModel
                     if ($end->gt($globalEnd))     $end   = (clone $globalEnd)->setTimezone($timezone);
                     if ($start->gt($end)) continue;
 
+                    // Exdate feldolgozása: csak az adott időszakba eső dátumok legyenek exdate-ben
+                    $rrule['exdate'] = [];
+                    foreach($excludedDatesRaw as $exDateString) {
+                        $exDate = Carbon::parse($exDateString)->setTimezone($timezone);
+                        if($exDate->between($start,$end)) {
+                            $rrule['exdate'][] = $exDate;
+                        }
+                    }
+                    $rrule['exdate'] = collect(is_array($excludedDatesRaw) ? $excludedDatesRaw : [])
+                    ->map(fn($d) => Carbon::parse($d)->toDateString())->toArray();
+
+                    // Experiod feldolgozása: csak az adott időszakba eső periódusok érdeklnek
+                    // Aztán a beleeső napokat áttesszük exDate-be
+                    foreach($excludedPeriods as $exPeriodString) {
+                        $exGeneratedPeriods = CalGeneratedPeriod::where('period_id', $exPeriodString)
+                                            ->where('start_date', '<=', $end->toDateString())
+                                            ->where('end_date', '>', $start->toDateString())
+                                            ->get();
+                        //Nagyon nagyon furcsa lenne, ha kettő is lenne belőle, de ugye....                                            
+                        foreach($exGeneratedPeriods as $exGeneratedPeriod) {
+                            
+                            // ExGeneratedPeriod intervallum (igazítva napokra, ugyanabban a timezone-ban mint $start/$end)
+                            $exStart = Carbon::parse($exGeneratedPeriod->start_date)->startOfDay()->setTimezone($timezone);
+                            $exEnd   = Carbon::parse($exGeneratedPeriod->end_date)->subDay()->endOfDay()->setTimezone($timezone);
+
+                            // Ha nincs átfedés, kihagyjuk
+                            if ($exEnd->lt($start) || $exStart->gt($end)) {
+                                continue;
+                            }
+
+                            // Átfedés kezdete és vége
+                            $overlapStart = $exStart->lt($start) ? $start->copy()->startOfDay() : $exStart->copy()->startOfDay();
+                            $overlapEnd   = $exEnd->gt($end)   ? $end->copy()->endOfDay()   : $exEnd->copy()->endOfDay();
+
+                            // Az átfedő napokat hozzáadjuk exdate-hez (YYYY-MM-DD formátumban)
+                            for ($d = $overlapStart->copy(); $d->lte($overlapEnd); $d->addDay()) {
+                                $rrule['exdate'][] = $d->toDateString();
+                            }
+                        }                    
+                    }
+                    // Duplikátumok eltávolítása                    
+                    $rrule['exdate'] = array_values(array_unique($rrule['exdate']));
+                    sort($rrule['exdate']);
+
                     $recurrences = self::generateDatesFromRrule($rrule, $start, $end);
                    /* $this->logDebug("Recurrence generálás", [
                         'mass_id' => $mass->id,
@@ -190,23 +233,8 @@ class CalMass extends CalModel
                         /*$this->logDebug("Generált dátum", [
                             'mass_id' => $mass->id,
                             'date' => $date->toIso8601String(),
-                        ]); */
-                        if ($excludedDates->contains($date->toDateString())) continue;
-
-                        $insideExcluded = false;
-                        foreach ($excludedPeriods as $exPid) {
-                            $exP = CalGeneratedPeriod::where('period_id', $exPid)->first();
-                            if ($exP) {
-                                $exStart = Carbon::parse($exP->start_date)->startOfDay();
-                                $exEnd = Carbon::parse($exP->end_date)->endOfDay();
-                                if ($date->between($exStart, $exEnd)) {
-                                    $insideExcluded = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if ($insideExcluded) continue;
-
+                        ]); */                        
+                       
                         $startUTC = $date->copy()->setTimezone('UTC');
                         $instancesByChurch[$mass->church_id][] = [
                             'church_id' => $mass->church_id,
@@ -225,7 +253,219 @@ class CalMass extends CalModel
             }
         }
 
+        // Rendezés start_date szerint (növekvő)
+        foreach($instancesByChurch as $churchId => &$recurrences) {            
+            usort($recurrences, function($a, $b) {
+                return $a['start_date'] <=> $b['start_date'];
+            });
+        }
+
         return $instancesByChurch;
+    }
+
+    /**
+     
+     */
+    static function generateMassPeriodInstancesForYears($masses, array $churchTimezones, array $years): array
+    {
+        $massPeriods = [];
+
+        /*
+        $this::logDebug("generateMassInstancesForYears indul", [
+            'mass_count' => count($masses),
+            'years'      => $years,
+        ]);
+*/
+        if (empty($masses) || empty($years)) {
+            //$this->logDebug("Nincs mise vagy év");
+            return $massPeriods;
+        }
+
+        // --- 0) Ütközés elkerülés alkalmazása ---
+        $masses = self::applyCollisionAvoidance($masses);
+        /*
+        $this->logDebug("applyCollisionAvoidance lefutott", [
+            'after_count' => count($masses),
+        ]);
+*/
+
+
+        foreach ($years as $year) {
+            $globalStart = Carbon::create($year, 1, 1)->startOfDay();
+            $globalEnd = Carbon::create($year, 12, 31)->endOfDay();
+
+            foreach ($masses as $mass) {
+                /*
+                $this->logDebug("Mise feldolgozás indul", [
+                    'mass_id' => $mass->id,
+                    'title' => $mass->title,
+                    'period_id' => $mass->period_id,
+                ]);
+*/
+                if (empty($mass->period_id)) {
+                    //$this->logDebug("Egyszeri mise", ['mass_id' => $mass->id]);
+                } else if (empty($mass->rrule)) {
+                    //$this->logDebug("Nincs RRULE", ['mass_id' => $mass->id]);
+                    continue;
+                }
+                $timezone = $churchTimezones[$mass->church_id] ?? 'Europe/Budapest';
+
+                // ---- duration konvertálása percekre ----
+                $durationMinutes = 0;
+                if (!empty($mass->duration)) {
+                    if (is_string($mass->duration)) {
+                        $decoded = json_decode($mass->duration, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $mass->duration = $decoded;
+                        }
+                    }
+                    if (is_array($mass->duration)) {
+                        $days = (int)($mass->duration['days'] ?? 0);
+                        $hours = (int)($mass->duration['hours'] ?? 0);
+                        $minutes = (int)($mass->duration['minutes'] ?? 0);
+                        $durationMinutes = $days * 24 * 60 + $hours * 60 + $minutes;
+                    }
+                }
+
+                // --- ha nincs period_id: egyszeri esemény ---
+                if (empty($mass->period_id)) {                   
+                    continue;
+                }
+
+                if (empty($mass->rrule)) {
+                    continue;
+                }
+
+                // --- RRULE feldolgozás ---
+                $rrule = $mass->rrule;
+                if (is_string($rrule)) {
+                    $decoded = json_decode($rrule, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $rrule = $decoded;
+                    }
+                }
+                if (!is_array($rrule) || empty($rrule)) {
+                    continue;
+                }
+
+                
+                // --- kizárt dátumokkal  ---
+                $excludedDatesRaw = $mass->exdate ?? [];
+                if (is_string($excludedDatesRaw)) {
+                    $decoded = json_decode($excludedDatesRaw, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $excludedDatesRaw = $decoded;
+                    }
+                }
+                                                                    
+                // --- kizárt periódusok ---
+                $excludedPeriods = $mass->experiod ?? [];
+                if (is_string($excludedPeriods)) {
+                    $decoded = json_decode($excludedPeriods, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $excludedPeriods = $decoded;
+                    }
+                }
+                $excludedPeriods = is_array($excludedPeriods) ? $excludedPeriods : [];
+
+                // --- az adott miséhez való legeneráltperiódusok betöltése ---
+                $periods = CalGeneratedPeriod::where('period_id', $mass->period_id)
+                    ->where('start_date', '<=', $globalEnd->toDateString())
+                    ->where('end_date', '>', $globalStart->toDateString())
+                    ->get();
+
+                foreach ($periods as $generatedPeriod) {
+                    $start = Carbon::parse($generatedPeriod->start_date)->startOfDay()->setTimezone($timezone);
+                    $end = Carbon::parse($generatedPeriod->end_date)->subDay()->endOfDay()->setTimezone($timezone);
+
+                    if ($start->lt($globalStart)) $start = (clone $globalStart)->setTimezone($timezone);
+                    if ($end->gt($globalEnd))     $end   = (clone $globalEnd)->setTimezone($timezone);
+                    if ($start->gt($end)) continue;
+
+                    // Exdate feldolgozása: csak az adott időszakba eső dátumok legyenek exdate-ben
+                    $rrule['exdate'] = [];
+                    foreach($excludedDatesRaw as $exDateString) {
+                        $exDate = Carbon::parse($exDateString)->setTimezone($timezone);
+                        if($exDate->between($start,$end)) {
+                            $rrule['exdate'][] = $exDate;
+                        }
+                    }
+                    $rrule['exdate'] = collect(is_array($excludedDatesRaw) ? $excludedDatesRaw : [])
+                    ->map(fn($d) => Carbon::parse($d)->toDateString())->toArray();
+
+                    // Experiod feldolgozása: csak az adott időszakba eső periódusok érdeklnek
+                    // Aztán a beleeső napokat áttesszük exDate-be
+                    foreach($excludedPeriods as $exPeriodString) {
+                        $exGeneratedPeriods = CalGeneratedPeriod::where('period_id', $exPeriodString)
+                                            ->where('start_date', '<=', $end->toDateString())
+                                            ->where('end_date', '>', $start->toDateString())
+                                            ->get();
+                        //Nagyon nagyon furcsa lenne, ha kettő is lenne belőle, de ugye....                                            
+                        foreach($exGeneratedPeriods as $exGeneratedPeriod) {
+                            
+                            // ExGeneratedPeriod intervallum (igazítva napokra, ugyanabban a timezone-ban mint $start/$end)
+                            $exStart = Carbon::parse($exGeneratedPeriod->start_date)->startOfDay()->setTimezone($timezone);
+                            $exEnd   = Carbon::parse($exGeneratedPeriod->end_date)->subDay()->endOfDay()->setTimezone($timezone);
+
+                            // Ha nincs átfedés, kihagyjuk
+                            if ($exEnd->lt($start) || $exStart->gt($end)) {
+                                continue;
+                            }
+
+                            // Átfedés kezdete és vége
+                            $overlapStart = $exStart->lt($start) ? $start->copy()->startOfDay() : $exStart->copy()->startOfDay();
+                            $overlapEnd   = $exEnd->gt($end)   ? $end->copy()->endOfDay()   : $exEnd->copy()->endOfDay();
+
+                            // Az átfedő napokat hozzáadjuk exdate-hez (YYYY-MM-DD formátumban)
+                            for ($d = $overlapStart->copy(); $d->lte($overlapEnd); $d->addDay()) {
+                                $rrule['exdate'][] = $d->toDateString();
+                            }
+                        }                    
+                    }
+                    // Duplikátumok eltávolítása                    
+                    if(count($rrule['exdate']) > 0) {
+                        $rrule['exdate'] = array_values(array_unique($rrule['exdate']));
+                        sort($rrule['exdate']);
+                    } else {
+                        unset($rrule['exdate']);
+                    }
+                    
+                    // RRULE dstart & until
+                    $tz = $start->getTimezone()->getName();
+                    $origDtStart = $rrule['dtstart'] instanceof \DateTimeInterface
+                        ? Carbon::instance($rrule['dtstart'])->setTimezone($tz)
+                        : Carbon::parse($rrule['dtstart'], $tz)->setTimezone($tz);
+                    $hh = $origDtStart->hour;
+                    $mm = $origDtStart->minute;
+                    $ss = $origDtStart->second;
+                    $alignedDtStart = $start->copy()->setTime($hh, $mm, $ss);
+                    $effectiveDtStart = $alignedDtStart;
+                    $rrule['dtstart'] = $effectiveDtStart->toIso8601String();
+                    $rrule['until']   = $end->toIso8601String();
+                    
+
+                    $massPeriods[] = [
+                        'mass_id' => $mass->id,
+                        'period_id' => $mass->period_id,
+                        'generated_period_id' => $generatedPeriod->id,
+                        'color' => $generatedPeriod->color,
+                        'church_id' => $mass->church_id,
+                        'start_date' => $start->toDateString(),
+                        'end_date' => $end->toDateString(),
+                        'rite' => $mass->rite,
+                        'types' => $mass->types,
+                        'title' => $mass->title,
+                        'duration_minutes' => $durationMinutes,
+                        'lang' => $mass->lang,
+                        'comment' => $mass->comment,
+                        'rrule' => $rrule,
+                    ];
+
+                }
+            }
+        }
+        
+        return $massPeriods;
     }
 
     static private function applyCollisionAvoidance(array $masses): array

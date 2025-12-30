@@ -64,6 +64,28 @@
             &nbsp;<a href="#" onclick="document.getElementById('cal-full-{{ id }}').style.display='none'; document.getElementById('cal-preview-{{ id }}').style.display='inline'; return false;" title="Bezárás">bezár</a>
         </span>
     </small>
+    <div class="btn-group btn-group-sm" style="margin-left:10px;">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Naptár">
+            <i class="fa fa-calendar" aria-hidden="true"></i> Naptár <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="{{ constant('DOMAIN') }}/templom/{{ id }}/ical" download rel="noopener noreferrer" title="Letöltés .ics fájl">
+                    Letöltés (.ics)
+                </a>
+            </li>
+            <li>
+                <a href="webcal://{{ constant('DOMAIN') }}/templom/{{ id }}/ical" rel="noopener noreferrer" title="Feliratkozás (webcal)">
+                    Feliratkozás (webcal)
+                </a>
+            </li>
+            <li>
+                <a href="https://calendar.google.com/calendar/r?cid={{ (constant('DOMAIN') ~ '/templom/' ~ id ~ '/ical')|url_encode }}" target="_blank" rel="noopener noreferrer" title="Megnyitás Google Naptárban">
+                    Hozzáadás a Google Naptárhoz
+                </a>
+            </li>
+        </ul>
+    </div>
     {% else %}
         <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
     {% endif %}
