@@ -300,8 +300,8 @@ class CalMass extends CalModel
                     'mass_id' => $mass->id,
                     'title' => $mass->title,
                     'period_id' => $mass->period_id,
-                ]);
-*/
+                ]);*/
+
                 if (empty($mass->period_id)) {
                     //$this->logDebug("Egyszeri mise", ['mass_id' => $mass->id]);
                 } else if (empty($mass->rrule)) {
@@ -327,15 +327,7 @@ class CalMass extends CalModel
                     }
                 }
 
-                // --- ha nincs period_id: egyszeri esemény ---
-                if (empty($mass->period_id)) {                   
-                    continue;
-                }
-
-                if (empty($mass->rrule)) {
-                    continue;
-                }
-
+                
                 // --- RRULE feldolgozás ---
                 $rrule = $mass->rrule;
                 if (is_string($rrule)) {
@@ -344,7 +336,25 @@ class CalMass extends CalModel
                         $rrule = $decoded;
                     }
                 }
+                
                 if (!is_array($rrule) || empty($rrule)) {
+                    throw new \Exception('Ilyennek igazából nem szabadna lennie, mert egy napos rrule-t kapnak az egyedi alkalmak. ');
+                     $massPeriods[] = [
+                        'mass_id' => $mass->id,
+                        'period_id' => $mass->period_id,
+                        'generated_period_id' => $generatedPeriod->id,
+                        'color' => $generatedPeriod->color,
+                        'church_id' => $mass->church_id,
+                        'start_date' => $start->toDateString(),
+                        'end_date' => $end->toDateString(),
+                        'rite' => $mass->rite,
+                        'types' => $mass->types,
+                        'title' => $mass->title,
+                        'duration_minutes' => $durationMinutes,
+                        'lang' => $mass->lang,
+                        'comment' => $mass->comment                      
+                    ];
+                    echo "egyedi";  //
                     continue;
                 }
 
@@ -368,20 +378,42 @@ class CalMass extends CalModel
                 }
                 $excludedPeriods = is_array($excludedPeriods) ? $excludedPeriods : [];
 
-                // --- az adott miséhez való legeneráltperiódusok betöltése ---
-                $periods = CalGeneratedPeriod::where('period_id', $mass->period_id)
-                    ->where('start_date', '<=', $globalEnd->toDateString())
-                    ->where('end_date', '>', $globalStart->toDateString())
-                    ->get();
 
+                // Ha nincsen periódusa, akkor ő minden bizonnyal egy egyedi esemény. Illetve nagyon reméljük.
+                // Általában kap RRULE-t is egynaposat. Ezért inkább végig visszük, persze csak a saját évében                
+                if(!$mass->period_id) { 
+                    $periods = collect([]);
+                    if($year == Carbon::parse($mass->start_date)->format('Y')) {
+                        $periods->push((object)[
+                            'id' => Carbon::parse($mass->start_date)->format('YmdHis'), // ideiglenes id
+                            'start_date' => $mass->start_date,
+                            'end_date' => $mass->start_date,
+                            'name' => 'Ideiglenes időszak egyetlen napra',
+                            'color' => false
+                        ]);
+                    }
+                }
+                else {
+                    // --- az adott miséhez való legeneráltperiódusok betöltése ---
+                    $periods = CalGeneratedPeriod::where('period_id', $mass->period_id)
+                        ->where('start_date', '<=', $globalEnd->toDateString())
+                        ->where('end_date', '>', $globalStart->toDateString())
+                        ->get();
+                }
                 foreach ($periods as $generatedPeriod) {
                     $start = Carbon::parse($generatedPeriod->start_date)->startOfDay()->setTimezone($timezone);
-                    $end = Carbon::parse($generatedPeriod->end_date)->subDay()->endOfDay()->setTimezone($timezone);
+                    // TODO / FIXME: valamiért itt volt egy subDay. Talán mert az alap periods-nak van inclusive beállítása. 
+                    // Passz. Az egy napo hossszú periódusoknál biztos nem kel subDay(). Majd meglátjuk a töbi határnál mi a helyzet.
+                    // $end = Carbon::parse($generatedPeriod->end_date)->subDay()->endOfDay()->setTimezone($timezone);
+                    $end = Carbon::parse($generatedPeriod->end_date)->endOfDay()->setTimezone($timezone);
 
+                    /*
+                    Ezt nem tudom pontosan mit akart itt cisnálni. De gondot okozott.*/
                     if ($start->lt($globalStart)) $start = (clone $globalStart)->setTimezone($timezone);
                     if ($end->gt($globalEnd))     $end   = (clone $globalEnd)->setTimezone($timezone);
-                    if ($start->gt($end)) continue;
-
+                    /*if ($start->gt($end)) continue;                    
+                    */
+                    
                     // Exdate feldolgozása: csak az adott időszakba eső dátumok legyenek exdate-ben
                     $rrule['exdate'] = [];
                     foreach($excludedDatesRaw as $exDateString) {
@@ -395,7 +427,7 @@ class CalMass extends CalModel
 
                     // Experiod feldolgozása: csak az adott időszakba eső periódusok érdeklnek
                     // Aztán a beleeső napokat áttesszük exDate-be
-                    foreach($excludedPeriods as $exPeriodString) {
+                    foreach($excludedPeriods as $exPeriodString) { //TODO és FIXME az átfedésre nem biztos hogy ez jó!
                         $exGeneratedPeriods = CalGeneratedPeriod::where('period_id', $exPeriodString)
                                             ->where('start_date', '<=', $end->toDateString())
                                             ->where('end_date', '>', $start->toDateString())

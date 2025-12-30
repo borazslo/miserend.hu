@@ -322,8 +322,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 					'church' => $churches[$mass['church_id']]
 				];
 				
-			}
-			echo $k." misePeriódusból lett ".count($occs)." db miseidőpont.<br/>\n";
+			}			
 			$countAllMasses += count($occs);
 			if (!empty($bulkInsert)) {
 				$elasticResult = $elastic->putBulk($bulkInsert);

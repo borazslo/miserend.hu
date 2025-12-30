@@ -119,8 +119,8 @@ class Ical extends \Html\Html {
         $lines[] = 'DTEND;TZID=Europe/Budapest:' . $this->formatIcsDate($dtend);
 
         $lines[] = 'SUMMARY:' . $this->escapeString($mass['title'] ?? '');
-        //if(!empty($mass['comment'] )) $lines[] = 'DESCRIPTION:' . $this->escapeString($mass['comment'] ?? '');
-        $lines[] = 'DESCRIPTION:'.$uid; // TODO: TYPES, COMMENT, ETC.
+        if(!empty($mass['comment'] )) $lines[] = 'DESCRIPTION:' . $this->escapeString($mass['comment'] ?? '');
+        //$lines[] = 'DESCRIPTION:'.$uid; // TODO: TYPES, COMMENT, ETC.
          
         if (!empty($mass['types'])) {
             $lines[] = 'CATEGORIES:' . implode(',', $this->escapeString($mass['types']));
