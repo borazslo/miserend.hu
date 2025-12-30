@@ -338,24 +338,16 @@ class CalMass extends CalModel
                 }
                 
                 if (!is_array($rrule) || empty($rrule)) {
-                    throw new \Exception('Ilyennek igazából nem szabadna lennie, mert egy napos rrule-t kapnak az egyedi alkalmak. ');
-                     $massPeriods[] = [
-                        'mass_id' => $mass->id,
-                        'period_id' => $mass->period_id,
-                        'generated_period_id' => $generatedPeriod->id,
-                        'color' => $generatedPeriod->color,
-                        'church_id' => $mass->church_id,
-                        'start_date' => $start->toDateString(),
-                        'end_date' => $end->toDateString(),
-                        'rite' => $mass->rite,
-                        'types' => $mass->types,
-                        'title' => $mass->title,
-                        'duration_minutes' => $durationMinutes,
-                        'lang' => $mass->lang,
-                        'comment' => $mass->comment                      
+                    
+                    // throw new \Exception('Ilyennek igazából nem szabadna lennie, mert egy napos rrule-t kapnak az egyedi alkalmak. ');
+                    echo "Ilyennek igazából nem szabadna lennie, mert egy napos rrule-t kapnak az egyedi alkalmak. ".$mass->id;
+                    $rrule = [
+                        "freq" => "daily",
+                        "count" => 1,
+                        "dtstart" => $start->copy()->format('Y-m-d\TH:i:s'),
                     ];
-                    echo "egyedi";  //
-                    continue;
+
+                    
                 }
 
                 
