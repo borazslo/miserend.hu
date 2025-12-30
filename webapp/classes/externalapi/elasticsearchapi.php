@@ -262,7 +262,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 
 		$elastic = new \ExternalApi\ElasticsearchApi();
 		
-		// Delete existing masses for the given church IDs
+		// Delete existing masses for the given church IDs		
 		$elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "POST");
 		$elastic->buildQuery('mass_index/_delete_by_query', json_encode([
 			"conflicts" => "proceed",
@@ -271,20 +271,15 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			]
 		]));
 		$elastic->run();
+		if(isset($elastic->error)) {			
+			throw new \Exception("Could not delete existing masses!\n" . $elastic->error);
+		}
 		
-		$churchTimezones = [];
-		$allMasses = [];
-		$churches = [];
-
-		foreach ($tids as $tid) {
-			$_SERVER['REQUEST_METHOD'] = false; // Egyelőre sajnos kell mert a generate az bizony a REQUEST_METHOD alapján dönt, hogy kérdez vagy mond	
-			$masses =  \Eloquent\CalMass::where('church_id', $tid)->get()->all();
-			if (!empty($masses)) {
-				$allMasses = array_merge($allMasses, $masses);
-			}
-			$church = \Eloquent\Church::find($tid);
-			$churchTimezones[$tid] = $church->time_zone ?? 'Europe/Budapest';
-			$churches[$tid] = $church->toElasticArray();
+		$churchTimezones = [];		
+		$churches = \Eloquent\Church::whereIn('id', $tids)->get()->keyBy('id');
+		$allMasses = \Eloquent\CalMass::whereIn('church_id', $tids)->get()->all();
+		foreach ($churches as $id => $church) {
+			$churchTimezones[$id] = $church->time_zone ?? 'Europe/Budapest';			
 		}
 
 		$debug = [];
@@ -307,51 +302,31 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			// Build and send bulk inserts in chunks of 500 when large
 			$chunkSize = 500;
 			$totalMasses = count($massInstances);
-			if ($totalMasses > $chunkSize) {
-				$offset = 0;
-				while ($offset < $totalMasses) {
-					$slice = array_slice($massInstances, $offset, $chunkSize);
-					$bulkInsert = [];
-					foreach ($slice as $massData) {
-						$bulkInsert[] = [
-							'index' => [
-								'_index' => 'mass_index',
-								'_id' => uniqid()
-							]
-						];
-						$massData['church'] = $churches[$churchId];
-						$bulkInsert[] = $massData;
-					}
-
-					if (!empty($bulkInsert)) {
-						$elasticResult = $elastic->putBulk($bulkInsert);
-						if (!$elasticResult) {
-							// optionally collect or log errors
-						}
-					}
-
-					$offset += $chunkSize;
-				}
-			} else {
+			
+			$offset = 0;
+			while ($offset < $totalMasses) {
+				$slice = array_slice($massInstances, $offset, $chunkSize);
 				$bulkInsert = [];
-				foreach ($massInstances as $massData) {
+				foreach ($slice as $massData) {
 					$bulkInsert[] = [
 						'index' => [
 							'_index' => 'mass_index',
 							'_id' => uniqid()
 						]
 					];
-					$massData['church'] = $churches[$churchId];
+					$massData['church'] = $churches[$churchId]->toElasticArray();
 					$bulkInsert[] = $massData;
 				}
 
 				if (!empty($bulkInsert)) {
 					$elasticResult = $elastic->putBulk($bulkInsert);
-					if ($elasticResult) {
-						// success
+					if (!$elasticResult) {
+						throw new \Exception("Could not insert mass data for church ID $churchId!\n".$elastic->error);						
 					}
 				}
+				$offset += $chunkSize;
 			}
+			 
 		}	
 		
 		echo "Elkészült a frissítés " . (time() - $startTime) . " másodperc alatt azaz ".round((time() - $startTime)/60,2)." perc alatt.<br>\n";	

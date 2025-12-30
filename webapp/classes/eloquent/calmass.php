@@ -230,54 +230,67 @@ class CalMass extends CalModel
 
     static private function applyCollisionAvoidance(array $masses): array
     {
-        $massesWithoutCollision = [];
-        $noPeriodMasses = [];
-
-        foreach ($masses as $mass) {
-            if (empty($mass->period_id)) {
-                $noPeriodMasses[] = $mass;
-                continue;
+        // Kevés CalPeriod van, és minden misénél kell, ezért inkább előre egyszer töltjük be mindet.
+        $calPeriods = CalPeriod::all()->keyBy('id');        
+        // Aránylag kevés (kb 100) CalGeneratedPeriod van, ezért ezeket is betöltjük egyszerre.
+        $calGeneratedPeriods = CalGeneratedPeriod::all()->groupBy('period_id');
+        
+        // Amikor nagyon sok misét kell egyszerre kezelni, akkor végtelenbe lelassulunk,
+        // ezért inkább csak templomonként nézzük meg
+        $massesByChurch = [];
+        foreach($masses as $mass) {
+            if(!isset($massesByChurch[$mass->church_id])) {
+                $massesByChurch[$mass->church_id] = [];
             }
-
-            $weight = CalPeriod::where('id', $mass->period_id)->value('weight');
-            if ($weight === null) {
-                $noPeriodMasses[] = $mass;
-                continue;
-            }
-
-            $massesWithoutCollision[$weight][] = $mass;
+            $massesByChurch[$mass->church_id][] = $mass;
         }
 
-        foreach ($massesWithoutCollision as $currentWeight => $currentMasses) {
-            if ($currentWeight > 1) {
-                $lowerPeriodMasses = [];
+        $results = [];
+        foreach($massesByChurch as $masses) {
+            $massesWithoutCollision = [];
+            $noPeriodMasses = [];
 
-                foreach (range(0, $currentWeight - 1) as $lowerWeight) {
-                    if (isset($massesWithoutCollision[$lowerWeight])) {
-                        $lowerPeriodMasses = array_merge($lowerPeriodMasses, $massesWithoutCollision[$lowerWeight]);
-                    }
+            foreach ($masses as $mass) {
+                if (empty($mass->period_id) or !isset($calPeriods[$mass->period_id])) {
+                    $noPeriodMasses[] = $mass;
+                    continue;
                 }
+                $weight = $calPeriods[$mass->period_id]->weight;
+                $massesWithoutCollision[$weight][] = $mass;
+            }
+            
+            foreach ($massesWithoutCollision as $currentWeight => $currentMasses) {
+                if ($currentWeight > 1) {
+                    $lowerPeriodMasses = [];
 
-                foreach ($lowerPeriodMasses as $lowerMass) {
-                    foreach ($currentMasses as $higherMass) {
-                        $mPeriodExists = CalGeneratedPeriod::where('period_id', $lowerMass->period_id)->exists();
-                        if ($mPeriodExists) {
-                            $experiod = $lowerMass->experiod ?? [];
-                            if (!in_array($higherMass->period_id, $experiod)) {
-                                $experiod[] = $higherMass->period_id;
-                                $lowerMass->experiod = $experiod; // csak a tömbben frissítjük
-                            }
+                    foreach (range(0, $currentWeight - 1) as $lowerWeight) {
+                        if (isset($massesWithoutCollision[$lowerWeight])) {
+                            $lowerPeriodMasses = array_merge($lowerPeriodMasses, $massesWithoutCollision[$lowerWeight]);
                         }
                     }
+
+                    foreach ($lowerPeriodMasses as $lowerMass) {
+                        foreach ($currentMasses as $higherMass) {
+                            $mPeriodExists = $calGeneratedPeriods[$lowerMass->period_id] ?? false;
+                            if ($mPeriodExists) {
+                                $experiod = $lowerMass->experiod ?? [];
+                                if (!in_array($higherMass->period_id, $experiod)) {
+                                    $experiod[] = $higherMass->period_id;
+                                    $lowerMass->experiod = $experiod; // csak a tömbben frissítjük
+                                }
+                            }
+                        }
+                    } 
                 }
             }
-        }
+            
+            foreach ($massesWithoutCollision as $group) {
+                $results = array_merge($results, $group);
+            }
 
-        $result = [];
-        foreach ($massesWithoutCollision as $group) {
-            $result = array_merge($result, $group);
+            $results = array_merge($results, $noPeriodMasses);
         }
-        return array_merge($result, $noPeriodMasses);
+        return $results;
     }
 
       /**
