@@ -311,7 +311,15 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             if(isset($masses)) {
                 foreach($masses as $key => $mise) {
                     $misek[$key]['idopont'] = date('Y-m-d H:i:s', strtotime($mise->start_date));
-                    $info = trim( $mise->rite." ".implode(',',$mise->types)." ".$mise->lang." ".$mise->comment);
+                    $info = trim( t($mise->rite)." ".t($mise->title));
+                    if( $this->orszag != 12 or $mise->lang != 'hu') {
+                        $info .= ' ' . t('LANGUAGES.'.$mise->lang)." nyelven";
+                    }
+                    if (!empty($mise->types)) {                        
+                        $translatedTypes = array_map(function($type) { return t($type); }, $mise->types);
+                        $info .= ', ' . implode(', ', $translatedTypes);                        
+                    }
+                    if($mise->comment) $info .= ' (' . $mise->comment.')';
                     if($info != '') $misek[$key]['informacio'] = $info;
                 }	            
             }
