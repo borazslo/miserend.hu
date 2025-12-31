@@ -293,6 +293,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         if($length == 'elastic') {
             $elastic = true;
             $length = 'medium';
+        } else {
+            $elastic = false;
         }
 
         if($length == false) $length = "minimal";

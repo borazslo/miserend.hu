@@ -9,7 +9,7 @@
      <strong><span class=kiscim>Keresési paraméterek:</span></strong><br/>
     {% if filters is defined and filters|length %}
         {% for filter in filters %}
-            <span class="alap"><img src="/img/negyzet_lila.gif" align="absmidle"> {{ filter }}</span><br/>
+            <span class="alap"><img src="/img/negyzet_lila.gif" align="absmidle"> {{ filter|striptags('<b><i>')|raw }}</span><br/>
         {% endfor %}
     {% endif %}
     <br/>

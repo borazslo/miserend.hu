@@ -17,7 +17,7 @@ class SearchResultsMasses extends Html {
         if ($ehm > 0) {
             $ehmnev = DB::table('egyhazmegye')->where('id',$ehm)->pluck('nev')[0];
             $search->addMust(["wildcard" => ['church.egyhazmegye.keyword' => $ehmnev ]]); 
-            $search->filters[] = "Egyházmegye: " . htmlspecialchars($ehmnev) ." egyházmegye";                              
+            $search->filters[] = "Egyházmegye: <b>" . htmlspecialchars($ehmnev) ." egyházmegye</b>";                              
         }
             
         // nyelvek filter
@@ -25,15 +25,9 @@ class SearchResultsMasses extends Html {
         if($tnyelv == "h") $tnyelv = "hu";
         if ($tnyelv AND $tnyelv != '0') {
             $search->addMust(["term" => ['church.nyelvek' => $tnyelv ]]); 
-            $search->filters[] = "Amelyik templomban van '" . htmlspecialchars($tnyelv) . "' nyelvű mise.";                              
+            $search->filters[] = "Amelyik templomban van <b>" . htmlspecialchars(t('LANGUAGES.'.$tnyelv)) . "</b> nyelvű mise.";                              
         }
-                
-        $zeneT = array('g' => 'gitáros', 'o' => 'orgonás', 'cs' => 'csendes', 'na' => 'meghátorazatlan');
-        $korT = array('csal' => 'családos', 'd' => 'diák', 'ifi' => 'ifjúsági', 'na' => 'meghátorazatlan');
-        $ritusT = array('gor' => 'görögkatolikus', 'rom' => 'római katolikus', 'regi' => 'régi rítusú');
-        $nyelvekT = array('h' => 'magyar', 'en' => 'angol', 'de' => 'német', 'it' => 'olasz', 'va' => 'latin', 'gr' => 'görög', 'sk' => 'szlovák', 'hr' => 'horvát', 'pl' => 'lengyel', 'si' => 'szlovén', 'ro' => 'román', 'fr' => 'francia', 'es' => 'spanyol');
-        $tartalom = '';        
-
+        
         // Main keyword search
         if (isset($_REQUEST['kulcsszo']) AND $_REQUEST['kulcsszo'] != '') {            
             $search->keyword($_REQUEST['kulcsszo']);
@@ -69,7 +63,7 @@ class SearchResultsMasses extends Html {
                 $mustNotRites = array_filter(array_map('trim', explode(',', $ritesReq['must_not'])));
                 foreach ($mustNotRites as $r) {
                     if ($r === '') continue;
-                    $search->filters[] = "Kizárt rítus: " . htmlspecialchars($r);
+                    $search->filters[] = "A rítus nem lehet: <i>" . htmlspecialchars(t($r)) . "</i>";
                     // add to query must_not
                     $search->query['bool']['must_not'][] = [ 'term' => ['rite' => $r] ];
                 }
@@ -80,7 +74,13 @@ class SearchResultsMasses extends Html {
                 $shouldRites = array_filter(array_map('trim', explode(',', $ritesReq['should'])));
                 $shouldClauses = [];
 
+                // Add a human-readable filter listing allowed rites (translated)
+                if (!empty($shouldRites)) {
+                    $translated = array_map(function($r){ return t($r); }, $shouldRites);
+                    $search->filters[] = 'A rítus lehet <i>' . implode('</i> vagy <i>', $translated) . '</i>';
+                }
                 foreach ($shouldRites as $r) {
+                    
                     if ($r === '') continue;
                     // Build clause requiring this rite
                     $cl = [ 'bool' => [ 'must' => [ [ 'term' => ['rite' => $r] ] ] ] ];
@@ -95,6 +95,7 @@ class SearchResultsMasses extends Html {
                             } else {
                                 $tShould = array_filter(array_map('trim', explode(',', $typesReq[$r]['should'])));
                             }
+                            
                         }
                         $tMustNot = [];
                         if (!empty($typesReq[$r]['must_not'])) {
@@ -116,17 +117,23 @@ class SearchResultsMasses extends Html {
                             $cl['bool']['must'][] = [ 'bool' => [ 
                                 'should' => $shouldTerms, 
                                 'minimum_should_match' => 1 
-                            ]];
-
-                            $search->filters[] = "Rítus: " . htmlspecialchars($r) . " (típus kell: " . htmlspecialchars(implode(',', $tShould)) . ")";
+                            ]];                            
                         }
 
                         // If there are negative type constraints, add must_not for each
                         if (!empty($tMustNot)) {
                             foreach ($tMustNot as $tt) {
                                 $cl['bool']['must_not'][] = [ 'term' => ['types' => $tt] ];
-                            }
-                            $search->filters[] = "Rítus: " . htmlspecialchars($r) . " (típus kizárva: " . htmlspecialchars(implode(',', $tMustNot)) . ")";
+                            }                            
+                        }
+                        foreach($tShould as $k => $ts)  $tShould[$k] = t($ts);
+                        foreach($tMustNot as $k => $ts)  $tMustNot[$k] = t($ts);
+
+                        if (!empty($tShould) or !empty($tMustNot)) {
+                            $search->filters[] = "Ha <b>".t($r)."</b> rítus, akkor  " . 
+                                (!empty($tShould) ? "legyen: <b>" . implode('</b> vagy <b>', $tShould) . "</b>" : '') . 
+                                (!empty($tShould) && !empty($tMustNot) ? ", de " : '') .
+                                (!empty($tMustNot) ? "ne legyen: <b>" . implode('</b> vagy <b>', $tMustNot) . "</b>" : '');
                         }
                     }
 
@@ -141,9 +148,7 @@ class SearchResultsMasses extends Html {
             
         }
 
-        //printr(json_encode($search->query)); exit;
-        $tartalom.="</span><br/>";
-
+        
         $templomurlap = "<img src=/img/space.gif width=5 height=6><br><a href=\"/\" class=link><img src=/img/search.gif width=16 height=16 border=0 align=absmiddle hspace=2><b>Vissza a főoldali keresőhöz</b></a><br><img src=/img/space.gif width=5 height=6>";
 
 
@@ -177,7 +182,7 @@ class SearchResultsMasses extends Html {
         $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
 
         $this->setTitle("Szentmise kereső");
-        $this->tartalom = $tartalom;    
+        
         $this->templomurlap = $templomurlap;
         $this->template = 'search/resultsmasses.twig';
         

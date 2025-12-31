@@ -31,7 +31,7 @@ class SearchResultsChurches extends Html {
         if ($ehm > 0) {
             $ehmnev = DB::table('egyhazmegye')->where('id',$ehm)->pluck('nev')[0];
             $search->addMust(["wildcard" => ['egyhazmegye.keyword' => $ehmnev ]]); 
-            $search->filters[] = "Egyházmegye: " . htmlspecialchars($ehmnev) ." egyházmegye";                              
+            $search->filters[] = "Egyházmegye: <b>" . htmlspecialchars($ehmnev) ." egyházmegye</b>";                              
         }
 
         // gorog only
@@ -45,7 +45,7 @@ class SearchResultsChurches extends Html {
         if($tnyelv == "h") $tnyelv = "hu";
         if ($tnyelv AND $tnyelv != '0') {
             $search->addMust(["term" => ['nyelvek' => $tnyelv ]]); 
-            $search->filters[] = "Amelyik templomban van '" . htmlspecialchars($tnyelv) . "' nyelvű mise.";                              
+            $search->filters[] = "Amelyik templomban van <b>" . htmlspecialchars(t('LANGUAGES.'.$tnyelv)) . "</b> nyelvű mise.";                              
         }
 
         //Let's do the search

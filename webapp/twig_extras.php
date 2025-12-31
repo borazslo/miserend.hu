@@ -72,8 +72,8 @@ function twig_hungarian_date_format($date, $format = null) {
 
 function twig_translate($text) {
     
-    // Ez egy helyőrző függvény a fordításhoz.
-    // Itt lehet integrálni egy fordító rendszert, pl. gettext vagy más.
-    // Jelenleg csak visszaadja az eredeti szöveget.
-    return "---".$text;
+    $text = Translator::translate($text);
+    
+    return $text;
 }
+

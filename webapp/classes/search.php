@@ -163,7 +163,7 @@ class Search {
     }
 
     function languages(array $languageAbbrevs) {
-        $this->filters[] = "Nyelvek: " . htmlspecialchars(implode(', ', $languageAbbrevs));
+        $this->filters[] = "Nyelv lehet: <b>" . htmlspecialchars(implode(', ', t($languageAbbrevs))) . "</b>";
         if (is_array($languageAbbrevs) && count($languageAbbrevs) > 0) {
             $this->query['bool']['must'][] = [
                 "terms" => ["lang" => $languageAbbrevs]
@@ -171,8 +171,8 @@ class Search {
         }
     }
 
-    function rites(array $rites) {        
-        $this->filters[] = "Rítus legyen " . htmlspecialchars(implode(', ', $rites));
+    function rites(array $rites) {
+        $this->filters[] = "Rítus legyen: <b>" . htmlspecialchars(implode(' vagy ', t($rites))) . "</b>";
         if (is_array($rites) && count($rites) > 0) {
             $this->query['bool']['must'][] = [
                 "terms" => ["rite" => $rites]
@@ -181,7 +181,7 @@ class Search {
     }
 
     function timeRange($fromDatetime, $toDatetime) {
-        $this->filters[] = "Időpont: " . htmlspecialchars($fromDatetime) . " - " . htmlspecialchars($toDatetime);                
+        $this->filters[] = "Időpont: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDatetime)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDatetime)) . "</b>";                
         $this->query['bool']['must'][] = [
             "range" => [
                 "start_date" => [
@@ -363,7 +363,7 @@ class Search {
         $elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "DELETE");
         $elastic->buildQuery('_pit', json_encode(['id' => [$pitId]]));
         $elastic->run();
-printr($elastic); 
+ 
         if (isset($elastic->jsonData->succeeded) && $elastic->jsonData->succeeded == true) {
             if ($pitId == $this->pitId) {
                 $this->pitId = false;

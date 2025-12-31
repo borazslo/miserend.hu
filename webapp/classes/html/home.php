@@ -36,13 +36,7 @@ class Home extends Html {
                 'id' => 'keyword',
                 'size' => 20,
                 'class' => 'keresourlap',
-                'placeholder' => 'név, település, kulcsszó'),
-            'varos' => array(
-                'name' => "varos",
-                'size' => 20,
-                'id' => 'varos',
-                'class' => 'keresourlap',
-                'placeholder' => 'település'),
+                'placeholder' => 'név, település, kulcsszó'),           
             'hely' => array(
                 'name' => "hely",
                 'size' => 20,
@@ -97,42 +91,7 @@ class Home extends Html {
             $kulonbseg = 7 - $mainap;
             $vasarnap = date('Y-m-d', (time() + (86400 * $kulonbseg)));
         }
-        $searchform['mikor'] = array(
-            'name' => "mikor",
-            'id' => "mikor",
-            'class' => 'keresourlap',
-            'onChange' => "if (this.value == 'x') $('#md').show().focus(); else $('#md').hide();",
-            'options' => array($vasarnap => 'vasárnap', $ma => 'ma', $holnap => 'holnap', 'x' => 'adott napon:')
-        );
-        $searchform['mikordatum'] = array(
-            'name' => "mikordatum",
-            'id' => "md",
-            'style' => "display:none",
-            'class' => "keresourlap datepicker",
-            'size' => "10",
-            'value' => $ma
-        );
-        $searchform['mikor2'] = array(
-            'name' => "mikor2",
-            'id' => "mikor2",
-            'style' => "margin-top:12px",
-            'class' => 'keresourlap',
-            'onChange' => "
-						if(this.value == 'x') {
-							document.getElementById('md2').style.display='inline'; 
-							alert('FIGYELEM! Fontos a formátum!');} 
-						else {document.getElementById('md2').style.display='none';}",
-            'options' => array(0 => 'egész nap', 'de' => 'délelőtt', 'du' => 'délután', 'x' => 'adott időben:')
-        );
-        $searchform['mikorido'] = array(
-            'name' => "mikorido",
-            'id' => "md2",
-            'style' => "display:none;",
-            'class' => "keresourlap",
-            'size' => "7",
-            'value' => $mikor
-        );
-
+       
         //languages
         $searchform['nyelv'] = array(
             'name' => "nyelv",
