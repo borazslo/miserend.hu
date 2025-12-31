@@ -31,17 +31,40 @@ class Service_times extends Api {
         $this->return = [];
 
 		
-        $churches = \Eloquent\Church::limit(1000000)->get();
+        $churches = \Eloquent\Church::limit(1000000000)->get();
 		set_time_limit('600');
         foreach($churches as $church ) {
 			
 			$church->loadAttributes();
-		
-            $serviceTimes = new \ServiceTimes();
-            $serviceTimes->loadMasses($church->id,['skipvalidation']);
-            
+		                        
 			$syntax = 'horariosdemisa';
+
 			
+			$serviceTimes = '';
+			foreach($church->MassRRulesByPeriod as $period) {
+				$serviceTimes .= isset($period['name']) ? $period['name']."\n" : '';	
+				
+				foreach($period['massrules'] as $mass) {
+					if(isset($mass['start_date'])) {
+						$serviceTimes .= !isset($period['name']) ? date('Y-m-d', strtotime($mass['start_date'])).", " : '';
+						$serviceTimes .= date('l H:i', strtotime($mass['start_date']))." ";
+					} else {
+						$serviceTimes .= "(ERROR/BUG no start_date) ";
+					}
+					if($mass['rite'] != 'ROMAN_CATHOLIC') $serviceTimes .= $mass['rite']." ";
+					$serviceTimes .= $mass['title']." (".$mass['lang'].")";	
+					if(!empty($mass['types'])) {
+						$serviceTimes .= ', '.implode(', ', $mass['types']);
+					}
+					if($mass['comment']) $serviceTimes .= ' - '.$mass['comment'];
+					$serviceTimes .= "\n ".$mass['rrule']['readable']."\n";
+
+				}
+				$serviceTimes .= "\n\n";
+			
+
+			}
+
 			if($syntax == 'horariosdemisa') {
 				$return = [
 					'church_id' => $church->id,
@@ -53,7 +76,7 @@ class Service_times extends Api {
 					'email' => $church->pleb_eml,
 					'url' => false,
 					'location' => [$church->location->lat,$church->location->lon],
-					'service_times' => $serviceTimes->string,
+					'service_times' => $serviceTimes,
 					'confessions' => false,
 					'adoration' => false,
 					'additional_information' => $church->misemegj,
@@ -74,8 +97,8 @@ class Service_times extends Api {
 						$return['name'] .= ' / '.$church->{"name:en"};
 					}
 				}
-						
-				$return['additional_information'] = 'Source: https://miserend.hu/templom/'.$church->id;
+				if($return['additional_information'] != '')	$return['additional_information'] .= "\n";		
+				$return['additional_information'] .= 'Source: https://miserend.hu/templom/'.$church->id. " (".date('Y-m-d').")";
 				
 				$this->return[] = $return;
 			} else {

@@ -195,5 +195,35 @@ class SimpleRRule
             return !in_array($date->toDateString(), $this->exDate);
         });
     }
+    
+
+    // EZt át kéne venni a miserend.hu/calendar/src/app/components/church-calendar/church-calendar.component.ts 
+    // private getReadableRRule(mass: Mass) függvénye alapján
+
+    function toText(): string {
+        $parts = [];
+        $parts[] = "Freq: " . $this->freq;
+        $parts[] = "Interval: " . $this->interval;
+        if (!empty($this->byWeekday)) {
+            $parts[] = "ByWeekday: " . implode(',', $this->byWeekday);
+        }
+        if ($this->bySetpos) {
+            $parts[] = "BySetpos: " . $this->bySetpos;
+        }
+        if (!empty($this->byWeekNo)) {
+            $parts[] = "ByWeekNo: " . implode(',', $this->byWeekNo);
+        }
+        // Nem kell, mert időszakok végéig tart mindig.        
+        //if ($this->until) {
+        //    $parts[] = "Until: " . $this->until->toIso8601String();
+        //}
+        if ($this->count) {
+            $parts[] = "Count: " . $this->count;
+        }
+        if (!empty($this->exDate)) {
+            $parts[] = "ExDate: " . implode(',', $this->exDate);
+        }
+        return implode('; ', $parts);
+    }
 
 }

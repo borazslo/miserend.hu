@@ -211,9 +211,58 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany('\Eloquent\Photo')->ordered();
     }
 
-    public function massrules()
+    public function getMassRRulesByPeriodAttribute()
     {
-        return $this->hasMany('\Eloquent\CalMass', 'church_id');
+        $massRRules = $this->hasMany('\Eloquent\CalMass', 'church_id')->with('period')->get()->groupBy('period_id')->toArray();
+        
+        $RRulesByPeriods = [];
+        foreach($massRRules as $periodId => $massRules) {
+            $RRulesByPeriods[$periodId] = $massRules[0]['period'];
+            $RRulesByPeriods[$periodId]['massrules'] = [];
+            foreach($massRules as $k => $massRule) {
+                if(!empty($massRule['rrule'])) {
+                    $rrule = new \SimpleRRule($massRule['rrule']);                    
+                    $massRule['rrule']['readable'] = $rrule->toText();
+                    //TODO: Itt ez hiba, mert nem egy konrkét legenerált Periodban nézünk szét, hanem csak egy általánosban
+                    // Vagyis a konkrét dátumokban keresés teljesen hülyeség.
+                    // Nekünk amúgy is csak azért kell, hogy tudjuk milyen napon kezdődik. Azt meg megtudhatjuk máshogy is.
+                    $occ = reset($rrule->getOccurrences());
+                    if($occ) {
+                        $massRule['start_date'] = $occ->toString();                                                
+                    }
+                    $RRulesByPeriods[$periodId]['massrules'][] = $massRule;
+                }
+            } 
+                        
+            // sort massrules by weekday of start_date (Sunday=0 .. Saturday=6), tie-breaker by datetime
+            usort($RRulesByPeriods[$periodId]['massrules'], function($a, $b) {
+                $wa = isset($a['start_date']) ? (int)date('w', strtotime($a['start_date'])) : 0;
+                $wb = isset($b['start_date']) ? (int)date('w', strtotime($b['start_date'])) : 0;
+                if ($wa === $wb) {
+                    $ta = isset($a['start_date']) ? strtotime($a['start_date']) : 0;
+                    $tb = isset($b['start_date']) ? strtotime($b['start_date']) : 0;
+                    return $ta < $tb ? -1 : ($ta > $tb ? 1 : 0);
+                }
+                return $wa < $wb ? -1 : 1;
+            });
+            
+        }
+
+        return $RRulesByPeriods;
+    }
+
+    
+    public function getGeneratedMassRRulesAttribute() {
+        $masses = $this->hasMany('\Eloquent\CalMass', 'church_id');
+        
+        $massPeriods = \Eloquent\CalMass::generateMassPeriodInstancesForYears( $masses->get()->all(), [], [date('Y'),date('Y')+1]);
+        foreach($massPeriods as $k => $mass) {
+            $rrule = new \SimpleRRule($mass['rrule']);
+            $occ = reset($rrule->getOccurrences());                        
+            $massPeriods[$k]['start_date'] = $occ->toString();
+            $massPeriods[$k]['readable_rrule'] = $rrule->toText();
+        }
+        return $massPeriods;
     }
 
     public function getLanguagesAttribute() {

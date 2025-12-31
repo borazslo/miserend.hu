@@ -40,6 +40,10 @@ class CalMass extends CalModel
     protected $primaryKey = 'id';
     protected $keyType = 'int';
 
+    public function period()
+    {
+        return $this->belongsTo(CalPeriod::class, 'period_id');
+    }
     /**
      * Generálja a miseidőpontokat adott évekre,
      * és templomonként csoportosítva visszaadja őket.
