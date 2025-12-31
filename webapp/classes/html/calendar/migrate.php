@@ -16,6 +16,13 @@ class Migrate extends \Html\Html {
             ];
 
     public function __construct($path) {
+
+        global $user;
+        if (!isset($user->isadmin) or !$user->isadmin) {
+            addMessage("Hozzáférés megtagadva!", "danger");
+            $this->redirect('/');
+        }
+        
         set_time_limit(300);
         ini_set('memory_limit', '512M');
 
