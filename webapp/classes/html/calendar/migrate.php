@@ -59,6 +59,9 @@ class Migrate extends \Html\Html {
             $countmisekwitherror = 0;
             //printr($templomok);
 
+            // pluck only the id of "Egész évben" period
+            $egeszEvbenId = \Eloquent\CalPeriod::where('name', 'Egész évben')->value('id');
+            
             
            $nyelv = array(
                 'h' => 'magyar',
@@ -267,10 +270,21 @@ class Migrate extends \Html\Html {
                                         $rrule['freq'] = 'yearly';
                                         $rrule['bymonthday'] = [ (int)substr($mise->tol, 3,2) ];
                                         $rrule['bymonth'] = [ (int)substr($mise->tol, 0,2) ];
-                                    } else {
-                                        echo "error :(";
-                                        echo $period->name;
-                                        printr($mise);
+                                        $calmass->period_id = $egeszEvbenId;
+                                    }
+                                    else if (preg_match('/^(\d{2})-(\d{2})(?:\s*-8)?$/', trim($mise->tol), $m)) {
+                                        $start_date = date('Y')."-".sprintf('%02d-%02d', (int)$m[1], (int)$m[2]);
+                                        $start_min = isset($mise->ido) ? preg_replace('/:\d{2}$/', '', trim($mise->ido)) : '00:00';
+                                        $calmass->start_date = $start_date."T".$start_min;
+                                        $rrule['until'] = $start_date.$rrule['until'];
+                                        $rrule['dtstart'] = $start_date."T".$start_min;
+                                        $rrule['freq'] = 'yearly';
+                                        $rrule['bymonth'] = [ (int)$m[1] ];
+                                        $rrule['bymonthday'] = [ (int)$m[2] ];          
+                                        $calmass->period_id = $egeszEvbenId;
+                                    }
+                                     else {                                        
+                                        throw new \Exception("Invalid single-day period date: ".$mise->tol);
                                     }
 
                                 }
@@ -289,22 +303,41 @@ class Migrate extends \Html\Html {
                         if ( $code > 0  ) {
                             // egy misére vonatkozó hiba
                             $countmisekwitherror++;
+                            
+                            // Gyakran van hogy nem is ott tartunk ahol tartunk, és ezért jobb az üzenetből kihalászni az id-t. Bocs.
+                            $msg = $e->getMessage();
+                            $massId = null;
+                            if (preg_match('/\(mass_id\s*:\s*(\d+)\)/', $msg, $m)) {
+                                $massId = (int)$m[1];
+                                $mise = DB::table('misek')->where('id', $massId)->first();                                                                 
+                            }
+
+                                
                             if(!isset($mise->error)) $mise->error = $e->getMessage();
-                            $masseswitherror[$mise->id] = $mise;   
-                            //echo  $code." -- Error processing mise id=".$mise->id.", templom id = ".$mise->tid.": ".$e->getMessage()."<br/>\n"; 
-                        
-                        }  else {                       
-                            // periódusokra vonatkozó hiba 
+                            $masseswitherror[$mise->id] = $mise;
+                            //echo  $code." -- Error processing mise id=".$mise->id.", templom id = ".$mise->tid.": ".$e->getMessage()."<br/>\n";
+
+                        }  else {
+                            // periódusokra vonatkozó hiba
                             $countmisekwitherror += count($misek);
-                        
-                            $key = $misek[0]->tol."-".$misek[0]->ig;
+
+                            if(is_array($misek)) $firstKey = array_key_first($misek);
+                            if (!is_array($misek) && ($misek instanceof \Illuminate\Support\Collection || $misek instanceof \Illuminate\Database\Eloquent\Collection)) {
+                                // convert collection to plain array of objects so the existing array access works
+                                $misek = $misek->all();
+                                $firstKey = array_key_first($misek);
+                            }
+                                                    
+                            $key = $misek[$firstKey]->tol."-".$misek[$firstKey]->ig;
                             if(!isset($periodswitherror[$key])) {
-                                $periodswitherror[$key] = $misek[0];
+                                $periodswitherror[$key] = $misek[$firstKey];
                                 $periodswitherror[$key]->count = 0;
                                 $periodswitherror[$key]->countall = 0;
                             } 
                             $periodswitherror[$key]->count++;       
                             $periodswitherror[$key]->countall += count($misek);
+                            $periodswitherror[$key]->message = $e->getMessage();       
+                            
                         }
                         
                         /*
@@ -408,6 +441,7 @@ class Migrate extends \Html\Html {
                         <th>templom</th>
                         <th>count</th>
                         <th>countall</th>
+                        <th>error</th>
                         <th>updated_at</th>
                         <th></th>
                     </tr></thead>\n";
@@ -418,7 +452,7 @@ class Migrate extends \Html\Html {
                     $ig = isset($m->ig) ? htmlspecialchars($m->ig) : '';
                     $count = isset($m->count) ? (int)$m->count : 0;
                     $countall = isset($m->countall) ? (int)$m->countall : 0;
-                    
+                    $error = isset($m->message) ? htmlspecialchars($m->message) : '';
 
                     $church = null;
                     if (isset($m->tid)) {
@@ -437,6 +471,7 @@ class Migrate extends \Html\Html {
                     echo "<td>{$count}</td>";
                     echo "<td>{$countall}</td>";
                     echo "<td>{$updated_at}</td>";
+                    echo "<td>{$error}</td>";
                     echo "<td>";
                     echo "<a href=\"/templom/{$tid}/editschedule\">/editschedule</a> ";
                     echo "<a href=\"/calendar/migrate/?tid={$tid}\">/migrate/...</a>";
@@ -475,6 +510,7 @@ class Migrate extends \Html\Html {
                     echo "<tr>";
                     echo "<td>".$n."</td>";
                     echo "<td>";
+                    echo $mise->tid;
                     $church = \Eloquent\Church::find($mise->tid);
                     if ($church) {
                         $nev = htmlspecialchars($church->nev);
@@ -488,7 +524,12 @@ class Migrate extends \Html\Html {
                     echo "<td>".json_encode($mise->nap)."</td>";
                     echo "<td>".$mise->nap2."</td>";
                     echo "<td>".$mise->nyelv."</td>";
-                    echo "<td>".$mise->liturgy." ".json_encode($mise->liturgies)."</td>";
+                    echo "<td>";
+                    if (!empty($mise->liturgy)) 
+                        echo htmlspecialchars($mise->liturgy) ;
+                    if ( !empty($mise->liturgies)) 
+                        echo  htmlspecialchars(json_encode($mise->liturgies)) ;
+                    echo "</td>";
                     echo "<td>".$mise->milyen."</td>";
                     echo "<td>".$mise->megjegyzes."</td>";
                     echo "<td>".$church->updated_at."</td>";
@@ -738,7 +779,20 @@ class Migrate extends \Html\Html {
             $periodName = 'December';                                    
         }
        
-        else {
+        // Egy napos periódusoknál nem elvárás hogy legyen hozzá megfelelő az adatbázisban.
+        if(!isset($periodName) AND $mise->tol == $mise->ig) {
+            // Return a lightweight "period" object for single-day entries (id = null)
+            $period = new \stdClass();
+            $period->id = null;
+            $period->name = (string)$mise->idoszamitas;
+            $period->multi_day = 0;            
+            $period->start_date = false; // csak hogy legyen valami            
+            $period->end_date = false;
+            return $period;
+        } 
+
+        // De azért lehet olyan hogy semmit nem találtunk.
+        if(!isset($periodName)) {
             throw new \Exception("Cannot map mise idoszamitas with tol=".$mise->tol." and ig=".$mise->ig);
         }
 
@@ -873,10 +927,10 @@ class Migrate extends \Html\Html {
                     if(isset($attributeMapping[$attr[0]])) {                        
                         $mise->types[] = $attributeMapping[$attr[0]];
                     } else {
-                        throw new \Exception("Unknown attribute code '".$attr[0]."' in mise id=".$mise->id. "(templom id=".$templom->id.")", 30);
+                        throw new \Exception("Unknown attribute code '".$attr[0]."' (mass_id:".$mise->id.")", 30);
                     }
                 } else {
-                    throw new \Exception("Mismatched attribute period in mise id=".$mise->id. "(templom id=".$templom->id.")", 31);                        
+                    throw new \Exception("Mismatched attribute period in  (mass_id:".$mise->id.")", 31);
                 }
                 
             }                
@@ -924,7 +978,7 @@ class Migrate extends \Html\Html {
                 $mise->liturgy = implode(',', array_map(function($x){
                     return (string)$x[0] . (isset($x[1]) && $x[1] !== null && $x[1] !== '' ? (string)$x[1] : '');
                 }, $mise->liturgies));
-                $mise->error = "Complex liturgy found '".$mise->milyen;
+                $mise->error = "Complex liturgy found '".$mise->milyen. " (mass_id:".$mise->id.")";
                 throw new \Exception($mise->error, 25);
                 
             }
