@@ -59,9 +59,26 @@ class Migrate extends \Html\Html {
             $countmisekwitherror = 0;
             //printr($templomok);
 
-            $languages = unserialize(LANGUAGES);
-            $languages['hu'] = $languages['h'];
-            $languages = is_array($languages) ? array_keys($languages) : [];
+            
+           $nyelv = array(
+                'h' => 'magyar',
+                'hu' => 'magyar',
+                'en' => 'angol',
+                'fr' => 'francia',
+                'gr' => 'görög',
+                'hr' => 'horvát',
+                'va' => 'latin',
+                'pl' => 'lengyel',
+                'de' => 'német',
+                'it' => 'olasz',
+                'pt' => 'portugál',
+                'ro' => 'román',
+                'es' => 'spanyol',
+                'sk' => 'szlovák',
+                'si' => 'szlovén',
+                'uk' => 'ukrán'
+            );
+            $languages = array_keys($nyelv);
             
             
             $rows = [];
@@ -208,6 +225,7 @@ class Migrate extends \Html\Html {
                                     if($period->name == 'Karácsony') {
                                         {
                                             $rrule['freq'] = 'monthly';
+                                            $rrule['bymonth'] = 12;
                                             if( in_array($mise->tol, ['12-24','12-24 -8', '12.24 -8','12-25 -1', 'december 24. -8','December 24 -8'])) {
                                                 $mise->tol = '12-24';
                                                 $rrule['bymonthday'] = [24];
@@ -222,24 +240,37 @@ class Migrate extends \Html\Html {
                                             }
                                         }
                                     }
-                                    else if($period->name == 'Nagyszombat' or $period->name == 'Húsvéti vigília') {
-                                        $rrule['freq'] = 'weekly';
-                                        $rrule['byweekday'] = ['SA'];
-                                    } else if ($period->name == 'Nagycsütörtök' or $period->name = 'Nagcsütörtök') {
-                                        $rrule['freq'] = 'weekly';
-                                        $rrule['byweekday'] = ['TH'];
-                                    } else if ($period->name == 'Nagypéntek') {
-                                        $rrule['freq'] = 'weekly';
-                                        $rrule['byweekday'] = ['FR'];
-                                    } else if ($period->name == 'Húsvétvasárnap' or $period->name == 'Húsvét') {
-                                        $rrule['freq'] = 'weekly';
-                                        $rrule['byweekday'] = ['SU'];
+                                    else if(in_array($period->name, ['Szent három nap','Szent Három nap'])) {
+
+                                        if (in_array($mise->tol, ['Nagycsütörtök', 'Nagcsütörtök','Nagycsütörtök -8','Húsvétvasárnap -3'])) {
+                                            $rrule['freq'] = 'weekly';
+                                            $rrule['byweekday'] = ['TH'];
+                                        } else if (in_array($mise->tol, ['Nagypéntek','Nagycsütörtök +1','2025.04.18. -8','Húsvétvasárnap -2'])) {
+                                            $rrule['freq'] = 'weekly';
+                                            $rrule['byweekday'] = ['FR'];
+                                        } else if (in_array($mise->tol, ['Nagyszombat','Húsvéti vigília','Húsvétvasárnap -1','2025.04.19. -8'])) {
+                                            $rrule['freq'] = 'weekly';
+                                            $rrule['byweekday'] = ['SA'];
+                                        } else if (in_array($mise->tol, ['Húsvétvasárnap', 'Húsvét','Húsvétvasárnap -8','2026-04-05 -8','Húsvéthétfő -1'])) {
+                                            $rrule['freq'] = 'weekly';
+                                            $rrule['byweekday'] = ['SU'];
+                                        } else if (in_array($mise->tol, ['Húsvéthétfő','Húsvéthétfő -8','Húsvétvasárnap +1'])) {
+                                            $rrule['freq'] = 'weekly';
+                                            $rrule['byweekday'] = ['MO'];
+                                        } else {
+                                            echo "Invalid date for Szent három nap period: ".$mise->tol." (templom id: ".$t->id.", mise idoszamitas: ".$mise->idoszamitas.")<br/>\n";
+                                            throw new \Exception("Invalid date for Szent három nap period: ".$mise->tol);
+                                        }
                                     }
                                     // Dátumos nagy ünnepeink 
                                     else if (in_array($mise->tol, $this->specialDays) ) {
                                         $rrule['freq'] = 'yearly';
                                         $rrule['bymonthday'] = [ (int)substr($mise->tol, 3,2) ];
                                         $rrule['bymonth'] = [ (int)substr($mise->tol, 0,2) ];
+                                    } else {
+                                        echo "error :(";
+                                        echo $period->name;
+                                        printr($mise);
                                     }
 
                                 }
@@ -536,13 +567,7 @@ class Migrate extends \Html\Html {
         ] ) )  {
             $periodName = 'Karácsony';
         }
-        // Szent három nap
-        elseif (
-            in_array($mise->idoszamitas, ['Húsvét','Húsvétvasárnap','Nagyszombat','Húsvéti vigília','Nagypéntek', 'Nagycsütörtök'])
-        ) {
-            $periodName = 'Szent három nap';
 
-        }
         // Egy-egy nagy ünnep az egész évbenbe rakjuk bele
         else if ( in_array( $mise->tol, $this->specialDays ) and $mise->tol == $mise->ig ) {
             $periodName = 'Egész évben';
@@ -648,12 +673,18 @@ class Migrate extends \Html\Html {
         }
         // Húsvét
         else if ( in_array( [$mise->tol, $mise->ig], [
-                ['Nagykedd', 'Húsvéthétfő'],['Nagycsütörtök', 'Húsvétvasárnap'],['Nagycsütörtök', 'Nagycsütörtök'],['Nagycsütörtök', 'Húsvéthétfő']  
-                
-        ] ) ) { 
+                    ['Nagykedd', 'Húsvéthétfő'],['Nagycsütörtök', 'Húsvétvasárnap'],['Nagycsütörtök', 'Nagycsütörtök'],['Nagycsütörtök', 'Húsvéthétfő']                  
+                ] ) or
+                in_array( $mise->idoszamitas, [
+                'Nagycsütörtök','NAGYCSÜTÖRTÖK',
+                'Nagypéntek','NAGYPÉNTEK',
+                'Nagyszombat','Húsvéti vigília','Húsvét vigíliája','NAGYSZOMBAT',
+                'Húsvét','Húsvétvasárnap','Húsvéti mise a Kálvárián',
+                'Húsvéthétfő','HÚSVÉTHÉTFŐ','Húsvét hétfő'
+                ] )
+                ) { 
             $periodName = 'Szent három nap';                                    
         }
-
 
         //
         // Lássuk hónapokra bontva
@@ -908,7 +939,7 @@ class Migrate extends \Html\Html {
     // A miséknél a nyelv mező rendezése és optimalizálása
     public function normalizeMiseLanguage($misek, $templom) {
         $languages = unserialize(LANGUAGES);
-        $languages['hu'] = $languages['h'];
+        
         $languages = is_array($languages) ? array_keys($languages) : [];
             
         foreach( $misek as &$mise) {
