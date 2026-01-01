@@ -1,0 +1,264 @@
+<div class="mat-mdc-card-header">
+  <h2 mat-dialog-title>{{ data.title | translate }}</h2>
+  <button mat-icon-button mat-dialog-close class="dialog-header-close">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content class="mat-typography">
+
+  <mat-accordion class="example-headers-align" multi>
+    <mat-expansion-panel expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Időpont</mat-panel-title>
+        <mat-panel-description>
+          {{ 'MASS_DETAILS_DATETIME' | translate }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="datetime-settings">
+        @if (!data.event.editOne) {
+          <div class="full-width-item single-recurrence-selector">
+            <mat-radio-group [(ngModel)]="singleEvent" (change)="onRecurrenceModChange()">
+              <mat-radio-button class="no-select pointer" [value]="true">Egyszeri alkalom</mat-radio-button>
+              <mat-radio-button class="no-select pointer" [value]="false">Ismétlődő esemény</mat-radio-button>
+            </mat-radio-group>
+            <mat-divider></mat-divider>
+          </div>
+
+          @if (!singleEvent) {
+            <mat-form-field>
+              <mat-label>{{'PERIOD' | translate}}</mat-label>
+              <input type="text"
+                     placeholder="{{'PERIOD' | translate}}"
+                     matInput
+                     [formControl]="periodCtr"
+                     [matAutocomplete]="auto">
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayPeriod">
+                @for (period of filteredPeriods$ | async; track period.id) {
+                  <mat-option [value]="period">{{period.name}}</mat-option>
+                }
+              </mat-autocomplete>
+              <button matSuffix class="input-suffix" mat-icon-button title="" (click)="resetPeriod($event)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+              @if (periodCtr.invalid) {
+                @if (periodCtr.hasError('required')) {
+                  <mat-error class="input-error">{{ 'ERRORS.REQUIRED_PERIOD' | translate }}</mat-error>
+                }
+              }
+            </mat-form-field>
+          }
+        }
+        @if (!data.event.editOne && !singleEvent) {
+          @if (specialPeriodType === SpecialType.CHRISTMAS) {
+            <mat-form-field>
+              <mat-label>{{'CHRISTMAS_DAY' | translate}}</mat-label>
+              <mat-select [(ngModel)]="selectedChristmasDay" (selectionChange)="onSelectedChristmasDayChange()">
+                @for (day of christmasDays; track day) {
+                  <mat-option [value]="day">{{('CHRISTMAS_DAYS.' + day) | translate}}</mat-option>
+                }
+              </mat-select>
+              @if (christmasDayError) {
+                <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_CHRISTMAS_DAY' | translate }}</mat-error></div>
+              }
+            </mat-form-field>
+          } @else if (specialPeriodType === SpecialType.EASTER) {
+            <mat-form-field>
+              <mat-label>{{'EASTER_DAY' | translate}}</mat-label>
+              <mat-select [(ngModel)]="selectedEasterDay" (selectionChange)="onSelectedEasterDayChange()">
+                @for (day of easterDays; track day) {
+                  <mat-option [value]="day">{{('EASTER_DAYS.' + day) | translate}}</mat-option>
+                }
+              </mat-select>
+              @if (easterDayError) {
+                <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_EASTER_DAY' | translate }}</mat-error></div>
+              }
+            </mat-form-field>
+          } @else {
+            <mat-form-field>
+              <mat-label>{{'RECURRENCE' | translate}}</mat-label>
+              <mat-select [(ngModel)]="data.event.renum" name="renum" (selectionChange)="onRenumChange()">
+                @for (recurrence of Object.values(recurrences); track recurrence.type) {
+                  @if (recurrence.type !== Renum.NONE) {
+                    <mat-option
+                            [value]="recurrence.type"
+                            [matTooltip]="recurrence.hint"
+                            [matTooltipShowDelay]="1000">
+                      {{recurrence.name}}
+                    </mat-option>
+                  }
+                }
+              </mat-select>
+            </mat-form-field>
+
+            @if (recurrences[data.event.renum].multiDays) {
+              <mat-form-field>
+                <mat-label>{{'SELECTED_DAYS' | translate}}</mat-label>
+                <mat-select [(ngModel)]="selectedDays" multiple (selectionChange)="onSelectedDaysChange()">
+                  @for (day of allDays; track day) {
+                    <mat-option [value]="day">{{('DAYS.' + day) | translate}}</mat-option>
+                  }
+                </mat-select>
+                @if (dayError) {
+                  <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_DAYS' | translate }}</mat-error></div>
+                }
+              </mat-form-field>
+            } @else {
+              <mat-form-field>
+                <mat-label>{{'SELECTED_DAY' | translate}}</mat-label>
+                <mat-select [(ngModel)]="selectedDays" (selectionChange)="onSelectedDaysChange()">
+                  @for (day of allDays; track day) {
+                    <mat-option [value]="day">{{('DAYS.' + day) | translate}}</mat-option>
+                  }
+                </mat-select>
+                @if (dayError) {
+                  <div><mat-error class="input-error">{{ 'ERRORS.REQUIRED_DAY' | translate }}</mat-error></div>
+                }
+              </mat-form-field>
+            }
+          }
+        }
+
+        @if (singleEvent) {
+          <mat-form-field>
+            <mat-label>{{'START_DATE' | translate}}</mat-label>
+            <input matInput
+                   [matDatepicker]="datePicker"
+                   [(ngModel)]="data.event.start"
+                   [ngModelOptions]="{updateOn: 'blur'}">
+            <mat-datepicker #datePicker/>
+            <mat-datepicker-toggle [for]="datePicker" matSuffix/>
+          </mat-form-field>
+        }
+
+        <mat-form-field>
+          <mat-label>{{'START_TIME' | translate}}</mat-label>
+          <input matInput
+                 [matTimepicker]="timepicker"
+                 [(ngModel)]="data.event.start"
+                 (ngModelChange)="onStartTimeChange()"
+                 [ngModelOptions]="{updateOn: 'blur'}">
+          <mat-timepicker #timepicker/>
+          <mat-timepicker-toggle [for]="timepicker" matSuffix/>
+        </mat-form-field>
+      </div>
+
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{'DURATION' | translate}}</mat-panel-title>
+        <mat-panel-description>
+          @if (data.event.duration.days) {
+            <span>{{ data.event.duration.days }} {{ 'DURATION_DAYS' | translate }}&nbsp;</span>
+          }
+          @if (data.event.duration.hours) {
+            <span>{{ data.event.duration.hours }} {{ 'DURATION_HOURS' | translate }}&nbsp;</span>
+          }
+          @if (data.event.duration.minutes) {
+            <span>{{ data.event.duration.minutes }} {{ 'DURATION_MINUTES' | translate }}</span>
+          }
+          <mat-icon>hourglass_bottom</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="duration-wrapper">
+        <mat-form-field>
+          <mat-label>{{ 'DURATION_DAYS' | translate | titlecase }}</mat-label>
+          <input matInput type="number" [(ngModel)]="data.event.duration.days" min="0" max="366">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'DURATION_HOURS' | translate | titlecase }}</mat-label>
+          <input matInput type="number" [(ngModel)]="data.event.duration.hours" min="0" max="24">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'DURATION_MINUTES' | translate | titlecase }}</mat-label>
+          <input matInput type="number" [(ngModel)]="data.event.duration.minutes" min="0" max="59">
+        </mat-form-field>
+      </div>
+
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>{{'OTHER_SETTINGS' | translate}}</mat-panel-title>
+        <mat-panel-description>
+          <div class="text-description">
+            <span class="rite">{{ data.event.rite | translate }}</span>
+            <span>{{ data.event.title | translate }}</span>
+          </div>
+          <div class="description-icons">
+            @if (data.event.types.length > 0) {
+              @for (type of data.event.types; track type) {
+                <img class="type-icon"
+                     [matTooltip]="type | translate"
+                     [src]="'/cal_images/types/' + type.toLowerCase() + '.png'" [alt]="type | translate" />
+              }
+            }
+            <img class="type-icon"
+                 [matTooltip]="(('LANGUAGES.' + data.event.language) | translate) + ' nyelvű'"
+                 [src]="'/cal_images/flags/' + data.event.language.toLowerCase() + '.svg'" [alt]="(('LANGUAGES.' + data.event.language) | translate) + ' nyelvű'" />
+          </div>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <mat-form-field>
+        <mat-label>{{'RITE' | translate}}</mat-label>
+        <mat-select [(ngModel)]="data.event.rite" name="rite" (selectionChange)="onRiteChange()">
+          @for (rite of rites; track rite) {
+            <mat-option [value]="rite">
+              {{rite | translate}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{'MASS_TYPES' | translate}}</mat-label>
+        <mat-select [(ngModel)]="data.event.types" name="types" multiple>
+          @for (type of Object.values(RiteMassTypes[data.event.rite]); track type) {
+            <mat-option [value]="type">
+              {{type | translate}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{'TITLE' | translate}}</mat-label>
+        <mat-select [(ngModel)]="data.event.title" name="title">
+          @for (title of titles; track title) {
+            <mat-option [value]="title | translate">
+              {{title | translate}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{'LANGUAGE' | translate}}</mat-label>
+        <mat-select [(ngModel)]="data.event.language" name="renum">
+          @for (lang of languages; track lang) {
+            <mat-option [value]="lang">
+              {{('LANGUAGES.' + lang) | translate}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="comment">
+        <mat-label>{{ 'COMMENT' | translate }}</mat-label>
+        <textarea matInput [(ngModel)]="data.event.comment"></textarea>
+      </mat-form-field>
+
+    </mat-expansion-panel>
+  </mat-accordion>
+
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-flat-button mat-dialog-close>{{ 'CANCEL' | translate }}</button>
+  <button mat-flat-button (click)="onSave()">{{ 'SAVE' | translate }}</button>
+</mat-dialog-actions>

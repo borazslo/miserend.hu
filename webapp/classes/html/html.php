@@ -46,6 +46,7 @@ class Html {
 		$this->twig = new \Twig\Environment($loader); //cache:
         include_once('twig_extras.php');
         $this->twig->addFilter(new \Twig\TwigFilter('miserend_date', 'twig_hungarian_date_format'));
+        $this->twig->addFilter(new \Twig\TwigFilter('trans', 'twig_translate'));
         // DANGER: a twig declarálva van / meg van hívva a Load.php -ban is. Így ott is módosítani kellhet a filterket
 
     }
@@ -85,7 +86,7 @@ class Html {
                     ['title' => 'kezelendő észrevételek', 'url' => '/templom/list?status=Rnj&orderBy=updated_at+DESC', 'permission' => ''],
 
                     ['title' => 'egyházmegyei lista', 'url' => '/egyhazmegye/list', 'permission' => 'miserend'],
-                    ['title' => 'kifejezések és dátumok', 'url' => '/eventscatalogue', 'permission' => 'miserend'],
+                    ['title' => 'időszakok dátumai', 'url' => '/periodyeareditor', 'permission' => 'miserend'],
                     ['title' => 'statisztika', 'url' => '/stat', 'permission' => '"any"'],
                     ['title' => 'gyóntatások', 'url' => '/confessionscatalogue', 'permission' => 'miserend'],
 					['title' => 'egészség', 'url' => '/health', 'permission' => 'miserend'],

@@ -1,0 +1,43 @@
+{% set columns2 = true  %}
+{% extends  "layout.twig" %}
+
+{% import "forms.twig" as forms %}
+
+{% set title = "Beküldött javaslatok kezelése" %}
+
+{% block pageHeader %}
+    <div class="page-header">
+        <h2>            
+            Beküldött javaslatok kezelése: {{ church.names.0 }}
+			<div style="float:right" class="text-end">{% include "church/_adminlinks.twig" %}</div>
+            {% if church.alternative_names|length > 0 %}
+                <br/>
+                <small>
+                    <span class="hidden-xs hidden-sm">
+                       {{ church.alternative_names.0|raw }}{% if church.alternative_names|length > 1 %}, <a href="#" onclick="this.style.display='none'; document.getElementById('all-names').style.display='inline'; return false;">...</a><span id="all-names" style="display:none;" onclick="document.getElementById('all-names').style.display='none'; this.previousElementSibling.style.display='inline'; return false;">
+                            {{ church.alternative_names|slice(1)|join(", ")|raw }}                            
+                        </span>
+                    {% endif %}
+                    </span>
+                </small>
+            {% endif %}
+        </h2>
+    </div>
+{%  endblock %}
+
+{% block content %}
+
+{% include 'angularjs.twig' %}
+
+<style>
+ .text-box {
+	font-size: 0.92em;
+	background: #f8f9fa;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 7px 10px;
+	margin-top: 5px;
+	color: #333;
+ }
+</style>
+{% endblock %}

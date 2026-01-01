@@ -4,44 +4,52 @@ namespace Api;
 
 class Signup extends Api {
 
+    public $title = 'Új felhasználó regisztrálása';
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
+
+    public $fields = [
+        'username' => [
+            'required' => true,
+            'validation' => [
+                'string' => [
+                    'maxLength' => 20,
+                    'pattern' => '^[a-zA-Z0-9._-]+$'
+                ]
+            ],
+            'description' => 'a felhasználó regisztrált neve.',
+            'example' => 'ujfelhasznalo'
+        ],
+        'email' => [
+            'required' => true,
+            'validation' => 'string',
+            'description' => 'a felhasználó email címe. (A regisztrációról értesítést kap.)',
+            'example' => 'ujfelhasznalo@no-reply.nomail'
+        ],
+        'password' => [
+            'required' => true,
+            'validation' => 'string',
+            'description' => 'a jelszó egyszerű szövegként. (Jelenleg nincsen összetettségi követelmény.)'
+        ],
+        'nickname' => [             
+            'validation' => 'string',
+            'description' => 'Becenév vagy megszólítás.',
+            'example' => 'Józsi'
+        ],
+        'name' => [             
+            'validation' => 'string',
+            'description' => 'Teljes név.',
+            'example' => 'Kovács József'
+        ]
+    ];  
+
+
 
      public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Új felhasználó regisztrálása';
-        $docs['input'] = [
-            'username' => [
-                'required',
-                'string(20)',
-                'a felhasználó regisztrált neve. (Maximum 20 karakter. Ékezetek és speciális karakterek nélkül'
-            ],
-            'email' => [
-                'required',
-                'string',
-                'a felhasználó email címe. (A regisztrációról értesítést kap.)'
-            ],
-            'password' => [
-                'required',
-                'string',
-                'a jelszó egyszerű szövegként. (Jelenleg nincsen összetettségi követelmény.)'
-            ],
-            'nickname' => [
-                'optional',
-                'string',
-                'Becenév vagy megszólítás.'
-            ],
-            'name' => [
-                'optional',
-                'string',
-                'Teljes név.'
-            ]
-        ];
-
-
+        
         $docs['description'] = <<<HTML
         <p>Az API-n keresztül lehetséges új miserend felhasználó regisztrálása is. A megfelelő url-re JSON formátumban küldött adatok esetén JSON választ ad a rendszer.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/signup</code></p>
         HTML;
 
         $docs['response'] = <<<HTML
@@ -52,12 +60,6 @@ class Signup extends Api {
         HTML;
 
         return $docs;
-    }
-
-    public function validateInput() {
-        if (!isset($this->input['username']) OR ! isset($this->input['email']) OR ! isset($this->input['password'])) {
-            throw new \Exception("JSON input misses variables: username and/or email and/or password");
-        }
     }
 
     public function run() {

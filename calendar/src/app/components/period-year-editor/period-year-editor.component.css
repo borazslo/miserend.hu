@@ -1,0 +1,29 @@
+.component-wrapper {
+  max-width: 70em;
+  margin: 0 auto;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  column-gap: 1em;
+  row-gap: 1em;
+
+  & mat-form-field {
+    min-width: 20em;
+  }
+}
+
+.hint {
+  margin: 1em 0;
+}
+
+.footer {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  column-gap: 1em;
+  max-width: 60em;
+  margin: 0 auto;
+}

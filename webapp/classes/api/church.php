@@ -6,29 +6,31 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Church extends Api {
 
-    public $format = 'json'; //or text
-	public $requiredFields = array('id');
+    public $title = 'Egy misézőhely adatai és miséi röviden';
+    public $format = 'json'; //or text	
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
+
+    public $fields = [
+        'id' => [
+            'required' => true, 
+            'validation' => 'integer', 
+            'description' => 'A misézőhely azonosítója, amely egyedi azonosító a rendszerben.',
+            'example' => 7
+        ],
+        'response_length' => [
+            'validation' => [
+                'enum' => ['minimal', 'medium','full']
+            ],
+            'description' =>  'A válasz részletessége', 
+            'default' => 'medium'
+        ]
+    ];
 
     public function docs() {
         $docs = [];
-        $docs['title'] = 'Egy misézőhely adatai és miséi röviden';
-        $docs['input'] = [
-            'id' => [
-                'required',
-                'integer',
-                'A misézőhely azonosítója, amely egyedi azonosító a rendszerben.'
-            ],
-            'response_length' => [
-                'optional',
-                'enum(minimal, medium, full)', 
-                'A válasz részletessége: "minimal", "medium", vagy "full".',
-                'medium']
-        ];
-
+             
         $docs['description'] = <<<HTML
-        <p>Egy templom adatát adja vissza. Csak röviden, a legszükségesebb adatokkal. Az aktuális napi misék rendjét is hozza.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/church</code></p>
+        <p>Egy templom adatát adja vissza. Csak röviden, a legszükségesebb adatokkal. Az aktuális napi misék rendjét is hozza.</p>        
         HTML;
 
         $docs['response'] = <<<HTML
@@ -56,16 +58,7 @@ class Church extends Api {
 
         return $docs;
     }
-
-    public function validateInput() {
-		if (!is_numeric($this->input['id']))  {
-            throw new \Exception("JSON input 'id' should be an integer.");
-        }
-        if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
-            throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
-        }
-	}
-
+    
     public function run() {
         parent::run();
 		

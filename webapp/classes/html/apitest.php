@@ -1,6 +1,6 @@
 <?php
 
-namespace Html;
+namespace Html;    
 
 use Illuminate\Database\Capsule\Manager as DB;
 
@@ -9,17 +9,62 @@ class Apitest extends Html {
     public $sampleChurchId;
     public $sampleImageBase64;
     public $sampleImage; // For template compatibility
+    public $endpoints = [];
 
     public function __construct() {
         parent::__construct();
         $this->setTitle('API tesztelés');
 
         global $user;
-        if (!$user->isadmin) {
+        if (!isset($user->isadmin) OR !$user->isadmin) {
             addMessage("Hozzáférés megtagadva!", "danger");
             $this->redirect('/');
         }
 
+        $this->endpoints = [];
+        // Collect API endpoints
+        $endpointNames = \Api\Api::collectApiEndpoints();
+        foreach($endpointNames as $name) {
+            $className = 'Api\\' . $name;
+            $endpointClass = new $className();
+
+            $endpoint = new class {};
+            $endpoint->name = $name;
+
+            $payLoad = false;
+            foreach($endpointClass->fields as $field => $details) {
+                $parts = explode('/', $field);
+                $ref =& $payLoad;
+                foreach ($parts as $i => $part) {
+                    if (!isset($ref[$part]) || !is_array($ref[$part])) {
+                        $ref[$part] = [];
+                    }
+                    // If last part, set value
+                    if ($i === count($parts) - 1) {
+                        if(isset($details['example'])) {
+                            $ref[$part] = $details['example'];
+                        } elseif(isset($details['default'])) {
+                            if($details['default'] !== 'false' && $details['default'] !== false) {
+                                $ref[$part] = $details['default'];
+                            } else {
+                                $ref[$part] = '...';
+                            }
+                        } else {
+                            $ref[$part] = '...';
+                        }
+                    }
+                    $ref =& $ref[$part];
+                }
+            }
+
+            $this->endpoints[] = [
+               'url' => '/api/v4/' . strtolower($name),
+               'jsonPayload' => json_encode($payLoad,                   
+                   JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+               ),
+            ];
+        }
+        
         // Get a sample church ID for testing
         $this->sampleChurchId = 1;
         

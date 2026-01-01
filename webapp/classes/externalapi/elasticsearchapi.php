@@ -178,90 +178,9 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		return $this->jsonData->hits;
 	}
 
-	function search($keyword, $params = [] ) {
-		// Defaults
-		$default_params = [
-			'from'=>0,
-			'size'=>10
-		];		
-		$data = $default_params;
-		foreach($params as $key => $value) {
-			$data[$key] = $value;
-		}
-		
-		// Build the query
-		$data = [
-				'from' => $data['from'],
-				'size' => $data['size'],
-				'query' => ['bool' => ['should' => []]]];
-
-		if (preg_match('/\bid:(\d+)\b/i', $keyword, $matches)) {
-			$id = $matches[1];
-			$keyword = trim(str_replace($matches[0], '', $keyword));
-			$data['query'] = [
-				'bool' => [
-					'must' => [
-						['term' => ['id' => $id]]
-					],
-					'should' => [
-						[
-							'multi_match' => [
-								'query' => $keyword,
-								'fields' => ['id^100','names^4', 'alternative_names^2', 'varos^40']
-							]
-						]
-					]
-				]
-			];
-		} else {
-			/*
-			$data['query'] = [
-				'multi_match' => [
-					'query' => $keyword,
-					'fields' => ['id^100','names^4', 'alternative_names^2', 'varos^2']
-				]
-			];
-			*/
-
-			$data['query']['bool']['should'][] = [
-				"match" => [
-					"varos" => [
-						"query" => $keyword,
-						"operator" => "or",
-						"boost" => 64
-					]
-				]
-			];
-
-			$data['query']['bool']['should'][] = ['term'=>['names'=>[ 'value' => $keyword, 'boost'=>32 ]]];			
-			$data['query']['bool']['should'][] = ['term'=>['varos'=>[ 'value' => $keyword, 'boost'=>18 ]]];
-			$data['query']['bool']['should'][] = ['term'=>['alternative_names'=>[ 'value' => $keyword, 'boost'=>7 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['names'=>[ 'query' => $keyword, 'boost'=>30 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['varos'=>[ 'query' => $keyword, 'boost'=>15 ]]];
-			$data['query']['bool']['should'][] = ['match'=>['alternative_names'=>[ 'query' => $keyword, 'boost'=>5 ]]];
-			$data['query']['bool']['should'][] = ['wildcard'=>['names'=>[ 'value' => '*'.$keyword.'*', 'boost'=>28 ]]];			
-			$data['query']['bool']['should'][] = ['wildcard'=>['varos'=>[ 'value' => '*'.$keyword.'*', 'boost'=>12 ]]];
-			$data['query']['bool']['should'][] = ['wildcard'=>['alternative_names'=>[ 'value' => '*'.$keyword.'*', 'boost'=>4 ]]];
-								
-		}
-
-		
-
-		$this->curl_setopt(CURLOPT_CUSTOMREQUEST ,"GET");		
-		$this->buildQuery('churches/_search', json_encode($data));		
-		$this->run();
-
-		if($this->responseCode != 200) {
-			throw new \Exception("Could not search churches!\n".print_r($this->jsonData->error,true));
-		}
-
-		return $this->jsonData->hits;
-		
-		
-	}
 	
 	// Rendszeresen feltöltjük a keresőbe az adatbázisunkat, mert az jó.
-	static function updateChurches() {
+	static function updateChurches(array $tids = []) {
 
 		
 		$elastic = new \ExternalApi\ElasticsearchApi();
@@ -282,25 +201,13 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		}
 		
 		// Előkészítjük feltöltsére az adatokat
-		$churches = \Eloquent\Church::where('ok', 'i')->limit(200000)->get()->map->toAPIArray('medium')->toArray();
+		$churches = \Eloquent\Church::where('ok', 'i');
+		if(!empty($tids)) {
 
-		// Kiegészítjük Budapest kerületekkel
-		$romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
-		foreach($churches as $c => $church) {
-			preg_match('/^Budapest (.*?)\. kerület$/',$church['varos'],$match);
-			if($match) {
-				$churches[$c]['varos'] = [ $church['varos'], 'Budapest '.array_search($match[1], $romai).'. kerület', 'Budapest' ];
-			}
+			$churches = $churches->whereIn('id', $tids);
 		}
-
-		foreach ($churches as $index => $church) {
-			unset($churches[$index]['adoraciok']);
-			unset($churches[$index]['miserend_deprecated']);
-			if($churches[$index]['gyontatas'] == null) {
-				$churches[$index]['gyontatas'] = [];
-			}
-		}
-
+		$churches = $churches->limit(200000)->get()->map->toElasticArray()->toArray();
+		
 		// Truncate the index
 		$elastic->truncateIndex('churches');
 
@@ -326,8 +233,122 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 
 			throw new \Exception("Could not update churches!\n" . implode("\n", $errors));
 		}
-		
+				
 	}
 	
+	/*
+	 * Frissíti az összes elasticsearch mise indexet az adatbázisból
+	 * Ehhez legenerálja az összes miseidőpontot is
+	 * !! TODO: Iszonyú overkill mindig mindent frissíteni. Optimalizálni kellene!!
+	 */
+	static function updateMasses($years = [], $tids = []) {
+		$startTime = time();
+		set_time_limit(3000); // Hosszabb idő kellhet a frissítéshez
+
+		if (empty($years)) {
+			$years = [date('Y') - 1, date('Y'), date('Y') + 1];
+		}
+		if( empty($tids)) {
+			$tids = \Eloquent\Church::where('ok', 'i')->limit(8000)->pluck('id')->toArray();
+		} 
+
+		$chunksize = 100;
+		if (is_array($tids) && count($tids) > $chunksize) {
+			foreach (array_chunk($tids,  $chunksize) as $chunk) {
+				static::updateMasses($years, $chunk);
+			}
+			return;
+		}
+
+		$elastic = new \ExternalApi\ElasticsearchApi();		
+		// Delete existing masses for the given church IDs		
+		$elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "POST");
+		$elastic->buildQuery('mass_index/_delete_by_query', json_encode([
+			"conflicts" => "proceed",
+			"query" => [
+				"terms" => ["church_id" => $tids]
+			]
+		]));
+		$elastic->run();
+		if(isset($elastic->error)) {			
+			throw new \Exception("Could not delete existing masses!\n" . $elastic->error);
+		}
+		
+		$churchTimezones = [];		
+		$churches = \Eloquent\Church::whereIn('id', $tids)->get()->keyBy('id');
+		foreach($churches as $church_id => $church) {
+			$churches[$church_id] = $church->toElasticArray();
+		}
+		echo  "Talált templomok száma: " . count($churches)."<br>\n";
+
+		$allMasses = \Eloquent\CalMass::whereIn('church_id', $tids)->get()->all();
+		foreach ($churches as $id => $church) {
+			$churchTimezones[$id] = $church->time_zone ?? 'Europe/Budapest';			
+		}
+
+		$debug = [];
+		$debug[] = "Talált misék száma: " . count($allMasses);
+		
+		echo "Talált misék száma: " . count($allMasses)."<br>\n";
+		
+		$massPeriods = \Eloquent\CalMass::generateMassPeriodInstancesForYears($allMasses, $churchTimezones, $years);
+		echo "Egyedi periódusokkal felpumpálva már ". count($massPeriods). " a szám.<br>\n";
+		
+		$countAllMasses = 0;
+		foreach($massPeriods as $k => $mass) {
+			$bulkInsert = [];
+
+            $rrule = new \SimpleRRule($mass['rrule']);
+            $occs = $rrule->getOccurrences();
+			//printr($occs); exit;
+			foreach($occs as $occ) {
+				$bulkInsert[] = [
+					'index' => [
+						'_index' => 'mass_index',
+						'_id' => uniqid()
+					]
+				];
+				$bulkInsert[] = [
+					'church_id' => $mass['church_id'],
+					'mass_id' => $mass['mass_id'],
+					'start_date' => $occ->copy()->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::ATOM),
+					'start_minutes' => $occ->copy()->setTimezone(new \DateTimeZone('UTC'))->hour * 60 + $occ->copy()->setTimezone(new \DateTimeZone('UTC'))->minute,
+					'title' => $mass['title'],
+					'types' => $mass['types'],
+					'rite' => $mass['rite'],
+					'duration_minutes' => $mass['duration_minutes'],
+					'lang' => $mass['lang'],
+					'comment' => $mass['comment'],
+					'church' => $churches[$mass['church_id']]
+				];
+				
+			}			
+			$countAllMasses += count($occs);
+			if (!empty($bulkInsert)) {
+				$elasticResult = $elastic->putBulk($bulkInsert);
+				if (!$elasticResult) {
+					
+					if(isset($elastic->jsonData->errors)) {
+						$elastic->error = '';
+						$errItems = [];
+						foreach($elastic->jsonData->items as $item ) {
+							if(isset($item->index->error)) {					
+								$errItems[] = $item->index->error->type . ': ' . $item->index->error->reason . "\n";
+							}
+						}
+						$elastic->error .= "\n" . implode("\n", $errItems);
+						
+					}
+
+					throw new \Exception("Could not insert mass data for church ID ".$mass['church_id']."!\n".$elastic->error);
+				}
+			}
+		}
+
+		echo "Nos hát szépen minden napra szét bontva így lett nekünk már ".$countAllMasses." misénk.<br/>";
+
+		echo "Elkészült a frissítés " . (time() - $startTime) . " másodperc alatt azaz ".round((time() - $startTime)/60,2)." perc alatt.<br>\n";
+		return $debug;
+	}
 	
 }

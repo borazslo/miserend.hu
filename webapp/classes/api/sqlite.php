@@ -6,24 +6,27 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class Sqlite extends Api {
 
+    public $title = 'Adatbázis';
     public $format = false;
     public $sqliteFileName;
     public $folder = 'fajlok/sqlite/';
     public $sqlite;
-
+    public $search;
+    public $massId = 0; // global-ban kell a mise azonosító, hogy beilleszthessük a táblázatban
 
 
     public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Adatbázis';
+        
         $docs['input'] = "Semmilyen adatot nem kell küldeni. Sőt meg sem kell hívni külön az API-t csak elkérni a fájlokat az alábbi URL-en";
 
         $docs['description'] = <<<HTML
         <p>SQLite formátumban a templomok, misék és képek. Naponta frissül. Nem szükséges külön meghívni.</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/fajlok/sqlite/miserend_v3.sqlite3</code></p>
+        <p><strong>Átirányít a konkrét fájlhoz:</strong> <code>http://miserend.hu/fajlok/sqlite/miserend_v3.sqlite3</code></p>
         <p><em>(Léteznek még többé-kevésbé működő más url-ek is.)</em></p>
         <p><strong>Vigyázat!</strong> A 2025 második felében kezdődött felújítás a <em>misék</em> adattáblát biztosan meg fogja változtatni!</p>
+        <p><strong>Vigyázat!</strong> A 2026-ban beért változásokkal a v3 nem támogatott itt többé. A v4 még igen.</p>
         HTML;
 
         $docs['response'] = <<<HTML
@@ -80,6 +83,8 @@ class Sqlite extends Api {
 
         $this->setFilePath();
 
+        $this->search = new \Search("masses");
+
         if ($this->generateSqlite()) {
             //Sajnos ez itten nem működik... Nem lesz szépen letölthető.  Headerrel sem
             //$data = readfile($sqllitefile); exit($data);
@@ -87,6 +92,10 @@ class Sqlite extends Api {
         } else {
             throw new \Exception("Could not make the requested sqlite3 file.");
         }
+
+        // Ha nyitva maradt volna a pit, akkor szépen csukjuk be
+        if($this->search->pitId != false ) $this->search->closePit();
+
     }
 
     function setFileName() {
@@ -144,10 +153,10 @@ class Sqlite extends Api {
         $this->connectToSqlite('sqlite_v' . $this->version, $this->sqliteFilePath);
         $this->sqlite->beginTransaction();
         $this->dropAllTables();
-        echo "\nCreate Tables ...";
+        echo "<br/>\nCreate Tables ...";
         $this->createTables();
         $this->insertData();
-        echo "\n";
+        echo "<br/>\n";
         $this->sqlite->commit();
         DB::disconnect('sqlite_v' . $this->version);
         return true;
@@ -172,10 +181,17 @@ class Sqlite extends Api {
         ini_set('memory_limit', '800M');
         DB::disableQueryLog();
         $this->sqlite->disableQueryLog();
-        echo "\ninsertDataTemplomok ... \n";
+
+        echo "<br/>\ninsertDataTemplomok ... <br/>\n";
         $this->insertDataTemplomok();
-        echo "\ninsertDataMisek ... \n";
-        $this->insertDataMisek();
+
+        echo "<br/>\ninsertDataMisek ... <br/>\n";                
+        $chunkSize = 3000;
+        $this->insertDataMisek($chunkSize);                
+        while( $this->search->countHits > 0 ) {                        
+            $this->insertDataMisek($chunkSize);
+        }
+        
         if ($this->version > 1) {
             $this->insertDataKepek();
         }
@@ -264,7 +280,7 @@ class Sqlite extends Api {
         $c = 1;
         foreach ($churches as $church) {
             $line = "v" . $this->version . " " . (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $c++ . "/" . $sum . " -- " . $church->id . " " . $church->nev;
-            echo "\r" . str_pad($line, 120);
+            echo "\r" . str_pad($line, 120)."<br/>";
             $church->location;
 
             $insert = [
@@ -311,60 +327,76 @@ class Sqlite extends Api {
         $this->insertDataSql('templomok', $inserts);
     }
 
-    function insertDataMisek() {
-        set_time_limit(60);
-        $masses = DB::table('misek')->where('torles', '0000-00-00 00:00:00')->where('tid', '<>', 0)->orderBy('tid')->orderBy('id')->get();
-        if (!$masses) {
-            throw new Exception("There are no valid masses.");
-        }
+    function insertDataMisek($limit = 30) {
+        if(!$this->search->pitId) $this->search->openPit("5m");
 
-        $c = 1;
-        $sum = count($masses);
-        foreach ($masses as $mass) {
-            $line = "v" . $this->version . " " . (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $c++ . "/" . $sum . " -- " . $mass->id . " (in " . $mass->tid . ")";
-            echo "\r" . str_pad($line, 120);
+        set_time_limit(60);
+        $inserts = [];
+        //Mivel a serach a pit miatt sokáig él, ezért a query-t mindig letakarítjuk, mert különben zavart okoz
+        $this->search->query = ["bool" => ["must" => [], "must_not" => []]];
+        $this->search->filters = [];
+
+        $this->search->dateRange(date('Y-m-d'), date('Y-m-d', strtotime('+6 months')));
+
+        $misek = $this->search->getResults(0,$limit); // Az $offset mindig 0, mert PIT esetén nem kell!
+        
+        $attributeMapping = [
+            'FAMILY' => 'csal',
+            'STUDENT' => 'd',
+            'UNIVERSITY_YOUTH' => 'ifi',
+            'GUITAR' => 'g',
+            'SILENT' => 'cs'
+        ]; // Van ORGAN is, de azt nem tudja kezelni a régi miserend alkalmazás azt hiszem
+        
+        foreach($misek as $mass) {
+            $this->massId++;
             $insert = [
-                'mid' => $mass->id,
-                'tid' => $mass->tid,
-                'nap' => $mass->nap,
-                'ido' => $mass->ido,
-                'nyelv' => $mass->nyelv,
-                'milyen' => $mass->milyen,
+                'mid' => $this->massId, // Nem használhatjuk a $mass->mass_id -t mert az nem a konkrét példány azonosítója, hanem az anya miséé
+                'tid' => $mass->church_id,
+                'nap' => 0,
+                'ido' => isset($mass->start_minutes) ? sprintf('%02d:%02d:00', (int) floor($mass->start_minutes / 60), (int) ($mass->start_minutes % 60)) : null,
+                'nyelv' => $mass->lang,
+                'milyen' => implode(',', array_filter(array_map(function($t) use ($attributeMapping) {
+                    return isset($attributeMapping[$t]) ? $attributeMapping[$t] : null;
+                }, is_array($mass->types) ? $mass->types : array_filter(array_map('trim', explode(',', (string)$mass->types)))))),
             ];
 
-            if ($this->version >= 4) {
-                $insert['datumtol'] = preg_replace('/-/i', '', $mass->tmp_datumtol);
-                $insert['datumig'] = preg_replace('/-/i', '', $mass->tmp_datumig);
-                $insert['periodus'] = $mass->nap2;
-                $insert['idoszak'] = $mass->idoszamitas;
-                $insert['suly'] = $mass->weight;
+            
+
+             if ($this->version >= 4) {
+                $insert['datumtol'] =  date('nd', strtotime($mass->start_date));
+                $insert['datumig'] =  date('nd', strtotime($mass->start_date));
+                $insert['periodus'] = 0;
+                $insert['idoszak'] = "Ezen a napon: ".date('Y-m-d', strtotime($mass->start_date));
+                $insert['suly'] = 1;
             }
 
             if ($this->version >= 3) {
-                $insert['megjegyzes'] = $mass->megjegyzes;
+                $insert['megjegyzes'] = $mass->comment;
             }
 
             if ($this->version < 4) {
-                if (preg_match('/^(t$|tél)/i', $mass->idoszamitas)) {
-                    $insert['telnyar'] = 't';
-                } elseif (preg_match('/^(ny$|nyár)/i', $mass->idoszamitas)) {
-                    $insert['telnyar'] = 'ny';
-                } elseif ($mass->idoszamitas == 'egész évben') {
-                    $insert['telnyar'] = 'ny';
-                    $extraInsert = $insert;
-                    $extraInsert['telnyar'] = 't';
-                    $extraInsert['mid'] = $insert['mid'] + 1000000;
-                    $inserts[] = $extraInsert;
-                } else {
-                    unset($insert);
-                }
+                /*  A v3-ig csak tél/nyár megkülönböztetés volt. Egyedi nap sem létezett
+                * Így itt nem tudunk mit csinálni, a backward compatibilitás egyszerűen
+                * nem lehetséges
+                */
+
             }
 
             if (isset($insert)) {
                 $inserts[] = $insert;
             }
+                                    
         }
-        $this->insertDataSql('misek', $inserts);
+
+        if(count($inserts) == 0) {
+            echo "Itt a vége, nem volt már találat<br>";            
+        } else {
+            $this->insertDataSql('misek', $inserts);
+        }
+
+        $line = "v" . $this->version . " " . (int) ( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . "s : " . $this->massId . "/" . $this->search->total . " -- ";
+            echo "\r" . str_pad($line, 120)."<br>";             
     }
 
     function insertDataKepek() {

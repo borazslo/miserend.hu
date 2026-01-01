@@ -6,47 +6,67 @@ use Illuminate\Database\Capsule\Manager as DB;
 
 class NearBy extends Api {
 
-    public $format = 'json'; //or text
-	public $requiredFields = array('lat','lon');        
+	public $title = 'Közeli templomok és misék';
+    public $format = 'json'; //or text	
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
 
+	public $fields = [
+		'lat' => [
+			'required' => true, 
+			'validation' => [
+				'float'=> [ 
+					'minimum' => -90, 
+					'maximum' => 90 
+				]
+			], 
+			'description' => 'a szélességi fok',
+			'example' => 47.497913
+		],
+		'lon' => [
+			'required' => true, 
+			'validation' => [
+				'float' => [ 
+					'minimum' => -180, 
+					'maximum' => 180 
+				]
+			], 
+			'description' => 'a hosszúsági fok',
+			'example' => 19.040236
+		],
+		'limit' => [
+			'validation' => [
+				'integer' => [ 
+					'minimum' => 1, 
+					'maximum' => 100 
+				]
+			],
+			'description' =>  'az egyszerre megmutantandó válaszok száma',
+			'default' => 10
+		],
+		'whenMass' => [
+			'validation' => [
+				'enum' => ['today', 'tomorrow', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+				['date' => []]]				
+			],
+			'description' =>  'csak az adott napi misék megjelenítése',
+			'default' => false
+		],
+		'response_length' => [
+			'validation' => [
+				'enum' => ['minimal', 'medium','full']
+			],
+			'description' =>  'az egy templomra vonatkozó válaszok részletessége',
+			'default' => 'minimal'
+		]
+	];
+		
+	
     public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Közeli templomok és misék';
-        $docs['input'] = [
-            'lat' => [
-                'required',
-                'float',
-                'a szélességi fok, -90 &lt; x &lt; 90'
-			],
-            'lon' => [
-                'required',
-                'float',
-                'a hosszúsági fok, -180 &lt; c &lt; 90'
-			],
-			'limit' => [
-				'optional',
-				'integer',
-				'az egyszerre megmutantandó válaszok száma, 0 &lt; c &lt; 101'
-			],
-			'whenMass' => [
-				'optional',
-				'enum(today, monday, tuesday, wednesday, thursday, friday, saturday, sunday, yyyy-mm-dd)',
-				'csak az adott napi misék megjelenítése',
-				'false'
-			],
-			'response_length' => [
-				'optional',
-				'enum(minimal, medium, full)',
-				'az egy templomra vonatkozó válaszok részletessége',
-				'minimal (eloquent/church-ben meghatározva)'
-			]			
-        ];
-		 
+         
         $docs['description'] = <<<HTML
             <p>Adott koordinátákhoz legközelebbi templomok listáját adja vissza az adott napi misékkel együtt.</p>
-            <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/nearby</code></p>
         HTML;
 
         $docs['response'] = <<<HTML
@@ -59,25 +79,6 @@ class NearBy extends Api {
         return $docs;
     }
 
-    public function validateInput() {
-		if (!is_numeric($this->input['lat']) OR $this->input['lat'] > 90 OR $this->input['lat'] < -90 ) {
-            throw new \Exception("JSON input 'lat' should be float between -90 and 90.");
-        }
-		if (!is_numeric($this->input['lon']) OR $this->input['lon'] > 90 OR $this->input['lon'] < -180 ) {
-            throw new \Exception("JSON input 'lon' should be float between -180 and 90.");
-        }
-		if (isset($this->input['limit']) AND (!is_numeric($this->input['limit']) OR $this->input['limit'] > 100 OR $this->input['limit'] < 1 )) {
-            throw new \Exception("JSON input 'limit' should be an integer between 1 and 100.");
-        }
-		if (isset($this->input['whenMass']) AND 
-			!(in_array($this->input['whenMass'], ['today', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) OR
-			preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $this->input['whenMass']))) {
-			throw new \Exception("JSON input 'whenMass' should be a day or today or a date (yyyy-mm-dd).");
-		}
-		if (isset($this->input['response_length']) AND !in_array($this->input['response_length'], ['minimal', 'medium', 'full'])) {
-            throw new \Exception("JSON input 'response_length' should be 'minimal', 'medium', or 'full'.");
-        }		
-	}
 
     public function run() {
         parent::run();
@@ -91,7 +92,9 @@ class NearBy extends Api {
 				->where('lat','<>','')
                 ->orderBy('distance', 'ASC')
 				->limit($limit)
-                ->get()->map->toAPIArray( isset($this->input['response_length']) ? $this->input['response_length'] : false, isset($this->input["whenMass"]) ? $this->input["whenMass"] : false);
+                ->get()->map->toAPIArray( 
+					isset($this->input['response_length']) ? $this->input['response_length'] : (  $this->fields['response_length']['default'] ? $this->fields['response_length']['default'] : false ), 
+					isset($this->input["whenMass"]) ? $this->input["whenMass"] : (  $this->fields['whenMass']['default'] ? $this->fields['whenMass']['default'] : false ));
 				
         //$this->return['lat'] = $this->input['lat'];
 

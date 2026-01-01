@@ -1,0 +1,97 @@
+{% set columns2 = true  %}
+{% extends "layout.twig" %}
+
+{% import "forms.twig" as forms %}
+
+{% set title = "Időszakok éves beállítása" %}
+
+{% block content %}
+
+	{% include 'angularjs.twig' %}
+
+	<h1>Időszakaink és felhasználtságuk</h1>
+	<div class="table-responsive">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th scope="col">#</th>
+					<th scope="col">W</th>
+					<th scope="col">Név</th>
+					<th scope="col">Szín</th>
+					<th scope="col">Kezdés</th>
+					<th scope="col">Befejezés</th>
+					<th scope="col">Választható</th>
+					<th scope="col">Templomok</th>
+					<th scope="col">Misék</th>
+				</tr>
+			</thead>
+			<tbody>
+				{%- for p in periods %}
+				<tr id="period-{{ p.id }}">
+					<td>{{ p.id }}</td>
+					<td>
+						{{ p.weight }}
+					</td>					
+					<td><strong>{{ p.name }}</strong></td>
+					<td>
+						{%- if p.color is defined and p.color %}
+							<span class="badge" style="background-color: {{ p.color }}; color: {{ (p.color|lower in ['#fff','#ffffff','white']) ? '#000' : '#fff' }};">
+								{{ p.color }}
+							</span>
+						{%- else %}
+							<span class="text-muted">-</span>
+						{%- endif %}
+					</td>
+					<td>
+						{%- if p.start_period_name is defined and p.start_period_name %}
+							{# If there is an explicit anchor for the referenced period, use it; otherwise build one from the name #}
+							{% set target = (p.start_period_anchor is defined and p.start_period_anchor) ? p.start_period_anchor : (p.start_period_name|replace({' ':'-'})|lower) %}
+							<a href="#period-{{ p.start_period_id }}">{{ p.start_period_name }}</a>
+						{%- elseif p.start_month_day is defined and p.start_month_day %}
+							{{ p.start_month_day }}
+						{%- else %}
+							<span class="text-muted">-</span>
+						{%- endif %}
+					</td>
+					<td>
+						{%- if p.end_period_name is defined and p.end_period_name %}
+							{% set target_end = (p.end_period_anchor is defined and p.end_period_anchor) ? p.end_period_anchor : (p.end_period_name|replace({' ':'-'})|lower) %}
+							<a href="#period-{{ p.end_period_id }}">{{ p.end_period_name }}</a>
+						{%- elseif p.end_month_day is defined and p.end_month_day %}
+							{{ p.end_month_day }}
+						{%- else %}
+							<span class="text-muted">-</span>
+						{%- endif %}
+					</td>
+					<td>
+						{%- if p.selectable is defined and p.selectable == 1 %}
+							<span class="text-success" title="Választható">✓</span>
+						{%- else %}
+							<span class="text-muted" title="Nem választható">✗</span>
+						{%- endif %}
+					</td>
+					<td>
+						{{ p.churches_count|default(0) }}{%- if p.extra_churches_count is defined and p.extra_churches_count > 0 %}&nbsp;<em class="text-muted" title="Más időszakok részeként" aria-label="Más időszakok részeként">+{{ p.extra_churches_count }}</em>
+						{%- endif %}
+					</td>
+					<td>
+						{{ p.masses_count|default(0) }}{%- if p.extra_mass_count is defined and p.extra_mass_count > 0 %}&nbsp;<em class="text-muted" title="Más időszakok részeként" aria-label="Más időszakok részeként">+{{ p.extra_mass_count }}</em>
+						{%- endif %}
+					</td>
+				</tr>
+				{%- else %}
+				<tr><td colspan="9" class="text-muted">Nincsenek bejegyzések</td></tr>
+				{%- endfor %}
+			</tbody>
+		</table>
+	</div>
+
+
+	
+
+	<br><br>
+
+
+
+
+{% endblock %}

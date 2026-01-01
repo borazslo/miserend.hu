@@ -22,6 +22,11 @@ configurationSetEnvironment($env);
 error_reporting($config['error_reporting'] ? $config['error_reporting'] : 0);
 define('DOMAIN', $config['path']['domain']);
 
+Translator::init('hu'); // vagy autodetect
+// Short alias for Translator::translate(). Use as t('key') in PHP or templates when available.
+function t($text, $default = null) {
+    return Translator::translate($text, $default);
+}
 
 //Felhasználó
 if (isset($_REQUEST['login'])) {
@@ -40,12 +45,13 @@ include_once('twig_extras.php');
 $loader = new \Twig\Loader\FilesystemLoader(PATH . 'templates');
 $twig = new \Twig\Environment($loader);
 $twig->addFilter(new \Twig\TwigFilter('miserend_date', 'twig_hungarian_date_format'));
+$twig->addFilter(new \Twig\TwigFilter('trans', 'twig_translate'));
 // DANGER: a twig declarálva van / meg van hívva a Class/Html/Html.php -ban is. Így ott is módosítani kellhet a filterket
 
 //
 //  Useful CONSTANTS
 //
-// ATTRIBUTES, LANGUAGES, PERIODS, ROLES 
+// ATTRIBUTES, LANGUAGES, ROLES 
 //
 use Illuminate\Database\Capsule\Manager as DB;
 
@@ -154,73 +160,31 @@ foreach ($milyen as $k => $v) {
 }
 define("ATTRIBUTES", serialize($milyen));
 
-$nyelv = array(
-    'h' => 'magyar',
-    'en' => 'angol',
-    'fr' => 'francia',
-    'gr' => 'görög',
-    'hr' => 'horvát',
-    'va' => 'latin',
-    'pl' => 'lengyel',
-    'de' => 'német',
-    'it' => 'olasz',
-	'pt' => 'portugál',
-    'ro' => 'román',
-    'es' => 'spanyol',
-    'sk' => 'szlovák',
-    'si' => 'szlovén',
-    'uk' => 'ukrán'
-);
-foreach ($nyelv as $k => $v) {
-    $nyelv[$k] = array(
-        'abbrev' => $k,
-        'name' => $v,
-        'file' => 'zaszloikon/' . $k . '.gif',
-        'description' => $v . " nyelven"
-    );
+// Gyűjtse össze a CalMass modellekben előforduló, egyedi "lang" mezőértékeket
+$_calmass_langs = collect(\Eloquent\CalMass::select('lang')->distinct()->pluck('lang'))
+    ->filter(function($v){ return $v !== null && $v !== ''; })
+    ->map(function($v){ return trim($v); })
+    ->unique()
+    ->sort()
+    ->values()
+    ->all();
+asort($_calmass_langs);
+$_calmass_langs = array_values($_calmass_langs);
+$huIndex = array_search('hu', $_calmass_langs, true);
+if ($huIndex !== false) {
+    array_splice($_calmass_langs, $huIndex, 1);
+    array_unshift($_calmass_langs, 'hu');
 }
-define("LANGUAGES", serialize($nyelv));
 
-$periods = array(
-    0 => array(
-        'abbrev' => 0,
-        'name' => '',
-        'description' => 'minden'
-    ),
-    1 => array(
-        'abbrev' => 1,
-        'name' => '1.'
-    ),
-    2 => array(
-        'abbrev' => 2,
-        'name' => '2.'
-    ),
-    3 => array(
-        'abbrev' => 3,
-        'name' => '3.'
-    ),
-    4 => array(
-        'abbrev' => 4,
-        'name' => '4.'
-    ),
-    5 => array(
-        'abbrev' => 5,
-        'name' => '5.'
-    ),
-    '-1' => array(
-        'abbrev' => '-1',
-        'name' => 'utolsó'
-    ),
-    'ps' => array(
-        'abbrev' => 'ps',
-        'name' => 'páros'
-    ),
-    'pt' => array(
-        'abbrev' => 'pt',
-        'name' => 'páratlan'
-    )
-);
-define("PERIODS", serialize($periods));
+foreach($_calmass_langs as $k => $langAbbrev) {
+    $nyelvek[$langAbbrev] = [
+        'abbrev' => $langAbbrev,
+        'name' => t('LANGUAGES.' . $langAbbrev),
+        'file' => 'zaszloikon/' . $langAbbrev . '.gif',
+        'description' => t('LANGUAGES.' . $langAbbrev) . ' nyelven'
+    ];
+}
+define("LANGUAGES", serialize($nyelvek));
 
 $roles = ['miserend', 'user'];
 define("ROLES", serialize($roles));

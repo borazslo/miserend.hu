@@ -1,0 +1,154 @@
+<form [formGroup]="searchForm" (ngSubmit)="searchChurches()">
+
+  <!-- Templom adatok csoport -->
+  <mat-card appearance="outlined">
+    <mat-card-title>Templom </mat-card-title>
+    <mat-card-content>
+      <div class="row">
+        <mat-form-field appearance="fill" class="col-6 me-3">
+          <mat-label>Templom neve, kulcsszó</mat-label>
+          <input matInput formControlName="kulcsszo" placeholder="Templom neve, kulcsszó">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="col-6">
+          <mat-label>Település neve</mat-label>
+          <input matInput formControlName="telepules" placeholder="Település">
+        </mat-form-field>
+      </div>
+
+      <mat-expansion-panel class="mt-4">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Részletek
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field appearance="fill" class="w-100 mt-3">
+          <mat-label>Egyházmegye</mat-label>
+          <mat-select formControlName="ehm">
+            <mat-option value="">-- válassz --</mat-option>
+            @for (e of egyhazmegyek; track e.id) {
+              <mat-option [value]="e.id">{{ e.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="gorog">Csak görögkatolikus</mat-checkbox>
+
+        <mat-form-field appearance="fill" class="w-100 mt-3">
+          <mat-label>Nyelv</mat-label>
+          <mat-select formControlName="nyelv">
+            <mat-option value="">-- válassz --</mat-option>
+            @for (ny of nyelvek; track ny) {
+              <mat-option [value]="ny.id">{{ ny.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </mat-expansion-panel>
+    </mat-card-content>
+  </mat-card>
+
+  <button mat-raised-button color="primary" (click)="searchChurches()">Templom keresése</button>
+
+  <br>
+  <mat-card appearance="outlined">
+    <mat-card-title>Mise </mat-card-title>
+    <mat-card-content>
+
+      <mat-form-field appearance="fill" class="w-100 mt-2">
+        <mat-label>Nap</mat-label>
+        <mat-select formControlName="mikor">
+          <mat-option value="vasárnap">Hétvége</mat-option>
+          <mat-option value="ma">Ma</mat-option>
+          <mat-option value="holnap">Holnap</mat-option>
+          <mat-option value="adott napon">Adott napon</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      @if (searchForm.get("mikor")?.value == "adott napon") {
+        <mat-form-field appearance="fill" class="w-100 mt-2">
+          <mat-label>Dátum</mat-label>
+          <input matInput formControlName="mikordatum" type="date">
+        </mat-form-field>
+      }
+
+      <div class="row mt-2">
+        <mat-form-field appearance="fill" class="col-6 me-3">
+          <mat-label>Óra</mat-label>
+          <mat-select formControlName="mikor2">
+            <mat-option value="Egész nap">Egész nap</mat-option>
+            <mat-option value="Délelőtt">Délelőtt</mat-option>
+            <mat-option value="Délután">Délután</mat-option>
+            <mat-option value="Adott időben">Adott időben:</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (searchForm.get("mikor2")?.value == "Adott időben") {
+          <mat-form-field appearance="fill" class="col-6">
+            <mat-label>Kezdés</mat-label>
+            <input matInput formControlName="startTime" type="time">
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="col-6">
+            <mat-label>Befejezés</mat-label>
+            <input matInput formControlName="endTime" type="time">
+          </mat-form-field>
+        }
+      </div>
+
+      <!-- Mise adatai csoport - lenyitható -->
+      <mat-expansion-panel class="mt-4">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Részletek
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field appearance="fill" class="w-100 mt-2">
+          <mat-label>Nyelv</mat-label>
+          <mat-select formControlName="nyelv">
+            @for (r of nyelvek; track r) {
+              <mat-option [value]="r.id">{{ r.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-100 mt-2">
+          <mat-label>Zene</mat-label>
+          <mat-select formControlName="zene" multiple>
+            @for (r of zenek; track r) {
+              <mat-option [value]="r.id">{{ r.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-100 mt-2">
+          <mat-label>Korosztály</mat-label>
+          <mat-select formControlName="korosztaly" multiple>
+            @for (r of korosztalyok; track r) {
+              <mat-option [value]="r.id">{{ r.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-100 mt-2">
+          <mat-label>Rítus</mat-label>
+          <mat-select formControlName="ritus">
+            <mat-option value="">-- válassz --</mat-option>
+            @for (r of ritusok; track r) {
+              <mat-option [value]="r.id">{{ r.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="ige" class="mt-2">Igeliturgiák is</mat-checkbox>
+
+      </mat-expansion-panel>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Gombok -->
+  <div class="mt-4 text-center">
+    <button mat-raised-button color="primary" (click)="searchMasses()">Mise keresése</button>
+  </div>
+</form>

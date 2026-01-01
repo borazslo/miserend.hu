@@ -4,31 +4,32 @@ namespace Api;
 
 class Upload extends Api {
 
-    public $requiredFields = array('tid','photo');
+    public $title = 'Fénykép feltöltése templomokhoz';
     public $photo; // Photo object
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
 
+    public $fields = [
+        'tid' => [
+            'required' => true, 
+            'validation' => 'integer', 
+            'description' => 'A templom azonosítója, ahová a fényképet feltöltjük.',
+            'example' => 7
+        ],
+        'photo' => [
+            'required' => true, 
+            'validation' => 'string', 
+            'description' => 'A fénykép fájl streamje base64 kódolású stringben a megfelelő <code>data:image/jpeg;base64,</code> előtaggal. PHP-ban ez így állítható elő: <code>$photo = \'data:\'.$_FILES[\'fileToUpload\'][\'type\'].\';base64,\'.base64_encode(file_get_contents($_FILES[\'fileToUpload\'][\'tmp_name\']));</code>',
+            'example' => 'data:image/jpeg;base64,...'            
+        ]
+    ];
+        
      public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Fénykép feltöltése templomokhoz';
-        $docs['input'] = [
-            'tid' => [
-                'required',
-                'integer',
-                'A templom azonosítója, ahová a fényképet feltöltjük.'
-            ],
-            'photo' => [
-                'required',
-                'string',
-                'A fénykép fájl streamje base64 kódolású stringben a megfelelő <code>data:image/jpeg;base64,</code> előtaggal. PHP-ban ez így állítható elő: <code>$photo = \'data:\'.$_FILES[\'fileToUpload\'][\'type\'].\';base64,\'.base64_encode(file_get_contents($_FILES[\'fileToUpload\'][\'tmp_name\']));</code>'
-            ]        
-        ];
-
+               
         $docs['description'] = <<<HTML
         <p>Lehetséges fénykép beküldése bármelyik templomhoz. A beküldött képek jelenleg azonnal megjelennek a honlapon. Ez változhat majd, hogy nem regisztrált felhasználóknak csak jóváhagyás után jelenik meg a fényképük. JSON formátumba kell küldeni az adatokat és JSON formátumban válaszol az API.</p>
         <p><strong>Fontos</strong> felhívni a beküldő figyelmét, hogy a fénykép feltöltésével <strong>a)</strong> a fotó jogos tulajdonosának jelenti ki magát <strong>b)</strong> a kép felhasználói jogait teljesen (de nem kizárólagosan) átadja a miserend.hu-nak (és a hozzá tartozó alkalmazásoknak).</p>
-        <p><strong>Elérhető:</strong> <code>http://miserend.hu/api/v4/upload</code></p>
 
         <p>A kép formátuma lehet <code>image/jpg</code>, <code>image/jpeg</code>, <code>image/gif</code>, <code>image/png</code>. Van felső méret korlát is.</p>
         HTML;
@@ -43,13 +44,6 @@ class Upload extends Api {
         return $docs;
     }
 
-
-    public function validateInput() {
-        //TODO: !isValidChurchId()?
-        if (!is_numeric($this->input['tid'])) {
-            throw new \Exception("Wrong format of 'tid' in JSON input.");
-        }    
-    }
 
     public function run() {
         try {

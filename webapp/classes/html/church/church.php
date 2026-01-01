@@ -65,7 +65,7 @@ class Church extends \Html\Html {
 								
         copyArrayToObject($church->toArray(), $this);
 				
-		$this->church = ['remarksicon' => $church->remarksicon, 'id' => $church->id]; // A church/_adminlinks.twig számára kell ez. Bocsi.
+		$this->church = ['hasPendingSuggestionPackage' => $church->hasPendingSuggestionPackage, 'remarksicon' => $church->remarksicon, 'id' => $church->id]; // A church/_adminlinks.twig számára kell ez. Bocsi.
         $this->neighbours = $church->neighbours;
         
         
@@ -75,9 +75,6 @@ class Church extends \Html\Html {
             $this->setTitle($this->names[0]);
         
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
-
-        //Miseidőpontok
-        $misek = getMasses($tid);
 
         //Convert to OSM ServiceTimes
         if(isset($user->isadmin) AND $user->isadmin == 1)  {
@@ -107,8 +104,7 @@ class Church extends \Html\Html {
         if ($user->checkFavorite($tid)) {
             $this->favorite = 1;
         }
-                
-        $this->miserend = $misek;
+                        
 		$this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
         
         $this->isChurchHolder = $user->getHoldingData($this->id);                

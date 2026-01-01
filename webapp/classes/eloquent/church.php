@@ -3,6 +3,7 @@
 namespace Eloquent;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use ExternalApi\ElasticsearchApi;
 
 /*
  ALTER TABLE `miserend`.`templomok` 
@@ -210,12 +211,80 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->hasMany('\Eloquent\Photo')->ordered();
     }
 
+    public function getMassRRulesByPeriodAttribute()
+    {
+        $massRRules = $this->hasMany('\Eloquent\CalMass', 'church_id')->with('period')->get()->groupBy('period_id')->toArray();
+        
+        $RRulesByPeriods = [];
+        foreach($massRRules as $periodId => $massRules) {
+            $RRulesByPeriods[$periodId] = $massRules[0]['period'];
+            $RRulesByPeriods[$periodId]['massrules'] = [];
+            foreach($massRules as $k => $massRule) {
+                if(!empty($massRule['rrule'])) {
+                    $rrule = new \SimpleRRule($massRule['rrule']);                    
+                    $massRule['rrule']['readable'] = $rrule->toText();
+                    //TODO: Itt ez hiba, mert nem egy konrkét legenerált Periodban nézünk szét, hanem csak egy általánosban
+                    // Vagyis a konkrét dátumokban keresés teljesen hülyeség.
+                    // Nekünk amúgy is csak azért kell, hogy tudjuk milyen napon kezdődik. Azt meg megtudhatjuk máshogy is.
+                    $occ = reset($rrule->getOccurrences());
+                    if($occ) {
+                        $massRule['start_date'] = $occ->toString();                                                
+                    }
+                    $RRulesByPeriods[$periodId]['massrules'][] = $massRule;
+                }
+            } 
+                        
+            // sort massrules by weekday of start_date (Sunday=0 .. Saturday=6), tie-breaker by datetime
+            usort($RRulesByPeriods[$periodId]['massrules'], function($a, $b) {
+                $wa = isset($a['start_date']) ? (int)date('w', strtotime($a['start_date'])) : 0;
+                $wb = isset($b['start_date']) ? (int)date('w', strtotime($b['start_date'])) : 0;
+                if ($wa === $wb) {
+                    $ta = isset($a['start_date']) ? strtotime($a['start_date']) : 0;
+                    $tb = isset($b['start_date']) ? strtotime($b['start_date']) : 0;
+                    return $ta < $tb ? -1 : ($ta > $tb ? 1 : 0);
+                }
+                return $wa < $wb ? -1 : 1;
+            });
+            
+        }
+
+        return $RRulesByPeriods;
+    }
+
+    
+    public function getGeneratedMassRRulesAttribute() {
+        $masses = $this->hasMany('\Eloquent\CalMass', 'church_id');
+        
+        $massPeriods = \Eloquent\CalMass::generateMassPeriodInstancesForYears( $masses->get()->all(), [], [date('Y'),date('Y')+1]);
+        foreach($massPeriods as $k => $mass) {
+            $rrule = new \SimpleRRule($mass['rrule']);
+            $occ = reset($rrule->getOccurrences());                        
+            $massPeriods[$k]['start_date'] = $occ->toString();
+            $massPeriods[$k]['readable_rrule'] = $rrule->toText();
+        }
+        return $massPeriods;
+    }
+
+    public function getLanguagesAttribute() {
+        // Grab the 'lang' column from related massrules, remove empty values, unique and return as array
+        return $this->massrules()
+                    ->pluck('lang')
+                    ->filter(function($v) { return $v !== null && $v !== ''; })
+                    ->unique()
+                    ->values()
+                    ->toArray();
+    }
+
     public function keywordshortcuts() {
         return $this->hasMany('\Eloquent\KeywordShortcut');
     }
 
     public function remarks() {
         return $this->hasMany('\Eloquent\Remark')->orderBy('created_at', 'DESC');
+    }
+
+    public function suggestionPackages() {
+        return $this->hasMany('\Eloquent\CalSuggestionPackage', 'church_id')->orderBy('created_at', 'DESC');
     }
 
     public function updateNeighbours() {
@@ -269,26 +338,41 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     
     public function toAPIArray($length = "minimal", $whenMass = false)
     {
-        if($length == false) $length = "minimal";
-        if ($whenMass == false || $whenMass == "today") $whenMass = date('Y-m-d');
-        elseif (!(in_array($whenMass, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']) ||
-            preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $whenMass))) {
-            throw new \Exception("JSON input 'whenMass' should be a day or today or a date (yyyy-mm-dd).");
-        }
-        if (in_array($whenMass, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])) {
-            $whenMass = date('Y-m-d', strtotime("next $whenMass"));
+
+        if($length == 'elastic') {
+            $elastic = true;
+            $length = 'medium';
+        } else {
+            $elastic = false;
         }
 
-        $masses = searchMasses(['templom'=>$this->id, 'mikor' => $whenMass] );
+        if($length == false) $length = "minimal";
+        if ($whenMass == false ) $whenMass = date('Y-m-d');
         
-        $misek = [];        
-        if(isset($masses['churches'][$this->id])) {
-            foreach($masses['churches'][$this->id]['masses'] as $key => $mise) {
-                $misek[$key]['idopont'] = $whenMass." ".$mise['ido'];
-                $info = trim($mise['milyen']." ".$mise['megjegyzes']." ".$mise['nyelv']);
-                if($info != '') $misek[$key]['informacio'] = $info;
-            }	            
-        }
+        $misek = [];
+        if(!$elastic) {
+            $search = new \Search('masses');
+            $search->day($whenMass);
+            
+            $search->tids([$this->id]);
+            $masses = $search->getResults(0,10);
+                    
+            if(isset($masses)) {
+                foreach($masses as $key => $mise) {
+                    $misek[$key]['idopont'] = date('Y-m-d H:i:s', strtotime($mise->start_date));
+                    $info = trim( t($mise->rite)." ".t($mise->title));
+                    if( $this->orszag != 12 or $mise->lang != 'hu') {
+                        $info .= ' ' . t('LANGUAGES.'.$mise->lang)." nyelven";
+                    }
+                    if (!empty($mise->types)) {                        
+                        $translatedTypes = array_map(function($type) { return t($type); }, $mise->types);
+                        $info .= ', ' . implode(', ', $translatedTypes);                        
+                    }
+                    if($mise->comment) $info .= ' (' . $mise->comment.')';
+                    if($info != '') $misek[$key]['informacio'] = $info;
+                }	            
+            }
+        } 
 
         $adorations = [];
         $results = $this->adorations()
@@ -344,7 +428,7 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             'email' => $this->pleb_eml,
             'links' => $this->links->pluck('href')->toArray(),
             'misek' => $misek,
-            
+            'nyelvek' => $this->languages,
             'miserend_megjegyzes' => str_replace('<br>', "\n", strip_tags($this->misemegj, '<br>')),
             'adoraciok' => $adorations,
             'gyontatas' => $this->confessions ? $this->confessions : false,
@@ -362,33 +446,44 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
         if($length == 'full') {
             $return = array_merge($return, [                
-                'photos' => $this->photos->pluck('url')->toArray(),
-                'miserend_deprecated' => DB::table('misek')
-                    ->select('nap', 'ido', 'nap2', 'idoszamitas', 'tol', 'ig', 'nyelv', 'milyen', 'megjegyzes')
-                    ->where('tid', $this->id)
-                    ->where(function($query) {
-                        $query->where('torles', '0000-00-00 00:00:00')
-                            ->orWhereNull('torles');
-                    })
-                    ->orderBy('nap')
-                    ->orderBy('ido')
-                    ->get()
-                    ->groupBy('idoszamitas')
-                    ->map(function($items) {
-                        return $items->map(function($item) {
-                            return (array) $item;
-                        })->toArray();
-                    }),
-                
+                'photos' => $this->photos->pluck('url')->toArray()                
             ]);
-
 
         }
         
-        
+        if($elastic) {
+
+            // Kiegészítjük Budapest kerületekkel
+            $romai = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII','XXIII'];
+            
+            preg_match('/^Budapest (.*?)\. kerület$/',$return['varos'],$match);
+            if($match) {
+                $return['varos'] = [ $return['varos'], 'Budapest '.array_search($match[1], $romai).'. kerület', 'Budapest' ];
+            }
+
+            unset($return['adoraciok']);
+            unset($return['miserend_deprecated']);
+            if($return['gyontatas'] == null) {
+                $return['gyontatas'] = [];
+            }
+
+            //görög
+            if( isset($this->denomination) && $this->denomination == 'greek_catholic') {
+                $return['gorog'] = 'true';
+            } else {
+                $return['gorog'] = 'false';
+            }
+        }
 
         return $return;
     }
+
+    public function toElasticArray()
+    {
+        $church = $this->toAPIArray('elastic');           
+        return $church;
+    }   
+    
 
     /* 
      * scopes
@@ -571,11 +666,12 @@ class Church extends \Illuminate\Database\Eloquent\Model {
     public function getJelzesAttribute() {
             $jelzes = ""; //$this->remarksStatus['html'];
 
-            if ($this->miseaktiv == 1) {
-                $countMasses = DB::table('misek')->where('tid', $this->id)->where('torles', '0000-00-00 00:00:00')->count();
-                if ($countMasses < 1) {
-                    $jelzes.=' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
+            if ($this->miseaktiv == 1) {                
+                $calMassCount = \Eloquent\CalMass::where('church_id', $this->id)->count();
+                if ($calMassCount < 1) {
+                    $jelzes .= ' <i class="fa fa-lightbulb-o fa-lg" title="Nincs hozzá mise!" style="color:#FDEE00"></i> ';
                 }
+                
             }
 
             if ($this->ok == 'n')
@@ -598,7 +694,8 @@ class Church extends \Illuminate\Database\Eloquent\Model {
             return $jelzes;
     }
 
-      public function getRemarksiconAttribute() {
+    /* Észrevételekhez azaz Remarks-hez kapcsolódó attribútumok */
+    public function getRemarksiconAttribute() {
         // Treat empty string allapot as 'j' for grouping
         $allapotok = $this->remarks->map(function($remark) {
             return ($remark->allapot === '' ? 'j' : $remark->allapot);
@@ -631,18 +728,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $remarksStatusText;
     }
 
-    function getFullNameAttribute($value) {
-        
-        $return = $this->names[0];
-
-        if (!empty($this->alternative_names)) {
-            $return .= ' (' . $this->alternative_names[0] . ')';
-        } else {
-            $return .= ' (' . $this->varos . ')';
-        }
-        return $return;
-    }
-
     function getRemarksStatusAttribute($value) {
         $return = false;
         $remark = $this->remarks()
@@ -669,6 +754,33 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         }
         return $return;
     }
+
+    /* Javaslat csomagokhoz azaz suggestion_packages-hez kapcsolódó attribútumok */
+    public function getHasPendingSuggestionPackageAttribute() {        
+        $hasPendingSuggestionPackage = $this->suggestionPackages()
+                        ->select('id')
+                        ->where('state', 'PENDING')                        
+                        ->first();                        
+        if ($hasPendingSuggestionPackage) {
+            return true;
+        } 
+        return false;
+    }
+
+
+    function getFullNameAttribute($value) {
+        
+        $return = $this->names[0];
+
+        if (!empty($this->alternative_names)) {
+            $return .= ' (' . $this->alternative_names[0] . ')';
+        } else {
+            $return .= ' (' . $this->varos . ')';
+        }
+        return $return;
+    }
+
+
     
     function getLocationAttribute($value) {
         $location = new \stdClass();
@@ -918,9 +1030,11 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         
         //Nem elegáns:
         DB::table('lookup_boundary_church')->where('church_id',$this->id)->delete();
-                
-        DB::table('misek')->where('tid',$this->tid)->delete();
-        
+                        
+        // Calendar dolgok törlése
+        \Eloquent\CalMass::where('church_id', $this->id)->delete();
+        \Eloquent\CalSuggestionPackage::where('church_id', $this->id)->delete();
+
         $this->remarks()->delete();
         $this->photos()->delete();
 
@@ -942,6 +1056,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         }
 
         // Meghívjuk az eredeti save() metódust
-        return parent::save($options);
+        $return = parent::save($options);
+
+        // Miután már elmentettük, akkor
+        // Elasticsearch frissítése
+        ElasticsearchApi::updateChurches([$this->id]);
     }
 }

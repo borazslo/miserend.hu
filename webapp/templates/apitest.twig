@@ -19,9 +19,10 @@
 		}
 	</style>
 	
-	<p>Ezen az oldalon az API-val lehet kísérletezni a megfelelő url és a json kulcs-érték párosok megadásával. Az API-ról itt olvashatsz bővebben:
-    <a href="https://github.com/borazslo/miserend.hu/wiki/API">https://github.com/borazslo/miserend.hu/wiki/API</a></p>
-    
+	<p>Ezen az oldalon az API-val lehet kísérletezni a megfelelő url és a json kulcs-érték párosok megadásával.    
+     Az API-ról itt olvashatsz bővebben:
+    <a href="/apidocs">/apidocs</a></p>
+    <!--
     <div class="alert alert-info">
         <h5>📷 Kép feltöltés tesztelése</h5>
         <p>Az új <code>/api/v4/upload</code> végpont lehetővé teszi képek feltöltését templomokhoz. A kép feltöltés teszteléséhez:</p>
@@ -32,7 +33,7 @@
         </ul>
         <p><strong>Megjegyzés:</strong> A kép feltöltéshez szükséges a <code>tid</code> (templom ID) és a <code>photo</code> (base64 kódolt kép) mező.</p>
     </div>
-    
+    -->
 	<form id="ajaxForm" class="form" enctype="multipart/form-data">
 		<table class="table">
 			<tr>
@@ -102,16 +103,17 @@
             {% set response_length = random(['minimal', 'medium', 'full']) %}
 
             var examples = [
-                {url: '/api/v4/search', jsonPayload: '{ "q" : "jezsuita", "offset" : 0, "limit" : 10, "response_length" : "{{ response_length }}"  }'},
-                {url: '/api/v4/templomok', jsonPayload: '{ "columns" : ["nev", "id"] }'},
-                {url: '/api/v4/nearby', jsonPayload: '{"lat": 47.47880, "lon": 19.07609, "response_length" : "{{ response_length }}" }'},
-                {url: '/api/v4/updated/{{ one_week_ago|date('Y-m-d') }}', jsonPayload: '{}'},
-                {url: '/api/v4/church', jsonPayload: '{ "id": {{ random(5000) }}, "response_length" : "{{ response_length }}"  }'},                
+                {% for endpoint in endpoints %}
+                    {url: '{{ endpoint.url }}', jsonPayload: '{{ endpoint.jsonPayload|e('js') }}' },
+                {% endfor %}                
+            ];
+
+            var examples2 = [               
+                {url: '/api/v4/updated/{{ one_week_ago|date('Y-m-d') }}', jsonPayload: '{}'},                
                 {url: '/api/v4/upload', jsonPayload: '{ "tid": {{ sampleChurchId }}, "photo": "data:image/jpeg;base64,..." }'},
                 {url: '/api/v4/lorawan', jsonPayload: '{"deduplicationId":"' + generateUUID() + '","time":"{{ "now"|date("Y-m-d\\TH:i:s.vP") }}","deviceInfo":{"tenantId":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb","tenantName":"Mikrohalo","applicationId":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","applicationName":"JS_Templomok","deviceProfileId":"eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee","deviceProfileName":"Dragino_LDS02_LWL02","deviceName":"LDS02-004","devEui":"aaaaaaaaaaaaaaaa","deviceClassEnabled":"CLASS_A","tags":{"local_id":"{{ random([1,2]) }}","templom_id":"1252","Hely":"Szeged"}},"devAddr":"00000000","adr":true,"dr":0,"fCnt":0,"fPort":10,"confirmed":false,"data":"C8oBAAAbAAAAAA==","object":{"Counter":1,"Fej":"Mérési adat","Elemfeszültség_(V)":3.018,"Mód":{{ random([1,2]) }},"Satus_Door":{{ random([0,1]) }},"Status_Leak": {{ random([0,1]) }},"Duration":0,"Alarm":0},"rxInfo":[{"gatewayId":"0000000000000000","uplinkId":12345,"gwTime":"{{ "now"|date("Y-m-d\\TH:i:s.vP") }}","rssi":-124,"snr":-9.8,"context":"keqI+w==","metadata":{"gateway_lat":"26.336463029554102","network":"helium_iot","gateway_h3index":"000000000000000","gateway_id":"xxxxxxxxxxxxxxxxxxxxxxxxx","regi":"EU868","gateway_long":"10.122844916841093","gateway_name":"wwwwww-wwwwww-wwwwwwwww"},"crcStatus":"CRC_OK"}],"txInfo":{"frequency":868500000,"modulation":{"lora":{"bandwidth":125000,"spreadingFactor":12,"codeRate":"CR_4_5"}}},"regionConfigId":"eu868"}'}
 
             ];
-
             // Populate the select input with examples
             examples.forEach(function(example, index) {
                 $('#exampleSelect').append(new Option(example.url, index));

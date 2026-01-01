@@ -1,0 +1,82 @@
+<div class="diffs-container">
+  <div>
+    <span>
+      @if (!origMass.period || origMass.period.length === 0) {
+        {{ origMass.startDate }}
+      } @else if (origMass.christmas) {
+        <span>{{ origMass.christmas }}</span><span>, {{ origMass.time }}</span>
+      } @else if (origMass.easter) {
+        <span>{{ origMass.easter }}</span><span>, {{ origMass.time }}</span>
+      } @else if (origMass.week) {
+        <span>{{ origMass.period }}</span>, <span>{{ origMass.week }}</span>, <span>{{ origMass.days }}</span><span>, {{ origMass.time }}</span>
+      } @else if (origMass.month) {
+        <span>{{ origMass.period }}</span>, <span>{{ origMass.month }} </span><span>{{ origMass.days }}</span><span>, {{ origMass.time }}</span>
+      } @else {
+        <span>(nem ismétlődő)</span>
+      }
+    </span>
+    @if (origMass.period !== newMass.period || origMass.startDate !== newMass.startDate || origMass.month !== newMass.month ||
+    origMass.week !== newMass.week || origMass.days !== newMass.days || origMass.time !== newMass.time) {
+      <span>
+        <span> => </span>
+        @if (!newMass.period || newMass.period.length === 0) {
+          {{ newMass.startDate }}
+        } @else if (newMass.christmas) {
+          <span>{{ newMass.christmas }}</span><span>, {{ newMass.time }}</span>
+        } @else if (newMass.easter) {
+          <span>{{ newMass.easter }}</span><span>, {{ newMass.time }}</span>
+        } @else if (newMass.week) {
+          <span>{{ newMass.period }}</span>, <span>{{ newMass.week }}</span>, <span>{{ newMass.days }}</span><span>, {{ newMass.time }}</span>
+        } @else if (newMass.month) {
+          <span>{{ newMass.period }}</span>, <span>{{ newMass.month }} </span><span>{{ newMass.days }}</span><span>, {{ newMass.time }}</span>
+        } @else {
+          <span>(nem ismétlődő)</span>
+        }
+      </span>
+    }
+  </div>
+  <div class="diff-details">
+    @if (origMass.title != newMass.title) {
+        <span>Liturgia neve:</span>
+        <span>{{origMass.title}}</span>
+        <span> => </span>
+        <span>{{newMass.title}}</span>
+    }
+    @if (origMass.lang != newMass.lang) {
+        <span>Nyelv:</span>
+        <span>{{origMass.lang}}</span>
+        <span> => </span>
+        <span>{{newMass.lang}}</span>
+    }
+    @if (origMass.rite != newMass.rite) {
+      <span>Rítus:</span>
+      <span>{{origMass.rite}}</span>
+      <span> => </span>
+      <span>{{newMass.rite}}</span>
+    }
+    @if (origMass.types != newMass.types) {
+      <span>Jellemzők:</span>
+      <span>{{origMass.types}}</span>
+      <span> => </span>
+      <span>{{newMass.types}}</span>
+    }
+    @if (origMass.duration != newMass.duration) {
+      <span>Hossz:</span>
+      <span>{{origMass.duration}}</span>
+      <span> => </span>
+      <span>{{newMass.duration}}</span>
+    }
+    @if (origMass.comment != newMass.comment) {
+      <span>Megjegyzés:</span>
+      <span>{{origMass.comment}}</span>
+      <span> => </span>
+      <span>{{newMass.comment}}</span>
+    }
+    @if (experiodChanged) {
+      <span>Kizárt periódus(ok):</span>
+      <span>{{origMass.experiod}}</span>
+      <span> => </span>
+      <span>{{newMass.experiod}}</span>
+    }
+  </div>
+</div>

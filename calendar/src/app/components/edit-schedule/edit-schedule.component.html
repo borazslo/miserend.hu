@@ -1,0 +1,10 @@
+@if (dataLoaded) {
+  <app-church-calendar
+    #churchCalendar
+    [suggestible]="false"
+    [editable]="true"
+    [currentChurch]="currentChurch!"
+    [masses]="masses"
+  >
+  </app-church-calendar>
+}

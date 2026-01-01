@@ -327,6 +327,19 @@ class User {
         \Eloquent\ChurchHolder::where('user_id',$this->uid)->delete();
         \Eloquent\Favorite::where('uid',$this->uid)->delete();
         
+        \Eloquent\Remark::where('login', $this->username)->update([
+            'login' => 'deleted_user',
+            'email' => 'deleted_user@miserend.invalid',
+            'nev'   => '*törölt felhasználó*'
+        ]);
+        
+        \Eloquent\CalSuggestionPackage::where('sender_user_id', $this->uid)->update([
+            'sender_user_id' => 0,
+            'sender_email'   => 'deleted_user@miserend.invalid',
+            'sender_name'    => '*törölt felhasználó*'
+        ]);
+        
+
         DB::table('user')->where('uid', $this->uid)->delete();
         
         foreach ($this as $key => $value)

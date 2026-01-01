@@ -1,3 +1,5 @@
+{% set columns2 = true  %}
+
 {% extends "layout.twig" %}
 
 {% set pageTitle = 'Szentmise keresés | Miserend' %}
@@ -12,9 +14,91 @@
 
 {% block content %}
 
-{{ alert|raw }}
+    {{ alert|raw }}
+    {{ tartalom|raw }}
+    <strong><span class=kiscim>Keresési paraméterek:</span></strong><br/>
+    {% if filters is defined and filters|length %}
+        {% for filter in filters %}
+            <span class="alap"><img src="/img/negyzet_lila.gif" align="absmiddle"> {{ filter|striptags('<i><b>')|raw }}</span><br/>
+        {% endfor %}
+    {% else %}
+        <span class="alap">Nincsenek szűrők</span><
+    {% endif %}
+    <br/>
 
-{{ content|raw }}</td>
+    {% if results %}
+            <div class="row" style="margin-bottom:12px">
+                Összesen: {{ pagination.resultsCount }} találat<br/>
+                Listázás: {{ (pagination.active * pagination.take) + 1 }} - 
+                {% if pagination.resultsCount < ( pagination.active + 1 ) * pagination.take %}
+                    {{ pagination.resultsCount }}
+                {% else %}
+                    {{ ( pagination.active + 1 ) * pagination.take }} 
+                {% endif %}
+            </div>
+
+            {% for result in results %}
+                {% set church = result.church %}
+                <div class="row">
+                    <div class="col-md-9">
+                        <a href='/templom/{{ church.id }}' class=felsomenulink title='{{ church.names|slice(1)|join(', ') }}'>
+                            <b>{{ church.names.0 }}</b> 
+                            <font color=#8D317C>
+                                {% if church.varos is iterable %}
+                                    ({{ church.varos.0 }})
+                                {% else %}
+                                    ({{ church.varos }})
+                                {% endif %}
+                            </font>                            
+                        </a>
+                        {% if church.alternative_names.0 %}
+                            <br/><span class="alap" style="margin-left: 20px; font-style: italic;" title="{{ church.alternative_names|slice(1)|join(', ') }}">{{ church.alternative_names.0 }}</span>
+                        {% endif %}
+                    </div>
+                    {% if user.isadmin %}
+                        <div class="col-md-3">                            
+                            {% include "church/_adminlinks.twig" with church %}                       
+                        </div>
+                    {% endif %}
+
+                </div>
+                <div class="row" style="margin-bottom:6px">
+                    {% for key, item in result %}                    
+                        {% if key != 'church' %}                                                     
+                            <div class="col-md-12" style="margin-bottom:4px">
+                                
+                                <span class="badge badge-primary" title="{{ item.title ~ ' ' ~ item.rite }}">{{ item.start_date|miserend_date('H:i') }}</span>
+                                
+                                <img src="/cal_images/types/{{ item.rite|lower }}.svg" alt="{{ item.rite|trans }}" title="{{ item.rite|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+
+                                <strong><span class="mass-list-title">{{ item.title }}</span></strong>
+
+                                {% if item.readable_rrule %}
+                                    <div class="text-muted small">{{ item.readable_rrule }}</div>
+                                {% endif %}
+
+                                {% if item.lang and item.lang != 'hu' %}
+                                    <img src="/cal_images/flags/{{ item.lang|lower }}.svg" alt="{{ item.lang|trans }}" title="{{ item.lang|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+                                {% endif %}
+                                {% if item.types is iterable and item.types|length %}                                
+                                    {% for type in item.types %}
+                                        <img src="/cal_images/types/{{ type|lower }}.png" alt="{{ type|trans }}" title="{{ type|trans }}" style="height:1.3em; margin-right:6px; vertical-align:middle;">
+                                        {% if not loop.last %} {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if user.isadmin %}
+                                    <small>{{ church.score }}</small>
+                                {% endif %}
+                            </div>                            
+                        {% endif %}
+                    {% endfor %}
+                </div>    
+            {% endfor %}
+        {% endif %}
+
+        {% include '_pagination.twig' %}
+
 
 {% endblock %}
 

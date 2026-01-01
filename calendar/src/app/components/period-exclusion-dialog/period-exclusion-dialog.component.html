@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>{{ 'Időszak módosítása' | translate }}</h2>
+<mat-dialog-content>
+  <p>A <span class="periodName">{{ data.periodName }}</span> időszakhoz tartozó adatokat mentesz éppen. 
+  Ez az időszak átfedésben lehet más időszakokkal is, ami hatással lesz arra, hogy mely napokon jelenik meg.</p>
+
+  @if (data.recentlyExcludedPeriodNames && data.recentlyExcludedPeriodNames.length > 0) {              
+    <span>Az alábbi időszakokkal való átfedés esetén, nem ennek az időszaknak az adatai kerülnek az érvényre, hanem valamelyik az alábbiak közül:</span>    
+    <ul>
+      @for (period of data.recentlyExcludedPeriodNames; track period) {
+        <li class="periodName">{{ period }}</li>
+      }
+    </ul>
+  }
+  @if (data.recentlyExclusionSourcePeriodNames && data.recentlyExclusionSourcePeriodNames.length > 0) {
+    <span>Átfedésben lévő napok esetén a következő időszakok helyett ennek az időszaknak az adati kerülnek megjelenítésre:</span>
+    <ul>
+      @for (period of data.recentlyExclusionSourcePeriodNames; track period) {
+        <li class="periodName">{{ period }}</li>
+      }
+    </ul>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="close()">OK</button>
+</mat-dialog-actions>

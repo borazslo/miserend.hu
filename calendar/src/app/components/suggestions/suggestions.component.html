@@ -1,0 +1,185 @@
+<div class="suggestion-wrapper">
+
+  <div class="suggestion-header">
+    @if (selectedSuggestionPackage && selectedSuggestionPackage.id) {
+      <div class="sender-data">
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.NAME' | translate }}</mat-label>
+          <input matInput [value]="selectedSuggestionPackage.senderName" readonly />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.EMAIL' | translate }}</mat-label>
+          <input matInput [value]="selectedSuggestionPackage.senderEmail" readonly />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.USERID' | translate }}</mat-label>
+          <input matInput [value]="selectedSuggestionPackage.senderUserId" readonly />
+        </mat-form-field>
+      </div>
+      {{ selectedSuggestionPackage.id }}
+      <div class="package-data">
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.STATE' | translate }}</mat-label>
+          <input matInput [value]="('SUGGESTION.STATES.' + selectedSuggestionPackage.state) | translate" readonly />
+        </mat-form-field>
+
+        <mat-form-field class="package-selector">
+          <mat-label>{{ 'SUGGESTION.SELECTED_PACKAGE' | translate }}</mat-label>
+          <mat-select [(value)]="selectedSuggestionPackage" (selectionChange)="onSuggestionPackageChange()">
+            @for (suggestionPackage of suggestionPackages; track suggestionPackage.id) {
+              <mat-option [value]="suggestionPackage">
+                {{ suggestionPackage.createdAt  | date:'yyyy.MM.dd HH:mm' }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+  </div>
+
+  <div class="changes-readable">
+
+    @if (readableFullyDeletedMasses.length > 0) {
+      <fieldset>
+        <legend>Teljesen törölt misék</legend>
+        @for (rdm of readableFullyDeletedMasses; track $index) {
+          <div class="event-row deleted-event-row">
+            @if (!rdm.period || rdm.period.length === 0) {
+              {{ rdm.startDate }}
+            }
+            @if (rdm.christmas) {
+              <span>{{ rdm.christmas }}</span><span>, {{ rdm.time }}</span>
+            } @else if (rdm.easter) {
+              <span>{{ rdm.easter }}</span><span>, {{ rdm.time }}</span>
+            } @else if (rdm.week) {
+              <span>{{ rdm.period }}</span>, <span>{{ rdm.week }}</span>, <span>{{ rdm.days }}</span><span>, {{ rdm.time }}</span>
+            } @else if (rdm.month) {
+              <span>{{ rdm.period }}</span>, <span>{{ rdm.month }} </span><span>{{ rdm.days }}</span><span>, {{ rdm.time }}</span>
+            } @else {
+              <span>(nem ismétlődő)</span>
+            }
+          </div>
+        }
+      </fieldset>
+    }
+
+    @if (readableOccasionalDeletedMasses.length > 0) {
+      <fieldset>
+        <legend>Törölt alkalmak</legend>
+        <p>(Azért, mert konkrétan kitörölték, vagy azért, mert a háttérben kitöröltük egyéni szerkesztés miatt)</p>
+        @for (rdm of readableOccasionalDeletedMasses; track $index) {
+          <div class="event-row deleted-event-row">
+            <app-mass-row [mass]="rdm"></app-mass-row>
+          </div>
+        }
+      </fieldset>
+    }
+
+    @if (readableNewMasses.length > 0) {
+      <fieldset>
+        <legend>Újonnan hozzáadva</legend>
+        @for (rnm of readableNewMasses; track $index) {
+          <div class="event-row new-event-row">
+            <app-mass-row [mass]="rnm" [showDetails]="true"></app-mass-row>
+          </div>
+        }
+      </fieldset>
+    }
+
+    @if (readableModifiedMasses.length > 0) {
+      <fieldset>
+        <legend>Módosítva</legend>
+        @for (rmm of readableModifiedMasses; track $index) {
+          <div class="event-row modified-event-row">
+            <app-masses-diff [origMass]="rmm.origMass" [newMass]="rmm.newMass"></app-masses-diff>
+          </div>
+        }
+      </fieldset>
+    }
+
+    @if (selectedSuggestionPackage && selectedSuggestionPackage.id && selectedSuggestionPackage.senderMessage ) {
+      <fieldset>
+        <legend>Javaslattevő üzenete</legend>
+        <div class="event-row message-event-row">
+          {{ selectedSuggestionPackage.senderMessage }}
+        </div>
+      </fieldset>
+    }
+  </div>
+
+  <div class="calendar-header">
+    <div class="left-controls">
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
+        <mat-button-toggle (click)="prev()" [matTooltip]="'SUGGESTION.HEADER.PREV' | translate"><mat-icon>keyboard_arrow_left</mat-icon></mat-button-toggle>
+        <mat-button-toggle (click)="next()" [matTooltip]="'SUGGESTION.HEADER.NEXT' | translate"><mat-icon>keyboard_arrow_right</mat-icon></mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="current-date">
+      {{ calendarsTitle }}
+    </div>
+
+    <div class="right-controls">
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
+        <mat-button-toggle (click)="changeView('dayGridDay')">{{ 'SUGGESTION.HEADER.DAY' | translate }}</mat-button-toggle>
+        <mat-button-toggle [checked]="true" (click)="changeView('timeGridWeek')">{{ 'SUGGESTION.HEADER.WEEK' | translate }}</mat-button-toggle>
+        <mat-button-toggle (click)="changeView('dayGridMonth')">{{ 'SUGGESTION.HEADER.MONTH' | translate }}</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+
+  <div class="calendars">
+    <div class="calendar-wrapper" id="calendar1">
+      <p class="calendar-title">{{ 'SUGGESTION.ORIGINAL_CALENDAR' | translate }}</p>
+      @if (origDataLoaded) {
+        <app-church-calendar
+          #calendarOrig
+          [suggestible]="false"
+          [editable]="false"
+          [showHeader]="false"
+          [showFooter]="false"
+          [currentChurch]="currentChurch!"
+          [masses]="origMasses"
+          [deletedMasses]="deletedMasses"
+          [deletedDates]="deletedDates"
+          [changedMasses]="changedMasses"
+          (datesSet)="setCalendarsTitle($event)"
+        >
+        </app-church-calendar>
+      }
+    </div>
+
+    <div class="calendar-wrapper {{!hasSuggestion ? 'no-suggestion-wrapper' : ''}}" id="calendar2">
+      @if (hasSuggestion) {
+        <p class="calendar-title">{{ 'SUGGESTION.NEW_CALENDAR' | translate }}</p>
+        @if (newDataLoaded) {
+          <app-church-calendar
+            #calendarNew
+            [suggestible]="false"
+            [editable]="false"
+            [showHeader]="false"
+            [showFooter]="false"
+            [currentChurch]="currentChurch!"
+            [masses]="newMasses"
+            [changes]="changes"
+            [changedMasses]="changedMasses"
+            [deletedMasses]="deletedMasses"
+          >
+          </app-church-calendar>
+        }
+      } @else {
+        <p>{{ 'SUGGESTION.THERE_IS_NO_SUGGESTION' | translate }}</p>
+      }
+    </div>
+  </div>
+
+  @if (suggestionPackages.length > 0) {
+    <div class="bottom-buttons">
+      <button mat-flat-button class="reject" (click)="onReject()">{{ 'SUGGESTION.REJECT' | translate }}</button>
+      <button mat-flat-button class="approve" (click)="onApprove()">{{ 'SUGGESTION.APPROVE' | translate }}</button>
+    </div>
+  }
+
+</div>

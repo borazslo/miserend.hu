@@ -69,3 +69,11 @@ function twig_hungarian_date_format($date, $format = null) {
     // Pl.: Júl. 16., szerda 14:30
     return $month . ' ' . $day . ', ' . $weekday . ($showTime ? ' ' . $time : '');
 }
+
+function twig_translate($text) {
+    
+    $text = Translator::translate($text);
+    
+    return $text;
+}
+

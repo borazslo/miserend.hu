@@ -52,6 +52,39 @@
 		{% endfor %}
 	</table>
 	
+	<h3 id="elasticsearch">ElasticSearch állapot</h3>
+	<p>A keresőnk az ElasticSearch szolgáltatást használja. Az alábbi táblázat az indexek állapotát mutatja.</p>
+	<table class="table table-hover table-condensed table-striped">
+		<tr>
+			<th>health</th>
+			<th>status</th>
+			<th>index</th>
+			
+			<th>docs.count</th>
+			<th>docs.deleted</th>
+			<th>store.size</th>
+			<th>pri.store.size</th>
+		</tr>
+		{% for esindex in elasticsearch %}
+			<tr>
+				<td>
+					<span class="badge {{ esindex.health == 'green' ? 'bg-success' : (esindex.health == 'yellow' ? 'bg-warning' : (esindex.health == 'red' ? 'bg-danger' : 'bg-secondary')) }}">
+						{{ esindex.health }}
+					</span>
+				</td>
+				<td>{{ esindex.status }}</td>
+				<td>{{ esindex.index }}</td>
+				<td style="text-align: center">{{ attribute(esindex, 'docs.count')|number_format(0, '.', ' ') }}</td>
+				<td style="text-align: center">{{ attribute(esindex, 'docs.deleted')|number_format(0, '.', ' ') }}</td>
+				<td>{{ attribute(esindex, 'store.size') }}</td>
+				<td>{{ attribute(esindex, 'pri.store.size') }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+		
+		
+		
+
 	<h3 id="externalapis">Külső szolgáltatók elérhetősége</h3>
 	<p><i>Olyanok mint mapqquest, openstreetmap, kozossegekapi, liturgiativ, nominatim, openinghapi, overpass</i></p> 
 

@@ -18,18 +18,7 @@
 
     RewriteRule ^(vendor|kepek|fajlok|node_modules|bower_components|img)/ - [L]
               
-    RewriteRule ^api/v([0-9]{1,4})/(sqlite|report|updated|signup|login|user|search)(/|)$ /index.php?q=api&action=$2&v=$1 [NC,QSA]
     
-    RewriteRule ^api/v([0-9]{1,4})/miserend.sqlite3(/|)$ /fajlok/sqlite/miserend_v$1.sqlite3 [NC,L]	
-    RewriteRule ^api/v([0-9]{1,4})/templomok(/|)$ /index.php?q=api&action=table&table=templomok&v=$1 [NC,QSA]    
-    RewriteRule ^api/v([0-9]{1,4})/updated/([0-9]{4}-[0-9]{2}-[0-9]{2})(/|)$ /index.php?q=api&action=updated&v=$1&datum=$2 [NC]
-    RewriteRule ^api/v([0-9]{1,4})/user/favorites(/|)$ /index.php?q=api&action=favorites&v=$1 [NC,QSA]
-    RewriteRule ^api/v([0-9]{1,4})/upload(/|)$ /index.php?q=api&action=upload&v=$1 [NC,QSA]
-    RewriteRule ^api/v([0-9]{1,4})/service_times(/|)$ /index.php?q=api&action=service_times&v=$1 [NC,QSA]
-	RewriteRule ^api/v([0-9]{1,4})/nearby(/|)$ /index.php?q=api&action=nearby&v=$1 [NC,QSA]
-    RewriteRule ^api/v([0-9]{1,4})/church(/|)$ /index.php?q=api&action=church&v=$1 [NC,QSA]
-	RewriteRule ^api/v([0-9]{1,4})/database(/|)$ /index.php?q=api&action=database&v=$1 [NC,QSA]
-    RewriteRule ^api/v([0-9]{1,4})/lorawan(/|)$ /index.php?q=api&action=lorawan&v=$1 [NC,QSA]
         
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

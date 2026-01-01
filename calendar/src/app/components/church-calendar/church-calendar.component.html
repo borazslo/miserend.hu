@@ -1,0 +1,195 @@
+@if (showHeader) {
+  <div class="calendar-header">    
+    <div class="left-controls">
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
+        <mat-button-toggle (click)="prev()" [matTooltip]="'SUGGESTION.HEADER.PREV' | translate"><mat-icon>keyboard_arrow_left</mat-icon></mat-button-toggle>
+        <mat-button-toggle (click)="calendarComponent.getApi().today()" [matTooltip]="'SUGGESTION.HEADER.TODAY' | translate" aria-label="today">
+          {{ 'SUGGESTION.HEADER.TODAY' | translate }}          
+        </mat-button-toggle>
+        <mat-button-toggle (click)="next()" [matTooltip]="'SUGGESTION.HEADER.NEXT' | translate"><mat-icon>keyboard_arrow_right</mat-icon></mat-button-toggle>        
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="current-date">
+      {{ calendarsTitle }}
+    </div>
+    <div class="right-controls">
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true">
+        <mat-button-toggle (click)="changeView('listWeek')">{{ 'SUGGESTION.HEADER.LIST' | translate }}</mat-button-toggle>        
+        <mat-button-toggle [checked]="true" (click)="changeView('timeGridWeek')">{{ 'SUGGESTION.HEADER.WEEK' | translate }}</mat-button-toggle>
+        <mat-button-toggle (click)="changeView('dayGridMonth')">{{ 'SUGGESTION.HEADER.MONTH' | translate }}</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+}
+<full-calendar
+  #calendar
+  [options]="calendarOptions"
+  [events]="eventsPromise | async"
+></full-calendar>
+
+<!-- Template used to render FullCalendar list items via Angular bindings.
+     Context variables provided from component: timeText, title, lang, types -->
+<ng-template #eventListTemplate let-timeText="timeText" let-title="title" let-lang="lang" let-types="types">
+  <div class="fc-list-item-container d-flex align-items-center" style="gap:6px;">
+    <span class="fc-list-item-time" *ngIf="timeText">{{ timeText }}</span>
+    <div class="fc-list-item-main d-flex align-items-center" style="gap:6px;">
+      <span class="fc-list-item-title">{{ title }}</span>
+
+      <ng-container *ngIf="lang">
+        <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="('LANGUAGES.' + lang) | translate" [src]="'/cal_images/flags/' + (lang | lowercase) + '.svg'" [alt]="('LANGUAGES.' + lang) | translate" />
+      </ng-container>
+
+      <ng-container *ngIf="types && types.length">
+        <ng-container *ngFor="let t of types">
+          <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="t | translate" [src]="'/cal_images/types/' + (t | lowercase) + '.png'" [alt]="t | translate" />
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Hidden anchor where the component will create embedded views from the template -->
+<ng-template #eventListTemplateContainer></ng-template>
+
+@if (showFooter && (editable || suggestible)) {
+  @if (suggestible && (changes.size != 0 || deletedMasses.length != 0)) {
+    <div class="footer suggestion-footer">
+      <div class="sender-data">
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.NAME' | translate }}</mat-label>
+          <input matInput [formControl]="suggestionSenderName" />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.EMAIL' | translate }}</mat-label>
+          <input matInput [formControl]="suggestionSenderEmail" />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{ 'SUGGESTION.SENDER.MESSAGE' | translate }}</mat-label>
+          <textarea matInput rows="3" [formControl]="suggestionSenderMessage"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="buttons">
+        <button mat-flat-button="tonal" (click)="onResetCalendar()"> {{ 'CANCEL' | translate }}</button>
+        <button mat-flat-button (click)="onSendToApprove()">{{ 'SEND_TO_APPROVE' | translate }}</button>
+      </div>
+    </div>
+  } @else if (editable && (deletedMasses.length > 0 || changes.size > 0)) {
+    <div class="footer">
+      <div class="buttons">
+        <button mat-flat-button (click)="onResetCalendar()"> {{ 'CANCEL' | translate }}</button>
+        <button mat-flat-button (click)="onSaveCalendar()">{{ 'SAVE' | translate }}</button>
+      </div>
+    </div>
+  }
+}
+
+
+@if (showMassListInEdit) {
+  <div class="mass-list mt-3">
+    <h3>Misék listája</h3>
+
+    <div class="table-responsive">
+      <style>
+        /* subtle separators between rows */
+        .mass-list .table {
+          border-collapse: separate;
+          border-spacing: 0 6px; /* vertical gap between rows */
+        }
+        .mass-list .table tbody tr {
+          background: #fff;
+          box-shadow: 0 1px 0 rgba(0,0,0,0.06); /* thin line between rows */
+          border-radius: 4px;
+        }
+        .mass-list .table tbody tr td {
+          vertical-align: middle;
+          border: none; /* avoid double borders with bootstrap table-striped */
+        }
+      </style>
+      <table class="table table-sm table-striped" style="width: 100%; padding: 5px; background: transparent;">
+        <tbody>
+              
+          <ng-container *ngFor="let group of massListGrouped">
+        
+        
+            <tr style="background-color:#f5f5f5;">
+              <th colspan="2">
+                  <ng-container *ngIf="group.color; else noColor">
+                    <span class="badge period-color-badge"
+                          [style.backgroundColor]="group.color"
+                          [ngStyle]="{
+                            'color': '#fff',
+                            'padding': '6px 10px',
+                            'border-radius': '12px',
+                            'font-weight': '600',
+                            'font-size': '0.95rem',
+                            'display': 'inline-block',
+                            'box-shadow': '0 1px 4px rgba(0,0,0,0.25)',
+                            'margin-right': '8px'
+                          }">
+                      {{ group.color }}
+                    </span>
+                  </ng-container>
+
+                  <ng-template #noColor>
+                    <br/><br/>
+                  </ng-template>
+              </th>
+              <th colspan="2">
+                <h3>
+                  <ng-container *ngIf="group.periodName; else noPeriod">
+                    {{ group.periodName }}
+                  </ng-container>
+                  <ng-template #noPeriod>
+                    <i>Időszak nélküli egyedi misék</i>
+                  </ng-template>
+                  </h3>
+              </th>
+              <th colspan="2">
+                <ng-container *ngIf="group.startMonthDay || group.startPeriodName || group.endMonthDay || group.endPeriodName">
+                  <span *ngIf="group.startMonthDay || group.startPeriodName" style="font-weight: normal;">
+                    {{ group.startPeriodName ? group.startPeriodName : group.startMonthDay }}
+                  </span>
+                  <br>
+                  <span *ngIf="group.endMonthDay || group.endPeriodName" style="font-weight: normal;">
+                    {{ group.endPeriodName ? group.endPeriodName : group.endMonthDay }}
+                  </span>
+                </ng-container>
+              </th> 
+                  
+            </tr>
+
+            <tr *ngFor="let m of group.masses">
+              <td>
+                <button mat-icon-button (click)="openMassFromList(m)" [matTooltip]="'EDIT' | translate" aria-label="edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </td>
+              <td style="padding:10px">{{ m.startDate | date:'HH:mm' }}</td>
+              <td style="padding:10px">
+                {{m.rite | translate }} <strong><span class="mass-list-title">{{m.title}}</span></strong>
+                <div *ngIf="m.readableRRule" class="text-muted small">{{m.readableRRule}}</div>
+              </td>              
+              <td style="padding:10px">
+                <ng-container *ngFor="let t of m.types">
+                  <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="t | translate" [src]="'/cal_images/types/' + t.toLowerCase() + '.png'" [alt]="t | translate" />
+                </ng-container>
+                <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="(('LANGUAGES.' + m.lang) | translate) + ' nyelvű'" [src]="'/cal_images/flags/' + m.lang.toLowerCase() + '.svg'" [alt]="(('LANGUAGES.' + m.lang) | translate) + ' nyelvű'" />
+              </td>              
+              <td style="padding:10px">
+                <div *ngIf="m.experiodNames && m.experiodNames.length" class="text-muted small">
+                  <ng-container *ngFor="let e of m.experiodNames; let i = index">
+                    {{ e }}<span *ngIf="i < m.experiodNames.length - 1">, </span>
+                  </ng-container>
+                </div>
+              </td>
+              <td style="padding:10px">{{m.comment}}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>  
+  </div>    
+}

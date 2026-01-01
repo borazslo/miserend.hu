@@ -299,8 +299,16 @@ class ExternalApi {
         return $result;
     }
 
-}
+    public static function clearAllOldCache() {
+        $apis = self::collectExternalApis();
+        foreach ($apis as $apiName) {
+            $className = '\\ExternalApi\\' . $apiName;
+            $apiInstance = new $className();
+            $apiInstance->clearOldCache();
+        }
+    }   
 
+}
 class Exception extends \Exception {
 	
 }

@@ -4,67 +4,87 @@ namespace Api;
 
 class LoRaWAN extends Api {
 
-    public $requiredFields = array('deduplicationId','time','deviceInfo','object');
-
     public $requiredVersion = ['>=',4]; // API v4-től érhető el
-
+    public $title = 'Gyóntatás jelentése LoRaWAN eszközről';
+    public $fields = [
+        'deduplicationId' => [
+            'validation' => ['string'
+                => ['pattern' => '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$']
+            ],  
+            'description' => 'UUID formátumú egyedi azonosító minden egyes adatküldéshez. Fontos, hogy minden külön adat külön UUID-vel érkezzen. Kétszer azonos adatot nem fogadunk.',
+            'example' => '123e4567-e89b-12d3-a456-426614174000',
+            'required' => true
+        ],
+        'time' => [
+            'validation' => ['string' => [
+                'pattern' => '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+\d{2}:\d{2}$'
+            ]],
+            'description' => 'Az esemény időbélyege YYYY-MM-DDTHH:MM:SS.sss+00:00 formátumban',
+            'example' => '2023-10-05T14:48:00.000+00:00',
+            'required' => true  
+        ],
+        'deviceInfo' => [
+            'validation' => 'list',
+            'description' => 'Az eszköz információi, beleértve a devEui-t és a címkéket.',
+            'example' => [],
+            'required' => true
+        ],
+        'deviceInfo/devEui' => [
+            'validation' => [
+                'string' => [
+                    'pattern' => '^[a-f0-9]{16}$'
+                ]                
+            ],  
+            'description' => 'A konkrét eszköz egyedi azonosítója, hexadecimális formátumban (16 karakter).',
+            'example' => '70b3d57ed00001a1',
+            'required' => true
+        ],
+        'deviceInfo/tags/templom_id' => [
+            'validation' => 'integer', 
+            'description' => 'A misézőhely azonosítója.',
+            'example' => 7,
+            'required' => true
+        ],
+        'deviceInfo/tags/local_id' => [
+            'validation' => 'integer', 
+            'description' => 'Egy misézőhelyen több eszköz is lehet, ezért szükséges a helyi azonosító.',
+            'example' => 1,
+            'required' => true
+        ],
+        'object' => [
+            'validation' => 'list',
+            'description' => 'Az eszközről itt jönnek a státuszt érintő adatok.',
+            'example' => [],
+            'required' => true
+        ],
+        'object/Mód' => [
+            'validation' => [
+                'enum' => [1,2]
+            ],  
+            'description' => 'Az eszköz működési módja: 1 - ajtó állapot, 2 - vízszivárgás érzékelés.',
+            'example' => 1,
+            'required' => true
+        ],
+        'object/Status_Leak' => [
+            'validation' => [
+                'enum' => [0,1]
+            ],  
+            'description' => 'Mód 2 esetén kötelező. Az eszköz vízszivárgás érzékelésének állapota: 1 - vízszivárgás, 0 - nincs vízszivárgás.',
+            'example' => 0
+        ],
+        'object/Satus_Door' => [
+            'validation' => [
+                'enum' => [0,1]
+            ],  
+            'description' => 'Mód 1 esetén kötelező. Az eszköz ajtó állapotának érzékelése: 1 - nyitva, 0 - zárva.',
+            'example' => 1
+        ] 
+    ];
+        
      public function docs() {
 
         $docs = [];
-        $docs['title'] = 'Gyóntatás jelentése LoRaWAN eszközről';
-        $docs['input'] = [
-            'deduplicationId' => [
-                'required',
-                'UUID',
-                'Fontos, hogy minden külön adat külön UUID-vel érkezzen. Kétszer azonos adatot nem fogadunk.'
-            ],
-            'time' => [
-                'required',
-                'timestamp',
-                'Az esemény időbélyege YYYY-MM-DDTHH:MM:SS.sss+00:00 formátumban'
-            ],
-            'deviceInfo' => [
-                'required',
-                'array',
-                'Az eszköz információi, beleértve a devEui-t és a címkéket.',
-            ],
-            'deviceInfo/tags/local_id' => [
-                'required',
-                'integer',
-                'Egy misézőhelyen több eszköz is lehet, ezért szükséges a helyi azonosító.',
-            ],
-            'deviceInfo/tags/templom_id' => [
-                'required',
-                'integer',
-                'A misézőhely azonosítója.',
-            ],            
-            'deviceInfo/devEui' => [
-                'required',
-                '',
-                'A konkrét eszköz egyedi azonosítója, hexadecimális formátumban (16 karakter).',
-            ],
-            'object' => [
-                'required',
-                'object',
-                'Az eszközről itt jönnek a státuszt érintő adatok.',
-            ],
-            'object/Mód' => [
-                'required',
-                'enum(1,2)',
-                'Az eszköz működési módja: 1 - ajtó állapot, 2 - vízszivárgás érzékelés.',
-            ],
-            'object/Status_Leak' => [
-                'optional/required',
-                'enum(1,0)',
-                'Mód 2 esetén kötelező. Az eszköz vízszivárgás érzékelésének állapota: 1 - vízszivárgás, 0 - nincs vízszivárgás.',
-            ],
-            'object/Status_Door' => [
-                'optional/required',
-                'enum(1,0)',
-                'Mód 1 esetén kötelező. Az eszköz ajtó állapotának érzékelése: 1 - nyitva, 0 - zárva.',
-            ],                        
-        ];
-
+     
         $docs['description'] = <<<HTML
         <strong><i>Ez még egy kísérleti API, használata csak saját felelősségre!</i></strong>
         <p>Ez az API lehetővé teszi a LoRaWAN eszközök által küldött gyóntatási adatok jelentését. A rendszer ellenőrzi a bemeneti adatokat, és ha minden rendben van, elmenti az adatokat az adatbázisba.</p>
@@ -81,37 +101,7 @@ class LoRaWAN extends Api {
 
         return $docs;
     }
-
-    public function validateInput() {
-        
-        if (!preg_match('/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/', $this->input['deduplicationId'])) {
-            throw new \Exception("JSON input 'deduplicationId' is not in valid form.");
-        }
-        
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+\d{2}:\d{2}$/', $this->input['time'])) {
-            throw new \Exception("JSON input 'time' is not in valid form. Expected format: YYYY-MM-DDTHH:MM:SS.sss+00:00");
-        }
-
-        if (!is_array($this->input['deviceInfo'])) {
-            throw new \Exception("JSON input 'deviceInfo' should be an array.");
-        }
-        if (!isset($this->input['deviceInfo']['tags']['local_id'])|| !is_numeric($this->input['deviceInfo']['tags']['local_id'])) {
-            throw new \Exception("JSON input 'deviceInfo[tags][local_id]' is required and should be a number.");
-        }
-        if (!isset($this->input['deviceInfo']['tags']['templom_id']) || !is_numeric($this->input['deviceInfo']['tags']['templom_id'])) {
-            throw new \Exception("JSON input 'deviceInfo[tags][templom_id]' is required and should be a number.");
-        }
-        if (!isset($this->input['deviceInfo']['devEui']) || !preg_match('/^[a-f0-9]{16}$/', $this->input['deviceInfo']['devEui'])) {
-            throw new \Exception("JSON input 'deviceInfo[devEui]' is required and should be in a valid format.");
-        }
-
-        if (!is_array($this->input['object'])) {
-            throw new \Exception("JSON input 'object' should be an array.");
-        }
-
-
-	}
-
+    
     public function run() {
         parent::run();
 
@@ -121,9 +111,15 @@ class LoRaWAN extends Api {
         $confession = new \Eloquent\Confession();
         
         if ($this->input['object']['Mód'] == 1) {
+            if (!isset($this->input['object']['Satus_Door'])) {
+                throw new \Exception('Satus_Door field is required when Mód is 1.');
+            }
             $confession->status = ($this->input['object']['Satus_Door'] == 1) ? 'ON' : 'OFF';
         }
         if ($this->input['object']['Mód'] == 2) {
+            if (!isset($this->input['object']['Status_Leak'])) {
+                throw new \Exception('Status_Leak field is required when Mód is 2.');
+            }
             $confession->status = ($this->input['object']['Status_Leak'] == 1) ? 'ON' : 'OFF';
         }
 
