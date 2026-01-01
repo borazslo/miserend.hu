@@ -265,6 +265,10 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $massPeriods;
     }
 
+    public function massrules() {
+        return $this->hasMany('\Eloquent\CalMass', 'church_id');
+    }
+    
     public function getLanguagesAttribute() {
         // Grab the 'lang' column from related massrules, remove empty values, unique and return as array
         return $this->massrules()

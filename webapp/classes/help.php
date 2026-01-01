@@ -201,45 +201,9 @@ class Help {
 
                 break;
 
-            case 47:
-                //miserend adatlap
-                $this->html = '<h4>Tulajdonságok</h4>' .
-                        'A szentmise tulajdonságának rövidítése esetleg egy periódus megjelölésével. Több érték esetén vesszővel elválasztva. Például: <i>ifi,ige3</i> = mindig ifjúsági/egyetemista mise, de a hónap harmadik hetében csak igeliturgia.<br/><br/>' .
-                        'Lehetséges tulajdonságok:' .
-                        '<ul>';
-                foreach (unserialize(ATTRIBUTES) as $name => $attr) {
-                    $this->html .= "<li> " . $attr['abbrev'] . " = " . $attr['name'] . "</li>";
-                }
-                $this->html .='</ul><p><i>Ha nincs megadva ezzel ellenkező tulajdonság, akkor a római katolikus misézőhely eseménye „római katolikus szentmise”, míg egy görögkatolikus hely alapérelmezett eseménye „görögkatolikus isteni liturgia”.</i>';
-
-                $this->html = '</p>Lehetséges periódusok:
-		<ul>';
-                foreach (unserialize(PERIODS) as $name => $attr) {
-                    $this->html .= "<li> " . $attr['abbrev'] . " = " . ( isset($attr['description']) ? $attr['description'] : " " ) . $attr['name'] . " héten</li>";
-                }
-                $this->html .= '</ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust. Vagyis ha nincs itt periódus érték megadva, akkor a mise periódusa érvényes.';
-                break;
-
-            case 48:
-                //miserend adatlap
-                $this->html = 'A <b>megjegyzés</b> rovatba minden további részletet tüntessünk fel, amit nem tudtunk a tulajdonságokhoz feljegyezni.';
-                break;
-
-            case 49:
-                //miserend adatlap
-                $this->html = '<h4>Periódus / Különleges mierend név</h4>' .
-                        'Minden periódusnak, más néven időszaknak, valamint minden különleges miserendnek kell legyen egy egyedi neve. Például: <i>téli miserend</i>, <i>ádventi időszak</i> vagy <i>karácsony napja</i>. Gépelés közben megjelennek a már használt nevek is. Ha egy már használt nevet választunk, akkor az időszak kezdetét és végét átmásolja onnan, így nem kell újra beállítani.';
-                break;
-
-            case 50:
-                //miserend adatlap
-                $this->html = '<h4>Periódus határok</h4>' .
-                        'Minden periódusnak, más néven időszaknak, be kell állítani a kezdetét és a végét. Több féleképpen adhatjuk meg a kezdő napot és a lezáró napot.<ul><li>Megadhatjuk egy konkért dátum nélküli kifejezéssel. Például: <i>első tanítási nap</i> vagy <i>Krisztus Király vasárnapja</i>. Gépelés közben megjelennek a választható kezdeti időpontok. Ha szükség lenne olyanra, ami még nincs, akkor írj nekem: eleklaszlosj@gmail.com. Azért nagyon praktikus ilyen kifejezéssel megadni egy időszak határát, mert így nem kell minden évben átírni. A miserend.hu tudja, hogy melyik évben mikor van pl. Húsvét.</li><li>Ha minden évben ugyan azon a naptári napon van az időszak váltása, akkor megadhatunk egy dátumot is. Például: <i>12-25</i>. Ilyenkor minden évben, pont ez lesz a forduló nap.</li><li>Nagy ritkán előfordulhat, hogy egy periódus/időszak csak egy adott évben létezik és más években nincsen rá szükség. Ilyen esetben meg lehet adni teljes tádummal a határt. Például: <i>2016-03-12</i>. Fontos, hogy így az adott időszaki miserend nem fog megjelenni más évben.</li></ul>Fontos, hogy nem szabad két különböző időszaknak pontosan ugyan azokat a határokat megadni, mert akkor nincs ami megkülönböztesse azokat egymástól.';
-                break;
-				
-			 case 51:
-				//templom űrlap - akadálymentesség
-				$this->html = '<h4>Akadálymentesség</h4>
+            case 51:
+                //templom űrlap - akadálymentesség
+                $this->html = '<h4>Akadálymentesség</h4>
 				<h5>Kerekesszékkel hozzáférhetőség:</h5>
 				<ul>
 					<li><strong>Teljesen</strong>: A bejáratnál és a helyiségekben sincsenek lépcsők.</li>

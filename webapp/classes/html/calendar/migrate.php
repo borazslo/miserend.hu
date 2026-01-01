@@ -59,9 +59,26 @@ class Migrate extends \Html\Html {
             $countmisekwitherror = 0;
             //printr($templomok);
 
-            $languages = unserialize(LANGUAGES);
-            $languages['hu'] = $languages['h'];
-            $languages = is_array($languages) ? array_keys($languages) : [];
+            
+           $nyelv = array(
+                'h' => 'magyar',
+                'hu' => 'magyar',
+                'en' => 'angol',
+                'fr' => 'francia',
+                'gr' => 'görög',
+                'hr' => 'horvát',
+                'va' => 'latin',
+                'pl' => 'lengyel',
+                'de' => 'német',
+                'it' => 'olasz',
+                'pt' => 'portugál',
+                'ro' => 'román',
+                'es' => 'spanyol',
+                'sk' => 'szlovák',
+                'si' => 'szlovén',
+                'uk' => 'ukrán'
+            );
+            $languages = array_keys($nyelv);
             
             
             $rows = [];
@@ -908,7 +925,7 @@ class Migrate extends \Html\Html {
     // A miséknél a nyelv mező rendezése és optimalizálása
     public function normalizeMiseLanguage($misek, $templom) {
         $languages = unserialize(LANGUAGES);
-        $languages['hu'] = $languages['h'];
+        
         $languages = is_array($languages) ? array_keys($languages) : [];
             
         foreach( $misek as &$mise) {
