@@ -10,6 +10,8 @@ class SimpleRRule
     private $count;
     private $freq;
     private $interval;
+    private $byMonth;
+    private $byMonthDay;
     private $byWeekday;
     private $bySetpos;
     private $byWeekNo;
@@ -23,6 +25,8 @@ class SimpleRRule
         $this->count      = $rrule['count'] ?? null;
         $this->freq       = strtoupper($rrule['freq'] ?? 'DAILY');
         $this->interval   = $rrule['interval'] ?? 1;
+        $this->byMonth    = $rrule['bymonth'] ?? [];
+        $this->byMonthDay = $rrule['bymonthday'] ?? [];
         $this->byWeekday  = $this->normalizeByWeekday($rrule['byweekday'] ?? []);
         $this->bySetpos   = $rrule['bysetpos'] ?? null;
         $this->byWeekNo   = $rrule['byweekno'] ?? [];
@@ -68,6 +72,8 @@ class SimpleRRule
             'freq'      => $this->freq,
             'count'     => $this->count,
             'interval'  => $this->interval,
+            'byMonth'   => $this->byMonth,
+            'byMonthDay'=> $this->byMonthDay,
             'byWeekday' => $this->byWeekday,
             'bySetpos'  => $this->bySetpos,
         ]);
@@ -177,6 +183,49 @@ class SimpleRRule
                         }
                     }
                     $current->addMonths($this->interval)->startOfMonth();
+                    break;
+                
+                case 'YEARLY':
+                    // Éves ismétlődés: csak byMonth és byMonthDay tömbök alapján generálunk konkrét dátumokat
+                    $months = !empty($this->byMonth) ? $this->byMonth : [$current->month];
+                    $days = !empty($this->byMonthDay) ? $this->byMonthDay : [$current->day];
+
+                    foreach ($months as $m) {
+                        foreach ($days as $d) {
+                            $m = (int)$m; $d = (int)$d;
+                            // Ellenőrizzük, hogy létezik-e ilyen nap az adott évben
+                            if (!checkdate($m, $d, (int)$current->year)) {
+                                continue;
+                            }
+
+                            try {
+                                $occurrence = Carbon::create($current->year, $m, $d, $this->start->hour, $this->start->minute, $this->start->second, $this->start->getTimezone());
+                            } catch (Exception $e) {
+                                continue;
+                            }
+
+                            if ($occurrence->gte($this->start) &&
+                                (!$this->until || $occurrence->lte($this->until)) &&
+                                (!$this->count || $generated < $this->count)) {
+                                $occurrences[] = $occurrence;
+                                $generated++;
+                                $this->logDebug("Yearly occurrence", [
+                                    'date' => $occurrence->toIso8601String(),
+                                    'month' => $m,
+                                    'day' => $d,
+                                    'generated' => $generated
+                                ]);
+                            }
+
+                            // ha elértük a count limitet, hagyjuk abba a további generálást
+                            if ($this->count && $generated >= $this->count) {
+                                break 2;
+                            }
+                        }
+                    }
+
+                    // Tovább lépünk az év intervallumával
+                    $current->addYears($this->interval)->startOfYear();
                     break;
 
                 default:

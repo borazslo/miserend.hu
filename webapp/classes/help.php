@@ -182,25 +182,7 @@ class Help {
                 $this->html = '<b>Kiegészítő infók</b>' .
                         '<br><br>Ide jön minden olyan kapcsolódó információ, ami nem egy konkrét miséhez tartozik, hanem rendszeres esemény. Pl. a minden héten valamelyik este szentségimádás, vagy minden hónap első hétfője családos hittan, vagy bármi hasonló, ami fontos lehet, de nem a templomhoz tartozik (pl. védőszent, ünnep), hanem a miserendet kiegészítő rendszeres információ.';
                 break;
-
-            case 46:
-                //miserend adatlap
-                $this->html = '<h4>Nyelvek</h4>' .
-                        'A szentmise nyelvének azonosítója esetleg egy periódus megjelölésével. Több érték esetén vesszővel elválasztva. Például: <i>sk-1,grps</i> = minden hónap utolsó hetében szlovák nyelvű, minden páros héten görög (egyéb esetekben magyar)<br/><br/>Lehetséges nyelvek:<ul>';
-                foreach (unserialize(LANGUAGES) as $name => $attr) {
-                    $this->html .= "<li> " . $attr['abbrev'] . " = " . $attr['name'] . "</li>";
-                }
-                $this->html .= '<li>további nyelvek esetén az internetes 2 betűs végződés az irányadó!</li></ul><p><i>Ha egy magyaroszági misézőhelynél nincs megadva a nyelv, azt magyarnak tekintjük.</i></p>';
-
-                $this->html = 'Lehetséges periódusok:' .
-                        '<ul>';
-                foreach (unserialize(PERIODS) as $name => $attr) {
-                    $this->html .= "<li> " . $attr['abbrev'] . " = " . ( isset($attr['description']) ? $attr['description'] : " " ) . $attr['name'] . " héten</li>";
-                }
-                $this->html .= '</ul>Ha maga a mise periódusa meg van advan, akkor nem szükséges itt is megadni a periódust. Vagyis ha nincs itt periódus érték megadva, akkor a mise periódusa érvényes.';
-
-                break;
-
+         
             case 51:
                 //templom űrlap - akadálymentesség
                 $this->html = '<h4>Akadálymentesség</h4>
