@@ -879,10 +879,9 @@ class Migrate extends \Html\Html {
                     throw new \Exception("Mismatched attribute period in mise id=".$mise->id. "(templom id=".$templom->id.")", 31);                        
                 }
                 
-            }
-         
-            return $misek;
+            }                
         }
+        return $misek;
     }
 
     public function normalizeMiseTitleAndRite($misek, $templom) {
