@@ -1027,6 +1027,34 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     return null;
   }
 
+  private getYearFromRRule(mass: Mass): string | null {
+    const rrule = mass.rrule;    
+    if (ScriptUtil.isNotNull(rrule) && rrule.freq === 'yearly') {
+      return this.translateService.instant('RRULE.ON.EVERY_YEAR');
+    }
+    return null;
+  }
+
+  private getMonthsFromRRule(mass: Mass): string | null {
+    const rrule = mass.rrule;
+    if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.bymonth)) {
+      const bymonth = rrule.bymonth;
+      const months: number[] = Array.isArray(bymonth) ? bymonth as number[] : [bymonth as number];
+      const translatedMonths: string[] = months.map(m => this.translateService.instant('MONTHS.' + m));
+      return translatedMonths.join(', ');
+    }
+    return null;
+  }
+
+  private getMonthDaysFromRRule(mass: Mass): string | null {
+    const rrule = mass.rrule;
+    if (ScriptUtil.isNotNull(rrule) && ScriptUtil.isNotNull(rrule.bymonthday)) {
+      const monthDays: number[] = rrule.bymonthday;      
+      return monthDays.join(', ');
+    }
+    return null;
+  }
+
   private getEasterFromMass(mass: Mass): string | null {
     if (ScriptUtil.isNotNull(mass.periodId)) {
       const specialPeriodType = this.periodService.getSpecialPeriodType(mass.periodId);
@@ -1055,19 +1083,53 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     return null;
   }
 
+  
+  private getSimpleEventFromRRule(mass: Mass): string | null {
+      const rrule = mass.rrule;
+      if (ScriptUtil.isNull(rrule)) return null;      
+      // If daily with a single occurrence, return the DTSTART as YYYY.mm.dd
+      const countIsOne = rrule.count === 1 || String(rrule.count) === '1';
+      if (rrule.freq === 'daily' && countIsOne) {
+        if (ScriptUtil.isNotNull(rrule.dtstart)) {
+          const dtstartDate = new Date(rrule.dtstart);
+          const year = dtstartDate.getFullYear();
+          const month = ('0' + (dtstartDate.getMonth() + 1)).slice(-2);
+          const day = ('0' + dtstartDate.getDate()).slice(-2);
+          return this.translateService.instant(`RRULE.NO_RECURRENCE`) + `: ${year}.${month}.${day}`;
+        }
+
+      }
+
+      return null;
+  }
+
   private getReadableRRule(mass: Mass): string {
     if (!mass || ScriptUtil.isNull(mass.rrule)) return '';
     const parts: string[] = [];
-    const days = this.getDaysFromRRule(mass);
-    if (days) parts.push(days);
-    const week = this.getWeekFromRRule(mass);
-    if (week) parts.push(week);
-    const month = this.getMonthFromRRule(mass);
-    if (month) parts.push(month);
+
     const easter = this.getEasterFromMass(mass);
     if (easter) parts.push(easter);
     const christmas = this.getChristmasFromRRule(mass);
     if (christmas) parts.push(christmas);
+
+    if (!easter && !christmas) {
+        const days = this.getDaysFromRRule(mass);
+        if (days) parts.push(days);
+        const week = this.getWeekFromRRule(mass);
+        if (week) parts.push(week);
+        const month = this.getMonthFromRRule(mass);
+        if (month) parts.push(month);
+        const year = this.getYearFromRRule(mass);    
+        const months = this.getMonthsFromRRule(mass);
+        const monthDays = this.getMonthDaysFromRRule(mass);
+        if (year || months  || monthDays ) {
+          const combined = [year, months, monthDays].filter(p => !!p).join(' ');
+          parts.push(combined);
+        } 
+        const simpleEvent = this.getSimpleEventFromRRule(mass);
+        if(simpleEvent) parts.push(simpleEvent);
+    }       
+    
     return parts.join(', ');
   }
   // Itt ért véget a masslist használta rész
@@ -1156,7 +1218,8 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         comment: m.comment,
         // include experiod ids and resolved period names for display
         experiod: m.experiod ? m.experiod : [],
-        experiodNames: m.experiod ? m.experiod.map((pid: number) => this.periodService.getPeriodNameById(pid)).filter((n: any) => n) : []
+        experiodNames: m.experiod ? m.experiod.map((pid: number) => this.periodService.getPeriodNameById(pid)).filter((n: any) => n) : [],
+        exDates: m.exdate ? m.exdate : []
       });
     });
 

@@ -143,18 +143,18 @@
                     {{ group.periodName }}
                   </ng-container>
                   <ng-template #noPeriod>
-                    <i>Időszak nélküli egyedi misék</i>
+                    <i>{{ 'PERIODS.NO_PERIOD' | translate }}</i>
                   </ng-template>
                   </h3>
               </th>
               <th colspan="2">
                 <ng-container *ngIf="group.startMonthDay || group.startPeriodName || group.endMonthDay || group.endPeriodName">
                   <span *ngIf="group.startMonthDay || group.startPeriodName" style="font-weight: normal;">
-                    {{ group.startPeriodName ? group.startPeriodName : group.startMonthDay }}
+                    {{ 'PERIODS.START_DATE' | translate }}: {{ group.startPeriodName ? group.startPeriodName : group.startMonthDay }}
                   </span>
                   <br>
                   <span *ngIf="group.endMonthDay || group.endPeriodName" style="font-weight: normal;">
-                    {{ group.endPeriodName ? group.endPeriodName : group.endMonthDay }}
+                    {{ 'PERIODS.END_DATE' | translate }}: {{ group.endPeriodName ? group.endPeriodName : group.endMonthDay }}
                   </span>
                 </ng-container>
               </th> 
@@ -179,9 +179,25 @@
                 <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="(('LANGUAGES.' + m.lang) | translate) + ' nyelvű'" [src]="'/cal_images/flags/' + m.lang.toLowerCase() + '.svg'" [alt]="(('LANGUAGES.' + m.lang) | translate) + ' nyelvű'" />
               </td>              
               <td style="padding:10px">
-                <div *ngIf="m.experiodNames && m.experiodNames.length" class="text-muted small">
-                  <ng-container *ngFor="let e of m.experiodNames; let i = index">
-                    {{ e }}<span *ngIf="i < m.experiodNames.length - 1">, </span>
+                <div *ngIf="(m.experiodNames && m.experiodNames.length) || m.exdate || m.exDates" class="text-muted small">
+                  <ng-container *ngIf="(m.exDates && m.exDates.length ) || (m.experiodNames && m.experiodNames.length)">
+                  Kivétel:
+                  </ng-container>
+                  
+                  <ng-container *ngIf="m.experiodNames && m.experiodNames.length">
+                    <ng-container *ngFor="let e of m.experiodNames; let last = last">
+                      {{ e }}<span *ngIf="!last">, </span>
+                    </ng-container>
+                  </ng-container>
+
+                  <ng-container *ngIf="m.exDates && m.exDates.length && m.experiodNames && m.experiodNames.length">
+                    <ng-container *ngIf="m.experiodNames && m.experiodNames.length">, </ng-container>
+
+                    <ng-container *ngIf="m.exDates && m.exDates.length">
+                      <ng-container *ngFor="let d of m.exDates; let lastd = last">
+                        {{ d | date:'yyyy.MM.dd.' }}<span *ngIf="!lastd">, </span>
+                      </ng-container>
+                    </ng-container>                    
                   </ng-container>
                 </div>
               </td>
