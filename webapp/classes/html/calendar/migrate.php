@@ -102,7 +102,8 @@ class Migrate extends \Html\Html {
                 'es' => 'spanyol',
                 'sk' => 'szlovák',
                 'si' => 'szlovén',
-                'uk' => 'ukrán'
+                'uk' => 'ukrán',
+                'ua' => 'ukrán'
             );
             $languages = array_keys($nyelv);
             
@@ -1024,6 +1025,9 @@ class Migrate extends \Html\Html {
 
             // távolítsa el a végén álló vesszőket és követő szóközöket
             $mise->nyelv = preg_replace('/,+\s*$/', '', (string)$mise->nyelv);
+
+            // normalize Ukrainian code 'uk' to 'ua' (handles 'uk', 'uk1', 'uk,', 'uk ' etc.)
+            $mise->nyelv = preg_replace('/\buk(?=\d|$|,|\s)/i', 'ua', (string)$mise->nyelv);
 
             if($mise->nyelv == 'h2,h4') {
                 $mise->nap2 = 'ps';
