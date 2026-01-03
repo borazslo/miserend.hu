@@ -1,8 +1,23 @@
 <?php
 
+/*
+
+SELECT * FROM `misek` where tid = 791
+ORDER BY `misek`.`idoszamitas` ASC, `nap` ASC, ido, id   
+LIMIT 200;
+
+INSERT INTO misek (tid, nap, ido, nap2, idoszamitas, tol, ig, nyelv, milyen, megjegyzes, torles)
+SELECT t.tid, t.nap, t.ido, t.nap2, t.idoszamitas, t.tol, t.ig, t.nyelv, t.milyen, t.megjegyzes, t.torles
+FROM misek t
+JOIN (SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4) n
+WHERE t.id = 238054;
+*/
+
 namespace Html\Calendar;
 
 use Api\Church;
+use Eloquent\CalMass;
+
 use Illuminate\Database\Capsule\Manager as DB;
 
 
@@ -48,7 +63,15 @@ class Migrate extends \Html\Html {
             
             if(isset($_GET['tid'])) {
                 $templomok = $templomok->where('t.id',$_GET['tid']);
-            } 
+            } else if ( 6 == 7)  {
+
+                $tids = 
+                
+                [76, 34, 34, 31];
+
+                $templomok->whereIn('t.id',$tids);
+            }
+            
 
             $templomok = $templomok->get();
 
@@ -169,7 +192,7 @@ class Migrate extends \Html\Html {
                                     $mise->types = [];
                                 }
 
-                                $calmass = \Eloquent\CalMass::create([
+                                $calmass = \Eloquent\CalMass::make([
                                     'church_id' => $t->id,
                                     'period_id' => $period->id,
                                     'title' => $title,
@@ -270,7 +293,7 @@ class Migrate extends \Html\Html {
                                         $rrule['freq'] = 'yearly';
                                         $rrule['bymonthday'] = [ (int)substr($mise->tol, 3,2) ];
                                         $rrule['bymonth'] = [ (int)substr($mise->tol, 0,2) ];
-                                        $calmass->period_id = $egeszEvbenId;
+                                        $calmass->period_id = false;
                                     }
                                     else if (preg_match('/^(\d{2})-(\d{2})(?:\s*-8)?$/', trim($mise->tol), $m)) {
                                         $start_date = date('Y')."-".sprintf('%02d-%02d', (int)$m[1], (int)$m[2]);
@@ -281,17 +304,19 @@ class Migrate extends \Html\Html {
                                         $rrule['freq'] = 'yearly';
                                         $rrule['bymonth'] = [ (int)$m[1] ];
                                         $rrule['bymonthday'] = [ (int)$m[2] ];          
-                                        $calmass->period_id = $egeszEvbenId;
+                                        $calmass->period_id = false;
                                     }
                                      else {                                        
                                         throw new \Exception("Invalid single-day period date: ".$mise->tol);
                                     }
 
                                 }
-                                $calmass->rrule = $rrule;
+
                                 
+                                $calmass->rrule = $rrule;                                
                                 $calmass->save();
                                 $savednasses++;
+                                
                                                                 
                         }
                     } catch (\Exception $e) {   
@@ -541,11 +566,10 @@ class Migrate extends \Html\Html {
 
                     echo "</tr>";
                 }
+                echo "</table>";
             }
 
-            
-
-
+            echo "<br>Tids:<br> [".implode(',',array_keys($churcheswitherror))."]; ";
         } catch (\Exception $e) {
             $this->rows = ['error' => $e->getMessage()];
             printr($e->getMessage());
@@ -619,7 +643,7 @@ class Migrate extends \Html\Html {
             ['január 1.', 'december 31.'],['0101', '1231'],['December 25.', 'Advent I. vasárnapja'],['01-03', 'Advent I. vasárnapja -1'],['08-24', '07-04'],['December 25.', 'Advent I. vasárnapja'],['01.01', '12.31'],[ '12-25','Advent I. vasárnapja -1'],	['1', '12-31'],	['01-01', '11-30'],	['Advent I. vasárnapja', 'Krisztus Király vasárnapja'],
             ['08-28', '07-23'],['01-01', 'Advent I. vasárnapja -1'],[ "01-01", "12-31"],['12-24', 'Advent I. vasárnapja'],['12-25', '11-30'],['01-01 +1', '12-31 -1'],['01-01 +1', '12-31'],	['július 2. vasárnapja', '05-31'],
             ['01.01', '12.31'],[ "12-25", "Advent I. vasárnapja"],['06-01', '04-30'],['Húsvéthétfő +1', '11.06.'],	['08-31', '06-30'],	['12-27', 'Advent I. vasárnapja'],
-            ['Advent I. vasárnapja', '12-24 -1'] , ['Húsvétvasárnap', 'Krisztus Király vasárnapja'],	['12-26 +1', 'Advent I. vasárnapja -1'],	['12-28', '11-30'],	['12-24', '11-30']
+              ['Húsvétvasárnap', 'Krisztus Király vasárnapja'],	['12-26 +1', 'Advent I. vasárnapja -1'],	['12-28', '11-30'],	['12-24', '11-30']
         ] ) )  {
             $periodName = 'Egész évben';
         }
@@ -699,7 +723,7 @@ class Migrate extends \Html\Html {
         else if ( in_array( [$mise->tol, $mise->ig], [
                 ['Advent I. vasárnapja', '12-23'],['Advent I. vasárnapja', 'December 25. -1'],['Advent I. vasárnapja', '12-24'],['Advent I. vasárnapja', '12-23 -1'],['Advent I. vasárnapja +1', '12-25 -1'],	['Advent I. vasárnapja +1', '12-24 -1'],['Advent I. vasárnapja', '12-26'],
                 ['Advent I. vasárnapja', 'December 25. -1'],['Advent I. vasárnapja', '12-23'],['Advent I. vasárnapja', '12-25 -1'],	['Advent I. vasárnapja +1', '12-23'],['Advent I. vasárnapja', '12-20 -1'],	['12-01', '12-23'],['Advent I. vasárnapja +1', '2025-12-23'],
-                ['12-01', '12-25 -1'] ,['Advent I. vasárnapja', '12-25']       , ['Advent I. vasárnapja', '12-19'], ['12-01', '12-24 -1'],['Advent I. vasárnapja +1', '12-24'],['Advent I. vasárnapja', '01-02']
+                ['12-01', '12-25 -1'] ,['Advent I. vasárnapja', '12-24 -1'],['Advent I. vasárnapja', '12-25']       , ['Advent I. vasárnapja', '12-19'], ['12-01', '12-24 -1'],['Advent I. vasárnapja +1', '12-24'],['Advent I. vasárnapja', '01-02']
         ] ) ) {         
             $periodName =  'Advent';            
         } 

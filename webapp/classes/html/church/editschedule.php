@@ -19,6 +19,9 @@ class EditSchedule extends \Html\Html {
             return;
         }
         
+        $this->tids = 
+        
+        [76, 34, 34, 31];
     }
 
 }
