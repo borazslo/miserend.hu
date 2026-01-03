@@ -334,11 +334,14 @@ export class MassUtil {
       titles = [
         "MASS_TITLE.DIVINE_LITURGY",
         "MASS_TITLE.LITURGY_OF_THE_PRESANCTIFIED_GIFTS",
+        "MASS_TITLE.MATINS",
+        "MASS_TITLE.VESPRES"
       ];
     } else {
       titles = [
         "MASS_TITLE.HOLY_MASS",
         "MASS_TITLE.LITURGY_OF_THE_WORD",
+        "MASS_TITLE.ADORATION",
         "MASS_TITLE.MASS_OF_THE_LORD_S_SUPPER",
         "MASS_TITLE.GOOD_FRIDAY_LITURGY",
         "MASS_TITLE.EASTER_VIGIL"
