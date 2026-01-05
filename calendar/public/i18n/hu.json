@@ -142,7 +142,8 @@
     "DELETE": "Törlés",
     "DELETE_ONE": "Csak ennek az egy alkalomnak a törlése",
     "DELETE_ALL": "Az összes ismétlődés törlése",
-    "CLOSE": "Bezárás"
+    "CLOSE": "Bezárás",
+    "SUGGEST": "Javaslat küldése"
   },
 
   "RRULE": {

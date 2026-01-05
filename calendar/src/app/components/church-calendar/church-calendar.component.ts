@@ -48,6 +48,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {SearchService} from '../../services/search.service';
 import {GeneratedPeriod} from "../../model/generated-period";
 import { eventListTemplate, EventListTemplateVars } from './event-list-template';
+import {EditConfirmationService} from '../../services/edit-confirmation.service';
 
 export interface SimpleDialogData {
   dateTime: Date;
@@ -141,6 +142,7 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     private readonly spinnerService: SpinnerService,
     private readonly userService: UserService,
     private readonly translateService: TranslateService,
+    private readonly editConfirmation: EditConfirmationService,
   ) {}
 
   ngOnInit() {
@@ -152,7 +154,12 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     // default edit mode: enable immediately for the dedicated editschedule route,
     // otherwise keep false so users see the confirmation dialog on first edit attempt
     this.edit = pathname.indexOf('editschedule') !== -1;
-    
+
+    // If we're on the editschedule route, treat the app as already confirmed for editing
+    if (this.edit) {
+      this.editConfirmation.confirm();
+    }
+
     this.userService.loadUser().subscribe(user => {
       if (user) {
         this.suggestionSenderName.setValue(user.username);
@@ -368,12 +375,10 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     this.selectedEvent = undefined;
     this.selectedEventStart = undefined;
     this.selectedDate = new Date(arg.dateStr);
-    if (viewType === 'dayGridDay' || viewType === 'timeGridWeek') {
-      this.openEditDialog();
-    } else {
-      this.dialogEvent = CalendarUtil.generateDialogEvent(this.currentChurch, this.translateService, this.selectedDate);
-      this.openFullDialog('ADD_NEW_MASS', this.selectedDate);
-    }
+
+    // For month and other calendar views use the confirmation -> simple add flow
+    // so users are asked once and then shown the simple add dialog instead of the full editor.
+    this.openEditDialog();
   }
 
   openEditDialog() {
@@ -382,13 +387,21 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
     }
 
     if(!this.edit) {
+      // If the user already confirmed in this app instance, enable edit immediately
+      if (this.editConfirmation.isConfirmed()) {
+        this.edit = true;
+        this.openSimpleDialog();
+        return;
+      }
+
       const messageDialogRef = this.dialog.open(AddMessageDialogComponent, {
-        data: {message: "Szerkeszteni szeretnéd a naptárat?", decision: true}
+        data: {message: this.editConfirmation.getMessage(), decision: true}
       });
 
       messageDialogRef.afterClosed().subscribe(result => {
         if (result === DialogResponse.CONTINUE) {
           this.edit = true;
+          this.editConfirmation.confirm();
           this.openSimpleDialog();
         }
       });

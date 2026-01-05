@@ -76,8 +76,11 @@
   "MASS_TITLE": {
     "HOLY_MASS": "Szentmise",
     "LITURGY_OF_THE_WORD": "Igeliturgia",
+    "ADORATION": "Szentségimádás",
     "DIVINE_LITURGY": "Szent Liturgia",
     "LITURGY_OF_THE_PRESANCTIFIED_GIFTS": "Előszenteltek liturgiája",
+    "MATINS": "Utrenye",
+    "VESPRES": "Vecsernye",
     "MASS_OF_THE_LORD_S_SUPPER": "Az utolsó vacsora emlékmiséje",
     "GOOD_FRIDAY_LITURGY": "Nagypénteki szertartás",
     "EASTER_VIGIL": "Húsvét vigíliája",
@@ -139,7 +142,8 @@
     "DELETE": "Törlés",
     "DELETE_ONE": "Csak ennek az egy alkalomnak a törlése",
     "DELETE_ALL": "Az összes ismétlődés törlése",
-    "CLOSE": "Bezárás"
+    "CLOSE": "Bezárás",
+    "SUGGEST": "Javaslat küldése"
   },
 
   "RRULE": {
