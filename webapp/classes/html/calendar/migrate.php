@@ -63,12 +63,10 @@ class Migrate extends \Html\Html {
             
             if(isset($_GET['tid'])) {
                 $templomok = $templomok->where('t.id',$_GET['tid']);
-            } else if ( 6 == 7)  {
+            } else if ( 6 == 6)  {
 
-                $tids = 
-                
-                [76, 34, 34, 31];
-
+                global $_tidsToWorkWith;
+                $tids = $_tidsToWorkWith;
                 $templomok->whereIn('t.id',$tids);
             }
             

@@ -64,7 +64,13 @@ class Church extends \Html\Html {
   
 								
         copyArrayToObject($church->toArray(), $this);
-				
+		
+        global $_tidsToWorkWith;
+        if(in_array($this->id, $_tidsToWorkWith)) {
+            $this->hasWorkAccess = false;
+        } else {
+            $this->hasWorkAccess = true;
+        }
 		$this->church = ['hasPendingSuggestionPackage' => $church->hasPendingSuggestionPackage, 'remarksicon' => $church->remarksicon, 'id' => $church->id]; // A church/_adminlinks.twig számára kell ez. Bocsi.
         $this->neighbours = $church->neighbours;
         
