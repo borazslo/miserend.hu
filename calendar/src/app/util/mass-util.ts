@@ -223,6 +223,14 @@ export class MassUtil {
             byweekday: event.selectedDays,
           };
           break;
+        case Renum.YEARLY:
+          // For YEARLY we will treat it as a single yearly occurrence (count=1)
+          rrule = {
+            dtstart: dtstart,
+            freq: 'yearly',
+            count: 1
+          };
+          break;
       }
     }
 
@@ -376,6 +384,10 @@ export class MassUtil {
     const rrule = mass.rrule;
     if (ScriptUtil.isNull(mass.rrule)) {
       return Renum.NONE;
+    }
+
+    if (rrule?.freq === 'yearly') {
+      return Renum.YEARLY;
     }
 
     if (rrule?.freq === 'weekly') {

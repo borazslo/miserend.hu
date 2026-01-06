@@ -28,7 +28,7 @@
       </div>
     }
 
-    @if (!data.mass.rrule || data.mass.rrule.count === 1) {
+    @if (!data.mass.rrule ) {
       <div><span>{{ 'RRULE.NO_RECURRENCE' | translate }}</span></div>
     } @else {
       <div>
@@ -41,6 +41,8 @@
           <span>{{ period }}</span>, <span>{{ week }}</span>, <span>{{ days }}</span>
         } @else if (month) {
           <span>{{ period }}</span>, <span>{{ month }} </span><span>{{ days }}</span>
+        } @else if (yearly) {
+          <span>{{ period }}</span>, <span>{{ yearly }}</span>
         } @else {
           <div><span>{{ 'RRULE.NO_RECURRENCE' | translate }}</span></div>
         }

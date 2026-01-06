@@ -129,6 +129,15 @@ export class EventViewerDialogComponent {
     return period ? period.name : '';
   }
 
+  get yearly() : string {
+    const rrule = this.data.mass.rrule;
+    console.log("rrule yearly", rrule);
+    if (ScriptUtil.isNotNull(rrule) && rrule.freq === 'yearly') {
+      return this.translateService.instant('RRULE.ON.EVERY_YEAR');
+    }
+    return '';
+  }
+
   get days(): string {
     let days = this.data.mass.rrule?.byweekday;
     if (ScriptUtil.isNotNull(days)) {
