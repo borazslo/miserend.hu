@@ -287,6 +287,13 @@ class Migrate extends \Html\Html {
                                             throw new \Exception("Invalid date for Szent három nap period: ".$mise->tol);
                                         }
                                     }
+                                    // Egyetlen nap hosszú de valódi időszakjainknál használjuk ki a lehetőséget
+                                    else if ($period->id != null) {
+                                        $rrule['freq'] = 'yearly';
+                                        $rrule['count'] = 1;
+                                        
+                                        
+                                    }
                                     // Dátumos nagy ünnepeink 
                                     else if (in_array($mise->tol, $this->specialDays) ) {
                                         $rrule['freq'] = 'yearly';
@@ -744,7 +751,7 @@ class Migrate extends \Html\Html {
                 'Nagypéntek','NAGYPÉNTEK',
                 'Nagyszombat','Húsvéti vigília','Húsvét vigíliája','NAGYSZOMBAT',
                 'Húsvét','Húsvétvasárnap','Húsvéti mise a Kálvárián',
-                'Húsvéthétfő','HÚSVÉTHÉTFŐ','Húsvét hétfő'
+                'Húsvéthétfő','HÚSVÉTHÉTFŐ','Húsvét hétfő','Búcsú Húsvéthétfő'
                 ] )
                 ) { 
             $periodName = 'Szent három nap';                                    
@@ -802,6 +809,26 @@ class Migrate extends \Html\Html {
             $periodName = 'December';                                    
         }
        
+        // Egynapos dolgoknál is keresünk gyakran periódust, de elég legyen a tol alapján keresni
+        if ( $mise->tol == $mise->ig ) {
+            if( in_array($mise->tol,['Pünkösdhétfő -8', 'Pünkösdhétfő'])) {
+                $periodName = 'Pünkösdhétfő';
+            } else if( in_array($mise->tol,['Hamvazószerda','Hamvazószerda -8','Hamvazószerda -8'])) {
+                $periodName = 'Hamvazószerda';
+            } else if( in_array($mise->tol,['Úrnapja','Úrnapja -8'])) {
+                $periodName = 'Úrnapja';
+            } else if( in_array($mise->tol,['01-01'])) {
+                $periodName = 'Szűz Műria, Isten anyja (Újév)';
+            } else if( in_array($mise->tol,['01-06'])) {
+                $periodName = 'Vízkereszt';
+            } else if( in_array($mise->tol,['08-15'])) {
+                $periodName = 'Nagyboldogasszony';
+            } else if( in_array($mise->tol,['11-01'])) {
+                $periodName = 'Mindenszentek';
+            }
+
+        }
+
         // Egy napos periódusoknál nem elvárás hogy legyen hozzá megfelelő az adatbázisban.
         if(!isset($periodName) AND $mise->tol == $mise->ig) {
             // Return a lightweight "period" object for single-day entries (id = null)
