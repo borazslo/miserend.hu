@@ -41,6 +41,7 @@ jobs:
           echo "✅ Tag detected: ${GITHUB_REF#refs/tags/}"
 
       - name: 🚀 Build and push multi-arch image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -49,3 +50,9 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.TAG }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+      - name: 🎉 Success
+        run: |
+          echo "🎉 Image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.TAG }} pushed successfully!"
