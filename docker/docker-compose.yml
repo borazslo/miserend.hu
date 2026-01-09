@@ -1,0 +1,34 @@
+services:
+  mysql:
+    image: mariadb:12
+    container_name: mysql
+    platform: linux/amd64
+    profiles:
+      - dumper
+      - main
+    command: --default-authentication-plugin=mysql_native_password --ssl=0 --skip-ssl
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+      - ./my.cnf:/etc/my.cnf
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pw
+      MYSQL_DATABASE: miserend
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pw
+    healthcheck:
+      test: [CMD, mariadb-admin, ping, -h, localhost, -u, user, -ppw]
+      timeout: 5s
+      retries: 10
+    networks:
+      inner:
+        aliases:
+          - mysql  
+networks:
+  inner:
+    driver: bridge
+volumes:
+  db_data: {}
+  images: {}
+  elasticsearch_data: {}
