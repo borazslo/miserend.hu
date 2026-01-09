@@ -1,0 +1,7 @@
+calendar/node_modules
+calendar/dist
+calendar/.angular
+calendar/tmp
+node_modules
+vendor
+.git

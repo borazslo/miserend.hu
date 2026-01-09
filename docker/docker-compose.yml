@@ -4,7 +4,6 @@ services:
     container_name: mysql
     platform: linux/amd64
     profiles:
-      - dumper
       - main
     command: --default-authentication-plugin=mysql_native_password --ssl=0 --skip-ssl
     volumes:
@@ -24,7 +23,63 @@ services:
     networks:
       inner:
         aliases:
-          - mysql  
+          - mysql
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
+    container_name: elasticsearch
+    profiles:
+      - main
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      inner:
+        aliases:
+          - elasticsearch
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.1
+    container_name: kibana
+    profiles:
+      - main
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      XPACK_SECURITY_ENABLED: false
+    depends_on:
+      - elasticsearch
+    networks:
+      inner:
+        aliases:
+          - kibana
+  miserend:
+    container_name: miserend
+    profiles:
+      - main
+    build:
+      dockerfile: docker/Dockerfile.miserend
+    volumes:
+      - .:/miserend
+      - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
+      - images:/app/kepek
+    ports:
+      - ${MISEREND_PORT:-8000}:8000
+    environment:
+      MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
+    networks:
+      inner:
+        aliases:
+          - miserend
 networks:
   inner:
     driver: bridge
