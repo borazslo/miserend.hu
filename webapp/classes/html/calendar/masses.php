@@ -40,15 +40,18 @@ class Masses extends \Html\Calendar\CalendarApi {
             case 'POST':
                 $this->church->append(['writeAccess']);
 
-//                if (!$this->church->writeAccess) {
-//                    $this->sendJsonError('Hiányzó jogosultság!', 403);
-//                    exit;
-//                }
+                if (!$this->church->writeAccess) {
+                    $this->sendJsonError('Hiányzó jogosultság!', 403);
+                    exit;
+                }
 
                 $input = json_decode(file_get_contents('php://input'), true);
                 $changeRequest = new ChangeRequest($input['masses'], $input['deletedMasses']);
                 $this->save($changeRequest);
                 $this->optimizeExperiods();
+                // Ha frissítettünk egy miserendet, akkor mindig és automatikusan a dátuma is legyen friss!                
+                $this->church->frissites = date('Y-m-d');
+                $this->church->save();
                 echo json_encode($this->getByChurchId($this->tid));
                 break;
 
