@@ -3,19 +3,16 @@ services:
     image: mariadb:12
     container_name: mysql
     platform: linux/amd64
-    profiles:
-      - main
-    command: --default-authentication-plugin=mysql_native_password --ssl=0 --skip-ssl
     volumes:
       - db_data:/var/lib/mysql
-      - ./mysql:/docker-entrypoint-initdb.d
-      - ./my.cnf:/etc/my.cnf
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/mysql.conf.d:/etc/mysql/mysql.conf.d
+    ports:
+      - 3306:3306
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: pw
       MYSQL_DATABASE: miserend
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pw
     healthcheck:
       test: [CMD, mariadb-admin, ping, -h, localhost, -u, user, -ppw]
       timeout: 5s
@@ -27,8 +24,6 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
     container_name: elasticsearch
-    profiles:
-      - main
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
@@ -49,8 +44,6 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:8.10.1
     container_name: kibana
-    profiles:
-      - main
     ports:
       - 5601:5601
     environment:
@@ -64,18 +57,11 @@ services:
           - kibana
   miserend:
     container_name: miserend
-    profiles:
-      - main
-    build:
-      dockerfile: docker/Dockerfile.miserend
-    volumes:
-      - .:/miserend
-      - ./docker/apache2/miserend.conf:/etc/apache2/sites-enabled/miserend.conf
-      - images:/app/kepek
+    image: localhost/miserend:latest
+    volumes: []
     ports:
-      - ${MISEREND_PORT:-8000}:8000
-    environment:
-      MISEREND_WEBAPP_ENVIRONMENT: ${MISEREND_WEBAPP_ENVIRONMENT:-development}
+      - 8000:8000
+    environment: []
     networks:
       inner:
         aliases:
@@ -85,5 +71,4 @@ networks:
     driver: bridge
 volumes:
   db_data: {}
-  images: {}
   elasticsearch_data: {}
