@@ -1,6 +1,6 @@
 # 🙏 miserend.hu
 
-A miserend.hu teljes forrása elavult mintaadatokkal.
+A miserend.hu weboldal teljes forráskódja.
 
 # Komponensek
 
@@ -30,51 +30,71 @@ Az alkalmazást vagy fejlesztési vagy kipróbálási céllal lehet telepíteni 
 
 ### 📦 Előfeltételek
  
+- [git](gttps://git-scm.com)
 - [Docker](https://docs.docker.com/engine/install/)
-- [make](https://www.gnu.org/software/make/)
-
-_Megjegyzés: ha lehetőségünk a `make` telepítésére, a `Makefile`-ban megnézhetjük, melyik task mit futtat le._
 
 ### 🚀 Indítás
 
 ```sh
-make start
+git clone https://github.com/borazslo/miserend.hu/
+cd miserend.hu
+docker-compose  -f docker/compose.yml -f docker/compose.test.yml up
 ```
 
-### 🛸 Indítás a háttérben:
-
-```sh
-make start DAEMON=true
-```
-
-> TODO: korrekt előkonfiguráció, docker compose helyi build nélkül
+Az alkalmazásba a http://localhost:8000 címen az `admin` felhasználóval lehet belépni, az alapérelmezett jelszó `miserend`.
 
 ## Fejlesztés
 
 ### 📦 Előfeltételek
 
 - git
-- bash (Windows alatt a git része, vagy WSL használata ajánlott)
-- Docker/podman
-- MySQL kliens
-- nodejs/npm és Python (naptár fejlesztésre)
-- SMTP szerver (mailcatcher ajánlott)
+- Docker/Podman
+- MySQL vagy MariaDB kliens
+- nodejs/npm és python (naptár fejlesztésre)
 
-Ügyeljünk, hogy a fejlesztéskor konzisztensen *UNIX sorvégeket* használjunk!
+#### Windows 
 
-### Telepítés
+Lehetséges Windows Subsystem for Linux nélkül is felépíteni egy miserend fejlesztői környezetet, de mivel az alkalmazás komponensei alapvetően natív linuxos eszközök, a windowsos futtatás mindig extra odafigyelést igényel.   
+
+Mindenesetre, a szükséges eszközök winget-tel is telepíthetőek.
+
+```
+winget install --id=Git.Git -e
+winget install --id=Python.Python.3.14 -e
+winget install --id=Docker.DockerCLI -e
+winget install --id=Docker.DockerCompose -e
+winget install --id=OpenJS.NodeJS.LTS -e
+```
+
+De szinte biztos, hogy a végén valami extra masszírozás kell.
+
+
+### 🚀 Indítás
+
+```sh
+git clone https://github.com/borazslo/miserend.hu/
+cd miserend.hu
+docker-compose  -f docker/compose.yml -f docker/compose.dev.yml up
+```
+
+A dev composer file tartalmaz egy mailcatcher-t, így nem kell külön SMTP szerverrel bajlódni.
+
 
 #### Adatbázis
 
 Az adatbázis konténer első futtatáskor a `docker/mysql/initdb.d` könyvtár alapján inicializálja az adatbázist. Ha az adatbázis sémán változtatsz, ebbe a könyvtárba vezesd be a módosításokat!
 
-### Elastisearch/Kibana
-
-A compose fájlban található beállítások első körben teljesen megfelelnek.
-
 ### Miserend alkalmazás
 
-A webapp könyvtárat kell az upstream miserend konténerbe mappelni. Amennyiben a naptár alkalmazáson dolgozunk, az npm build után a `docker/miserend/calendar_deploy.py` szkript futtatásával lehet az alkalmazásba integrálni.
+Itt is igaz, hogy admin / miserend az első felhasználó neve / jelszava.
+
+A repó `webapp` könyvtárát a dev composer rá-mappeli a konténerre. Így ha bármit változtatsz, rögtön tesztelhető is. Amennyiben a naptár alkalmazáson dolgozunk, az npm build után a `docker/miserend/calendar_deploy.py` szkript futtatásával lehet az alkalmazásba integrálni.
+
+Ha grafikus adatbázis elérésre lenne szükség, az [adminer](https://www.adminer.org/en/) ajánlott, egyszerűen az alkalmazás valamelyik könyvtárába kell tenni és már megy is. Természetesen ezt a fájl nem kell a git tárolóba elmenteni.
+
+TODO: .gitignore frissítése
+
+Ha új PHP van NodeJS függőséget építesz be, akkor a dev composer fájlból a két volume-ot ki kell venni és a függőségeket helyben telepíteni. 
 
 # Fejlesztői megjegyzések
 
@@ -87,11 +107,10 @@ Egyes beállításokat, pl. portokat, az `.env.example` fájl tartalmának átm�
 
 ## 🔗 Elérések
 
-| Megnevezés | Cím                   | Felhasználónév | Jelszó | Megjegyzés                      |
-| ---------- | --------------------- | -------------- | ------ | ------------------------------- |
-| Miserend   | http://localhost:8001 | admin          | admin  | `.env` fájlban állítható        |
-| phpMyAdmin | http://localhost:8081 | user vagy root | pw     | Host: mysql, Database: miserend |
-| Kibana     | http://localhost:5601 |                |        | Elasticsearch frontend          |
+| Megnevezés | Cím                   | Felhasználónév | Jelszó    | Megjegyzés                      |
+| ---------- | --------------------- | -------------- | --------- | ------------------------------- |
+| Miserend   | http://localhost:8001 | admin          | miserend  | `.env` fájlban állítható        |
+| Kibana     | http://localhost:5601 |                |           | Elasticsearch frontend          |
 
 ## 🗃️ Dump készítés
 
@@ -99,7 +118,7 @@ Ha dump-ot szeretnénk készíteni az adatbázisról fejlesztési célra, a kén
 
 ## 🐳 Konténerek
 
-A [docker-compose.yml](docker-compose.yml) a következő konténereket indítja el:
+A [docker/compose.yml](docker/compose.yml) a következő konténereket indítja el:
 
 ### 🛢️ mysql
 
@@ -121,12 +140,15 @@ Beizzítása kis varázslást igényelhet.
 
 A webalkalmazás fő komponense. A `/webapp` mappa kerül betöltésre.
 
+Ezen felül a dev composer fájl tartalmaz egy mailcatcher konténert is.
+
+
 ## 🛠️ További parancsok
 
 ### 🧭 Konténerekbe belépés
 
 ```sh
-docker exec -it [mysql|pma|mailcatcher|miserend] bash
+docker exec -it [mysql|mailcatcher|miserend] bash
 ```
 
 ### ✅ Unit tesztek futtatása (hamarosan)
@@ -148,51 +170,41 @@ docker exec miserend composer install|require|update
 - `master` ➜ staging környezet (`staging.miserend.hu`)
 - `production` ➜ éles honlap
 
-## 💬 Egyéb megjegyzések
-
-- A `mailcatcher` csak `env['production']` esetén nem aktív.
-
 ## 📆 Naptárnézet
 
 - Egy különálló projekt, ami be lett integrálva a meglévő rendszerbe
 - Első alkalommal le kell generálni az időszakokat:
 - Admin joggal, az `/periodyeareditor` felületen
 
-### Naptár szerkesztése
+A minta adatok idővel elévülhetnek, fontos az aktualizálásuk!
+
+### Naptárnézet fejlesztése
 
 A `/calendar` könyvtárban az alábbi parancsokat futtassuk:
 
 Ha még nem volt, akkor:
+
 ```sh
 npm install
 ```
+
 ```sh
 ng build --configuration=localProd
 python ../scripts/calendar_deploy.py
 npm run start:integrated
 ```
+
 - Ezzel egyrészt elérjük, hogy fejlesztői legyen a naptár
 - Másrészt elérjük, hogy ha valamit módosítunk, az szinte egyből érvényre jusson
 - Ilyenkor egy python script a `/calendar` mappában buildeli az Angularos projektet, majd a megfelelő helyre átmásolja a legenerált fájlokat
 
+### Fájl jogosultságok
 
-## Táblák beszúrása
-Ha még nincsenek a miserend adatbázisban a `cal_` prefixű táblák, akkor először másoljuk fel a dockerre az sql fájlokat:
-```
-docker cp ./scripts/calendar_sql_init mysql:/calendar_sql_init
-```
+Ha a fejlesztői környezetben a repót a miserend konténerbe mappeled előfordulhat, hogy a konténerben futó PHP nem tud (ideiglenes/cache) fájlokat írni, ilyenkor plusz írási jogot kell adnod az adott könyvtárra, pl:
 
-Majd a mysql docker konténerbe belépve, az alábbi kódot futtassuk:
+```sh
+chmod 777 webapp/fajlok/tmp
 ```
-mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/calendar_init.sql
-```
-Ha minta adatokat is szeretnénk (periódushoz) akkor az alábbiakat is futtassuk, ebben a sorrendben:
-```
-mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/sample_periods.sql
-mysql --default-character-set=utf8 -u root -p miserend < /calendar_sql_init/sample_period_years.sql
-```
-Ezután be kell lépni a felületre, és az `/periodyeareditor` felületen legenerálni az aktuális időszakra.
-A minta adatok idővel elévülhetnek, fontos az aktualizálásuk!
 
 ## Éles / staging / UAT build
 Fejlesztés végén azonban egy megfelelő környezetbe való build kell, például:
