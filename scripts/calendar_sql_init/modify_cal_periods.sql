@@ -1,1 +1,0 @@
-ALTER TABLE miserend.cal_periods ADD COLUMN special_type ENUM('CHRISTMAS', 'EASTER') NULL;
