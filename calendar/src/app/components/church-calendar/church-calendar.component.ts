@@ -332,6 +332,10 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
             }
 
             this.calEvents = this.calEvents.filter(event => event.extendedProps.massId !== this.selectedMassId);
+            this.calEvents.push(
+              ...MassUtil.createCalendarEvent(mass, this.periodService.generatedPeriods$.getValue())
+            );
+            
             this.refreshCalendarAndMassList();
           }
         }
