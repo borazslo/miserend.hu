@@ -1,4 +1,5 @@
 # TODO automate
+use miserend;
 
 -- 2024
 INSERT INTO cal_period_years (period_id, start_year, start_date, end_date, created_at, updated_at)
