@@ -96,6 +96,16 @@ TODO: .gitignore frissítése
 
 Ha új PHP van NodeJS függőséget építesz be, akkor a dev composer fájlból a két volume-ot ki kell venni és a függőségeket helyben telepíteni. 
 
+#### Helyi build
+
+Az alkamazásból helyben is lehet container image-t készíteni, ehhez a következő parancsot kell lefuttatni:
+
+```sh
+docker build -t miserend:latest -f docker/miserend/Dockerfile
+```
+
+Ha ki szeretnéd próbálni, hogyan működne a valóságban, akkor a [dev composer](docker/compose.dev.yml) fájlban írd ät a `miserend` service `image` attribútumát `localhost/miserend:latest`-re. 
+
 # Fejlesztői megjegyzések
 
 ## 🌍 Környezeti változók

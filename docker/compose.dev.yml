@@ -11,6 +11,7 @@ services:
         aliases:
           - mailcatcher
   miserend:
+    image: localhost/miserend:latest
     environment:
       - SMTP_HOST=mailcatcher
       - SMTP_PORT=11025
