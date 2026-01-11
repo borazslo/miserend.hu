@@ -266,6 +266,15 @@ class SimpleRRule
         //if ($this->until) {
         //    $parts[] = "Until: " . $this->until->toIso8601String();
         //}
+        if(!empty($this->byMonth)) {
+            if(!is_array($this->byMonth)) {
+                $this->byMonth = [$this->byMonth];
+            }   
+            $parts[] = "ByMonth: " . implode(',', $this->byMonth);
+        }
+        if(!empty($this->byMonthDay)) {
+            $parts[] = "ByMonthDay: " . implode(',', $this->byMonthDay);
+        }   
         if ($this->count) {
             $parts[] = "Count: " . $this->count;
         }

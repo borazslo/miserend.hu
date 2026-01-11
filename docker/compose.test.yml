@@ -1,0 +1,16 @@
+services:
+  mailcatcher:
+    image: dockage/mailcatcher
+    container_name: mailcatcher
+    ports:
+      - 11025:1025
+      - 11080:1080
+    restart: on-failure:10
+    networks:
+      inner:
+        aliases:
+          - mailcatcher
+  miserend:
+    environment:
+      - SMTP_HOST=mailcatcher
+      - SMTP_PORT=11025

@@ -375,18 +375,55 @@ class CalMass extends CalModel
                 $excludedPeriods = is_array($excludedPeriods) ? $excludedPeriods : [];
 
 
-                // Ha nincsen periódusa, akkor ő minden bizonnyal egy egyedi esemény. Illetve nagyon reméljük.
+                // Ha nincsen periódusa, akkor ő vagy egyedi esemény vagy évenként ismétlődő egyedi esemény!
                 // Általában kap RRULE-t is egynaposat. Ezért inkább végig visszük, persze csak a saját évében                
+              
                 if(!$mass->period_id) { 
-                    $periods = collect([]);
-                    if($year == Carbon::parse($mass->start_date)->format('Y')) {
-                        $periods->push((object)[
-                            'id' => Carbon::parse($mass->start_date)->format('YmdHis'), // ideiglenes id
-                            'start_date' => $mass->start_date,
-                            'end_date' => $mass->start_date,
-                            'name' => 'Ideiglenes időszak egyetlen napra',
-                            'color' => false
-                        ]);
+
+                    /* Egyetlen egyszer előforduló eseményeinket tipikusen így adjuk meg
+                        { freq: daily,
+                           count: 1
+                           dtstart: ...
+                        }
+                    */
+                    if( isset($rrule['freq']) and $rrule['freq'] == 'daily' AND
+                        isset($rrule['count']) and $rrule['count'] == 1 ) {
+
+                        $periods = collect([]);                                                
+                        if($year == Carbon::parse($mass->start_date)->format('Y')) {
+                            
+                            $periods->push((object)[
+                                'id' => $mass->id."-".Carbon::parse($mass->start_date)->format('YmdHis'), // ideiglenes id
+                                'start_date' => $mass->start_date,
+                                'end_date' => $mass->start_date, // Ezek egy napos események ugye
+                                'name' => 'Ideiglenes időszak egyetlen napra',
+                                'color' => false
+                            ]);                            
+                        }
+                    } else if (
+                        isset($rrule['freq']) and $rrule['freq'] == 'yearly' AND
+                        isset($rrule['bymonth']) and is_array($rrule['bymonth']) AND
+                        isset($rrule['bymonthday']) and is_array($rrule['bymonthday'])
+                    ) {
+                        foreach($rrule['bymonth'] as $month) {
+                            foreach($rrule['bymonthday'] as $day) {
+                                $periods = collect([]);                                                
+                                $dateString = sprintf('%04d-%02d-%02d', $year, $month, $day);                                                                                                       
+                                $periods->push((object)[
+                                    'id' => $mass->id."-".str_replace(['-',' ',':'], '', $dateString), // ideiglenes id
+                                    'start_date' => $dateString,
+                                    'end_date' => $dateString, // Ezek egy napos események ugye
+                                    'name' => 'Ideiglenes időszak egyetlen napra',
+                                    'color' => false
+                                ]); 
+
+
+
+                            }
+                        }
+
+                    } else {
+                        throw new \Exception('Nincs period_id és az RRULE sem egy napos eseményre van beállítva. Ez nem támogatott. Mass: '.print_r($mass->toArray(),1));
                     }
                 }
                 else {

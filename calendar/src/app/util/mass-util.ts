@@ -223,6 +223,14 @@ export class MassUtil {
             byweekday: event.selectedDays,
           };
           break;
+        case Renum.YEARLY:
+          // For YEARLY we will treat it as a single yearly occurrence (count=1)
+          rrule = {
+            dtstart: dtstart,
+            freq: 'yearly',
+            count: 1
+          };
+          break;
       }
     }
 
@@ -334,11 +342,14 @@ export class MassUtil {
       titles = [
         "MASS_TITLE.DIVINE_LITURGY",
         "MASS_TITLE.LITURGY_OF_THE_PRESANCTIFIED_GIFTS",
+        "MASS_TITLE.MATINS",
+        "MASS_TITLE.VESPRES"
       ];
     } else {
       titles = [
         "MASS_TITLE.HOLY_MASS",
         "MASS_TITLE.LITURGY_OF_THE_WORD",
+        "MASS_TITLE.ADORATION",
         "MASS_TITLE.MASS_OF_THE_LORD_S_SUPPER",
         "MASS_TITLE.GOOD_FRIDAY_LITURGY",
         "MASS_TITLE.EASTER_VIGIL"
@@ -373,6 +384,10 @@ export class MassUtil {
     const rrule = mass.rrule;
     if (ScriptUtil.isNull(mass.rrule)) {
       return Renum.NONE;
+    }
+
+    if (rrule?.freq === 'yearly') {
+      return Renum.YEARLY;
     }
 
     if (rrule?.freq === 'weekly') {

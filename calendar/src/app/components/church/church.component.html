@@ -1,9 +1,16 @@
 @if (dataLoaded) {
-  <app-church-calendar
-    #churchCalendar
-    [suggestible]="true"
-    [currentChurch]="currentChurch!"
-    [masses]="masses"
-  >
-  </app-church-calendar>
+  <ng-container *ngIf="!loadError; else errorTpl">
+    <app-church-calendar
+      #churchCalendar
+      [suggestible]="true"
+      [currentChurch]="currentChurch!"
+      [masses]="masses"
+    >
+    </app-church-calendar>
+  </ng-container> 
+  <ng-template #errorTpl>
+    <div class="alert alert-danger" role="alert">
+      {{ loadError }}
+    </div>
+  </ng-template>
 }
