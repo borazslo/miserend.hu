@@ -1,7 +1,14 @@
 calendar/node_modules
-calendar/dist
 calendar/.angular
 calendar/tmp
 node_modules
 vendor
 .git
+
+# ignore node junk
+**/node_modules
+**/.npm
+
+# allow Angular build output
+!calendar/dist
+!calendar/dist/**
