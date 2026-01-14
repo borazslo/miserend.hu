@@ -1,0 +1,32 @@
+FROM ghcr.io/krisek/miserend.hu/php-base:8.2
+
+WORKDIR /miserend
+
+COPY docker/miserend/ docker/miserend/
+COPY webapp/ webapp/
+COPY calendar/dist/mcal calendar/dist/mcal
+
+RUN python3 docker/miserend/calendar_deploy.py \
+    calendar/dist/mcal/browser webapp \
+ && rm -rf calendar/dist
+
+WORKDIR /miserend/webapp
+
+COPY webapp/composer.json webapp/composer.lock ./
+
+RUN --mount=type=cache,target=/root/.composer \
+    composer install \
+      --no-dev \
+      --no-interaction \
+      --no-progress \
+      --optimize-autoloader
+
+COPY webapp/ .
+
+COPY docker/miserend/php.ini /usr/local/etc/php/conf.d/php.ini
+COPY docker/miserend/apache.conf /etc/apache2/sites-available/miserend.conf
+
+RUN a2dissite 000-default && a2ensite miserend
+
+COPY docker/miserend/entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
