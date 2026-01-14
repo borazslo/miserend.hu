@@ -264,31 +264,6 @@ CREATE TABLE IF NOT EXISTS `favorites` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `igenaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `igenaptar` (
-  `id` int(5) NOT NULL AUTO_INCREMENT,
-  `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'feher',
-  `ev` enum('0','A','B','C') NOT NULL DEFAULT '0',
-  `idoszak` char(1) NOT NULL DEFAULT '',
-  `nap` varchar(250) NOT NULL DEFAULT '',
-  `oszov_hely` varchar(50) NOT NULL DEFAULT '',
-  `oszov` text NOT NULL,
-  `ujszov_hely` varchar(50) NOT NULL DEFAULT '',
-  `ujszov` text NOT NULL,
-  `evang_hely` varchar(50) NOT NULL DEFAULT '',
-  `evang` text NOT NULL,
-  `unnep` varchar(250) NOT NULL DEFAULT '',
-  `intro` text NOT NULL,
-  `gondolat` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=821 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `keyword_shortcuts`
 --
 
@@ -311,20 +286,6 @@ CREATE TABLE IF NOT EXISTS `keyword_shortcuts` (
 ) ENGINE=InnoDB AUTO_INCREMENT=12825 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `lnaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `lnaptar` (
-  `datum` date NOT NULL DEFAULT '0000-00-00',
-  `ige` int(5) NOT NULL DEFAULT 0,
-  `szent` int(5) NOT NULL DEFAULT 0,
-  `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'lila',
-  PRIMARY KEY (`datum`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `lookup_boundary_church`
@@ -448,58 +409,7 @@ CREATE TABLE IF NOT EXISTS `misek` (
 ) ENGINE=MyISAM AUTO_INCREMENT=242464 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `modulok`
---
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `modulok` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `nev` varchar(50) NOT NULL DEFAULT '',
-  `leiras` tinytext NOT NULL,
-  `fajlnev` varchar(50) NOT NULL DEFAULT '',
-  `sablon` varchar(20) NOT NULL DEFAULT 'alap',
-  `zart` int(1) NOT NULL DEFAULT 0,
-  `jogkod` varchar(50) NOT NULL DEFAULT '',
-  `szamlalo` int(11) NOT NULL DEFAULT 0,
-  `funkcio` enum('i','n') NOT NULL DEFAULT 'n',
-  `ok` enum('i','n') NOT NULL DEFAULT 'n',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `nevnaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `nevnaptar` (
-  `datum` varchar(4) NOT NULL DEFAULT '',
-  `nevnap` varchar(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`datum`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `oldalkeret`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `oldalkeret` (
-  `fooldal_id` int(2) NOT NULL DEFAULT 0,
-  `modul_id` int(10) NOT NULL DEFAULT 0,
-  `fajlnev` varchar(50) NOT NULL DEFAULT '',
-  `html_tmpl` varchar(30) NOT NULL DEFAULT 'hasabdoboz',
-  `helyzet` int(2) NOT NULL DEFAULT 0,
-  `lang` varchar(10) NOT NULL DEFAULT 'hu',
-  `sorrend` int(2) NOT NULL DEFAULT 0,
-  `zart` int(2) NOT NULL DEFAULT 0,
-  `megj` varchar(100) NOT NULL DEFAULT ''
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `orszagok`
@@ -647,25 +557,6 @@ CREATE TABLE IF NOT EXISTS `stats_externalapi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `szentek`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `szentek` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nev` varchar(200) NOT NULL DEFAULT '',
-  `nevnap` varchar(200) NOT NULL DEFAULT '',
-  `intro` text NOT NULL,
-  `ho` int(2) NOT NULL DEFAULT 0,
-  `nap` int(2) NOT NULL DEFAULT 0,
-  `leiras` text NOT NULL,
-  `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'feher',
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=261 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci PACK_KEYS=1;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `szentsegimadasok`
@@ -811,21 +702,6 @@ CREATE TABLE IF NOT EXISTS `tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `unnepnaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `unnepnaptar` (
-  `datum` date NOT NULL DEFAULT '0000-00-00',
-  `unnep` varchar(50) NOT NULL DEFAULT '',
-  `szabadnap` enum('i','n') NOT NULL DEFAULT 'i',
-  `mise` enum('v','n','u') NOT NULL DEFAULT 'u',
-  `miseinfo` varchar(250) NOT NULL DEFAULT '',
-  PRIMARY KEY (`datum`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `updates`
