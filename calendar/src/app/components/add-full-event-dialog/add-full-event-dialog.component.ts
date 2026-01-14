@@ -15,7 +15,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {Day} from '../../enum/day';
 import {MatTooltip} from '@angular/material/tooltip';
 import {PeriodService} from '../../services/period.service';
-import {AsyncPipe, TitleCasePipe} from '@angular/common';
+import {AsyncPipe, TitleCasePipe, CommonModule} from '@angular/common';
 import {map, Observable, of, startWith} from 'rxjs';
 import {MatSelectModule} from '@angular/material/select';
 import {recurrences, Renum} from '../../enum/recurrence';
@@ -40,6 +40,7 @@ import {ChristmasDay} from "../../enum/christmas-day";
     provideNativeDateAdapter()
   ],
   imports: [
+    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -95,10 +96,15 @@ export class AddFullEventDialogComponent {
   selectedChristmasDay?: ChristmasDay | null = this.data.event.selectedChristmasDay;
   selectedEasterDay?: EasterDay | null = this.data.event.selectedEasterDay;
 
+  public selectedPeriodIsMultiday: boolean | null = null;
+
   constructor(
     readonly periodService: PeriodService,
     readonly translateService: TranslateService,
   ) {
+    const hasPeriodId = !!(this.data.event.period && (this.data.event.period as any).periodId);
+
+    // A választható időszakokat furcsa sorrendben jelenítjük meg direkt. 
     periodService.getSelectableGeneratedPeriodsByDate(this.data.event.start).subscribe(generatedPeriods => {
       this.selectableGenPeriods = generatedPeriods;
     });
@@ -108,8 +114,10 @@ export class AddFullEventDialogComponent {
       this.specialPeriodType = this.periodService.getPeriodById(value?.periodId)?.specialType;
       // Ensure titles are filtered when period changes
       this.applyTitleFilter();
-    });
 
+      // Update multiday flag and warn if necessary
+      this.maybeWarnIfNotMultiday(value);
+    });
     this.filteredPeriods$ = this.periodCtr.valueChanges.pipe(
       startWith(''),
       map(value => {
@@ -123,10 +131,29 @@ export class AddFullEventDialogComponent {
       if (this.specialPeriodType !== null) {
         this.singleEvent = false;
       }
+
+      // If the initial period is not multi-day, inform the user as well
+      this.maybeWarnIfNotMultiday(this.data.event.period);
     }
 
     // Apply initial filtering of titles based on the current mode/period
     this.applyTitleFilter();
+  }
+
+  // Centralized check for multi-day flag and user notification
+  private maybeWarnIfNotMultiday(selectedGeneratedPeriod: GeneratedPeriod | null | undefined): void {
+    try {
+      const period = selectedGeneratedPeriod ? this.periodService.getPeriodById(selectedGeneratedPeriod.periodId) : null;
+      if (period) {
+        // set the flag for template consumption
+        this.selectedPeriodIsMultiday = !!period.multiDay;      
+      } else {
+        this.selectedPeriodIsMultiday = null;
+      }
+    } catch (e) {
+      // ignore errors and clear flag
+      this.selectedPeriodIsMultiday = null;
+    }
   }
 
   onSave(): void {
@@ -145,7 +172,17 @@ export class AddFullEventDialogComponent {
       return;
     }
 
-    if (!this.singleEvent && this.specialPeriodType === null && (ScriptUtil.isNull(this.selectedDays) || this.selectedDays.length < 1)) {
+    const selectedGeneratedPeriod = this.data.event.period ?? this.periodCtr.value;
+    const period = selectedGeneratedPeriod ? this.periodService.getPeriodById(selectedGeneratedPeriod.periodId) : null;
+    if (!this.singleEvent && (period && period.multiDay === false)) {
+      this.data.event.selectedChristmasDay = null;
+      this.data.event.selectedEasterDay = null;
+      this.data.event.selectedDays = [];
+      this.data.event.renum = Renum.YEARLY;
+      
+    }
+
+    else if (!this.singleEvent && this.specialPeriodType === null && (ScriptUtil.isNull(this.selectedDays) || this.selectedDays.length < 1)) {
       this.dayError = true;
       return;
     }

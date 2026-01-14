@@ -1,10 +1,7 @@
 {% extends 'panel.twig' %}
 
 {% set title = random([
-    'Már folyik a munka! - Köszönjük a támogatást!',
-    'Már fel van állványozva a honlap! - Köszönjük a támogatást!',
-    'Támogasd a megújulást! - Köszönjük a támogatást!',
-    'A kód pörög, a tervező izgul! - Köszönjük a támogatást!'
+    'Megújul(t)unk! - Ezt hozta a sok munka:'
 ]) %}
 {% set panel = 'success' %}
 
@@ -16,11 +13,19 @@
 
 
 {% block body %}
-    <p>323 támogató közreműködésével 4,5 millió forint gyűlt össze, hogy a miserend mélyét megújítsuk.</p>
-    <p>A gyűjtés lezárulása után elkezdtük egy céggel a részletes tervek kidolgozását.
-     Az elkészült tervhez aztán több kivitelezőt is megkerestük. 
-     Majd nem régen megszületett a szerződés. 
-     És most folyik a munka.</p>    
+    <p>2026-ot hatalmas újítással kezdjük, még akkor ha van mit ezeken csiszolni.</p>
+    <ul>
+        <li>Naptár nézetben látható minden templom liturgikus rendje mostantól, és naptárként is kezeljük a miserendeket. 
+        Vannak ismétlődő szentmisék, de lehet kivételeket megadni egy-egy különleges napra. Lehetnek alkalmi misék, és visszatérő szentségimádások is.</li>
+        <li>Másik hatalmas újítás, hogy minden látogatónk beküldhet már kész módosítási javaslatot. Csak írd át a templom miséit, majd 
+        megadva elérhetőségedet és egy üzenetet, be is küldheted a javaslatodat. Így a gondnokok, felelősök és szerkesztők 
+        egyetlen gombnyomással élesíteni tudják a legújabb frissítéseket, és máris mindenki számára elérhető lesz a helyes miserend.</li>
+        <li>A templom naptárját már felveheted saját naptárjaid közé is, így mindig látod a friss miserendet. Vagy más honlapba is be lehet illeszteni a mindig frissé váló templomi miserendet. </li>
+        <li>A kereső felületes is megkezdte átalakulását, hogy jobban kézre álljon még mobilfelületeken is. Itt még sok tennivaló van, de az utat elkezdtük.</li>
+    </ul>
+    <p>Ez a fejlesztés nem jöhetett volna létre a több mint 300 támogatónk nélkül, akik adományaiból tudtunk fejlesztőket felbérelni a munka dandárjára, 
+    majd önkéntes programozóink további több mint száz óra munkát beletettek a fejlesztésekbe már így is. És még nincs vége.</p>
+    <p>Hálásak vagyunk minden adományért, támogatásért, imáért! </p>
 {% endblock %}    
 
 {% block footer %}

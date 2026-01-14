@@ -76,8 +76,11 @@
   "MASS_TITLE": {
     "HOLY_MASS": "Szentmise",
     "LITURGY_OF_THE_WORD": "Igeliturgia",
+    "ADORATION": "Szentségimádás",
     "DIVINE_LITURGY": "Szent Liturgia",
     "LITURGY_OF_THE_PRESANCTIFIED_GIFTS": "Előszenteltek liturgiája",
+    "MATINS": "Utrenye",
+    "VESPRES": "Vecsernye",
     "MASS_OF_THE_LORD_S_SUPPER": "Az utolsó vacsora emlékmiséje",
     "GOOD_FRIDAY_LITURGY": "Nagypénteki szertartás",
     "EASTER_VIGIL": "Húsvét vigíliája",
@@ -114,6 +117,21 @@
     "ua": "ukrán"
   },
 
+  "MONTHS": {
+    "1" : "január",
+    "2" : "február",
+    "3" : "március",
+    "4" : "április",
+    "5" : "május",
+    "6" : "június",
+    "7" : "július",
+    "8" : "augusztus",
+    "9" : "szeptember",
+    "10" : "október",
+    "11" : "november",
+    "12" : "december"
+  },
+
   "EVENT_VIEWER": {
     "EQUAL_TIMEZONE": "Az Önével azonos időzónában.",
     "DIFFERENT_TIMEZONE": "Figyelem! A kezdési idő más időzónában ({{eventTimeZone}}) lett megadva, mint az öné ({{localTimeZone}})!",
@@ -124,7 +142,8 @@
     "DELETE": "Törlés",
     "DELETE_ONE": "Csak ennek az egy alkalomnak a törlése",
     "DELETE_ALL": "Az összes ismétlődés törlése",
-    "CLOSE": "Bezárás"
+    "CLOSE": "Bezárás",
+    "SUGGEST": "Javaslat küldése"
   },
 
   "RRULE": {
@@ -138,7 +157,8 @@
       "THIRD_WEEK": "minden hónapban a harmadik",
       "FOURTH_WEEK": "minden hónapban az negyedik",
       "FIFTH_WEEK": "minden hónapban az ötödik",
-      "LAST_DAY_OF_MONTH": "minden hónapban az utolsó"
+      "LAST_DAY_OF_MONTH": "minden hónapban az utolsó",
+      "EVERY_YEAR": "minden évben"
     }
   },
   "SEPARATOR_AND": " és ",
@@ -179,7 +199,8 @@
     "START_DATE": "Kezdete",
     "END_DATE": "Vége",
     "SAVE": "Mentés",
-    "GENERATE": "Generálás"
+    "GENERATE": "Generálás",
+    "NO_PERIOD": "Időszak nélkül"
   },
 
   "SIMPLE_EVENT": {

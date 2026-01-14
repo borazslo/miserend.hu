@@ -22,6 +22,8 @@ import {ScriptUtil} from '../../util/script-util';
 import {MatTooltip} from '@angular/material/tooltip';
 import {DeleteWarningDialogComponent} from '../delete-warning-dialog/delete-warning-dialog.component';
 import {SpecialType} from "../../model/period";
+import {AddMessageDialogComponent} from '../add-message-dialog/add-message-dialog.component';
+import {EditConfirmationService} from '../../services/edit-confirmation.service';
 
 @Component({
   selector: 'app-event-viewer-dialog',
@@ -52,11 +54,40 @@ export class EventViewerDialogComponent {
   readonly data = inject<EventViewerDialogData>(MAT_DIALOG_DATA);
 
   public readonly start = DateTimeUtil.getReadableDateTime(this.data.start);
+  // User must confirm editing via the confirmation dialog before edit/delete controls are shown
+  public confirmedEdit: boolean = false;
 
   constructor(
     readonly periodService: PeriodService,
-    readonly translateService: TranslateService
+    readonly translateService: TranslateService,
+    readonly editConfirmation: EditConfirmationService
   ) {
+    // Initialize confirmedEdit from shared service so the user's choice is remembered within the app
+    this.confirmedEdit = !!this.editConfirmation.isConfirmed();
+  }
+
+  // Called when user clicks the Suggest button in the viewer. Ask for confirmation and enable edit controls on accept.
+  onSuggestClicked(): void {
+    // If the user previously confirmed editing, don't ask again
+    if (this.editConfirmation.isConfirmed()) {
+      this.confirmedEdit = true;
+      return;
+    }
+
+    const messageDialogRef = this.dialog.open(AddMessageDialogComponent, {
+      data: { message: this.editConfirmation.getMessage(), decision: true }
+    });
+
+    messageDialogRef.afterClosed().subscribe(result => {
+      if (result === DialogResponse.CONTINUE) {
+        this.confirmedEdit = true;
+        // remember user's decision in shared service so other components don't ask again
+        this.editConfirmation.confirm();
+      } else {
+        // if user declines, simply close the viewer
+        this.dialogRef.close();
+      }
+    });
   }
 
   onDeleteMassOne(): void {
@@ -96,6 +127,15 @@ export class EventViewerDialogComponent {
   get period(): string {
     const period = this.periodService.getPeriodById(this.data.mass.periodId);
     return period ? period.name : '';
+  }
+
+  get yearly() : string {
+    const rrule = this.data.mass.rrule;
+    console.log("rrule yearly", rrule);
+    if (ScriptUtil.isNotNull(rrule) && rrule.freq === 'yearly') {
+      return this.translateService.instant('RRULE.ON.EVERY_YEAR');
+    }
+    return '';
   }
 
   get days(): string {

@@ -19,6 +19,8 @@ class EditSchedule extends \Html\Html {
             return;
         }
         
+        global $_tidsToWorkWith;
+        $this->tids = $_tidsToWorkWith;
     }
 
 }

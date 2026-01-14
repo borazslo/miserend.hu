@@ -1,4 +1,5 @@
 export enum Renum {
+  YEARLY = 'YEARLY',
   NONE = 'NONE',
   EVERY_WEEK = 'EVERY_WEEK',
   FIRST_WEEK = 'FIRST_WEEK',
@@ -65,6 +66,12 @@ export const recurrences: Record<Renum, Recurrence> = {
     type: Renum.LAST_DAY_OF_MONTH,
     name: 'Hónap utolsó megadott napján',
     hint: 'Pl. minden hónap utolsó hétfője',
+    multiDays: false
+  },
+  [Renum.YEARLY]: {
+    type: Renum.YEARLY,
+    name: 'Évente',
+    hint: 'Évente egyszer, a periódushoz igazítva',
     multiDays: false
   },
   [Renum.EVEN_WEEK]: {

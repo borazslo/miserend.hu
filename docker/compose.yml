@@ -1,0 +1,76 @@
+services:
+  mysql:
+    image: mariadb:12
+    container_name: mysql
+    platform: linux/amd64
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/mysql.conf.d:/etc/mysql/mysql.conf.d
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pw
+      MYSQL_DATABASE: miserend
+    healthcheck:
+      test: [CMD, mariadb-admin, ping, -h, localhost, -u, user, -ppw]
+      timeout: 5s
+      retries: 10
+    networks:
+      inner:
+        aliases:
+          - mysql
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      inner:
+        aliases:
+          - elasticsearch
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.1
+    container_name: kibana
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      XPACK_SECURITY_ENABLED: false
+    depends_on:
+      - elasticsearch
+    networks:
+      inner:
+        aliases:
+          - kibana
+  miserend:
+    container_name: miserend
+    image: ghcr.io/krisek/miserend.hu:v2026.1.12
+    volumes: 
+       - miserend_tmp:/miserend/webapp/fajlok/tmp
+    ports:
+      - 8000:8000
+    environment: []
+    networks:
+      inner:
+        aliases:
+          - miserend
+networks:
+  inner:
+    driver: bridge
+volumes:
+  db_data: {}
+  elasticsearch_data: {}
+  miserend_tmp: {}

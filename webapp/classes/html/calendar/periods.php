@@ -76,7 +76,8 @@ class Periods extends \Html\Calendar\CalendarApi {
                     echo json_encode($periodsYear->toArray());
                 } else {
                     //ha csak simán lekérjük a periódusokat
-                    $periods = CalPeriod::all();
+                    
+                    $periods = CalPeriod::orderBy('weight', 'asc')->get();
                     $generatedPeriods = CalGeneratedPeriod::all();
 
                     $result = [

@@ -40,14 +40,18 @@ class Masses extends \Html\Calendar\CalendarApi {
             case 'POST':
                 $this->church->append(['writeAccess']);
 
-//                if (!$this->church->writeAccess) {
-//                    $this->sendJsonError('Hiányzó jogosultság!', 403);
-//                    exit;
-//                }
+                if (!$this->church->writeAccess) {
+                    $this->sendJsonError('Hiányzó jogosultság!', 403);
+                    exit;
+                }
 
                 $input = json_decode(file_get_contents('php://input'), true);
                 $changeRequest = new ChangeRequest($input['masses'], $input['deletedMasses']);
                 $this->save($changeRequest);
+                $this->optimizeExperiods();
+                // Ha frissítettünk egy miserendet, akkor mindig és automatikusan a dátuma is legyen friss!                
+                $this->church->frissites = date('Y-m-d');
+                $this->church->save();
                 echo json_encode($this->getByChurchId($this->tid));
                 break;
 
@@ -86,6 +90,50 @@ class Masses extends \Html\Calendar\CalendarApi {
                 CalMass::create($massData);
             }
         }
+    }
+
+    // Az experiod azaz kizárt időszak azonosítók között 
+    // időnként maradhat olyan, amilyen időszak már nincs is, ezért nem kéne kizárni
+    // Ezeket lapátoljuk el az útból
+    private function optimizeExperiods() {
+
+        // Build list of currently used period_ids for this church
+        $periodIds = CalMass::where('church_id', $this->tid)
+            ->get()
+            ->pluck('period_id')
+            ->filter()    // remove null/empty
+            ->unique()    // keep only unique ids
+            ->values()    // reindex the collection
+            ->toArray();
+
+        // Find masses that have experiod set
+        $experiods = CalMass::where('church_id', $this->tid)
+            ->whereNotNull('experiod')
+            ->groupBy('experiod')
+            ->get();
+                            
+        foreach($experiods as $current) {            
+            $cleanedExperiods = [];
+            $toChange = CalMass::where('church_id', $this->tid);
+            foreach($current->experiod as $k => $experiodId) {
+                $toChange = $toChange->whereJsonContains('experiod',$experiodId);                
+                if(in_array($experiodId, $periodIds)) {
+                    $cleanedExperiods[] = $experiodId;
+                }
+            }
+            $cleanedExperiodString = !empty($cleanedExperiods) ? json_encode($cleanedExperiods) : null;
+        
+            $toChange = $toChange->whereRaw('JSON_LENGTH(experiod) = ?', [count($current->experiod)]);
+                
+            //printr($toChange->get()->toArray());
+            if($cleanedExperiodString === $current->experiod) {
+                // no change
+                continue;
+            }
+            $toChange->update(['experiod' => $cleanedExperiodString]);
+        }
+
+        return true;
     }
 
     private function sendJsonError($message, $code): void {

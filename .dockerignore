@@ -1,0 +1,12 @@
+calendar/node_modules
+calendar/.angular
+calendar/tmp
+vendor
+.git
+
+# ignore node junks
+**/.npm
+
+# allow Angular build output
+!calendar/dist
+!calendar/dist/**

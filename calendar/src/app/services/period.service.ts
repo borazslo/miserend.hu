@@ -75,7 +75,7 @@ export class PeriodService {
    */
   public getSelectableGeneratedPeriodsByDate(date: Date): Observable<GeneratedPeriod[]> {
     let generatedPeriodsByYear = this.getSelectableGeneratedPeriodsByYear(date.getFullYear());
-    return generatedPeriodsByYear.pipe(
+    let filteredGeneratedPeriods = generatedPeriodsByYear.pipe(
       map(periods => {
         const sorted = this.sortPeriods(periods, date);
 
@@ -89,6 +89,7 @@ export class PeriodService {
         });
       })
     );
+    return filteredGeneratedPeriods;
   }
 
   private sortPeriods(periods: GeneratedPeriod[], date: Date): GeneratedPeriod[] {
@@ -166,7 +167,7 @@ export class PeriodService {
         return (
           p.periodId === periodId &&
           start <= targetDate &&
-          end > targetDate
+          end >= targetDate //Egy napos eseményeknél ha csak sima ">" akkor nem talál semmit
         );
       });
 

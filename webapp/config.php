@@ -22,8 +22,8 @@ $environment['default'] = [
 		'API' => "15 minutes"
     ],
 	'smtp' => [
-		'Host' => 'mailcatcher',
-		'Port' => 1025,
+		'Host' => env('SMTP_HOST', 'mailcatcher'),
+		'Port' => env('SMTP_PORT', 1025),
 		'SMTPAuth' => false,
 		'SMTPSecure' => false
 	],		

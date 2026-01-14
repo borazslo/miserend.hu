@@ -44,6 +44,10 @@
 
     {{ alert|raw }}
         
+    {% if not hasWorkAccess %}
+    <div class="alert alert-warning">Ennek a misézőhelynek a liturgikus beosztását sajnos még nem sikerült áthoznunk az új rendszerbe. Elnézést és türelmet kérünk.</div>
+    {% endif %}
+
     <h5><b>Frissítve ill. megerősítve:</b> {{ updated }}</h5>
 
     {% include '_panelcampaign.twig' with { collapsible: 'collapsed' }  %}
