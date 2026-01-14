@@ -57,7 +57,7 @@ services:
           - kibana
   miserend:
     container_name: miserend
-    image: ghcr.io/krisek/miserend.hu:v2026.1.12
+    image: ghcr.io/borazslo/miserend.hu:v2026.1.14
     volumes: 
        - miserend_tmp:/miserend/webapp/fajlok/tmp
     ports:
