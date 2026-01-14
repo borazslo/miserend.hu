@@ -73,12 +73,19 @@ De szinte biztos, hogy a végén valami extra masszírozás kell.
 
 ```sh
 git clone https://github.com/borazslo/miserend.hu/
-cd miserend.hu
+cd miserend.hu/webapp
+npm ci
+cd ..
+chmod 777 webapp/fajlok/tmp
+docker pull ghcr.io/borazslo/miserend.hu:{{ version }}
+docker tag ghcr.io/borazslo/miserend.hu:{{ version }} 
 docker-compose  -f docker/compose.yml -f docker/compose.dev.yml up
+localhost/miserend.hu:latest
 ```
 
-A dev composer file tartalmaz egy mailcatcher-t, így nem kell külön SMTP szerverrel bajlódni.
+Ahol a `{{ version }}` helyére (kapcsoszárojeleket is elhagyva), azt a verziót konténer image verziót kell beírni, amelyikkel dolgozni szeretnél.
 
+A dev composer file tartalmaz egy mailcatcher-t, így nem kell külön SMTP szerverrel bajlódni.
 
 #### Adatbázis
 
@@ -91,8 +98,6 @@ Itt is igaz, hogy admin / miserend az első felhasználó neve / jelszava.
 A repó `webapp` könyvtárát a dev composer rá-mappeli a konténerre. Így ha bármit változtatsz, rögtön tesztelhető is. Amennyiben a naptár alkalmazáson dolgozunk, az npm build után a `docker/miserend/calendar_deploy.py` szkript futtatásával lehet az alkalmazásba integrálni.
 
 Ha grafikus adatbázis elérésre lenne szükség, az [adminer](https://www.adminer.org/en/) ajánlott, egyszerűen az alkalmazás valamelyik könyvtárába kell tenni és már megy is. Természetesen ezt a fájl nem kell a git tárolóba elmenteni.
-
-TODO: .gitignore frissítése
 
 Ha új PHP van NodeJS függőséget építesz be, akkor a dev composer fájlból a két volume-ot ki kell venni és a függőségeket helyben telepíteni. 
 
