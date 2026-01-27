@@ -515,36 +515,6 @@ CREATE TABLE IF NOT EXISTS `messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `misek`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `misek` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tid` int(5) DEFAULT NULL,
-  `nap` int(1) NOT NULL DEFAULT 0,
-  `ido` time NOT NULL DEFAULT '00:00:00',
-  `nap2` varchar(4) DEFAULT NULL,
-  `idoszamitas` varchar(255) DEFAULT NULL,
-  `weight` int(11) DEFAULT NULL,
-  `tol` varchar(100) DEFAULT NULL,
-  `ig` varchar(100) DEFAULT NULL,
-  `tmp_datumtol` varchar(5) DEFAULT NULL,
-  `tmp_relation` char(1) DEFAULT NULL,
-  `tmp_datumig` varchar(5) DEFAULT NULL,
-  `nyelv` varchar(100) NOT NULL DEFAULT '',
-  `milyen` varchar(50) NOT NULL DEFAULT '',
-  `megjegyzes` text NOT NULL,
-  `modositotta` varchar(20) NOT NULL DEFAULT '',
-  `moddatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `torles` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `torolte` varchar(20) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=242464 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `orszagok`
 --
 
