@@ -1,0 +1,99 @@
+{
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "hungarian_analyzer": {
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "hungarian_folding"
+                    ]
+                }
+            },
+            "filter": {
+                "hungarian_folding": {
+                    "type": "asciifolding",
+                    "preserve_original": false
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "id": {
+                "type": "keyword"
+            },
+            "names": {
+                "type": "text",
+                "analyzer": "hungarian_analyzer"
+            },
+            "alternative_names": {
+                "type": "text",
+                "analyzer": "hungarian_analyzer"
+            },
+            "varos": {
+                "type": "text",
+                "analyzer": "hungarian_analyzer"
+            },
+            "misek": {
+                "type": "nested",
+                "properties": {
+                    "idopont": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm:ss"
+                    },
+                    "nyelv": {
+                        "type": "text"
+                    },
+                    "zene" : {
+                        "type": "text"
+                    },
+                    "ritus": {
+                        "type": "text"
+                    }
+                }
+            },
+            "adoraciok": {
+                "type": "nested",
+                "properties": {
+                    "kezdete": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm"
+                    },
+                    "vege": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm"
+                    },
+                    "fajta": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "location": {
+                "type": "geo_point"
+            },
+            "gorog": {
+                "type": "boolean"
+            },
+            "nyelvek": {
+                "type": "keyword"
+            },            
+            "gyontatas": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "keyword"
+                    },
+                    "last_periods": {
+                        "type": "nested",
+                        "properties": {
+                            "start": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss" },
+                            "end": { "type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": null },
+                            "duration": { "type": "integer" }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
