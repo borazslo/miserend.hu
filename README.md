@@ -7,7 +7,7 @@ Csak [git](gttps://git-scm.com) és [Docker](https://docs.docker.com/engine/inst
 ```sh
 git clone https://github.com/borazslo/miserend.hu/
 cd miserend.hu
-docker-compose  -f docker/compose.yml -f docker/compose.test.yml up
+docker-compose  -f docker/compose.yml -f docker/compose.init.yml  -f docker/compose.test.yml up
 ```
 
 Máris elérhető a http://localhost:8000 címen a miserend alkalmazás. Az `admin` felhasználóval be is lehet lépni az alapérelmezett jelszóval: `miserend`.
@@ -40,7 +40,7 @@ cd ..
 chmod 777 webapp/fajlok/tmp
 docker pull ghcr.io/borazslo/miserend.hu:{{ version }}
 docker tag ghcr.io/borazslo/miserend.hu:{{ version }} localhost/miserend.hu:latest
-docker-compose  -f docker/compose.yml -f docker/compose.dev.yml up
+docker-compose  -f docker/compose.yml -f docker/compose.init.yml -f docker/compose.dev.yml up
 ```
 
 Ahol a `{{ version }}` helyére (kapcsoszárojeleket is elhagyva), azt a verziót konténer image verziót kell beírni, amelyikkel dolgozni szeretnél.
@@ -83,11 +83,10 @@ docker tag ghcr.io/borazslo/miserend.hu:v2026.1.14 localhost/miserend.hu:latest
 ##### Kezdődjön a móka
 A docker compose valamennyi konténert szépen felépíti, bekonfigurálja, feltölti adatokkal, és elindítja:
 ```
-docker-compose  -f docker/compose.yml -f docker/compose.dev.yml up
+docker-compose  -f docker/compose.yml  -f docker/compose.init.yml -f docker/compose.dev.yml up
 ```
 
 Máris elérhető a http://localhost:8000 címen a miserend alkalmazás. Az `admin` felhasználóval be is lehet lépni az alapérelmezett jelszóval: `miserend`.
-
 
 
 # Komponensek és konténerek
@@ -108,15 +107,18 @@ Ha grafikus adatbázis elérésre lenne szükség, az [adminer](https://www.admi
 
 Az alkalmazás keresőmotorját az Elasticsearch adja. A fent leírt standard konténer alapú telepítés során szépen elindul ez is. De kézzel kell feltölteni adatokkal legalább az első indítás után!
 
-A templom keresőhöz a `Externalapi\ElasticsearchApi::updateChurches()` függvényt kell rendszeresen futtatni, a szentmisék kereséséhez a `Externalapi\ElasticsearchApi::updateMasses()` függvényt. Ezeket legegyszerűbb az alapértelmezett adatbázisból felálló időzített cron feladatok kézi futtatásával elindíteni:
-[/index.php?q=cron&cron_id=XX](http:/localhost:8000/index.php?q=cron&cron_id=XX) és [/index.php?q=cron&cron_id=XX](http:/localhost:8000/index.php?q=cron&cron_id=XX)
-Első használatkor is futtatni kell!
+A templom keresőhöz a `Externalapi\ElasticsearchApi::updateChurches()` függvényt fut PHP cron-ból, a szentmisék kereséséhez a `Externalapi\ElasticsearchApi::updateMasses()` függvény. 
+
+Ezeket kézileg is lehet frissíteni:
+[/index.php?q=cron&cron_id=38](http:/localhost:8000/index.php?q=cron&cron_id=38) és [/index.php?q=cron&cron_id=39](http:/localhost:8000/index.php?q=cron&cron_id=39)
+
+Első használatkor az elasticache-init konténer gondoskodik az inicializálásról.
 
 Vigyázat! Az 5000 misézőhelyhez évente több mint 500 ezer (!) konkrét liturgikus esemény tartozik, így az updateMass() eltarthat fél óráig is! 
 
 ### 📊 kibana
 
-Elasticsearch admin felülete fejlesztéshez.  
+Elasticsearch web interfész fejlesztéshez, teszteléshez.  
 Beizzítása kis varázslást igényelhet.
 
 ## Mailcatcher
