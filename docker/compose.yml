@@ -41,20 +41,6 @@ services:
       inner:
         aliases:
           - elasticsearch
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.1
-    container_name: kibana
-    ports:
-      - 5601:5601
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      XPACK_SECURITY_ENABLED: false
-    depends_on:
-      - elasticsearch
-    networks:
-      inner:
-        aliases:
-          - kibana
   miserend:
     container_name: miserend
     image: ghcr.io/borazslo/miserend.hu:v2026.1.14
