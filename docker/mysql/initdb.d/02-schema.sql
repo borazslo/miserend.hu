@@ -51,12 +51,148 @@ CREATE TABLE IF NOT EXISTS `boundaries` (
   `denomination` varchar(50) DEFAULT NULL,
   `osmtype` varchar(9) DEFAULT NULL,
   `osmid` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` DATE NOT NULL DEFAULT '0000-00-00',
+  `updated_at` DATE NULL DEFAULT '0000-00-00',
   PRIMARY KEY (`id`),
   KEY `index1` (`boundary`,`admin_level`),
   KEY `index2` (`osmtype`,`osmid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7891 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_generated_periods`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_generated_periods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `period_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `weight` int NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `created_at` DATE NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` DATE NULL DEFAULT CURRENT_DATE,
+  `color` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `period_id` (`period_id`),
+  CONSTRAINT `fk_cal_generated_periods_period_id` FOREIGN KEY (`period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_masses`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_masses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `church_id` int(11) NOT NULL,
+  `period_id` int(11) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `types` text,
+  `rite` varchar(50) NOT NULL,
+  `start_date` varchar(50) NOT NULL,
+  `duration` json DEFAULT NULL,
+  `rrule` json DEFAULT NULL,
+  `experiod` json DEFAULT NULL,
+  `exdate` json DEFAULT NULL,
+  `lang` varchar(3) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `created_at` DATE NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` DATE NULL DEFAULT CURRENT_DATE,
+  PRIMARY KEY (`id`),
+  KEY `period_id` (`period_id`),
+  KEY `church_id` (`church_id`),
+  CONSTRAINT `fk_cal_masses_period_id` FOREIGN KEY (`period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_periods`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_periods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `weight` int NOT NULL,
+  `start_month_day` varchar(5) DEFAULT NULL,
+  `end_month_day` varchar(5) DEFAULT NULL,
+  `start_period_id` int(11) DEFAULT NULL,
+  `end_period_id` int(11) DEFAULT NULL,
+  `all_inclusive` tinyint(1) DEFAULT NULL,
+  `multi_day` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` DATE NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` DATE NULL DEFAULT CURRENT_DATE,
+  `special_type` enum('CHRISTMAS','EASTER') DEFAULT NULL,
+  `selectable` tinyint(1) DEFAULT 1,
+  `color` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `start_period_id` (`start_period_id`),
+  KEY `end_period_id` (`end_period_id`),
+  CONSTRAINT `fk_cal_periods_start_period` FOREIGN KEY (`start_period_id`) REFERENCES `cal_periods` (`id`),
+  CONSTRAINT `fk_cal_periods_end_period` FOREIGN KEY (`end_period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_period_years`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_period_years` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `period_id` int(11) NOT NULL,
+  `start_year` int(4) NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `created_at` date NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` date NULL DEFAULT CURRENT_DATE,
+  PRIMARY KEY (`id`),
+  KEY `period_id` (`period_id`),
+  CONSTRAINT `fk_cal_period_years_period_id` FOREIGN KEY (`period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_suggestion_packages`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_suggestion_packages` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `church_id` bigint(20) unsigned DEFAULT NULL,
+  `sender_name` varchar(255) DEFAULT NULL,
+  `sender_email` varchar(255) DEFAULT NULL,
+  `sender_user_id` bigint(20) unsigned DEFAULT NULL,
+  `sender_message` text DEFAULT NULL,
+  `state` enum('ACCEPTED','REJECTED','PENDING') DEFAULT 'PENDING',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `church_id` (`church_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_suggestions`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_suggestions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `package_id` bigint(20) unsigned NOT NULL,
+  `period_id` bigint(20) unsigned DEFAULT NULL,
+  `mass_id` bigint(20) unsigned DEFAULT NULL,
+  `mass_state` enum('NEW','DELETED','MODIFIED') NOT NULL,
+  `changes` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `package_id` (`package_id`),
+  CONSTRAINT `fk_cal_suggestions_package` FOREIGN KEY (`package_id`) REFERENCES `cal_suggestion_packages` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -286,7 +422,6 @@ CREATE TABLE IF NOT EXISTS `keyword_shortcuts` (
 ) ENGINE=InnoDB AUTO_INCREMENT=12825 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-
 --
 -- Table structure for table `lookup_boundary_church`
 --
@@ -408,8 +543,6 @@ CREATE TABLE IF NOT EXISTS `misek` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=242464 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
-
 
 --
 -- Table structure for table `orszagok`
@@ -557,7 +690,6 @@ CREATE TABLE IF NOT EXISTS `stats_externalapi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-
 --
 -- Table structure for table `szentsegimadasok`
 --
@@ -701,7 +833,6 @@ CREATE TABLE IF NOT EXISTS `tokens` (
   UNIQUE KEY `name_UNIQUE` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
 
 --
 -- Table structure for table `updates`
