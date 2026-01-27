@@ -666,7 +666,7 @@ class Migrate extends \Html\Html {
         
         // Tavasszal
         else if ( in_array( [$mise->tol, $mise->ig], [
-                ['05-01', '06-30'],['Tavaszi óraátállítás', '06-30'],['Tavaszi óraátállítás', 'utolsó tanítási nap'],
+        ['03-26', 'utolsó tanítási nap'],['Tavaszi óraátállítás', '05-31'],    ['Tavaszi óraátállítás', '06-30 -1'],    ['05-01', '06-30'],['Tavaszi óraátállítás', '06-30'],['Tavaszi óraátállítás', 'utolsó tanítási nap'],
                 ['03-01', 'Húsvétvasárnap'],['Húsvétvasárnap', '06-30'],['04-01', 'utolsó tanítási nap'],['Tavaszi óraátállítás', '06-05'],['04-25', '07-15'],['Húsvétvasárnap', '07-04'],['01-01', '04-30'],['03-30', 'utolsó tanítási nap'],['03-01', '05-31'],['05-01', '06-19'],	['Tavaszi óraátállítás', '07-04'],
                 ['Tavaszi óraátállítás', '04-30 -1'],['03-01', '03-19'],['május első vasárnapja', 'június utolsó vasárnapja -1'],['05-01', '06-31 -1'],['03-01', '04-30'],['03-16', '05-30'], 	['04-25', '05-31'], ['05-01', 'utolsó tanítási nap'],['04-01', '05-21']
         ] ) ) { 
@@ -675,22 +675,22 @@ class Migrate extends \Html\Html {
         
         // Télen 
         else if ( in_array( [$mise->tol, $mise->ig], [
-                ['10.01', '04.30'],['10-31', '02-28'],['09-01', 'Hamvazószerda -1'],['12-24', 'utolsó tanítási nap'],['10.01', '03.30'],['október utolsó vasárnapja', '03-25'],	['10-01', '05-01 -1'],	['12-25', 'Tavaszi óraátállítás -1'],['Őszi óraátállítás', '02-28'],	['szeptember 1. vasárnapja', '03-28'],
-                ['Őszi óraátállítás', '03-25'],['12-01', '02-28'],	["12-25 +1", "03-24"],['12-25 +1', '04-30'],['09-04', '02-25'],	['10-01', '02-28'],['09-01', '07-31'],	['10-01', '03-28'],	['09-01', '03-24'],	['10.05', 'Tavaszi óraátállítás'],
+['10-01', 'Pünkösdvasárnap -1'],                ['10-01','03-30 -1'],['10.01', '04.30'],['10-31', '02-28'],['09-01', 'Hamvazószerda -1'],['12-24', 'utolsó tanítási nap'],['10.01', '03.30'],['október utolsó vasárnapja', '03-25'],	['10-01', '05-01 -1'],	['12-25', 'Tavaszi óraátállítás -1'],['Őszi óraátállítás', '02-28'],	['szeptember 1. vasárnapja', '03-28'],
+            ['10-01', '06-30'],    ['Őszi óraátállítás', '03-25'],['12-01', '02-28'],	["12-25 +1", "03-24"],['12-25 +1', '04-30'],['09-04', '02-25'],	['10-01', '02-28'],['09-01', '07-31'],	['10-01', '03-28'],	['09-01', '03-24'],	['10.05', 'Tavaszi óraátállítás'],
                 ['10-23', '02-28'],['Virágvasárnap', 'Advent I. vasárnapja -1'],['10-31', '03-31'],['10-26', '03-28'], ['10-30', '03-25'],['10-01', '03-30'],['11-01', 'Advent I. vasárnapja'],	['09-30', '04-07'],['09-01', '05-31 -1'],['09-03', '06-30'],	['október utolsó vasárnapja', 'március utolsó szombatja'],
                 ['Advent I. vasárnapja', 'Virágvasárnap -1'],['10-15', '04-14'],['10-30', '03-26'],	['10-28', '03-24'],	['10-01', '05-31'],	['10-04', '04-30'],['10-01', '03-25'],['október második vasárnapja +1', '05-31'],	['12-25', '03-25'],	['11-01', '05-31 -1'],['10.01.', '03.31.'],
                 ['10-05', 'Tavaszi óraátállítás -1'],['10-27', '05-31'],['11-01', '05-31'],['11-01','03-15'],['10-01', '03-31'],['10-31', '03-27'],	['11-01', 'Húsvétvasárnap -1'],['Őszi óraátállítás', '02-27'],	['09-03', '06-30'],['12-25', 'utolsó tanítási nap -1'],	['10-05', '06-14'],
                 ['10-02', '03-29'],['10-26', '03-29'],['10-29', '03-24'],['10-01', '03-29'],	['09-29', '04-24'],	['11-01', '03-25'],	['10-30', '04-30'],	['szeptember 1', '03.31'],['10-03', '03-16'],
                 ['09-30 +1', 'Tavaszi óraátállítás'],['10-01', '03.31'],['október első vasárnapja', 'Tavaszi óraátállítás'],['11-01', '03-01 -1'],['10-27', '03-30'],['10-01', '04-30'],	['12-25', '03-29'],['09-01', 'Húsvétvasárnap'],['10-27', '03-29'],['Advent I. vasárnapja +1', 'Húsvétvasárnap']	,	['10-15', 'Tavaszi óraátállítás'],
-                ['10-01', '03-01 -1'],['10-26', 'Tavaszi óraátállítás -1'],['szeptember utolsó vasárnapja', '03-31'],['11-01', '03-29'],['09-01', '03-31'],['09-01', '03-31'],['09-02', '04-30'],['Őszi óraátállítás', 'Tavaszi óraátállítás'],['11-01', '04-30'],['Őszi óraátállítás', 'Advent I. vasárnapja -1'],['11-01', '03-30'],['10-31', '03-26'],['10-01', '03-23'],	['szeptember utolsó vasárnapja', 'május első vasárnapja'],
-                ['09-27', '03-30 -1'],['10-29', '03-26'],['szeptember utolsó vasárnapja', 'március utolsó vasárnapja'],['10-15', '02-28'],['10-02', '04-30'],['09-01', '04-05'],['12-25', '03-31 -1'],['09-10', '03-30'],['Őszi óraátállítás', 'Tavaszi óraátállítás -1'],	['09-30', '04-23'], 	['10-01', 'Húsvétvasárnap'],['10-02', '03-24'], 	['09-01', '12-31 -1'], 		['10-01', 'március utolsó vasárnapja'],	['augusztus utolsó vasárnapja', 'Úrnapja'],
-                ['Őszi óraátállítás +1', '03-24'],['09-13', 'Húsvétvasárnap -1'],['szeptember 1. vasárnapja', '03-28'],['09-01', '05-31'],    	['11-01', '03-31']  , ['11-01', '02-28'], ['12-25', '06-30'], ['12-25', '04-23'],	['10-15', '03-14'],	['09-02', '05-31'],['05-01', '09-31'],                	['10-01', 'március utolsó vasárnapja -1'], ['11-01', 'Húsvétvasárnap'], ['09-02', '06-06'],	['09-30', '04-24'], ['12-25', '03-31'], 	['szeptember utolsó vasárnapja +1', 'Húsvétvasárnap -1'],	['11-01', '01-31'], 	['10.01', '03.31'], ['10.01', '03.31 -1'], 	['10.01', '04.30 -1'],['12-25', 'Húsvéthétfő']
+            	['10-15', '04-30'],['10-01', '03-01 -1'],['10-26', 'Tavaszi óraátállítás -1'],['szeptember utolsó vasárnapja', '03-31'],['11-01', '03-29'],['09-01', '03-31'],['09-01', '03-31'],['09-02', '04-30'],['Őszi óraátállítás', 'Tavaszi óraátállítás'],['11-01', '04-30'],['Őszi óraátállítás', 'Advent I. vasárnapja -1'],['11-01', '03-30'],['10-31', '03-26'],['10-01', '03-23'],	['szeptember utolsó vasárnapja', 'május első vasárnapja'],
+            ['09-29', 'március utolsó vasárnapja -1'],    ['október utolsó vasárnapja', 'március utolsó vasárnapja -1'],['09-08','03-31'],['09-27', '03-30 -1'],['10-29', '03-26'],['szeptember utolsó vasárnapja', 'március utolsó vasárnapja'],['10-15', '02-28'],['10-02', '04-30'],['09-01', '04-05'],['12-25', '03-31 -1'],['09-10', '03-30'],['Őszi óraátállítás', 'Tavaszi óraátállítás -1'],	['09-30', '04-23'], 	['10-01', 'Húsvétvasárnap'],['10-02', '03-24'], 	['09-01', '12-31 -1'], 		['10-01', 'március utolsó vasárnapja'],	['augusztus utolsó vasárnapja', 'Úrnapja'],
+            ['09-30','03-26'],['Őszi óraátállítás +1', '03-24'],['09-13', 'Húsvétvasárnap -1'],['szeptember 1. vasárnapja', '03-28'],['09-01', '05-31'],    	['11-01', '03-31']  , ['11-01', '02-28'], ['12-25', '06-30'], ['12-25', '04-23'],	['10-15', '03-14'],	['09-02', '05-31'],['05-01', '09-31'],                	['10-01', 'március utolsó vasárnapja -1'], ['11-01', 'Húsvétvasárnap'], ['09-02', '06-06'],	['09-30', '04-24'], ['12-25', '03-31'], 	['szeptember utolsó vasárnapja +1', 'Húsvétvasárnap -1'],	['11-01', '01-31'], 	['10.01', '03.31'], ['10.01', '03.31 -1'], 	['10.01', '04.30 -1'],['12-25', 'Húsvéthétfő']
             ] ) ) { 
             $periodName = 'Tél';
         }        
         // Nyáron
         else if ( in_array( [$mise->tol, $mise->ig], [
-                ['Húsvétvasárnap +1', '09-30'],['Tavaszi óraátállítás', '11-04'],['05-01', '10-01'],['04-15', '08-31'],['04-05', '08-31'],['04-25', '09-28'],['03-29', 'szeptember 1. vasárnapja -1'],['03-27', '10-29'],['03-25', '10-27'],	['03-30', '09-30'],['Húsvétvasárnap', 'október utolsó szombatja'],['03-15', '10-14'],	['03-25', '10-01'],['03-17', '10-02'],['06-15', '10-04'],
+            ['05-01', '10-14'],    ['március utolsó vasárnapja', '09-28'],['március utolsó vasárnapja', 'október utolsó vasárnapja -1'],['03-27','09-29'],['04-01','03-30 -1'],['Húsvétvasárnap +1', '09-30'],['Tavaszi óraátállítás', '11-04'],['05-01', '10-01'],['04-15', '08-31'],['04-05', '08-31'],['04-25', '09-28'],['03-29', 'szeptember 1. vasárnapja -1'],['03-27', '10-29'],['03-25', '10-27'],	['03-30', '09-30'],['Húsvétvasárnap', 'október utolsó szombatja'],['03-15', '10-14'],	['03-25', '10-01'],['03-17', '10-02'],['06-15', '10-04'],
                 ['Tavaszi óraátállítás', '09-26 -1'],['03-30', '08-31 -1'],['Húsvéthétfő', 'szeptember utolsó vasárnapja'],['04-01', '08-31'],['05-01', '11-30'],['03-30', '10-01 -1'],['05-01', '09-01'],['03-30', '10-25'],['03-25', '10-28'],['Tavaszi óraátállítás', '09-30'],	['05-29', '09-03'],['04-01', '10-01 -1'],['04.01', '09.30'],['03-01', '05-21 -1'],
                 ['03-01', '11-30'],['Húsvétvasárnap', '09-12'],['03-29', 'október első vasárnapja -1'],['05-01', '09-01 -1'],['04-01', '09-09 -1'],['06-01', '09-31'],['04-01', '10-31'],['03-31', '09-30'],['március utolsó vasárnapja', '09-30'],['06.01 +1', 'október második vasárnapja -1'],	['Húsvéthétfő +1', 'szeptember utolsó vasárnapja -1'],
                 ['03-01', '10-14'],['03-30', 'szeptember 2. vasárnapja'],['Tavaszi óraátállítás', 'Őszi óraátállítás'],['04-24', '09-29'],	['05-01', '10-03'],['04-01', '10-30'],['03-31', '10-31'],['03-27', '10-30'],	['06-01', '10-31'],	['Tavaszi óraátállítás', '10.04'],
@@ -706,8 +706,8 @@ class Migrate extends \Html\Html {
 
         // Tanítási időben
         else if ( in_array( [$mise->tol, $mise->ig], [
-                ['szeptember 2. vasárnapja +1', 'június 2. vasárnapja -1'],['09-02', '06-02'],['12-26', 'utolsó tanítási nap'],	['09-01', '06-29'],	['08-31 +1', '04-27'],	['09-08', '06-01'],
-                ['09-01', '03-30'],['10-01', '0331'],['09-01', '06-31'],['első tanítási nap', 'utolsó tanítási nap'],['első tanítási nap', 'utolsó tanítási nap -1'],['09-08', '06-23 -1'],
+                ['09-01', '03-26'],['szeptember 2. vasárnapja +1', 'június 2. vasárnapja -1'],['09-02', '06-02'],['12-26', 'utolsó tanítási nap'],	['09-01', '06-29'],	['08-31 +1', '04-27'],	['09-08', '06-01'],
+                ['09-01', '03-30'],['09-01','05-30'],['10-01', '0331'],['09-01', '06-31'],['első tanítási nap', 'utolsó tanítási nap'],['első tanítási nap', 'utolsó tanítási nap -1'],['09-08', '06-23 -1'],
                 ['szeptember 1. vasárnapja', 'május első szombatja -1'],['09-09', '05-15'],['08-24', '06-22'],['09-01', '06-15'],['09-01', '04-30'],	['szeptember 2. vasárnapja', 'utolsó tanítási nap'],
                 ['szeptember 2. vasárnapja', 'május első vasárnapja'],['08-31', '06-01'],['09-01', '06-30'],['09-01', '06-14'],	['09-01', 'utolsó tanítási nap'],['szeptember 1. vasárnapja', 'június első vasárnapja'],
                 ['szeptember 1. vasárnapja', 'Úrnapja -1'],['08-29', '06-04'],['09-30 +1', '05-01'],	['09-01', '06-01 -1'],
@@ -717,9 +717,9 @@ class Migrate extends \Html\Html {
         }
         // Nyári szünetben
         else if ( in_array( [$mise->tol, $mise->ig], [
-                	['05-01', '09-08'],['május első vasárnapja', 'augusztus utolsó vasárnapja'],['Május 3. vasárnapja', 'szeptember 2. vasárnapja -1'],['07-16', '08-31'],['06-23', '08-23'],['06-11', '08-31'],['06-03', '09-01'],['07.01', '09.01.'],['utolsó tanítási nap +1', '08-31'],['06-02', '08-30'],['június első vasárnapja', 'augusztus utolsó vasárnapja -1'],['utolsó tanítási nap +1', 'szeptember 1. vasárnapja -1'],['06-15 +1', '09-01 -1'],['06-30', '08-31'],['07-01', '08-31'],	['06-16', '08-31'],['06-15', '08-31'],['utolsó tanítási nap +1', '0831'],	['07-01', '09-30'], 	['június 2. vasárnapja', 'szeptember 2. vasárnapja'],	['utolsó tanítási nap', 'első tanítási nap -1'],	['06-30', '08-30'],	['06-23', '09-07'],
-                ['03-31', '08-31'],['Pünkösdvasárnap', '09-02'],['06-06', '08-31'],['06-01 +1', '09-30'],['06-01', '08-30'],['06-01', '08-31'],['06-01', '09-30'],['06-01', '09-01'],['utolsó tanítási nap', 'szeptember 2. vasárnapja'],	['07-01', '10-01'],	['05-01', '08-31'],	['07-01', '08-30'],	['06-29 +1', '09-01 -1'],['04-28', '08-31'],['06-15 +1', '08-31'],	['Nagycsütörtök', '08-31'],
-               	['05-16', '09-08'],['június utolsó vasárnapja', '08-28'],['június 2. vasárnapja', '08-31'],['június első vasárnapja', 'szeptember 1. vasárnapja'],['utolsó tanítási nap', '06-30'],['utolsó tanítási nap +1','első tanítási nap -1'],['05-21', '08-31'],['07-05', '08-23'],['Pünkösdvasárnap', '09-30'],['Június 3. vasárnapja', 'szeptember 1. vasárnapja'],	['06-15', '09-15'],['06-29', '08-31'],	['06-02', '09-07'],
+                	['03-20', '09-02'],['05-01', '09-08'],['május első vasárnapja', 'augusztus utolsó vasárnapja'],['Május 3. vasárnapja', 'szeptember 2. vasárnapja -1'],['07-16', '08-31'],['06-23', '08-23'],['06-11', '08-31'],['06-03', '09-01'],['07.01', '09.01.'],['utolsó tanítási nap +1', '08-31'],['06-02', '08-30'],['június első vasárnapja', 'augusztus utolsó vasárnapja -1'],['utolsó tanítási nap +1', 'szeptember 1. vasárnapja -1'],['06-15 +1', '09-01 -1'],['06-30', '08-31'],['07-01', '08-31'],	['06-16', '08-31'],['06-15', '08-31'],['utolsó tanítási nap +1', '0831'],	['07-01', '09-30'], 	['június 2. vasárnapja', 'szeptember 2. vasárnapja'],	['utolsó tanítási nap', 'első tanítási nap -1'],	['06-30', '08-30'],	['06-23', '09-07'],
+        ['07-01', '08-20'],    ['utolsó tanítási nap', '08-31'],    ['03-31', '08-31'],['Pünkösdvasárnap', '09-02'],['06-06', '08-31'],['06-01 +1', '09-30'],['06-01', '08-30'],['06-01', '08-31'],['06-01', '09-30'],['06-01', '09-01'],['utolsó tanítási nap', 'szeptember 2. vasárnapja'],	['07-01', '10-01'],	['05-01', '08-31'],	['07-01', '08-30'],	['06-29 +1', '09-01 -1'],['04-28', '08-31'],['06-15 +1', '08-31'],	['Nagycsütörtök', '08-31'],
+               	['05-16', '09-08'],['06-01','09-07'],['június utolsó vasárnapja', '08-28'],['június 2. vasárnapja', '08-31'],['június első vasárnapja', 'szeptember 1. vasárnapja'],['utolsó tanítási nap', '06-30'],['utolsó tanítási nap +1','első tanítási nap -1'],['05-21', '08-31'],['07-05', '08-23'],['Pünkösdvasárnap', '09-30'],['Június 3. vasárnapja', 'szeptember 1. vasárnapja'],	['06-15', '09-15'],['06-29', '08-31'],	['06-02', '09-07'],
                 ['07-18', '08-27'],['06-19 +1', '08-28 -1'],['Júius 3. vasárnapja', 'szeptember 1. vasárnapja'], ['07-24', '08-27'], ['utolsó tanítási nap', 'első tanítási nap'], 	['Húsvétvasárnap', 'szeptember utolsó vasárnapja'], ['június első vasárnapja +1', 'szeptember 1. vasárnapja -1'],['06-27', '09-06'],	['Virágvasárnap', '08-31']	
         ] ) ) { 
             $periodName = 'Nyári szünet';
@@ -797,7 +797,7 @@ class Migrate extends \Html\Html {
             $periodName = 'Szeptember';                                    
         }
         // Októberben
-        else if ( in_array( [$mise->tol, $mise->ig], [['10-01', '10-31']] ) ) { 
+        else if ( in_array( [$mise->tol, $mise->ig], [['10-01', '10-31'],['10-01', 'október utolsó vasárnapja -1']] ) ) { 
             $periodName = 'Október';            
         }
         // Novemberben
@@ -818,7 +818,7 @@ class Migrate extends \Html\Html {
             } else if( in_array($mise->tol,['Úrnapja','Úrnapja -8'])) {
                 $periodName = 'Úrnapja';
             } else if( in_array($mise->tol,['01-01'])) {
-                $periodName = 'Szűz Műria, Isten anyja (Újév)';
+                $periodName = 'Szűz Mária, Isten anyja (Újév)';
             } else if( in_array($mise->tol,['01-06'])) {
                 $periodName = 'Vízkereszt';
             } else if( in_array($mise->tol,['08-15'])) {
