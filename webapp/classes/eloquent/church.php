@@ -545,7 +545,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
      * 
      * names
      * alternative_names
-     * liturgiatv
      * denomination
      * holders
      * links
@@ -615,34 +614,6 @@ class Church extends \Illuminate\Database\Eloquent\Model {
 
     }
 
-    public function getLiturgiatvAttribute($value) {
-        $litapi = new \ExternalApi\LiturgiatvApi();
-        $datas = $litapi->getByChurch($this->id); 
-        foreach($datas as $key => $data) {
-            if(!isset($data->duration)) $data->duration = 60;
-            
-            //https://github.com/molnarm/zsolozsma#API
-            $minutesToStart  = ( strtotime($data->date." ".$data->time) - time() ) / 60 ;
-            if( $minutesToStart > 15 ) {
-                $datas[$key]->state = 1;
-                $datas[$key]->iconstate = 'disabled';
-            } elseif ($minutesToStart > 0 ) {
-                $datas[$key]->state = 2;
-                $datas[$key]->iconstate = 'higlight';
-            } elseif ($minutesToStart > -15 ) {
-                $datas[$key]->state = 3;
-                $datas[$key]->iconstate = 'live';
-            } elseif ( $minutesToStart > 0 - $data->duration - 15 )  {
-                $datas[$key]->state = 4;
-                $datas[$key]->iconstate = 'higlight';
-            } else {
-                unset($datas[$key]);
-            }            
-        }
-                                                
-        return $datas;
-    }
-    
     public function getDenominationAttribute($value) {
         return  in_array($this->egyhazmegye,[34,17,18]) ? 'greek_catholic' : 'roman_catholic';
     }
