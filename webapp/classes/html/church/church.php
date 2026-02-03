@@ -19,7 +19,7 @@ class Church extends \Html\Html {
         if(!$church) {
             throw new \Exception("Church with tid = '$tid' does not exist.");
         }
-        $church = $church->append(['readAccess','writeAccess','liturgiatv','accessibility']);
+        $church = $church->append(['readAccess','writeAccess','accessibility']);
         
         if (!$church->readAccess) {
             throw new \Exception("Read access denied to church tid = '$tid'");
