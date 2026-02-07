@@ -19,7 +19,7 @@ INSERT INTO `cal_periods` (`id`, `name`, `weight`, `start_month_day`, `end_month
 (6, 'Utolsó tanítási nap', 11, NULL, NULL, NULL, NULL, NULL, 0, '2025-06-30', '2025-06-30', 0, '#FB8C00', NULL),
 (7, 'Tél', 4, NULL, NULL, 4, 3, 0, 1, '2025-06-30', '2025-06-30', 1, '#6EC6FF', NULL),
 (8, 'Nyár', 5, NULL, NULL, 3, 4, 0, 1, '2025-06-30', '2025-06-30', 1, '#FFD480', NULL),
-(10, 'Egész évben', 1, NULL, NULL, 1, 2, 1, 1, '2025-06-30', '2025-06-30', 1, '#CCCCCC', NULL),
+(10, 'Egész évben', 1, NULL, NULL, 1, 2, 1, 1, '2025-06-30', '2025-06-30', 1, '#807e7e', NULL),
 (13, 'Nyári szünet', 3, NULL, NULL, 6, 5, 0, 1, '2025-10-11', '2025-10-11', 1, '#FFCC66', NULL),
 (14, 'Advent I. vasárnapja', 15, NULL, NULL, NULL, NULL, NULL, 0, '2025-11-15', '2025-11-15', 0, NULL, NULL),
 (15, 'Advent', 12, NULL, NULL, 14, 16, NULL, 1, '2025-11-15', '2025-11-15', 1, '#6A0DAD', NULL),
