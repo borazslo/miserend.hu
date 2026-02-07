@@ -1,0 +1,33 @@
+{
+    "mappings": {
+        "properties": {
+            "church_id": { 
+                "type": "integer" 
+            },
+            "mass_id": { 
+                "type": "integer" 
+            },
+            "start_date": { 
+                "type": "date" 
+            },
+            "title": { 
+                "type": "text" 
+            },
+            "types": { 
+                "type": "keyword" 
+            },
+            "rite": { 
+                "type": "keyword" 
+            },
+            "duration": { 
+                "type": "object" 
+            },
+            "lang": { 
+                "type": "keyword" 
+            },
+            "comment": { 
+                "type": "text" 
+            }
+        }
+    }
+}
