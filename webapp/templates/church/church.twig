@@ -93,11 +93,6 @@
     {% else %}
         <span class="alap">Nincs rendszeres szentmise.<br/><br/></span>
     {% endif %}
-    
-    {% if liturgiatv is not empty %}
-        {% include 'church/_panelliturgiatv.twig' %}
-    {% endif %}
-
 
     {% if misemegj %}
         {% include "panel.twig" with {title:'Kapcsolódó információk','body': misemegj|raw|nl2br } %}    
