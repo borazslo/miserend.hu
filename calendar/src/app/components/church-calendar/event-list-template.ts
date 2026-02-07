@@ -28,17 +28,18 @@ export function eventListTemplate(vars: EventListTemplateVars): string {
   if (Array.isArray(types) && types.length > 0) {
     for (const t of types) {
       const tLower = String(t).toLowerCase();
-      typesHtml += `<img class="type-icon" style="height:18px; margin-left:6px" title="${t}" src="/cal_images/types/${tLower}.png" alt="${t}" />`;
+      typesHtml += `<img class="type-icon" style="height:18px; margin-left:6px" title="${t}" src="/cal_images/types/${tLower}.png" alt="${t}" />aa`;
     }
   }
 
   return `
     <div class="fc-list-item-container" style="display:flex;align-items:center;gap:6px;">
       ${timeHtml}
-      <div class="fc-list-item-main" style="display:flex;align-items:center;gap:6px;">
+      <div class="fc-list-item-main" style="display:flex;align-items:center;gap:60px;">
         ${titleHtml}
-        ${flagHtml}
+        ${flagHtml} ssss
         ${typesHtml}
+        ssssss
       </div>
     </div>
   `;

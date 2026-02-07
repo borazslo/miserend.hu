@@ -29,8 +29,8 @@
 ></full-calendar>
 
 <!-- Template used to render FullCalendar list items via Angular bindings.
-     Context variables provided from component: timeText, title, lang, types -->
-<ng-template #eventListTemplate let-timeText="timeText" let-title="title" let-lang="lang" let-types="types">
+     Context variables provided from component: timeText, title, lang, types, comment -->
+<ng-template #eventListTemplate let-timeText="timeText" let-title="title" let-lang="lang" let-types="types" let-comment="comment">
   <div class="fc-list-item-container d-flex align-items-center" style="gap:6px;">
     <span class="fc-list-item-time" *ngIf="timeText">{{ timeText }}</span>
     <div class="fc-list-item-main d-flex align-items-center" style="gap:6px;">
@@ -44,6 +44,10 @@
         <ng-container *ngFor="let t of types">
           <img class="type-icon" style="height:18px; margin-left:6px" [matTooltip]="t | translate" [src]="'/cal_images/types/' + (t | lowercase) + '.png'" [alt]="t | translate" />
         </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="comment">          
+          <span class="material-icons" title="{{ comment }}" style="margin-left:6px; height:18px; font-size:18px; vertical-align:top;">info</span>
       </ng-container>
     </div>
   </div>

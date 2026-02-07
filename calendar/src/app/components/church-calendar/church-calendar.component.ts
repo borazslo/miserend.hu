@@ -966,27 +966,66 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       const viewType = info.view?.type || (this.calendarComponent ? this.calendarComponent.getApi().view.type : '');
       const isListView = typeof viewType === 'string' && viewType.startsWith('list');
 
+      // helper to escape attribute values
+      const escapeAttr = (s: any) => {
+        if (s === null || s === undefined) return '';
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+          .replace(/\r?\n/g, ' ');
+      };
+
+      // Resolve mass info (if available) so both list and non-list views can show flags/types/comment
+      const massId = info.event.extendedProps?.massId;
+      let lang = null as string | null;
+      let types: string[] = [];
+      let comment: string | null = null;
+      let mass: any | undefined = undefined;
+      if (massId != null) {
+        if (this.changes && this.changes.has(massId)) {
+          mass = this.changes.get(massId);
+        } else if (this.masses && this.masses.has(massId)) {
+          mass = this.masses.get(massId);
+        }
+        if (mass && mass.lang) lang = mass.lang;
+        if (mass && mass.types) types = mass.types;
+        if (mass && mass.comment) comment = mass.comment;
+      }
+
+      const flagMap: Record<string, string> = { hu: '🇭🇺', en: '🇬🇧', de: '🇩🇪', sk: '🇸🇰', ro: '🇷🇴' };
+
+      let flagHtml = '';
+      if (lang) {
+        const langLower = String(lang).toLowerCase();
+        const src = `/cal_images/flags/${langLower}.svg`;
+        flagHtml = `<img class="type-icon" style="height:18px; margin-left:6px" title="${escapeAttr(lang)}" src="${src}" alt="${escapeAttr(lang)}" />`;
+      }
+
+      let typesHtml = '';
+      if (Array.isArray(types) && types.length > 0) {
+        for (const t of types) {
+          const tLower = String(t).toLowerCase();
+          typesHtml += `<img class="type-icon" style="height:18px; margin-left:6px" title="${escapeAttr(t)}" src="/cal_images/types/${tLower}.png" alt="${escapeAttr(t)}" />`;
+        }
+      }
+
+      let commentHtml = '';
+      if (comment) {
+        const escaped = escapeAttr(comment);
+        // mat-icon and Angular directives won't be processed when inserting raw HTML,
+        // so use the Material Icons ligature (or a simple <i> / <span> with the icon font) and title for tooltip.
+        commentHtml = `<span class="material-icons" title="${escaped}" style="height:22px; font-size:22px; vertical-align:middle;">info</span>`;
+      }
+
       // For list views build a list-style row (with optional flag)
       if (isListView) {
         // Render the Angular template into DOM nodes and serialize to HTML so translation pipes
         // and other Angular bindings work.
-        const massId = info.event.extendedProps?.massId;
-        let lang = null as string | null;
-        let types: string[] = [];
-        let mass: any | undefined = undefined;
-        if (massId != null) {
-          if (this.changes && this.changes.has(massId)) {
-            mass = this.changes.get(massId);
-          } else if (this.masses && this.masses.has(massId)) {
-            mass = this.masses.get(massId);
-          }
-          if (mass && mass.lang) lang = mass.lang;
-          if (mass && mass.types) types = mass.types;
-        }
-
-        // Create embedded view from ng-template, pass context values and serialize
         if (this.eventListTemplateRef && this.eventListTemplateContainer) {
-          const ctx = { timeText: info.timeText || '', title: info.event.title || '', lang: lang, types: types };
+          const ctx = { timeText: info.timeText || '', title: info.event.title || '', lang: lang, types: types, comment: comment };
           const view: EmbeddedViewRef<any> = this.eventListTemplateContainer.createEmbeddedView(this.eventListTemplateRef, ctx);
           view.detectChanges();
           // serialize root nodes
@@ -996,11 +1035,49 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
         }
       }
 
-      // For non-list views return simple markup using FullCalendar's standard classes so
-      // default styles (colors, layout) are preserved.
-      const timeHtml = info.timeText ? `<span class="fc-event-time">${info.timeText}</span>` : '';
+      // For non-list views: in month view (dayGridMonth) we intentionally omit extra icons
+      // (flag/types/comment). Other non-list views (day/time) may show icons.
+      const isMonthView = viewType === 'dayGridMonth';
+
+      // Format time: in month view show hours:minutes (e.g. 9:00 or 17:15).
+      // For other views use FullCalendar's info.timeText so it remains consistent with view settings.
+      let timeHtml = '';
+      if (info.timeText) {
+        if (isMonthView) {
+          // Try to derive precise minutes from the event start if available
+          const startDate = info.event?.start ? new Date(info.event.start) : (info.event?.startStr ? new Date(info.event.startStr) : null);
+          if (startDate) {
+            const h = startDate.getHours();
+            const m = startDate.getMinutes();
+            const mins = ('0' + m).slice(-2);
+            // Bold time in month view
+            timeHtml = `<span class="fc-event-time" style="font-weight:700">${h}:${mins}</span>`;
+          } else {
+            // Fallback to the provided timeText
+            timeHtml = `<span class="fc-event-time" style="font-weight:700">${escapeAttr(info.timeText)}</span>`;
+          }
+        } else {
+          timeHtml = `<span class="fc-event-time">${info.timeText}</span>`;
+        }
+      }
+
+      const dotHtml = `<span class="fc-list-event-dot" style="background-color:${info.event.backgroundColor || '#3788d8'}; border-color:${info.event.borderColor || '#3788d8'};"></span>`;
       const titleHtml = `<span class="fc-event-title">${info.event.title}</span>`;
-      return { html: `${timeHtml} ${titleHtml}` };
+      
+      if (isMonthView) {
+        // Minimal markup for month view: bold time, normal-weight title, no icons by default
+        const detailsHtml = `<span class="material-icons" title="További információ" style="margin-left:6px; height:18px; font-size:18px; vertical-align:top;">info</span>`;
+        const monthHtml = `${timeHtml} ${dotHtml} <span class="fc-event-title" style="font-weight:400">${escapeAttr(info.event.title)}</span>`;
+        const shouldShowDetails =
+          (lang && String(lang).toLowerCase() !== 'hu') ||
+          (Array.isArray(types) && types.length > 0) ||
+          !!comment;
+        return { html: shouldShowDetails ? `${monthHtml} ${detailsHtml}` : monthHtml };
+      }
+
+      // For other non-list views include icons
+      const combinedHtml = `${timeHtml} <span class="fc-event-title-wrap">${titleHtml} ${flagHtml} ${typesHtml} ${commentHtml}</span>`;
+      return { html: combinedHtml };
     } catch (e) {
       return { html: info.event.title };
     }
