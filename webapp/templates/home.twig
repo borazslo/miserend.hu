@@ -408,6 +408,15 @@
                                 }
                             }
 
+                            // set title (hover) on the active button to show the resolved date
+                            if ($btn.length) {
+                                if (dateStr) {
+                                    $btn.attr('title', dateStr);
+                                } else {
+                                    $btn.removeAttr('title');
+                                }
+                            }
+
                             if (dateStr) {
                                 $('#mikor').val(dateStr);
                                 $('#mikordatum').val(dateStr);
@@ -435,6 +444,32 @@
                                     $('#mass_datepicker').hide();
                                 }
                             });
+
+                            // Adjust quick button labels/visibility based on today's weekday
+                            (function(){
+                                var today = new Date();
+                                var day = today.getDay(); // 0 = Sunday, 6 = Saturday
+                                var $group = $('#mass_quick_group');
+                                if (day === 0) {
+                                    // Today is Sunday -> show "Ma, vasárnap" and hide explicit Sunday button
+                                    $group.find('.mass-quick[data-value="today"]').text('Ma, vasárnap');
+                                    $group.find('.mass-quick[data-value="sunday"]').hide();
+                                } else if (day === 6) {
+                                    // Today is Saturday -> "Holnap, vasárnap" on Tomorrow button and hide Sunday button
+                                    $group.find('.mass-quick[data-value="tomorrow"]').text('Holnap, vasárnap');
+                                    $group.find('.mass-quick[data-value="sunday"]').hide();
+                                } else {
+                                    // Normal weekdays: ensure defaults
+                                    $group.find('.mass-quick[data-value="today"]').text('Ma');
+                                    $group.find('.mass-quick[data-value="tomorrow"]').text('Holnap');
+                                    $group.find('.mass-quick[data-value="sunday"]').show();
+                                }
+
+                                // Set hover titles for the quick buttons so users see the resolved date on hover
+                                $group.find('.mass-quick[data-value="today"]').attr('title', computeDateForValue('today'));
+                                $group.find('.mass-quick[data-value="tomorrow"]').attr('title', computeDateForValue('tomorrow'));
+                                $group.find('.mass-quick[data-value="sunday"]').attr('title', computeDateForValue('sunday'));
+                            })();
 
                             // If the server prefilled values, reflect them
                             var initMikor = ($('#mikor').val() || '').toString();
