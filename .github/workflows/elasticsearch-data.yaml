@@ -1,0 +1,47 @@
+name: 🐳 Build & publish elasticsearch data
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to publish (e.g. 2026.2.8, ci, test)"
+        required: true
+        default: "dev"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download elasticsearch data snapshot
+        run: |
+          curl -fsSL https://nc.lxs.cloud/s/WPL4tyQjWXbp6Qa/download -o elasticsearch_data.tar.gz
+
+      - name: Verify checksum
+        run: |
+          echo "f7af916e615dbf744d20534f40e10d2772e258e4febadb45f963ef36af9db994  elasticsearch_data.tar.gz" \
+            | sha256sum -c -
+
+      - name: Resolve image tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "TAG=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build & push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/elasticsearch/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/miserend-elasticsearch-data:${{ steps.tag.outputs.TAG }}
