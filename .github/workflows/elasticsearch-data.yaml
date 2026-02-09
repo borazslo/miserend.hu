@@ -27,6 +27,12 @@ jobs:
           echo "f7af916e615dbf744d20534f40e10d2772e258e4febadb45f963ef36af9db994  elasticsearch_data.tar.gz" \
             | sha256sum -c -
 
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Resolve image tag
         id: tag
         run: |
