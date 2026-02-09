@@ -17,17 +17,6 @@ Ez a fő Compose fájl, amely a legfontosabb szolgáltatásokat írja le:
 
 A szolgáltatások egy belső hálózaton kommunikálnak egymással. Ez a fájl az alapértelmezett, ha a teljes rendszert szeretnéd futtatni (pl. helyi teszteléshez vagy éles környezethez).
 
-## compose.init.yml – Elasticsearch és adat inicializálás (dev/test)
-Ez a fájl egy speciális, csak inicializálásra szolgáló szolgáltatást (data-init) tartalmaz, amely:
-
-- Megvárja, amíg az Elasticsearch és a miserend konténer elindul.
-- Beállítja az Elasticsearch cluster és index paramétereit (pl. replikák száma, disk watermark).
-- Ha a churches index még nem létezik, visszaállítja azt egy snapshotból (JSON fájlból).
-- Megvárja, amíg a miserend alkalmazás elérhető, majd elindít két cron feladatot HTTP-n keresztül.
-- Egy állapotfájllal (/state/initialized) biztosítja, hogy az inicializálás csak egyszer fusson le.
-
-Ez a fájl főleg fejlesztési és tesztelési környezetben hasznos, ahol gyakran kell újra inicializálni az adatokat.
-
 ## compose.kibana.yml – Kibana (opcionális)
 Ez a fájl egy opcionális Kibana szolgáltatást ad a stack-hez:
 

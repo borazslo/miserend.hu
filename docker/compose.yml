@@ -21,6 +21,11 @@ services:
       inner:
         aliases:
           - mysql
+  data-init:
+    image: ghcr.io/krisek/miserend-elasticsearch-data:2026.2.9
+    volumes:
+      - elasticsearch_data:/data
+    restart: "no"
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
     container_name: elasticsearch
@@ -28,6 +33,7 @@ services:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - xpack.security.enabled=false
+      - cluster.name=miserend
     ulimits:
       memlock:
         soft: -1
@@ -35,6 +41,8 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    depends_on:
+      - data-init
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
@@ -48,6 +56,9 @@ services:
        - miserend_tmp:/miserend/webapp/fajlok/tmp
     ports:
       - 8000:8000
+    depends_on:
+      - mysql
+      - elasticsearch
     environment: []
     networks:
       inner:

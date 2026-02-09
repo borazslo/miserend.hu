@@ -7,7 +7,7 @@ Csak [git](gttps://git-scm.com) és [Docker](https://docs.docker.com/engine/inst
 ```sh
 git clone https://github.com/borazslo/miserend.hu/
 cd miserend.hu
-docker-compose  -f docker/compose.yml -f docker/compose.init.yml  -f docker/compose.test.yml up
+docker-compose  -f docker/compose.yml  -f docker/compose.test.yml up
 ```
 
 Máris elérhető a http://localhost:8000 címen a miserend alkalmazás. Az `admin` felhasználóval be is lehet lépni az alapérelmezett jelszóval: `miserend`.
@@ -40,7 +40,7 @@ cd ..
 chmod 777 webapp/fajlok/tmp
 docker pull ghcr.io/borazslo/miserend.hu:{{ version }}
 docker tag ghcr.io/borazslo/miserend.hu:{{ version }} localhost/miserend.hu:latest
-docker-compose  -f docker/compose.yml -f docker/compose.init.yml -f docker/compose.dev.yml up
+docker-compose  -f docker/compose.yml -f docker/compose.dev.yml up
 ```
 
 Ahol a `{{ version }}` helyére (kapcsoszárojeleket is elhagyva), azt a verziót konténer image verziót kell beírni, amelyikkel dolgozni szeretnél.
@@ -83,7 +83,7 @@ docker tag ghcr.io/borazslo/miserend.hu:v2026.1.14 localhost/miserend.hu:latest
 ##### Kezdődjön a móka
 A docker compose valamennyi konténert szépen felépíti, bekonfigurálja, feltölti adatokkal, és elindítja:
 ```
-docker-compose  -f docker/compose.yml  -f docker/compose.init.yml -f docker/compose.dev.yml up
+docker-compose  -f docker/compose.yml  -f docker/compose.dev.yml up
 ```
 
 Máris elérhető a http://localhost:8000 címen a miserend alkalmazás. Az `admin` felhasználóval be is lehet lépni az alapérelmezett jelszóval: `miserend`.
