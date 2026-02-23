@@ -49,6 +49,12 @@ services:
       inner:
         aliases:
           - elasticsearch
+  tmp-init:
+    image: busybox
+    volumes:
+      - tmp:/data
+    command: sh -c "chown -R 33:33 /data"
+
   miserend:
     container_name: miserend
     image: ghcr.io/borazslo/miserend.hu:v2026.1.14
@@ -59,7 +65,9 @@ services:
     user: "www-data"
     depends_on:
       - mysql
+      - tmp-init
       - elasticsearch
+
     environment: []
     networks:
       inner:

@@ -46,13 +46,13 @@ Ez a fájl akkor hasznos, ha automatizált teszteket futtatsz, és szükséged v
 
 - Fejlesztéshez:
 ```
-docker compose -f compose.yaml - f compose.init.yml -f compose.dev.yml up
+docker compose -f compose.yaml -f compose.dev.yml up
 ```
 
 - Teszteléshez:
 
 ```
-docker compose -f compose.yml -f compose.init.yml -f compose.test.yml up
+docker compose -f compose.yml -f compose.test.yml up
 ```
 
 - Kibana hozzáadása:
@@ -67,7 +67,7 @@ A fájlokat egymásra rétegezve is használhatod, pl. fejlesztés közben Kiban
 ## Fontosabb tudnivalók
 A Compose fájlok egymásra épülnek, így csak a szükséges szolgáltatásokat adod hozzá a fő rendszerhez.
 
-Az inicializáló konténerek (data-init, elastic-init) csak egyszer futnak le, és nem maradnak futva.
+Az inicializáló konténerek (data-init, elastic-init, tmp-init) csak egyszer futnak le, és nem maradnak futva.
 
 A volume-ok biztosítják, hogy az adatbázis, Elasticsearch és ideiglenes fájlok tartósak maradjanak konténer újraindítás után is.
 

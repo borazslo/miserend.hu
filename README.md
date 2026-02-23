@@ -34,10 +34,7 @@ Elsősorban __linux__ alapú fejlesztésre van minden optimalizálva, de nem leh
 ### tl;dr
 ```sh
 git clone https://github.com/borazslo/miserend.hu/
-cd miserend.hu/webapp
-npm ci
-cd ..
-chmod 777 webapp/fajlok/tmp
+npm --prefix miserend.hu/webapp ci
 docker pull ghcr.io/borazslo/miserend.hu:{{ version }}
 docker tag ghcr.io/borazslo/miserend.hu:{{ version }} localhost/miserend.hu:latest
 docker-compose  -f docker/compose.yml -f docker/compose.dev.yml up
@@ -51,18 +48,12 @@ Ahol a `{{ version }}` helyére (kapcsoszárojeleket is elhagyva), azt a verzió
 ```
 git clone https://github.com/borazslo/miserend.hu/
 ```
-2. Telepítenünk kell a Javascript/CSS függőségeket
+#### Telepítenünk kell a Javascript/CSS függőségeket
 ```
 cd miserend.hu/webapp
 npm ci
 ```
-#### Hozzáférést kell adni a /tmp könyvtárhoz
 
-Jó adag ideiglenes fájlt tárolunk a gyorsabb működés érdekében. Ezek a webapp/fajlok/tmp könyvtárban gyűlnek. Alapértelmezetten viszont a weblapot kiszolgáló www-data nem tudja írni ezt a könyvtárat és sorra kapjuk a hibaüzeneteket, hogy "We could not save the cacheFile to..."
-```
-cd ..
-chmod 777 webapp/fajlok/tmp
-```
 #### Miserend docker image letöltése
 
 Természetesen magunk is felépíthetjük a helyi "miserend" docker conatinert, de sokkal gyorsabb és stabilabb, ha egy már kiadott release-t töltünk le és használunk. 
@@ -71,14 +62,14 @@ A github oldalunkon található [tag-elt release-k](https://github.com/borazslo/
 
 Például:
 ```
-docker pull ghcr.io/borazslo/miserend.hu:v2026.1.14
+docker pull ghcr.io/borazslo/miserend.hu:v2026.2.23
 ```
 ##### A letöltött image átnevezése
-A developer környezet a l```ocalhost/miserend.hu:latest``` image-t keresi, így az előbb letöltött változatnak adjunk egy megfelelő aliast. 
+A developer környezet a ```localhost/miserend.hu:latest``` image-t keresi, így az előbb letöltött változatnak adjunk egy megfelelő aliast. 
 
 Előbbi példát folytatva:
 ```
-docker tag ghcr.io/borazslo/miserend.hu:v2026.1.14 localhost/miserend.hu:latest
+docker tag ghcr.io/borazslo/miserend.hu:v2026.2.23 localhost/miserend.hu:latest
 ```
 ##### Kezdődjön a móka
 A docker compose valamennyi konténert szépen felépíti, bekonfigurálja, feltölti adatokkal, és elindítja:
@@ -105,14 +96,11 @@ Ha grafikus adatbázis elérésre lenne szükség, az [adminer](https://www.admi
 
 ## Elastisearch és Kibana
 
-Az alkalmazás keresőmotorját az Elasticsearch adja. A fent leírt standard konténer alapú telepítés során szépen elindul ez is. De kézzel kell feltölteni adatokkal legalább az első indítás után!
+Az alkalmazás keresőmotorját az Elasticsearch adja. A fent leírt standard konténer alapú telepítés során szépen elindul ez is. Sőt az elasticache-init konténer gondoskodik az inicializálásról. Azaz egy jó nagy fájlt lehúzva feltölti rögtön adatokkal is. 
 
-A templom keresőhöz a `Externalapi\ElasticsearchApi::updateChurches()` függvényt fut PHP cron-ból, a szentmisék kereséséhez a `Externalapi\ElasticsearchApi::updateMasses()` függvény. 
+#### Ezeket kézileg is lehet frissíteni:
 
-Ezeket kézileg is lehet frissíteni:
-[/index.php?q=cron&cron_id=38](http:/localhost:8000/index.php?q=cron&cron_id=38) és [/index.php?q=cron&cron_id=39](http:/localhost:8000/index.php?q=cron&cron_id=39)
-
-Első használatkor az elasticache-init konténer gondoskodik az inicializálásról.
+A templom kereső frissítéséhez az `Externalapi\ElasticsearchApi::updateChurches()` függvényt, a szentmisék keresésének frissítéséhez az `Externalapi\ElasticsearchApi::updateMasses()` függvényt kell futtatni. Legkönnyebb a [/index.php?q=cron&cron_id=38](http:/localhost:8000/index.php?q=cron&cron_id=38) és [/index.php?q=cron&cron_id=39](http:/localhost:8000/index.php?q=cron&cron_id=39) cron oldalak betöltése révén.
 
 Vigyázat! Az 5000 misézőhelyhez évente több mint 500 ezer (!) konkrét liturgikus esemény tartozik, így az updateMass() eltarthat fél óráig is! 
 
@@ -223,14 +211,6 @@ De szinte biztos, hogy a végén valami extra masszírozás kell.
 docker exec -it [mysql|mailcatcher|miserend] bash
 ```
 
-### ✅ Unit tesztek futtatása (hamarosan)
-
-```sh
-make test
-```
-
-Megjegyzés: Jelenleg nincs `phpunit` telepítve.
-
 ### 📦 Composer használata (interaktív módban):
 
 ```sh
@@ -241,16 +221,6 @@ docker exec miserend composer install|require|update
 
 - `master` ➜ staging környezet (`staging.miserend.hu`)
 - `production` ➜ éles honlap
-
-
-
-## Fájl jogosultságok
-
-Ha a fejlesztői környezetben a repót a miserend konténerbe mappeled előfordulhat, hogy a konténerben futó PHP nem tud (ideiglenes/cache) fájlokat írni, ilyenkor plusz írási jogot kell adnod az adott könyvtárra, pl:
-
-```sh
-chmod 777 webapp/fajlok/tmp
-```
 
 ## Éles / staging / UAT build
 Fejlesztés végén azonban egy megfelelő környezetbe való build kell, például:
