@@ -82,18 +82,6 @@ class Church extends \Html\Html {
         
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
 
-        //Convert to OSM ServiceTimes
-        if(isset($user->isadmin) AND $user->isadmin == 1)  {
-            $serviceTimes = new \ServiceTimes();
-            $serviceTimes->loadMasses($tid);
-			if(!isset($serviceTimes->error))
-				$this->service_times = print_r(preg_replace('/;/',";\n",$serviceTimes->string),1)."\n".$serviceTimes->linkForDetails;
-			else 
-				$this->service_times	= $serviceTimes->error;
-        }
-                
-       
-
         /*
           $staticmap = "kepek/staticmaps/" . $tid . "_227x140.jpeg";
           if (file_exists($staticmap))
