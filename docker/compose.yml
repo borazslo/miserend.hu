@@ -53,9 +53,10 @@ services:
     container_name: miserend
     image: ghcr.io/borazslo/miserend.hu:v2026.1.14
     volumes: 
-       - miserend_tmp:/miserend/webapp/fajlok/tmp
+       - tmp:/miserend/webapp/fajlok/tmp
     ports:
       - 8000:8000
+    user: "www-data"
     depends_on:
       - mysql
       - elasticsearch
@@ -70,4 +71,4 @@ networks:
 volumes:
   db_data: {}
   elasticsearch_data: {}
-  miserend_tmp: {}
+  tmp: {}

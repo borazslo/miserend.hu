@@ -153,6 +153,9 @@ class NearBy extends Api {
 	static function getLogFileInfo() {
 		$logFile = '../nearby.log';
 		if (!file_exists($logFile)) {
+
+			throw new \Exception("Log file '".$logFile."' does not exist.");
+
 			return [
 				'line_count' => 'N/A',
 				'file_size' => 'file does not exist'
