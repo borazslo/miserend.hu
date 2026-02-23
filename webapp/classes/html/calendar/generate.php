@@ -120,12 +120,13 @@ class Generate extends \Html\Calendar\CalendarApi {
      */
     public function createMassIndex(): void
     {
-        $massFilePath = '../docker/elasticsearch/mappings/mass.json';
+ 
+        $massFilePath = '../../../fajlok/elasticsearch/mappings/mass.json';
         if (!file_exists($massFilePath)) {
             throw new \Exception("File not found: " . $massFilePath);
         }
         $massData = file_get_contents($massFilePath);
-        $churchFilePath = '../docker/elasticsearch/mappings/church.json';
+        $churchFilePath = '../../../fajlok/elasticsearch/mappings/church.json';
         if (!file_exists($churchFilePath)) {
             throw new \Exception("File not found: " . $churchFilePath);
         }

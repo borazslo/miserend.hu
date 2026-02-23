@@ -186,19 +186,24 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		$elastic = new \ExternalApi\ElasticsearchApi();
 		
 		$elastic->deleteIndex('churches'); // Először töröljük az indexet, ha létezik. Ez nem baj, mert a putIndex úgyis létrehozza újra.
-		// Megnézzük, hogy létezik-e már a churches index és ha nem, akkor létrehozzuk
+				
+		
 		if(!$elastic->isexistsIndex('churches')) {
-						
-			$filePath = '../docker/elasticsearch/mappings/church.json';
-			if (!file_exists($filePath)) {
-				throw new \Exception("File not found: " . $filePath);
+
+			$data = file_get_contents(__DIR__ . '/../../fajlok/elasticsearch/mappings/church.json');
+			$elastic->curl_setopt(CURLOPT_TIMEOUT, 3600);
+			if (!$elastic->putIndex('churches', json_decode($data, true))) {
+				throw new \Exception(
+						"Failed to create index: churches\n" .
+						"Response code: " . $elastic->responseCode . "\n" .
+						"Error: " . print_r($elastic->error, true) . "\n" .
+						"Response: " . print_r($elastic->jsonData, true) . "\n" .
+						"Request: " . print_r($elastic->requestData, true) . "\n" .
+						"\$elastic: " . print_r($elastic, true)
+				);
 			}
-			$data = file_get_contents($filePath);
-			if (!$elastic->putIndex('churches', json_decode($data, true))) {				
-				throw new \Exception("Failed to create index: churches");
-			}
-			
-		}
+
+		}	
 		
 		// Előkészítjük feltöltsére az adatokat
 		$churches = \Eloquent\Church::where('ok', 'i');
@@ -231,10 +236,32 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 				}
 			}
 
-			throw new \Exception("Could not update churches!\n" . implode("\n", $errors));
-		}
-				
-	}
+		       throw new \Exception("Could not update churches!\n" . implode("\n", $errors));
+	       }
+
+	       // --- Output Elasticsearch stats and a sample doc ---
+	       $stats = @file_get_contents('http://elasticsearch:9200/churches/_stats');
+	       $statsData = $stats ? json_decode($stats, true) : null;
+	       $count = $statsData['_all']['primaries']['docs']['count'] ?? 'N/A';
+	       $size = $statsData['_all']['primaries']['store']['size_in_bytes'] ?? 'N/A';
+	       $shards = $statsData['_shards']['successful'] ?? 'N/A';
+
+	       echo "<blockquote>Index stats:<br>";
+	       echo "Documents: <tt>" . htmlspecialchars($count) . "</tt><br>";
+	       echo "Store size (bytes): <tt>" . htmlspecialchars($size) . "</tt><br>";
+	       echo "Successful shards: <tt>" . htmlspecialchars($shards) . "</tt><br>";
+	       echo "</blockquote>\n";
+
+	       // Get a sample document
+	       $sample = @file_get_contents('http://elasticsearch:9200/churches/_search?size=1');
+	       $sampleData = $sample ? json_decode($sample, true) : null;
+	       $doc = $sampleData['hits']['hits'][0]['_source'] ?? null;
+	       if ($doc) {
+		   echo "<blockquote>Sample document:<br><tt>" . htmlspecialchars(json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . "</tt></blockquote>\n";
+	       } else {
+		   echo "<blockquote>No sample document found.</blockquote>\n";
+	       }
+       }
 	
 	/*
 	 * Frissíti az összes elasticsearch mise indexet az adatbázisból
