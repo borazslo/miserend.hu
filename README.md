@@ -152,7 +152,7 @@ npm install
 
 ```sh
 ng build --configuration=localProd
-python ../scripts/calendar_deploy.py
+python ../docker/miserend/calendar_deploy.py
 npm run start:integrated
 ```
 
@@ -226,5 +226,5 @@ docker exec miserend composer install|require|update
 Fejlesztés végén azonban egy megfelelő környezetbe való build kell, például:
 ```
 ng build --configuration=production
-python ../scripts/calendar_deploy.py
+python ../docker/miserend/calendar_deploy.py
 ```

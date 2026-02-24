@@ -8,8 +8,8 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Globális változók
 # Relatív útvonalak a scripthez képest
-FROM_PATH = os.path.join(SCRIPT_DIR, '..', 'calendar', 'dist', 'mcal', 'browser')
-TO_PATH = os.path.join(SCRIPT_DIR, '..', 'webapp')
+FROM_PATH = os.path.join(SCRIPT_DIR, '..', '..', 'calendar', 'dist', 'mcal', 'browser')
+TO_PATH = os.path.join(SCRIPT_DIR, '..', '..', 'webapp')
 
 if len(sys.argv) > 1:
     FROM_PATH = sys.argv[1]
