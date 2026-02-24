@@ -1,6 +1,7 @@
 export enum LanguageCode {
   HU = 'hu',
   EN = 'en',
+  TL = 'tl',
   FR = 'fr',
   GR = 'gr',
   HR = 'hr',

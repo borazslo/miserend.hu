@@ -42,7 +42,9 @@ INSERT INTO `crons` VALUES
 (34,'\\User','sendUpdateNotification','20 minutes','1am','6am','2023-06-09 00:58:07',0,'2023-06-09 00:38:07','0000-00-00 00:00:00','2023-06-09 00:38:07'),
 (35,'\\User','deleteNonActivatedUsers','20 minutes','1am','6am','2023-06-09 00:45:01',0,'2023-06-09 00:25:01','0000-00-00 00:00:00','2023-06-09 00:25:01'),
 (36,'\\Externalapi\\SolrApi','updateChurches','6 hours',NULL,NULL,'2000-01-01 00:45:01',0,'2000-01-01 00:25:01','0000-00-00 00:00:00','2023-06-09 00:25:01'),
-(37,'\\Api\\NearBy','cleanOldLogs','1 day',NULL,NULL,'2000-01-01 00:45:01',0,'2000-01-01 00:25:01','0000-00-00 00:00:00','2024-09-25 00:25:01');
+(37,'\\Api\\NearBy','cleanOldLogs','1 day',NULL,NULL,'2000-01-01 00:45:01',0,'2000-01-01 00:25:01','0000-00-00 00:00:00','2024-09-25 00:25:01'),
+(38,'\\ExternalApi\\ElasticsearchApi','updateChurches','6 hours',NULL,NULL,'2026-01-26 23:58:05',0,'2026-01-26 17:58:05','0000-00-00 00:00:00','2026-01-26 17:58:05'),
+(39,'\\ExternalApi\\ElasticsearchApi','updateMasses','6 hours',NULL,NULL,'2026-01-26 23:58:39',0,'2026-01-26 17:58:39','0000-00-00 00:00:00','2026-01-26 17:58:39');
 /*!40000 ALTER TABLE `crons` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;

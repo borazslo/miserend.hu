@@ -26,7 +26,8 @@ export class CalendarUtil {
     return {
       plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, rrulePlugin],
       initialView: initialView,
-      slotDuration: '00:20',
+      // Use 30 minute slots for week/time grids (was 20 minutes)
+      slotDuration: '00:30',
       allDaySlot: false, 
       // Hide the hour labels in the left time axis (prevent stacked hour strings)
       // slotLabelContent can return an object with html to override rendering

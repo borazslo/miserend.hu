@@ -51,12 +51,148 @@ CREATE TABLE IF NOT EXISTS `boundaries` (
   `denomination` varchar(50) DEFAULT NULL,
   `osmtype` varchar(9) DEFAULT NULL,
   `osmid` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` DATE NOT NULL DEFAULT '0000-00-00',
+  `updated_at` DATE NULL DEFAULT '0000-00-00',
   PRIMARY KEY (`id`),
   KEY `index1` (`boundary`,`admin_level`),
   KEY `index2` (`osmtype`,`osmid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7891 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_generated_periods`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_generated_periods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `period_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `weight` int NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `created_at` DATE NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` DATE NULL DEFAULT CURRENT_DATE,
+  `color` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `period_id` (`period_id`),
+  CONSTRAINT `fk_cal_generated_periods_period_id` FOREIGN KEY (`period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_masses`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_masses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `church_id` int(11) NOT NULL,
+  `period_id` int(11) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `types` text,
+  `rite` varchar(50) NOT NULL,
+  `start_date` varchar(50) NOT NULL,
+  `duration` json DEFAULT NULL,
+  `rrule` json DEFAULT NULL,
+  `experiod` json DEFAULT NULL,
+  `exdate` json DEFAULT NULL,
+  `lang` varchar(3) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `created_at` DATE NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` DATE NULL DEFAULT CURRENT_DATE,
+  PRIMARY KEY (`id`),
+  KEY `period_id` (`period_id`),
+  KEY `church_id` (`church_id`),
+  CONSTRAINT `fk_cal_masses_period_id` FOREIGN KEY (`period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_periods`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_periods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `weight` int NOT NULL,
+  `start_month_day` varchar(5) DEFAULT NULL,
+  `end_month_day` varchar(5) DEFAULT NULL,
+  `start_period_id` int(11) DEFAULT NULL,
+  `end_period_id` int(11) DEFAULT NULL,
+  `all_inclusive` tinyint(1) DEFAULT NULL,
+  `multi_day` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` DATE NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` DATE NULL DEFAULT CURRENT_DATE,
+  `special_type` enum('CHRISTMAS','EASTER') DEFAULT NULL,
+  `selectable` tinyint(1) DEFAULT 1,
+  `color` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `start_period_id` (`start_period_id`),
+  KEY `end_period_id` (`end_period_id`),
+  CONSTRAINT `fk_cal_periods_start_period` FOREIGN KEY (`start_period_id`) REFERENCES `cal_periods` (`id`),
+  CONSTRAINT `fk_cal_periods_end_period` FOREIGN KEY (`end_period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_period_years`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_period_years` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `period_id` int(11) NOT NULL,
+  `start_year` int(4) NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `created_at` date NOT NULL DEFAULT CURRENT_DATE,
+  `updated_at` date NULL DEFAULT CURRENT_DATE,
+  PRIMARY KEY (`id`),
+  KEY `period_id` (`period_id`),
+  CONSTRAINT `fk_cal_period_years_period_id` FOREIGN KEY (`period_id`) REFERENCES `cal_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_suggestion_packages`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_suggestion_packages` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `church_id` bigint(20) unsigned DEFAULT NULL,
+  `sender_name` varchar(255) DEFAULT NULL,
+  `sender_email` varchar(255) DEFAULT NULL,
+  `sender_user_id` bigint(20) unsigned DEFAULT NULL,
+  `sender_message` text DEFAULT NULL,
+  `state` enum('ACCEPTED','REJECTED','PENDING') DEFAULT 'PENDING',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `church_id` (`church_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cal_suggestions`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+CREATE TABLE IF NOT EXISTS `cal_suggestions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `package_id` bigint(20) unsigned NOT NULL,
+  `period_id` bigint(20) unsigned DEFAULT NULL,
+  `mass_id` bigint(20) unsigned DEFAULT NULL,
+  `mass_state` enum('NEW','DELETED','MODIFIED') NOT NULL,
+  `changes` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `package_id` (`package_id`),
+  CONSTRAINT `fk_cal_suggestions_package` FOREIGN KEY (`package_id`) REFERENCES `cal_suggestion_packages` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -264,31 +400,6 @@ CREATE TABLE IF NOT EXISTS `favorites` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `igenaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `igenaptar` (
-  `id` int(5) NOT NULL AUTO_INCREMENT,
-  `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'feher',
-  `ev` enum('0','A','B','C') NOT NULL DEFAULT '0',
-  `idoszak` char(1) NOT NULL DEFAULT '',
-  `nap` varchar(250) NOT NULL DEFAULT '',
-  `oszov_hely` varchar(50) NOT NULL DEFAULT '',
-  `oszov` text NOT NULL,
-  `ujszov_hely` varchar(50) NOT NULL DEFAULT '',
-  `ujszov` text NOT NULL,
-  `evang_hely` varchar(50) NOT NULL DEFAULT '',
-  `evang` text NOT NULL,
-  `unnep` varchar(250) NOT NULL DEFAULT '',
-  `intro` text NOT NULL,
-  `gondolat` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=821 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `keyword_shortcuts`
 --
 
@@ -309,21 +420,6 @@ CREATE TABLE IF NOT EXISTS `keyword_shortcuts` (
   KEY `church_type_value` (`church_id`,`type`,`value`),
   KEY `type_value` (`type`,`value`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12825 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `lnaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `lnaptar` (
-  `datum` date NOT NULL DEFAULT '0000-00-00',
-  `ige` int(5) NOT NULL DEFAULT 0,
-  `szent` int(5) NOT NULL DEFAULT 0,
-  `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'lila',
-  PRIMARY KEY (`datum`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -416,89 +512,6 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `shown` int(11) DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `misek`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `misek` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tid` int(5) DEFAULT NULL,
-  `nap` int(1) NOT NULL DEFAULT 0,
-  `ido` time NOT NULL DEFAULT '00:00:00',
-  `nap2` varchar(4) DEFAULT NULL,
-  `idoszamitas` varchar(255) DEFAULT NULL,
-  `weight` int(11) DEFAULT NULL,
-  `tol` varchar(100) DEFAULT NULL,
-  `ig` varchar(100) DEFAULT NULL,
-  `tmp_datumtol` varchar(5) DEFAULT NULL,
-  `tmp_relation` char(1) DEFAULT NULL,
-  `tmp_datumig` varchar(5) DEFAULT NULL,
-  `nyelv` varchar(100) NOT NULL DEFAULT '',
-  `milyen` varchar(50) NOT NULL DEFAULT '',
-  `megjegyzes` text NOT NULL,
-  `modositotta` varchar(20) NOT NULL DEFAULT '',
-  `moddatum` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `torles` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `torolte` varchar(20) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=242464 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `modulok`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `modulok` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `nev` varchar(50) NOT NULL DEFAULT '',
-  `leiras` tinytext NOT NULL,
-  `fajlnev` varchar(50) NOT NULL DEFAULT '',
-  `sablon` varchar(20) NOT NULL DEFAULT 'alap',
-  `zart` int(1) NOT NULL DEFAULT 0,
-  `jogkod` varchar(50) NOT NULL DEFAULT '',
-  `szamlalo` int(11) NOT NULL DEFAULT 0,
-  `funkcio` enum('i','n') NOT NULL DEFAULT 'n',
-  `ok` enum('i','n') NOT NULL DEFAULT 'n',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `nevnaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `nevnaptar` (
-  `datum` varchar(4) NOT NULL DEFAULT '',
-  `nevnap` varchar(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`datum`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `oldalkeret`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `oldalkeret` (
-  `fooldal_id` int(2) NOT NULL DEFAULT 0,
-  `modul_id` int(10) NOT NULL DEFAULT 0,
-  `fajlnev` varchar(50) NOT NULL DEFAULT '',
-  `html_tmpl` varchar(30) NOT NULL DEFAULT 'hasabdoboz',
-  `helyzet` int(2) NOT NULL DEFAULT 0,
-  `lang` varchar(10) NOT NULL DEFAULT 'hu',
-  `sorrend` int(2) NOT NULL DEFAULT 0,
-  `zart` int(2) NOT NULL DEFAULT 0,
-  `megj` varchar(100) NOT NULL DEFAULT ''
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -648,26 +661,6 @@ CREATE TABLE IF NOT EXISTS `stats_externalapi` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `szentek`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `szentek` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nev` varchar(200) NOT NULL DEFAULT '',
-  `nevnap` varchar(200) NOT NULL DEFAULT '',
-  `intro` text NOT NULL,
-  `ho` int(2) NOT NULL DEFAULT 0,
-  `nap` int(2) NOT NULL DEFAULT 0,
-  `leiras` text NOT NULL,
-  `szin` enum('piros','feher','zold','lila') NOT NULL DEFAULT 'feher',
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=261 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci PACK_KEYS=1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `szentsegimadasok`
 --
 
@@ -809,22 +802,6 @@ CREATE TABLE IF NOT EXISTS `tokens` (
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `unnepnaptar`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE IF NOT EXISTS `unnepnaptar` (
-  `datum` date NOT NULL DEFAULT '0000-00-00',
-  `unnep` varchar(50) NOT NULL DEFAULT '',
-  `szabadnap` enum('i','n') NOT NULL DEFAULT 'i',
-  `mise` enum('v','n','u') NOT NULL DEFAULT 'u',
-  `miseinfo` varchar(250) NOT NULL DEFAULT '',
-  PRIMARY KEY (`datum`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

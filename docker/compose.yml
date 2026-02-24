@@ -21,6 +21,11 @@ services:
       inner:
         aliases:
           - mysql
+  data-init:
+    image: ghcr.io/krisek/miserend-elasticsearch-data:2026.2.9
+    volumes:
+      - elasticsearch_data:/data
+    restart: "no"
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
     container_name: elasticsearch
@@ -28,6 +33,7 @@ services:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - xpack.security.enabled=false
+      - cluster.name=miserend
     ulimits:
       memlock:
         soft: -1
@@ -35,33 +41,33 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    depends_on:
+      - data-init
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
       inner:
         aliases:
           - elasticsearch
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.1
-    container_name: kibana
-    ports:
-      - 5601:5601
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      XPACK_SECURITY_ENABLED: false
-    depends_on:
-      - elasticsearch
-    networks:
-      inner:
-        aliases:
-          - kibana
+  tmp-init:
+    image: busybox
+    volumes:
+      - tmp:/data
+    command: sh -c "chown -R 33:33 /data"
+
   miserend:
     container_name: miserend
-    image: ghcr.io/krisek/miserend.hu:v2026.1.12
+    image: ghcr.io/borazslo/miserend.hu:v2026.1.14
     volumes: 
-       - miserend_tmp:/miserend/webapp/fajlok/tmp
+       - tmp:/miserend/webapp/fajlok/tmp
     ports:
       - 8000:8000
+    user: "www-data"
+    depends_on:
+      - mysql
+      - tmp-init
+      - elasticsearch
+
     environment: []
     networks:
       inner:
@@ -73,4 +79,4 @@ networks:
 volumes:
   db_data: {}
   elasticsearch_data: {}
-  miserend_tmp: {}
+  tmp: {}

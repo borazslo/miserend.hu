@@ -12,7 +12,9 @@ class Search {
     public $massOrChurch = 'church';
     public $pitId = false; 
     private $pit_keepAlive;
-    public $search_after = false;    
+    public $search_after = false; 
+    public $defaultTimezone = 'Europe/Budapest';   
+    public $timezone = 'Europe/Budapest';
     private $index;
     
     /**
@@ -28,8 +30,7 @@ class Search {
      *                            query building (filters, ranges, pagination hints)
      */
     function __construct($massOrChurch, $params = []) {
-        $this->timezone = 'Europe/Budapest';
-
+        
         switch ($massOrChurch) {
             case 'mass':
             case 'masses':
@@ -181,24 +182,57 @@ class Search {
     }
 
     function timeRange($fromDatetime, $toDatetime) {
-        $this->filters[] = "Időpont: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDatetime)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDatetime)) . "</b>";                
+        // Keep human-readable filter text in the configured timezone
+        $filter = "Időpont: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDatetime)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDatetime)) . "</b>";
+        if ($this->timezone !== $this->defaultTimezone) {
+            $filter .= " (" . $this->timezone . ")";
+        }
+        $this->filters[] = $filter;
+
+        // Convert the provided datetimes (assumed to be in $this->timezone) to UTC
+        try {
+            $fromUtc = Carbon::parse($fromDatetime, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+            $toUtc = Carbon::parse($toDatetime, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+        } catch (\Exception $e) {
+            // If parsing fails, fall back to raw values (defensive)
+            $fromUtc = $fromDatetime;
+            $toUtc = $toDatetime;
+        }
+
         $this->query['bool']['must'][] = [
             "range" => [
                 "start_date" => [
-                    "gte" => $fromDatetime,
-                    "lte" => $toDatetime
+                    "gte" => $fromUtc,
+                    "lte" => $toUtc
                 ]
             ]
         ];
     }
 
     function dateRange($fromDate, $toDate) {
-        $this->filters[] = "Dátum: " . htmlspecialchars($fromDate) . " - " . htmlspecialchars($toDate);                
+        // Keep human-readable filter text in the configured timezone
+        $filter = "Dátum: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDate)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDate)) . "</b>";
+        if ($this->timezone !== $this->defaultTimezone) {
+            $filter .= " (" . $this->timezone . ")";
+        }
+        $this->filters[] = $filter;
+
+        // Build local datetimes at day boundaries and convert to UTC for ES
+        try {
+            $fromLocal = $fromDate . 'T00:00:00';
+            $toLocal = $toDate . 'T23:59:59';
+            $fromUtc = Carbon::parse($fromLocal, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+            $toUtc = Carbon::parse($toLocal, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+        } catch (\Exception $e) {
+            $fromUtc = $fromDate . "T00:00:00";
+            $toUtc = $toDate . "T23:59:59";
+        }
+
         $this->query['bool']['must'][] = [
             "range" => [
                 "start_date" => [
-                    "gte" => $fromDate . "T00:00:00",
-                    "lte" => $toDate . "T23:59:59"
+                    "gte" => $fromUtc,
+                    "lte" => $toUtc
                 ]
             ]
         ];
@@ -276,7 +310,7 @@ class Search {
             "size"  => $size,
             "track_total_hits" => true
         ];
-
+    
         // Nagy adatkupacoknál jobb PIT-et nyitni ( openPit() ) és azt használva kérdezgetni le
         if ($this->pitId) {
             $esQuery['pit'] = [

@@ -67,6 +67,9 @@ RUN a2dissite 000-default \
  && a2ensite miserend \
  && apache2ctl configtest
 
+ RUN mkdir -p /var/www/app/fajlok/tmp \
+    && chown -R www-data:www-data /var/www/app/fajlok
+    
 # Entrypoint
 COPY docker/miserend/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

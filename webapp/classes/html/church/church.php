@@ -19,7 +19,7 @@ class Church extends \Html\Html {
         if(!$church) {
             throw new \Exception("Church with tid = '$tid' does not exist.");
         }
-        $church = $church->append(['readAccess','writeAccess','liturgiatv','accessibility']);
+        $church = $church->append(['readAccess','writeAccess','accessibility']);
         
         if (!$church->readAccess) {
             throw new \Exception("Read access denied to church tid = '$tid'");
@@ -81,18 +81,6 @@ class Church extends \Html\Html {
             $this->setTitle($this->names[0]);
         
         $this->updated = str_replace('-', '.', $this->frissites) . '.';
-
-        //Convert to OSM ServiceTimes
-        if(isset($user->isadmin) AND $user->isadmin == 1)  {
-            $serviceTimes = new \ServiceTimes();
-            $serviceTimes->loadMasses($tid);
-			if(!isset($serviceTimes->error))
-				$this->service_times = print_r(preg_replace('/;/',";\n",$serviceTimes->string),1)."\n".$serviceTimes->linkForDetails;
-			else 
-				$this->service_times	= $serviceTimes->error;
-        }
-                
-       
 
         /*
           $staticmap = "kepek/staticmaps/" . $tid . "_227x140.jpeg";
