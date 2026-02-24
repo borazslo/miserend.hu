@@ -13,6 +13,7 @@ class Search {
     public $pitId = false; 
     private $pit_keepAlive;
     public $search_after = false;    
+    public $timezone = 'Europe/Budapest';
     private $index;
     
     /**
@@ -28,8 +29,7 @@ class Search {
      *                            query building (filters, ranges, pagination hints)
      */
     function __construct($massOrChurch, $params = []) {
-        $this->timezone = 'Europe/Budapest';
-
+        
         switch ($massOrChurch) {
             case 'mass':
             case 'masses':
@@ -181,24 +181,49 @@ class Search {
     }
 
     function timeRange($fromDatetime, $toDatetime) {
-        $this->filters[] = "Időpont: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDatetime)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDatetime)) . "</b>";                
+        // Keep human-readable filter text in the configured timezone
+        $this->filters[] = "Időpont: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDatetime)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDatetime)) . "</b> (".$this->timezone.")";
+
+        // Convert the provided datetimes (assumed to be in $this->timezone) to UTC
+        try {
+            $fromUtc = Carbon::parse($fromDatetime, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+            $toUtc = Carbon::parse($toDatetime, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+        } catch (\Exception $e) {
+            // If parsing fails, fall back to raw values (defensive)
+            $fromUtc = $fromDatetime;
+            $toUtc = $toDatetime;
+        }
+
         $this->query['bool']['must'][] = [
             "range" => [
                 "start_date" => [
-                    "gte" => $fromDatetime,
-                    "lte" => $toDatetime
+                    "gte" => $fromUtc,
+                    "lte" => $toUtc
                 ]
             ]
         ];
     }
 
     function dateRange($fromDate, $toDate) {
-        $this->filters[] = "Dátum: " . htmlspecialchars($fromDate) . " - " . htmlspecialchars($toDate);                
+        // Keep human-readable filter text in the configured timezone
+        $this->filters[] = "Dátum: " . htmlspecialchars($fromDate) . " - " . htmlspecialchars($toDate);
+
+        // Build local datetimes at day boundaries and convert to UTC for ES
+        try {
+            $fromLocal = $fromDate . 'T00:00:00';
+            $toLocal = $toDate . 'T23:59:59';
+            $fromUtc = Carbon::parse($fromLocal, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+            $toUtc = Carbon::parse($toLocal, $this->timezone)->setTimezone('UTC')->format('Y-m-d\\TH:i:s') . 'Z';
+        } catch (\Exception $e) {
+            $fromUtc = $fromDate . "T00:00:00";
+            $toUtc = $toDate . "T23:59:59";
+        }
+
         $this->query['bool']['must'][] = [
             "range" => [
                 "start_date" => [
-                    "gte" => $fromDate . "T00:00:00",
-                    "lte" => $toDate . "T23:59:59"
+                    "gte" => $fromUtc,
+                    "lte" => $toUtc
                 ]
             ]
         ];
