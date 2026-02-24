@@ -123,6 +123,21 @@
                             <button type="button" class="btn btn-light mass-quick" data-value="date" >Adott napon</button>
                         
                             <!-- Time toggle button (separate control, neutral by default) -->
+                            <input type="hidden" name="timezone" id="timezone" value="Europe/Budapest">
+                            <script>
+                            (function($){
+                                $(function(){
+                                    var tz = 'Europe/Budapest';
+                                    try {
+                                        if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+                                            var resolved = Intl.DateTimeFormat().resolvedOptions();
+                                            if (resolved && resolved.timeZone) tz = resolved.timeZone;
+                                        }
+                                    } catch(e){}
+                                    $('#timezone').val(tz);
+                                });
+                            })(jQuery);
+                            </script>
                             <button type="button" class="btn btn-light time-toggle" id="time_toggle" style="margin-left:30px">Óra</button>
                             <div id="time_controls" style="display:none; margin-top:6px;">
                                 <select id="mikorido_hour" class="form-control" style="display:inline-block; width:5rem;">

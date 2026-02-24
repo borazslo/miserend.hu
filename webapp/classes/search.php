@@ -12,7 +12,8 @@ class Search {
     public $massOrChurch = 'church';
     public $pitId = false; 
     private $pit_keepAlive;
-    public $search_after = false;    
+    public $search_after = false; 
+    public $defaultTimezone = 'Europe/Budapest';   
     public $timezone = 'Europe/Budapest';
     private $index;
     
@@ -182,7 +183,11 @@ class Search {
 
     function timeRange($fromDatetime, $toDatetime) {
         // Keep human-readable filter text in the configured timezone
-        $this->filters[] = "Időpont: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDatetime)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDatetime)) . "</b> (".$this->timezone.")";
+        $filter = "Időpont: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDatetime)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDatetime)) . "</b>";
+        if ($this->timezone !== $this->defaultTimezone) {
+            $filter .= " (" . $this->timezone . ")";
+        }
+        $this->filters[] = $filter;
 
         // Convert the provided datetimes (assumed to be in $this->timezone) to UTC
         try {
@@ -206,7 +211,11 @@ class Search {
 
     function dateRange($fromDate, $toDate) {
         // Keep human-readable filter text in the configured timezone
-        $this->filters[] = "Dátum: " . htmlspecialchars($fromDate) . " - " . htmlspecialchars($toDate);
+        $filter = "Dátum: <b>" . htmlspecialchars(twig_hungarian_date_format($fromDate)) . "</b> - <b>" . htmlspecialchars(twig_hungarian_date_format($toDate)) . "</b>";
+        if ($this->timezone !== $this->defaultTimezone) {
+            $filter .= " (" . $this->timezone . ")";
+        }
+        $this->filters[] = $filter;
 
         // Build local datetimes at day boundaries and convert to UTC for ES
         try {
@@ -301,7 +310,7 @@ class Search {
             "size"  => $size,
             "track_total_hits" => true
         ];
-
+    
         // Nagy adatkupacoknál jobb PIT-et nyitni ( openPit() ) és azt használva kérdezgetni le
         if ($this->pitId) {
             $esQuery['pit'] = [

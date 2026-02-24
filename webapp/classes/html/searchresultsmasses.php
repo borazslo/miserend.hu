@@ -11,7 +11,10 @@ class SearchResultsMasses extends Html {
         global $user, $config;
 
         $search = new \Search('masses', $_REQUEST);
-                       
+        if($_REQUEST['timezone']) {
+            $search->timezone = $_REQUEST['timezone'];
+        }
+
         // Diocese filter
         $ehm = isset($_REQUEST['ehm']) ? $_REQUEST['ehm'] : 0;
         if ($ehm > 0) {
@@ -156,11 +159,13 @@ class SearchResultsMasses extends Html {
 		$leptet = isset($_REQUEST['leptet']) ? $_REQUEST['leptet'] : 25;	
         $offset = $this->pagination->take * $this->pagination->active;
         $limit = $this->pagination->take;     	        
-        $results = $search->getResults($offset, $limit, true);
+        $results = $search->getResults($offset, $limit, false);
+                
                         
         if ($search->total != 0) {                   
             foreach ($results as &$result) {
-                $result['church'] = \Eloquent\Church::find($result[0]->church_id)->toArray();                
+                $result->church = \Eloquent\Church::find($result->church_id)->toArray();       
+                
             }
         }
 
