@@ -184,10 +184,8 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 
 		
 		$elastic = new \ExternalApi\ElasticsearchApi();
-		
-		$elastic->deleteIndex('churches'); // Először töröljük az indexet, ha létezik. Ez nem baj, mert a putIndex úgyis létrehozza újra.
-				
-		
+								
+		// Első esetben lehet hogy létre kell hozni. De ez innen kikerülhetne ha már biztos a működésünk
 		if(!$elastic->isexistsIndex('churches')) {
 
 			$data = file_get_contents(__DIR__ . '/../../fajlok/elasticsearch/mappings/church.json');
@@ -208,15 +206,33 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 		// Előkészítjük feltöltsére az adatokat
 		$churches = \Eloquent\Church::where('ok', 'i');
 		if(!empty($tids)) {
-
 			$churches = $churches->whereIn('id', $tids);
 		}
 		$churches = $churches->limit(200000)->get()->map->toElasticArray()->toArray();
 		
-		// Truncate the index
-		$elastic->truncateIndex('churches');
+		if(empty($tids)) {
+			// When we update all churches, we can just truncate the index, which is faster. When we update only some churches, we need to delete them one by one, which is slower, but we don't want to delete all churches in that case.
+			// Truncate the index
+			$elastic->truncateIndex('churches');
+		} else {
+			// When we update only some churches, we need to delete them one by one, which is slower, but we don't want to delete all churches in that case.			
+			// Delete existing masses for the given church IDs		
+			$elastic->curl_setopt(CURLOPT_CUSTOMREQUEST, "POST");
+			$elastic->buildQuery('churches/_delete_by_query', json_encode([
+				"conflicts" => "proceed",
+				"query" => [
+					"terms" => ["id" => array_map('strval', $tids)]
+				]
+			]));			
+			$elastic->run();
+			if(isset($elastic->error)) {			
+				throw new \Exception("Could not delete existing masses!\n" . $elastic->error);
+			}
+			
+		}
 
 		// Feltöltjük az adatokat az indexbe. Ezzel új verzióval felülírja a régieket. De mondjuk nem üríti ki a régit.
+		
 		$bulkData = [];
 		foreach($churches as $church) {
 			$bulkData[] = json_encode([
@@ -228,7 +244,7 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			$bulkData[] = json_encode($church);
 		}
 		
-		if(!$elastic->putBulk($bulkData)) {
+		if(empty($tids) AND !$elastic->putBulk($bulkData)) {
 			$errors = [];
 			foreach($elastic->jsonData->items as $item ) {
 				if(isset($item->index->error)) {					
@@ -237,31 +253,9 @@ class ElasticsearchApi extends \ExternalApi\ExternalApi {
 			}
 
 		       throw new \Exception("Could not update churches!\n" . implode("\n", $errors));
-	       }
-
-	       // --- Output Elasticsearch stats and a sample doc ---
-	       $stats = @file_get_contents('http://elasticsearch:9200/churches/_stats');
-	       $statsData = $stats ? json_decode($stats, true) : null;
-	       $count = $statsData['_all']['primaries']['docs']['count'] ?? 'N/A';
-	       $size = $statsData['_all']['primaries']['store']['size_in_bytes'] ?? 'N/A';
-	       $shards = $statsData['_shards']['successful'] ?? 'N/A';
-
-	       echo "<blockquote>Index stats:<br>";
-	       echo "Documents: <tt>" . htmlspecialchars($count) . "</tt><br>";
-	       echo "Store size (bytes): <tt>" . htmlspecialchars($size) . "</tt><br>";
-	       echo "Successful shards: <tt>" . htmlspecialchars($shards) . "</tt><br>";
-	       echo "</blockquote>\n";
-
-	       // Get a sample document
-	       $sample = @file_get_contents('http://elasticsearch:9200/churches/_search?size=1');
-	       $sampleData = $sample ? json_decode($sample, true) : null;
-	       $doc = $sampleData['hits']['hits'][0]['_source'] ?? null;
-	       if ($doc) {
-		   echo "<blockquote>Sample document:<br><tt>" . htmlspecialchars(json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . "</tt></blockquote>\n";
-	       } else {
-		   echo "<blockquote>No sample document found.</blockquote>\n";
-	       }
-       }
+		}
+   
+	}
 	
 	/*
 	 * Frissíti az összes elasticsearch mise indexet az adatbázisból
