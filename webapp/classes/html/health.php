@@ -78,9 +78,27 @@ class Health extends Html {
 		$results = [] ;
 
 		// Health of nearby log
-		$loginfo = \Api\NearBy::getLogFileInfo();		
-		$this->infos[] = ['nearby.log mérete',round($loginfo['file_size']/1024,2)." KB"];
-		$this->infos[] = ['nearby.log hossza', $loginfo['line_count']." sor"];
+		try {
+			$loginfo = \Api\NearBy::getLogFileInfo();
+			if (!is_array($loginfo)) {
+				$this->infos[] = ['nearby.log', '<span class="text-warning">Nincs információ</span>'];
+			} else {
+				if (isset($loginfo['file_size'])) {
+					$sizeKb = round($loginfo['file_size'] / 1024, 2);
+					$this->infos[] = ['nearby.log mérete', $sizeKb . ' KB'];
+				} else {
+					$this->infos[] = ['nearby.log mérete', '<span class="text-warning">ismeretlen</span>'];
+				}
+
+				if (isset($loginfo['line_count'])) {
+					$this->infos[] = ['nearby.log hossza', $loginfo['line_count'] . ' sor'];
+				} else {
+					$this->infos[] = ['nearby.log hossza', '<span class="text-warning">ismeretlen</span>'];
+				}
+			}
+		} catch (\Exception $e) {
+			$this->infos[] = ['nearby.log', '<span class="text-danger">Hiba: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES) . '</span>'];
+		}
 		
 
 		// Health of CronJobs
