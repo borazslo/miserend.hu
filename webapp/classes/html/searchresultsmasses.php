@@ -11,7 +11,7 @@ class SearchResultsMasses extends Html {
         global $user, $config;
 
         $search = new \Search('masses', $_REQUEST);
-        if($_REQUEST['timezone']) {
+        if(isset($_REQUEST['timezone']) AND $_REQUEST['timezone'] != '') {
             $search->timezone = $_REQUEST['timezone'];
         }
 

@@ -11,7 +11,7 @@ ng.stdout.on("data", (data) => {
   if (output.includes("Application bundle generation complete")) {
     console.log("[NODE] Start deploy script...");
 
-    const py = spawn("python", ["../scripts/calendar_deploy.py"], { shell: true });
+    const py = spawn("python", ["../docker/miserend/calendar_deploy.py"], { shell: true });
 
     py.stdout.on("data", (d) => {
       process.stdout.write(`[PYTHON STDOUT] ${d}`);
