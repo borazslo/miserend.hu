@@ -1045,7 +1045,9 @@ export class ChurchCalendarComponent implements OnInit, AfterViewInit, OnChanges
       if (info.timeText) {
         if (isMonthView) {
           // Try to derive precise minutes from the event start if available
-          const startDate = info.event?.start ? new Date(info.event.start) : (info.event?.startStr ? new Date(info.event.startStr) : null);
+          let startDate: Date | null = null;                    
+          let s = String(info.event.startStr);
+          startDate = new Date(s);          
           if (startDate) {
             const h = startDate.getHours();
             const m = startDate.getMinutes();
