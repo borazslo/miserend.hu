@@ -184,7 +184,7 @@ class SearchResultsMasses extends Html {
 
         $this->filters = $search->getFilters();
 
-        $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
+        $this->alert = (new \ExternalApi\NapilelkibatyuApi())->LiturgicalAlert(isset($mikordatum) ? $mikordatum : false);
 
         $this->setTitle("Szentmise kereső");
         

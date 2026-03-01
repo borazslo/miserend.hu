@@ -118,11 +118,10 @@ class Home extends Html {
 
         $this->favorites = $user->getFavorites();
         $this->searchform = $searchform;
-        		
-        try {
-            $this->alert = (new \ExternalApi\BreviarskApi())->liturgicalAlert();
+		try {
+            $this->alert = (new \ExternalApi\NapilelkibatyuApi())->liturgicalAlert();            
         } catch (\Exception $e) {
-            addMessage('Nem sikerült a zsolozsma honlapról megtudni, hogy van-e ma különleges ünnep.', "warning");
+            addMessage('Nem sikerült a Napi Lelki Batyuból megtudni, hogy van-e ma különleges ünnep.', "warning");
         }
 		
 							

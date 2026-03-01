@@ -1,25 +1,57 @@
-<div class="alert alert-warning" role="alert">
 
-
-{% if name == 'Nagycsütörtök' %}
+{% if date.name == 'Nagycsütörtök, az utolsó vacsora emléknapja' %}
+    <div class="alert alert-warning" role="alert">
         Ma <strong><a href="https://lexikon.katolikus.hu/N/nagycs%C3%BCt%C3%B6rt%C3%B6k.html">Nagycsütörtök</a></strong> van.<br/>
             Ilyenkor csak az utolsó vacsora emlékmiséje van az est folyamán. Valamint általában krizmaszentelési mise a székesegyházban.
-{% elseif name == 'Nagypéntek' %}
+    </div>
+{% elseif date.name == 'Nagypéntek' %}
+    <div class="alert alert-warning" role="alert">
         Ma <strong><a href="https://lexikon.katolikus.hu/N/nagyp%C3%A9ntek.html">Nagypéntek</a></strong> van.<br/>
-            Ilyenkor csak esti úgynevezett „csonkamise” van, <a href="https://katolikus.hu/cikk/nagypentek---jezus-krisztus-kereszthalalanak-napja-24874153">amiben ünnepeljük Krisztus kereszthalálát.
-{% elseif name == 'Nagyszombat' %}
+            Ilyenkor csak esti úgynevezett <a href="https://katolikus.hu/cikk/nagypentek---jezus-krisztus-kereszthalalanak-napja-24874153">„csonkamise”</a> van, amiben ünnepeljük Krisztus kereszthalálát.
+    </div>
+{% elseif date.name == 'Nagyszombat' %}
+    <div class="alert alert-warning" role="alert">
         Ma <strong><a href="https://lexikon.katolikus.hu/N/Nagyszombat.html">Nagyszombat</a></strong> van.<br/>
             Ilyenkor nincs szentmise. Csak a sír. Este pedig a feltámadás vigíliája, amely a húsvétot megnyitja.
-{% else %}
+{% else %}    
+	{# compute a user-friendly date label: 'Ma' for today, otherwise 'Január 3-án' #}
+	{% set today = "now"|date('Y-m-d') %}
+	{% if date.date == today %}
+		{% set displayDate = 'Ma' %}
+        {% set displayNextDay = 'Este' %}
+	{% else %}
 
-    {{ text|raw }}. 
-    {% if parancsoltunnep %}
-        Ez olyan fontos, hogy <a href="https://lexikon.katolikus.hu/P/parancsolt%20%C3%BCnnep.html">parancsolt</a> ünnep rangra emelte az Egyház, hogy kötelezően szentmisével és lehetőség szerint munkaszünettel szenteljük meg.<br/>
-        <strong>Ezért valószínűleg, különleges miserend van életben.</strong>
-    {% else %}
-        <br/><strong>Ezért lehetséges, hogy különleges miserend van életben.</strong>
+		{# Month name and day; choose appropriate Hungarian suffix (-ján/-jén/-án/-én) with a heuristic #}
+		{% set monthInt = date.date|date('n') %}        
+        {% set monthName = monthInt ~ '. hó ' %}
+		{% set dayNum = (date.date|date('j'))|number_format(0, '', '') %}
+		{% set dayInt = dayNum %}
+        {% if dayInt in [1,4,5,7,9,10,11,12,14,15,17,19,21,22,24,25,27,29] %}
+            {% set suffix = '-én' %}
+        {% else %} 
+            {% set suffix = '-án' %}
+        {% endif %}
+		
+		{% set displayDate = monthName ~ ' ' ~ dayNum ~ suffix %}        
+		{% set displayNextDay = displayDate %}
+
     {% endif %}
 
+    {% if ( (date.level <= 4 and not date.isSunday) or date.level < 2 ) or ( date.level > date.nextDay.level and ((nextDay.level <= 4 and not nextDay.isSunday) or nextDay.level < 2) and date.level > 2 )  %}
+        <div class="alert alert-warning" role="alert">
+    {% endif %}
+
+
+	{% if (date.level <= 4 and not date.isSunday) or date.level < 2 %}
+		{{ displayDate }} van <strong>{{ date.name }}</strong>, ezért valószínűleg különleges miserend van érvényben.
+	{% endif %}
+	{% if date.level > date.nextDay.level and ((nextDay.level <= 4 and not nextDay.isSunday) or nextDay.level < 2) and date.level > 2 %}
+		{{displayNextDay}} már a másnapi ünnepre készülve <strong>{{ nextDay.name }}</strong> lesz.
+	{% endif %}
+
+    {% if ( (date.level <= 4 and not date.isSunday) or date.level < 2 ) or ( date.level > date.nextDay.level and ((nextDay.level <= 4 and not nextDay.isSunday) or nextDay.level < 2) and date.level > 2 )  %}
+        </div>
+    {% endif %}
+    
 {% endif %}
 
-</div>
