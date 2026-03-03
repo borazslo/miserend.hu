@@ -67,7 +67,6 @@ class SearchResultsChurches extends Html {
         $this->pagination->set($resultsCount, $url );
 
         $this->filters = $search->getFilters();
-        $this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
 
         if ($resultsCount < 1) {
             addMessage('A keresés nem hozott eredményt', 'info');

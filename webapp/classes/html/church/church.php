@@ -99,7 +99,7 @@ class Church extends \Html\Html {
             $this->favorite = 1;
         }
                         
-		$this->alert = (new \ExternalApi\BreviarskApi())->LiturgicalAlert();
+		$this->alert = (new \ExternalApi\NapilelkibatyuApi())->LiturgicalAlert();
         
         $this->isChurchHolder = $user->getHoldingData($this->id);                
 		
