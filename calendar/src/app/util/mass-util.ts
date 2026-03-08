@@ -65,7 +65,7 @@ export class MassUtil {
 
   public static createCalendarEvent(mass: Mass, periods: GeneratedPeriod[], recentExDates?:string[]): CalendarEvent[] {
     const calEvents: CalendarEvent[] = [];
-    //ha nem egyszeri alkalom
+    //ha rendes ismétlődő esemény
     if (mass.rrule && mass.periodId) {
       periods
         .filter(gp => mass.periodId != null ? gp.periodId === mass.periodId: true)
@@ -89,6 +89,28 @@ export class MassUtil {
         }
           calEvents.push(calEvent);
       });
+    
+    // Ha van ismétlődés, de nincs hozzárendelve periódus. 
+    // Ez akkor fordulhat elő, ha importálunk külső naptárból. Mert a felületenilyet nem lehet beállítani
+    } else if (mass.rrule ) {      
+      
+      const calEvent: CalendarEvent = {
+        //id: mass.id!.toString(),
+        title: mass.title,
+        rrule: ScriptUtil.clone(mass.rrule!),
+        ...(mass.duration && {duration: mass.duration}),
+        ...(mass.exdate && {exdate: mass.exdate}),
+        ...(mass.experiod && {exrule: MassUtil.generateExRule(mass.rrule!, mass.experiod, periods)}),
+        extendedProps: {
+          massId: mass.id,
+          recentExDates: recentExDates?.map(date=>date.slice(0, 10))
+        }
+        
+      };
+      console.log(calEvent);            
+      calEvents.push(calEvent);
+      
+      
     } else {
       const calEvent: CalendarEvent = {
         title: mass.title,
