@@ -161,6 +161,26 @@ npm run start:integrated
 - Ilyenkor egy python script a `/calendar` mappában buildeli az Angularos projektet, majd a megfelelő helyre átmásolja a legenerált fájlokat
 
 
+# 📅 RRULE Definícióik dokumentációja
+
+Az Angular naptár és a PHP backend különféle **RRULE** (Recurrence Rule) definíciókat támogat az ismétlődő eseményekhez. Az összes támogatott RRULE tulajdonság, frekvencia típus, és implementációs mintázat részletes dokumentációja megtalálható itt:
+
+📖 **[RRULE_DEFINITIONS.md](RRULE_DEFINITIONS.md)** - Teljes RRULE dokumentáció (RFC 5545 alapú)
+
+**Támogatott RRULE tulajdonságok:**
+- `dtstart` - Ismétlődés kezdete (SZÜKSÉGES)
+- `freq` - Frekvencia: daily, weekly, monthly, yearly (SZÜKSÉGES)
+- `until` - Ismétlődés vége (opcionális)
+- `count` - Előfordulások száma (opcionális)
+- `interval` - Lépések közötti távolság
+- `bymonth` - Hónap(ok) [1-12]
+- `bymonthday` - Hónap napja(i) [1-31]
+- `byweekday` - Hét napja(i) [MO, TU, WE, TH, FR, SA, SU]
+- `bysetpos` - Pozíció a halmazban (pl. 1=első, -1=utolsó)
+- `byweekno` - Hét szám(ai) [1-53]
+- `exdate` - Kizárt dátumok
+- Páros/páratlan hét szűrés (`byweekno` tömbökkel)
+
 # Fejlesztői megjegyzések
 
 ## 🌍 Környezeti változók
