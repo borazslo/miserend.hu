@@ -77,7 +77,11 @@ CREATE TABLE external_calendars (
 
 ### Mintaadatok
 
-**Fájl:** `docker/mysql/data/external-calendars-sample.sql`
+#### A) External Calendar Minta
+
+**Fájl:** `docker/mysql/initdb.d/data/external-calendars-sample.sql`
+
+(Megjegyzés: Az **initdb.d** mappában kell lennie, hogy az adatbázis inicializálásakor automatikusan lefusson)
 
 ```sql
 INSERT INTO external_calendars (church_id, name, url, active, created_at) VALUES
@@ -88,6 +92,32 @@ INSERT INTO external_calendars (church_id, name, url, active, created_at) VALUES
 - **Church ID:** 1254
 - **Naptár név:** "Google Calendar"
 - **URL:** Public Google Calendar iCalendar endpoint
+
+#### B) Cron Job Bejegyzés
+
+**Módosítandó fájl:** `docker/mysql/initdb.d/data/crons.sql`
+
+A `crons` tábla INSERT utolsó sorában hozzáadni az alábbi bejegyzést (id=40):
+
+```sql
+(40,'\\ExternalCalendarImporter','importAllExternalCalendars','1 day',NULL,NULL,'0000-00-00 00:00:00',0,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00')
+```
+
+**Teljes módosítás:**
+```sql
+INSERT INTO `crons` VALUES
+...
+(39,'\\ExternalApi\\ElasticsearchApi','updateMasses','6 hours',NULL,NULL,'2026-01-26 23:58:39',0,'2026-01-26 17:58:39','0000-00-00 00:00:00','2026-01-26 17:58:39'),
+(40,'\\ExternalCalendarImporter','importAllExternalCalendars','1 day',NULL,NULL,'0000-00-00 00:00:00',0,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
+```
+
+**Mezők:**
+- `id`: 40
+- `class`: `\\ExternalCalendarImporter`
+- `function`: `importAllExternalCalendars`
+- `frequency`: `1 day`
+- `from`, `until`: `NULL` (nincs időintervallum)
+- Egyéb timestamp mezők: `0000-00-00 00:00:00` vagy `NULL`
 
 ---
 
@@ -121,10 +151,13 @@ class ExternalCalendar extends \Illuminate\Database\Eloquent\Model {
 
 **Fájl:** `webapp/classes/externalcalendarimporter.php`
 
+**Namespace:** Nincsen explicit namespace (a projekt gyökerében, vagy `Html\Calendar` alatt - ellenőrizd a projekt konvencióit)
+
 **Felelősségek:**
 - iCalendar URL-ből tartalom letöltése
 - VEVENT elemek feldolgozása
 - CalMass objektumok létrehozása
+- Régi CalMass objektumok törlése
 - CalMass-ok mentése az adatbázisba
 - Elasticsearch index frissítése (`updateMasses()`)
 
@@ -157,11 +190,12 @@ Letöltés és feldolgozás egy naptárhoz.
 
 ```php
 // Flow
-1. ICS tartalom letöltése URL-ből (HTTP GET)
-2. Jelenlegi temple összes CalMass törlése
-3. iCalendar feldolgozása (parseICalendar)
+1. ICS tartalom letöltése URL-ből (HTTP GET via ExternalApi)
+2. Jelenlegi templom összes external CalMass törlése (WHERE church_id = ? AND period_id IS NULL)
+3. iCalendar feldolgozása (parseICalendar - VEVENT-ek kiolvasása)
 4. CalMass objektumok létrehozása
-5. Elasticsearch frissítés
+5. Elasticsearch frissítés: ElasticsearchApi::updateMasses($years, [$churchId])
+6. last_import_at timestamp frissítése az external_calendars táblában
 ```
 
 #### `private static function parseICalendar($icsContent)`
@@ -238,12 +272,13 @@ public function getHasExternalCalendarAttribute() {
 }
 ```
 
-**WriteAccess property módosítása:**
+**WriteAccess Accessor módosítása:**
 
-Jelenlegi logika (előző kód alapján):
+Az `getWriteAccessAttribute()` metódus-ban (vagy a `church.php` logikájában) hozzáadni az external calendar ellenőrzést:
+
 ```php
-private function calcWriteAccess() {
-    // ... meglévő logika ...
+public function getWriteAccessAttribute() {
+    // ... meglévő logika (jogosultság check) ...
     
     // NEW: Ha external calendar van, akkor read-only
     if ($this->hasExternalCalendar) {
@@ -253,6 +288,8 @@ private function calcWriteAccess() {
     return $canWrite;
 }
 ```
+
+**Logika:** Ha a templomnak van aktív external calendar-ja, akkor senki sem szerkesztheti a naptárat, függetlenül a jogosultságoktól.
 
 ---
 
@@ -300,11 +337,8 @@ $jobsToSave = [
 **Flow:**
 ```
 1. Összes external_calendars lekérése WHERE active = 1
-2. Mindegyik naptárhoz:
-   a) Templom összes CalMass törlése (WHERE church_id = ? AND period_id IS NULL)
-   b) iCalendar import futtatása (parseICalendar + CalMass create)
-   c) Elasticsearch index frissítése: ElasticsearchApi::updateMasses([2025, 2026, 2027], [$churchId])
-   d) last_import_at timestamp frissítése
+2. Mindegyik naptárhoz: iCalendar import futtatása - importFromUrl 
+    Ez tartalmazza már a parsert, a calmass created, törlést, elasticsearch frissítést is. Stb.
 3. Log: Sikeres/sikertelen importok naplózása
 ```
 
@@ -316,25 +350,8 @@ public static function importAllExternalCalendars() {
     $calendars = ExternalCalendar::where('active', 1)->get();
     
     foreach ($calendars as $calendar) {
-        try {
-            // 1. Templomhoz tartozó CalMass törlése
-            CalMass::where('church_id', $calendar->church_id)
-                ->whereNull('period_id')
-                ->delete();
-            
-            // 2. Import
-            self::importFromUrl($calendar->url, $calendar->church_id);
-            
-            // 3. Elasticsearch frissítés
-            ElasticsearchApi::updateMasses(
-                [2025, 2026, 2027, 2028],
-                [$calendar->church_id]
-            );
-            
-            // 4. Timestamp frissítés
-            $calendar->last_import_at = now();
-            $calendar->save();
-            
+        try {           
+            self::importFromUrl($calendar->url, $calendar->church_id);            
             echo "✓ Import sikeres: Church #{$calendar->church_id} ({$calendar->name})\n";
         } catch (Exception $e) {
             echo "✗ Import hiba: {$e->getMessage()}\n";
@@ -351,9 +368,22 @@ public static function importAllExternalCalendars() {
 
 **Módosítandó fájl:** `webapp/classes/html/calendar/church.php`
 
-A Church API response-ba hozzáadása:
+A Church API response-ba hozzáadása (GET metódus, 37-46. sor körül):
+
 ```php
-$church->append('hasExternalCalendar');
+case 'GET':
+    $this->church->append(['hasExternalCalendar']);  // NEW
+    
+    $response = [
+        'id' => $this->tid,
+        'name' => $this->church->nev,
+        'rite' => strtoupper($this->church->denomination),
+        'timeZone' => 'Europe/Budapest',
+        'hasExternalCalendar' => $this->church->hasExternalCalendar,  // NEW
+        'masses' => $this->getByChurchId($this->tid)
+    ];
+    echo json_encode($response);
+    break;
 ```
 
 **API response minta:**
@@ -361,11 +391,27 @@ $church->append('hasExternalCalendar');
 {
     "id": 1254,
     "name": "Nagyvárad Székesegyháza",
-    "nev": "Nagyvárad Székesegyháza",
+    "rite": "LATIN",
+    "timeZone": "Europe/Budapest",
     "hasExternalCalendar": true,
-    "writeAccess": false,
-    "rite": "latin",
-    ...
+    "masses": [
+        {
+            "id": 1,
+            "church_id": 1254,
+            "title": "Vasárnapi mise",
+            "start_date": "2026-03-15 10:00:00",
+            ...
+        }
+    ]
+}
+```
+
+**Használat az Angular-ban:**
+Az `hasExternalCalendar` flag alapján az Angular komponens tudni fogja, hogy le kell-e tiltani a szerkesztést:
+```typescript
+if (this.churchData.hasExternalCalendar) {
+    this.editable = false;
+    // rejtés: szerkesztés/törlés gombok
 }
 ```
 
@@ -374,6 +420,195 @@ $church->append('hasExternalCalendar');
 **Módosítandó fájl:** `webapp/classes/html/calendar/masses.php`
 
 A `getByChurchId()` metódus output-ja már tartalmazza a CalMass objektumokat, így az RRULE és egyéb mezők már benne vannak.
+
+### Backend Védelem: Mise-Módosítás Végpontok
+
+**Fájlok:** `webapp/classes/html/calendar/masses.php` és `webapp/classes/html/calendar/suggestions.php`
+
+**Probléma:** Az Angular frontend levédi a szerkesztés lehetőségét, de a backend-nek is védekezni kell a direct API hívások ellen.
+
+**Megoldás:** Minden POST/PUT/DELETE végponton (masse módosítás, javaslatok kezelése) az `writeAccess` check mellett hozzáadni egy ellenőrzést az `hasExternalCalendar` flag-hez.
+
+#### masses.php - POST metódus (57. sor körül)
+
+```php
+case 'POST':
+    $this->church->append(['writeAccess']);
+    
+    // NEW: External calendar check
+    if (!$this->church->writeAccess || $this->church->hasExternalCalendar) {
+        $this->sendJsonError('Hiányzó jogosultság! Ez a templom külső naptárra van csatlakoztatva.', 403);
+        exit;
+    }
+    
+    // ... meglévő POST logika ...
+```
+
+#### suggestions.php - GET metódus (52-62. sor)
+
+```php
+case 'GET':
+    if ($this->modify) {
+        $this->sendJsonError('Method not allowed', 405);
+        exit;
+    }
+    $this->church->append(['writeAccess']);
+    
+    // NEW: External calendar check
+    if (!$this->church->writeAccess || $this->church->hasExternalCalendar) {
+        $this->sendJsonError('Hiányzó jogosultság! Ez a templom külső naptárra van csatlakoztatva.', 403);
+        exit;
+    }
+    
+    // ... meglévő GET logika ...
+```
+
+#### suggestions.php - POST metódus (81-91. sor)
+
+```php
+case 'POST':
+    if ($this->modify) {
+        // handleModifiedPost: modify accept/reject operáció
+        // Erre is vonatkozik a check, ha az egyik endif-ből jön
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        // NEW: Get church for external calendar check
+        $modifyChurch = \Eloquent\Church::find($path[1]);
+        if ($modifyChurch && $modifyChurch->hasExternalCalendar) {
+            $this->sendJsonError('Ez a templom külső naptárra van csatlakoztatva, módosítás nem lehetséges.', 403);
+            exit;
+        }
+        
+        $this->handleModifiedPost($path[0], $path[1], $input);
+    } else {
+        // NEW: handleNewSuggestionPackage - check external calendar
+        $this->church->append(['hasExternalCalendar']);
+        if ($this->church->hasExternalCalendar) {
+            $this->sendJsonError('Ez a templom külső naptárra van csatlakoztatva, módosítás nem lehetséges.', 403);
+            exit;
+        }
+        
+        $this->handleNewSuggestionPackage();
+    }
+    exit();
+```
+
+**Logika:**
+- `writeAccess`: A felhasználónak van-e joga szerkeszteni (jogosultság)
+- `hasExternalCalendar`: A templomnak van-e külső Google Calendar naptára
+
+Ha **bármelyik** false → hibát dobunk 403-as válaszkóddal.
+
+### Frontend Védelem Redundancia
+
+Az Angular UI már levédi az edit/delete gombokat, de a backend sanity check-ek garantálják, hogy még ha a frontend "kikerülnék" (pl. hackelés, fejlesztői konzol), az adatok védelme továbbra is érvényes.
+
+---
+
+## 🖊️ Church/Edit Oldal Integráció
+
+### Templomadat szerkesztési oldal módosítások
+
+**Korlátozás:** Egy templomhoz maximum **1 külső naptár** kerülhet.
+
+#### A) PHP Backend: `webapp/classes/html/church/edit.php`
+
+**1. Form elem hozzáadása `preparePage()` metódusban:**
+```php
+// Az external calendar URL mező
+$this->form['external_calendar_url'] = [
+    'type' => 'text',
+    'name' => 'church[external_calendar_url]',
+    'id' => 'external_calendar_url',
+    'class' => 'form-control',
+    'placeholder' => 'https://calendar.google.com/calendar/ical/...',
+    'value' => $this->getExternalCalendarUrl(),
+    'labelback' => 'Külső naptár (iCalendar ICS URL) - maximum 1'
+];
+```
+
+**2. Segéd metódus az aktuális URL lekéréséhez:**
+```php
+private function getExternalCalendarUrl() {
+    $externalCal = \Eloquent\ExternalCalendar::where('church_id', $this->tid)
+        ->where('active', 1)
+        ->first();
+    return $externalCal ? $externalCal->url : '';
+}
+```
+
+**3. Modify metódus módosítása:**
+```php
+function modify() {
+    // ... meglévő kód ...
+    
+    // External calendar URL kezelés
+    if (isset($this->input['church']['external_calendar_url'])) {
+        $newUrl = trim($this->input['church']['external_calendar_url']);
+        
+        if (!empty($newUrl)) {
+            // URL validáció
+            if (!filter_var($newUrl, FILTER_VALIDATE_URL)) {
+                throw new \Exception('Érvénytelen URL formátum!');
+            }
+            
+            // Meglévő naptár frissítése vagy új létrehozása
+            $externalCal = \Eloquent\ExternalCalendar::where('church_id', $this->tid)
+                ->where('active', 1)
+                ->first();
+            
+            if ($externalCal) {
+                $externalCal->url = $newUrl;
+                $externalCal->save();
+            } else {
+                \Eloquent\ExternalCalendar::create([
+                    'church_id' => $this->tid,
+                    'name' => 'Google Calendar',  // Default név
+                    'url' => $newUrl,
+                    'active' => 1
+                ]);
+            }
+        } else {
+            // URL törléskor inaktiválás (nem törlés!)
+            \Eloquent\ExternalCalendar::where('church_id', $this->tid)
+                ->update(['active' => 0]);
+        }
+    }
+    
+    // ... meglévő Church mentés ...
+    $this->church->save();
+}
+```
+
+#### B) Twig Template: `webapp/templates/church/edit.twig`
+
+**Form elem hozzáadása az editform-ban:**
+```twig
+<tr>
+    <td bgcolor=#F5CC4C class=kiscim align=right>Külső naptár (Google Calendar):</td>
+    <td bgcolor=#F5CC4C>
+        {{ forms.text(form.external_calendar_url) }}
+        <small style="display: block; margin-top: 5px; color: #666;">
+            Egy templomhoz maximum 1 Google Calendar iCalendar URL adható meg.
+            Az URL-t a Google Calendar megosztás beállításaiból másolhatod.
+            <br/>
+            Ha URL van beállítva, a naptár read-only lesz (szerkesztés nem lehetséges).
+        </small>
+    </td>
+    <td></td>
+</tr>
+```
+
+---
+
+## 📊 Adatbázis Séma - Módosítások
+
+### External Calendar tábla korlátozások
+
+Az `external_calendars` tábla egyediségének garantálása:
+```sql
+UNIQUE KEY unique_church_external (church_id, name)
+```
 
 ---
 
@@ -414,18 +649,24 @@ Ezek a logikák már a meglévő kódban vannak, csak az `editable` flag-et kell
 
 ### Tesztelési Checklist
 
-- [ ] MySQL tábla létrehozve (`external_calendars`)
-- [ ] Mintaadatok beillesztve (church_id 1254)
+- [ ] MySQL tábla `external_calendars` létrehozve
+- [ ] Mintaadatok beillesztve (church_id 1254 + URL)
+- [ ] Cron tábla módosítva (id=40 bejegyzés)
 - [ ] Composer lib telepítve (`sabre/vobject`)
+- [ ] ExternalCalendar Eloquent model működik
 - [ ] ExternalCalendarImporter osztály működik
-- [ ] Cron job regisztrálva (initialize-nél)
+- [ ] Church model `externalCalendars()` relationship működik
 - [ ] Church model `hasExternalCalendar` property működik
-- [ ] `writeAccess` property `false`-ra vált external calendar-nál
-- [ ] API response tartalmazza `hasExternalCalendar` flag-et
+- [ ] Church model `writeAccess` `false`-ra vált external calendar-nál
+- [ ] Cron job regisztrálva (initialize-ben hozzáadva)
+- [ ] Church/edit oldal form mező megjenik és működik
+- [ ] API response `/calendar/church/1254` tartalmazza `hasExternalCalendar` flag-et
+- [ ] Backend védelem: `/calendar/masses` POST 403-at ad external calendar-nál
+- [ ] Backend védelem: `/calendar/suggestions` GET/POST 403-at ad external calendar-nál
 - [ ] Angular UI read-only (edit/delete gombok rejtve)
-- [ ] CalMass-ok Elasticsearch-be indexelve
-- [ ] Keresésben megjelenik az importált esemény
-- [ ] Napi cron job sikeresen lefutott
+- [ ] Import után CalMass-ok Elasticsearch-be indexelve
+- [ ] Keresésben (`/search`) megjelenik az importált esemény
+- [ ] Napi cron job manuálisan lefuttatható és működik
 
 ### Manuális Tesztelés
 
@@ -456,36 +697,45 @@ curl -X GET "localhost:9200/mass/_search?q=church_id:1254"
 ## 📝 Implementációs Sorrend
 
 1. **Adatbázis séma**
-   - `03-external-calendars.sql` létrehozása
-   - `external-calendars-sample.sql` létrehozása
+   - `docker/mysql/initdb.d/03-external-calendars.sql` létrehozása
+   - `docker/mysql/initdb.d/data/external-calendars-sample.sql` létrehozása
+   - `docker/mysql/initdb.d/data/crons.sql` módosítása (id=40 bejegyzés)
 
 2. **Composer dependency**
-   - `composer require sabre/vobject`
+   - `composer require sabre/vobject` futtatása
 
-3. **Eloquent Model**
-   - `webapp/classes/eloquent/externalcalendar.php`
+3. **PHP Backend**
+   - `webapp/classes/eloquent/externalcalendar.php` - ExternalCalendar model
+   - `webapp/classes/externalcalendarimporter.php` - Importer osztály
+   - `webapp/classes/eloquent/church.php` módosítása:
+     - `externalCalendars()` relationship
+     - `getHasExternalCalendarAttribute()` property
+     - `getWriteAccessAttribute()` módosítása
 
-4. **ExternalCalendarImporter**
-   - `webapp/classes/externalcalendarimporter.php`
+4. **Cron Job Regisztrálás**
+   - `webapp/classes/eloquent/cron.php` módosítása (initialize metódus)
 
-5. **Church Model bővítés**
-   - `hasExternalCalendar` property
-   - `writeAccess` módosítás
-   - `externalCalendars()` relationship
+5. **API Végpontok**
+   - `webapp/classes/html/calendar/church.php` módosítása (GET response)
+   - `webapp/classes/html/calendar/masses.php` módosítása (POST védelmi check)
+   - `webapp/classes/html/calendar/suggestions.php` módosítása (GET/POST védelmi check)
 
-6. **Cron Job regisztrálás**
-   - `webapp/classes/eloquent/cron.php` módosítása
+6. **Church/Edit Form Integráció**
+   - `webapp/classes/html/church/edit.php` módosítása (form elem + modify logika)
+   - `webapp/templates/church/edit.twig` módosítása (form render)
 
-7. **API Integration**
-   - `webapp/classes/html/calendar/church.php` módosítása
-
-8. **Angular Frontend (ha szükséges)**
+7. **Angular Frontend (ha szükséges)**
    - `calendar/src/app/components/church-calendar/church-calendar.component.ts` tesztelése
+   - (Az `editable` property már kezelni fogja a `hasExternalCalendar` flag-et az API-ból)
 
-9. **End-to-end tesztelés**
-   - Cron job futtatása
-   - Keresés validáció
-   - UI validáció
+8. **Tesztelés & Validáció**
+   - MySQL tábla & mintaadatok
+   - Composer dependency telepítés
+   - ExternalCalendarImporter manuális futtatása
+   - Cron job napi futtatása validálása
+   - Keresés integráció tesztelése
+   - Angular UI read-only mód tesztelése
+   - Backend védelem API hívásokon (masses, suggestions)
 
 ---
 
