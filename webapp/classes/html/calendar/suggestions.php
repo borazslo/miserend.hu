@@ -54,10 +54,14 @@ class Suggestions extends \Html\Calendar\CalendarApi
                     $this->sendJsonError('Method not allowed', 405);
                     exit;
                 }
-                $this->church->append(['writeAccess']);
+                $this->church->append(['writeAccess', 'hasExternalCalendar']);
 
                 if (!$this->church->writeAccess) {
                     $this->sendJsonError('Hiányzó jogosultság!', 403);
+                    exit;
+                }
+                if ($this->church->hasExternalCalendar) {
+                    $this->sendJsonError('Hiányzó jogosultság! Ez a templom külső naptárra van csatlakoztatva.', 403);
                     exit;
                 }
 
@@ -83,8 +87,24 @@ class Suggestions extends \Html\Calendar\CalendarApi
                 if ($this->modify) {
                     //$path[0]: accept/reject
                     $input = json_decode(file_get_contents('php://input'), true);
+                    
+                    // Check if church has external calendar
+                    $modifyChurch = \Eloquent\Church::find($path[1]);
+                    $modifyChurch->append(['hasExternalCalendar']);
+                    if ($modifyChurch && $modifyChurch->hasExternalCalendar) {
+                        $this->sendJsonError('Ez a templom külső naptárra van csatlakoztatva, módosítás nem lehetséges.', 403);
+                        exit;
+                    }
+                    
                     $this->handleModifiedPost($path[0], $path[1], $input);
                 } else {
+                    // Check if church has external calendar
+                    $this->church->append(['hasExternalCalendar']);
+                    if ($this->church->hasExternalCalendar) {
+                        $this->sendJsonError('Ez a templom külső naptárra van csatlakoztatva, módosítás nem lehetséges.', 403);
+                        exit;
+                    }
+                    
                     $this->handleNewSuggestionPackage();
                 }
 

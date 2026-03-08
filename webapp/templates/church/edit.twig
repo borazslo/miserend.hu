@@ -171,8 +171,18 @@
                     </div>
                 </td>
                 <td></td>
-            </tr>            
+            </tr>
             {{ _self.helptr(6,help) }}
+            
+            <tr>
+                <td bgcolor=#F0E6D2 class=kiscim align=right>Külső naptár (iCalendar):</td>
+                <td bgcolor=#F0E6D2>
+                    {{ forms.input(form.external_calendar_url) }}
+                    <small><i>Google Calendar vagy más iCalendar-kompatibilis naptár URL. Az importálást naponta automatikusan végezzük. Maximum 1 naptár templomként. Ürítse az mezőt az importálás leállításához.</i></small>
+                </td>
+                <td>{{ _self.helplink(60, ICONS_INFO ) }}</td>
+            </tr>
+            {{ _self.helptr(60,help) }}
             
             <tr>
                 <td bgcolor=#ffffff class=kiscim align=right>Megjegyzés:</td>

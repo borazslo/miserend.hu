@@ -40,8 +40,9 @@ class Cron extends \Illuminate\Database\Eloquent\Model {
             ['\Token', 'cleanOut', '2 hours'],
             ['\Photos', 'cron', '1 week'],
             ['\Crons','gorogkatolizalas','1 week'],
-			['\Crons','generateMassTolIgTmp','1 week']
-			
+   ['\Crons','generateMassTolIgTmp','1 week'],
+   ['\ExternalCalendarImporter', 'importAllExternalCalendars', '1 day']
+   
         ];
         foreach ($jobsToSave as $jobToSave) {
             $job = \Eloquent\Cron::firstOrCreate(['class' => $jobToSave[0], 'function' => $jobToSave[1]]);

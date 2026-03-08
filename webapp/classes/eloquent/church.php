@@ -633,6 +633,20 @@ class Church extends \Illuminate\Database\Eloquent\Model {
         return $this->checkReadAccess($user);
     }
     
+    /**
+     * Relationship: External calendars for this church
+     */
+    public function externalCalendars() {
+        return $this->hasMany('\Eloquent\ExternalCalendar', 'church_id');
+    }
+    
+    /**
+     * Property: Check if this church has an active external calendar
+     */
+    public function getHasExternalCalendarAttribute() {
+        return $this->externalCalendars()->where('active', 1)->exists();
+    }
+    
     public function getWriteAccessAttribute($value) {
         global $user;
         return $this->checkWriteAccess($user);

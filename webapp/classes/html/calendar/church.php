@@ -35,12 +35,15 @@ class Church extends \Html\Calendar\CalendarApi {
                 http_response_code(200);
                 exit();
             case 'GET':
+                // Append external calendar info
+                $this->church->append(['hasExternalCalendar']);
+                
                 $response = [
                     'id' => $this->tid,
                     'name' => $this->church->nev,
                     'rite' => strtoupper($this->church->denomination),
-                    //TODO: HACK MOCK
                     'timeZone' => 'Europe/Budapest',
+                    'hasExternalCalendar' => $this->church->hasExternalCalendar,
                     'masses' => $this->getByChurchId($this->tid)
                 ];
                 echo json_encode($response);

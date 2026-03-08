@@ -33,8 +33,8 @@ class Edit extends \Html\Html {
         }
 
         $allowedFields = ['adminmegj', 'nev',
-            'orszag', 'megye', 'varos', 'cim', 
-            'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml', 
+            'orszag', 'megye', 'varos', 'cim',
+            'egyhazmegye', 'espereskerulet', 'plebania', 'pleb_eml',
             'megjegyzes', 'miseaktiv', 'misemegj', 'leiras', 'ok', 'frissites',
             'lat','lon'];
 
@@ -44,13 +44,45 @@ class Edit extends \Html\Html {
             }
         }
 
-		
+        // Handle external calendar URL
+        if (isset($this->input['church']['external_calendar_url'])) {
+            $newUrl = trim($this->input['church']['external_calendar_url']);
+            
+            if (!empty($newUrl)) {
+                // URL validation
+                if (!filter_var($newUrl, FILTER_VALIDATE_URL)) {
+                    throw new \Exception('Érvénytelen URL formátum!');
+                }
+                
+                // Update or create external calendar
+                $externalCal = \Eloquent\ExternalCalendar::where('church_id', $this->tid)
+                    ->where('active', 1)
+                    ->first();
+                
+                if ($externalCal) {
+                    $externalCal->url = $newUrl;
+                    $externalCal->save();
+                } else {
+                    \Eloquent\ExternalCalendar::create([
+                        'church_id' => $this->tid,
+                        'name' => 'Google Calendar',
+                        'url' => $newUrl,
+                        'active' => 1
+                    ]);
+                }
+            } else {
+                // Empty URL: deactivate external calendar
+                \Eloquent\ExternalCalendar::where('church_id', $this->tid)
+                    ->update(['active' => 0]);
+            }
+        }
+
        
         global $user;
         $this->church->log .= "\nMod: " . $user->login . " (" . date('Y-m-d H:i:s') . ")";
         
         /* Valamiért a writeAcess nem az igazi és mivel nincs a tálában ezért kiakadt...*/
-        $this->church->save();        
+        $this->church->save();
 
         switch ($this->input['modosit']) {
             case 'n':
@@ -76,12 +108,23 @@ class Edit extends \Html\Html {
         if ($user->checkRole('miserend')) {
             $this->addFormNewHolder();
         }
-		
+  
 
         $this->addFormAdministrative();
         $this->addFormReligiousAdministration();
-				
-		$this->form['misemegj'] = array(
+        
+        // Add external calendar URL field
+        $this->form['external_calendar_url'] = [
+            'type' => 'text',
+            'name' => 'church[external_calendar_url]',
+            'id' => 'external_calendar_url',
+            'class' => 'form-control',
+            'placeholder' => 'https://calendar.google.com/calendar/ical/...',
+            'value' => $this->getExternalCalendarUrl(),
+            'labelback' => 'Külső naptár (iCalendar ICS URL) - maximum 1'
+        ];
+    
+  $this->form['misemegj'] = array(
 			'class' => 'tinymce',
             'name' => 'church[misemegj]',
 			'type' => 'textarea',
@@ -127,6 +170,13 @@ class Edit extends \Html\Html {
         }
     }
 
+    private function getExternalCalendarUrl() {
+        $externalCal = \Eloquent\ExternalCalendar::where('church_id', $this->tid)
+            ->where('active', 1)
+            ->first();
+        return $externalCal ? $externalCal->url : '';
+    }
+    
     function addFormAdministrative() {
         $options = [0 => 'Válassz/Nem tudom'];
         $countries = \Illuminate\Database\Capsule\Manager::table('orszagok')

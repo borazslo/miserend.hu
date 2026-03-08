@@ -38,10 +38,15 @@ class Masses extends \Html\Calendar\CalendarApi {
                 http_response_code(200);
                 exit();
             case 'POST':
-                $this->church->append(['writeAccess']);
+                $this->church->append(['writeAccess', 'hasExternalCalendar']);
 
+                // Check write access AND external calendar constraint
                 if (!$this->church->writeAccess) {
                     $this->sendJsonError('Hiányzó jogosultság!', 403);
+                    exit;
+                }
+                if ($this->church->hasExternalCalendar) {
+                    $this->sendJsonError('Hiányzó jogosultság! Ez a templom külső naptárra van csatlakoztatva.', 403);
                     exit;
                 }
 
