@@ -3,6 +3,7 @@ name: 🐘 Build PHP base image
 on:
   schedule:
     - cron: '0 3 * * 1'   # every Monday
+  workflow_dispatch:
   push:
     paths:
       - docker/php-base/**
