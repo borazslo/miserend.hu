@@ -1,6 +1,7 @@
 name: 🐳 Build & publish app image
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'
